@@ -28,6 +28,9 @@ Usage:
         result = apply_v4a_operations(operations, file_ops)
 """
 
+from __future__ import annotations
+from tools.file_operations import PatchResult
+
 import difflib
 import re
 from dataclasses import dataclass, field
@@ -329,7 +332,7 @@ def _validate_operations(
 
 
 def apply_v4a_operations(operations: List[PatchOperation],
-                          file_ops: Any) -> 'PatchResult':
+                          file_ops: Any) -> PatchResult:
     """Apply V4A patch operations using a file operations interface.
 
     Uses a two-phase validate-then-apply approach:
@@ -346,9 +349,6 @@ def apply_v4a_operations(operations: List[PatchOperation],
     Returns:
         PatchResult with results of all operations
     """
-    # Import here to avoid circular imports
-    from tools.file_operations import PatchResult
-
     # ---- Phase 1: validate ----
     validation_errors = _validate_operations(operations, file_ops)
     if validation_errors:
