@@ -151,7 +151,7 @@ def render_brief(plan: dict) -> str:
             f"| {d.get('format', '?')} | {d.get('resolution', '?')} | "
             f"{d.get('notes', '')} |"
         )
-    deliv_table = "\n".join(deliv_rows) if deliv_rows else "_(none)_"
+    "\n".join(deliv_rows) if deliv_rows else "_(none)_"
 
     # Replacements (single-pass)
     replacements = {
@@ -311,12 +311,12 @@ def render_team_md(plan: dict) -> str:
         "",
         "## Per-task workspace requirement",
         "",
-        f"All `kanban_create` calls MUST pass:",
-        f"```",
-        f'workspace_kind="dir"',
+        "All `kanban_create` calls MUST pass:",
+        "```",
+        'workspace_kind="dir"',
         f'workspace_path="$HOME/projects/video-pipeline/{plan["slug"]}"',
         f'tenant="{plan["tenant"]}"',
-        f"```",
+        "```",
     ])
     return "\n".join(lines)
 

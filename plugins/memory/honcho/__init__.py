@@ -252,7 +252,6 @@ class HonchoMemoryProvider(MemoryProvider):
     def save_config(self, values, hermes_home):
         """Write config to $HERMES_HOME/honcho.json (Honcho SDK native format)."""
         import json
-        import os
         from pathlib import Path
         config_path = Path(hermes_home) / "honcho.json"
         existing = {}

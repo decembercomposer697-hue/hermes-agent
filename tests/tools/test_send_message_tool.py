@@ -1442,7 +1442,7 @@ class TestSendToPlatformDiscordThread:
         send_mock = AsyncMock(return_value={"success": True, "message_id": "1"})
 
         with _patch_discord_sender(send_mock):
-            result = asyncio.run(
+            asyncio.run(
                 _send_to_platform(
                     Platform.DISCORD,
                     SimpleNamespace(enabled=True, token="tok", extra={}),
@@ -1934,7 +1934,6 @@ class TestSendDiscordForumMedia:
         session.post = MagicMock(return_value=thread_resp)
 
         post_calls = []
-        orig_post = session.post
 
         def track_post(url, **kwargs):
             post_calls.append({"url": url, "kwargs": kwargs})

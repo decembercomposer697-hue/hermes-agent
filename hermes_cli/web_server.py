@@ -31,7 +31,6 @@ import sys
 import tempfile
 import threading
 import time
-import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -5462,7 +5461,6 @@ def _codex_full_login_worker(session_id: str) -> None:
         from hermes_cli.auth import (
             CODEX_OAUTH_CLIENT_ID,
             CODEX_OAUTH_TOKEN_URL,
-            DEFAULT_CODEX_BASE_URL,
         )
         issuer = "https://auth.openai.com"
 
@@ -6625,7 +6623,7 @@ async def install_mcp_catalog_entry(body: MCPCatalogInstall):
     # action path so the request returns immediately and the UI can tail logs.
     if entry.install is not None:
         try:
-            proc = _spawn_hermes_action(["mcp", "install", name], "mcp-install")
+            _spawn_hermes_action(["mcp", "install", name], "mcp-install")
         except Exception as exc:
             raise HTTPException(status_code=500, detail=f"Install failed: {exc}")
         return {"ok": True, "name": name, "background": True, "action": "mcp-install"}
@@ -10796,9 +10794,9 @@ def start_server(
                     f"Bundled providers reported these issues:\n"
                     + "\n".join(skip_reasons)
                     + "\n"
-                    f"\n"
-                    f"Or pass --insecure to skip the auth gate (NOT "
-                    f"recommended on untrusted networks)."
+                    "\n"
+                    "Or pass --insecure to skip the auth gate (NOT "
+                    "recommended on untrusted networks)."
                 )
             raise SystemExit(
                 f"Refusing to bind dashboard to {host} — the OAuth auth "

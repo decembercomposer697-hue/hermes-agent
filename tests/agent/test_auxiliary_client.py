@@ -1596,7 +1596,7 @@ class TestCallLlmPaymentFallback:
                     return_value=("auto", "xiaomi/mimo-v2-pro", None, None, None)), \
              patch("agent.auxiliary_client._try_payment_fallback",
                     return_value=(fallback_client, "fallback-model", "openrouter")):
-            result = call_llm(
+            call_llm(
                 task="session_search",
                 messages=[{"role": "user", "content": "hello"}],
             )
@@ -1634,7 +1634,7 @@ class TestAuxiliaryFallbackLayering:
                    return_value=(chain_client, "gpt-4o-mini", "fallback_chain[0](openai)")), \
              patch("agent.auxiliary_client._try_main_agent_model_fallback",
                    side_effect=main_called):
-            result = call_llm(
+            call_llm(
                 task="vision",
                 messages=[{"role": "user", "content": "hello"}],
             )
@@ -1663,7 +1663,7 @@ class TestAuxiliaryFallbackLayering:
                    return_value=(None, None, "")), \
              patch("agent.auxiliary_client._try_main_agent_model_fallback",
                    return_value=(main_client, "claude-sonnet-4", "main-agent(openrouter)")):
-            result = call_llm(
+            call_llm(
                 task="vision",
                 messages=[{"role": "user", "content": "hello"}],
             )

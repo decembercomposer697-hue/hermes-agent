@@ -23,7 +23,6 @@ from typing import Optional, Dict, Any
 
 from hermes_cli.nous_subscription import get_nous_subscription_features
 from tools.tool_backend_helpers import managed_nous_tools_enabled
-from utils import base_url_hostname
 from hermes_constants import get_optional_skills_dir
 
 logger = logging.getLogger(__name__)
@@ -733,10 +732,9 @@ def setup_model_provider(config: dict, *, quick: bool = False):
     config.update(_refreshed)
 
     # Derive the selected provider for downstream steps (vision setup).
-    selected_provider = None
     _m = config.get("model")
     if isinstance(_m, dict):
-        selected_provider = _m.get("provider")
+        _m.get("provider")
 
     # Credential rotation, vision-backend selection, and TTS provider are no
     # longer prompted here. They have safe defaults (rotation off, vision
@@ -1967,9 +1965,9 @@ def _setup_matrix():
                     print_success(f"{matrix_pkg} installed")
                 except Exception as exc:
                     print_warning(
-                        f"Install failed — run manually: pip install "
-                        f"'mautrix[encryption]' asyncpg aiosqlite Markdown "
-                        f"aiohttp-socks"
+                        "Install failed — run manually: pip install "
+                        "'mautrix[encryption]' asyncpg aiosqlite Markdown "
+                        "aiohttp-socks"
                     )
                     print_info(f"  Error: {exc}")
         except ImportError:

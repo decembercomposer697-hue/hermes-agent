@@ -121,11 +121,11 @@ def _(home, kb):
             metadata=meta,
         )
         run = kb.latest_run(conn, tid)
-        assert run.summary == "完成了 📝 résumé", f"summary round-trip failed"
+        assert run.summary == "完成了 📝 résumé", "summary round-trip failed"
         assert run.metadata == meta, (
             f"metadata round-trip failed: {run.metadata} != {meta}"
         )
-        print(f"  metadata with CJK + emoji round-tripped")
+        print("  metadata with CJK + emoji round-tripped")
     finally:
         conn.close()
 
@@ -153,7 +153,7 @@ def _(home, kb):
         run = kb.latest_run(conn, tid)
         assert run.summary == huge_summary
         assert run.metadata == meta
-        print(f"  1 MB body + 1 MB summary + 50-deep metadata OK")
+        print("  1 MB body + 1 MB summary + 50-deep metadata OK")
     finally:
         conn.close()
 
@@ -341,7 +341,7 @@ def _(home, kb):
             f"leaf should promote with both parents done, got "
             f"{kb.get_task(conn, leaf).status}"
         )
-        print(f"  diamond dependency resolved correctly")
+        print("  diamond dependency resolved correctly")
     finally:
         conn.close()
 
@@ -401,7 +401,7 @@ def _(home, kb):
         kb.complete_task(conn, parents[-1])
         kb.recompute_ready(conn)
         assert kb.get_task(conn, child).status == "ready"
-        print(f"  500 parents → 1 child promotion works")
+        print("  500 parents → 1 child promotion works")
     finally:
         conn.close()
 
@@ -441,7 +441,7 @@ def _(home, kb):
                 # This is escaping the home dir. Whether that's actually
                 # a problem depends on the threat model. Flag for attention.
                 print(f"  ⚠ workspace resolved OUTSIDE hermes_home: {resolved}")
-                print(f"    (not necessarily a bug — dir: workspaces are intentionally arbitrary, but worth documenting)")
+                print("    (not necessarily a bug — dir: workspaces are intentionally arbitrary, but worth documenting)")
         except Exception as e:
             print(f"  resolve_workspace rejected: {e}")
     finally:
@@ -461,7 +461,7 @@ def _(home, kb):
             workspace_path="/nonexistent/path/that/does/not/exist",
         )
         # Run dispatch_once with a dummy spawn_fn
-        result = kb.dispatch_once(conn, spawn_fn=lambda *_: 99999)
+        kb.dispatch_once(conn, spawn_fn=lambda *_: 99999)
         # If the path was rejected, the task went through _record_spawn_failure
         task = kb.get_task(conn, tid)
         # Possible outcomes:
@@ -515,7 +515,7 @@ def _(home, kb):
             # doesn't produce "-1800s" elapsed.
             elapsed = run.ended_at - run.started_at
             print(f"  clock-skewed run: elapsed = {elapsed}s (negative)")
-            print(f"  ⚠ kernel stores this; UI should clamp to 0 or handle")
+            print("  ⚠ kernel stores this; UI should clamp to 0 or handle")
             # Don't fail — document the behavior.
         else:
             print("  kernel normalized ended_at >= started_at")
@@ -631,7 +631,7 @@ def _(home, kb):
         for i in range(1000):
             kb.claim_task(conn, tid)
             # Force close the run directly so we can make another claim
-            rid = kb.latest_run(conn, tid).id
+            kb.latest_run(conn, tid).id
             kb._end_run(conn, tid, outcome="reclaimed", summary=f"attempt {i}")
             conn.execute(
                 "UPDATE tasks SET status='ready', claim_lock=NULL, "
@@ -670,7 +670,7 @@ def _(home, kb):
                     assignee="w",
                 )
         t0 = time.monotonic()
-        stats = kb.board_stats(conn)
+        kb.board_stats(conn)
         el_stats = (time.monotonic() - t0) * 1000
         t0 = time.monotonic()
         tasks = kb.list_tasks(conn)
@@ -875,7 +875,7 @@ def _(home, kb):
         elapsed = (time.monotonic() - t0) * 1000
         print(f"  1000 comments: list in {elapsed:.0f}ms, context size = {len(ctx)} chars")
         if len(ctx) > 200_000:
-            print(f"  ⚠ comment thread unbounded in worker context")
+            print("  ⚠ comment thread unbounded in worker context")
     finally:
         conn.close()
 
@@ -905,9 +905,9 @@ def _(home, kb):
         # Empty summary on complete → accept
         kb.claim_task(conn, tid)
         kb.complete_task(conn, tid, summary="")
-        run = kb.latest_run(conn, tid)
+        kb.latest_run(conn, tid)
         # Empty summary falls back to result; both empty → None on run
-        print(f"  empty body accepted, empty-title rejected")
+        print("  empty body accepted, empty-title rejected")
     finally:
         conn.close()
 
@@ -925,8 +925,8 @@ def _(home, kb):
         back = kb.get_task(conn, tid)
         assert back.tenant == weird_tenant
         # board_stats groups by tenant — verify it doesn't fall over
-        stats = kb.board_stats(conn)
-        print(f"  multiline tenant stored and stats still work")
+        kb.board_stats(conn)
+        print("  multiline tenant stored and stats still work")
     finally:
         conn.close()
 
