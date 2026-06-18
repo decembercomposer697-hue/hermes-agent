@@ -91,6 +91,7 @@ def log_memory_usage(prefix: str = "") -> None:
     prefix
         Optional extra tag inserted after ``[MEMORY]`` — e.g.
         ``"baseline"``, ``"shutdown"``.
+
     """
     rss = _get_rss_mb()
     uptime = int(time.monotonic() - _start_time) if _start_time else 0
@@ -154,6 +155,7 @@ def start_memory_monitoring(interval_seconds: float = 300.0) -> bool:
     bool
         True if a fresh monitor thread was started, False if one was
         already running or if memory introspection isn't available.
+
     """
     global _monitor_thread, _stop_event, _start_time, _interval_seconds
 

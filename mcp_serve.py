@@ -1,5 +1,4 @@
-"""
-Hermes MCP Server — expose messaging conversations as MCP tools.
+"""Hermes MCP Server — expose messaging conversations as MCP tools.
 
 Starts a stdio MCP server that lets any MCP client (Claude Code, Cursor, Codex,
 etc.) list conversations, read message history, send messages, poll for live
@@ -176,7 +175,7 @@ def _extract_attachments(msg: dict) -> list[dict]:
     # MEDIA: tags in text content
     text = _extract_message_content(msg)
     if text:
-        media_pattern = re.compile(r'MEDIA:\s*(\S+)')
+        media_pattern = re.compile(r"MEDIA:\s*(\S+)")
         for match in media_pattern.finditer(text):
             path = match.group(1)
             attachments.append({"type": "media", "path": path})
@@ -483,6 +482,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
             platform: Filter by platform name (telegram, discord, slack, etc.)
             limit: Maximum number of conversations to return (default 50)
             search: Optional text to filter conversations by name
+
         """
         limit = _coerce_int(limit, default=50, minimum=1, maximum=200)
         entries = _load_sessions_index()
@@ -531,6 +531,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
 
         Args:
             session_key: The session key from conversations_list
+
         """
         entries = _load_sessions_index()
         entry = entries.get(session_key)
@@ -571,6 +572,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
         Args:
             session_key: The session key from conversations_list
             limit: Maximum number of messages to return (default 50, most recent)
+
         """
         limit = _coerce_int(limit, default=50, minimum=1, maximum=200)
         entries = _load_sessions_index()
@@ -628,6 +630,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
         Args:
             session_key: The session key from conversations_list
             message_id: The message ID from messages_read
+
         """
         entries = _load_sessions_index()
         entry = entries.get(session_key)
@@ -684,6 +687,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
             after_cursor: Return events after this cursor (0 for all)
             session_key: Optional filter to one conversation
             limit: Maximum events to return (default 20)
+
         """
         after_cursor = _coerce_int(after_cursor, default=0, minimum=0, maximum=10**18)
         limit = _coerce_int(limit, default=20, minimum=1, maximum=200)
@@ -711,6 +715,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
             after_cursor: Wait for events after this cursor
             session_key: Optional filter to one conversation
             timeout_ms: Maximum wait time in milliseconds (default 30000)
+
         """
         after_cursor = _coerce_int(after_cursor, default=0, minimum=0, maximum=10**18)
         timeout_ms = _coerce_int(
@@ -749,6 +754,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
         Args:
             target: Platform target in "platform:identifier" format
             message: The message text to send
+
         """
         if not target or not message:
             return json.dumps({"error": "Both target and message are required"})
@@ -775,6 +781,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
 
         Args:
             platform: Filter by platform name (telegram, discord, slack, etc.)
+
         """
         directory = _load_channel_directory()
         if not directory:
@@ -846,6 +853,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
         Args:
             id: The approval ID from permissions_list_open
             decision: One of "allow-once", "allow-always", or "deny"
+
         """
         if decision not in {"allow-once", "allow-always", "deny"}:
             return json.dumps({

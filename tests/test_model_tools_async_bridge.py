@@ -18,10 +18,10 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 async def _get_current_loop():
     """Return the running event loop from inside a coroutine."""
@@ -89,8 +89,10 @@ class TestRunAsyncWorkerThread:
 
     def test_worker_thread_loop_not_closed(self):
         """A worker thread's loop must stay open after _run_async returns,
-        so cached httpx/AsyncOpenAI clients don't crash on GC."""
+        so cached httpx/AsyncOpenAI clients don't crash on GC.
+        """
         from concurrent.futures import ThreadPoolExecutor
+
         from model_tools import _run_async
 
         def _run_on_worker():
@@ -108,8 +110,10 @@ class TestRunAsyncWorkerThread:
 
     def test_worker_thread_reuses_loop_across_calls(self):
         """Multiple _run_async calls on the same worker thread should
-        reuse the same persistent loop (not create-and-destroy each time)."""
+        reuse the same persistent loop (not create-and-destroy each time).
+        """
         from concurrent.futures import ThreadPoolExecutor
+
         from model_tools import _run_async
 
         def _run_twice_on_worker():
@@ -128,8 +132,10 @@ class TestRunAsyncWorkerThread:
 
     def test_parallel_workers_get_separate_loops(self):
         """Different worker threads must get their own loops to avoid
-        contention (the original reason for the worker-thread branch)."""
+        contention (the original reason for the worker-thread branch).
+        """
         from concurrent.futures import ThreadPoolExecutor, as_completed
+
         from model_tools import _run_async
 
         barrier = threading.Barrier(3, timeout=5)
@@ -160,9 +166,11 @@ class TestRunAsyncWorkerThread:
 
     def test_worker_loop_separate_from_main_loop(self):
         """Worker thread loops must be different from the main thread's
-        persistent loop to avoid cross-thread contention."""
+        persistent loop to avoid cross-thread contention.
+        """
         from concurrent.futures import ThreadPoolExecutor
-        from model_tools import _run_async, _get_tool_loop
+
+        from model_tools import _get_tool_loop, _run_async
 
         main_loop = _get_tool_loop()
 
@@ -185,7 +193,8 @@ class TestRunAsyncWithRunningLoop:
     @pytest.mark.asyncio
     async def test_run_async_from_async_context(self):
         """_run_async should still work when called from inside an
-        already-running event loop (gateway / Atropos path)."""
+        already-running event loop (gateway / Atropos path).
+        """
         from model_tools import _run_async
 
         async def _simple():
@@ -208,6 +217,7 @@ class TestRunAsyncWithRunningLoop:
         caller returns).
         """
         import concurrent.futures
+
         from model_tools import _run_async
 
         events = {
@@ -283,12 +293,12 @@ class TestRunAsyncWithRunningLoop:
         future is a no-op, so the worker thread kept running the coroutine
         to completion (leaking one thread per tool-timeout).
         """
-        from model_tools import _run_async
-
         # Shrink the 300s internal timeout by patching future.result.
         # We do this surgically: let everything else run for real so the
         # worker loop actually exists and can observe cancellation.
         import concurrent.futures as _cf
+
+        from model_tools import _run_async
 
         real_pool_cls = _cf.ThreadPoolExecutor
 
@@ -350,11 +360,13 @@ def _mock_vision_response():
 class TestVisionDispatchLoopSafety:
     """Simulate the full registry.dispatch('vision_analyze') chain and
     verify the event loop stays alive afterwards — the exact scenario
-    from issue #2104."""
+    from issue #2104.
+    """
 
     def test_vision_dispatch_keeps_loop_alive(self, tmp_path):
         """After dispatching vision_analyze via the registry, the event
-        loop must remain open so cached async clients don't crash on GC."""
+        loop must remain open so cached async clients don't crash on GC.
+        """
         from model_tools import _get_tool_loop
         from tools.registry import registry
 
@@ -399,7 +411,8 @@ class TestVisionDispatchLoopSafety:
     def test_two_consecutive_vision_dispatches(self, tmp_path):
         """Two back-to-back vision_analyze dispatches must both succeed
         and share the same loop (simulates 'first call fails, second
-        works' from the issue report)."""
+        works' from the issue report).
+        """
         from model_tools import _get_tool_loop
         from tools.registry import registry
 

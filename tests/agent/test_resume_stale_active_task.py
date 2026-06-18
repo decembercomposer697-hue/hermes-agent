@@ -24,11 +24,10 @@ mechanism that makes the stale task historical rather than active.
 """
 
 from agent.context_compressor import (
-    SUMMARY_PREFIX,
     LEGACY_SUMMARY_PREFIX,
+    SUMMARY_PREFIX,
     ContextCompressor,
 )
-
 
 # The conflicting prefix that shipped before the #35344 fix. A handoff
 # persisted in a resumed lineage could carry this verbatim.
@@ -48,7 +47,8 @@ _OLD_CONFLICTING_PREFIX = (
 
 def test_latest_message_wins_over_inherited_active_task():
     """The handoff must explicitly privilege the latest user message over a
-    stale ``## Active Task`` — the core #35344 contract."""
+    stale ``## Active Task`` — the core #35344 contract.
+    """
     lower = SUMMARY_PREFIX.lower()
     assert "latest user message" in lower
     assert "## active task" in lower
@@ -59,7 +59,8 @@ def test_latest_message_wins_over_inherited_active_task():
 
 def test_no_resume_exactly_directive_can_hijack():
     """The directive that caused the hijack ("resume exactly from Active
-    Task") must be gone."""
+    Task") must be gone.
+    """
     assert "resume exactly" not in SUMMARY_PREFIX.lower()
 
 
@@ -67,7 +68,8 @@ def test_resumed_stale_handoff_gets_renormalized_to_current_prefix():
     """A handoff persisted under the OLD conflicting prefix (e.g. saved before
     the fix and inherited into a resumed lineage) is upgraded to the CURRENT
     prefix when re-normalized on re-compaction — so the "resume exactly"
-    directive cannot survive into a resumed session."""
+    directive cannot survive into a resumed session.
+    """
     stale_body = (
         "## Active Task\n"
         "User asked: 'Migrate the billing module to Stripe'\n\n"
@@ -91,7 +93,8 @@ def test_resumed_stale_handoff_gets_renormalized_to_current_prefix():
 
 def test_legacy_prefix_handoff_also_renormalized():
     """The same upgrade applies to the oldest ``[CONTEXT SUMMARY]:`` handoff
-    format that may sit in a long-lived resumed lineage."""
+    format that may sit in a long-lived resumed lineage.
+    """
     legacy = f"{LEGACY_SUMMARY_PREFIX} ## Active Task\nUser asked: 'task A'"
     renormalized = ContextCompressor._with_summary_prefix(legacy)
     assert renormalized.startswith(SUMMARY_PREFIX)
@@ -104,7 +107,8 @@ def test_inherited_handoff_detected_in_resumed_protected_head():
     prompt (in the protected head). ``_find_latest_context_summary`` must
     detect it there so re-compaction rehydrates state from it rather than
     serializing it as a fresh user turn (which is what let the stale Active
-    Task read as live intent)."""
+    Task read as live intent).
+    """
     messages = [
         {"role": "system", "content": "system prompt"},
         {"role": "user", "content": f"{SUMMARY_PREFIX}\n## Active Task\nUser asked: 'task A'"},
@@ -126,7 +130,8 @@ def test_historical_prefixed_handoff_detected_and_stripped():
     """A pre-fix handoff (old conflicting prefix) inherited into a resumed
     lineage must still be recognized as a context summary AND have its old
     directive stripped on detection — otherwise re-compaction serializes the
-    stale 'resume exactly' text as a fresh turn."""
+    stale 'resume exactly' text as a fresh turn.
+    """
     messages = [
         {"role": "system", "content": "system prompt"},
         {"role": "user", "content": f"{_OLD_CONFLICTING_PREFIX}\n## Active Task\nUser asked: 'task A'"},

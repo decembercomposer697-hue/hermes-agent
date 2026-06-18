@@ -1,5 +1,6 @@
 """Tests for CLI voice mode integration -- command parsing, markdown stripping,
-state management, streaming TTS activation, voice message prefix, _vprint."""
+state management, streaming TTS activation, voice message prefix, _vprint.
+"""
 
 import ast
 import queue
@@ -180,14 +181,19 @@ class TestStreamingTTSActivation:
 
     def test_activates_when_elevenlabs_and_sounddevice_available(self):
         """use_streaming_tts should be True when provider is elevenlabs
-        and both lazy imports succeed."""
+        and both lazy imports succeed.
+        """
         use_streaming_tts = False
         try:
             from tools.tts_tool import (
-                _load_tts_config as _load_tts_cfg,
                 _get_provider as _get_prov,
+            )
+            from tools.tts_tool import (
                 _import_elevenlabs,
                 _import_sounddevice,
+            )
+            from tools.tts_tool import (
+                _load_tts_config as _load_tts_cfg,
             )
             assert callable(_import_elevenlabs)
             assert callable(_import_sounddevice)
@@ -203,10 +209,16 @@ class TestStreamingTTSActivation:
             mock_sd.return_value = MagicMock()
 
             from tools.tts_tool import (
-                _load_tts_config as load_cfg,
                 _get_provider as get_prov,
+            )
+            from tools.tts_tool import (
                 _import_elevenlabs as import_el,
+            )
+            from tools.tts_tool import (
                 _import_sounddevice as import_sd,
+            )
+            from tools.tts_tool import (
+                _load_tts_config as load_cfg,
             )
             cfg = load_cfg()
             if get_prov(cfg) == "elevenlabs":
@@ -224,10 +236,16 @@ class TestStreamingTTSActivation:
              patch("tools.tts_tool._import_elevenlabs", side_effect=ImportError("no elevenlabs")):
             try:
                 from tools.tts_tool import (
-                    _load_tts_config as load_cfg,
                     _get_provider as get_prov,
+                )
+                from tools.tts_tool import (
                     _import_elevenlabs as import_el,
+                )
+                from tools.tts_tool import (
                     _import_sounddevice as import_sd,
+                )
+                from tools.tts_tool import (
+                    _load_tts_config as load_cfg,
                 )
                 cfg = load_cfg()
                 if get_prov(cfg) == "elevenlabs":
@@ -248,10 +266,16 @@ class TestStreamingTTSActivation:
              patch("tools.tts_tool._import_sounddevice", side_effect=OSError("no PortAudio")):
             try:
                 from tools.tts_tool import (
-                    _load_tts_config as load_cfg,
                     _get_provider as get_prov,
+                )
+                from tools.tts_tool import (
                     _import_elevenlabs as import_el,
+                )
+                from tools.tts_tool import (
                     _import_sounddevice as import_sd,
+                )
+                from tools.tts_tool import (
+                    _load_tts_config as load_cfg,
                 )
                 cfg = load_cfg()
                 if get_prov(cfg) == "elevenlabs":
@@ -270,10 +294,16 @@ class TestStreamingTTSActivation:
              patch("tools.tts_tool._get_provider", return_value="edge"):
             try:
                 from tools.tts_tool import (
-                    _load_tts_config as load_cfg,
                     _get_provider as get_prov,
+                )
+                from tools.tts_tool import (
                     _import_elevenlabs as import_el,
+                )
+                from tools.tts_tool import (
                     _import_sounddevice as import_sd,
+                )
+                from tools.tts_tool import (
+                    _load_tts_config as load_cfg,
                 )
                 cfg = load_cfg()
                 if get_prov(cfg) == "elevenlabs":
@@ -300,11 +330,13 @@ class TestStreamingTTSActivation:
 
 class TestVoiceMessagePrefix:
     """Voice mode should inject instruction via user message prefix,
-    not by modifying the system prompt (which breaks prompt cache)."""
+    not by modifying the system prompt (which breaks prompt cache).
+    """
 
     def test_prefix_added_when_voice_mode_active(self):
         """When voice mode is active and message is str, agent_message
-        should have the voice instruction prefix."""
+        should have the voice instruction prefix.
+        """
         voice_mode = True
         message = "What's the weather like?"
 
@@ -351,7 +383,8 @@ class TestVoiceMessagePrefix:
 
     def test_history_stays_clean(self):
         """conversation_history should contain the original message,
-        not the prefixed version."""
+        not the prefixed version.
+        """
         voice_mode = True
         message = "Hello there"
         conversation_history = []
@@ -373,7 +406,8 @@ class TestVoiceMessagePrefix:
     def test_enable_voice_mode_does_not_modify_system_prompt(self):
         """_enable_voice_mode should NOT modify self.system_prompt or
         agent.ephemeral_system_prompt -- the system prompt must stay
-        stable to preserve prompt cache."""
+        stable to preserve prompt cache.
+        """
         cli = SimpleNamespace(
             _voice_mode=False,
             _voice_tts=False,
@@ -442,7 +476,8 @@ class TestVprintForceParameter:
 
     def test_error_messages_use_force_in_run_agent(self):
         """Verify that critical error _vprint calls in run_agent.py
-        include force=True."""
+        include force=True.
+        """
         with open("run_agent.py") as f:
             source = f.read()
 
@@ -499,7 +534,8 @@ class TestEdgeTTSLazyImport:
 
     def test_generate_edge_tts_calls_lazy_import(self):
         """AST check: _generate_edge_tts must call _import_edge_tts(), not
-        reference bare 'edge_tts' module name."""
+        reference bare 'edge_tts' module name.
+        """
         import ast as _ast
 
         with open("tools/tts_tool.py") as f:
@@ -537,7 +573,8 @@ class TestStreamingTTSOutputStreamCleanup:
 
     def test_output_stream_closed_in_finally(self):
         """AST check: stream_tts_to_speaker's finally block must close
-        output_stream even on exception."""
+        output_stream even on exception.
+        """
         import ast as _ast
 
         with open("tools/tts_tool.py") as f:
@@ -564,7 +601,8 @@ class TestCtrlCResetsContinuousMode:
 
     def test_ctrl_c_handler_resets_voice_continuous(self):
         """Source check: Ctrl+C voice cancel block must set
-        _voice_continuous = False."""
+        _voice_continuous = False.
+        """
         with open("cli.py") as f:
             source = f.read()
 
@@ -594,6 +632,7 @@ class TestDisableVoiceModeStopsTTS:
     def test_disable_voice_mode_calls_stop_playback(self):
         """Source check: _disable_voice_mode must call stop_playback()."""
         import inspect
+
         from cli import HermesCLI
 
         source = inspect.getsource(HermesCLI._disable_voice_mode)
@@ -653,7 +692,8 @@ class TestChatTTSCleanupOnException:
 
     def test_chat_has_finally_for_tts_cleanup(self):
         """AST check: chat() method must have a finally block that cleans up
-        text_queue, stop_event, and tts_thread."""
+        text_queue, stop_event, and tts_thread.
+        """
         import ast as _ast
 
         with open("cli.py") as f:
@@ -684,11 +724,13 @@ class TestChatTTSCleanupOnException:
 class TestBrowserToolSignalHandlerRemoved:
     """browser_tool.py must NOT register SIGINT/SIGTERM handlers that call
     sys.exit() — this conflicts with prompt_toolkit's event loop and causes
-    the process to become unkillable during voice mode."""
+    the process to become unkillable during voice mode.
+    """
 
     def test_no_signal_handler_registration(self):
         """Source check: browser_tool.py must not call signal.signal()
-        for SIGINT or SIGTERM."""
+        for SIGINT or SIGTERM.
+        """
         with open("tools/browser_tool.py") as f:
             source = f.read()
 
@@ -718,7 +760,8 @@ class TestKeyHandlerNeverBlocks:
 
     def test_start_recording_not_called_directly_in_handler(self):
         """AST check: handle_voice_record must NOT call _voice_start_recording()
-        directly — it must wrap it in a Thread to avoid blocking the UI."""
+        directly — it must wrap it in a Thread to avoid blocking the UI.
+        """
         import ast as _ast
 
         with open("cli.py") as f:
@@ -740,7 +783,8 @@ class TestKeyHandlerNeverBlocks:
 
     def test_processing_guard_in_start_path(self):
         """Source check: key handler must check _voice_processing before
-        starting a new recording."""
+        starting a new recording.
+        """
         with open("cli.py") as f:
             source = f.read()
 
@@ -766,7 +810,8 @@ class TestKeyHandlerNeverBlocks:
 
     def test_processing_set_atomically_with_recording_false(self):
         """Source check: _voice_stop_and_transcribe must set _voice_processing = True
-        in the same lock block where it sets _voice_recording = False."""
+        in the same lock block where it sets _voice_recording = False.
+        """
         with open("cli.py") as f:
             source = f.read()
 
@@ -1299,7 +1344,8 @@ class TestRefreshLevelLock:
     """Bug: _refresh_level thread read _voice_recording without lock."""
 
     def test_refresh_stops_when_recording_false(self):
-        import threading, time
+        import threading
+        import time
 
         lock = threading.Lock()
         recording = True

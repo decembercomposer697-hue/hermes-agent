@@ -15,7 +15,6 @@ import pytest
 
 from tests.tools.conftest import register_all_web_providers
 
-
 # ---------------------------------------------------------------------------
 # ABC enforcement
 # ---------------------------------------------------------------------------
@@ -170,7 +169,8 @@ class TestPerCapabilityBackendSelection:
     def test_explicit_extract_backend_honored_when_unavailable(self, monkeypatch):
         """An explicit per-capability backend is honored even with no creds, so
         its setup error surfaces instead of silently rerouting to the keyless
-        Parallel default (which would send user URLs to a different provider)."""
+        Parallel default (which would send user URLs to a different provider).
+        """
         from tools import web_tools
 
         monkeypatch.setattr(web_tools, "_load_web_config", lambda: {
@@ -311,8 +311,10 @@ class TestUnconfiguredErrorEnvelopeParity:
     def test_extract_empty_urls_does_not_raise(self, monkeypatch):
         """Regression: empty (or fully SSRF-blocked) URL sets skip the dispatch
         branch; the free-Parallel flag must still be initialized so the tool
-        returns an error envelope instead of UnboundLocalError."""
+        returns an error envelope instead of UnboundLocalError.
+        """
         import asyncio
+
         from tools import web_tools
         self._clear_web_creds(monkeypatch)
         monkeypatch.setattr(web_tools, "_load_web_config", lambda: {})
@@ -329,8 +331,8 @@ class TestUnconfiguredErrorEnvelopeParity:
         stays offline; we assert dispatch landed on parallel and returned the
         standard search envelope.
         """
-        from tools import web_tools
         import plugins.web.parallel.provider as parallel_provider
+        from tools import web_tools
 
         self._clear_web_creds(monkeypatch)
         monkeypatch.setattr(web_tools, "_firecrawl_client", None, raising=False)
@@ -379,7 +381,8 @@ class TestDispatchersTriggerPluginDiscovery:
     def _clear_registry(self):
         """Reset the web_search registry to empty and return a callback
         that restores the original contents. Used in a try/finally so the
-        snapshot is restored even when the dispatcher under test raises."""
+        snapshot is restored even when the dispatcher under test raises.
+        """
         from agent import web_search_registry
 
         with web_search_registry._lock:
@@ -407,8 +410,9 @@ class TestDispatchersTriggerPluginDiscovery:
         import asyncio
         import json
         from unittest.mock import MagicMock
-        from agent.web_search_provider import WebSearchProvider
+
         from agent import web_search_registry
+        from agent.web_search_provider import WebSearchProvider
         from tools import web_tools
 
         restore = self._clear_registry()
@@ -488,8 +492,9 @@ class TestDispatchersTriggerPluginDiscovery:
         """
         import json
         from unittest.mock import MagicMock
-        from agent.web_search_provider import WebSearchProvider
+
         from agent import web_search_registry
+        from agent.web_search_provider import WebSearchProvider
         from tools import web_tools
 
         restore = self._clear_registry()

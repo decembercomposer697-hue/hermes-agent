@@ -451,6 +451,7 @@ class TestFeishuAdapterMessaging(unittest.TestCase):
         self.assertEqual(info["name"], "Hermes Group")
         self.assertEqual(info["type"], "group")
 
+
 class TestAdapterModule(unittest.TestCase):
     def test_load_settings_uses_sdk_defaults_for_invalid_ws_reconnect_values(self):
         from gateway.platforms.feishu import FeishuAdapter
@@ -1059,7 +1060,8 @@ class TestAdapterBehavior(unittest.TestCase):
     def test_group_message_matches_bot_name_when_only_name_available(self):
         """Name fallback engages when either side lacks an open_id. When BOTH
         the mention and the bot carry open_ids, IDs are authoritative — a
-        same-name human with a different open_id must NOT admit."""
+        same-name human with a different open_id must NOT admit.
+        """
         from gateway.config import PlatformConfig
         from gateway.platforms.feishu import FeishuAdapter
 
@@ -1807,7 +1809,8 @@ class TestAdapterBehavior(unittest.TestCase):
         context is still active so pooled connections fully release on
         exit.  Otherwise the response is only readable because httpx
         eagerly buffers it; a future refactor to .stream() would silently
-        read-after-close."""
+        read-after-close.
+        """
         from gateway.config import PlatformConfig
         from gateway.platforms.feishu import FeishuAdapter
 
@@ -2973,7 +2976,8 @@ class TestHydrateBotIdentity(unittest.TestCase):
 class TestPendingInboundQueue(unittest.TestCase):
     """Tests for the loop-not-ready race (#5499): inbound events arriving
     before or during adapter loop transitions must be queued for replay
-    rather than silently dropped."""
+    rather than silently dropped.
+    """
 
     @patch.dict(os.environ, {}, clear=True)
     def test_event_queued_when_loop_not_ready(self):
@@ -3082,7 +3086,8 @@ class TestPendingInboundQueue(unittest.TestCase):
     @patch.dict(os.environ, {}, clear=True)
     def test_normal_path_unchanged_when_loop_ready(self):
         """When the loop is ready, events should dispatch directly without
-        ever touching the pending queue."""
+        ever touching the pending queue.
+        """
         from gateway.config import PlatformConfig
         from gateway.platforms.feishu import FeishuAdapter
 
@@ -3150,7 +3155,7 @@ class TestWebhookSecurity(unittest.TestCase):
 
     def test_signature_missing_headers_rejected(self):
         adapter = self._make_adapter("test_secret")
-        self.assertFalse(adapter._is_webhook_signature_valid({}, b'{}'))
+        self.assertFalse(adapter._is_webhook_signature_valid({}, b"{}"))
 
     def test_rate_limit_allows_requests_within_window(self):
         adapter = self._make_adapter()
@@ -3165,7 +3170,10 @@ class TestWebhookSecurity(unittest.TestCase):
         self.assertFalse(adapter._check_webhook_rate_limit("10.0.0.2"))
 
     def test_rate_limit_resets_after_window_expires(self):
-        from gateway.platforms.feishu import _FEISHU_WEBHOOK_RATE_LIMIT_MAX, _FEISHU_WEBHOOK_RATE_WINDOW_SECONDS
+        from gateway.platforms.feishu import (
+            _FEISHU_WEBHOOK_RATE_LIMIT_MAX,
+            _FEISHU_WEBHOOK_RATE_WINDOW_SECONDS,
+        )
         adapter = self._make_adapter()
         ip = "10.0.0.3"
         for _ in range(_FEISHU_WEBHOOK_RATE_LIMIT_MAX):
@@ -3179,7 +3187,10 @@ class TestWebhookSecurity(unittest.TestCase):
     @patch.dict(os.environ, {}, clear=True)
     def test_webhook_request_rejects_oversized_body(self):
         from gateway.config import PlatformConfig
-        from gateway.platforms.feishu import FeishuAdapter, _FEISHU_WEBHOOK_MAX_BODY_BYTES
+        from gateway.platforms.feishu import (
+            _FEISHU_WEBHOOK_MAX_BODY_BYTES,
+            FeishuAdapter,
+        )
 
         adapter = FeishuAdapter(PlatformConfig())
         # Simulate a request whose Content-Length already signals oversize.
@@ -3288,7 +3299,7 @@ class TestDedupTTL(unittest.TestCase):
     @patch.dict(os.environ, {}, clear=True)
     def test_expired_entry_is_not_considered_duplicate(self):
         from gateway.config import PlatformConfig
-        from gateway.platforms.feishu import FeishuAdapter, _FEISHU_DEDUP_TTL_SECONDS
+        from gateway.platforms.feishu import _FEISHU_DEDUP_TTL_SECONDS, FeishuAdapter
 
         adapter = FeishuAdapter(PlatformConfig())
         # Plant an entry that expired well past the TTL.
@@ -3305,6 +3316,7 @@ class TestDedupTTL(unittest.TestCase):
         skipped; the rest of the state loads.
         """
         import tempfile
+
         from gateway.config import PlatformConfig
         from gateway.platforms.feishu import FeishuAdapter
 
@@ -3579,7 +3591,8 @@ class TestBotNameResolution(unittest.TestCase):
     @patch.dict(os.environ, {}, clear=True)
     def test_bot_absent_from_response_is_not_cached(self):
         """Bot not in ``data.bots`` (e.g. landed in ``failed_bots``) → no
-        cache entry, next lookup re-fetches."""
+        cache entry, next lookup re-fetches.
+        """
         adapter, _ = self._build_adapter_with_bots({"ou_other": "Other Bot"})
 
         async def _direct(func, *args, **kwargs):
@@ -3632,7 +3645,8 @@ class TestBotNameResolution(unittest.TestCase):
 @unittest.skipUnless(_HAS_LARK_OAPI, "lark-oapi not installed")
 class TestProcessingReactions(unittest.TestCase):
     """Typing on start → removed on SUCCESS, swapped for CrossMark on FAILURE,
-    removed (no replacement) on CANCELLED."""
+    removed (no replacement) on CANCELLED.
+    """
 
     @staticmethod
     def _run(coro):
@@ -3859,7 +3873,11 @@ class TestProcessingReactions(unittest.TestCase):
 
 class TestFeishuMentionMap(unittest.TestCase):
     def test_build_mentions_map_handles_at_all(self):
-        from gateway.platforms.feishu import _build_mentions_map, _FeishuBotIdentity, FeishuMentionRef
+        from gateway.platforms.feishu import (
+            FeishuMentionRef,
+            _build_mentions_map,
+            _FeishuBotIdentity,
+        )
 
         mention = SimpleNamespace(key="@_all", id=None, name="")
         result = _build_mentions_map(
@@ -3896,7 +3914,8 @@ class TestFeishuMentionMap(unittest.TestCase):
         """Regression: a human user whose display name matches the bot must
         NOT be flagged as self when their open_id differs. Before the fix,
         name-match fired even when open_id was present and different, causing
-        their messages to be silently stripped/dropped."""
+        their messages to be silently stripped/dropped.
+        """
         from gateway.platforms.feishu import _build_mentions_map, _FeishuBotIdentity
 
         human_with_same_name = SimpleNamespace(
@@ -3914,7 +3933,8 @@ class TestFeishuMentionMap(unittest.TestCase):
         """Regression: right after gateway startup, _hydrate_bot_identity may
         not have populated _bot_open_id yet. During that window, a mention
         carrying a real open_id should still match via name — otherwise
-        @bot messages silently fail admission."""
+        @bot messages silently fail admission.
+        """
         from gateway.platforms.feishu import _build_mentions_map, _FeishuBotIdentity
 
         bot_mention = SimpleNamespace(
@@ -4102,20 +4122,20 @@ class TestFeishuStripLeadingSelf(unittest.TestCase):
         self.assertEqual(_strip_edge_self_mentions("@Hermes /help", []), "@Hermes /help")
 
     def test_returns_input_when_no_self_refs(self):
-        from gateway.platforms.feishu import _strip_edge_self_mentions, FeishuMentionRef
+        from gateway.platforms.feishu import FeishuMentionRef, _strip_edge_self_mentions
 
         refs = [FeishuMentionRef(name="Alice", open_id="ou_alice")]
         self.assertEqual(_strip_edge_self_mentions("@Alice hi", refs), "@Alice hi")
 
     def test_uses_open_id_fallback_when_name_missing(self):
-        from gateway.platforms.feishu import _strip_edge_self_mentions, FeishuMentionRef
+        from gateway.platforms.feishu import FeishuMentionRef, _strip_edge_self_mentions
 
         refs = [FeishuMentionRef(name="", open_id="ou_bot", is_self=True)]
         self.assertEqual(_strip_edge_self_mentions("@ou_bot hi", refs), "hi")
 
     def test_word_boundary_prevents_prefix_collision(self):
         """A bot named 'Al' must not eat the leading '@Alice' of a different user."""
-        from gateway.platforms.feishu import _strip_edge_self_mentions, FeishuMentionRef
+        from gateway.platforms.feishu import FeishuMentionRef, _strip_edge_self_mentions
 
         refs = [FeishuMentionRef(name="Al", open_id="ou_bot", is_self=True)]
         self.assertEqual(_strip_edge_self_mentions("@Alice hi", refs), "@Alice hi")
@@ -4123,13 +4143,13 @@ class TestFeishuStripLeadingSelf(unittest.TestCase):
 
 class TestFeishuNormalizeText(unittest.TestCase):
     def test_renders_mention_with_display_name(self):
-        from gateway.platforms.feishu import _normalize_feishu_text, FeishuMentionRef
+        from gateway.platforms.feishu import FeishuMentionRef, _normalize_feishu_text
 
         refs = {"@_user_1": FeishuMentionRef(name="Alice", open_id="ou_alice")}
         self.assertEqual(_normalize_feishu_text("@_user_1 hello", refs), "@Alice hello")
 
     def test_renders_self_mention_with_name(self):
-        from gateway.platforms.feishu import _normalize_feishu_text, FeishuMentionRef
+        from gateway.platforms.feishu import FeishuMentionRef, _normalize_feishu_text
 
         refs = {"@_user_1": FeishuMentionRef(name="Hermes", open_id="ou_bot", is_self=True)}
         self.assertEqual(
@@ -4154,7 +4174,7 @@ class TestFeishuNormalizeText(unittest.TestCase):
         self.assertEqual(_normalize_feishu_text("hello  world"), "hello world")
 
     def test_mention_for_missing_map_entry_degrades_to_space(self):
-        from gateway.platforms.feishu import _normalize_feishu_text, FeishuMentionRef
+        from gateway.platforms.feishu import FeishuMentionRef, _normalize_feishu_text
 
         refs = {"@_user_1": FeishuMentionRef(name="Alice")}
         # @_user_2 has no entry — should degrade to a space (legacy behavior)
@@ -4168,8 +4188,9 @@ class TestFeishuPostMentionParsing(unittest.TestCase):
     def test_post_at_tag_renders_via_mentions_map(self):
         """Post <at>.user_id is a placeholder ('@_user_N'); the real display
         name comes from the mentions_map lookup. Confirmed via live
-        im.v1.message.get payload."""
-        from gateway.platforms.feishu import parse_feishu_post_payload, FeishuMentionRef
+        im.v1.message.get payload.
+        """
+        from gateway.platforms.feishu import FeishuMentionRef, parse_feishu_post_payload
 
         payload = {
             "en_us": {
@@ -4187,7 +4208,8 @@ class TestFeishuPostMentionParsing(unittest.TestCase):
 
     def test_post_at_tag_falls_back_to_inline_user_name_when_map_misses(self):
         """When the mentions payload is missing a placeholder, fall back to the
-        inline user_name in the <at> tag itself."""
+        inline user_name in the <at> tag itself.
+        """
         from gateway.platforms.feishu import parse_feishu_post_payload
 
         payload = {
@@ -4203,7 +4225,8 @@ class TestFeishuPostMentionParsing(unittest.TestCase):
 
     def test_post_at_all_tag_renders_as_at_all(self):
         """Post-format @everyone has user_id == '@_all' (confirmed via live
-        im.v1.message.get). Rendered as literal '@all' regardless of map."""
+        im.v1.message.get). Rendered as literal '@all' regardless of map.
+        """
         from gateway.platforms.feishu import parse_feishu_post_payload
 
         payload = {
@@ -4220,7 +4243,10 @@ class TestFeishuPostMentionParsing(unittest.TestCase):
 
 class TestFeishuNormalizeWithMentions(unittest.TestCase):
     def test_text_message_renders_mention_by_name(self):
-        from gateway.platforms.feishu import normalize_feishu_message, _FeishuBotIdentity
+        from gateway.platforms.feishu import (
+            _FeishuBotIdentity,
+            normalize_feishu_message,
+        )
 
         mention = SimpleNamespace(
             key="@_user_1",
@@ -4239,7 +4265,10 @@ class TestFeishuNormalizeWithMentions(unittest.TestCase):
         self.assertFalse(normalized.mentions[0].is_self)
 
     def test_text_message_marks_bot_self_mention(self):
-        from gateway.platforms.feishu import normalize_feishu_message, _FeishuBotIdentity
+        from gateway.platforms.feishu import (
+            _FeishuBotIdentity,
+            normalize_feishu_message,
+        )
 
         mention = SimpleNamespace(
             key="@_user_1",
@@ -4272,7 +4301,8 @@ class TestFeishuNormalizeWithMentions(unittest.TestCase):
     def test_text_message_at_all_in_text_without_mentions_payload(self):
         """Feishu SDK sometimes omits @_all from the mentions payload (confirmed
         via im.v1.message.get). The fallback scan on raw text must still yield
-        an is_all ref so [Mentioned: @all] gets injected."""
+        an is_all ref so [Mentioned: @all] gets injected.
+        """
         from gateway.platforms.feishu import normalize_feishu_message
 
         normalized = normalize_feishu_message(
@@ -4307,8 +4337,12 @@ class TestFeishuNormalizeWithMentions(unittest.TestCase):
 
     def test_post_message_marks_self_via_mentions_map_lookup(self):
         """Real Feishu post: <at user_id="@_user_N"> + top-level mentions array
-        resolves to open_id via placeholder lookup, not direct tag fields."""
-        from gateway.platforms.feishu import normalize_feishu_message, _FeishuBotIdentity
+        resolves to open_id via placeholder lookup, not direct tag fields.
+        """
+        from gateway.platforms.feishu import (
+            _FeishuBotIdentity,
+            normalize_feishu_message,
+        )
 
         raw = json.dumps({
             "en_us": {
@@ -4685,7 +4719,8 @@ class TestFeishuFetchMessageText(unittest.TestCase):
     def test_build_mentions_map_string_id_shape(self):
         """_build_mentions_map accepts the reply-history shape (id as str +
         id_type='open_id'). user_id id_type is not load-bearing for self
-        detection — inbound mention payloads always include an open_id."""
+        detection — inbound mention payloads always include an open_id.
+        """
         from gateway.platforms.feishu import _build_mentions_map, _FeishuBotIdentity
 
         # open_id discriminator, non-self
@@ -4775,7 +4810,8 @@ class TestFeishuMentionEndToEnd(unittest.TestCase):
 
     def test_scenario_trailing_self_mention_stripped(self):
         """Trailing @bot at the end of a message is routing noise, not content —
-        strip it so the agent sees a clean instruction body."""
+        strip it so the agent sees a clean instruction body.
+        """
         adapter = self._build_adapter()
         event = self._run(
             adapter,
@@ -4786,7 +4822,8 @@ class TestFeishuMentionEndToEnd(unittest.TestCase):
 
     def test_scenario_mid_text_self_mention_preserved(self):
         """Self mention in the middle of a sentence (followed by a non-terminal
-        character) is meaningful content — preserve it."""
+        character) is meaningful content — preserve it.
+        """
         adapter = self._build_adapter()
         event = self._run(
             adapter,
@@ -4803,7 +4840,8 @@ class TestFeishuMentionEndToEnd(unittest.TestCase):
 
     def test_scenario_post_at_alice_exposes_open_id(self):
         """Post-type @mention: <at> placeholder resolves via top-level mentions,
-        agent gets real open_id in the hint (mirrors text-type behavior)."""
+        agent gets real open_id in the hint (mirrors text-type behavior).
+        """
         adapter = self._build_adapter()
         alice_mention = SimpleNamespace(
             key="@_user_1",
@@ -4841,7 +4879,8 @@ class TestFeishuMentionEndToEnd(unittest.TestCase):
     def test_scenario_post_bot_plus_alice_filters_self_from_hint(self):
         """Post-type message @-ing both the bot and Alice: leading bot is
         stripped from the body, self is filtered from the [Mentioned: ...]
-        hint, and Alice's real open_id is surfaced for the agent."""
+        hint, and Alice's real open_id is surfaced for the agent.
+        """
         adapter = self._build_adapter()
         bot_mention = SimpleNamespace(
             key="@_user_1",

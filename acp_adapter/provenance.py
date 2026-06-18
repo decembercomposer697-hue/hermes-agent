@@ -39,6 +39,7 @@ def build_session_provenance(
     Returns:
         A dict suitable for ``{"hermes": {"sessionProvenance": <dict>}}`` under
         ACP ``_meta``, or ``None`` if the session can't be read.
+
     """
     try:
         row = db.get_session(current_hermes_session_id)

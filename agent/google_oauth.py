@@ -97,7 +97,9 @@ _DEFAULT_CLIENT_SECRET = f"GOCSPX-{_PUBLIC_CLIENT_SECRET_SUFFIX}"
 
 # Regex patterns for fallback scraping from an installed gemini-cli.
 import re as _re
+
 from utils import atomic_replace
+
 _CLIENT_ID_PATTERN = _re.compile(
     r"OAUTH_CLIENT_ID\s*=\s*['\"]([0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com)['\"]",
 )
@@ -847,6 +849,7 @@ def start_oauth_flow(
         callback_wait_seconds: Max seconds to wait for the browser callback.
         project_id: Initial GCP project ID to bake into the stored creds.
                     Can be discovered/updated later via update_project_ids().
+
     """
     if not force_relogin:
         existing = load_credentials()

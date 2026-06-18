@@ -50,7 +50,7 @@ _CUA_DRIVER_ARGS = ["mcp"]  # stdio MCP transport
 # Regex to parse list_windows text output lines:
 #   "- AppName (pid 12345) "Title" [window_id: 67890]"
 _WINDOW_LINE_RE = re.compile(
-    r'^-\s+(.+?)\s+\(pid\s+(\d+)\)\s+.*\[window_id:\s+(\d+)\]',
+    r"^-\s+(.+?)\s+\(pid\s+(\d+)\)\s+.*\[window_id:\s+(\d+)\]",
     re.MULTILINE,
 )
 
@@ -182,7 +182,7 @@ def _parse_key_combo(keys: str) -> tuple[str | None, list[str]]:
     MODIFIER_NAMES = {"cmd", "command", "shift", "option", "alt", "ctrl", "control", "fn"}
     KEY_ALIASES = {"command": "cmd", "alt": "option", "control": "ctrl"}
 
-    parts = [p.strip().lower() for p in re.split(r'[+\-]', keys) if p.strip()]
+    parts = [p.strip().lower() for p in re.split(r"[+\-]", keys) if p.strip()]
     modifiers = []
     key = None
     for part in parts:
@@ -268,6 +268,7 @@ class _CuaDriverSession:
 
     async def _aenter(self) -> None:
         from contextlib import AsyncExitStack
+
         from mcp import ClientSession, StdioServerParameters
         from mcp.client.stdio import stdio_client
 
@@ -514,7 +515,7 @@ class CuaDriverBackend(ComputerUseBackend):
             summary, tree = _split_tree_text(text)
 
             # Parse element count from summary e.g. "✅ AppName — 42 elements, turn 3..."
-            m = re.search(r'(\d+)\s+elements?', summary)
+            m = re.search(r"(\d+)\s+elements?", summary)
             if tree and not gws_out["images"]:
                 # ax mode — no screenshot
                 elements = _parse_elements_from_tree(tree)
@@ -705,7 +706,7 @@ class CuaDriverBackend(ComputerUseBackend):
         if isinstance(data, str):
             apps = []
             for line in data.splitlines():
-                m = re.search(r'(.+?)\s+\(pid\s+(\d+)\)', line)
+                m = re.search(r"(.+?)\s+\(pid\s+(\d+)\)", line)
                 if m:
                     apps.append({"name": m.group(1).strip(), "pid": int(m.group(2))})
             return apps

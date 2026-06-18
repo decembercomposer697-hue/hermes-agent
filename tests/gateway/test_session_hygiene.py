@@ -13,7 +13,7 @@ import sys
 import types
 from datetime import datetime
 from types import SimpleNamespace
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -22,10 +22,10 @@ from gateway.config import GatewayConfig, Platform, PlatformConfig
 from gateway.platforms.base import BasePlatformAdapter, MessageEvent, SendResult
 from gateway.session import SessionEntry, SessionSource
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_history(n_messages: int, content_size: int = 100) -> list:
     """Build a fake transcript with n_messages user/assistant pairs."""
@@ -210,9 +210,6 @@ class TestSessionHygieneWarnThreshold:
         warn_threshold = int(context_length * 0.95)  # 190k
         post_compress_tokens = 150_000
         assert post_compress_tokens < warn_threshold
-
-
-
 
 
 class TestEstimatedTokenThreshold:
@@ -401,7 +398,8 @@ async def test_session_hygiene_warns_user_when_compression_aborts(monkeypatch, t
     ABORTS — returns messages unchanged, sets _last_compress_aborted=True,
     and drops nothing.  Gateway must surface a visible ⚠️ warning to the
     user (including thread_id metadata so it lands in the originating
-    topic/thread) saying the conversation is unchanged and how to retry."""
+    topic/thread) saying the conversation is unchanged and how to retry.
+    """
     fake_dotenv = types.ModuleType("dotenv")
     fake_dotenv.load_dotenv = lambda *args, **kwargs: None
     monkeypatch.setitem(sys.modules, "dotenv", fake_dotenv)
@@ -520,7 +518,8 @@ async def test_session_hygiene_informs_user_when_aux_model_fails_but_recovers(mo
     and we recover via the main model, compression succeeds but the user's
     config is still broken.  Gateway hygiene must surface an ℹ note so the
     user knows to fix ``auxiliary.compression.model`` — silent recovery
-    hides a misconfig only they can resolve."""
+    hides a misconfig only they can resolve.
+    """
     fake_dotenv = types.ModuleType("dotenv")
     fake_dotenv.load_dotenv = lambda *args, **kwargs: None
     monkeypatch.setitem(sys.modules, "dotenv", fake_dotenv)
@@ -762,7 +761,8 @@ async def test_session_hygiene_default_hard_message_limit_does_not_fire_at_12_me
 ):
     """Sanity check for the companion test above: without config override,
     12 messages must NOT trigger the 400-message hard limit.  If this test
-    passes without changes, the override test's finding is meaningful."""
+    passes without changes, the override test's finding is meaningful.
+    """
     fake_dotenv = types.ModuleType("dotenv")
     fake_dotenv.load_dotenv = lambda *args, **kwargs: None
     monkeypatch.setitem(sys.modules, "dotenv", fake_dotenv)

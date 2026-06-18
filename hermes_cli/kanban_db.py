@@ -73,6 +73,7 @@ from __future__ import annotations
 import contextlib
 import hashlib
 import json
+import logging
 import os
 import re
 import secrets
@@ -81,13 +82,12 @@ import sqlite3
 import subprocess
 import sys
 import threading
-import logging
 import time
+from collections.abc import Iterable
 from contextvars import ContextVar, Token
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
-from collections.abc import Iterable
 
 from toolsets import get_toolset_names
 
@@ -1795,8 +1795,8 @@ def _migrate_add_optional_columns(conn: sqlite3.Connection) -> None:
     # per DB because after the UPDATE no rows match the old kinds.
     _EVENT_RENAMES = (
         # (old, new)
-        ("ready",              "promoted"),
-        ("priority",           "reprioritized"),
+        ("ready", "promoted"),
+        ("priority", "reprioritized"),
         ("spawn_auto_blocked", "gave_up"),
     )
     for old, new in _EVENT_RENAMES:
@@ -3993,7 +3993,8 @@ def _scratch_tip_sentinel_path() -> Path:
 def _scratch_tip_shown() -> bool:
     """True iff the scratch-workspace tip has already been emitted on this
     install. Best-effort — any error means we re-emit, which is the safer
-    failure mode for a help message."""
+    failure mode for a help message.
+    """
     try:
         return _scratch_tip_sentinel_path().exists()
     except OSError:
@@ -4163,7 +4164,6 @@ def block_task(
             )
         _append_event(conn, task_id, "blocked", {"reason": reason}, run_id=run_id)
         return True
-
 
 
 def promote_task(
@@ -5339,7 +5339,6 @@ def detect_stale_running(
     if stale_timeout_seconds <= 0:
         return []
 
-
     now = int(time.time())
     host_prefix = f"{_claimer_id().split(':', 1)[0]}:"
     reclaimed: list[str] = []
@@ -5433,8 +5432,8 @@ def _error_fingerprint(error_text: str) -> str:
     Strips host-specific details (PIDs, timestamps) so that errors
     with the same root cause produce the same fingerprint.
     """
-    fp = re.sub(r'\bpid \d+\b', 'pid N', error_text[:80])
-    fp = re.sub(r'\b\d{10,}\b', '<TS>', fp)
+    fp = re.sub(r"\bpid \d+\b", "pid N", error_text[:80])
+    fp = re.sub(r"\b\d{10,}\b", "<TS>", fp)
     return fp.lower().strip()
 
 
@@ -7235,7 +7234,8 @@ def add_notify_sub(
     notifier_profile: str | None = None,
 ) -> None:
     """Register a gateway source that wants terminal-state notifications
-    for ``task_id``. Idempotent on (task, platform, chat, thread)."""
+    for ``task_id``. Idempotent on (task, platform, chat, thread).
+    """
     now = int(time.time())
     with write_txn(conn):
         conn.execute(
@@ -7445,7 +7445,8 @@ def gc_events(
     """Delete task_events rows older than ``older_than_seconds`` for tasks
     in a terminal state (``done`` or ``archived``). Returns the number of
     rows deleted. Running / ready / blocked tasks keep their full event
-    history."""
+    history.
+    """
     cutoff = int(time.time()) - int(older_than_seconds)
     with write_txn(conn):
         cur = conn.execute(
@@ -7464,7 +7465,8 @@ def gc_worker_logs(
     the number of files removed. Kept separate from ``gc_events`` because
     log files live on disk, not in SQLite. Scoped to ``board`` (defaults
     to the active board) — per-board isolation means deleting logs from
-    board A cannot touch board B's logs."""
+    board A cannot touch board B's logs.
+    """
     log_dir = worker_logs_dir(board=board)
     if not log_dir.exists():
         return 0
@@ -7491,7 +7493,8 @@ def worker_log_path(task_id: str, *, board: str | None = None) -> Path:
     When ``board`` is None, resolves via the active board (env var →
     current-board file → default). The dispatcher always passes the
     board explicitly to avoid any resolution ambiguity when multiple
-    boards exist."""
+    boards exist.
+    """
     return worker_logs_dir(board=board) / f"{task_id}.log"
 
 
@@ -7501,7 +7504,8 @@ def read_worker_log(
 ) -> str | None:
     """Read the worker log for ``task_id``. Returns None if the file
     doesn't exist. If ``tail_bytes`` is set, only the last N bytes are
-    returned (useful for the dashboard drawer which shouldn't page megabytes)."""
+    returned (useful for the dashboard drawer which shouldn't page megabytes).
+    """
     path = worker_log_path(task_id, board=board)
     if not path.exists():
         return None

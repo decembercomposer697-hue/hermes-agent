@@ -1,5 +1,4 @@
-"""
-test_yuanbao_markdown.py - Unit tests for yuanbao_markdown.py
+"""test_yuanbao_markdown.py - Unit tests for yuanbao_markdown.py
 
 Run (no pytest needed):
     cd /root/.openclaw/workspace/hermes-agent
@@ -9,17 +8,17 @@ Or with pytest if available:
     python3 -m pytest tests/test_yuanbao_markdown.py -v
 """
 
-import sys
 import os
+import sys
 import unittest
 
 # Ensure project root is on the path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from gateway.platforms.yuanbao import MarkdownProcessor
 
-
 # ============ has_unclosed_fence ============
+
 
 class TestHasUnclosedFence(unittest.TestCase):
     def test_unclosed_fence(self):
@@ -130,13 +129,13 @@ class TestChunkMarkdownText(unittest.TestCase):
         self.assertEqual(result[0], text)
 
     def test_plain_text_split(self):
-        """x * 9000 should return 3 chunks of ~3000"""
+        """X * 9000 should return 3 chunks of ~3000"""
         text = "x" * 9000
         result = MarkdownProcessor.chunk_markdown_text(text, 3000)
         self.assertEqual(len(result), 3)
         for chunk in result:
             self.assertLessEqual(len(chunk), 3000)
-        self.assertEqual(''.join(result), text)
+        self.assertEqual("".join(result), text)
 
     def test_5000_chars_returns_2(self):
         """验收标准: 'a'*5000 with max 3000 → 2 chunks"""
@@ -178,7 +177,7 @@ class TestChunkMarkdownText(unittest.TestCase):
         text = "\n\n".join(paragraphs)
         result = MarkdownProcessor.chunk_markdown_text(text, 500)
         self.assertGreater(len(result), 1)
-        total_content = ''.join(result)
+        total_content = "".join(result)
         self.assertGreaterEqual(len(total_content), len(text) * 0.95)
 
     def test_single_long_line(self):
@@ -247,7 +246,7 @@ class TestAcceptanceCriteria(unittest.TestCase):
             self.assertFalse(MarkdownProcessor.has_unclosed_fence(chunk))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main(verbosity=2)
 
 
@@ -297,7 +296,7 @@ def test_table_not_broken():
     chunks = MarkdownProcessor.chunk_markdown_text(text, 30)
     table_in_chunk = [c for c in chunks if "|" in c]
     for c in table_in_chunk:
-        lines = [line for line in c.split('\n') if line.strip().startswith('|')]
+        lines = [line for line in c.split("\n") if line.strip().startswith("|")]
         if lines:
             # 至少表格行不被半截切割
             pass

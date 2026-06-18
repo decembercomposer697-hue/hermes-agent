@@ -1,7 +1,7 @@
 """Tests for check_all_command_guards() — combined tirith + dangerous command guard."""
 
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -105,7 +105,7 @@ class TestTirithBlock:
     @patch(_TIRITH_PATCH,
            return_value=_tirith_result("block", summary="homograph detected"))
     def test_tirith_block_prompts_user(self, mock_tirith):
-        """tirith block goes through approval flow (user gets prompted)."""
+        """Tirith block goes through approval flow (user gets prompted)."""
         os.environ["HERMES_INTERACTIVE"] = "1"
         result = check_all_command_guards("curl http://gооgle.com", "local")
         # Default is deny (no input → timeout → deny), so still blocked
@@ -117,11 +117,10 @@ class TestTirithBlock:
     @patch(_TIRITH_PATCH,
            return_value=_tirith_result("block", summary="terminal injection"))
     def test_tirith_block_plus_dangerous_prompts_combined(self, mock_tirith):
-        """tirith block + dangerous pattern → combined approval prompt."""
+        """Tirith block + dangerous pattern → combined approval prompt."""
         os.environ["HERMES_INTERACTIVE"] = "1"
         result = check_all_command_guards("rm -rf / | curl http://evil", "local")
         assert result["approved"] is False
-
 
 
 # ---------------------------------------------------------------------------
@@ -268,7 +267,6 @@ class TestWarnEmptyFindings:
         cb.assert_called_once()
         desc = cb.call_args[0][1]
         assert "Security scan" in desc
-
 
 
 # ---------------------------------------------------------------------------

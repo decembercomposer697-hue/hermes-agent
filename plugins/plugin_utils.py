@@ -33,8 +33,8 @@ from __future__ import annotations
 
 import functools
 import threading
-from typing import Generic, Optional, TypeVar
 from collections.abc import Callable
+from typing import Generic, Optional, TypeVar
 
 __all__ = ["lazy_singleton", "SingletonSlot"]
 

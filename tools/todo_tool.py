@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Todo Tool Module - Planning & Task Management
+"""Todo Tool Module - Planning & Task Management
 
 Provides an in-memory task list the agent uses to decompose complex tasks,
 track progress, and maintain focus across long conversations. The state
@@ -15,8 +14,7 @@ Design:
 """
 
 import json
-from typing import Dict, Any, List, Optional
-
+from typing import Any, Dict, List, Optional
 
 # Valid status values for todo items
 VALID_STATUSES = {"pending", "in_progress", "completed", "cancelled"}
@@ -34,8 +32,7 @@ _TRUNCATION_MARKER = "… [truncated]"
 
 
 class TodoStore:
-    """
-    In-memory todo list. One instance per AIAgent (one per session).
+    """In-memory todo list. One instance per AIAgent (one per session).
 
     Items are ordered -- list position is priority. Each item has:
       - id: unique string identifier (agent-chosen)
@@ -47,13 +44,13 @@ class TodoStore:
         self._items: list[dict[str, str]] = []
 
     def write(self, todos: list[dict[str, Any]], merge: bool = False) -> list[dict[str, str]]:
-        """
-        Write todos. Returns the full current list after writing.
+        """Write todos. Returns the full current list after writing.
 
         Args:
             todos: list of {id, content, status} dicts
             merge: if False, replace the entire list. If True, update
                    existing items by id and append new ones.
+
         """
         if not merge:
             # Replace mode: new list entirely
@@ -104,8 +101,7 @@ class TodoStore:
         return bool(self._items)
 
     def format_for_injection(self) -> str | None:
-        """
-        Render the todo list for post-compression injection.
+        """Render the todo list for post-compression injection.
 
         Returns a human-readable string to append to the compressed
         message history, or None if the list is empty.
@@ -152,8 +148,7 @@ class TodoStore:
 
     @staticmethod
     def _validate(item: dict[str, Any]) -> dict[str, str]:
-        """
-        Validate and normalize a todo item.
+        """Validate and normalize a todo item.
 
         Ensures required fields exist and status is valid.
         Returns a clean dict with only {id, content, status}.
@@ -189,8 +184,7 @@ def todo_tool(
     merge: bool = False,
     store: TodoStore | None = None,
 ) -> str:
-    """
-    Single entry point for the todo tool. Reads or writes depending on params.
+    """Single entry point for the todo tool. Reads or writes depending on params.
 
     Args:
         todos: if provided, write these items. If None, read current list.
@@ -199,6 +193,7 @@ def todo_tool(
 
     Returns:
         JSON string with the full current list and summary metadata.
+
     """
     if store is None:
         return tool_error("TodoStore not initialized")

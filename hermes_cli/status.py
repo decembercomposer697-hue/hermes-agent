@@ -1,15 +1,16 @@
-"""
-Status command for hermes CLI.
+"""Status command for hermes CLI.
 
 Shows the status of all Hermes Agent components.
 """
 
 import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
+
+from datetime import UTC
 
 from hermes_cli.auth import AuthError, resolve_provider
 from hermes_cli.colors import Colors, color
@@ -23,12 +24,13 @@ from hermes_cli.nous_subscription import get_nous_subscription_features
 from hermes_cli.runtime_provider import resolve_requested_provider
 from hermes_constants import OPENROUTER_MODELS_URL
 from tools.tool_backend_helpers import managed_nous_tools_enabled
-from datetime import UTC
+
 
 def check_mark(ok: bool) -> str:
     if ok:
         return color("✓", Colors.GREEN)
     return color("✗", Colors.RED)
+
 
 def redact_key(key: str) -> str:
     """Redact an API key for display.
@@ -87,14 +89,15 @@ def _effective_provider_label() -> str:
     return provider_label(effective)
 
 
-from hermes_constants import is_termux as _is_termux
 from datetime import UTC
+
+from hermes_constants import is_termux as _is_termux
 
 
 def show_status(args):
     """Show status of all Hermes Agent components."""
-    show_all = getattr(args, 'all', False)
-    deep = getattr(args, 'deep', False)
+    show_all = getattr(args, "all", False)
+    deep = getattr(args, "deep", False)
 
     print()
     print(color("┌─────────────────────────────────────────────────────────┐", Colors.CYAN))
@@ -183,10 +186,10 @@ def show_status(args):
 
     try:
         from hermes_cli.auth import (
-            get_nous_auth_status,
             get_codex_auth_status,
-            get_qwen_auth_status,
             get_minimax_oauth_auth_status,
+            get_nous_auth_status,
+            get_qwen_auth_status,
         )
         nous_status = get_nous_auth_status()
         codex_status = get_codex_auth_status()
@@ -478,7 +481,10 @@ def show_status(args):
     print(color("◆ Gateway Service", Colors.CYAN, Colors.BOLD))
 
     try:
-        from hermes_cli.gateway import get_gateway_runtime_snapshot, _format_gateway_pids
+        from hermes_cli.gateway import (
+            _format_gateway_pids,
+            get_gateway_runtime_snapshot,
+        )
 
         snapshot = get_gateway_runtime_snapshot()
         is_running = snapshot.running
@@ -497,10 +503,10 @@ def show_status(args):
         if _is_termux():
             print(f"  Status:       {color('unknown', Colors.DIM)}")
             print("  Manager:      Termux / manual process")
-        elif sys.platform.startswith('linux'):
+        elif sys.platform.startswith("linux"):
             print(f"  Status:       {color('unknown', Colors.DIM)}")
             print("  Manager:      systemd/manual")
-        elif sys.platform == 'darwin':
+        elif sys.platform == "darwin":
             print(f"  Status:       {color('unknown', Colors.DIM)}")
             print("  Manager:      launchd")
         else:
@@ -572,7 +578,7 @@ def show_status(args):
             import socket
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(1)
-            result = sock.connect_ex(('127.0.0.1', 18789))
+            result = sock.connect_ex(("127.0.0.1", 18789))
             sock.close()
             # Port in use = gateway likely running
             port_in_use = result == 0

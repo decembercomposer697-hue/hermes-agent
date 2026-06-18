@@ -131,7 +131,6 @@ def test_honcho_prefetch_returns_without_waiting_for_first_context_fetch():
     assert fetch_started.is_set()
 
 
-
 def test_honcho_sync_turn_does_not_start_network_write_before_session_init():
     """Session-end sync must not create a blocking writer before init finishes."""
     provider = HonchoMemoryProvider()
@@ -257,7 +256,7 @@ def test_honcho_system_prompt_advertises_active_while_background_init_runs(monke
 
 
 def test_honcho_tools_eager_init_still_ready_on_return(monkeypatch):
-    """tools + initOnSessionStart=true keeps its ready-on-return contract."""
+    """Tools + initOnSessionStart=true keeps its ready-on-return contract."""
     provider = HonchoMemoryProvider()
     cfg = _configured_tools_config(init_on_session_start=True)
 
@@ -315,7 +314,7 @@ def test_honcho_tools_eager_init_failure_does_not_leave_ready_manager(monkeypatc
 
 
 def test_honcho_tools_lazy_hooks_do_not_prestart_background_init(monkeypatch):
-    """tools lazy mode lets the first tool call own session initialization."""
+    """Tools lazy mode lets the first tool call own session initialization."""
     provider = HonchoMemoryProvider()
     cfg = _configured_tools_config(init_on_session_start=False)
 

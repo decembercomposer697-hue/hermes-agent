@@ -58,10 +58,10 @@ def _ensure_discord_mock():
 
 _ensure_discord_mock()
 
-from plugins.platforms.discord.adapter import DiscordAdapter
-from gateway.platforms.base import MessageType
 from datetime import UTC
 
+from gateway.platforms.base import MessageType
+from plugins.platforms.discord.adapter import DiscordAdapter
 
 # Minimal valid image / audio / PDF bytes so the cache_*_from_bytes
 # validators accept them. cache_image_from_bytes runs _looks_like_image()
@@ -182,7 +182,8 @@ class TestCacheDiscordImage:
     async def test_falls_back_to_url_when_bytes_validator_rejects(self):
         """If att.read() returns garbage that cache_image_from_bytes rejects
         (e.g. an HTML error page), fall back to the URL downloader instead
-        of surfacing the validation error to the caller."""
+        of surfacing the validation error to the caller.
+        """
         adapter = _make_adapter()
         att = _make_attachment_with_read(b"<html>forbidden</html>")
 

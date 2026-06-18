@@ -16,8 +16,6 @@ from __future__ import annotations
 import json
 from unittest.mock import MagicMock
 
-
-
 # ---------------------------------------------------------------------------
 # Provider surface
 # ---------------------------------------------------------------------------
@@ -100,7 +98,8 @@ class TestFalImageGenProviderGenerate:
     def test_generate_delegates_to_legacy_image_generate_tool(self, monkeypatch):
         """Plugin must look up ``image_generate_tool`` at call time so
         ``monkeypatch.setattr(image_tool, "image_generate_tool", ...)``
-        takes effect."""
+        takes effect.
+        """
         import tools.image_generation_tool as image_tool
         from plugins.image_gen.fal import FalImageGenProvider
 

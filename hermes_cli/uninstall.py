@@ -1,5 +1,4 @@
-"""
-Hermes Agent Uninstaller.
+"""Hermes Agent Uninstaller.
 
 Provides options for:
 - Full uninstall: Remove everything including configs and data
@@ -12,18 +11,21 @@ import subprocess
 import sys
 from pathlib import Path
 
+from hermes_cli.colors import Colors, color
 from hermes_constants import get_hermes_home
 
-from hermes_cli.colors import Colors, color
 
 def log_info(msg: str):
     print(f"{color('→', Colors.CYAN)} {msg}")
 
+
 def log_success(msg: str):
     print(f"{color('✓', Colors.GREEN)} {msg}")
 
+
 def log_warn(msg: str):
     print(f"{color('⚠', Colors.YELLOW)} {msg}")
+
 
 def get_project_root() -> Path:
     """Get the project installation directory."""
@@ -64,27 +66,27 @@ def remove_path_from_shell_configs():
             new_lines = []
             skip_next = False
             
-            for line in content.split('\n'):
+            for line in content.split("\n"):
                 # Skip the "# Hermes Agent" comment and following line
-                if '# Hermes Agent' in line or '# hermes-agent' in line:
+                if "# Hermes Agent" in line or "# hermes-agent" in line:
                     skip_next = True
                     continue
-                if skip_next and ('hermes' in line.lower() and 'PATH' in line):
+                if skip_next and ("hermes" in line.lower() and "PATH" in line):
                     skip_next = False
                     continue
                 skip_next = False
                 
                 # Remove any PATH line containing hermes
-                if 'hermes' in line.lower() and ('PATH=' in line or 'path=' in line.lower()):
+                if "hermes" in line.lower() and ("PATH=" in line or "path=" in line.lower()):
                     continue
                     
                 new_lines.append(line)
             
-            new_content = '\n'.join(new_lines)
+            new_content = "\n".join(new_lines)
             
             # Clean up multiple blank lines
-            while '\n\n\n' in new_content:
-                new_content = new_content.replace('\n\n\n', '\n\n')
+            while "\n\n\n" in new_content:
+                new_content = new_content.replace("\n\n\n", "\n\n")
             
             if new_content != original_content:
                 config_path.write_text(new_content)
@@ -109,7 +111,7 @@ def remove_wrapper_script():
             try:
                 # Check if it's our wrapper (contains hermes_cli reference)
                 content = wrapper.read_text()
-                if 'hermes_cli' in content or 'hermes-agent' in content:
+                if "hermes_cli" in content or "hermes-agent" in content:
                     wrapper.unlink()
                     removed.append(wrapper)
             except Exception as e:
@@ -192,7 +194,7 @@ def uninstall_gateway_service():
 
     # 1. Kill any standalone gateway processes (all platforms, including Termux)
     try:
-        from hermes_cli.gateway import kill_gateway_processes, find_gateway_pids
+        from hermes_cli.gateway import find_gateway_pids, kill_gateway_processes
         pids = find_gateway_pids()
         if pids:
             killed = kill_gateway_processes()
@@ -214,9 +216,9 @@ def uninstall_gateway_service():
     if system == "Linux":
         try:
             from hermes_cli.gateway import (
-                get_systemd_unit_path,
-                get_service_name,
                 _systemctl_cmd,
+                get_service_name,
+                get_systemd_unit_path,
             )
             svc_name = get_service_name()
 
@@ -400,7 +402,8 @@ def remove_hermes_env_vars_windows() -> list[str]:
 def remove_portable_tooling_windows(hermes_home: Path) -> list[Path]:
     """Delete PortableGit and Node installs the Windows installer created under
     ``%LOCALAPPDATA%\\hermes\\``.  Only called on full uninstall; they're
-    isolated from any system Git / Node so they cannot break other tools."""
+    isolated from any system Git / Node so they cannot break other tools.
+    """
     removed: list[Path] = []
     for sub in ("git", "node", "gateway-service"):
         target = hermes_home / sub
@@ -430,7 +433,8 @@ def _is_default_hermes_home(hermes_home: Path) -> bool:
 def _discover_named_profiles():
     """Return a list of ``ProfileInfo`` for every non-default profile, or ``[]``
     if profile support is unavailable or nothing is installed beyond the
-    default root."""
+    default root.
+    """
     try:
         from hermes_cli.profiles import list_profiles
     except Exception:
@@ -565,8 +569,7 @@ def run_gui_uninstall(args):
 
 
 def run_uninstall(args):
-    """
-    Run the uninstall process.
+    """Run the uninstall process.
     
     Options:
     - Full uninstall: removes code + ~/.hermes/ (configs, data, logs)

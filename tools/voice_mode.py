@@ -29,14 +29,15 @@ logger = logging.getLogger(__name__)
 # in headless environments (SSH, Docker, WSL, no PortAudio).
 # ---------------------------------------------------------------------------
 
+
 def _import_audio():
     """Lazy-import sounddevice and numpy.  Returns (sd, np).
 
     Raises ImportError or OSError if the libraries are not available
     (e.g. PortAudio missing on headless servers).
     """
-    import sounddevice as sd
     import numpy as np
+    import sounddevice as sd
     return sd, np
 
 
@@ -62,7 +63,6 @@ def _termux_microphone_command() -> str | None:
     if not _is_termux_environment():
         return None
     return shutil.which("termux-microphone-record")
-
 
 
 def _termux_api_app_installed() -> bool:
@@ -101,21 +101,21 @@ def _pulse_socket_reachable() -> bool:
 
     candidates: list[str] = []
 
-    pulse_server = os.environ.get('PULSE_SERVER', '')
+    pulse_server = os.environ.get("PULSE_SERVER", "")
     # PULSE_SERVER may be "unix:/path", "unix:/path;..." or a bare path.
-    for part in pulse_server.split(';'):
+    for part in pulse_server.split(";"):
         part = part.strip()
-        if part.startswith('unix:'):
-            candidates.append(part[len('unix:'):])
+        if part.startswith("unix:"):
+            candidates.append(part[len("unix:"):])
 
-    pulse_runtime = os.environ.get('PULSE_RUNTIME_PATH')
+    pulse_runtime = os.environ.get("PULSE_RUNTIME_PATH")
     if pulse_runtime:
-        candidates.append(os.path.join(pulse_runtime, 'native'))
+        candidates.append(os.path.join(pulse_runtime, "native"))
 
-    xdg_runtime = os.environ.get('XDG_RUNTIME_DIR')
+    xdg_runtime = os.environ.get("XDG_RUNTIME_DIR")
     if xdg_runtime:
-        candidates.append(os.path.join(xdg_runtime, 'pulse', 'native'))
-        candidates.append(os.path.join(xdg_runtime, 'pipewire-0'))
+        candidates.append(os.path.join(xdg_runtime, "pulse", "native"))
+        candidates.append(os.path.join(xdg_runtime, "pipewire-0"))
 
     for path in candidates:
         if not path:
@@ -152,15 +152,15 @@ def detect_audio_environment() -> dict:
     termux_app_installed = _termux_api_app_installed()
     termux_capture = bool(termux_mic_cmd and termux_app_installed)
     has_forwarded_audio = bool(
-        os.environ.get('PULSE_SERVER')
-        or os.environ.get('PIPEWIRE_REMOTE')
+        os.environ.get("PULSE_SERVER")
+        or os.environ.get("PIPEWIRE_REMOTE")
         or _pulse_socket_reachable(),
     )
 
     # SSH detection -- normally no audio devices, but honor a reachable
     # sound server (PulseAudio/PipeWire socket or forwarding env vars), which
     # works fine over SSH (issue #35622).
-    if any(os.environ.get(v) for v in ('SSH_CLIENT', 'SSH_TTY', 'SSH_CONNECTION')):
+    if any(os.environ.get(v) for v in ("SSH_CLIENT", "SSH_TTY", "SSH_CONNECTION")):
         if has_forwarded_audio:
             notices.append("Running over SSH with a reachable PulseAudio/PipeWire sound server")
         else:
@@ -193,9 +193,9 @@ def detect_audio_environment() -> dict:
     # WSL detection — PulseAudio bridge makes audio work in WSL.
     # Only block if PULSE_SERVER is not configured.
     try:
-        with open('/proc/version', encoding="utf-8") as f:
-            if 'microsoft' in f.read().lower():
-                if os.environ.get('PULSE_SERVER'):
+        with open("/proc/version", encoding="utf-8") as f:
+            if "microsoft" in f.read().lower():
+                if os.environ.get("PULSE_SERVER"):
                     notices.append("Running in WSL with PulseAudio bridge")
                 else:
                     warnings.append(
@@ -295,6 +295,7 @@ def play_beep(frequency: int = 880, duration: float = 0.12, count: int = 1) -> N
         frequency: Tone frequency in Hz (default 880 = A5).
         duration: Duration of each beep in seconds.
         count: Number of beeps to play (with short gap between).
+
     """
     try:
         sd, np = _import_audio()
@@ -666,6 +667,7 @@ class AudioRecorder:
 
         Raises ``RuntimeError`` if sounddevice/numpy are not installed
         or if a recording is already in progress.
+
         """
         try:
             _import_audio()
@@ -730,6 +732,7 @@ class AudioRecorder:
 
         Returns:
             Path to the WAV file, or ``None`` if no audio was captured.
+
         """
         with self._lock:
             if not self._recording:
@@ -853,7 +856,7 @@ WHISPER_HALLUCINATIONS = {
 
 # Regex patterns for repetitive hallucinations (e.g. "Thank you. Thank you. Thank you.")
 _HALLUCINATION_REPEAT_RE = re.compile(
-    r'^(?:thank you|thanks|bye|you|ok|okay|the end|\.|\s|,|!)+$',
+    r"^(?:thank you|thanks|bye|you|ok|okay|the end|\.|\s|,|!)+$",
     flags=re.IGNORECASE,
 )
 
@@ -864,7 +867,7 @@ def is_whisper_hallucination(transcript: str) -> bool:
     if not cleaned:
         return True
     # Exact match against known phrases
-    if cleaned.rstrip('.!') in WHISPER_HALLUCINATIONS or cleaned in WHISPER_HALLUCINATIONS:
+    if cleaned.rstrip(".!") in WHISPER_HALLUCINATIONS or cleaned in WHISPER_HALLUCINATIONS:
         return True
     # Repetitive patterns (e.g. "Thank you. Thank you. Thank you. you")
     if _HALLUCINATION_REPEAT_RE.match(cleaned):
@@ -887,6 +890,7 @@ def transcribe_recording(wav_path: str, model: str | None = None) -> dict[str, A
 
     Returns:
         Dict with ``success``, ``transcript``, and optionally ``error``.
+
     """
     from tools.transcription_tools import MAX_FILE_SIZE, transcribe_audio
 
@@ -1052,6 +1056,7 @@ def play_audio_file(file_path: str) -> bool:
 
     Returns:
         ``True`` if playback succeeded, ``False`` otherwise.
+
     """
     global _active_playback
 
@@ -1127,9 +1132,14 @@ def check_voice_requirements() -> dict[str, Any]:
     Returns:
         Dict with ``available``, ``audio_available``, ``stt_available``,
         ``missing_packages``, and ``details``.
+
     """
     # Determine STT provider availability
-    from tools.transcription_tools import _get_provider, _load_stt_config, is_stt_enabled
+    from tools.transcription_tools import (
+        _get_provider,
+        _load_stt_config,
+        is_stt_enabled,
+    )
     stt_config = _load_stt_config()
     stt_enabled = is_stt_enabled(stt_config)
     stt_provider = _get_provider(stt_config)
@@ -1196,6 +1206,7 @@ def cleanup_temp_recordings(max_age_seconds: int = 3600) -> int:
 
     Returns:
         Number of files deleted.
+
     """
     if not os.path.isdir(_TEMP_DIR):
         return 0

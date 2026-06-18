@@ -7,11 +7,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from tools.environments import ssh as ssh_env
-from tools.environments import modal as modal_env
 from tools.environments import daytona as daytona_env
+from tools.environments import modal as modal_env
+from tools.environments import ssh as ssh_env
 from tools.environments.ssh import SSHEnvironment
-
 
 # ── SSH helpers ──────────────────────────────────────────────────────
 
@@ -239,7 +238,7 @@ class TestModalBulkDownload:
     """Unit tests for _modal_bulk_download."""
 
     def test_modal_bulk_download_command(self, tmp_path):
-        """exec should be called with tar cf - -C /root/.hermes ."""
+        """Exec should be called with tar cf - -C /root/.hermes ."""
         env = _make_mock_modal_env()
         exec_calls = _wire_modal_download(env, tar_bytes=b"tar-content")
         dest = tmp_path / "backup.tar"
@@ -344,7 +343,7 @@ class TestDaytonaBulkDownload:
     """Unit tests for _daytona_bulk_download."""
 
     def test_daytona_bulk_download_creates_tar_and_downloads(self, tmp_path):
-        """exec and download_file should both be called."""
+        """Exec and download_file should both be called."""
         env = _make_mock_daytona_env()
         dest = tmp_path / "backup.tar"
 

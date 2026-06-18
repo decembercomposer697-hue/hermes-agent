@@ -40,7 +40,6 @@ from hermes_cli.dashboard_auth import (
     assert_protocol_compliance,
 )
 
-
 # ---------------------------------------------------------------------------
 # RSA keypair fixture (module-scope — keygen is slow)
 # ---------------------------------------------------------------------------
@@ -183,7 +182,8 @@ class TestPluginRegister:
     ):
         """Phase 7 follow-up: HERMES_DASHBOARD_PORTAL_URL is optional —
         defaults to the production Nous Portal. The user shouldn't have
-        to set it for the common production deployment path."""
+        to set it for the common production deployment path.
+        """
         monkeypatch.setenv("HERMES_DASHBOARD_OAUTH_CLIENT_ID", "agent:inst1")
         monkeypatch.delenv("HERMES_DASHBOARD_PORTAL_URL", raising=False)
         ctx = MagicMock()
@@ -225,7 +225,8 @@ class TestPluginRegister:
     def test_empty_portal_url_env_uses_default(self, monkeypatch):
         """Explicit empty string still falls back to the production
         default — same handling as 'unset' so an empty Fly secret can't
-        accidentally point the dashboard at nowhere."""
+        accidentally point the dashboard at nowhere.
+        """
         monkeypatch.setenv("HERMES_DASHBOARD_OAUTH_CLIENT_ID", "agent:inst1")
         monkeypatch.setenv("HERMES_DASHBOARD_PORTAL_URL", "")
         ctx = MagicMock()
@@ -257,7 +258,8 @@ class TestConfigYamlSource:
     def patch_config(self, monkeypatch):
         """Yield a callable that replaces ``hermes_cli.config.load_config``
         with a stub returning the given dict. Tests pass the intended
-        ``dashboard.oauth`` block; the stub returns the wrapping structure."""
+        ``dashboard.oauth`` block; the stub returns the wrapping structure.
+        """
 
         def _set(oauth_block: dict[str, Any] | None) -> None:
             cfg = {}
@@ -272,7 +274,8 @@ class TestConfigYamlSource:
     def test_config_yaml_only_client_id_registers(self, patch_config, monkeypatch):
         """No env var, only config.yaml — plugin reads from config and
         registers successfully. This is the path Teknium's review pushed
-        for (".env is for secrets only")."""
+        for (".env is for secrets only").
+        """
         monkeypatch.delenv("HERMES_DASHBOARD_OAUTH_CLIENT_ID", raising=False)
         monkeypatch.delenv("HERMES_DASHBOARD_PORTAL_URL", raising=False)
         patch_config({"client_id": "agent:from-config"})
@@ -301,7 +304,8 @@ class TestConfigYamlSource:
     def test_env_overrides_config_client_id(self, patch_config, monkeypatch):
         """Env wins. Critical for Fly.io: the Portal injects
         HERMES_DASHBOARD_OAUTH_CLIENT_ID at deploy time and we MUST
-        honour it even if a stale config.yaml ships in the image."""
+        honour it even if a stale config.yaml ships in the image.
+        """
         monkeypatch.setenv("HERMES_DASHBOARD_OAUTH_CLIENT_ID", "agent:from-env")
         patch_config({"client_id": "agent:from-config"})
         ctx = MagicMock()
@@ -332,7 +336,8 @@ class TestConfigYamlSource:
         """``HERMES_DASHBOARD_OAUTH_CLIENT_ID=`` (set but empty) is
         common in CI/Fly when a secret is provisioned-but-not-populated.
         It MUST NOT shadow a valid config.yaml value with an empty
-        string — operators would lose the gate."""
+        string — operators would lose the gate.
+        """
         monkeypatch.setenv("HERMES_DASHBOARD_OAUTH_CLIENT_ID", "")
         patch_config({"client_id": "agent:from-config"})
         ctx = MagicMock()
@@ -346,7 +351,8 @@ class TestConfigYamlSource:
     ):
         """Neither env nor config.yaml set — skip with a reason that
         mentions BOTH surfaces so operators don't guess wrong about
-        which one to populate."""
+        which one to populate.
+        """
         monkeypatch.delenv("HERMES_DASHBOARD_OAUTH_CLIENT_ID", raising=False)
         patch_config(None)
         ctx = MagicMock()
@@ -367,7 +373,8 @@ class TestConfigYamlSource:
         """If load_config() raises (e.g. malformed YAML, IOError), the
         plugin must not crash — it falls through to the env-only path
         and either succeeds (if env is set) or surfaces the standard
-        'not set' skip reason."""
+        'not set' skip reason.
+        """
         monkeypatch.delenv("HERMES_DASHBOARD_OAUTH_CLIENT_ID", raising=False)
 
         def _broken_load():
@@ -386,7 +393,8 @@ class TestConfigYamlSource:
     ):
         """cfg_get handles 'config has a string where a section was
         expected' robustly. Verify the plugin inherits that resilience
-        so a malformed user config doesn't crash startup."""
+        so a malformed user config doesn't crash startup.
+        """
         monkeypatch.delenv("HERMES_DASHBOARD_OAUTH_CLIENT_ID", raising=False)
         monkeypatch.setattr(
             "hermes_cli.config.load_config",
@@ -642,7 +650,8 @@ class TestCompleteLogin:
         self, provider, rsa_keypair,
     ):
         """Forward-compat: contract V1 doesn't issue, but if a future Portal
-        does, we should preserve it in the Session for later use."""
+        does, we should preserve it in the Session for later use.
+        """
         access_token = _mint_token(rsa_keypair)
         mock_resp = self._mock_post(
             200,
@@ -699,7 +708,8 @@ class TestVerifySession:
         self, provider, rsa_keypair,
     ):
         """Operators need to see the actual iss/aud the token carries to debug
-        config drift between HERMES_DASHBOARD_PORTAL_URL/CLIENT_ID and Portal."""
+        config drift between HERMES_DASHBOARD_PORTAL_URL/CLIENT_ID and Portal.
+        """
         token = _mint_token(rsa_keypair, iss="https://evil.example")
         with pytest.raises(ProviderError) as excinfo:
             provider.verify_session(access_token=token)

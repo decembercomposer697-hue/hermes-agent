@@ -8,10 +8,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from tools.discord_tool import (
-    DiscordAPIError,
     _ACTIONS,
     _ADMIN_ACTIONS,
     _CORE_ACTIONS,
+    DiscordAPIError,
     _available_actions,
     _channel_type_name,
     _detect_capabilities,
@@ -28,10 +28,10 @@ from tools.discord_tool import (
     get_dynamic_schema_core,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _mock_urlopen(response_data, status=200):
     """Create a mock for urllib.request.urlopen."""
@@ -689,7 +689,8 @@ class TestCapabilityDetection:
     def test_detection_failure_is_permissive(self, mock_req):
         """If detection fails (network/401/revoked token), expose everything
         and let runtime errors surface. Silent failure should never hide
-        actions the bot actually has."""
+        actions the bot actually has.
+        """
         mock_req.side_effect = DiscordAPIError(401, "unauthorized")
         caps = _detect_capabilities("tok")
         assert caps["detected"] is False
@@ -849,7 +850,8 @@ class TestAvailableActions:
 
     def test_no_message_content_keeps_fetch_messages(self):
         """MESSAGE_CONTENT affects the content field, not the action.
-        Hiding fetch_messages would lose author/timestamp/attachments access."""
+        Hiding fetch_messages would lose author/timestamp/attachments access.
+        """
         caps = {"detected": True, "has_members_intent": True, "has_message_content": False}
         actions = _available_actions(caps, None)
         assert "fetch_messages" in actions
@@ -925,7 +927,8 @@ class TestDynamicSchema:
         self, mock_req, monkeypatch,
     ):
         """member_info is an admin action; it should be hidden when
-        GUILD_MEMBERS intent is missing."""
+        GUILD_MEMBERS intent is missing.
+        """
         monkeypatch.setenv("DISCORD_BOT_TOKEN", "tok")
         monkeypatch.setattr(
             "hermes_cli.config.load_config",
@@ -983,7 +986,8 @@ class TestDynamicSchema:
     @patch("tools.discord_tool._discord_request")
     def test_empty_allowlist_with_valid_values_hides_tools(self, mock_req, monkeypatch):
         """If the allowlist resolves to zero valid actions (e.g. all names
-        were typos), get_dynamic_schema returns None so the tool is dropped."""
+        were typos), get_dynamic_schema returns None so the tool is dropped.
+        """
         monkeypatch.setenv("DISCORD_BOT_TOKEN", "tok")
         monkeypatch.setattr(
             "hermes_cli.config.load_config",
@@ -1104,7 +1108,8 @@ class TestModelToolsIntegration:
         self, mock_req, monkeypatch,
     ):
         """When model_tools.get_tool_definitions runs with discord_admin
-        available, it should replace the static schema with the dynamic one."""
+        available, it should replace the static schema with the dynamic one.
+        """
         monkeypatch.setenv("DISCORD_BOT_TOKEN", "tok")
         monkeypatch.setattr(
             "hermes_cli.config.load_config",

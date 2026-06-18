@@ -9,7 +9,6 @@ import hermes_cli.providers as providers_mod
 from hermes_cli.model_switch import list_authenticated_providers, switch_model
 from hermes_cli.providers import resolve_provider_full
 
-
 _MOCK_VALIDATION = {
     "accepted": True,
     "persist": True,
@@ -115,7 +114,8 @@ def test_switch_model_accepts_explicit_named_custom_provider(monkeypatch):
 
 def test_list_groups_same_name_custom_providers_into_one_row(monkeypatch):
     """Multiple custom_providers entries sharing a name should produce one row
-    with all models collected, not N duplicate rows."""
+    with all models collected, not N duplicate rows.
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr(providers_mod, "HERMES_OVERLAYS", {})
 
@@ -146,7 +146,8 @@ def test_list_groups_same_name_custom_providers_into_one_row(monkeypatch):
 
 def test_list_deduplicates_same_model_in_group(monkeypatch):
     """Duplicate model entries under the same provider name should not produce
-    duplicate entries in the models list."""
+    duplicate entries in the models list.
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr(providers_mod, "HERMES_OVERLAYS", {})
 
@@ -205,7 +206,8 @@ def test_list_enumerates_dict_format_models_alongside_default(monkeypatch):
 
 def test_list_enumerates_dict_format_models_without_singular_model(monkeypatch):
     """Dict-format ``models:`` with no singular ``model:`` should still
-    enumerate every dict key (previously the picker reported 0 models)."""
+    enumerate every dict key (previously the picker reported 0 models).
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr(providers_mod, "HERMES_OVERLAYS", {})
 
@@ -238,7 +240,8 @@ def test_list_enumerates_dict_format_models_without_singular_model(monkeypatch):
 
 def test_list_dedupes_dict_model_matching_singular_default(monkeypatch):
     """When the singular ``model:`` is also a key in the ``models:`` dict,
-    it must appear exactly once in the picker."""
+    it must appear exactly once in the picker.
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr(providers_mod, "HERMES_OVERLAYS", {})
 
@@ -264,14 +267,14 @@ def test_list_dedupes_dict_model_matching_singular_default(monkeypatch):
     assert ds_rows[0]["models"] == ["deepseek-chat", "deepseek-reasoner"]
 
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # #9210: group custom_providers by (base_url, api_key) in /model picker
 # ─────────────────────────────────────────────────────────────────────────────
 
 def test_list_authenticated_providers_groups_same_endpoint(monkeypatch):
     """Multiple custom_providers entries sharing a base_url+api_key must be
-    returned as a single picker row with all their models merged."""
+    returned as a single picker row with all their models merged.
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr(providers_mod, "HERMES_OVERLAYS", {})
 
@@ -282,7 +285,7 @@ def test_list_authenticated_providers_groups_same_endpoint(monkeypatch):
         custom_providers=[
             {"name": "Ollama — MiniMax M2.7", "base_url": "http://localhost:11434/v1",
              "api_key": "ollama", "model": "minimax-m2.7"},
-            {"name": "Ollama — GLM 5.1",      "base_url": "http://localhost:11434/v1",
+            {"name": "Ollama — GLM 5.1", "base_url": "http://localhost:11434/v1",
              "api_key": "ollama", "model": "glm-5.1"},
             {"name": "Ollama — Qwen3-coder", "base_url": "http://localhost:11434/v1",
              "api_key": "ollama", "model": "qwen3-coder"},
@@ -306,7 +309,8 @@ def test_list_authenticated_providers_current_endpoint_uses_current_slug(monkeyp
     """When current_base_url matches the grouped endpoint, the slug must
     equal current_provider so picker selection routes through the live
     credential pipeline — provided current_provider is a real slug, not
-    the corrupt bare "custom" (see #17478)."""
+    the corrupt bare "custom" (see #17478).
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr(providers_mod, "HERMES_OVERLAYS", {})
 
@@ -332,7 +336,8 @@ def test_list_authenticated_providers_bare_custom_slug_recovers(monkeypatch):
     """Regression for #17478: when a prior failed switch left the bare
     literal "custom" in model.provider, the picker must NOT propagate
     that broken slug. It must fall back to the canonical
-    ``custom:<name>`` form so the picker stays usable."""
+    ``custom:<name>`` form so the picker stays usable.
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr(providers_mod, "HERMES_OVERLAYS", {})
 
@@ -357,7 +362,8 @@ def test_list_authenticated_providers_bare_custom_slug_recovers(monkeypatch):
 
 def test_list_authenticated_providers_distinct_endpoints_stay_separate(monkeypatch):
     """Entries with different base_urls must produce separate picker rows
-    even if some display names happen to be similar."""
+    even if some display names happen to be similar.
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr(providers_mod, "HERMES_OVERLAYS", {})
 
@@ -386,7 +392,8 @@ def test_list_authenticated_providers_distinct_endpoints_stay_separate(monkeypat
 def test_list_authenticated_providers_same_url_different_keys_disambiguated(monkeypatch):
     """Two custom_providers entries with the same base_url but different
     api_keys (and identical cleaned names) must both stay visible in the
-    picker — slug is suffixed to disambiguate."""
+    picker — slug is suffixed to disambiguate.
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr(providers_mod, "HERMES_OVERLAYS", {})
 
@@ -452,7 +459,8 @@ def test_list_authenticated_providers_same_url_different_key_env_and_api_mode_st
 
 def test_list_authenticated_providers_total_models_reflects_grouped_count(monkeypatch):
     """After grouping six entries into one row, total_models must reflect
-    the full count, and every grouped model appears in the list."""
+    the full count, and every grouped model appears in the list.
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr(providers_mod, "HERMES_OVERLAYS", {})
 

@@ -1,5 +1,4 @@
-"""
-Interface compliance tests for all plugin-based gateway platforms.
+"""Interface compliance tests for all plugin-based gateway platforms.
 
 Discovers platforms dynamically under ``plugins/platforms/`` — no manual
 enumeration — and verifies each one implements the required contract.
@@ -64,7 +63,7 @@ class _MockPluginContext:
         check_fn: Any,
         **kwargs: Any,
     ) -> None:
-        from gateway.platform_registry import platform_registry, PlatformEntry
+        from gateway.platform_registry import PlatformEntry, platform_registry
 
         entry = PlatformEntry(
             name=name,

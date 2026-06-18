@@ -1,5 +1,4 @@
-"""
-yuanbao_media.py — 元宝平台媒体处理模块
+"""yuanbao_media.py — 元宝平台媒体处理模块
 
 提供 COS 上传、文件下载、TIM 媒体消息构建等功能。
 移植自 TypeScript 版 media.ts（yuanbao-openclaw-plugin），
@@ -25,7 +24,7 @@ import secrets
 import struct
 import time
 import urllib.parse
-from typing import Optional, Any
+from typing import Any, Optional
 
 import httpx
 
@@ -115,12 +114,10 @@ def generate_file_id() -> str:
     return secrets.token_hex(16)
 
 
-
 # ============ 图片尺寸解析（纯 Python，无需 Pillow） ============
 
 def parse_image_size(data: bytes) -> dict[str, int] | None:
-    """
-    解析图片宽高（支持 JPEG/PNG/GIF/WebP），无需第三方依赖。
+    """解析图片宽高（支持 JPEG/PNG/GIF/WebP），无需第三方依赖。
     返回 {"width": w, "height": h} 或 None（无法识别）。
     """
     return (
@@ -203,8 +200,7 @@ async def download_url(
     url: str,
     max_size_mb: int = DEFAULT_MAX_SIZE_MB,
 ) -> tuple[bytes, str]:
-    """
-    下载 URL 内容，返回 (bytes, content_type)。
+    """下载 URL 内容，返回 (bytes, content_type)。
 
     Args:
         url:          HTTP(S) URL
@@ -216,6 +212,7 @@ async def download_url(
     Raises:
         ValueError:  内容超过大小限制
         httpx.HTTPError: 网络/HTTP 错误
+
     """
     max_bytes = max_size_mb * 1024 * 1024
     async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
@@ -262,8 +259,7 @@ def _cos_sign(
     start_time: int | None = None,
     expire_seconds: int = 3600,
 ) -> str:
-    """
-    构建 COS 请求签名（q-sign-algorithm=sha1 方案）。
+    """构建 COS 请求签名（q-sign-algorithm=sha1 方案）。
     参考：https://cloud.tencent.com/document/product/436/7778
 
     Args:
@@ -278,6 +274,7 @@ def _cos_sign(
 
     Returns:
         Authorization header 值（完整字符串）
+
     """
     now = int(time.time())
     q_sign_time = f"{start_time or now};{(start_time or now) + expire_seconds}"
@@ -345,8 +342,7 @@ async def get_cos_credentials(
     bot_id: str = "",
     route_env: str = "",
 ) -> dict:
-    """
-    调用 genUploadInfo 接口获取 COS 临时密钥及上传配置。
+    """调用 genUploadInfo 接口获取 COS 临时密钥及上传配置。
 
     Args:
         app_key:        应用 Key（用于 X-ID 头）
@@ -371,6 +367,7 @@ async def get_cos_credentials(
 
     Raises:
         RuntimeError: 接口返回非 0 code 或字段缺失
+
     """
     if file_id is None:
         file_id = generate_file_id()
@@ -422,8 +419,7 @@ async def upload_to_cos(
     bucket: str,
     region: str,
 ) -> dict:
-    """
-    通过 httpx PUT 请求将文件上传到 COS。
+    """通过 httpx PUT 请求将文件上传到 COS。
     使用临时凭证（tmpSecretId/tmpSecretKey/sessionToken）构建 HMAC-SHA1 签名。
 
     Args:
@@ -452,6 +448,7 @@ async def upload_to_cos(
     Raises:
         httpx.HTTPStatusError: COS 返回非 2xx 状态
         RuntimeError:          credentials 字段缺失
+
     """
     secret_id: str = credentials.get("encryptTmpSecretId", "")
     secret_key: str = credentials.get("encryptTmpSecretKey", "")
@@ -561,8 +558,7 @@ def build_image_msg_body(
     height: int = 0,
     mime_type: str = "",
 ) -> list[dict]:
-    """
-    构建腾讯 IM TIMImageElem 消息体。
+    """构建腾讯 IM TIMImageElem 消息体。
     参考：https://cloud.tencent.com/document/product/269/2720
 
     Args:
@@ -576,6 +572,7 @@ def build_image_msg_body(
 
     Returns:
         TIMImageElem 消息体列表（适合直接放入 msg_body）
+
     """
     _uuid = uuid or filename or _basename_from_url(url) or "image"
     image_format = get_image_format(mime_type) if mime_type else 255
@@ -606,8 +603,7 @@ def build_file_msg_body(
     uuid: str | None = None,
     size: int = 0,
 ) -> list[dict]:
-    """
-    构建腾讯 IM TIMFileElem 消息体。
+    """构建腾讯 IM TIMFileElem 消息体。
     参考：https://cloud.tencent.com/document/product/269/2720
 
     Args:
@@ -618,6 +614,7 @@ def build_file_msg_body(
 
     Returns:
         TIMFileElem 消息体列表（适合直接放入 msg_body）
+
     """
     _uuid = uuid or filename
 

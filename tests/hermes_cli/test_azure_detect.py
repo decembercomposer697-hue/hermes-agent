@@ -9,10 +9,10 @@ import pytest
 
 from hermes_cli import azure_detect
 
-
 # ----------------------------------------------------------------------
 # Helpers
 # ----------------------------------------------------------------------
+
 
 class _FakeHTTPResponse:
     """Minimal stand-in for urllib.request.urlopen's context manager."""

@@ -7,7 +7,6 @@ host systemd/launchd/windows code path.
 """
 from __future__ import annotations
 
-
 import pytest
 
 
@@ -31,7 +30,8 @@ class _CallRecorder:
 def test_dispatch_returns_false_on_host(monkeypatch: pytest.MonkeyPatch) -> None:
     """When the environment isn't s6 (host run), the helper must
     return False and not invoke a manager — callers continue with
-    their existing systemd/launchd/windows path."""
+    their existing systemd/launchd/windows path.
+    """
     from hermes_cli import gateway as gw
     monkeypatch.setattr(
         "hermes_cli.service_manager.detect_service_manager", lambda: "systemd",
@@ -83,7 +83,8 @@ def test_dispatch_unknown_action_returns_false(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """An unrecognized action (e.g. 'install') must not silently
-    succeed — return False so the host code path handles it."""
+    succeed — return False so the host code path handles it.
+    """
     from hermes_cli import gateway as gw
     rec = _CallRecorder()
     monkeypatch.setattr(
@@ -100,7 +101,8 @@ def test_dispatch_defaults_profile_to_default(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """When profile is None, the helper resolves it via _profile_arg().
-    With no profile context set anywhere, that resolves to "default"."""
+    With no profile context set anywhere, that resolves to "default".
+    """
     from hermes_cli import gateway as gw
     rec = _CallRecorder()
     monkeypatch.setattr(
@@ -194,7 +196,8 @@ def test_dispatch_all_handles_partial_failure(
     capsys: pytest.CaptureFixture,
 ) -> None:
     """A failure on one profile must not skip the others; the helper
-    reports each failure and the success count."""
+    reports each failure and the success count.
+    """
     from hermes_cli import gateway as gw
 
     class _FailOnWriter(_ListingRecorder):
@@ -228,7 +231,8 @@ def test_dispatch_all_empty_list_reports_and_returns_true(
     """With no profile gateways registered the helper still claims the
     dispatch (returns True) and prints a friendly message — the host
     fallback would just pkill nothing, which isn't useful inside a
-    container."""
+    container.
+    """
     from hermes_cli import gateway as gw
     rec = _ListingRecorder([])
     monkeypatch.setattr(
@@ -246,7 +250,8 @@ def test_dispatch_all_unknown_action_returns_false(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """`start --all` is not a supported CLI surface; the helper must
-    fall through to the host code path rather than no-op."""
+    fall through to the host code path rather than no-op.
+    """
     from hermes_cli import gateway as gw
     monkeypatch.setattr(
         "hermes_cli.service_manager.detect_service_manager", lambda: "s6",
@@ -271,7 +276,8 @@ def test_dispatch_renders_gateway_not_registered_friendly(
     capsys: pytest.CaptureFixture,
 ) -> None:
     """`hermes -p typo gateway start` should print a clear message and
-    exit 1 — not dump a traceback at the user."""
+    exit 1 — not dump a traceback at the user.
+    """
     from hermes_cli import gateway as gw
     from hermes_cli.service_manager import GatewayNotRegisteredError
 
@@ -303,7 +309,8 @@ def test_dispatch_renders_s6_command_error_friendly(
     capsys: pytest.CaptureFixture,
 ) -> None:
     """An s6-svc failure (e.g. EACCES on the supervise FIFO) should
-    surface the stderr inline, not as an opaque traceback."""
+    surface the stderr inline, not as an opaque traceback.
+    """
     from hermes_cli import gateway as gw
     from hermes_cli.service_manager import S6CommandError
 
@@ -349,7 +356,8 @@ class _Args:
 
 def _stub_s6(monkeypatch: pytest.MonkeyPatch, *, on_s6: bool) -> _CallRecorder:
     """Wire up service-manager stubs so the underlying dispatcher will
-    fire (on_s6=True) or return False (on_s6=False)."""
+    fire (on_s6=True) or return False (on_s6=False).
+    """
     rec = _CallRecorder()
     monkeypatch.setattr(
         "hermes_cli.service_manager.detect_service_manager",
@@ -363,7 +371,8 @@ def _stub_s6(monkeypatch: pytest.MonkeyPatch, *, on_s6: bool) -> _CallRecorder:
 
 def test_redirect_noop_on_host(monkeypatch: pytest.MonkeyPatch) -> None:
     """Host runs (non-s6) must not redirect. Returns False; caller
-    continues to the foreground gateway code path unchanged."""
+    continues to the foreground gateway code path unchanged.
+    """
     from hermes_cli import gateway as gw
 
     _stub_s6(monkeypatch, on_s6=False)
@@ -475,6 +484,7 @@ def test_block_until_terminated_installs_sigterm_handler_and_blocks(
     when PATH lacked a directory containing `sleep`.
     """
     import signal as _signal
+
     from hermes_cli import gateway as gw
 
     registered: dict[int, object] = {}
@@ -537,7 +547,8 @@ def test_redirect_respects_no_supervise_flag(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """`--no-supervise` (CLI flag) must skip the redirect even inside
-    an s6 container, restoring pre-s6 foreground semantics."""
+    an s6 container, restoring pre-s6 foreground semantics.
+    """
     from hermes_cli import gateway as gw
 
     monkeypatch.setattr(
@@ -585,7 +596,8 @@ def test_redirect_no_supervise_env_falsy_values_dont_opt_out(
     """Falsy / unrecognized values of HERMES_GATEWAY_NO_SUPERVISE must
     NOT opt out. We're strict about what counts as "yes" so a typo
     like `HERMES_GATEWAY_NO_SUPERVISE=0` doesn't silently enable the
-    historical foreground behavior."""
+    historical foreground behavior.
+    """
     from hermes_cli import gateway as gw
 
     _stub_s6(monkeypatch, on_s6=True)

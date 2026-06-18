@@ -229,8 +229,8 @@ class GatewaySlashCommandsMixin:
 
     async def _handle_profile_command(self, event: MessageEvent) -> str:
         """Handle /profile — show active profile name and home directory."""
-        from hermes_constants import display_hermes_home
         from hermes_cli.profiles import get_active_profile_name
+        from hermes_constants import display_hermes_home
 
         display = display_hermes_home()
         profile_name = get_active_profile_name()
@@ -310,6 +310,7 @@ class GatewaySlashCommandsMixin:
         import asyncio
         import re
         import shlex
+
         from hermes_cli.kanban import run_slash
 
         text = (event.text or "").strip()
@@ -440,8 +441,8 @@ class GatewaySlashCommandsMixin:
         if title:
             lines.append(t("gateway.status.title", title=title))
         lines.extend([
-            t("gateway.status.created", timestamp=session_entry.created_at.strftime('%Y-%m-%d %H:%M')),
-            t("gateway.status.last_activity", timestamp=session_entry.updated_at.strftime('%Y-%m-%d %H:%M')),
+            t("gateway.status.created", timestamp=session_entry.created_at.strftime("%Y-%m-%d %H:%M")),
+            t("gateway.status.last_activity", timestamp=session_entry.updated_at.strftime("%Y-%m-%d %H:%M")),
             t("gateway.status.tokens", tokens=f"{db_total_tokens:,}"),
             t("gateway.status.agent_running", state=t("gateway.status.state_yes") if is_running else t("gateway.status.state_no")),
         ])
@@ -449,7 +450,7 @@ class GatewaySlashCommandsMixin:
             lines.append(t("gateway.status.queued", count=queue_depth))
         lines.extend([
             "",
-            t("gateway.status.platforms", platforms=', '.join(connected_platforms)),
+            t("gateway.status.platforms", platforms=", ".join(connected_platforms)),
         ])
 
         return "\n".join(lines)
@@ -616,6 +617,7 @@ class GatewaySlashCommandsMixin:
             ``/platform list``           — show connected + failed/paused platforms
             ``/platform pause whatsapp`` — stop the reconnect watcher hammering whatsapp
             ``/platform resume whatsapp`` — re-queue a paused platform for retry
+
         """
         text = (getattr(event, "content", "") or "").strip()
         # Strip the leading "/platform" (or "/PLATFORM") token if present
@@ -895,12 +897,16 @@ class GatewaySlashCommandsMixin:
           /model <name> --provider <provider> — switch provider + model
           /model --provider <provider>        — switch to provider, auto-detect model
         """
-        from gateway.run import _hermes_home, _load_gateway_config
         import yaml
+
+        from gateway.run import _hermes_home, _load_gateway_config
         from hermes_cli.model_switch import (
-            switch_model as _switch_model, parse_model_flags,
             list_authenticated_providers,
             list_picker_providers,
+            parse_model_flags,
+        )
+        from hermes_cli.model_switch import (
+            switch_model as _switch_model,
         )
         from hermes_cli.providers import get_label
 
@@ -1068,7 +1074,9 @@ class GatewaySlashCommandsMixin:
                         lines = [t("gateway.model.switched", model=result.new_model)]
                         lines.append(t("gateway.model.provider_label", provider=plabel))
                         mi = result.model_info
-                        from hermes_cli.model_switch import resolve_display_context_length
+                        from hermes_cli.model_switch import (
+                            resolve_display_context_length,
+                        )
                         _sw_config_ctx = None
                         try:
                             _sw_cfg = _load_gateway_config()
@@ -1363,7 +1371,8 @@ class GatewaySlashCommandsMixin:
 
         On change, the cached agent for this session is evicted so the next
         message creates a fresh AIAgent with the new api_mode wired in
-        (avoids prompt-cache invalidation mid-session)."""
+        (avoids prompt-cache invalidation mid-session).
+        """
         from hermes_cli import codex_runtime_switch as crs
 
         raw_args = event.get_command_args().strip() if event else ""
@@ -1403,7 +1412,7 @@ class GatewaySlashCommandsMixin:
         from hermes_constants import display_hermes_home
 
         args = event.get_command_args().strip().lower()
-        config_path = _hermes_home / 'config.yaml'
+        config_path = _hermes_home / "config.yaml"
 
         try:
             config = _load_gateway_config()
@@ -1764,12 +1773,12 @@ class GatewaySlashCommandsMixin:
                 if info:
                     lines = [
                         t("gateway.voice.status_mode", label=labels.get(mode, mode)),
-                        t("gateway.voice.status_channel", channel=info['channel_name']),
-                        t("gateway.voice.status_participants", count=info['member_count']),
+                        t("gateway.voice.status_channel", channel=info["channel_name"]),
+                        t("gateway.voice.status_participants", count=info["member_count"]),
                     ]
                     for m in info["members"]:
                         status = t("gateway.voice.speaking") if m.get("is_speaking") else ""
-                        lines.append(t("gateway.voice.status_member", name=m['display_name'], status=status))
+                        lines.append(t("gateway.voice.status_member", name=m["display_name"], status=status))
                     return "\n".join(lines)
             return t("gateway.voice.status_mode", label=labels.get(mode, mode))
         else:
@@ -1907,8 +1916,9 @@ class GatewaySlashCommandsMixin:
             /reasoning show|on               Show model reasoning in responses
             /reasoning hide|off              Hide model reasoning from responses
         """
-        from gateway.run import _hermes_home, _platform_config_key
         import yaml
+
+        from gateway.run import _hermes_home, _platform_config_key
 
         raw_args = event.get_command_args().strip()
         args, persist_global = self._parse_reasoning_command_args(raw_args)
@@ -2118,8 +2128,13 @@ class GatewaySlashCommandsMixin:
 
     async def _handle_fast_command(self, event: MessageEvent) -> str:
         """Handle /fast — mirror the CLI Priority Processing toggle in gateway chats."""
-        from gateway.run import _hermes_home, _load_gateway_config, _resolve_gateway_model
         import yaml
+
+        from gateway.run import (
+            _hermes_home,
+            _load_gateway_config,
+            _resolve_gateway_model,
+        )
         from hermes_cli.models import model_supports_fast_mode
 
         args = event.get_command_args().strip().lower()
@@ -2264,7 +2279,12 @@ class GatewaySlashCommandsMixin:
         are respected but not modified here — edit config.yaml directly for
         per-platform control.
         """
-        from gateway.run import _hermes_home, _load_gateway_config, _platform_config_key, _resolve_gateway_model
+        from gateway.run import (
+            _hermes_home,
+            _load_gateway_config,
+            _platform_config_key,
+            _resolve_gateway_model,
+        )
         from gateway.runtime_footer import resolve_footer_config
 
         config_path = _hermes_home / "config.yaml"
@@ -2367,9 +2387,9 @@ class GatewaySlashCommandsMixin:
         partial, keep_last, focus_topic = parse_partial_compress_args(_raw_args)
 
         try:
-            from run_agent import AIAgent
             from agent.manual_compression_feedback import summarize_manual_compression
             from agent.model_metadata import estimate_request_tokens_rough
+            from run_agent import AIAgent
 
             session_key = self._session_key_for_source(source)
             model, runtime_kwargs = self._resolve_session_agent_runtime(
@@ -3018,7 +3038,7 @@ class GatewaySlashCommandsMixin:
         args = event.get_command_args().strip()
 
         # Normalize Unicode dashes (Telegram/iOS auto-converts -- to em/en dash)
-        args = re.sub(r'[\u2012\u2013\u2014\u2015](days|source)', r'--\1', args)
+        args = re.sub(r"[\u2012\u2013\u2014\u2015](days|source)", r"--\1", args)
 
         days = 30
         source = None
@@ -3044,8 +3064,8 @@ class GatewaySlashCommandsMixin:
                     i += 1
 
         try:
-            from hermes_state import SessionDB
             from agent.insights import InsightsEngine
+            from hermes_state import SessionDB
 
             loop = asyncio.get_running_loop()
 
@@ -3233,7 +3253,7 @@ class GatewaySlashCommandsMixin:
         invoking the bundle's own ``/<slug>`` command, not by this one.
         """
         try:
-            from agent.skill_bundles import list_bundles, _bundles_dir
+            from agent.skill_bundles import _bundles_dir, list_bundles
         except Exception as exc:
             logger.warning("Bundles command unavailable: %s", exc)
             return f"Bundles subsystem unavailable: {exc}"
@@ -3284,7 +3304,8 @@ class GatewaySlashCommandsMixin:
         session_key = self._session_key_for_source(source)
 
         from tools.approval import (
-            resolve_gateway_approval, has_blocking_approval,
+            has_blocking_approval,
+            resolve_gateway_approval,
         )
 
         if not has_blocking_approval(session_key):
@@ -3330,7 +3351,8 @@ class GatewaySlashCommandsMixin:
         session_key = self._session_key_for_source(source)
 
         from tools.approval import (
-            resolve_gateway_approval, has_blocking_approval,
+            has_blocking_approval,
+            resolve_gateway_approval,
         )
 
         if not has_blocking_approval(session_key):
@@ -3364,10 +3386,14 @@ class GatewaySlashCommandsMixin:
         full log uploads should use ``hermes debug share`` from the CLI.
         """
         import asyncio
+
         from hermes_cli.debug import (
-            _capture_dump, collect_debug_report,
-            upload_to_pastebin, _schedule_auto_delete,
-            _GATEWAY_PRIVACY_NOTICE, _best_effort_sweep_expired_pastes,
+            _GATEWAY_PRIVACY_NOTICE,
+            _best_effort_sweep_expired_pastes,
+            _capture_dump,
+            _schedule_auto_delete,
+            collect_debug_report,
+            upload_to_pastebin,
         )
 
         loop = asyncio.get_running_loop()
@@ -3408,12 +3434,13 @@ class GatewaySlashCommandsMixin:
         files are written so either the current gateway process or the next one
         can notify the user when the update finishes.
         """
-        from gateway.run import _hermes_home, _resolve_hermes_bin
         import json
         import shutil
         import subprocess
         from datetime import datetime
-        from hermes_cli.config import is_managed, format_managed_message
+
+        from gateway.run import _hermes_home, _resolve_hermes_bin
+        from hermes_cli.config import format_managed_message, is_managed
 
         # Block non-messaging platforms (API server, webhooks, ACP)
         platform = event.source.platform
@@ -3432,7 +3459,7 @@ class GatewaySlashCommandsMixin:
             return f"✗ {format_managed_message('update Hermes Agent')}"
 
         project_root = Path(__file__).parent.parent.resolve()
-        git_dir = project_root / '.git'
+        git_dir = project_root / ".git"
 
         if not git_dir.exists():
             return t("gateway.update.not_git_repo")
@@ -3489,6 +3516,7 @@ class GatewaySlashCommandsMixin:
         try:
             if sys.platform == "win32":
                 import textwrap
+
                 from hermes_cli._subprocess_compat import windows_detach_popen_kwargs
 
                 # hermes_cmd is a list of argv parts we can pass directly

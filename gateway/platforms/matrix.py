@@ -34,7 +34,6 @@ import os
 import re
 import time
 from dataclasses import dataclass
-
 from html import escape as _html_escape
 from pathlib import Path
 from typing import Any, Dict, Optional, Set
@@ -100,8 +99,8 @@ from gateway.platforms.base import (
     MessageType,
     ProcessingOutcome,
     SendResult,
-    resolve_proxy_url,
     proxy_kwargs_for_aiohttp,
+    resolve_proxy_url,
 )
 from gateway.platforms.helpers import ThreadParticipationTracker
 
@@ -296,10 +295,10 @@ def _check_e2ee_deps() -> bool:
     ``No module named 'asyncpg'`` (#31116).
     """
     try:
+        import aiosqlite
+        import asyncpg
         from mautrix.crypto import OlmMachine
         from mautrix.crypto.store.asyncpg import PgCryptoStore
-        import asyncpg
-        import aiosqlite
 
         return True
     except (ImportError, AttributeError):
@@ -333,7 +332,7 @@ def check_matrix_requirements() -> bool:
     # lookups) and correctly handles ``mautrix[encryption]`` by stripping
     # the extras marker before checking the bare package.
     try:
-        from tools.lazy_deps import feature_missing, ensure_and_bind
+        from tools.lazy_deps import ensure_and_bind, feature_missing
         missing = feature_missing("platform.matrix")
     except Exception as exc:  # pragma: no cover — defensive
         logger.debug("Matrix: lazy_deps lookup failed: %s", exc)
@@ -343,9 +342,16 @@ def check_matrix_requirements() -> bool:
     if missing or ensure_and_bind is None:
         def _import():
             from mautrix.types import (
-                ContentURI, EventID, EventType, PaginationDirection,
-                PresenceState, RoomCreatePreset, RoomID, SyncToken,
-                TrustState, UserID,
+                ContentURI,
+                EventID,
+                EventType,
+                PaginationDirection,
+                PresenceState,
+                RoomCreatePreset,
+                RoomID,
+                SyncToken,
+                TrustState,
+                UserID,
             )
             return {
                 "ContentURI": ContentURI,
@@ -1190,7 +1196,6 @@ class MatrixAdapter(BasePlatformAdapter):
                 await self._client.set_typing(RoomID(chat_id), timeout=0)
             except Exception:
                 pass
-
 
     async def edit_message(
         self, chat_id: str, message_id: str, content: str, *, finalize: bool = False,
@@ -2768,15 +2773,15 @@ class MatrixAdapter(BasePlatformAdapter):
             localpart = self._user_id.split(":")[0].lstrip("@")
             if localpart:
                 body = re.sub(
-                    r'(?<![\w])@' + re.escape(localpart) + r'\b',
-                    '',
+                    r"(?<![\w])@" + re.escape(localpart) + r"\b",
+                    "",
                     body,
                     flags=re.IGNORECASE,
                 )
 
         # Normalize spacing after mention removal.
-        body = re.sub(r'[ \t]{2,}', ' ', body)
-        body = re.sub(r'\s+([,.;:!?])', r'\1', body)
+        body = re.sub(r"[ \t]{2,}", " ", body)
+        body = re.sub(r"\s+([,.;:!?])", r"\1", body)
         return body.strip()
 
     async def _get_display_name(self, room_id: str, user_id: str) -> str:

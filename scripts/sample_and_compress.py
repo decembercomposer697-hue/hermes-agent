@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Sample and Compress HuggingFace Datasets
+"""Sample and Compress HuggingFace Datasets
 
 Downloads trajectories from multiple HuggingFace datasets, randomly samples them,
 and runs trajectory compression to fit within a target token budget.
@@ -18,11 +17,13 @@ Usage:
 import json
 import random
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
+from typing import Any, Dict, List, Tuple
+
 import fire
 
 # Load environment variables
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
@@ -37,14 +38,14 @@ DEFAULT_DATASETS = [
 
 
 def load_dataset_from_hf(dataset_name: str) -> list[dict[str, Any]]:
-    """
-    Load a dataset from HuggingFace.
+    """Load a dataset from HuggingFace.
     
     Args:
         dataset_name: HuggingFace dataset name (e.g., "NousResearch/dataset-name")
         
     Returns:
         List of trajectory entries
+
     """
     from datasets import load_dataset
     
@@ -86,14 +87,14 @@ def _init_tokenizer_worker(tokenizer_name: str):
 
 
 def _count_tokens_for_entry(entry: dict) -> tuple[dict, int]:
-    """
-    Count tokens for a single entry (used in parallel processing).
+    """Count tokens for a single entry (used in parallel processing).
     
     Args:
         entry: Trajectory entry with 'conversations' field
         
     Returns:
         Tuple of (entry, token_count)
+
     """
     global _TOKENIZER
     
@@ -122,8 +123,7 @@ def sample_from_datasets(
     seed: int = 42,
     num_proc: int = 8,
 ) -> list[dict[str, Any]]:
-    """
-    Load all datasets, filter by token count, then randomly sample from combined pool.
+    """Load all datasets, filter by token count, then randomly sample from combined pool.
     
     Args:
         datasets: List of HuggingFace dataset names
@@ -135,6 +135,7 @@ def sample_from_datasets(
         
     Returns:
         List of sampled trajectory entries
+
     """
     from multiprocessing import Pool
     
@@ -226,13 +227,13 @@ def save_samples_for_compression(
     output_dir: Path,
     batch_size: int = 100,
 ):
-    """
-    Save samples to JSONL files for trajectory compression.
+    """Save samples to JSONL files for trajectory compression.
     
     Args:
         samples: List of trajectory entries
         output_dir: Directory to save JSONL files
         batch_size: Number of entries per file
+
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     
@@ -248,26 +249,26 @@ def save_samples_for_compression(
         batch = samples[start_idx:end_idx]
         
         output_file = output_dir / f"batch_{i}.jsonl"
-        with open(output_file, 'w', encoding='utf-8') as f:
+        with open(output_file, "w", encoding="utf-8") as f:
             for entry in batch:
-                f.write(json.dumps(entry, ensure_ascii=False) + '\n')
+                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
     
     print(f"   ✅ Saved {num_batches} batch files")
 
 
 def run_compression(input_dir: Path, output_dir: Path, config_path: str):
-    """
-    Run trajectory compression on the sampled data.
+    """Run trajectory compression on the sampled data.
     
     Args:
         input_dir: Directory containing JSONL files to compress
         output_dir: Directory for compressed output
         config_path: Path to compression config YAML
+
     """
     # Import the compressor
     import sys
     sys.path.insert(0, str(Path(__file__).parent.parent))
-    from trajectory_compressor import TrajectoryCompressor, CompressionConfig
+    from trajectory_compressor import CompressionConfig, TrajectoryCompressor
     
     print(f"\n🗜️  Running trajectory compression...")
     print(f"   Input: {input_dir}")
@@ -285,12 +286,12 @@ def run_compression(input_dir: Path, output_dir: Path, config_path: str):
 
 
 def merge_output_to_single_jsonl(input_dir: Path, output_file: Path):
-    """
-    Merge all JSONL files in a directory into a single JSONL file.
+    """Merge all JSONL files in a directory into a single JSONL file.
     
     Args:
         input_dir: Directory containing JSONL files
         output_file: Output JSONL file path
+
     """
     print(f"\n📦 Merging output files into {output_file.name}...")
     
@@ -298,16 +299,16 @@ def merge_output_to_single_jsonl(input_dir: Path, output_file: Path):
     for jsonl_file in sorted(input_dir.glob("*.jsonl")):
         if jsonl_file.name == output_file.name:
             continue
-        with open(jsonl_file, encoding='utf-8') as f:
+        with open(jsonl_file, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if line:
                     all_entries.append(json.loads(line))
     
     # Write merged file
-    with open(output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         for entry in all_entries:
-            f.write(json.dumps(entry, ensure_ascii=False) + '\n')
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
     
     print(f"   ✅ Merged {len(all_entries):,} entries into {output_file.name}")
     return output_file
@@ -324,8 +325,7 @@ def main(
     num_proc: int = 8,
     skip_download: bool = False,
 ):
-    """
-    Sample trajectories from HuggingFace datasets and run compression.
+    """Sample trajectories from HuggingFace datasets and run compression.
     
     Args:
         total_samples: Total number of samples to collect (default: 2500)
@@ -337,6 +337,7 @@ def main(
         min_tokens: Minimum token count to filter trajectories (default: 16000)
         num_proc: Number of parallel workers for tokenization (default: 8)
         skip_download: Skip download and use existing sampled data
+
     """
     print("=" * 70)
     print("📊 TRAJECTORY SAMPLING AND COMPRESSION")

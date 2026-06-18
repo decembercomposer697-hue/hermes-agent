@@ -37,7 +37,8 @@ def _create_skill(tmp_path, name, frontmatter_extra=""):
 class TestSkillViewRegistersPassthrough:
     def test_available_env_vars_registered(self, tmp_path, monkeypatch):
         """When a skill declares required_environment_variables and the var IS set,
-        it should be registered in the passthrough."""
+        it should be registered in the passthrough.
+        """
         _create_skill(
             tmp_path,
             "test-skill",
@@ -93,7 +94,8 @@ class TestSkillViewRegistersPassthrough:
 
     def test_missing_env_vars_not_registered(self, tmp_path, monkeypatch):
         """When a skill declares required_environment_variables but the var is NOT set,
-        it should NOT be registered in the passthrough."""
+        it should NOT be registered in the passthrough.
+        """
         _create_skill(
             tmp_path,
             "test-skill",

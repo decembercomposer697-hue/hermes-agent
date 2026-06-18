@@ -1,5 +1,4 @@
-"""
-Tests for skip_confirm and invalidate_cache behavior in /skills install
+"""Tests for skip_confirm and invalidate_cache behavior in /skills install
 and /skills uninstall slash commands.
 
 Slash commands always skip confirmation (input() hangs in TUI).
@@ -11,7 +10,6 @@ Updated for PR #3586 (cache-aware install/uninstall).
 """
 
 from unittest.mock import patch
-
 
 
 class TestHandleSkillsSlashInstallFlags:

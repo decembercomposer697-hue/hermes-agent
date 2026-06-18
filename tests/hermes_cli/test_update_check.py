@@ -18,8 +18,8 @@ def test_version_string_no_v_prefix():
 
 def test_check_for_updates_uses_cache(tmp_path, monkeypatch):
     """When cache is fresh, check_for_updates should return cached value without calling git."""
-    from hermes_cli.banner import check_for_updates
     from hermes_cli import __version__
+    from hermes_cli.banner import check_for_updates
 
     # Create a fake git repo and fresh cache
     repo_dir = tmp_path / "hermes-agent"

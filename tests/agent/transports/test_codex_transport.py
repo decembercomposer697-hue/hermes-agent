@@ -1,8 +1,9 @@
 """Tests for the ResponsesApiTransport (Codex)."""
 
 import json
-import pytest
 from types import SimpleNamespace
+
+import pytest
 
 from agent.transports import get_transport
 from agent.transports.types import NormalizedResponse
@@ -100,7 +101,7 @@ class TestCodexBuildKwargs:
         assert "prompt_cache_key" not in kw
 
     def test_xai_responses_sends_cache_key_via_extra_body(self, transport):
-        """xAI's Responses API documents ``prompt_cache_key`` as the
+        """XAI's Responses API documents ``prompt_cache_key`` as the
         body-level cache-routing key (the ``x-grok-conv-id`` header is
         Chat-Completions-only). Passing it via ``extra_body`` is robust
         against openai SDK builds whose ``Responses.stream()`` kwarg
@@ -125,7 +126,8 @@ class TestCodexBuildKwargs:
         request_overrides), the xAI cache-key injection must merge into
         the existing dict instead of overwriting it. Caller-supplied
         ``prompt_cache_key`` wins (setdefault semantics) so user overrides
-        aren't silently clobbered by the transport."""
+        aren't silently clobbered by the transport.
+        """
         messages = [{"role": "user", "content": "Hi"}]
         kw = transport.build_kwargs(
             model="grok-4.3", messages=messages, tools=[],
@@ -354,7 +356,8 @@ class TestCodexValidateResponse:
 
     def test_output_text_fallback_not_valid(self, transport):
         """validate_response is strict — output_text doesn't make it valid.
-        The caller handles output_text fallback with diagnostic logging."""
+        The caller handles output_text fallback with diagnostic logging.
+        """
         r = SimpleNamespace(output=None, output_text="Some text")
         assert transport.validate_response(r) is False
 
@@ -453,7 +456,6 @@ class TestCodexNormalizeResponse:
         assert '"command"' in tc.arguments
 
 
-
 class TestCodexTransportTimeout:
     """Forward per-request timeout from build_kwargs to the SDK kwargs."""
 
@@ -533,7 +535,8 @@ class TestCodexTransportXaiServiceTierStrip:
 
     def test_xai_strips_service_tier_from_request_overrides(self, transport):
         """Headline #28490 case: service_tier=priority leaks through
-        request_overrides, must not reach the xAI request body."""
+        request_overrides, must not reach the xAI request body.
+        """
         kw = transport.build_kwargs(
             model="grok-4.3",
             messages=[{"role": "user", "content": "hi"}],
@@ -565,7 +568,8 @@ class TestCodexTransportXaiServiceTierStrip:
 
     def test_github_responses_preserves_service_tier(self, transport):
         """GitHub Models (Copilot) is another codex_responses surface
-        that should not be affected by the xAI strip."""
+        that should not be affected by the xAI strip.
+        """
         kw = transport.build_kwargs(
             model="gpt-5.5",
             messages=[{"role": "user", "content": "hi"}],
@@ -613,7 +617,8 @@ class TestPreflightSlashEnumStrip:
 
     def test_grok_model_strips_slash_enum_values(self):
         """When the model name is Grok-family, slash-containing enum
-        values are stripped so xAI doesn't 400 on the tool schema."""
+        values are stripped so xAI doesn't 400 on the tool schema.
+        """
         from agent.codex_responses_adapter import _preflight_codex_api_kwargs
         kwargs = self._make_kwargs(
             "grok-4.3",
@@ -642,7 +647,8 @@ class TestPreflightSlashEnumStrip:
         """Native Codex / GitHub Models DO accept slash-containing
         enums.  The safety-net must NOT strip there or we silently
         degrade tool-schema constraints on every codex_responses
-        provider that isn't xAI."""
+        provider that isn't xAI.
+        """
         from agent.codex_responses_adapter import _preflight_codex_api_kwargs
         kwargs = self._make_kwargs(
             "gpt-5.5",

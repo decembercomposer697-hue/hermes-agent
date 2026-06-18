@@ -108,7 +108,8 @@ class TestVerifyCoreDependencies:
     ):
         """If --reinstall doesn't repair the partial install (uv resolver
         thinks the env is satisfied), force-install each missing dep with
-        its declared pin spec. This is the last-ditch path."""
+        its declared pin spec. This is the last-ditch path.
+        """
         py, venv_root = fake_venv_python
         env = {"VIRTUAL_ENV": str(venv_root)}
 
@@ -144,7 +145,8 @@ class TestVerifyCoreDependencies:
         """``ptyprocess ; sys_platform != 'win32'`` should NOT be reported as
         missing on Windows. Without marker evaluation, the verification step
         would false-positive on every cross-platform exclusion and chase its
-        tail forever trying to install something that can't apply here."""
+        tail forever trying to install something that can't apply here.
+        """
         py, venv_root = fake_venv_python
         env = {"VIRTUAL_ENV": str(venv_root)}
         captured_argv: list[list[str]] = []
@@ -178,7 +180,8 @@ class TestVerifyCoreDependencies:
 
     def test_no_pyproject_is_noop(self, tmp_path, monkeypatch):
         """If pyproject.toml is missing (unusual but possible in some test
-        envs), the verification step must short-circuit, not crash."""
+        envs), the verification step must short-circuit, not crash.
+        """
         import hermes_cli.main as main_mod
         monkeypatch.setattr(main_mod, "PROJECT_ROOT", tmp_path)
         # No pyproject.toml in tmp_path.
@@ -238,7 +241,8 @@ class TestResolveInstallTargetPython:
         """When VIRTUAL_ENV is set, the verification step must probe THAT
         venv's interpreter — not the outer Python that drove `hermes update`.
         If we probed sys.executable instead, we'd false-positive every dep
-        the outer interpreter happens to lack."""
+        the outer interpreter happens to lack.
+        """
         venv_root = tmp_path / "newvenv"
         scripts = venv_root / "Scripts"
         scripts.mkdir(parents=True)
@@ -255,7 +259,8 @@ class TestResolveInstallTargetPython:
     def test_returns_none_when_venv_python_missing(self, tmp_path):
         """If the path we'd point at doesn't exist (uv install failed before
         the python shim landed), return None so the verification step
-        cleanly short-circuits instead of crashing on FileNotFoundError."""
+        cleanly short-circuits instead of crashing on FileNotFoundError.
+        """
         with patch("hermes_cli.main._is_windows", return_value=True):
             from hermes_cli.main import _resolve_install_target_python
             result = _resolve_install_target_python(

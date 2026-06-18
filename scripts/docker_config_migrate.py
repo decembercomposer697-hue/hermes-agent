@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import shutil
 import sys
-from datetime import datetime, timezone, UTC
-from pathlib import Path
 from collections.abc import Iterable
+from datetime import UTC, datetime, timezone
+from pathlib import Path
 
 from hermes_cli.config import (
     check_config_version,

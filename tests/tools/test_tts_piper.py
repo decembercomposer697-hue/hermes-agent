@@ -1,5 +1,4 @@
-"""
-Tests for the native Piper TTS provider.
+"""Tests for the native Piper TTS provider.
 
 These tests pin the resolution / caching / dispatch paths for Piper
 without requiring the ``piper-tts`` package to actually be installed
@@ -24,10 +23,10 @@ from tools.tts_tool import (
     text_to_speech_tool,
 )
 
-
 # ---------------------------------------------------------------------------
 # Registry / constants
 # ---------------------------------------------------------------------------
+
 
 class TestPiperRegistration:
     def test_piper_is_a_builtin_provider(self):
@@ -61,7 +60,8 @@ class TestResolvePiperVoicePath:
 
     def test_cached_voice_name_not_redownloaded(self, tmp_path):
         """If both <voice>.onnx and <voice>.onnx.json exist in the
-        download dir, no subprocess is spawned."""
+        download dir, no subprocess is spawned.
+        """
         voice = "en_US-test-medium"
         (tmp_path / f"{voice}.onnx").write_bytes(b"model")
         (tmp_path / f"{voice}.onnx.json").write_text("{}")
@@ -191,7 +191,8 @@ class TestGeneratePiperTts:
 
     def test_voice_name_triggers_download(self, tmp_path, monkeypatch):
         """A config voice of ``en_US-lessac-medium`` should be resolved via
-        _resolve_piper_voice_path (which would normally download)."""
+        _resolve_piper_voice_path (which would normally download).
+        """
         monkeypatch.setattr(tts_tool, "_import_piper", lambda: _StubPiperVoice)
 
         def fake_resolve(voice, download_dir):

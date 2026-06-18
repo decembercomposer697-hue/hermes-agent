@@ -100,7 +100,8 @@ def _hermes_home() -> Path:
     Tests and ``HERMES_HOME=...`` env overrides need this to be late-
     binding. If we cached the path at import time, switching profiles
     or tweaking env vars in tests would silently keep using the old
-    path."""
+    path.
+    """
     return get_hermes_home()
 
 
@@ -194,8 +195,8 @@ def load_user_credentials(email: str | None = None) -> Any | None:
         return None
 
     try:
-        from google.oauth2.credentials import Credentials
         from google.auth.transport.requests import Request
+        from google.oauth2.credentials import Credentials
     except ImportError:
         logger.warning(
             "[google_chat_user_oauth] google-auth not installed; user-OAuth "
@@ -361,8 +362,8 @@ def _write_private_json(path: Path, data: Any) -> None:
 def _ensure_deps() -> None:
     """Check deps available; install if not; exit on failure."""
     try:
-        import googleapiclient
         import google_auth_oauthlib
+        import googleapiclient
     except ImportError:
         if not install_deps():
             sys.exit(1)
@@ -370,8 +371,8 @@ def _ensure_deps() -> None:
 
 def install_deps() -> bool:
     try:
-        import googleapiclient
         import google_auth_oauthlib
+        import googleapiclient
         print("Dependencies already installed.")
         return True
     except ImportError:
@@ -536,8 +537,9 @@ def exchange_auth_code(code: str, email: str | None = None) -> None:
         sys.exit(1)
 
     _ensure_deps()
-    from google_auth_oauthlib.flow import Flow
     from urllib.parse import parse_qs, urlparse
+
+    from google_auth_oauthlib.flow import Flow
 
     granted_scopes = list(SCOPES)
     if isinstance(raw_callback, str) and raw_callback.startswith("http"):
@@ -600,8 +602,8 @@ def revoke(email: str | None = None) -> None:
         return
 
     _ensure_deps()
-    from google.oauth2.credentials import Credentials
     from google.auth.transport.requests import Request
+    from google.oauth2.credentials import Credentials
 
     try:
         creds = Credentials.from_authorized_user_file(str(token_path), SCOPES)

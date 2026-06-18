@@ -25,8 +25,8 @@ import logging
 import os
 import sys
 import threading
-from typing import Any, Optional
 from collections.abc import Callable
+from typing import Any, Optional
 
 # Modifier aliases mirrored from the TUI parser (``ui-tui/src/lib/platform.ts``)
 # ``_MOD_ALIASES`` table — the contract that removes the cross-runtime
@@ -783,16 +783,16 @@ def speak_text(text: str) -> None:
         from tools.tts_tool import text_to_speech_tool
 
         tts_text = text[:4000] if len(text) > 4000 else text
-        tts_text = re.sub(r'```[\s\S]*?```', ' ', tts_text)             # fenced code blocks
-        tts_text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', tts_text)    # [text](url) → text
-        tts_text = re.sub(r'https?://\S+', '', tts_text)                # bare URLs
-        tts_text = re.sub(r'\*\*(.+?)\*\*', r'\1', tts_text)            # bold
-        tts_text = re.sub(r'\*(.+?)\*', r'\1', tts_text)                # italic
-        tts_text = re.sub(r'`(.+?)`', r'\1', tts_text)                  # inline code
-        tts_text = re.sub(r'^#+\s*', '', tts_text, flags=re.MULTILINE)  # headers
-        tts_text = re.sub(r'^\s*[-*]\s+', '', tts_text, flags=re.MULTILINE)  # list bullets
-        tts_text = re.sub(r'---+', '', tts_text)                        # horizontal rules
-        tts_text = re.sub(r'\n{3,}', '\n\n', tts_text)                  # excess newlines
+        tts_text = re.sub(r"```[\s\S]*?```", " ", tts_text)             # fenced code blocks
+        tts_text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", tts_text)    # [text](url) → text
+        tts_text = re.sub(r"https?://\S+", "", tts_text)                # bare URLs
+        tts_text = re.sub(r"\*\*(.+?)\*\*", r"\1", tts_text)            # bold
+        tts_text = re.sub(r"\*(.+?)\*", r"\1", tts_text)                # italic
+        tts_text = re.sub(r"`(.+?)`", r"\1", tts_text)                  # inline code
+        tts_text = re.sub(r"^#+\s*", "", tts_text, flags=re.MULTILINE)  # headers
+        tts_text = re.sub(r"^\s*[-*]\s+", "", tts_text, flags=re.MULTILINE)  # list bullets
+        tts_text = re.sub(r"---+", "", tts_text)                        # horizontal rules
+        tts_text = re.sub(r"\n{3,}", "\n\n", tts_text)                  # excess newlines
         tts_text = tts_text.strip()
         if not tts_text:
             return

@@ -1,5 +1,6 @@
 """Tests for _reap_orphaned_browser_sessions() — kills orphaned agent-browser
-daemons whose Python parent exited without cleaning up."""
+daemons whose Python parent exited without cleaning up.
+"""
 
 import os
 from unittest.mock import patch
@@ -34,6 +35,7 @@ def _make_socket_dir(tmpdir, session_name, pid=None, owner_pid=None):
         pid: daemon PID to write to <session>.pid (None = no file)
         owner_pid: owning hermes PID to write to <session>.owner_pid
                    (None = no file; tests the legacy path)
+
     """
     d = tmpdir / f"agent-browser-{session_name}"
     d.mkdir()

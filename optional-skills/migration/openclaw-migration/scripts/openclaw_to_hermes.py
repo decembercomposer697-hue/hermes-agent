@@ -14,11 +14,11 @@ import json
 import os
 import re
 import shutil
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-from collections.abc import Sequence
 
 try:
     import yaml
@@ -405,9 +405,9 @@ def backup_existing(path: Path, backup_root: Path) -> Path | None:
 # like ``openclaw`` → ``hermes`` (so filesystem paths like ``~/.openclaw``
 # become ``~/.hermes`` — the real Hermes home — not the broken ``~/.Hermes``).
 _REBRAND_PATTERNS: list[tuple[re.Pattern, str]] = [
-    (re.compile(r'\bOpen[\s-]?Claw\b', re.IGNORECASE), 'Hermes'),
-    (re.compile(r'\bClawdBot\b', re.IGNORECASE), 'Hermes'),
-    (re.compile(r'\bMoltBot\b', re.IGNORECASE), 'Hermes'),
+    (re.compile(r"\bOpen[\s-]?Claw\b", re.IGNORECASE), "Hermes"),
+    (re.compile(r"\bClawdBot\b", re.IGNORECASE), "Hermes"),
+    (re.compile(r"\bMoltBot\b", re.IGNORECASE), "Hermes"),
 ]
 
 

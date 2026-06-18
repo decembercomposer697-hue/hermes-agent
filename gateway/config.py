@@ -1,5 +1,4 @@
-"""
-Gateway configuration management.
+"""Gateway configuration management.
 
 Handles loading and validating configuration for:
 - Connected platforms (Telegram, Discord, WhatsApp, Weixin, and more)
@@ -8,14 +7,14 @@ Handles loading and validating configuration for:
 - Delivery preferences
 """
 
+import json
 import logging
 import os
-import json
-from pathlib import Path
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
 from collections.abc import Callable
+from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from hermes_cli.config import get_hermes_home
 from utils import is_truthy_value
@@ -238,8 +237,7 @@ _BUILTIN_PLATFORM_VALUES = frozenset(m.value for m in Platform.__members__.value
 
 @dataclass
 class HomeChannel:
-    """
-    Default destination for a platform.
+    """Default destination for a platform.
     
     When a cron job specifies deliver="telegram" without a specific chat ID,
     messages are sent to this home channel. Thread-aware platforms may also
@@ -273,8 +271,7 @@ class HomeChannel:
 
 @dataclass
 class SessionResetPolicy:
-    """
-    Controls when sessions reset (lose context).
+    """Controls when sessions reset (lose context).
     
     Modes:
     - "daily": Reset at a specific hour each day
@@ -494,8 +491,7 @@ _PLATFORM_CONNECTED_CHECKERS: dict[Platform, Callable[[PlatformConfig], bool]] =
 
 @dataclass
 class GatewayConfig:
-    """
-    Main gateway configuration.
+    """Main gateway configuration.
     
     Manages all platform connections, session policies, and delivery settings.
     """
@@ -603,8 +599,7 @@ class GatewayConfig:
         platform: Platform | None = None,
         session_type: str | None = None,
     ) -> SessionResetPolicy:
-        """
-        Get the appropriate reset policy for a session.
+        """Get the appropriate reset policy for a session.
         
         Priority: platform override > type override > default
         """
@@ -751,8 +746,7 @@ class GatewayConfig:
 
 
 def load_gateway_config() -> GatewayConfig:
-    """
-    Load gateway configuration from multiple sources.
+    """Load gateway configuration from multiple sources.
 
     Priority (highest to lowest):
     1. Environment variables

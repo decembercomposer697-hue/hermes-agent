@@ -21,16 +21,16 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-
-
 # ---------------------------------------------------------------------------
 # Part 1: Agent-side — _flush_messages_to_session_db after compression
 # ---------------------------------------------------------------------------
 
+
 class TestFlushAfterCompression:
     """Verify that compressed messages are flushed to the new session's SQLite
     even when conversation_history (from the original session) is longer than
-    the compressed messages list."""
+    the compressed messages list.
+    """
 
     def _make_agent(self, session_db):
         with patch.dict(os.environ, {"OPENROUTER_API_KEY": "test-key"}):
@@ -140,7 +140,8 @@ class TestFlushAfterCompression:
 class TestGatewayHistoryOffsetAfterSplit:
     """Verify that when the agent creates a new session during compression,
     the gateway uses history_offset=0 so all compressed messages are written
-    to the JSONL transcript."""
+    to the JSONL transcript.
+    """
 
     def test_history_offset_zero_on_session_split(self):
         """When agent.session_id differs from the original, history_offset must be 0."""

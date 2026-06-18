@@ -1,8 +1,8 @@
 """Tests for native Discord slash command fast-paths (thread creation & auto-thread)."""
 
+import sys
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
-import sys
 
 import pytest
 
@@ -166,7 +166,8 @@ async def test_registers_native_restart_slash_command(adapter):
 @pytest.mark.asyncio
 async def test_auto_registers_missing_gateway_commands(adapter):
     """Commands in COMMAND_REGISTRY that aren't explicitly registered should
-    be auto-registered by the dynamic catch-all block."""
+    be auto-registered by the dynamic catch-all block.
+    """
     adapter._run_simple_slash = AsyncMock()
     adapter._register_slash_commands()
 
@@ -539,7 +540,8 @@ async def test_auto_create_thread_strips_mention_syntax_from_name(adapter):
 @pytest.mark.asyncio
 async def test_auto_create_thread_falls_back_to_hermes_when_only_mentions(adapter):
     """If a message contains only mention syntax, the stripped content is
-    empty — fall back to the 'Hermes' default rather than ''."""
+    empty — fall back to the 'Hermes' default rather than ''.
+    """
     thread = SimpleNamespace(id=999, name="Hermes")
     message = SimpleNamespace(
         content="<@&1490963422786093149>",
@@ -771,8 +773,9 @@ async def test_auto_thread_skips_threads_and_dms(adapter, monkeypatch):
 
 def test_discord_auto_thread_config_bridge(monkeypatch, tmp_path):
     """discord.auto_thread in config.yaml should be bridged to DISCORD_AUTO_THREAD env var."""
-    import yaml
     from pathlib import Path
+
+    import yaml
 
     # Write a config.yaml the loader will find
     hermes_dir = tmp_path / ".hermes"

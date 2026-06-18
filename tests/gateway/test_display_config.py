@@ -229,7 +229,8 @@ class TestPlatformDefaults:
 
     def test_telegram_mobile_chatter_defaults(self):
         """Telegram keeps real mid-turn signal (interim commentary + heartbeats)
-        but skips the verbose busy-ack iteration counter by default."""
+        but skips the verbose busy-ack iteration counter by default.
+        """
         from gateway.display_config import resolve_display_setting
 
         # Real model voice — keep on. Without this, Telegram users see
@@ -249,7 +250,8 @@ class TestPlatformDefaults:
 
     def test_telegram_mobile_chatter_can_opt_in(self):
         """Per-platform config can re-enable Telegram busy-ack detail
-        and re-disable the kept-on defaults."""
+        and re-disable the kept-on defaults.
+        """
         from gateway.display_config import resolve_display_setting
 
         config = {
@@ -294,6 +296,7 @@ class TestConfigMigration:
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         # Re-import to pick up the new HERMES_HOME
         import importlib
+
         import hermes_cli.config as cfg_mod
         importlib.reload(cfg_mod)
 
@@ -320,6 +323,7 @@ class TestConfigMigration:
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         import importlib
+
         import hermes_cli.config as cfg_mod
         importlib.reload(cfg_mod)
 

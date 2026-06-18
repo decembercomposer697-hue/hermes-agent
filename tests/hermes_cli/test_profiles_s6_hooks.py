@@ -18,7 +18,6 @@ from hermes_cli.profiles import (
     _maybe_unregister_gateway_service,
 )
 
-
 # ---------------------------------------------------------------------------
 # _maybe_register_gateway_service / _maybe_unregister_gateway_service
 # ---------------------------------------------------------------------------
@@ -111,7 +110,8 @@ def test_register_swallows_duplicate_value_error(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """A pre-existing s6 registration (from container-boot reconcile)
-    is a benign condition — register must not propagate ValueError."""
+    is a benign condition — register must not propagate ValueError.
+    """
     _patch_detect_s6(monkeypatch)
     mgr = _S6Manager()
     mgr.raise_on_register = ValueError("already registered")
@@ -126,7 +126,8 @@ def test_register_swallows_arbitrary_error(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Even an unexpected exception from the manager must not bring
-    down `hermes profile create` — print and continue."""
+    down `hermes profile create` — print and continue.
+    """
     _patch_detect_s6(monkeypatch)
     mgr = _S6Manager()
     mgr.raise_on_register = RuntimeError("svscanctl exploded")
@@ -142,8 +143,10 @@ def test_register_swallows_no_backend_runtime_error(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """When `get_service_manager()` raises RuntimeError (no backend
-    detected), the hook must silently no-op."""
+    detected), the hook must silently no-op.
+    """
     _patch_detect_s6(monkeypatch)
+
     def _no_backend() -> None:
         raise RuntimeError("no supported service manager detected")
     monkeypatch.setattr(
@@ -159,7 +162,8 @@ def test_register_silent_when_detect_throws(
     """If detect_service_manager itself raises (e.g. a partial s6
     install on a host machine), the hook must stay silent — no
     confusing s6 warning printed to a user who has never touched a
-    container."""
+    container.
+    """
     def _broken_detect() -> str:
         raise RuntimeError("detection blew up")
     monkeypatch.setattr(

@@ -36,9 +36,9 @@ import logging
 import os
 import re
 import time
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Optional
-from collections.abc import Mapping
 
 from utils import is_truthy_value
 
@@ -78,7 +78,6 @@ def _safe_int(value: Any) -> Any:
         return int(str(value))
     except (TypeError, ValueError):
         return _SENTINEL
-
 
 
 def _validate_usd(value: str | None) -> bool:
@@ -674,7 +673,8 @@ def _credits_state_from_account(info) -> CreditsState | None:
 
     Float account dollars → micros (plus a DISPLAY *_usd string — allowed, since
     we're formatting account floats, NOT parsing a server-provided *_usd). Returns
-    None if the account can't yield a usable state (fail-open)."""
+    None if the account can't yield a usable state (fail-open).
+    """
     try:
         _acc = getattr(info, "paid_service_access_info", None)
         _sub = getattr(info, "subscription", None)
@@ -717,7 +717,8 @@ def _hydrate_seed_state(agent, state) -> None:
     gate (the cold-start snapshot IS the first observation, so a session that opens
     already in a band warns immediately — the live header path keeps true crossing
     semantics), then emits. Safe to call from a worker thread: emit already runs
-    off-thread in the TUI build path."""
+    off-thread in the TUI build path.
+    """
     agent._credits_state = state
     if getattr(agent, "_credits_session_start_micros", None) is None:
         agent._credits_session_start_micros = state.remaining_micros

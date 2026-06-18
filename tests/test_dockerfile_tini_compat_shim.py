@@ -29,7 +29,8 @@ def test_tini_compat_symlink_present():
 def test_tini_compat_comment_explains_why():
     """The symlink line is comment-anchored to #34192 so a future reader
     knows why it exists. Removing the comment makes it look like dead
-    code worth deleting."""
+    code worth deleting.
+    """
     df = _dockerfile_text()
     assert "#34192" in df, (
         "The Dockerfile tini compat shim must keep its #34192 anchor "
@@ -40,7 +41,8 @@ def test_tini_compat_comment_explains_why():
 def test_entrypoint_still_init_not_tini():
     """Sanity check: the actual ENTRYPOINT is still /init (s6-overlay).
     The shim is for legacy external wrappers, not for the image's own
-    runtime — that path must continue to use the canonical /init."""
+    runtime — that path must continue to use the canonical /init.
+    """
     df = _dockerfile_text()
     assert 'ENTRYPOINT [ "/init"' in df, (
         "Dockerfile ENTRYPOINT must remain /init (s6-overlay). The "

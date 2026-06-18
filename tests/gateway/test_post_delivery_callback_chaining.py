@@ -84,7 +84,8 @@ class TestPostDeliveryCallbackChaining:
 
     def test_stale_generation_registration_rejected(self, adapter):
         """A registration with an older generation than the existing
-        entry is rejected — it doesn't clobber the newer run's slot."""
+        entry is rejected — it doesn't clobber the newer run's slot.
+        """
         fired = []
         adapter.register_post_delivery_callback(
             "s", lambda: fired.append("gen7"), generation=7,

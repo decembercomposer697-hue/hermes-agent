@@ -161,6 +161,7 @@ def _normalize_for_deepseek(model_name: str) -> str:
 
     Returns:
         A DeepSeek-accepted model identifier.
+
     """
     bare = _strip_vendor_prefix(model_name).lower()
 
@@ -268,6 +269,7 @@ def detect_vendor(model_name: str) -> str | None:
         >>> detect_vendor("anthropic/claude-sonnet-4.6")
         'anthropic'
         >>> detect_vendor("my-custom-model")
+
     """
     name = model_name.strip()
     if not name:
@@ -381,6 +383,7 @@ def normalize_model_for_provider(model_input: str, target_provider: str) -> str:
 
         >>> normalize_model_for_provider("MiMo-V2.5-Pro", "xiaomi")
         'mimo-v2.5-pro'
+
     """
     name = (model_input or "").strip()
     if not name:

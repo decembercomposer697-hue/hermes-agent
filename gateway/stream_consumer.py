@@ -21,18 +21,21 @@ import logging
 import queue
 import re
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Optional
-from collections.abc import Callable
 
-from gateway.platforms.base import BasePlatformAdapter as _BasePlatformAdapter
-from gateway.platforms.base import _custom_unit_to_cp
-from gateway.platforms.base import MEDIA_TAG_CLEANUP_RE
 from gateway.config import (
-    DEFAULT_STREAMING_EDIT_INTERVAL as _DEFAULT_STREAMING_EDIT_INTERVAL,
     DEFAULT_STREAMING_BUFFER_THRESHOLD as _DEFAULT_STREAMING_BUFFER_THRESHOLD,
+)
+from gateway.config import (
     DEFAULT_STREAMING_CURSOR as _DEFAULT_STREAMING_CURSOR,
 )
+from gateway.config import (
+    DEFAULT_STREAMING_EDIT_INTERVAL as _DEFAULT_STREAMING_EDIT_INTERVAL,
+)
+from gateway.platforms.base import MEDIA_TAG_CLEANUP_RE, _custom_unit_to_cp
+from gateway.platforms.base import BasePlatformAdapter as _BasePlatformAdapter
 
 logger = logging.getLogger("gateway.stream_consumer")
 
@@ -209,7 +212,8 @@ class GatewayStreamConsumer:
     @property
     def final_content_delivered(self) -> bool:
         """True when the final response content reached the user, even if
-        the subsequent cosmetic edit (cursor removal) failed."""
+        the subsequent cosmetic edit (cursor removal) failed.
+        """
         return self._final_content_delivered
 
     async def _edit_message(
@@ -716,7 +720,7 @@ class GatewayStreamConsumer:
         cleaned = text.replace("[[audio_as_voice]]", "")
         cleaned = GatewayStreamConsumer._MEDIA_RE.sub("", cleaned)
         # Collapse excessive blank lines left behind by removed tags
-        cleaned = re.sub(r'\n{3,}', '\n\n', cleaned)
+        cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
         # Strip trailing whitespace/newlines but preserve leading content
         return cleaned.rstrip()
 

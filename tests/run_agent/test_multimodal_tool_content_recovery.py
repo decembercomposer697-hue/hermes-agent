@@ -25,7 +25,6 @@ See: https://github.com/NousResearch/hermes-agent/issues/27344
 
 from __future__ import annotations
 
-
 from agent.error_classifier import FailoverReason, classify_api_error
 
 
@@ -75,7 +74,8 @@ class TestStripImagePartsHelper:
 
     def test_tool_message_list_without_image_unchanged(self):
         """List content with only text parts is left alone — caller surfaces
-        the original error if this turns out to also be rejected."""
+        the original error if this turns out to also be rejected.
+        """
         agent = _make_agent()
         msgs = [
             {"role": "tool", "tool_call_id": "x", "content": [
@@ -101,7 +101,8 @@ class TestStripImagePartsHelper:
 
     def test_tool_message_image_only_gets_placeholder(self):
         """If the list had nothing but image parts, leave a placeholder so
-        the assistant message has something to reference."""
+        the assistant message has something to reference.
+        """
         agent = _make_agent()
         msgs = [
             {"role": "tool", "tool_call_id": "x", "content": [
@@ -125,7 +126,8 @@ class TestStripImagePartsHelper:
 
     def test_only_tool_messages_get_downgraded(self):
         """User / assistant messages with list-type content are out of
-        scope — they're handled by the existing image-routing path."""
+        scope — they're handled by the existing image-routing path.
+        """
         agent = _make_agent()
         msgs = [
             {"role": "user", "content": [
@@ -147,7 +149,8 @@ class TestStripImagePartsHelper:
 
     def test_skips_recording_when_no_model_id(self):
         """Don't poison the cache with empty keys when provider/model is
-        unset (e.g. lazy-initialised mid-handshake)."""
+        unset (e.g. lazy-initialised mid-handshake).
+        """
         agent = _make_agent(provider="", model="")
         msgs = [
             {"role": "tool", "tool_call_id": "x", "content": [
@@ -184,7 +187,8 @@ class TestToolResultContentShortCircuit:
     def test_returns_text_summary_for_xiaomi_proactively(self, monkeypatch):
         """Xiaomi MiMo rejects list-type tool content, so even with an
         empty cache, _tool_result_content_for_active_model should
-        proactively downgrade to a text summary."""
+        proactively downgrade to a text summary.
+        """
         agent = _make_agent(provider="xiaomi", model="mimo-v2.5")
         agent._no_list_tool_content_models = set()  # explicit empty
         monkeypatch.setattr(agent, "_model_supports_vision", lambda: True)
@@ -210,7 +214,8 @@ class TestToolResultContentShortCircuit:
 
     def test_xiaomi_any_model_gets_text_summary(self, monkeypatch):
         """All Xiaomi models reject list-type tool content, so even a
-        different model on the same provider gets a text summary."""
+        different model on the same provider gets a text summary.
+        """
         agent = _make_agent(provider="xiaomi", model="mimo-v2.5-pro")
         agent._no_list_tool_content_models = {("xiaomi", "mimo-v2.5")}
         monkeypatch.setattr(agent, "_model_supports_vision", lambda: True)
@@ -223,7 +228,8 @@ class TestToolResultContentShortCircuit:
     def test_missing_cache_attribute_falls_through(self, monkeypatch):
         """Agents built via ``object.__new__`` without calling ``__init__``
         must not crash — the cache attribute may be absent. Xiaomi still
-        gets a text summary because the provider profile says so."""
+        gets a text summary because the provider profile says so.
+        """
         agent = _make_agent(provider="xiaomi", model="mimo-v2.5")
         # Deliberately do not assign _no_list_tool_content_models.
         monkeypatch.setattr(agent, "_model_supports_vision", lambda: True)

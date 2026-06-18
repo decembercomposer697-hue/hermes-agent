@@ -7,8 +7,8 @@ from gateway.platforms.signal_rate_limit import (
     SIGNAL_RATE_LIMIT_BUCKET_CAPACITY,
     SIGNAL_RATE_LIMIT_DEFAULT_RETRY_AFTER,
     SignalAttachmentScheduler,
-    get_scheduler,
     _reset_scheduler,
+    get_scheduler,
 )
 
 
@@ -23,8 +23,10 @@ def _reset_signal_scheduler():
 def _patch_sleep_and_time(monkeypatch, capture: list):
     """Replace asyncio.sleep inside the scheduler module so tests don't
     actually wait and advances time.monotonic to simulate time passing.
-    Captures the requested duration per call."""
+    Captures the requested duration per call.
+    """
     offset = 0.0
+
     async def _fake_sleep(seconds):
         capture.append(seconds)
         nonlocal offset
@@ -116,7 +118,8 @@ class TestAcquire:
     @pytest.mark.asyncio
     async def test_back_to_back_acquires_drain_then_wait(self, monkeypatch):
         """Two sequential acquires of capacity each: first immediate,
-        second waits a full refill window."""
+        second waits a full refill window.
+        """
         sleeps: list = []
         _patch_sleep_and_time(monkeypatch, sleeps)
         s = SignalAttachmentScheduler()
@@ -138,6 +141,7 @@ class TestAcquire:
 
         with pytest.raises(Exception):
             await s.acquire(int(s.capacity) + 1)
+
 
 class TestFeedback:
     def test_calibrates_refill_rate_from_retry_after(self):
@@ -164,7 +168,8 @@ class TestFeedback:
         """signal-cli ≥v0.14.3: server says 'retry_after=42 for one
         token' → next acquire(1) waits 42s. Drops the old defensive
         ``retry_after * 32`` heuristic in favor of the server's
-        authoritative per-token value."""
+        authoritative per-token value.
+        """
         sleeps: list = []
         _patch_sleep_and_time(monkeypatch, sleeps)
         s = SignalAttachmentScheduler()
@@ -197,7 +202,8 @@ class TestFifoAcquire:
     async def test_concurrent_acquires_serialize(self, monkeypatch):
         """Two coroutines acquiring full capacity each: the second waits
         in the lock queue until the first finishes its bucket math + sleep.
-        Demonstrates the FIFO fairness across sessions."""
+        Demonstrates the FIFO fairness across sessions.
+        """
         sleeps: list = []
         _patch_sleep_and_time(monkeypatch, sleeps)
         s = SignalAttachmentScheduler()

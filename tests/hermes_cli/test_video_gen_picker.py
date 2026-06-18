@@ -84,7 +84,8 @@ class TestReconfigureWritesProvider:
         self, monkeypatch, tmp_path,
     ):
         """Env vars present and user accepts current value → still writes
-        video_gen.provider via the post-env-vars branch."""
+        video_gen.provider via the post-env-vars branch.
+        """
         from hermes_cli import tools_config
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -119,7 +120,8 @@ class TestReconfigureWritesProvider:
         self, monkeypatch, tmp_path,
     ):
         """No env vars at all (managed-style plugin) → writes
-        video_gen.provider via the no-env-vars early-return branch."""
+        video_gen.provider via the no-env-vars early-return branch.
+        """
         from hermes_cli import tools_config
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))

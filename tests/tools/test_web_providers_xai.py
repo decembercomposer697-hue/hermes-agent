@@ -86,7 +86,8 @@ class TestXAIProviderIsAvailable:
 
     def test_available_via_auth_store(self, monkeypatch, tmp_path):
         """Cheap probe should detect xai-oauth tokens in ~/.hermes/auth.json
-        without invoking the resolver (which can trigger refresh)."""
+        without invoking the resolver (which can trigger refresh).
+        """
         monkeypatch.delenv("XAI_API_KEY", raising=False)
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         auth_path = tmp_path / "auth.json"
@@ -130,7 +131,8 @@ class TestXAIProviderIsAvailable:
 
     def test_is_available_does_not_call_resolver(self, monkeypatch):
         """Regression guard: ``is_available()`` must NEVER touch the resolver,
-        because the OAuth resolver can trigger a network refresh."""
+        because the OAuth resolver can trigger a network refresh.
+        """
         monkeypatch.setenv("XAI_API_KEY", "sk-xai-test")
         from plugins.web.xai import provider as xai_provider
 
@@ -400,7 +402,7 @@ class TestXAIProviderRequestShape:
         }]
 
     def test_allowed_domains_capped_at_five(self):
-        """xAI caps domain filters at 5; we trim silently to avoid 400s."""
+        """XAI caps domain filters at 5; we trim silently to avoid 400s."""
         from plugins.web.xai import provider as xai_provider
 
         captured: dict = {}
@@ -449,6 +451,7 @@ class TestXAIProviderSearchErrors:
 
     def test_http_error_returns_failure(self):
         import httpx
+
         from plugins.web.xai import provider as xai_provider
 
         bad = MagicMock()
@@ -466,6 +469,7 @@ class TestXAIProviderSearchErrors:
 
     def test_request_error_returns_failure(self):
         import httpx
+
         from plugins.web.xai import provider as xai_provider
 
         with patch.object(xai_provider, "resolve_xai_http_credentials", return_value=_creds()), \
@@ -500,6 +504,7 @@ class TestXAIProviderSearchErrors:
         ``httpx.post`` to be called twice with two different Bearer tokens.
         """
         import httpx
+
         from plugins.web.xai import provider as xai_provider
 
         bad = MagicMock()
@@ -541,6 +546,7 @@ class TestXAIProviderSearchErrors:
     def test_401_on_env_var_path_does_not_retry(self):
         """Env-var (XAI_API_KEY) creds can't be refreshed — must not retry."""
         import httpx
+
         from plugins.web.xai import provider as xai_provider
 
         bad = MagicMock()
@@ -572,8 +578,10 @@ class TestXAIProviderSearchErrors:
 
     def test_401_retry_gives_up_when_refresh_returns_same_token(self):
         """If the force-refresh returns the same token (refresh-token also
-        dead), don't loop — surface the 401 to the caller."""
+        dead), don't loop — surface the 401 to the caller.
+        """
         import httpx
+
         from plugins.web.xai import provider as xai_provider
 
         bad = MagicMock()
@@ -609,8 +617,10 @@ class TestXAIProviderSearchErrors:
 
     def test_non_401_http_error_is_not_retried(self):
         """Only 401 is retryable — 429 / 500 / 503 must fail fast so the
-        agent (or upstream rate-limiter) decides what to do."""
+        agent (or upstream rate-limiter) decides what to do.
+        """
         import httpx
+
         from plugins.web.xai import provider as xai_provider
 
         bad = MagicMock()
@@ -640,7 +650,7 @@ class TestXAIProviderSearchErrors:
         assert calls["refreshed"] is False
 
     def test_http_200_with_error_envelope_surfaces_failure(self):
-        """xAI sometimes returns 200 with ``{"error": {...}}`` (model
+        """XAI sometimes returns 200 with ``{"error": {...}}`` (model
         overloaded, refusal, etc.). Must be surfaced as a failure rather
         than silently masked as success-with-empty-results.
         """
@@ -678,7 +688,8 @@ class TestXAIBackendWiring:
     def test_is_backend_available_does_not_call_resolver(self, monkeypatch):
         """Regression guard — `_is_backend_available` runs on every web_search
         dispatch and every `hermes tools` repaint. It must not invoke the
-        OAuth resolver (which can trigger a network refresh)."""
+        OAuth resolver (which can trigger a network refresh).
+        """
         from tools import web_tools
 
         monkeypatch.setenv("XAI_API_KEY", "sk-xai-test")

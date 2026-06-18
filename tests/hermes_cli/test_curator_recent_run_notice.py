@@ -12,7 +12,7 @@ is the high-attention surface where consolidations should land.
 from __future__ import annotations
 
 import importlib
-from datetime import datetime, timedelta, timezone, UTC
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest

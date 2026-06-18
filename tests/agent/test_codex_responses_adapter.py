@@ -137,7 +137,8 @@ def test_format_responses_error_ignores_non_string_code_message():
 def test_normalize_codex_response_failed_includes_code_in_error():
     """Regression: response_status == 'failed' should surface the error
     code, not just the message. Used to leak a bare 'Slow down' string
-    that was indistinguishable from a generic stream truncation."""
+    that was indistinguishable from a generic stream truncation.
+    """
     # ``output`` non-empty so we don't trip the "no output items" guard
     # before reaching the failed-status branch. Real failed responses
     # often DO carry a partial message item alongside the error.
@@ -159,7 +160,8 @@ def test_normalize_codex_response_failed_includes_code_in_error():
 
 def test_normalize_codex_response_failed_with_message_only():
     """Backwards-compat: a failed response with only a message field
-    (no code) should still surface that message verbatim."""
+    (no code) should still surface that message verbatim.
+    """
     response = SimpleNamespace(
         status="failed",
         output=[

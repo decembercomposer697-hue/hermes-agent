@@ -32,7 +32,6 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-
 _USAGE_EXIT = 2
 _FAILURE_EXIT = 1
 _SUCCESS_EXIT = 0

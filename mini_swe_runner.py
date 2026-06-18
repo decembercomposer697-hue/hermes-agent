@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-SWE Runner with Hermes Trajectory Format
+"""SWE Runner with Hermes Trajectory Format
 
 A runner that uses Hermes-Agent's built-in execution environments
 (local, docker, modal) and outputs trajectories in the Hermes-Agent format
@@ -30,10 +29,11 @@ import json
 import logging
 import os
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
 import fire
 from dotenv import load_dotenv
+
 from agent.tool_dispatch_helpers import make_tool_result_message
 
 # Load environment variables
@@ -50,15 +50,16 @@ def _effective_temperature_for_model(
     callers must omit the ``temperature`` kwarg entirely in that case.
     """
     try:
-        from agent.auxiliary_client import _fixed_temperature_for_model, OMIT_TEMPERATURE
+        from agent.auxiliary_client import (
+            OMIT_TEMPERATURE,
+            _fixed_temperature_for_model,
+        )
     except Exception:
         return None
     result = _fixed_temperature_for_model(model, base_url)
     if result is OMIT_TEMPERATURE:
         return None  # caller must omit temperature
     return result
-
-
 
 
 # ============================================================================
@@ -121,8 +122,7 @@ def create_environment(
     timeout: int = 60,
     **kwargs,
 ):
-    """
-    Create an execution environment using Hermes-Agent's built-in backends.
+    """Create an execution environment using Hermes-Agent's built-in backends.
     
     Args:
         env_type: One of "local", "docker", "modal"
@@ -133,6 +133,7 @@ def create_environment(
         
     Returns:
         Environment instance with execute() and cleanup() methods
+
     """
     if env_type == "local":
         from tools.environments.local import LocalEnvironment
@@ -155,8 +156,7 @@ def create_environment(
 # ============================================================================
 
 class MiniSWERunner:
-    """
-    Agent runner that uses Hermes-Agent's built-in execution environments
+    """Agent runner that uses Hermes-Agent's built-in execution environments
     and outputs trajectories in Hermes-Agent format.
     """
     
@@ -172,8 +172,7 @@ class MiniSWERunner:
         command_timeout: int = 60,
         verbose: bool = False,
     ):
-        """
-        Initialize the Mini-SWE Runner.
+        """Initialize the Mini-SWE Runner.
         
         Args:
             model: Model name for OpenAI-compatible API
@@ -185,6 +184,7 @@ class MiniSWERunner:
             max_iterations: Maximum tool-calling iterations
             command_timeout: Default timeout for commands
             verbose: Enable verbose logging
+
         """
         self.model = model
         self.max_iterations = max_iterations
@@ -197,8 +197,8 @@ class MiniSWERunner:
         # Setup logging
         logging.basicConfig(
             level=logging.DEBUG if verbose else logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            datefmt='%H:%M:%S',
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            datefmt="%H:%M:%S",
         )
         self.logger = logging.getLogger(__name__)
         
@@ -254,15 +254,14 @@ class MiniSWERunner:
     def _cleanup_env(self):
         """Cleanup the execution environment."""
         if self.env is not None:
-            if hasattr(self.env, 'cleanup'):
+            if hasattr(self.env, "cleanup"):
                 self.env.cleanup()
-            elif hasattr(self.env, 'stop'):
+            elif hasattr(self.env, "stop"):
                 self.env.stop()
             self.env = None
     
     def _execute_command(self, command: str, timeout: int = None) -> dict[str, Any]:
-        """
-        Execute a command in the environment.
+        """Execute a command in the environment.
         
         Args:
             command: Bash command to execute
@@ -270,6 +269,7 @@ class MiniSWERunner:
             
         Returns:
             Dict with 'output' and 'returncode'
+
         """
         if self.env is None:
             self._create_env()
@@ -307,8 +307,7 @@ class MiniSWERunner:
         user_query: str,
         completed: bool,
     ) -> list[dict[str, Any]]:
-        """
-        Convert internal message format to Hermes trajectory format.
+        """Convert internal message format to Hermes trajectory format.
         
         This produces the exact format used by batch_runner.py.
         """
@@ -412,14 +411,14 @@ class MiniSWERunner:
         return trajectory
     
     def run_task(self, task: str) -> dict[str, Any]:
-        """
-        Run a single task and return the result with trajectory.
+        """Run a single task and return the result with trajectory.
         
         Args:
             task: The task/prompt to execute
             
         Returns:
             Dict with trajectory, completion status, and metadata
+
         """
         print(f"\n{'='*60}")
         print(f"📝 Task: {task[:80]}{'...' if len(task) > 80 else ''}")
@@ -581,8 +580,7 @@ Complete the user's task step by step."""
         prompts: list[str],
         output_file: str,
     ) -> list[dict[str, Any]]:
-        """
-        Run multiple tasks and save trajectories to a JSONL file.
+        """Run multiple tasks and save trajectories to a JSONL file.
         
         Args:
             prompts: List of task prompts
@@ -590,13 +588,14 @@ Complete the user's task step by step."""
             
         Returns:
             List of results
+
         """
         results = []
         
         print(f"\n📦 Running batch of {len(prompts)} tasks")
         print(f"📁 Output: {output_file}")
         
-        with open(output_file, 'w', encoding='utf-8') as f:
+        with open(output_file, "w", encoding="utf-8") as f:
             for i, prompt in enumerate(prompts, 1):
                 print(f"\n{'='*60}")
                 print(f"📋 Task {i}/{len(prompts)}")
@@ -647,8 +646,7 @@ def main(
     timeout: int = 60,
     verbose: bool = False,
 ):
-    """
-    Run SWE tasks with Hermes trajectory format output.
+    """Run SWE tasks with Hermes trajectory format output.
     
     Args:
         task: Single task to run (use this OR prompts_file)
@@ -673,6 +671,7 @@ def main(
         
         # Batch from file
         python mini_swe_runner.py --prompts_file tasks.jsonl --output_file results.jsonl
+
     """
     print("🚀 Mini-SWE Runner with Hermes Trajectory Format")
     print("=" * 60)
@@ -695,7 +694,7 @@ def main(
         result = runner.run_task(task)
         
         # Save to file
-        with open(output_file, 'w', encoding='utf-8') as f:
+        with open(output_file, "w", encoding="utf-8") as f:
             f.write(json.dumps(result, ensure_ascii=False) + "\n")
         
         print(f"\n📁 Trajectory saved to: {output_file}")
@@ -706,7 +705,7 @@ def main(
     elif prompts_file:
         # Batch mode
         prompts = []
-        with open(prompts_file, encoding='utf-8') as f:
+        with open(prompts_file, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if line:

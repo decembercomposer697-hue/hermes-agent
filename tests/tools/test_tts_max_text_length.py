@@ -7,7 +7,6 @@ MiniMax allows 10000, and ElevenLabs allows 5000-40000 depending on model.
 
 import json
 
-
 from tools.tts_tool import (
     FALLBACK_MAX_TEXT_LENGTH,
     PROVIDER_MAX_TEXT_LENGTH,
@@ -117,7 +116,8 @@ class TestResolveMaxTextLength:
 
 class TestTextToSpeechToolTruncation:
     """End-to-end: verify the resolver actually drives the text_to_speech_tool
-    truncation path rather than the old 4000-char global."""
+    truncation path rather than the old 4000-char global.
+    """
 
     def test_openai_truncates_at_4096_not_4000(self, tmp_path, monkeypatch, caplog):
         import logging

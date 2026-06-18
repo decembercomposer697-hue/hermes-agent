@@ -13,11 +13,10 @@ import time
 import types
 from unittest.mock import MagicMock, patch
 
-
-
 # ===========================================================================
 # Helpers
 # ===========================================================================
+
 
 def _make_session_db(tmp_path):
     """Create a real SessionDB for integration-style tests."""
@@ -53,12 +52,14 @@ def _tui_session(agent=None, session_key="session-key-old", **extra):
 class TestFinalizeSessionUsesAgentSessionId:
     """After compression rotates agent.session_id, _finalize_session()
     must call end_session() on the NEW (current) session_id, not the stale
-    session_key stored in the session dict."""
+    session_key stored in the session dict.
+    """
 
     def test_finalize_targets_agent_session_id_not_stale_key(self, tmp_path):
         """Reproduction: agent.session_id rotated by compression, but
         session['session_key'] still holds old value. _finalize_session()
-        should end the agent's current session."""
+        should end the agent's current session.
+        """
         from tui_gateway import server
 
         db = _make_session_db(tmp_path)
@@ -103,7 +104,8 @@ class TestFinalizeSessionUsesAgentSessionId:
 
     def test_finalize_fallback_to_session_key_when_agent_is_none(self, tmp_path):
         """When agent is None (e.g. session never fully initialized),
-        _finalize_session falls back to session_key."""
+        _finalize_session falls back to session_key.
+        """
         from tui_gateway import server
 
         db = _make_session_db(tmp_path)
@@ -127,11 +129,13 @@ class TestFinalizeSessionUsesAgentSessionId:
 class TestSyncSessionKeyAfterAutoCompress:
     """When auto-compression fires inside run_conversation(), the post-turn
     code in _run_prompt_submit must call _sync_session_key_after_compress
-    to update session_key for downstream consumers (title, goals, etc.)."""
+    to update session_key for downstream consumers (title, goals, etc.).
+    """
 
     def test_session_key_synced_after_run_conversation_with_compression(self, monkeypatch):
         """Simulate: run_conversation() internally compresses and rotates
-        agent.session_id. After it returns, session['session_key'] must match."""
+        agent.session_id. After it returns, session['session_key'] must match.
+        """
         from tui_gateway import server
 
         class _CompressingAgent:
@@ -174,6 +178,7 @@ class TestSyncSessionKeyAfterAutoCompress:
         class _ImmediateThread:
             def __init__(self, target=None, daemon=None, **kw):
                 self._target = target
+
             def start(self):
                 self._target()
 
@@ -207,7 +212,8 @@ class TestSyncSessionKeyAfterAutoCompress:
 
 class TestPendingTitleValueError:
     """When set_session_title raises ValueError (duplicate/invalid title),
-    pending_title must be cleared — not left wedged forever."""
+    pending_title must be cleared — not left wedged forever.
+    """
 
     def test_valueerror_clears_pending_title(self, monkeypatch):
         """ValueError from set_session_title should drop pending_title."""
@@ -219,6 +225,7 @@ class TestPendingTitleValueError:
         class _Agent:
             session_id = "test-session"
             _cached_system_prompt = ""
+
             def run_conversation(self, prompt, **kw):
                 return {
                     "final_response": "ok",
@@ -242,6 +249,7 @@ class TestPendingTitleValueError:
         class _ImmediateThread:
             def __init__(self, target=None, daemon=None, **kw):
                 self._target = target
+
             def start(self):
                 self._target()
 
@@ -273,6 +281,7 @@ class TestPendingTitleValueError:
         class _Agent:
             session_id = "test-session"
             _cached_system_prompt = ""
+
             def run_conversation(self, prompt, **kw):
                 return {
                     "final_response": "ok",
@@ -296,6 +305,7 @@ class TestPendingTitleValueError:
         class _ImmediateThread:
             def __init__(self, target=None, daemon=None, **kw):
                 self._target = target
+
             def start(self):
                 self._target()
 
@@ -325,7 +335,8 @@ class TestPendingTitleValueError:
 class TestGatewaySurfacesNullResponse:
     """When the agent does work (api_calls > 0) but returns no final_response,
     the gateway must surface an error to the user instead of silently sending
-    nothing. Tests exercise the production _normalize_empty_agent_response helper."""
+    nothing. Tests exercise the production _normalize_empty_agent_response helper.
+    """
 
     def test_partial_response_surfaces_error(self):
         """Agent returns partial=True with no response → user sees error."""
@@ -458,7 +469,8 @@ class TestFinalizeOrphanedCompressionSessions:
 
     def test_skips_session_without_parent(self, tmp_path):
         """Ghost session without parent_session_id is NOT a compression
-        continuation — should not be touched by this prune."""
+        continuation — should not be touched by this prune.
+        """
         db = _make_session_db(tmp_path)
 
         db.create_session(session_id="ghost-notitle", source="tui", model="test")
@@ -521,7 +533,8 @@ class TestFinalizeOrphanedCompressionSessions:
 
     def test_skips_session_with_non_compression_parent(self, tmp_path):
         """Child session whose parent was NOT ended by compression should
-        not be touched — it's not from the compression continuation path."""
+        not be touched — it's not from the compression continuation path.
+        """
         db = _make_session_db(tmp_path)
 
         # Parent ended by user_exit, not compression
@@ -548,7 +561,8 @@ class TestFinalizeOrphanedCompressionSessions:
 
     def test_skips_sessions_without_messages(self, tmp_path):
         """Empty sessions (no messages) are NOT targeted by this prune —
-        those are handled by prune_empty_ghost_sessions()."""
+        those are handled by prune_empty_ghost_sessions().
+        """
         db = _make_session_db(tmp_path)
 
         # Create parent first to satisfy FK constraint
@@ -575,7 +589,8 @@ class TestFinalizeOrphanedCompressionSessions:
 
     def test_titled_ghost_with_parent_is_caught(self, tmp_path):
         """Ghost continuation that HAS a title (propagated from parent by
-        _compress_context) is still caught via parent with end_reason='compression'."""
+        _compress_context) is still caught via parent with end_reason='compression'.
+        """
         db = _make_session_db(tmp_path)
 
         # Create parent first — ended by compression

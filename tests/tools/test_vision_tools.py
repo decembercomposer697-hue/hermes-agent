@@ -3,27 +3,26 @@
 import json
 import logging
 import os
-from pathlib import Path
 from collections.abc import Awaitable
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from tools.vision_tools import (
-    _validate_image_url,
-    _handle_vision_analyze,
-    _determine_mime_type,
-    _image_to_base64_data_url,
-    _resize_image_for_vision,
-    _image_exceeds_dimension,
     _EMBED_MAX_DIMENSION,
-    _is_image_size_error,
     _MAX_BASE64_BYTES,
     _RESIZE_TARGET_BYTES,
-    vision_analyze_tool,
+    _determine_mime_type,
+    _handle_vision_analyze,
+    _image_exceeds_dimension,
+    _image_to_base64_data_url,
+    _is_image_size_error,
+    _resize_image_for_vision,
+    _validate_image_url,
     check_vision_requirements,
+    vision_analyze_tool,
 )
-
 
 # ---------------------------------------------------------------------------
 # _validate_image_url — urlparse-based validation
@@ -59,7 +58,7 @@ class TestValidateImageUrl:
             assert _validate_image_url("https://img.example.com/pic?w=200&h=200") is True
 
     def test_localhost_url_blocked_by_ssrf(self):
-        """localhost URLs are now blocked by SSRF protection."""
+        """Localhost URLs are now blocked by SSRF protection."""
         assert _validate_image_url("http://localhost:8080/image.png") is False
 
     def test_valid_url_with_port(self):
@@ -518,7 +517,7 @@ class TestVisionRequirements:
         # config.yaml must reference the codex provider so vision auto-detect
         # falls back to the active provider via _read_main_provider().
         (tmp_path / "config.yaml").write_text(
-            'model:\n  default: gpt-4o\n  provider: openai-codex\n',
+            "model:\n  default: gpt-4o\n  provider: openai-codex\n",
         )
         monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
         monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
@@ -1034,6 +1033,7 @@ class TestDownloadRetryClassification:
     async def test_404_fails_fast_without_retry(self, tmp_path):
         """A 404 must raise on the first attempt — no backoff sleep, no extra GETs."""
         import httpx
+
         from tools.vision_tools import _download_image
 
         mock_client = self._make_client_raising_status(404)
@@ -1054,6 +1054,7 @@ class TestDownloadRetryClassification:
     async def test_503_retries_then_raises(self, tmp_path):
         """A 5xx is retried up to max_retries, sleeping between attempts."""
         import httpx
+
         from tools.vision_tools import _download_image
 
         mock_client = self._make_client_raising_status(503)

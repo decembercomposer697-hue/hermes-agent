@@ -12,8 +12,6 @@ from both the installed and expected text before comparison.
 
 from __future__ import annotations
 
-
-
 # ---------------------------------------------------------------------------
 # _strip_optional_systemd_directives
 # ---------------------------------------------------------------------------
@@ -140,7 +138,8 @@ WantedBy=default.target
 class TestSystemdUnitIsCurrent:
     def test_unit_without_optional_directives_is_current(self, tmp_path, monkeypatch):
         """Installed unit missing RestartMaxDelaySec/RestartSteps should be
-        considered current when the generated unit includes them."""
+        considered current when the generated unit includes them.
+        """
         from hermes_cli import gateway as gw
 
         installed = """[Unit]

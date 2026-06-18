@@ -6,9 +6,9 @@ end-to-end dispatch.  All external dependencies are mocked.
 """
 
 import os
-import sys
 import struct
 import subprocess
+import sys
 import types
 import wave
 from unittest.mock import MagicMock, patch
@@ -143,11 +143,13 @@ class TestGetProviderFallbackPriority:
 
 class TestExplicitProviderRespected:
     """When stt.provider is explicitly set, that choice is authoritative.
-    No silent fallback to a different cloud provider."""
+    No silent fallback to a different cloud provider.
+    """
 
     def test_explicit_local_no_fallback_to_openai(self, monkeypatch):
         """GH-1774: provider=local must not silently fall back to openai
-        even when an OpenAI API key is set."""
+        even when an OpenAI API key is set.
+        """
         monkeypatch.setenv("OPENAI_API_KEY", "***")
         monkeypatch.delenv("GROQ_API_KEY", raising=False)
         with patch("tools.transcription_tools._HAS_FASTER_WHISPER", False), \
@@ -276,7 +278,7 @@ class TestTranscribeGroq:
 
         with patch("tools.transcription_tools._HAS_OPENAI", True), \
              patch("openai.OpenAI", return_value=mock_client) as mock_openai_cls:
-            from tools.transcription_tools import _transcribe_groq, GROQ_BASE_URL
+            from tools.transcription_tools import GROQ_BASE_URL, _transcribe_groq
             _transcribe_groq(sample_wav, "whisper-large-v3-turbo")
 
         call_kwargs = mock_openai_cls.call_args
@@ -333,7 +335,7 @@ class TestTranscribeOpenAIExtended:
 
         with patch("tools.transcription_tools._HAS_OPENAI", True), \
              patch("openai.OpenAI", return_value=mock_client) as mock_openai_cls:
-            from tools.transcription_tools import _transcribe_openai, OPENAI_BASE_URL
+            from tools.transcription_tools import OPENAI_BASE_URL, _transcribe_openai
             _transcribe_openai(sample_wav, "whisper-1")
 
         call_kwargs = mock_openai_cls.call_args
@@ -559,7 +561,7 @@ class TestTranscribeLocalExtended:
         assert call_args == [("auto", "auto"), ("cpu", "int8")]
 
     def test_runtime_cuda_lib_failure_evicts_cache_and_retries_on_cpu(self, tmp_path):
-        """libcublas dlopen fails at transcribe() → evict cache, reload CPU, retry."""
+        """Libcublas dlopen fails at transcribe() → evict cache, reload CPU, retry."""
         audio = tmp_path / "test.ogg"
         audio.write_bytes(b"fake")
 
@@ -634,7 +636,10 @@ class TestModelAutoCorrection:
 
         with patch("tools.transcription_tools._HAS_OPENAI", True), \
              patch("openai.OpenAI", return_value=mock_client):
-            from tools.transcription_tools import _transcribe_groq, DEFAULT_GROQ_STT_MODEL
+            from tools.transcription_tools import (
+                DEFAULT_GROQ_STT_MODEL,
+                _transcribe_groq,
+            )
             _transcribe_groq(sample_wav, "whisper-1")
 
         call_kwargs = mock_client.audio.transcriptions.create.call_args
@@ -648,7 +653,10 @@ class TestModelAutoCorrection:
 
         with patch("tools.transcription_tools._HAS_OPENAI", True), \
              patch("openai.OpenAI", return_value=mock_client):
-            from tools.transcription_tools import _transcribe_groq, DEFAULT_GROQ_STT_MODEL
+            from tools.transcription_tools import (
+                DEFAULT_GROQ_STT_MODEL,
+                _transcribe_groq,
+            )
             _transcribe_groq(sample_wav, "gpt-4o-transcribe")
 
         call_kwargs = mock_client.audio.transcriptions.create.call_args
@@ -662,7 +670,7 @@ class TestModelAutoCorrection:
 
         with patch("tools.transcription_tools._HAS_OPENAI", True), \
              patch("openai.OpenAI", return_value=mock_client):
-            from tools.transcription_tools import _transcribe_openai, DEFAULT_STT_MODEL
+            from tools.transcription_tools import DEFAULT_STT_MODEL, _transcribe_openai
             _transcribe_openai(sample_wav, "whisper-large-v3-turbo")
 
         call_kwargs = mock_client.audio.transcriptions.create.call_args
@@ -676,7 +684,7 @@ class TestModelAutoCorrection:
 
         with patch("tools.transcription_tools._HAS_OPENAI", True), \
              patch("openai.OpenAI", return_value=mock_client):
-            from tools.transcription_tools import _transcribe_openai, DEFAULT_STT_MODEL
+            from tools.transcription_tools import DEFAULT_STT_MODEL, _transcribe_openai
             _transcribe_openai(sample_wav, "distil-whisper-large-v3-en")
 
         call_kwargs = mock_client.audio.transcriptions.create.call_args
@@ -805,7 +813,7 @@ class TestValidateAudioFileEdgeCases:
         assert "Failed to access" in result["error"]
 
     def test_all_supported_formats_accepted(self, tmp_path):
-        from tools.transcription_tools import _validate_audio_file, SUPPORTED_FORMATS
+        from tools.transcription_tools import SUPPORTED_FORMATS, _validate_audio_file
         for fmt in SUPPORTED_FORMATS:
             f = tmp_path / f"test{fmt}"
             f.write_bytes(b"data")
@@ -914,7 +922,10 @@ class TestTranscribeAudioDispatch:
              patch("tools.transcription_tools._get_provider", return_value="groq"), \
              patch("tools.transcription_tools._transcribe_groq",
                    return_value={"success": True, "transcript": "hi"}) as mock_groq:
-            from tools.transcription_tools import transcribe_audio, DEFAULT_GROQ_STT_MODEL
+            from tools.transcription_tools import (
+                DEFAULT_GROQ_STT_MODEL,
+                transcribe_audio,
+            )
             transcribe_audio(sample_ogg, model=None)
 
         assert mock_groq.call_args[0][1] == DEFAULT_GROQ_STT_MODEL
@@ -1566,6 +1577,7 @@ class TestShellSafety:
     def test_env_var_template_uses_shell_path(self, monkeypatch):
         """When HERMES_LOCAL_STT_COMMAND is set, use_shell should be True."""
         import os
+
         from tools.transcription_tools import LOCAL_STT_COMMAND_ENV
         monkeypatch.setenv(LOCAL_STT_COMMAND_ENV, "whisper {input_path} | tee log.txt")
         use_shell = bool(os.getenv(LOCAL_STT_COMMAND_ENV, "").strip())
@@ -1574,6 +1586,7 @@ class TestShellSafety:
     def test_no_env_var_uses_list_mode(self, monkeypatch):
         """When no env var is set, use_shell should be False."""
         import os
+
         from tools.transcription_tools import LOCAL_STT_COMMAND_ENV
         monkeypatch.delenv(LOCAL_STT_COMMAND_ENV, raising=False)
         use_shell = bool(os.getenv(LOCAL_STT_COMMAND_ENV, "").strip())

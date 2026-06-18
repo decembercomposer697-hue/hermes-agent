@@ -8,8 +8,7 @@ tests/agent/test_direct_provider_url_detection.py.
 
 from __future__ import annotations
 
-from utils import base_url_hostname, base_url_host_matches
-
+from utils import base_url_host_matches, base_url_hostname
 
 # ─── base_url_hostname ────────────────────────────────────────────────────
 
@@ -117,7 +116,8 @@ class TestOllamaUrlHostCheck:
 
     def test_ollama_com_path_injection_rejected(self):
         """http://evil.test/ollama.com/v1 — ollama.com appears in the path,
-        not the host. Must not be treated as Ollama Cloud."""
+        not the host. Must not be treated as Ollama Cloud.
+        """
         assert base_url_host_matches(
             "http://127.0.0.1:9000/ollama.com/v1", "ollama.com",
         ) is False
@@ -130,7 +130,8 @@ class TestOllamaUrlHostCheck:
 
     def test_ollama_com_localtest_me_rejected(self):
         """ollama.com.localtest.me resolves to 127.0.0.1 via localtest.me
-        but its true hostname is localtest.me, not ollama.com."""
+        but its true hostname is localtest.me, not ollama.com.
+        """
         assert base_url_host_matches(
             "http://ollama.com.localtest.me:9000/v1", "ollama.com",
         ) is False
@@ -144,7 +145,8 @@ class TestOllamaUrlHostCheck:
     def test_localhost_ollama_port_is_not_ollama_com(self):
         """http://localhost:11434/v1 is a local Ollama install, but its
         hostname is localhost, so OLLAMA_API_KEY (an ollama.com-only secret)
-        must not be sent."""
+        must not be sent.
+        """
         assert base_url_host_matches(
             "http://localhost:11434/v1", "ollama.com",
         ) is False

@@ -44,7 +44,8 @@ class TestSyncExternalMemoryForTurn:
     def test_interrupted_turn_does_not_sync(self):
         """The whole point of #15218: even with a final_response and a
         user message, an interrupted turn must NOT reach the memory
-        backend."""
+        backend.
+        """
         agent = _bare_agent()
         agent._sync_external_memory_for_turn(
             original_user_message="What time is it?",
@@ -59,7 +60,8 @@ class TestSyncExternalMemoryForTurn:
         partial if ``interrupted`` is True — an interrupt may have
         landed between the streamed reply and the next tool call.  The
         memory backend has no way to distinguish on its own, so we must
-        gate at the source."""
+        gate at the source.
+        """
         agent = _bare_agent()
         agent._sync_external_memory_for_turn(
             original_user_message="Plan a trip to Lisbon",
@@ -134,7 +136,8 @@ class TestSyncExternalMemoryForTurn:
 
     def test_no_final_response_skips(self):
         """If the model produced no final_response (e.g. tool-only turn
-        that never resolved), we must not fabricate an empty sync."""
+        that never resolved), we must not fabricate an empty sync.
+        """
         agent = _bare_agent()
         agent._sync_external_memory_for_turn(
             original_user_message="Hello",
@@ -146,7 +149,8 @@ class TestSyncExternalMemoryForTurn:
     def test_no_original_user_message_skips(self):
         """No user-origin message means this wasn't a user turn (e.g.
         a system-initiated refresh).  Don't sync an assistant-only
-        exchange as if a user said something."""
+        exchange as if a user said something.
+        """
         agent = _bare_agent()
         agent._sync_external_memory_for_turn(
             original_user_message=None,
@@ -157,7 +161,8 @@ class TestSyncExternalMemoryForTurn:
 
     def test_no_memory_manager_is_a_no_op(self):
         """Sessions without an external memory manager must not crash
-        or try to call .sync_all on None."""
+        or try to call .sync_all on None.
+        """
         from run_agent import AIAgent
 
         agent = AIAgent.__new__(AIAgent)
@@ -175,7 +180,8 @@ class TestSyncExternalMemoryForTurn:
     def test_sync_exception_is_swallowed(self):
         """External memory providers are best-effort; a misconfigured
         or offline backend must not block the user from seeing their
-        response by propagating the exception up."""
+        response by propagating the exception up.
+        """
         agent = _bare_agent()
         agent._memory_manager.sync_all.side_effect = RuntimeError(
             "backend unreachable",
@@ -192,7 +198,8 @@ class TestSyncExternalMemoryForTurn:
 
     def test_prefetch_exception_is_swallowed(self):
         """Same best-effort contract applies to the prefetch step — a
-        failure in queue_prefetch_all must not bubble out."""
+        failure in queue_prefetch_all must not bubble out.
+        """
         agent = _bare_agent()
         agent._memory_manager.queue_prefetch_all.side_effect = RuntimeError(
             "prefetch worker dead",
@@ -210,14 +217,14 @@ class TestSyncExternalMemoryForTurn:
     # --- The specific matrix the reporter asked about ------------------
 
     @pytest.mark.parametrize("interrupted,final,user,expect_sync", [
-        (False, "resp", "user",  True),   # normal completed → sync
-        (True,  "resp", "user",  False),  # interrupted → skip (the fix)
-        (False, None,   "user",  False),  # no response → skip
-        (False, "resp", None,    False),  # no user msg → skip
-        (True,  None,   "user",  False),  # interrupted + no response → skip
-        (True,  "resp", None,    False),  # interrupted + no user → skip
-        (False, None,   None,    False),  # nothing → skip
-        (True,  None,   None,    False),  # interrupted + nothing → skip
+        (False, "resp", "user", True),   # normal completed → sync
+        (True, "resp", "user", False),  # interrupted → skip (the fix)
+        (False, None, "user", False),  # no response → skip
+        (False, "resp", None, False),  # no user msg → skip
+        (True, None, "user", False),  # interrupted + no response → skip
+        (True, "resp", None, False),  # interrupted + no user → skip
+        (False, None, None, False),  # nothing → skip
+        (True, None, None, False),  # interrupted + nothing → skip
     ])
     def test_sync_matrix(self, interrupted, final, user, expect_sync):
         agent = _bare_agent()

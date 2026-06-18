@@ -1,5 +1,4 @@
-"""
-Image Generation Provider Registry
+"""Image Generation Provider Registry
 ==================================
 
 Central map of registered providers. Populated by plugins at import-time via

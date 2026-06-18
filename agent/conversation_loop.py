@@ -31,8 +31,6 @@ from agent.codex_responses_adapter import _summarize_user_message_for_log
 from agent.display import KawaiiSpinner
 from agent.error_classifier import FailoverReason, classify_api_error
 from agent.iteration_budget import IterationBudget
-from agent.turn_context import build_turn_context
-from agent.turn_retry_state import TurnRetryState
 from agent.memory_manager import build_memory_context_block
 from agent.message_sanitization import (
     _repair_tool_call_arguments,
@@ -57,6 +55,8 @@ from agent.process_bootstrap import _install_safe_stdio
 from agent.prompt_caching import apply_anthropic_cache_control
 from agent.retry_utils import jittered_backoff
 from agent.trajectory import has_incomplete_scratchpad
+from agent.turn_context import build_turn_context
+from agent.turn_retry_state import TurnRetryState
 from agent.usage_pricing import estimate_usage_cost, normalize_usage
 from hermes_constants import PARTIAL_STREAM_STUB_ID
 from hermes_logging import set_session_context
@@ -377,8 +377,7 @@ def run_conversation(
     stream_callback: callable | None = None,
     persist_user_message: str | None = None,
 ) -> dict[str, Any]:
-    """
-    Run a complete conversation with tool calling until completion.
+    """Run a complete conversation with tool calling until completion.
 
     Args:
         user_message (str): The user's message/question
@@ -395,6 +394,7 @@ def run_conversation(
 
     Returns:
         Dict: Complete conversation result with final response and message history
+
     """
     # ── Per-turn setup (the prologue) ──
     # All once-per-turn setup — stdio guarding, retry-counter resets, user
@@ -786,7 +786,7 @@ def run_conversation(
             elif not agent._has_stream_consumers() and agent._should_start_quiet_spinner():
                 # Raw KawaiiSpinner only when no streaming consumers and the
                 # spinner output has a safe sink.
-                spinner_type = random.choice(['brain', 'sparkle', 'pulse', 'moon', 'star'])
+                spinner_type = random.choice(["brain", "sparkle", "pulse", "moon", "star"])
                 thinking_spinner = KawaiiSpinner(f"{face} {verb}...", spinner_type=spinner_type, print_fn=agent._print_fn)
                 thinking_spinner.start()
         
@@ -817,8 +817,10 @@ def run_conversation(
             if agent.provider == "nous":
                 try:
                     from agent.nous_rate_guard import (
-                        nous_rate_limit_remaining,
                         format_remaining as _fmt_nous_remaining,
+                    )
+                    from agent.nous_rate_guard import (
+                        nous_rate_limit_remaining,
                     )
                     _nous_remaining = nous_rate_limit_remaining()
                     if _nous_remaining is not None and _nous_remaining > 0:
@@ -898,6 +900,8 @@ def run_conversation(
                 try:
                     from hermes_cli.plugins import (
                         has_hook,
+                    )
+                    from hermes_cli.plugins import (
                         invoke_hook as _invoke_hook,
                     )
                     if has_hook("pre_api_request"):
@@ -1039,7 +1043,7 @@ def run_conversation(
                 
                 if agent.verbose_logging:
                     # Log response with provider info if available
-                    resp_model = getattr(response, 'model', 'N/A') if response else 'N/A'
+                    resp_model = getattr(response, "model", "N/A") if response else "N/A"
                     logging.debug(f"API Response received - Model: {resp_model}, Usage: {response.usage if hasattr(response, 'usage') else 'N/A'}")
                 
                 # Validate response shape before proceeding
@@ -1115,7 +1119,7 @@ def run_conversation(
                         response_invalid = True
                         if response is None:
                             error_details.append("response is None")
-                        elif not hasattr(response, 'choices'):
+                        elif not hasattr(response, "choices"):
                             error_details.append("response has no 'choices' attribute")
                         elif response.choices is None:
                             error_details.append("response.choices is None")
@@ -1164,31 +1168,31 @@ def run_conversation(
                     # Check for error field in response (some providers include this)
                     error_msg = "Unknown"
                     provider_name = "Unknown"
-                    if response and hasattr(response, 'error') and response.error:
+                    if response and hasattr(response, "error") and response.error:
                         error_msg = str(response.error)
                         # Try to extract provider from error metadata
-                        if hasattr(response.error, 'metadata') and response.error.metadata:
-                            provider_name = response.error.metadata.get('provider_name', 'Unknown')
-                    elif response and hasattr(response, 'message') and response.message:
+                        if hasattr(response.error, "metadata") and response.error.metadata:
+                            provider_name = response.error.metadata.get("provider_name", "Unknown")
+                    elif response and hasattr(response, "message") and response.message:
                         error_msg = str(response.message)
                     
                     # Try to get provider from model field (OpenRouter often returns actual model used)
-                    if provider_name == "Unknown" and response and hasattr(response, 'model') and response.model:
+                    if provider_name == "Unknown" and response and hasattr(response, "model") and response.model:
                         provider_name = f"model={response.model}"
                     
                     # Check for x-openrouter-provider or similar metadata
                     if provider_name == "Unknown" and response:
                         # Log all response attributes for debugging
-                        resp_attrs = {k: str(v)[:100] for k, v in vars(response).items() if not k.startswith('_')}
+                        resp_attrs = {k: str(v)[:100] for k, v in vars(response).items() if not k.startswith("_")}
                         if agent.verbose_logging:
                             logging.debug(f"Response attributes for invalid response: {resp_attrs}")
                     
                     # Extract error code from response for contextual diagnostics
                     _resp_error_code = None
-                    if response and hasattr(response, 'error') and response.error:
-                        _code_raw = getattr(response.error, 'code', None)
+                    if response and hasattr(response, "error") and response.error:
+                        _code_raw = getattr(response.error, "code", None)
                         if _code_raw is None and isinstance(response.error, dict):
-                            _code_raw = response.error.get('code')
+                            _code_raw = response.error.get("code")
                         if _code_raw is not None:
                             try:
                                 _resp_error_code = int(_code_raw)
@@ -1360,7 +1364,7 @@ def run_conversation(
                     # thinking-budget exhaustion.
                     _has_think_tags = bool(
                         _trunc_content and re.search(
-                            r'<(?:think|thinking|reasoning|REASONING_SCRATCHPAD)[^>]*>',
+                            r"<(?:think|thinking|reasoning|REASONING_SCRATCHPAD)[^>]*>",
                             _trunc_content,
                             re.IGNORECASE,
                         ),
@@ -1564,7 +1568,7 @@ def run_conversation(
                         }
                 
                 # Track actual token usage from response for context management
-                if hasattr(response, 'usage') and response.usage:
+                if hasattr(response, "usage") and response.usage:
                     canonical_usage = normalize_usage(
                         response.usage,
                         provider=agent.provider,
@@ -1753,7 +1757,7 @@ def run_conversation(
                 # first to strip surrogates, then once more for pure
                 # ASCII-only locale sanitization if needed.
                 # -----------------------------------------------------------
-                if isinstance(api_error, UnicodeEncodeError) and getattr(agent, '_unicode_sanitization_passes', 0) < 2:
+                if isinstance(api_error, UnicodeEncodeError) and getattr(agent, "_unicode_sanitization_passes", 0) < 2:
                     _err_str = str(api_error).lower()
                     _is_ascii_codec = "'ascii'" in _err_str or "ascii" in _err_str
                     # Detect surrogate errors — utf-8 codec refusing to
@@ -2186,7 +2190,7 @@ def run_conversation(
                 if (
                     agent.api_mode == "anthropic_messages"
                     and status_code == 401
-                    and hasattr(agent, '_anthropic_api_key')
+                    and hasattr(agent, "_anthropic_api_key")
                     and not _retry.anthropic_auth_retry_attempted
                 ):
                     _retry.anthropic_auth_retry_attempted = True
@@ -3335,6 +3339,8 @@ def run_conversation(
             try:
                 from hermes_cli.plugins import (
                     has_hook,
+                )
+                from hermes_cli.plugins import (
                     invoke_hook as _invoke_hook,
                 )
                 if has_hook("post_api_request"):
@@ -3387,12 +3393,12 @@ def run_conversation(
                 _think_text = assistant_message.content.strip()
                 # Strip reasoning XML tags that shouldn't leak to parent display
                 _think_text = re.sub(
-                    r'</?(?:REASONING_SCRATCHPAD|think|reasoning)>', '', _think_text,
+                    r"</?(?:REASONING_SCRATCHPAD|think|reasoning)>", "", _think_text,
                 ).strip()
                 # For subagents: relay first line to parent display (existing behaviour).
                 # For all agents with a structured callback: emit reasoning.available event.
-                first_line = _think_text.split('\n')[0][:80] if _think_text else ""
-                if first_line and getattr(agent, '_delegate_depth', 0) > 0:
+                first_line = _think_text.split("\n")[0][:80] if _think_text else ""
+                if first_line and getattr(agent, "_delegate_depth", 0) > 0:
                     try:
                         agent.tool_progress_callback("_thinking", first_line)
                     except Exception:
@@ -3874,8 +3880,8 @@ def run_conversation(
                     # likely mid-task narration ("I'll scan the directory...") and
                     # the empty follow-up means the model choked — let the
                     # post-tool nudge below handle that instead of exiting early.
-                    fallback = getattr(agent, '_last_content_with_tools', None)
-                    if fallback and getattr(agent, '_last_content_tools_all_housekeeping', False):
+                    fallback = getattr(agent, "_last_content_with_tools", None)
+                    if fallback and getattr(agent, "_last_content_tools_all_housekeeping", False):
                         _turn_exit_reason = "fallback_prior_turn_content"
                         logger.info("Empty follow-up after tool calls — using prior turn content as final response")
                         agent._emit_status("↻ Empty response after tool calls — using earlier content as final answer")
@@ -3914,7 +3920,7 @@ def run_conversation(
                     # after tool calls route to prefill instead of nudge.
                     _has_inline_thinking = bool(
                         re.search(
-                            r'<think>|<thinking>|<reasoning>',
+                            r"<think>|<thinking>|<reasoning>",
                             final_response or "",
                             re.IGNORECASE,
                         ),
@@ -4239,7 +4245,6 @@ def run_conversation(
         _should_review_memory=_should_review_memory,
         _turn_exit_reason=_turn_exit_reason,
     )
-
 
 
 __all__ = ["run_conversation"]

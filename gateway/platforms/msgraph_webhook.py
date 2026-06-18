@@ -8,9 +8,9 @@ import ipaddress
 import json
 import logging
 from collections import deque
+from collections.abc import Awaitable, Callable
 from hashlib import sha1
 from typing import Any, Dict, Optional
-from collections.abc import Awaitable, Callable
 
 try:
     from aiohttp import web

@@ -12,7 +12,6 @@ import sys
 import threading
 
 
-
 def _spawn_sleep(seconds: float = 60) -> subprocess.Popen:
     """Spawn a portable long-lived Python sleep process (no shell wrapper)."""
     return subprocess.Popen(
@@ -35,7 +34,8 @@ class TestZombieReproduction:
     def test_orphaned_processes_survive_without_cleanup(self):
         """REPRODUCTION: processes spawned directly survive if no one kills
         them — this models the gap that causes zombie accumulation when
-        the gateway drops agent references without calling close()."""
+        the gateway drops agent references without calling close().
+        """
         pids = []
 
         try:
@@ -64,7 +64,8 @@ class TestZombieReproduction:
 
     def test_explicit_terminate_reaps_processes(self):
         """Explicitly terminating+waiting on Popen handles works.
-        This models what ProcessRegistry.kill_process does internally."""
+        This models what ProcessRegistry.kill_process does internally.
+        """
         procs = []
 
         try:
@@ -186,7 +187,7 @@ class TestGatewayCleanupWiring:
     """Verify gateway lifecycle calls close() on agents."""
 
     def test_gateway_stop_calls_close(self):
-        """gateway stop() should call close() on all running agents."""
+        """Gateway stop() should call close() on all running agents."""
         import asyncio
         import threading
         from unittest.mock import MagicMock, patch
@@ -243,7 +244,8 @@ class TestGatewayCleanupWiring:
 
     def test_evict_does_not_call_close(self):
         """_evict_cached_agent() should NOT call close() — it's also used
-        for non-destructive refreshes (model switch, branch, fallback)."""
+        for non-destructive refreshes (model switch, branch, fallback).
+        """
         import threading
         from unittest.mock import MagicMock
 
@@ -267,6 +269,7 @@ class TestDelegationCleanup:
     def test_run_single_child_calls_close(self):
         """_run_single_child finally block should call close() on child."""
         from unittest.mock import MagicMock
+
         from tools.delegate_tool import _run_single_child
 
         parent = MagicMock()

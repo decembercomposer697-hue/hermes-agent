@@ -1,5 +1,4 @@
-"""
-Tests for custom command-type TTS providers.
+"""Tests for custom command-type TTS providers.
 
 These tests cover the ``tts.providers.<name>`` registry: built-in
 precedence, command resolution, placeholder rendering, shell-quote
@@ -42,10 +41,10 @@ from tools.tts_tool import (
     text_to_speech_tool,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _python_copy_command(output_placeholder: str = "{output_path}") -> str:
     """Return a cross-platform shell command that copies {input_path} -> output."""
@@ -105,7 +104,8 @@ class TestResolveCommandProviderConfig:
 
     def test_native_piper_cannot_be_shadowed_by_command_entry(self):
         """Regression guard for PR that added native Piper as a built-in.
-        A user's ``tts.providers.piper`` must not override the built-in."""
+        A user's ``tts.providers.piper`` must not override the built-in.
+        """
         cfg = {
             "providers": {
                 "piper": {"type": "command", "command": "some-script"},
@@ -245,7 +245,7 @@ class TestMaxTextLengthForCommandProviders:
 
 class TestShellQuoteContext:
     def test_bare_context(self):
-        tpl = 'tts {output_path}'
+        tpl = "tts {output_path}"
         pos = tpl.index("{output_path}")
         assert _shell_quote_context(tpl, pos) is None
 
@@ -452,7 +452,8 @@ class TestTextToSpeechToolWithCommandProvider:
 
     def test_voice_compatible_opt_in_toggles_flag(self, tmp_path):
         """voice_compatible=true is reflected in the response when the
-        file is already .ogg (no ffmpeg needed)."""
+        file is already .ogg (no ffmpeg needed).
+        """
         cfg = {
             "provider": "py-copy-ogg",
             "providers": {
@@ -476,7 +477,8 @@ class TestTextToSpeechToolWithCommandProvider:
     def test_missing_command_falls_through_to_builtin(self, tmp_path):
         """A provider entry with an empty command is not a command
         provider; the tool should not raise a "command not configured"
-        error but fall through to the built-in resolution path."""
+        error but fall through to the built-in resolution path.
+        """
         cfg = {
             "provider": "broken",
             "providers": {

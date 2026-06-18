@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-nutrition_search.py — Search USDA FoodData Central for nutrition info.
+"""nutrition_search.py — Search USDA FoodData Central for nutrition info.
 
 Usage:
   python3 nutrition_search.py "chicken breast"
@@ -10,12 +9,12 @@ Usage:
 Reads USDA_API_KEY from environment, falls back to DEMO_KEY.
 No external dependencies.
 """
-import sys
-import os
 import json
+import os
+import sys
 import time
-import urllib.request
 import urllib.parse
+import urllib.request
 
 API_KEY = os.environ.get("USDA_API_KEY", "DEMO_KEY")
 BASE = "https://api.nal.usda.gov/fdc/v1"

@@ -18,10 +18,10 @@ from typing import Any, Dict, Optional
 
 from plugins.google_meet import process_manager as pm
 
-
 # ---------------------------------------------------------------------------
 # Runtime gate
 # ---------------------------------------------------------------------------
+
 
 def check_meet_requirements() -> bool:
     """Return True when the plugin can actually run LOCALLY.
@@ -57,8 +57,8 @@ def _resolve_node_client(node: str | None):
     """
     if node is None or node == "":
         return None, None
-    from plugins.google_meet.node.registry import NodeRegistry
     from plugins.google_meet.node.client import NodeClient
+    from plugins.google_meet.node.registry import NodeRegistry
 
     reg = NodeRegistry()
     entry = reg.resolve(node if node != "auto" else None)

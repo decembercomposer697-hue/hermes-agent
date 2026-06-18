@@ -37,8 +37,8 @@ import shutil
 import subprocess
 import sys
 import time
-from pathlib import Path
 from datetime import UTC
+from pathlib import Path
 
 # Short timeouts: schtasks occasionally wedges and we don't want to hang forever.
 _SCHTASKS_TIMEOUT_S = 15
@@ -492,8 +492,6 @@ def _install_scheduled_task(task_name: str, script_path: Path) -> tuple[bool, st
     return (False, f"schtasks /Create failed (code {last_code}): {last_err.strip()}")
 
 
-
-
 def _install_startup_entry(script_path: Path) -> Path:
     """Write the Startup-folder fallback launcher. Returns its path."""
     entry = get_startup_entry_path()
@@ -731,7 +729,7 @@ def _install_startup_fallback(script_path: Path, start_now: bool, detail: str) -
     # Startup-folder fallback only installs login persistence. Starting is
     # controlled by the pre-UAC start_now answer so all user decisions happen
     # before any elevation prompt.
-    from hermes_cli.gateway import find_gateway_pids, _profile_arg
+    from hermes_cli.gateway import _profile_arg, find_gateway_pids
 
     running_pids = list(find_gateway_pids())
     if running_pids:
@@ -853,7 +851,7 @@ def install(
         # Startup-folder fallback only installs login persistence. Starting is
         # controlled by the pre-UAC start_now answer so all user decisions happen
         # before any elevation prompt.
-        from hermes_cli.gateway import find_gateway_pids, _profile_arg
+        from hermes_cli.gateway import _profile_arg, find_gateway_pids
 
         running_pids = list(find_gateway_pids())
         if running_pids:
@@ -1231,7 +1229,7 @@ def _drain_gateway_pid(pid: int, drain_timeout: float) -> bool:
     if pid <= 0:
         return False
     try:
-        from gateway.status import write_planned_stop_marker, _pid_exists
+        from gateway.status import _pid_exists, write_planned_stop_marker
     except ImportError:
         return False
 
@@ -1261,8 +1259,8 @@ def stop() -> None:
     + ``kill_gateway_processes(force=True)`` for any strays.
     """
     _assert_windows()
-    from hermes_cli.gateway import kill_gateway_processes, _get_restart_drain_timeout
     from gateway.status import get_running_pid
+    from hermes_cli.gateway import _get_restart_drain_timeout, kill_gateway_processes
 
     # Phase 1: ask the running gateway (if any) to drain itself by writing
     # the planned-stop marker, then wait briefly for it to exit cleanly.

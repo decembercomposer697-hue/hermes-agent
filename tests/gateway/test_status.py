@@ -2,11 +2,11 @@
 
 import json
 import os
+from datetime import UTC
 from pathlib import Path
 from types import SimpleNamespace
 
 from gateway import status
-from datetime import UTC
 
 
 class TestGatewayPidState:
@@ -446,7 +446,7 @@ class TestScopedLocks:
         assert existing["pid"] == 99999
 
     def test_acquire_scoped_lock_replaces_pid_reused_by_unrelated_process(self, tmp_path, monkeypatch):
-        """macOS regression: PID reused by an unrelated process with start_time=None.
+        """MacOS regression: PID reused by an unrelated process with start_time=None.
 
         On macOS /proc is unavailable, so both the lock record and the live
         process report start_time=None.  The live PID is alive (os.kill
@@ -744,7 +744,7 @@ class TestTakeoverMarker:
 
     def test_consume_returns_false_for_stale_marker(self, tmp_path, monkeypatch):
         """A marker older than 60s must be ignored."""
-        from datetime import datetime, timezone, timedelta
+        from datetime import datetime, timedelta, timezone
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         marker_path = tmp_path / ".gateway-takeover.json"
@@ -884,7 +884,7 @@ class TestPlannedStopMarker:
         assert not (tmp_path / ".gateway-planned-stop.json").exists()
 
     def test_consume_returns_false_for_stale_marker(self, tmp_path, monkeypatch):
-        from datetime import datetime, timezone, timedelta
+        from datetime import datetime, timedelta, timezone
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         marker_path = tmp_path / ".gateway-planned-stop.json"
@@ -1041,7 +1041,8 @@ class TestReadProcessCmdlinePsFallback:
 
 class TestCorruptStatusFiles:
     """A status / pid file holding non-UTF-8 (binary) bytes must read as
-    None, not crash the gateway status path with UnicodeDecodeError."""
+    None, not crash the gateway status path with UnicodeDecodeError.
+    """
 
     def test_read_json_file_returns_none_on_binary_garbage(self, tmp_path):
         p = tmp_path / "runtime.json"

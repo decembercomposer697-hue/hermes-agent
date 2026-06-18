@@ -26,7 +26,6 @@ from unittest.mock import patch
 from hermes_cli.model_normalize import normalize_model_for_provider
 from hermes_cli.model_switch import switch_model
 
-
 # Live catalog opencode-go currently returns from /v1/models (snapshot).
 _OPENCODE_GO_LIVE = [
     "minimax-m2.7", "minimax-m2.5",
@@ -110,7 +109,8 @@ def test_openrouter_still_prepends_vendor():
 
 def _run_switch(raw_input: str, **extra):
     """Call switch_model with opencode-go as current provider, mocking the
-    live catalog so the test doesn't hit the network."""
+    live catalog so the test doesn't hit the network.
+    """
     defaults = dict(
         current_provider="opencode-go",
         current_model="kimi-k2.6",
@@ -136,7 +136,8 @@ def _run_switch(raw_input: str, **extra):
 def test_deepseek_v4_flash_stays_on_opencode_go():
     """Regression: ``/model deepseek-v4-flash`` while on opencode-go must
     NOT switch to native deepseek just because deepseek's static catalog
-    also contains that name."""
+    also contains that name.
+    """
     result = _run_switch("deepseek-v4-flash")
     assert result.target_provider == "opencode-go", (
         f"Expected to stay on opencode-go, got {result.target_provider}. "

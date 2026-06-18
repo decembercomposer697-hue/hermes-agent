@@ -60,7 +60,8 @@ def _make_codex_agent(tmp_path, monkeypatch):
 def test_ttfb_kills_when_no_stream_event(tmp_path, monkeypatch):
     """Backend accepts the connection but emits no event -> killed at the TTFB
     cutoff, well before the 60s wall-clock stale timeout, with a retryable
-    TimeoutError and a ``codex_ttfb_kill`` close reason."""
+    TimeoutError and a ``codex_ttfb_kill`` close reason.
+    """
     from agent import chat_completion_helpers as h
 
     agent = _make_codex_agent(tmp_path, monkeypatch)
@@ -106,7 +107,8 @@ def test_ttfb_default_tolerates_slow_first_event(tmp_path, monkeypatch):
     """With no env var set, the no-byte TTFB default is generous (120s), so a
     request whose first stream event is merely slow (~2s of backend admission /
     prefill) is NOT killed. This is the subscription-backed Codex case the tight
-    12s default used to abort mid-prefill."""
+    12s default used to abort mid-prefill.
+    """
     from agent import chat_completion_helpers as h
 
     agent = _make_codex_agent(tmp_path, monkeypatch)
@@ -145,7 +147,8 @@ def test_ttfb_default_tolerates_slow_first_event(tmp_path, monkeypatch):
 
 def test_ttfb_includes_silent_hang_hint_for_gpt_5_5(tmp_path, monkeypatch):
     """The no-first-byte watchdog should surface the same actionable hint as the
-    stale-call timeout path when the model matches the silent-hang heuristic."""
+    stale-call timeout path when the model matches the silent-hang heuristic.
+    """
     from agent import chat_completion_helpers as h
 
     agent = _make_codex_agent(tmp_path, monkeypatch)
@@ -192,7 +195,8 @@ def test_ttfb_includes_silent_hang_hint_for_gpt_5_5(tmp_path, monkeypatch):
 
 def test_ttfb_high_env_is_capped_for_openai_codex(tmp_path, monkeypatch):
     """A stale local env value like 90s must not make openai-codex wait 90s
-    before reconnecting when the backend emits no SSE frames."""
+    before reconnecting when the backend emits no SSE frames.
+    """
     from agent import chat_completion_helpers as h
 
     agent = _make_codex_agent(tmp_path, monkeypatch)
@@ -235,7 +239,8 @@ def test_ttfb_high_env_is_capped_for_openai_codex(tmp_path, monkeypatch):
 
 def test_ttfb_does_not_kill_when_events_flow(tmp_path, monkeypatch):
     """Once a stream event has arrived, a generation that runs past the TTFB
-    cutoff is NOT killed by the watchdog — it completes normally."""
+    cutoff is NOT killed by the watchdog — it completes normally.
+    """
     from agent import chat_completion_helpers as h
 
     agent = _make_codex_agent(tmp_path, monkeypatch)
@@ -274,7 +279,8 @@ def test_ttfb_does_not_kill_when_events_flow(tmp_path, monkeypatch):
 def test_event_idle_kills_after_first_event_then_silence(tmp_path, monkeypatch):
     """If Codex emits an opening SSE event and then goes silent, kill it via
     the stream-idle watchdog instead of waiting for the long non-stream stale
-    timeout."""
+    timeout.
+    """
     from agent import chat_completion_helpers as h
 
     agent = _make_codex_agent(tmp_path, monkeypatch)
@@ -319,7 +325,8 @@ def test_event_idle_kills_after_first_event_then_silence(tmp_path, monkeypatch):
 def test_ttfb_disabled_via_env_zero(tmp_path, monkeypatch):
     """Setting HERMES_CODEX_TTFB_TIMEOUT_SECONDS=0 disables the TTFB watchdog;
     a no-event stall then falls through to the (here, 60s) stale timeout, so a
-    short hang is NOT killed by TTFB."""
+    short hang is NOT killed by TTFB.
+    """
     from agent import chat_completion_helpers as h
 
     agent = _make_codex_agent(tmp_path, monkeypatch)
@@ -354,7 +361,8 @@ def test_ttfb_disabled_via_env_zero(tmp_path, monkeypatch):
 def test_large_codex_request_waits_instead_of_ttfb_reconnect(tmp_path, monkeypatch):
     """Large Codex inputs can legitimately take longer than the small-request
     first-byte cutoff before the first SSE frame. Preserve the full input and
-    wait instead of killing/retrying at TTFB."""
+    wait instead of killing/retrying at TTFB.
+    """
     from agent import chat_completion_helpers as h
 
     agent = _make_codex_agent(tmp_path, monkeypatch)
@@ -388,7 +396,8 @@ def test_large_codex_request_waits_instead_of_ttfb_reconnect(tmp_path, monkeypat
 
 def test_large_codex_request_strict_ttfb_env_still_reconnects(tmp_path, monkeypatch):
     """Operators can force the old early-reconnect behavior for large inputs
-    with HERMES_CODEX_TTFB_STRICT=1."""
+    with HERMES_CODEX_TTFB_STRICT=1.
+    """
     from agent import chat_completion_helpers as h
 
     agent = _make_codex_agent(tmp_path, monkeypatch)

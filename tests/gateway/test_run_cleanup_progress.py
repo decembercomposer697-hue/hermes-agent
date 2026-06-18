@@ -23,7 +23,6 @@ from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import BasePlatformAdapter, SendResult
 from gateway.session import SessionSource
 
-
 # ---------------------------------------------------------------------------
 # Test fakes — mirror those in test_run_progress_topics.py but add a
 # delete_message implementation that records ids instead of hitting a bot.
@@ -78,7 +77,8 @@ class CleanupCaptureAdapter(BasePlatformAdapter):
 
 class NoDeleteAdapter(CleanupCaptureAdapter):
     """Adapter that inherits the base no-op delete_message (used to prove
-    the cleanup path skips adapters without deletion support)."""
+    the cleanup path skips adapters without deletion support).
+    """
 
     async def delete_message(self, chat_id, message_id) -> bool:  # type: ignore[override]
         # Pretend to be an adapter whose platform doesn't support deletion:
@@ -190,7 +190,8 @@ def _install_fakes(monkeypatch, agent_cls, *, cleanup_on: bool):
 @pytest.mark.asyncio
 async def test_cleanup_off_by_default_leaves_bubbles(monkeypatch, tmp_path):
     """Without ``cleanup_progress: true``, firing whatever callback is
-    registered never reaches delete_message."""
+    registered never reaches delete_message.
+    """
     adapter = CleanupCaptureAdapter()
     runner = _make_runner(adapter)
     gateway_run = _install_fakes(monkeypatch, ProgressAgent, cleanup_on=False)
@@ -296,7 +297,8 @@ async def test_cleanup_skipped_on_failed_run(monkeypatch, tmp_path):
 async def test_cleanup_noop_on_adapter_without_delete_support(monkeypatch, tmp_path):
     """Adapters that inherit the base-class delete_message no-op are
     detected up front — the cleanup path never registers its callback so
-    a stray bg-review callback (if present) can fire harmlessly."""
+    a stray bg-review callback (if present) can fire harmlessly.
+    """
     adapter = NoDeleteAdapter()
     runner = _make_runner(adapter)
     gateway_run = _install_fakes(monkeypatch, ProgressAgent, cleanup_on=True)
@@ -324,7 +326,8 @@ async def test_cleanup_noop_on_adapter_without_delete_support(monkeypatch, tmp_p
 @pytest.mark.asyncio
 async def test_cleanup_chains_with_existing_callback(monkeypatch, tmp_path):
     """When a bg-review-style callback is already registered, the cleanup
-    callback chains with it — both fire, neither clobbers the other."""
+    callback chains with it — both fire, neither clobbers the other.
+    """
     adapter = CleanupCaptureAdapter()
     runner = _make_runner(adapter)
     gateway_run = _install_fakes(monkeypatch, ProgressAgent, cleanup_on=True)

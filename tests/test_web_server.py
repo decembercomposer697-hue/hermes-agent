@@ -5,7 +5,8 @@ from hermes_cli import web_server
 
 def test_start_server_enables_ws_ping_for_half_open_detection(monkeypatch):
     """WS ping must be configured so half-open connections (reverse-proxy 524,
-    dropped tunnels) raise WebSocketDisconnect into the reaping path (#32377)."""
+    dropped tunnels) raise WebSocketDisconnect into the reaping path (#32377).
+    """
     captured = {}
     monkeypatch.setattr(uvicorn, "run", lambda *args, **kwargs: captured.update(kwargs))
 

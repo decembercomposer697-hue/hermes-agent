@@ -3,9 +3,10 @@
 Regression test for: cron jobs computing next_run_at from _hermes_now()
 instead of from last_run_at, making them inconsistent with interval jobs.
 """
-import pytest
 from datetime import datetime
 from zoneinfo import ZoneInfo
+
+import pytest
 
 pytest.importorskip("croniter")
 
@@ -14,13 +15,15 @@ from cron.jobs import compute_next_run
 
 class TestCronComputeNextRunUsesLastRunAt:
     """compute_next_run MUST use last_run_at as the croniter base for cron jobs,
-    consistent with how interval jobs work."""
+    consistent with how interval jobs work.
+    """
 
     def test_cron_uses_last_run_at_for_every_6h_schedule(self, monkeypatch):
         """For a schedule like 'every 6 hours', the base time matters.
         If last_run_at is Apr 6 14:10, next should be Apr 6 18:00.
         If now is Apr 10 22:00, next should be Apr 11 00:00.
-        compute_next_run must use last_run_at, not now."""
+        compute_next_run must use last_run_at, not now.
+        """
         morocco = ZoneInfo("Africa/Casablanca")
 
         # Job last ran April 6 at 14:10
@@ -47,7 +50,8 @@ class TestCronComputeNextRunUsesLastRunAt:
 
     def test_cron_without_last_run_at_uses_now(self, monkeypatch):
         """When last_run_at is NOT provided, compute_next_run falls back to
-        _hermes_now() as the croniter base (existing behavior)."""
+        _hermes_now() as the croniter base (existing behavior).
+        """
         morocco = ZoneInfo("Africa/Casablanca")
 
         now = datetime(2026, 4, 10, 22, 0, 0, tzinfo=morocco)
@@ -67,7 +71,8 @@ class TestCronComputeNextRunUsesLastRunAt:
 
     def test_cron_weekly_consistent_with_interval(self, monkeypatch):
         """Both cron and interval jobs should anchor to last_run_at when
-        provided, producing consistent behavior after a crash/restart."""
+        provided, producing consistent behavior after a crash/restart.
+        """
         morocco = ZoneInfo("Africa/Casablanca")
 
         last_run = datetime(2026, 4, 6, 14, 10, 0, tzinfo=morocco)

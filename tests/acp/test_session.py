@@ -5,8 +5,9 @@ import io
 import json
 import time
 from types import SimpleNamespace
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from acp_adapter import session as acp_session
 from acp_adapter.session import SessionManager, SessionState
@@ -43,7 +44,6 @@ class TestCreateSession:
         state = manager.create_session(cwd="/tmp/work")
         assert calls == [(state.session_id, "/tmp/work")]
 
-
     def test_register_task_cwd_translates_windows_drive_for_wsl_tools(self, monkeypatch):
         captured = {}
 
@@ -76,8 +76,6 @@ class TestCreateSession:
 
     def test_get_nonexistent_session_returns_none(self, manager):
         assert manager.get_session("does-not-exist") is None
-
-
 
 
 # ---------------------------------------------------------------------------

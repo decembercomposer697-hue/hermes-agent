@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Text-to-Speech Tool Module
+"""Text-to-Speech Tool Module
 
 Built-in TTS providers:
 - Edge TTS (default, free, no API key): Microsoft Edge neural voices
@@ -48,14 +47,16 @@ import subprocess
 import tempfile
 import threading
 import uuid
-from pathlib import Path
-from typing import Dict, Any, Optional
 from collections.abc import Callable
+from pathlib import Path
+from typing import Any, Dict, Optional
 from urllib.parse import urljoin
 
 from hermes_constants import display_hermes_home
 
 logger = logging.getLogger(__name__)
+
+
 def get_env_value(name, default=None):
     """Read env values through the live config module.
 
@@ -83,6 +84,7 @@ from tools.xai_http import hermes_xai_user_agent
 # crashing in headless environments (SSH, Docker, WSL, no PortAudio).
 # ---------------------------------------------------------------------------
 
+
 def _import_edge_tts():
     """Lazy import edge_tts. Returns the module or raises ImportError."""
     try:
@@ -94,6 +96,7 @@ def _import_edge_tts():
         raise ImportError(str(e))
     import edge_tts
     return edge_tts
+
 
 def _import_elevenlabs():
     """Lazy import ElevenLabs client. Returns the class or raises ImportError.
@@ -116,10 +119,12 @@ def _import_elevenlabs():
     from elevenlabs.client import ElevenLabs
     return ElevenLabs
 
+
 def _import_openai_client():
     """Lazy import OpenAI client. Returns the class or raises ImportError."""
     from openai import OpenAI as OpenAIClient
     return OpenAIClient
+
 
 def _import_mistral_client():
     """Lazy import Mistral client. Returns the class or raises ImportError.
@@ -138,6 +143,7 @@ def _import_mistral_client():
         raise ImportError(str(e))
     from mistralai.client import Mistral
     return Mistral
+
 
 def _import_sounddevice():
     """Lazy import sounddevice. Returns the module or raises ImportError/OSError."""
@@ -197,6 +203,7 @@ GEMINI_AUDIO_TAG_REWRITE_TASK = "tts_audio_tags"
 GEMINI_TTS_SAMPLE_RATE = 24000
 GEMINI_TTS_CHANNELS = 1
 GEMINI_TTS_SAMPLE_WIDTH = 2  # 16-bit PCM (L16)
+
 
 def _get_default_output_dir() -> str:
     from hermes_constants import get_hermes_dir
@@ -320,8 +327,7 @@ def _resolve_max_text_length(
 # Config loader -- reads tts: section from ~/.hermes/config.yaml
 # ===========================================================================
 def _load_tts_config() -> dict[str, Any]:
-    """
-    Load TTS configuration from ~/.hermes/config.yaml.
+    """Load TTS configuration from ~/.hermes/config.yaml.
 
     Returns a dict with provider settings. Falls back to defaults
     for any missing fields.
@@ -885,14 +891,14 @@ def _has_ffmpeg() -> bool:
 
 
 def _convert_to_opus(mp3_path: str) -> str | None:
-    """
-    Convert an MP3 file to OGG Opus format for Telegram voice bubbles.
+    """Convert an MP3 file to OGG Opus format for Telegram voice bubbles.
 
     Args:
         mp3_path: Path to the input MP3 file.
 
     Returns:
         Path to the .ogg file, or None if conversion fails.
+
     """
     if not _has_ffmpeg():
         return None
@@ -907,7 +913,7 @@ def _convert_to_opus(mp3_path: str) -> str | None:
         )
         if result.returncode != 0:
             logger.warning("ffmpeg conversion failed with return code %d: %s", 
-                          result.returncode, result.stderr.decode('utf-8', errors='ignore')[:200])
+                          result.returncode, result.stderr.decode("utf-8", errors="ignore")[:200])
             return None
         if os.path.exists(ogg_path) and os.path.getsize(ogg_path) > 0:
             return ogg_path
@@ -924,8 +930,7 @@ def _convert_to_opus(mp3_path: str) -> str | None:
 # Provider: Edge TTS (free)
 # ===========================================================================
 async def _generate_edge_tts(text: str, output_path: str, tts_config: dict[str, Any]) -> str:
-    """
-    Generate audio using Edge TTS.
+    """Generate audio using Edge TTS.
 
     Args:
         text: Text to convert.
@@ -934,6 +939,7 @@ async def _generate_edge_tts(text: str, output_path: str, tts_config: dict[str, 
 
     Returns:
         Path to the saved audio file.
+
     """
     _edge_tts = _import_edge_tts()
     edge_config = tts_config.get("edge", {})
@@ -954,8 +960,7 @@ async def _generate_edge_tts(text: str, output_path: str, tts_config: dict[str, 
 # Provider: ElevenLabs (premium)
 # ===========================================================================
 def _generate_elevenlabs(text: str, output_path: str, tts_config: dict[str, Any]) -> str:
-    """
-    Generate audio using ElevenLabs.
+    """Generate audio using ElevenLabs.
 
     Args:
         text: Text to convert.
@@ -964,6 +969,7 @@ def _generate_elevenlabs(text: str, output_path: str, tts_config: dict[str, Any]
 
     Returns:
         Path to the saved audio file.
+
     """
     api_key = (get_env_value("ELEVENLABS_API_KEY") or "")
     if not api_key:
@@ -1000,8 +1006,7 @@ def _generate_elevenlabs(text: str, output_path: str, tts_config: dict[str, Any]
 # Provider: OpenAI TTS
 # ===========================================================================
 def _generate_openai_tts(text: str, output_path: str, tts_config: dict[str, Any]) -> str:
-    """
-    Generate audio using OpenAI TTS.
+    """Generate audio using OpenAI TTS.
 
     Args:
         text: Text to convert.
@@ -1010,6 +1015,7 @@ def _generate_openai_tts(text: str, output_path: str, tts_config: dict[str, Any]
 
     Returns:
         Path to the saved audio file.
+
     """
     api_key, base_url = _resolve_openai_audio_client_config()
 
@@ -1112,8 +1118,7 @@ def _apply_xai_auto_speech_tags(text: str) -> str:
 
 
 def _generate_xai_tts(text: str, output_path: str, tts_config: dict[str, Any]) -> str:
-    """
-    Generate audio using xAI TTS.
+    """Generate audio using xAI TTS.
 
     xAI exposes a dedicated /v1/tts endpoint instead of the OpenAI audio.speech
     API shape, so this is implemented as a separate backend.
@@ -1187,8 +1192,7 @@ def _generate_xai_tts(text: str, output_path: str, tts_config: dict[str, Any]) -
 # Provider: MiniMax TTS
 # ===========================================================================
 def _generate_minimax_tts(text: str, output_path: str, tts_config: dict[str, Any]) -> str:
-    """
-    Generate audio using MiniMax TTS API.
+    """Generate audio using MiniMax TTS API.
 
     Supports two endpoints:
     - v1/text_to_speech: simple payload, returns raw audio (Content-Type: audio/mpeg)
@@ -1201,6 +1205,7 @@ def _generate_minimax_tts(text: str, output_path: str, tts_config: dict[str, Any
 
     Returns:
         Path to the saved audio file.
+
     """
     import requests
 
@@ -1571,6 +1576,7 @@ def _generate_gemini_tts(text: str, output_path: str, tts_config: dict[str, Any]
 
     Returns:
         Path to the saved audio file.
+
     """
     import requests
 
@@ -1971,6 +1977,7 @@ def _generate_kittentts(text: str, output_path: str, tts_config: dict[str, Any])
 
     Returns:
         Path to the saved audio file.
+
     """
     KittenTTS = _import_kittentts()
     kt_config = tts_config.get("kittentts", {})
@@ -2020,8 +2027,7 @@ def text_to_speech_tool(
     text: str,
     output_path: str | None = None,
 ) -> str:
-    """
-    Convert text to speech audio.
+    """Convert text to speech audio.
 
     Reads provider/voice config from ~/.hermes/config.yaml (tts: section).
     The model sends text; the user configures voice and provider.
@@ -2036,6 +2042,7 @@ def text_to_speech_tool(
 
     Returns:
         str: JSON result with success, file_path, and optionally MEDIA tag.
+
     """
     if not text or not text.strip():
         return tool_error("Text is required", success=False)
@@ -2332,8 +2339,7 @@ def text_to_speech_tool(
 # Requirements check
 # ===========================================================================
 def check_tts_requirements() -> bool:
-    """
-    Check if at least one TTS provider is available.
+    """Check if at least one TTS provider is available.
 
     Edge TTS needs no API key and is the default, so if the package
     is installed, TTS is available. A user-declared command provider
@@ -2341,6 +2347,7 @@ def check_tts_requirements() -> bool:
 
     Returns:
         bool: True if at least one provider can work.
+
     """
     # Any configured command provider counts as available.
     if _has_any_command_tts_provider():
@@ -2424,33 +2431,33 @@ def _has_openai_audio_backend() -> bool:
 # Streaming TTS: sentence-by-sentence pipeline for ElevenLabs
 # ===========================================================================
 # Sentence boundary pattern: punctuation followed by space or newline
-_SENTENCE_BOUNDARY_RE = re.compile(r'(?<=[.!?])(?:\s|\n)|(?:\n\n)')
+_SENTENCE_BOUNDARY_RE = re.compile(r"(?<=[.!?])(?:\s|\n)|(?:\n\n)")
 
 # Markdown stripping patterns (same as cli.py _voice_speak_response)
-_MD_CODE_BLOCK = re.compile(r'```[\s\S]*?```')
-_MD_LINK = re.compile(r'\[([^\]]+)\]\([^)]+\)')
-_MD_URL = re.compile(r'https?://\S+')
-_MD_BOLD = re.compile(r'\*\*(.+?)\*\*')
-_MD_ITALIC = re.compile(r'\*(.+?)\*')
-_MD_INLINE_CODE = re.compile(r'`(.+?)`')
-_MD_HEADER = re.compile(r'^#+\s*', flags=re.MULTILINE)
-_MD_LIST_ITEM = re.compile(r'^\s*[-*]\s+', flags=re.MULTILINE)
-_MD_HR = re.compile(r'---+')
-_MD_EXCESS_NL = re.compile(r'\n{3,}')
+_MD_CODE_BLOCK = re.compile(r"```[\s\S]*?```")
+_MD_LINK = re.compile(r"\[([^\]]+)\]\([^)]+\)")
+_MD_URL = re.compile(r"https?://\S+")
+_MD_BOLD = re.compile(r"\*\*(.+?)\*\*")
+_MD_ITALIC = re.compile(r"\*(.+?)\*")
+_MD_INLINE_CODE = re.compile(r"`(.+?)`")
+_MD_HEADER = re.compile(r"^#+\s*", flags=re.MULTILINE)
+_MD_LIST_ITEM = re.compile(r"^\s*[-*]\s+", flags=re.MULTILINE)
+_MD_HR = re.compile(r"---+")
+_MD_EXCESS_NL = re.compile(r"\n{3,}")
 
 
 def _strip_markdown_for_tts(text: str) -> str:
     """Remove markdown formatting that shouldn't be spoken aloud."""
-    text = _MD_CODE_BLOCK.sub(' ', text)
-    text = _MD_LINK.sub(r'\1', text)
-    text = _MD_URL.sub('', text)
-    text = _MD_BOLD.sub(r'\1', text)
-    text = _MD_ITALIC.sub(r'\1', text)
-    text = _MD_INLINE_CODE.sub(r'\1', text)
-    text = _MD_HEADER.sub('', text)
-    text = _MD_LIST_ITEM.sub('', text)
-    text = _MD_HR.sub('', text)
-    text = _MD_EXCESS_NL.sub('\n\n', text)
+    text = _MD_CODE_BLOCK.sub(" ", text)
+    text = _MD_LINK.sub(r"\1", text)
+    text = _MD_URL.sub("", text)
+    text = _MD_BOLD.sub(r"\1", text)
+    text = _MD_ITALIC.sub(r"\1", text)
+    text = _MD_INLINE_CODE.sub(r"\1", text)
+    text = _MD_HEADER.sub("", text)
+    text = _MD_LIST_ITEM.sub("", text)
+    text = _MD_HR.sub("", text)
+    text = _MD_EXCESS_NL.sub("\n\n", text)
     return text.strip()
 
 
@@ -2527,7 +2534,7 @@ def stream_tts_to_speaker(
         queue_timeout = 0.5
         _spoken_sentences: list[str] = []  # track spoken sentences to skip duplicates
         # Regex to strip complete <think>...</think> blocks from buffer
-        _think_block_re = re.compile(r'<think[\s>].*?</think>', flags=re.DOTALL)
+        _think_block_re = re.compile(r"<think[\s>].*?</think>", flags=re.DOTALL)
 
         def _speak_sentence(sentence: str):
             """Display sentence and optionally generate + play audio."""
@@ -2610,7 +2617,7 @@ def stream_tts_to_speaker(
 
             if delta is None:
                 # End-of-text sentinel: strip any remaining think blocks, flush
-                sentence_buf = _think_block_re.sub('', sentence_buf)
+                sentence_buf = _think_block_re.sub("", sentence_buf)
                 if sentence_buf.strip():
                     _speak_sentence(sentence_buf)
                 break
@@ -2620,11 +2627,11 @@ def stream_tts_to_speaker(
             # --- Think block filtering ---
             # Strip complete <think>...</think> blocks from buffer.
             # Works correctly even when tags span multiple deltas.
-            sentence_buf = _think_block_re.sub('', sentence_buf)
+            sentence_buf = _think_block_re.sub("", sentence_buf)
 
             # If an incomplete <think tag is at the end, wait for more data
             # before extracting sentences (the closing tag may arrive next).
-            if '<think' in sentence_buf and '</think>' not in sentence_buf:
+            if "<think" in sentence_buf and "</think>" not in sentence_buf:
                 continue
 
             # Check for sentence boundaries

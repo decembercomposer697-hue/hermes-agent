@@ -17,10 +17,9 @@ import base64
 import json
 import time
 import uuid
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Optional
-from collections.abc import Callable
-
 
 REALTIME_URL = "wss://api.openai.com/v1/realtime"
 

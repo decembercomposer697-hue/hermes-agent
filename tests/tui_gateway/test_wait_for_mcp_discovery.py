@@ -19,7 +19,8 @@ def _restore_thread_slot(saved):
 
 def test_no_thread_is_noop():
     """When no discovery thread was started (the common no-MCP case), the
-    helper returns immediately and never blocks."""
+    helper returns immediately and never blocks.
+    """
     saved = entry._mcp_discovery_thread
     try:
         entry._mcp_discovery_thread = None
@@ -47,7 +48,8 @@ def test_already_finished_thread_is_noop():
 
 def test_fast_thread_is_joined():
     """A reachable-but-still-connecting (fast) server lands before the agent
-    snapshots tools — the helper waits for it to finish."""
+    snapshots tools — the helper waits for it to finish.
+    """
     saved = entry._mcp_discovery_thread
     try:
         t = threading.Thread(target=lambda: time.sleep(0.05), daemon=True)
@@ -61,7 +63,8 @@ def test_fast_thread_is_joined():
 
 def test_hung_thread_is_bounded_by_timeout():
     """A slow/dead server must NOT re-introduce the startup hang — the join is
-    bounded by the timeout and returns even though the thread is still alive."""
+    bounded by the timeout and returns even though the thread is still alive.
+    """
     saved = entry._mcp_discovery_thread
     stop = threading.Event()
     try:

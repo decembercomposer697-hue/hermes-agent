@@ -9,14 +9,14 @@ from unittest.mock import AsyncMock, MagicMock
 import httpx
 import pytest
 
-from gateway.config import Platform, PlatformConfig, HomeChannel
+from gateway.config import HomeChannel, Platform, PlatformConfig
 from plugins.teams_pipeline.models import TeamsMeetingRef, TeamsMeetingSummaryPayload
 from tests.gateway._plugin_adapter_loader import load_plugin_adapter
-
 
 # ---------------------------------------------------------------------------
 # SDK Mock — install in sys.modules before importing the adapter
 # ---------------------------------------------------------------------------
+
 
 def _ensure_teams_mock():
     """Install a teams SDK mock in sys.modules if the real package isn't present."""
@@ -173,6 +173,7 @@ _teams_mod.AIOHTTP_AVAILABLE = True
 # Ensure SDK symbols that were None (import failed on Python <3.12) are
 # replaced with the mocked versions so runtime calls don't silently no-op.
 import sys as _sys
+
 _mt = _sys.modules.get("microsoft_teams.api.activities.typing")
 if _mt and _teams_mod.TypingActivityInput is None:
     _teams_mod.TypingActivityInput = _mt.TypingActivityInput
@@ -366,6 +367,7 @@ class TestTeamsInteractiveSetup:
         env_text = (hermes_home / ".env").read_text(encoding="utf-8")
         assert "TEAMS_CLIENT_ID=client-id" in env_text
         assert "TEAMS_TENANT_ID=tenant-id" in env_text
+
 
 class TestTeamsConnect:
     @pytest.mark.anyio
@@ -737,7 +739,8 @@ class _FakeAiohttpResponse:
 
 class _FakeAiohttpSession:
     """Scripted aiohttp.ClientSession with a queue of responses so tests
-    can assert calls in order."""
+    can assert calls in order.
+    """
 
     def __init__(self, scripts):
         self._scripts = list(scripts)
@@ -758,7 +761,8 @@ class _FakeAiohttpSession:
 
 def _install_fake_aiohttp(monkeypatch, session):
     """Replace ``aiohttp`` in ``sys.modules`` so ``import aiohttp as _aiohttp``
-    inside ``_standalone_send`` picks up our fake."""
+    inside ``_standalone_send`` picks up our fake.
+    """
     fake_aiohttp = types.SimpleNamespace(
         ClientSession=lambda timeout=None, **kwargs: session,
         ClientTimeout=lambda total=None: None,

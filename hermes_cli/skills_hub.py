@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Skills Hub CLI — Unified interface for the Hermes Skills Hub.
+"""Skills Hub CLI — Unified interface for the Hermes Skills Hub.
 
 Powers both:
   - `hermes skills <subcommand>` (CLI argparse entry point)
@@ -20,10 +19,11 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from agent.skill_utils import is_excluded_skill_path
+
 # Lazy imports to avoid circular dependencies and slow startup.
 # tools.skills_hub and tools.skills_guard are imported inside functions.
 from hermes_constants import display_hermes_home
-from agent.skill_utils import is_excluded_skill_path
 
 _console = Console()
 
@@ -33,8 +33,7 @@ _console = Console()
 # ---------------------------------------------------------------------------
 
 def _resolve_short_name(name: str, sources, console: Console) -> str:
-    """
-    Resolve a short skill name (e.g. 'pptx') to a full identifier by searching
+    """Resolve a short skill name (e.g. 'pptx') to a full identifier by searching
     all sources. If exactly one match is found, returns its identifier. If multiple
     matches exist, shows them and asks the user to use the full identifier.
     Returns empty string if nothing found or ambiguous.
@@ -321,7 +320,9 @@ def do_browse(page: int = 1, page_size: int = 20, source: str = "all",
     Official skills are always shown first, regardless of source filter.
     """
     from tools.skills_hub import (
-        GitHubAuth, create_source_router, parallel_search_sources,
+        GitHubAuth,
+        create_source_router,
+        parallel_search_sources,
     )
 
     # Clamp page_size to safe range
@@ -488,11 +489,15 @@ def do_install(identifier: str, category: str = "", force: bool = False,
     (so pair it with ``name_override`` when installing from a URL that has
     no frontmatter).
     """
+    from tools.skills_guard import format_scan_report, scan_skill, should_allow_install
     from tools.skills_hub import (
-        GitHubAuth, create_source_router, ensure_hub_dirs,
-        quarantine_bundle, install_from_quarantine, HubLockFile,
+        GitHubAuth,
+        HubLockFile,
+        create_source_router,
+        ensure_hub_dirs,
+        install_from_quarantine,
+        quarantine_bundle,
     )
-    from tools.skills_guard import scan_skill, should_allow_install, format_scan_report
 
     c = console or _console
     ensure_hub_dirs()
@@ -759,7 +764,9 @@ def browse_skills(page: int = 1, page_size: int = 20, source: str = "all") -> di
     Returns ``{"items": [...], "page": int, "total_pages": int, "total": int}``.
     """
     from tools.skills_hub import (
-        GitHubAuth, create_source_router, parallel_search_sources,
+        GitHubAuth,
+        create_source_router,
+        parallel_search_sources,
     )
 
     page_size = max(1, min(page_size, 100))
@@ -853,11 +860,12 @@ def do_list(source_filter: str = "all",
     config — ``hermes -p <profile> skills list`` reads that profile's
     ``skills.disabled`` list because ``-p`` swaps ``HERMES_HOME`` at process
     start.  No explicit profile flag needed here.
+
     """
+    from agent.skill_utils import get_disabled_skill_names
     from tools.skills_hub import HubLockFile, ensure_hub_dirs
     from tools.skills_sync import _read_manifest
     from tools.skills_tool import _find_all_skills
-    from agent.skill_utils import get_disabled_skill_names
 
     c = console or _console
     ensure_hub_dirs()
@@ -990,8 +998,8 @@ def do_audit(name: str | None = None, console: Console | None = None,
     files (review aid only — not a security gate; skills_guard.py verdicts
     are unchanged).
     """
-    from tools.skills_hub import HubLockFile, SKILLS_DIR
-    from tools.skills_guard import scan_skill, format_scan_report
+    from tools.skills_guard import format_scan_report, scan_skill
+    from tools.skills_hub import SKILLS_DIR, HubLockFile
 
     c = console or _console
     lock = HubLockFile()
@@ -1120,8 +1128,8 @@ def do_opt_out(remove: bool = False,
     never touched.
     """
     from tools.skills_sync import (
-        set_bundled_skills_opt_out,
         remove_pristine_bundled_skills,
+        set_bundled_skills_opt_out,
     )
 
     c = console or _console
@@ -1297,8 +1305,8 @@ def do_tap(action: str, repo: str = "", console: Console | None = None) -> None:
 def do_publish(skill_path: str, target: str = "github", repo: str = "",
                console: Console | None = None) -> None:
     """Publish a local skill to a registry (GitHub PR or ClawHub submission)."""
-    from tools.skills_hub import GitHubAuth, SKILLS_DIR
-    from tools.skills_guard import scan_skill, format_scan_report
+    from tools.skills_guard import format_scan_report, scan_skill
+    from tools.skills_hub import SKILLS_DIR, GitHubAuth
 
     c = console or _console
     path = Path(skill_path)
@@ -1316,7 +1324,7 @@ def do_publish(skill_path: str, target: str = "github", repo: str = "",
     fm = {}
     if skill_md.startswith("---"):
         import re
-        match = re.search(r'\n---\s*\n', skill_md[3:])
+        match = re.search(r"\n---\s*\n", skill_md[3:])
         if match:
             try:
                 fm = yaml.safe_load(skill_md[3:match.start() + 3]) or {}
@@ -1622,8 +1630,7 @@ def skills_command(args) -> None:
 # ---------------------------------------------------------------------------
 
 def handle_skills_slash(cmd: str, console: Console | None = None) -> None:
-    """
-    Parse and dispatch `/skills <subcommand> [args]` from the chat interface.
+    """Parse and dispatch `/skills <subcommand> [args]` from the chat interface.
 
     Examples:
         /skills search kubernetes
@@ -1643,6 +1650,7 @@ def handle_skills_slash(cmd: str, console: Console | None = None) -> None:
         /skills tap list
         /skills tap add owner/repo
         /skills tap remove owner/repo
+
     """
     c = console or _console
     parts = cmd.strip().split()

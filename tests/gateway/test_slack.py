@@ -1,5 +1,4 @@
-"""
-Tests for Slack platform adapter.
+"""Tests for Slack platform adapter.
 
 Covers: app_mention handler, send_document, send_video,
         incoming document handling, message routing.
@@ -12,7 +11,7 @@ import asyncio
 import contextlib
 import os
 import sys
-from unittest.mock import AsyncMock, MagicMock, patch, call
+from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import pytest
 
@@ -21,7 +20,6 @@ from gateway.platforms.base import (
     MessageType,
     is_host_excluded_by_no_proxy,
 )
-
 
 # ---------------------------------------------------------------------------
 # Mock the slack-bolt package if it's not installed
@@ -1480,7 +1478,8 @@ class TestIncomingDocumentHandling:
     @pytest.mark.asyncio
     async def test_rich_text_blocks_do_not_duplicate_plain_text(self, adapter):
         """Plain rich_text composer blocks match the plain text field exactly,
-        so the dedupe guard keeps the message clean."""
+        so the dedupe guard keeps the message clean.
+        """
         event = self._make_event(
             text="hello world",
             blocks=[
@@ -1604,7 +1603,8 @@ class TestIncomingDocumentHandling:
     ):
         """Block-extracted text with a bot mention must not satisfy mention
         gating in channels — routing decisions use the original user text so
-        quoted/forwarded content can't trick the bot into responding."""
+        quoted/forwarded content can't trick the bot into responding.
+        """
         event = self._make_event(
             text="please review",
             channel_type="channel",
@@ -2345,8 +2345,8 @@ class TestReactions:
         assert "1234567890.000001" in adapter._reacting_message_ids
 
         # Simulate the base class calling on_processing_start
-        from gateway.platforms.base import MessageEvent, MessageType, SessionSource
         from gateway.config import Platform
+        from gateway.platforms.base import MessageEvent, MessageType, SessionSource
 
         source = SessionSource(
             platform=Platform.SLACK,
@@ -2387,13 +2387,13 @@ class TestReactions:
         adapter._app.client.reactions_add = AsyncMock()
         adapter._app.client.reactions_remove = AsyncMock()
 
+        from gateway.config import Platform
         from gateway.platforms.base import (
             MessageEvent,
             MessageType,
-            SessionSource,
             ProcessingOutcome,
+            SessionSource,
         )
-        from gateway.config import Platform
 
         source = SessionSource(
             platform=Platform.SLACK,
@@ -2463,13 +2463,13 @@ class TestReactions:
         assert "1234567890.000004" not in adapter._reacting_message_ids
 
         # Hooks should also be no-ops when disabled
+        from gateway.config import Platform
         from gateway.platforms.base import (
             MessageEvent,
             MessageType,
-            SessionSource,
             ProcessingOutcome,
+            SessionSource,
         )
-        from gateway.config import Platform
 
         source = SessionSource(
             platform=Platform.SLACK,
@@ -3044,7 +3044,8 @@ class TestReplyBroadcast:
 class TestFallbackPreservesThreadContext:
     """Bug fix: file upload fallbacks lost thread context (metadata) when
     calling super() without metadata, causing replies to appear outside
-    the thread."""
+    the thread.
+    """
 
     @pytest.mark.asyncio
     async def test_send_image_file_fallback_preserves_thread(self, adapter, tmp_path):
@@ -3373,12 +3374,14 @@ class TestProgressMessageThread:
 class TestSlackReplyToText:
     """Ensure MessageEvent.reply_to_text is populated on thread replies so
     gateway.run can inject a ``[Replying to: "..."]`` prefix (parity with
-    Telegram/Discord/Feishu/WeCom)."""
+    Telegram/Discord/Feishu/WeCom).
+    """
 
     @pytest.mark.asyncio
     async def test_slack_reply_to_text_set_on_thread_reply(self, adapter):
         """When a thread reply arrives and the parent was posted by a bot
-        (e.g. cron summary), reply_to_text must carry the parent's text."""
+        (e.g. cron summary), reply_to_text must carry the parent's text.
+        """
         adapter._channel_team = {}  # primary workspace only
         adapter._team_bot_user_ids = {}
 
@@ -3681,6 +3684,7 @@ class TestSlashEphemeralAck:
     async def test_concurrent_users_same_channel_isolates_contexts(self, adapter):
         """Two users slash on the same channel — each gets their own context."""
         import time
+
         from gateway.platforms.slack import _slash_user_id
 
         # Simulate two users stashing contexts on the same channel.
@@ -3721,6 +3725,7 @@ class TestSlashEphemeralAck:
     async def test_no_contextvar_does_not_match_any_context(self, adapter):
         """send() without ContextVar (non-slash path) must not steal contexts."""
         import time
+
         from gateway.platforms.slack import _slash_user_id
 
         adapter._slash_command_contexts[("C1", "U1")] = {

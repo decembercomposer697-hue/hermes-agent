@@ -54,7 +54,7 @@ from gateway.platforms.base import (
     SessionSource,
     build_session_key,
 )
-from gateway.run import GatewayRunner, _AGENT_PENDING_SENTINEL
+from gateway.run import _AGENT_PENDING_SENTINEL, GatewayRunner
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -148,7 +148,8 @@ class TestAgentHasActiveSubagents:
 
     def test_returns_false_when_attribute_missing(self) -> None:
         """Production AIAgents always have _active_children, but the helper
-        must not blow up on test stubs or partial mocks."""
+        must not blow up on test stubs or partial mocks.
+        """
 
         class StubAgent:
             pass
@@ -187,7 +188,8 @@ class TestAgentHasActiveSubagents:
     def test_rejects_truthy_non_collection_attribute(self) -> None:
         """The MagicMock auto-attribute regression. ``MagicMock()._active_children``
         is itself a truthy MagicMock — without the isinstance guard, the
-        helper would falsely report subagents on every test mock."""
+        helper would falsely report subagents on every test mock.
+        """
         parent = MagicMock()  # no explicit _active_children setup
         assert GatewayRunner._agent_has_active_subagents(parent) is False
 
@@ -208,7 +210,8 @@ class TestAgentHasActiveSubagents:
 # ──────────────────────────────────────────────────────────────────────
 class TestBusyHandlerDemotesInterruptForSubagents:
     """The Phase-1 fix from #30170: parent.interrupt() must NOT fire when
-    the parent is currently driving subagents."""
+    the parent is currently driving subagents.
+    """
 
     @pytest.mark.asyncio
     async def test_does_not_call_interrupt_when_subagents_active(self) -> None:
@@ -232,7 +235,8 @@ class TestBusyHandlerDemotesInterruptForSubagents:
     @pytest.mark.asyncio
     async def test_ack_explains_the_demotion(self) -> None:
         """The user-visible ack must mention the subagent context AND
-        the `/stop` escape hatch so the operator can self-correct."""
+        the `/stop` escape hatch so the operator can self-correct.
+        """
         runner = _make_runner()
         runner._busy_input_mode = "interrupt"
         adapter = _make_adapter()
@@ -257,7 +261,8 @@ class TestBusyHandlerDemotesInterruptForSubagents:
     async def test_interrupt_still_fires_when_no_subagents(self) -> None:
         """Regression-guard the other direction: with no subagents the
         demotion must NOT trigger and behaviour must be byte-identical
-        to the pre-#30170 interrupt path."""
+        to the pre-#30170 interrupt path.
+        """
         runner = _make_runner()
         runner._busy_input_mode = "interrupt"
         adapter = _make_adapter()
@@ -278,7 +283,8 @@ class TestBusyHandlerDemotesInterruptForSubagents:
     @pytest.mark.asyncio
     async def test_queue_mode_unchanged_with_subagents(self) -> None:
         """Configured ``queue`` mode is already subagent-safe; the new
-        guard must not change its behaviour or its ack text."""
+        guard must not change its behaviour or its ack text.
+        """
         runner = _make_runner()
         runner._busy_input_mode = "queue"
         adapter = _make_adapter()
@@ -305,7 +311,8 @@ class TestBusyHandlerDemotesInterruptForSubagents:
     ) -> None:
         """Configured ``steer`` mode must reach ``running_agent.steer()``
         even when subagents are active — the #30170 demotion is
-        interrupt-specific so it doesn't accidentally disable steer."""
+        interrupt-specific so it doesn't accidentally disable steer.
+        """
         runner = _make_runner()
         runner._busy_input_mode = "steer"
         adapter = _make_adapter()
@@ -327,7 +334,8 @@ class TestBusyHandlerDemotesInterruptForSubagents:
         """The placeholder ``_AGENT_PENDING_SENTINEL`` is not a real
         agent — the guard must not treat it as having subagents.
         Otherwise we'd permanently queue messages for sessions that
-        haven't actually started running yet."""
+        haven't actually started running yet.
+        """
         runner = _make_runner()
         runner._busy_input_mode = "interrupt"
         adapter = _make_adapter()

@@ -13,12 +13,10 @@ import time
 from typing import Any, Dict, List
 
 import pytest
-
 import websockets
 from websockets.asyncio.server import serve
 
 from tools import browser_cdp_tool
-
 
 # ---------------------------------------------------------------------------
 # In-process CDP mock server
@@ -380,7 +378,8 @@ def test_dispatch_through_registry(cdp_server):
 
 def test_check_fn_false_when_no_cdp_url(monkeypatch):
     """Gate closes when no CDP URL is set — even if the browser toolset is
-    otherwise configured."""
+    otherwise configured.
+    """
     import tools.browser_tool as bt
 
     monkeypatch.setattr(bt, "check_browser_requirements", lambda: True)
@@ -401,7 +400,8 @@ def test_check_fn_true_when_cdp_url_set(monkeypatch):
 
 def test_check_fn_false_when_browser_requirements_fail(monkeypatch):
     """Even with a CDP URL, gate closes if the overall browser toolset is
-    unavailable (e.g. agent-browser not installed)."""
+    unavailable (e.g. agent-browser not installed).
+    """
     import tools.browser_tool as bt
 
     monkeypatch.setattr(bt, "check_browser_requirements", lambda: False)

@@ -25,9 +25,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from utils import atomic_json_write
-
 import requests
+
+from utils import atomic_json_write
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +181,6 @@ PROVIDER_TO_MODELS_DEV: dict[str, str] = {
 
 # Reverse mapping: models.dev → Hermes (built lazily)
 _MODELS_DEV_TO_PROVIDER: dict[str, str] | None = None
-
 
 
 def _get_cache_path() -> Path:
@@ -528,6 +527,7 @@ def list_provider_models(provider: str) -> list[str]:
 # Patterns that indicate non-agentic or noise models (TTS, embedding,
 # dated preview snapshots, live/streaming-only, image-only).
 import re
+
 _NOISE_PATTERNS: re.Pattern = re.compile(
     r"-tts\b|embedding|live-|-(preview|exp)-\d{2,4}[-_]|"
     r"-image\b|-image-preview\b|-customtools\b",
@@ -595,7 +595,6 @@ def list_agentic_models(provider: str) -> list[str]:
             continue
         result.append(mid)
     return result
-
 
 
 # ---------------------------------------------------------------------------

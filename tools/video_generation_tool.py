@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Video Generation Tool
+"""Video Generation Tool
 =====================
 
 Single ``video_generate`` tool that dispatches to a plugin-registered

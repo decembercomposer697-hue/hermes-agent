@@ -32,7 +32,6 @@ import tempfile
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Test infrastructure
 # ---------------------------------------------------------------------------
@@ -97,7 +96,8 @@ auxiliary:
         self, isolated_home, monkeypatch,
     ):
         """User-supplied base_url wins; alias still normalizes provider name
-        to ``custom`` so resolution doesn't hit the unknown-provider path."""
+        to ``custom`` so resolution doesn't hit the unknown-provider path.
+        """
         _write_config(isolated_home, """
 auxiliary:
   vision:
@@ -124,8 +124,9 @@ auxiliary:
         monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
         _fresh_modules()
 
-        from agent.auxiliary_client import resolve_vision_provider_client
         from urllib.parse import urlparse
+
+        from agent.auxiliary_client import resolve_vision_provider_client
         provider, client, model = resolve_vision_provider_client()
         assert client is not None, "openai alias should produce a usable client"
         # Exact hostname comparison (not substring) — defends against URLs
@@ -202,7 +203,8 @@ class TestVisionToolGating:
 
     def test_check_vision_succeeds_for_aliased_openai(self, isolated_home, monkeypatch):
         """The user's exact reported scenario: provider=openai unhides
-        vision_analyze instead of silently dropping it."""
+        vision_analyze instead of silently dropping it.
+        """
         _write_config(isolated_home, """
 auxiliary:
   vision:

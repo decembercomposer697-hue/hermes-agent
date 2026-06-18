@@ -48,7 +48,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from agent.web_search_provider import WebSearchProvider
 from tools.website_policy import check_website_access

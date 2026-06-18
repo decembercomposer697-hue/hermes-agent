@@ -98,7 +98,8 @@ def _wait_for_reconcile_log_mention(
 @pytest.fixture
 def restart_container(request, built_image: str):
     """A long-running container with a named volume so docker restart
-    preserves $HERMES_HOME/profiles/."""
+    preserves $HERMES_HOME/profiles/.
+    """
     safe = request.node.name.replace("[", "_").replace("]", "_")
     name = f"hermes-restart-{safe}"
     volume = f"hermes-restart-vol-{safe}"
@@ -226,7 +227,8 @@ def test_stale_gateway_pid_cleaned_up_on_restart(restart_container: str) -> None
     """A dead container's gateway.pid + processes.json must NOT
     survive the restart — a numerically-equal live PID in the new
     container is a different process and would confuse the gateway
-    process-mismatch checks."""
+    process-mismatch checks.
+    """
     container = restart_container
 
     _exec(container, "hermes", "profile", "create", "ghost").check_returncode()

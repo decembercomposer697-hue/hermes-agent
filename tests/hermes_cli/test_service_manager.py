@@ -21,7 +21,6 @@ from hermes_cli.service_manager import (
     validate_profile_name,
 )
 
-
 # ---------------------------------------------------------------------------
 # validate_profile_name
 # ---------------------------------------------------------------------------
@@ -64,7 +63,8 @@ def test_validate_profile_name_rejects_invalid(bad: str) -> None:
 def test_detect_service_manager_returns_known_value() -> None:
     """Without mocking, the function must still return one of the
     advertised literals — anything else means a new platform branch
-    was added without updating ServiceManagerKind."""
+    was added without updating ServiceManagerKind.
+    """
     result = detect_service_manager()
     assert result in ("systemd", "launchd", "windows", "s6", "none")
 
@@ -157,7 +157,8 @@ def test_s6_running_handles_missing_proc(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """On macOS / Windows / WSL-without-procfs, /proc/1/comm doesn't
-    exist. Must return False, not raise."""
+    exist. Must return False, not raise.
+    """
     from hermes_cli.service_manager import _s6_running
 
     _patch_s6_paths(monkeypatch, comm=None, basedir_is_dir=False)
@@ -357,7 +358,8 @@ def test_get_service_manager_returns_s6_instance(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The s6 backend ships in Phase 3 — the factory must return an
-    S6ServiceManager when running inside a container."""
+    S6ServiceManager when running inside a container.
+    """
     monkeypatch.setattr(
         "hermes_cli.service_manager.detect_service_manager", lambda: "s6",
     )
@@ -386,7 +388,8 @@ def fake_subprocess_run(monkeypatch: pytest.MonkeyPatch):
     Records are normalized: leading ``/command/`` is stripped from
     cmd[0] so assertions can match on the bare s6-svc / s6-svstat /
     s6-svscanctl name regardless of whether the manager calls them
-    via absolute path or bare name."""
+    via absolute path or bare name.
+    """
     calls: list[list[str]] = []
 
     def _fake(cmd, **kw):
@@ -605,7 +608,8 @@ def test_s6_register_rolls_back_on_svscanctl_failure(
     s6_scandir, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """If s6-svscanctl fails the service dir must be cleaned up so the
-    next register call doesn't see a stale duplicate."""
+    next register call doesn't see a stale duplicate.
+    """
     import subprocess as _sp
 
     def _fail_scanctl(cmd, **kw):
@@ -691,7 +695,8 @@ def test_lifecycle_raises_gateway_not_registered_for_missing_slot(
     """When the service slot doesn't exist, the lifecycle methods
     must raise GatewayNotRegisteredError BEFORE invoking s6-svc, so
     the user sees a clear 'no such gateway' message instead of an
-    opaque CalledProcessError stacktrace."""
+    opaque CalledProcessError stacktrace.
+    """
     from hermes_cli.service_manager import (
         GatewayNotRegisteredError,
     )
@@ -734,7 +739,8 @@ def test_gateway_not_registered_unprefixed_service_name(s6_scandir) -> None:
     """If the caller passes a name without the 'gateway-' prefix (the
     Protocol allows arbitrary service names), the error still carries
     that name verbatim as the 'profile' so error messages don't
-    accidentally strip user-provided text."""
+    accidentally strip user-provided text.
+    """
     from hermes_cli.service_manager import (
         GatewayNotRegisteredError,
     )
@@ -751,8 +757,10 @@ def test_lifecycle_raises_s6_command_error_on_subprocess_failure(
     """When s6-svc itself fails (non-zero exit) — e.g. EACCES on the
     supervise control FIFO — the lifecycle methods translate the
     CalledProcessError into a named S6CommandError carrying the
-    return code and stderr."""
+    return code and stderr.
+    """
     import subprocess as _sp
+
     from hermes_cli.service_manager import S6CommandError
 
     # Pre-create the slot so we reach the s6-svc call.
@@ -837,7 +845,8 @@ def test_s6_supervised_pid_none_when_down(monkeypatch, s6_scandir):
 
 def test_s6_stop_writes_planned_stop_marker(monkeypatch, s6_scandir):
     """stop() must mark the supervised PID before `s6-svc -d` so the
-    gateway recognises the SIGTERM as an intentional stop (#42675)."""
+    gateway recognises the SIGTERM as an intentional stop (#42675).
+    """
     import subprocess as _sp
 
     svc_dir = s6_scandir / "gateway-coder"

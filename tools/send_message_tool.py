@@ -215,7 +215,7 @@ def _handle_send(args):
         return tool_error("Interrupted")
 
     try:
-        from gateway.config import load_gateway_config, Platform
+        from gateway.config import Platform, load_gateway_config
         config = load_gateway_config()
     except Exception as e:
         return json.dumps(_error(f"Failed to load gateway config: {e}"))
@@ -291,6 +291,7 @@ def _handle_send(args):
     if platform_name == "slack" and chat_id and chat_id.startswith("U"):
         try:
             import aiohttp
+
             async def _open_slack_dm(token, user_id):
                 url = "https://slack.com/api/conversations.open"
                 headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
@@ -851,7 +852,7 @@ async def _send_telegram(token, chat_id, message, media_files=None, thread_id=No
 
         # Auto-detect HTML tags — if present, skip MarkdownV2 and send as HTML.
         # Inspired by github.com/ashaney — PR #1568.
-        _has_html = bool(re.search(r'<[a-zA-Z/][^>]*>', message))
+        _has_html = bool(re.search(r"<[a-zA-Z/][^>]*>", message))
 
         if _has_html:
             formatted = message
@@ -1068,7 +1069,7 @@ async def _send_slack(token, chat_id, message, thread_ts=None):
     except ImportError:
         return {"error": "aiohttp not installed. Run: pip install aiohttp"}
     try:
-        from gateway.platforms.base import resolve_proxy_url, proxy_kwargs_for_aiohttp
+        from gateway.platforms.base import proxy_kwargs_for_aiohttp, resolve_proxy_url
         _proxy = resolve_proxy_url()
         _sess_kw, _req_kw = proxy_kwargs_for_aiohttp(_proxy)
         url = "https://slack.com/api/chat.postMessage"
@@ -1359,7 +1360,7 @@ async def _send_sms(auth_token, chat_id, message):
     message = message.strip()
 
     try:
-        from gateway.platforms.base import resolve_proxy_url, proxy_kwargs_for_aiohttp
+        from gateway.platforms.base import proxy_kwargs_for_aiohttp, resolve_proxy_url
         _proxy = resolve_proxy_url()
         _sess_kw, _req_kw = proxy_kwargs_for_aiohttp(_proxy)
         creds = f"{account_sid}:{auth_token}"
@@ -1549,7 +1550,10 @@ async def _send_wecom(extra, chat_id, message):
 async def _send_weixin(pconfig, chat_id, message, media_files=None):
     """Send via Weixin iLink using the native adapter helper."""
     try:
-        from gateway.platforms.weixin import check_weixin_requirements, send_weixin_direct
+        from gateway.platforms.weixin import (
+            check_weixin_requirements,
+            send_weixin_direct,
+        )
         if not check_weixin_requirements():
             return {"error": "Weixin requirements not met. Need aiohttp + cryptography."}
     except ImportError:
@@ -1570,7 +1574,10 @@ async def _send_weixin(pconfig, chat_id, message, media_files=None):
 async def _send_bluebubbles(extra, chat_id, message):
     """Send via BlueBubbles iMessage server using the adapter's REST API."""
     try:
-        from gateway.platforms.bluebubbles import BlueBubblesAdapter, check_bluebubbles_requirements
+        from gateway.platforms.bluebubbles import (
+            BlueBubblesAdapter,
+            check_bluebubbles_requirements,
+        )
         if not check_bluebubbles_requirements():
             return {"error": "BlueBubbles requirements not met (need aiohttp + httpx)."}
     except ImportError:
@@ -1597,7 +1604,7 @@ async def _send_bluebubbles(extra, chat_id, message):
 async def _send_feishu(pconfig, chat_id, message, media_files=None, thread_id=None):
     """Send via Feishu/Lark using the adapter's send pipeline."""
     try:
-        from gateway.platforms.feishu import FeishuAdapter, FEISHU_AVAILABLE
+        from gateway.platforms.feishu import FEISHU_AVAILABLE, FeishuAdapter
         if not FEISHU_AVAILABLE:
             return {"error": "Feishu dependencies not installed. Run: pip install 'hermes-agent[feishu]'"}
         from gateway.platforms.feishu import FEISHU_DOMAIN, LARK_DOMAIN

@@ -28,9 +28,9 @@ import shlex
 import uuid
 
 from tools.budget_config import (
+    DEFAULT_BUDGET,
     DEFAULT_PREVIEW_SIZE_CHARS,
     BudgetConfig,
-    DEFAULT_BUDGET,
 )
 
 logger = logging.getLogger(__name__)
@@ -143,6 +143,7 @@ def maybe_persist_tool_result(
 
     Returns:
         Original content if small, or <persisted-output> replacement.
+
     """
     effective_threshold = threshold if threshold is not None else config.resolve_threshold(tool_name)
 

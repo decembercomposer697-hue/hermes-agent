@@ -18,13 +18,12 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from agent.codex_responses_adapter import _normalize_codex_response
 
 import run_agent
-from run_agent import AIAgent
+from agent.codex_responses_adapter import _normalize_codex_response
 from agent.error_classifier import FailoverReason
 from agent.prompt_builder import DEFAULT_AGENT_IDENTITY
-
+from run_agent import AIAgent
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -364,7 +363,8 @@ class TestStripThinkBlocks:
 
     def test_inline_think_mention_in_prose_not_over_stripped(self, agent):
         """Mid-line `<think>` mentioned in prose must not swallow the rest
-        of the content (the block-boundary check prevents this)."""
+        of the content (the block-boundary check prevents this).
+        """
         text = "Use the <think> tag like this in your prose."
         result = agent._strip_think_blocks(text)
         # Block-boundary check prevents unterminated-strip from firing
@@ -374,7 +374,8 @@ class TestStripThinkBlocks:
     def test_mixed_case_closed_pair_stripped(self, agent):
         """Mixed-case variants <THINK>…</THINK>, <Thinking>…</Thinking> are
         handled by case-insensitive closed-pair regex, so the trailing
-        content is preserved."""
+        content is preserved.
+        """
         result = agent._strip_think_blocks("<THINK>upper</THINK>final")
         assert "upper" not in result
         assert "final" in result
@@ -429,7 +430,8 @@ class TestStripThinkBlocks:
 
     def test_function_mention_in_prose_preserved(self, agent):
         """'Use <function> in JavaScript.' — no name attr, not at block boundary
-        in a way that suggests tool call. Must survive."""
+        in a way that suggests tool call. Must survive.
+        """
         text = "In JS you can use <function> declarations for hoisting."
         result = agent._strip_think_blocks(text)
         # Prose mention has no name="..." attribute -> not stripped
@@ -438,7 +440,8 @@ class TestStripThinkBlocks:
     def test_function_with_attr_in_middle_of_sentence_preserved(self, agent):
         """Docs example: 'Use <function name="x">...</function> in docs.'
         The sentence-middle position without a preceding punctuation block
-        boundary means it is NOT stripped. Prose context remains."""
+        boundary means it is NOT stripped. Prose context remains.
+        """
         text = 'You can write <function name="x">y</function> inline.'
         result = agent._strip_think_blocks(text)
         # Without a leading block boundary (no punctuation before), leaves intact
@@ -455,7 +458,8 @@ class TestStripThinkBlocks:
     def test_dangling_function_open_tag_preserved(self, agent):
         """A streamed-but-truncated <function name="..."> block with no close
         is intentionally NOT stripped (OpenClaw's asymmetry). The tail of a
-        streaming reply may still be valuable to the user."""
+        streaming reply may still be valuable to the user.
+        """
         text = 'Checking: <function name="read">'
         result = agent._strip_think_blocks(text)
         assert "Checking:" in result
@@ -610,7 +614,8 @@ class TestSaveSessionLogRedactsSecrets:
         """Force redaction on regardless of host HERMES_REDACT_SECRETS state.
         The hermetic conftest blanks the env var; the module-level
         ``_REDACT_ENABLED`` constant is captured at import time, so we
-        flip it directly for the duration of these tests."""
+        flip it directly for the duration of these tests.
+        """
         monkeypatch.delenv("HERMES_REDACT_SECRETS", raising=False)
         monkeypatch.setattr("agent.redact._REDACT_ENABLED", True)
 
@@ -1092,7 +1097,8 @@ class TestBuildSystemPrompt:
         """Timestamp must be date-only (no HH:MM) so the system prompt
         stays byte-stable for the full day. Minute precision invalidates
         prefix-cache KV on every rebuild path (compression, fresh-agent
-        gateway turns, session resume without a stored prompt)."""
+        gateway turns, session resume without a stored prompt).
+        """
         prompt = agent._build_system_prompt()
         # Find the line and strip it for inspection
         for line in prompt.splitlines():
@@ -1196,7 +1202,7 @@ class TestToolUseEnforcementConfig:
         assert TOOL_USE_ENFORCEMENT_GUIDANCE not in prompt
 
     def test_auto_injects_for_grok(self):
-        """xAI Grok / xai-oauth models hit the same enforcement path as GPT."""
+        """XAI Grok / xai-oauth models hit the same enforcement path as GPT."""
         from agent.prompt_builder import TOOL_USE_ENFORCEMENT_GUIDANCE
         agent = self._make_agent(model="x-ai/grok-4.3", tool_use_enforcement="auto")
         prompt = agent._build_system_prompt()
@@ -1331,7 +1337,8 @@ class TestTaskCompletionGuidance:
 
     Unlike tool_use_enforcement, this block is model-family-agnostic — it
     targets cross-model failure modes (stopping after a stub; fabricating
-    output when blocked) and should appear for every model by default."""
+    output when blocked) and should appear for every model by default.
+    """
 
     def _make_agent(self, model="anthropic/claude-opus-4.8",
                     task_completion_guidance=True, **extra_cfg):
@@ -1362,7 +1369,8 @@ class TestTaskCompletionGuidance:
 
     def test_default_injects_for_claude(self):
         """The block must reach Claude by default — that's the
-        primary motivating model family."""
+        primary motivating model family.
+        """
         from agent.prompt_builder import TASK_COMPLETION_GUIDANCE
         agent = self._make_agent(model="anthropic/claude-opus-4.8")
         prompt = agent._build_system_prompt()
@@ -1370,7 +1378,8 @@ class TestTaskCompletionGuidance:
 
     def test_default_injects_for_deepseek(self):
         """And for DeepSeek — the other model that failed the Sarasota
-        real-estate task by fabricating output."""
+        real-estate task by fabricating output.
+        """
         from agent.prompt_builder import TASK_COMPLETION_GUIDANCE
         agent = self._make_agent(model="deepseek/deepseek-v4-flash")
         prompt = agent._build_system_prompt()
@@ -1378,7 +1387,8 @@ class TestTaskCompletionGuidance:
 
     def test_default_injects_for_gpt(self):
         """Also reaches model families that already get enforcement —
-        it's additive, not exclusive."""
+        it's additive, not exclusive.
+        """
         from agent.prompt_builder import TASK_COMPLETION_GUIDANCE
         agent = self._make_agent(model="openai/gpt-5.4")
         prompt = agent._build_system_prompt()
@@ -1395,7 +1405,8 @@ class TestTaskCompletionGuidance:
     def test_no_tools_no_injection(self):
         """Same gate as tool_use_enforcement — no tools means no guidance.
         The guidance refers to ``tool calls`` and ``tool output``; without
-        tools it would be advice for a capability the agent doesn't have."""
+        tools it would be advice for a capability the agent doesn't have.
+        """
         from agent.prompt_builder import TASK_COMPLETION_GUIDANCE
         with (
             patch("run_agent.get_tool_definitions", return_value=[]),
@@ -1422,7 +1433,8 @@ class TestEnvironmentProbeIntegration:
     """Tests for the local Python toolchain probe wiring (config.yaml
     ``agent.environment_probe``).  The probe itself is unit-tested in
     tests/tools/test_env_probe.py; this class confirms it lands in the
-    system prompt when enabled and stays out when disabled."""
+    system prompt when enabled and stays out when disabled.
+    """
 
     def _make_agent(self, model="anthropic/claude-opus-4.8",
                     environment_probe=True):
@@ -1557,7 +1569,8 @@ class TestBuildApiKwargs:
     def test_kimi_coding_endpoint_sends_max_tokens_and_reasoning(self, agent):
         """Kimi endpoint sends max_tokens=32000. With no reasoning_config it
         defaults to the thinking toggle (xor contract: never paired with a
-        top-level reasoning_effort)."""
+        top-level reasoning_effort).
+        """
         agent.provider = "kimi-coding"
         agent.base_url = "https://api.kimi.com/coding/v1"
         agent._base_url_lower = agent.base_url.lower()
@@ -1585,7 +1598,8 @@ class TestBuildApiKwargs:
 
     def test_kimi_coding_endpoint_sends_thinking_extra_body(self, agent):
         """Kimi endpoint should send extra_body.thinking={"type":"enabled"}
-        to activate reasoning mode, mirroring Kimi CLI's with_thinking()."""
+        to activate reasoning mode, mirroring Kimi CLI's with_thinking().
+        """
         agent.provider = "kimi-coding"
         agent.base_url = "https://api.kimi.com/coding/v1"
         agent._base_url_lower = agent.base_url.lower()
@@ -1599,7 +1613,8 @@ class TestBuildApiKwargs:
     def test_kimi_coding_endpoint_disables_thinking(self, agent):
         """When reasoning_config.enabled=False, thinking should be disabled
         and reasoning_effort should be omitted entirely — mirroring Kimi
-        CLI's with_thinking("off") which maps to reasoning_effort=None."""
+        CLI's with_thinking("off") which maps to reasoning_effort=None.
+        """
         agent.provider = "kimi-coding"
         agent.base_url = "https://api.kimi.com/coding/v1"
         agent._base_url_lower = agent.base_url.lower()
@@ -1709,7 +1724,7 @@ class TestBuildApiKwargs:
         assert kwargs["extra_body"]["reasoning"] == {"effort": "medium"}
 
     def test_reasoning_xhigh_normalized_for_copilot(self, agent):
-        """xhigh effort should normalize to high for Copilot GitHub Models."""
+        """Xhigh effort should normalize to high for Copilot GitHub Models."""
         from agent.transports import get_transport
         from providers import get_provider_profile
 
@@ -1738,7 +1753,6 @@ class TestBuildApiKwargs:
         messages = [{"role": "user", "content": "hi"}]
         kwargs = agent._build_api_kwargs(messages)
         assert kwargs["max_tokens"] == 4096
-
 
     def test_qwen_portal_formats_messages_and_metadata(self, agent):
         agent.provider = "qwen-oauth"
@@ -1791,7 +1805,8 @@ class TestBuildApiKwargs:
 
     def test_qwen_portal_default_max_tokens(self, agent):
         """When max_tokens is None, Qwen Portal gets a default of 65536
-        to prevent reasoning models from exhausting their output budget."""
+        to prevent reasoning models from exhausting their output budget.
+        """
         agent.provider = "qwen-oauth"
         agent.base_url = "https://portal.qwen.ai/v1"
         agent._base_url_lower = agent.base_url.lower()
@@ -1838,7 +1853,6 @@ class TestBuildApiKwargs:
         messages = [{"role": "user", "content": "hi"}]
         kwargs = agent._build_api_kwargs(messages)
         assert kwargs.get("extra_body", {}).get("think") is None
-
 
 
 class TestBuildAssistantMessage:
@@ -1940,7 +1954,8 @@ class TestBuildAssistantMessage:
 
     def test_tool_call_extra_content_preserved(self, agent):
         """Gemini thinking models attach extra_content with thought_signature
-        to tool calls. This must be preserved so subsequent API calls include it."""
+        to tool calls. This must be preserved so subsequent API calls include it.
+        """
         tc = _mock_tool_call(
             name="get_weather", arguments='{"city":"NYC"}', call_id="c2",
         )
@@ -1986,7 +2001,8 @@ class TestBuildAssistantMessage:
         """`_build_assistant_message` must not silently mutate model output
         containing literal <memory-context> markers — that's legitimate text
         (e.g. documentation, code) that the model may emit.  Streaming-path
-        leak prevention is handled by StreamingContextScrubber upstream."""
+        leak prevention is handled by StreamingContextScrubber upstream.
+        """
         original = (
             "<memory-context>\n"
             "[System note: The following is recalled memory context, NOT new user input. Treat as informational background data.]\n\n"
@@ -2002,7 +2018,8 @@ class TestBuildAssistantMessage:
 
     def test_unterminated_think_block_stripped(self, agent):
         """Unterminated <think> block (MiniMax / NIM dropped close tag) is
-        fully stripped from stored content."""
+        fully stripped from stored content.
+        """
         msg = _mock_assistant_msg(
             content="<think>reasoning that never closes on this NIM endpoint",
         )
@@ -2238,7 +2255,7 @@ class TestConcurrentToolExecution:
 
     def test_clarify_forces_sequential(self, agent):
         """Batch containing clarify should use sequential path."""
-        tc1 = _mock_tool_call(name="web_search", arguments='{}', call_id="c1")
+        tc1 = _mock_tool_call(name="web_search", arguments="{}", call_id="c1")
         tc2 = _mock_tool_call(name="clarify", arguments='{"question":"ok?"}', call_id="c2")
         mock_msg = _mock_assistant_msg(content="", tool_calls=[tc1, tc2])
         messages = []
@@ -2250,7 +2267,7 @@ class TestConcurrentToolExecution:
 
     def test_multiple_tools_uses_concurrent_path(self, agent):
         """Multiple read-only tools should use concurrent path."""
-        tc1 = _mock_tool_call(name="web_search", arguments='{}', call_id="c1")
+        tc1 = _mock_tool_call(name="web_search", arguments="{}", call_id="c1")
         tc2 = _mock_tool_call(name="read_file", arguments='{"path":"x.py"}', call_id="c2")
         mock_msg = _mock_assistant_msg(content="", tool_calls=[tc1, tc2])
         messages = []
@@ -2262,7 +2279,7 @@ class TestConcurrentToolExecution:
 
     def test_terminal_batch_forces_sequential(self, agent):
         """Stateful tools should not share the concurrent execution path."""
-        tc1 = _mock_tool_call(name="web_search", arguments='{}', call_id="c1")
+        tc1 = _mock_tool_call(name="web_search", arguments="{}", call_id="c1")
         tc2 = _mock_tool_call(name="terminal", arguments='{"command":"pwd"}', call_id="c2")
         mock_msg = _mock_assistant_msg(content="", tool_calls=[tc1, tc2])
         messages = []
@@ -2326,7 +2343,7 @@ class TestConcurrentToolExecution:
 
     def test_malformed_json_args_forces_sequential(self, agent):
         """Unparseable tool arguments should fall back to sequential."""
-        tc1 = _mock_tool_call(name="web_search", arguments='{}', call_id="c1")
+        tc1 = _mock_tool_call(name="web_search", arguments="{}", call_id="c1")
         tc2 = _mock_tool_call(name="web_search", arguments="NOT JSON {{{", call_id="c2")
         mock_msg = _mock_assistant_msg(content="", tool_calls=[tc1, tc2])
         messages = []
@@ -2338,7 +2355,7 @@ class TestConcurrentToolExecution:
 
     def test_non_dict_args_forces_sequential(self, agent):
         """Tool arguments that parse to a non-dict type should fall back to sequential."""
-        tc1 = _mock_tool_call(name="web_search", arguments='{}', call_id="c1")
+        tc1 = _mock_tool_call(name="web_search", arguments="{}", call_id="c1")
         tc2 = _mock_tool_call(name="web_search", arguments='"just a string"', call_id="c2")
         mock_msg = _mock_assistant_msg(content="", tool_calls=[tc1, tc2])
         messages = []
@@ -2432,8 +2449,8 @@ class TestConcurrentToolExecution:
 
     def test_concurrent_interrupt_before_start(self, agent):
         """If interrupt is requested before concurrent execution, all tools are skipped."""
-        tc1 = _mock_tool_call(name="web_search", arguments='{}', call_id="c1")
-        tc2 = _mock_tool_call(name="read_file", arguments='{}', call_id="c2")
+        tc1 = _mock_tool_call(name="web_search", arguments="{}", call_id="c1")
+        tc2 = _mock_tool_call(name="read_file", arguments="{}", call_id="c2")
         mock_msg = _mock_assistant_msg(content="", tool_calls=[tc1, tc2])
         messages = []
 
@@ -2449,8 +2466,8 @@ class TestConcurrentToolExecution:
         """Concurrent path should save oversized results to file."""
         monkeypatch.setenv("HERMES_HOME", str(tmp_path / ".hermes"))
         (tmp_path / ".hermes").mkdir()
-        tc1 = _mock_tool_call(name="web_search", arguments='{}', call_id="c1")
-        tc2 = _mock_tool_call(name="web_search", arguments='{}', call_id="c2")
+        tc1 = _mock_tool_call(name="web_search", arguments="{}", call_id="c1")
+        tc2 = _mock_tool_call(name="web_search", arguments="{}", call_id="c2")
         mock_msg = _mock_assistant_msg(content="", tool_calls=[tc1, tc2])
         messages = []
         big_result = "x" * 150_000
@@ -2854,7 +2871,8 @@ class TestConcurrentToolExecution:
 
     def test_concurrent_blocked_write_does_not_steal_slot_from_allowed_write(self, agent, monkeypatch):
         """When write_file is blocked, its dedup slot must not be consumed,
-        so a subsequent allowed write_file for the same path still checkpoints."""
+        so a subsequent allowed write_file for the same path still checkpoints.
+        """
         tc1 = _mock_tool_call(name="write_file",
                               arguments='{"path":"dup.txt","content":"blocked"}',
                               call_id="c1")
@@ -2865,6 +2883,7 @@ class TestConcurrentToolExecution:
         messages = []
 
         call_count = {"n": 0}
+
         def block_first_only(*args, **kwargs):
             call_count["n"] += 1
             return "Blocked" if call_count["n"] == 1 else None
@@ -2934,7 +2953,8 @@ class TestAgentRuntimePostHookOwnershipSync:
     @classmethod
     def _extract_dispatch_chain_names(cls, func) -> set[str]:
         """Find the if/elif chain anchored on `_block_msg is not None`, return its
-        `function_name == "..."` literals."""
+        `function_name == "..."` literals.
+        """
         source = inspect.cleandoc("\n" + inspect.getsource(func))
         tree = ast.parse(source)
         names: set[str] = set()
@@ -2959,7 +2979,8 @@ class TestAgentRuntimePostHookOwnershipSync:
     def _extract_invoke_tool_names(cls, func) -> set[str]:
         """invoke_tool uses a flat if/elif on function_name directly; walk every
         Compare in the function body (no other static `function_name == "..."`
-        checks live there)."""
+        checks live there).
+        """
         source = inspect.cleandoc("\n" + inspect.getsource(func))
         tree = ast.parse(source)
         names: set[str] = set()
@@ -2997,7 +3018,8 @@ class TestAgentRuntimePostHookOwnershipSync:
         """invoke_tool (concurrent path) and the inline dispatcher (sequential
         path) must cover the same set of agent-runtime tools — otherwise
         post_tool_call fires inconsistently depending on which executor ran
-        the tool."""
+        the tool.
+        """
         from agent import agent_runtime_helpers, tool_executor
 
         invoke_tool_names = self._extract_invoke_tool_names(
@@ -3094,7 +3116,7 @@ class TestMcpParallelToolBatch:
     def test_mcp_tools_parallel_when_server_opted_in(self):
         """MCP tools from a parallel-safe server can run concurrently."""
         from run_agent import _should_parallelize_tool_batch
-        from tools.mcp_tool import _mcp_tool_server_names, _parallel_safe_servers, _lock
+        from tools.mcp_tool import _lock, _mcp_tool_server_names, _parallel_safe_servers
         with _lock:
             _parallel_safe_servers.add("github")
             _mcp_tool_server_names["mcp_github_list_repos"] = "github"
@@ -3112,7 +3134,7 @@ class TestMcpParallelToolBatch:
     def test_mixed_mcp_and_builtin_parallel(self):
         """MCP parallel tools mixed with built-in parallel-safe tools."""
         from run_agent import _should_parallelize_tool_batch
-        from tools.mcp_tool import _mcp_tool_server_names, _parallel_safe_servers, _lock
+        from tools.mcp_tool import _lock, _mcp_tool_server_names, _parallel_safe_servers
         with _lock:
             _parallel_safe_servers.add("docs")
             _mcp_tool_server_names["mcp_docs_search"] = "docs"
@@ -3128,7 +3150,7 @@ class TestMcpParallelToolBatch:
     def test_mixed_parallel_and_serial_mcp_servers(self):
         """One parallel MCP server + one non-parallel MCP server = sequential."""
         from run_agent import _should_parallelize_tool_batch
-        from tools.mcp_tool import _mcp_tool_server_names, _parallel_safe_servers, _lock
+        from tools.mcp_tool import _lock, _mcp_tool_server_names, _parallel_safe_servers
         with _lock:
             _parallel_safe_servers.add("docs")
             # "github" is NOT in _parallel_safe_servers
@@ -3181,7 +3203,8 @@ class TestHandleMaxIterations:
 
     def test_summary_request_removes_orphan_tool_result(self, agent):
         """Regression: max-iterations summary request must NOT contain
-        orphan tool results (tool_call_id with no matching assistant tool_call)."""
+        orphan tool results (tool_call_id with no matching assistant tool_call).
+        """
         resp = _mock_response(content="Summary of work done.")
         agent.client.chat.completions.create.return_value = resp
         agent._cached_system_prompt = "You are helpful."
@@ -3207,7 +3230,8 @@ class TestHandleMaxIterations:
 
     def test_summary_request_inserts_stub_for_missing_tool_result(self, agent):
         """If an assistant tool_call has no matching tool result in the
-        summary request, a stub must be inserted to satisfy the API contract."""
+        summary request, a stub must be inserted to satisfy the API contract.
+        """
         resp = _mock_response(content="Summary")
         agent.client.chat.completions.create.return_value = resp
         agent._cached_system_prompt = "You are helpful."
@@ -3235,7 +3259,8 @@ class TestHandleMaxIterations:
         scaffolding. Strict gateways (Fireworks-backed OpenCode Go, Mistral,
         Kimi) reject these with 'Extra inputs are not permitted, field:
         messages[N].tool_name'. The transport's convert_messages() strips
-        them on the main loop; this hand-built summary path must mirror it."""
+        them on the main loop; this hand-built summary path must mirror it.
+        """
         agent.client.chat.completions.create.return_value = _mock_response(content="Summary")
         agent._cached_system_prompt = "You are helpful."
         messages = [
@@ -4304,7 +4329,8 @@ class TestRunConversation:
 
     def test_length_empty_content_without_think_tags_retries_normally(self, agent):
         """When finish_reason='length' and content is None but no think tags,
-        fall through to normal continuation retry (not thinking-exhaustion)."""
+        fall through to normal continuation retry (not thinking-exhaustion).
+        """
         self._setup_agent(agent)
         resp = _mock_response(content=None, finish_reason="length")
         agent.client.chat.completions.create.return_value = resp
@@ -4347,7 +4373,8 @@ class TestRunConversation:
     def test_truncated_tool_call_retries_once_before_refusing(self, agent):
         """When tool call args are truncated, the agent retries the API call
         (up to 3 times). If a retry succeeds (valid JSON args), tool execution
-        proceeds."""
+        proceeds.
+        """
         self._setup_agent(agent)
         agent.valid_tool_names.add("write_file")
         bad_tc = _mock_tool_call(
@@ -4388,7 +4415,8 @@ class TestRunConversation:
         """A network stream stall mid tool-call (PARTIAL_STREAM_STUB_ID) must
         retry up to 3 times rather than hard-failing after one — and recover
         if a retry produces a complete tool call. Regression for the false
-        'model hit max output tokens' on Opus when the stream simply dropped."""
+        'model hit max output tokens' on Opus when the stream simply dropped.
+        """
         from hermes_constants import PARTIAL_STREAM_STUB_ID
 
         self._setup_agent(agent)
@@ -4429,7 +4457,8 @@ class TestRunConversation:
     def test_truncated_tool_args_detected_when_finish_reason_not_length(self, agent):
         """When a router rewrites finish_reason from 'length' to 'tool_calls',
         truncated JSON arguments should still be detected and refused rather
-        than wasting 3 retry attempts."""
+        than wasting 3 retry attempts.
+        """
         self._setup_agent(agent)
         agent.valid_tool_names.add("write_file")
         bad_tc = _mock_tool_call(
@@ -4520,7 +4549,8 @@ class TestRunConversation:
 
     def test_no_kanban_block_when_not_in_kanban_mode(self, agent, monkeypatch):
         """The exhaustion bridge must NOT fire when HERMES_KANBAN_TASK
-        is unset (non-kanban runs are unaffected by #29747 gap 2)."""
+        is unset (non-kanban runs are unaffected by #29747 gap 2).
+        """
         self._setup_agent(agent)
         agent.max_iterations = 2
 
@@ -4873,7 +4903,6 @@ class TestCredentialPoolRecovery:
         assert retry_same is False
         agent._swap_credential.assert_called_once_with(next_entry)
 
-
     def test_recover_with_pool_refreshes_on_401(self, agent):
         """401 with successful refresh should swap to refreshed credential."""
         refreshed_entry = SimpleNamespace(label="refreshed-primary", id="abc")
@@ -5067,7 +5096,8 @@ class TestMaxTokensParam:
 
     def test_returns_max_completion_tokens_for_gpt5_on_custom_endpoint(self, agent):
         """Custom OpenAI-compatible endpoint serving gpt-5.x must also use
-        max_completion_tokens — otherwise the server 400s on max_tokens."""
+        max_completion_tokens — otherwise the server 400s on max_tokens.
+        """
         agent.base_url = "https://my-gateway.example.com/v1"
         agent.model = "gpt-5.4"
         result = agent._max_tokens_param(4096)
@@ -5176,7 +5206,8 @@ class TestSystemPromptStability:
 
     def test_stored_prompt_reused_for_continuing_session(self, agent):
         """When conversation_history is non-empty and session DB has a stored
-        prompt, it should be reused instead of rebuilding from disk."""
+        prompt, it should be reused instead of rebuilding from disk.
+        """
         stored = "You are helpful. [stored from turn 1]"
         mock_db = MagicMock()
         mock_db.get_session.return_value = {"system_prompt": stored}
@@ -5266,6 +5297,7 @@ class TestSystemPromptStability:
         # Empty string is falsy, so should fall through to fresh build
         assert "Hermes Agent" in agent._cached_system_prompt
 
+
 class TestBudgetPressure:
     """Budget exhaustion grace call system."""
 
@@ -5280,8 +5312,9 @@ class TestSafeWriter:
 
     def test_write_delegates_normally(self):
         """When stdout is healthy, _SafeWriter is transparent."""
-        from run_agent import _SafeWriter
         from io import StringIO
+
+        from run_agent import _SafeWriter
         inner = StringIO()
         writer = _SafeWriter(inner)
         writer.write("hello")
@@ -5289,8 +5322,9 @@ class TestSafeWriter:
 
     def test_write_catches_oserror(self):
         """OSError on write is silently caught, returns len(data)."""
-        from run_agent import _SafeWriter
         from unittest.mock import MagicMock
+
+        from run_agent import _SafeWriter
         inner = MagicMock()
         inner.write.side_effect = OSError(5, "Input/output error")
         writer = _SafeWriter(inner)
@@ -5299,8 +5333,9 @@ class TestSafeWriter:
 
     def test_flush_catches_oserror(self):
         """OSError on flush is silently caught."""
-        from run_agent import _SafeWriter
         from unittest.mock import MagicMock
+
+        from run_agent import _SafeWriter
         inner = MagicMock()
         inner.flush.side_effect = OSError(5, "Input/output error")
         writer = _SafeWriter(inner)
@@ -5309,8 +5344,9 @@ class TestSafeWriter:
     def test_print_survives_broken_stdout(self, monkeypatch):
         """print() through _SafeWriter doesn't crash on broken pipe."""
         import sys
-        from run_agent import _SafeWriter
         from unittest.mock import MagicMock
+
+        from run_agent import _SafeWriter
         broken = MagicMock()
         broken.write.side_effect = OSError(5, "Input/output error")
         original = sys.stdout
@@ -5323,6 +5359,7 @@ class TestSafeWriter:
     def test_installed_in_run_conversation(self, agent):
         """run_conversation installs _SafeWriter on stdio."""
         import sys
+
         from run_agent import _SafeWriter
         resp = _mock_response(content="Done", finish_reason="stop")
         agent.client.chat.completions.create.return_value = resp
@@ -5346,8 +5383,9 @@ class TestSafeWriter:
 
     def test_double_wrap_prevented(self):
         """Wrapping an already-wrapped stream doesn't add layers."""
-        from run_agent import _SafeWriter
         from io import StringIO
+
+        from run_agent import _SafeWriter
         inner = StringIO()
         wrapped = _SafeWriter(inner)
         # isinstance check should prevent double-wrapping
@@ -5358,8 +5396,6 @@ class TestSafeWriter:
         # Still just one layer
         wrapped.write("test")
         assert inner.getvalue() == "test"
-
-
 
 
 # ===================================================================
@@ -5817,8 +5853,8 @@ class TestStreamingApiCall:
 
     def test_multiple_tool_calls(self, agent):
         chunks = [
-            _make_chunk(tool_calls=[_make_tc_delta(0, "call_a", "search", '{}')]),
-            _make_chunk(tool_calls=[_make_tc_delta(1, "call_b", "read", '{}')]),
+            _make_chunk(tool_calls=[_make_tc_delta(0, "call_a", "search", "{}")]),
+            _make_chunk(tool_calls=[_make_tc_delta(1, "call_b", "read", "{}")]),
             _make_chunk(finish_reason="tool_calls"),
         ]
         agent.client.chat.completions.create.return_value = iter(chunks)
@@ -5900,7 +5936,7 @@ class TestStreamingApiCall:
             _make_chunk(tool_calls=[_make_tc_delta(0, "call_a", "search", '{"q":')]),
             _make_chunk(tool_calls=[_make_tc_delta(0, None, None, '"hello"}')]),
             # New tool call, same index 0
-            _make_chunk(tool_calls=[_make_tc_delta(0, "call_b", "read", '{}')]),
+            _make_chunk(tool_calls=[_make_tc_delta(0, "call_b", "read", "{}")]),
             _make_chunk(finish_reason="tool_calls"),
         ]
         agent.client.chat.completions.create.return_value = iter(chunks)
@@ -5912,12 +5948,12 @@ class TestStreamingApiCall:
         assert tc[0].function.name == "search"
         assert tc[0].function.arguments == '{"q":"hello"}'
         assert tc[1].function.name == "read"
-        assert tc[1].function.arguments == '{}'
+        assert tc[1].function.arguments == "{}"
 
     def test_content_and_tool_calls_together(self, agent):
         chunks = [
             _make_chunk(content="I'll search"),
-            _make_chunk(tool_calls=[_make_tc_delta(0, "call_1", "search", '{}')]),
+            _make_chunk(tool_calls=[_make_tc_delta(0, "call_1", "search", "{}")]),
             _make_chunk(finish_reason="tool_calls"),
         ]
         agent.client.chat.completions.create.return_value = iter(chunks)
@@ -6038,6 +6074,7 @@ class TestAnthropicInterruptHandler:
     def test_interruptible_has_anthropic_branch(self):
         """The interrupt handler must check api_mode == 'anthropic_messages'."""
         import inspect
+
         from agent.chat_completion_helpers import interruptible_api_call
         source = inspect.getsource(interruptible_api_call)
         assert "anthropic_messages" in source, \
@@ -6046,6 +6083,7 @@ class TestAnthropicInterruptHandler:
     def test_interruptible_rebuilds_anthropic_client(self):
         """After interrupting, the Anthropic client should be rebuilt."""
         import inspect
+
         from agent.chat_completion_helpers import interruptible_api_call
         source = inspect.getsource(interruptible_api_call)
         assert "build_anthropic_client" in source, \
@@ -6054,6 +6092,7 @@ class TestAnthropicInterruptHandler:
     def test_streaming_has_anthropic_branch(self):
         """_streaming_api_call must also handle Anthropic interrupt."""
         import inspect
+
         from agent.chat_completion_helpers import interruptible_streaming_api_call
         source = inspect.getsource(interruptible_streaming_api_call)
         assert "anthropic_messages" in source, \
@@ -6067,7 +6106,8 @@ class TestAnthropicInterruptHandler:
 
 class TestStreamCallbackNonStreamingProvider:
     """When api_mode != chat_completions, stream_callback must still receive
-    the response content so TTS works (batch delivery)."""
+    the response content so TTS works (batch delivery).
+    """
 
     def test_callback_receives_chat_completions_response(self, agent):
         """For chat_completions-shaped responses, callback gets content."""
@@ -6297,7 +6337,8 @@ class TestVprintForceOnErrors:
 
 class TestNormalizeCodexDictArguments:
     """_normalize_codex_response must produce valid JSON strings for tool
-    call arguments, even when the Responses API returns them as dicts."""
+    call arguments, even when the Responses API returns them as dicts.
+    """
 
     def _make_codex_response(self, item_type, arguments, item_status="completed"):
         """Build a minimal Responses API response with a single tool call."""
@@ -6321,8 +6362,9 @@ class TestNormalizeCodexDictArguments:
         )
 
     def test_function_call_dict_arguments_produce_valid_json(self, agent):
-        """dict arguments from function_call must be serialised with
-        json.dumps, not str(), so downstream json.loads() succeeds."""
+        """Dict arguments from function_call must be serialised with
+        json.dumps, not str(), so downstream json.loads() succeeds.
+        """
         args_dict = {"query": "weather in NYC", "units": "celsius"}
         response = self._make_codex_response("function_call", args_dict)
         msg, _ = _normalize_codex_response(response)
@@ -6331,7 +6373,7 @@ class TestNormalizeCodexDictArguments:
         assert parsed == args_dict
 
     def test_custom_tool_call_dict_arguments_produce_valid_json(self, agent):
-        """dict arguments from custom_tool_call must also use json.dumps."""
+        """Dict arguments from custom_tool_call must also use json.dumps."""
         args_dict = {"path": "/tmp/test.txt", "content": "hello"}
         response = self._make_codex_response("custom_tool_call", args_dict)
         msg, _ = _normalize_codex_response(response)
@@ -6463,6 +6505,7 @@ class TestMemoryNudgeCounterPersistence:
     def test_counters_not_reset_in_preamble(self):
         """The turn preamble must not zero the nudge counters."""
         import inspect
+
         from agent.turn_context import build_turn_context as _btc
         src = inspect.getsource(_btc)
         # The preamble (now in build_turn_context) resets many fields (retry
@@ -6482,6 +6525,7 @@ class TestDeadRetryCode:
 
     def test_no_unreachable_max_retries_after_backoff(self):
         import inspect
+
         from agent.conversation_loop import run_conversation as _rc
         source = inspect.getsource(_rc)
         occurrences = source.count("if retry_count >= max_retries:")
@@ -6519,8 +6563,10 @@ class TestMemoryContextSanitization:
     def test_user_message_is_not_mutated_by_run_conversation(self):
         """User input must reach run_conversation untouched — if a user types
         a literal <memory-context> tag we don't silently delete their text.
-        The streaming scrubber + plugin-side scrub cover real leak paths."""
+        The streaming scrubber + plugin-side scrub cover real leak paths.
+        """
         import inspect
+
         from agent.conversation_loop import run_conversation as _rc
         src = inspect.getsource(_rc)
         assert "sanitize_context(user_message)" not in src
@@ -6529,7 +6575,8 @@ class TestMemoryContextSanitization:
     def test_sanitize_context_strips_full_block(self):
         """Helper-level: a string with an embedded memory-context block is
         cleaned to just the surrounding text.  Used by build_memory_context_block
-        (input-validation) and by plugins on their own backend boundary."""
+        (input-validation) and by plugins on their own backend boundary.
+        """
         from agent.memory_manager import sanitize_context
         user_text = "how is the honcho working"
         injected = (
@@ -6558,6 +6605,7 @@ class TestMemoryProviderTurnStart:
     def test_on_turn_start_called_before_prefetch(self):
         """Source-level check: on_turn_start appears before prefetch_all in the prologue."""
         import inspect
+
         from agent.turn_context import build_turn_context as _btc
         src = inspect.getsource(_btc)
         # Find the actual method calls, not comments
@@ -6571,6 +6619,7 @@ class TestMemoryProviderTurnStart:
     def test_on_turn_start_uses_user_turn_count(self):
         """Source-level check: on_turn_start receives the user_turn_count."""
         import inspect
+
         from agent.turn_context import build_turn_context as _btc
         src = inspect.getsource(_btc)
         # The extracted body uses ``agent.X`` rather than ``self.X``;

@@ -446,7 +446,8 @@ class TestModalPaintNow:
 
     def test_secret_response_teardown_paints(self):
         """_submit_secret_response tears the secret panel down via _paint_now,
-        so the panel clears immediately rather than being held by the throttle."""
+        so the panel clears immediately rather than being held by the throttle.
+        """
         cli = _make_real_paint_cli_stub()
         cli._secret_state = {"response_queue": queue.Queue()}
         cli._secret_deadline = 0
@@ -474,8 +475,8 @@ class TestApprovalCallbackThreadLocalWiring:
         is gone and the ACP race GHSA-qg5c-hvr5-hjgr may be back.
         """
         from tools.terminal_tool import (
-            set_approval_callback,
             _get_approval_callback,
+            set_approval_callback,
         )
 
         def main_cb(_cmd, _desc):
@@ -502,10 +503,10 @@ class TestApprovalCallbackThreadLocalWiring:
         fails, the CLI approval prompt freeze (#13617) has regressed.
         """
         from tools.terminal_tool import (
-            set_approval_callback,
-            set_sudo_password_callback,
             _get_approval_callback,
             _get_sudo_password_callback,
+            set_approval_callback,
+            set_sudo_password_callback,
         )
 
         def approval_cb(_cmd, _desc):

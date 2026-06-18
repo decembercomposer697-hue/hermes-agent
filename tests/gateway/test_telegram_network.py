@@ -20,10 +20,10 @@ import pytest
 
 from gateway.platforms import telegram_network as tnet
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 class FakeTransport(httpx.AsyncBaseTransport):
     """Records calls and raises / returns based on a host→action mapping."""
@@ -375,7 +375,12 @@ class TestFallbackTransportClose:
 
 class TestConfigFallbackIps:
     def test_env_var_populates_config_extra(self, monkeypatch):
-        from gateway.config import GatewayConfig, Platform, PlatformConfig, _apply_env_overrides
+        from gateway.config import (
+            GatewayConfig,
+            Platform,
+            PlatformConfig,
+            _apply_env_overrides,
+        )
 
         monkeypatch.setenv("TELEGRAM_FALLBACK_IPS", "149.154.167.220,149.154.167.221")
         config = GatewayConfig(platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="tok")})
@@ -396,7 +401,12 @@ class TestConfigFallbackIps:
         assert config.platforms[Platform.TELEGRAM].extra["fallback_ips"] == ["149.154.167.220"]
 
     def test_env_var_strips_whitespace(self, monkeypatch):
-        from gateway.config import GatewayConfig, Platform, PlatformConfig, _apply_env_overrides
+        from gateway.config import (
+            GatewayConfig,
+            Platform,
+            PlatformConfig,
+            _apply_env_overrides,
+        )
 
         monkeypatch.setenv("TELEGRAM_FALLBACK_IPS", "  149.154.167.220 , 149.154.167.221  ")
         config = GatewayConfig(platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="tok")})
@@ -407,7 +417,12 @@ class TestConfigFallbackIps:
         ]
 
     def test_empty_env_var_does_not_populate(self, monkeypatch):
-        from gateway.config import GatewayConfig, Platform, PlatformConfig, _apply_env_overrides
+        from gateway.config import (
+            GatewayConfig,
+            Platform,
+            PlatformConfig,
+            _apply_env_overrides,
+        )
 
         monkeypatch.setenv("TELEGRAM_FALLBACK_IPS", "")
         config = GatewayConfig(platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="tok")})

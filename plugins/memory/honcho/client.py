@@ -13,17 +13,17 @@ Resolution order for host-specific settings:
 
 from __future__ import annotations
 
-import json
-import os
-import logging
 import hashlib
+import json
+import logging
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
-from hermes_constants import get_hermes_home
 from hermes_cli.profiles import _get_default_hermes_home
+from hermes_constants import get_hermes_home
 from plugins.plugin_utils import SingletonSlot
-from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from honcho import Honcho
@@ -283,9 +283,6 @@ def _resolve_observation(
         "ai_observe_me": ai_block.get("observeMe", preset["ai_observe_me"]),
         "ai_observe_others": ai_block.get("observeOthers", preset["ai_observe_others"]),
     }
-
-
-
 
 
 @dataclass
@@ -699,7 +696,7 @@ class HonchoClientConfig:
 
         # /title mid-session remap
         if session_title:
-            sanitized = re.sub(r'[^a-zA-Z0-9_-]+', '-', session_title).strip('-')
+            sanitized = re.sub(r"[^a-zA-Z0-9_-]+", "-", session_title).strip("-")
             if sanitized:
                 if self.session_peer_prefix and self.peer_name:
                     return f"{self.peer_name}-{sanitized}"
@@ -711,7 +708,7 @@ class HonchoClientConfig:
         # based resolution because gateway platforms need per-chat isolation that
         # cwd-based strategies cannot provide.
         if gateway_session_key:
-            sanitized = re.sub(r'[^a-zA-Z0-9_-]+', '-', gateway_session_key).strip('-')
+            sanitized = re.sub(r"[^a-zA-Z0-9_-]+", "-", gateway_session_key).strip("-")
             if sanitized:
                 return self._enforce_session_id_limit(sanitized, gateway_session_key)
 
@@ -778,7 +775,8 @@ def get_honcho_client(config: HonchoClientConfig | None = None) -> Honcho:
         # the original ImportError-shape message so existing callers still get
         # the "go run hermes honcho setup" hint they used to.
         try:
-            from tools.lazy_deps import FeatureUnavailable, ensure as _lazy_ensure
+            from tools.lazy_deps import FeatureUnavailable
+            from tools.lazy_deps import ensure as _lazy_ensure
             _lazy_ensure("memory.honcho", prompt=False)
         except ImportError:
             # lazy_deps module missing — fall through to the raw import below.

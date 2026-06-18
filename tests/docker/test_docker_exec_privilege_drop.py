@@ -29,7 +29,6 @@ from collections.abc import Iterator
 
 import pytest
 
-
 # How long to give a `docker run -d` container before declaring it not ready.
 _RUN_READY_TIMEOUT_S = 20
 
@@ -72,7 +71,7 @@ def sleep_container(built_image: str, container_name: str) -> Iterator[str]:
 
 
 def test_shim_drops_root_to_hermes_uid(sleep_container: str) -> None:
-    """docker exec defaults to root; the shim should drop to uid 10000.
+    """Docker exec defaults to root; the shim should drop to uid 10000.
 
     We invoke `hermes` with a Python-style `-c` shim equivalent — there's no
     pure-hermes "print my uid" command, so we use the venv's python directly
@@ -115,7 +114,7 @@ def test_shim_drops_root_to_hermes_uid(sleep_container: str) -> None:
 
 
 def test_shim_short_circuits_for_non_root_exec(sleep_container: str) -> None:
-    """docker exec --user hermes already runs as 10000; shim should be a no-op.
+    """Docker exec --user hermes already runs as 10000; shim should be a no-op.
 
     Verified indirectly: the command must still succeed end-to-end. If the
     shim incorrectly tried to drop privileges a second time (e.g. by

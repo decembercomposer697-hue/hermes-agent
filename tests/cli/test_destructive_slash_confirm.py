@@ -33,7 +33,8 @@ def _make_self(prompt_response):
 
 def test_gate_off_returns_once_without_prompting():
     """When approvals.destructive_slash_confirm is False, return 'once'
-    immediately (caller proceeds without showing a prompt)."""
+    immediately (caller proceeds without showing a prompt).
+    """
     from cli import HermesCLI
 
     self_ = _make_self(prompt_response="should not be called")
@@ -119,12 +120,14 @@ def test_gate_on_unknown_choice_returns_none():
 
 def test_gate_on_choice_always_persists_and_returns_always():
     """User picks 'always' → returns 'always' AND
-    save_config_value('approvals.destructive_slash_confirm', False) was called."""
+    save_config_value('approvals.destructive_slash_confirm', False) was called.
+    """
     from cli import HermesCLI
 
     self_ = _make_self(prompt_response="2")
 
     saves = []
+
     def _fake_save(key, value):
         saves.append((key, value))
         return True
@@ -143,7 +146,8 @@ def test_gate_on_choice_always_persists_and_returns_always():
 
 def test_gate_default_true_when_config_missing():
     """If load_cli_config raises or returns malformed data, treat as
-    'gate on' (default safe) — must prompt."""
+    'gate on' (default safe) — must prompt.
+    """
     from cli import HermesCLI
 
     self_ = _make_self(prompt_response="3")  # cancel

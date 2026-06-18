@@ -11,8 +11,8 @@ import tempfile
 import time
 from pathlib import Path
 
-from tools.environments.base import BaseEnvironment, _pipe_stdin
 from hermes_cli._subprocess_compat import windows_hide_flags
+from tools.environments.base import BaseEnvironment, _pipe_stdin
 
 _IS_WINDOWS = platform.system() == "Windows"
 
@@ -31,11 +31,11 @@ def _msys_to_windows_path(cwd: str) -> str:
     if not _IS_WINDOWS or not cwd:
         return cwd
     # Match leading "/<single letter>/" or exactly "/<letter>" (bare drive root).
-    m = re.match(r'^/([a-zA-Z])(/.*)?$', cwd)
+    m = re.match(r"^/([a-zA-Z])(/.*)?$", cwd)
     if not m:
         return cwd
     drive = m.group(1).upper()
-    tail = (m.group(2) or "").replace('/', '\\')
+    tail = (m.group(2) or "").replace("/", "\\")
     return f"{drive}:{tail or chr(92)}"  # chr(92) = backslash, avoid raw-string escape
 
 

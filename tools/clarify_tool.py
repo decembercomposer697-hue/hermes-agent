@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Clarify Tool Module - Interactive Clarifying Questions
+"""Clarify Tool Module - Interactive Clarifying Questions
 
 Allows the agent to present structured multiple-choice questions or open-ended
 prompts to the user. In CLI mode, choices are navigable with arrow keys. On
@@ -12,9 +11,8 @@ a thin dispatcher that delegates to a platform-provided callback.
 """
 
 import json
-from typing import List, Optional
 from collections.abc import Callable
-
+from typing import List, Optional
 
 # Maximum number of predefined choices the agent can offer.
 # A 5th "Other (type your answer)" option is always appended by the UI.
@@ -26,8 +24,7 @@ def clarify_tool(
     choices: list[str] | None = None,
     callback: Callable | None = None,
 ) -> str:
-    """
-    Ask the user a question, optionally with multiple-choice options.
+    """Ask the user a question, optionally with multiple-choice options.
 
     Args:
         question: The question text to present.
@@ -39,6 +36,7 @@ def clarify_tool(
 
     Returns:
         JSON string with the user's response.
+
     """
     if not question or not question.strip():
         return tool_error("Question text is required.")

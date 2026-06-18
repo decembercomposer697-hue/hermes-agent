@@ -1,5 +1,4 @@
-"""
-Tests for hermes_cli.mcp_config — ``hermes mcp`` subcommands.
+"""Tests for hermes_cli.mcp_config — ``hermes mcp`` subcommands.
 
 These tests mock the MCP server connection layer so they run without
 any actual MCP servers or API keys.
@@ -10,10 +9,10 @@ from pathlib import Path
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(autouse=True)
 def _isolate_config(tmp_path, monkeypatch):
@@ -347,8 +346,8 @@ class TestMcpAdd:
         )
         monkeypatch.setattr("builtins.input", lambda _: "")
 
-        from hermes_cli.mcp_config import cmd_mcp_add
         from hermes_cli.config import read_raw_config
+        from hermes_cli.mcp_config import cmd_mcp_add
 
         cmd_mcp_add(_make_args(name="myserver", preset="testmcp"))
         out = capsys.readouterr().out
@@ -379,8 +378,8 @@ class TestMcpAdd:
         )
         monkeypatch.setattr("builtins.input", lambda _: "")
 
-        from hermes_cli.mcp_config import cmd_mcp_add
         from hermes_cli.config import read_raw_config
+        from hermes_cli.mcp_config import cmd_mcp_add
 
         cmd_mcp_add(_make_args(
             name="custom",
@@ -491,7 +490,8 @@ class TestProbeEnvResolution:
     """The probe path must resolve ``${ENV}`` before connecting, so the
     discovery probe behaves like runtime tool loading. Regression for #37792
     where `hermes mcp add --auth header` sent a literal
-    ``Authorization: Bearer ${MCP_X_API_KEY}`` and got 401."""
+    ``Authorization: Bearer ${MCP_X_API_KEY}`` and got 401.
+    """
 
     def test_resolve_interpolates_header(self, monkeypatch):
         from hermes_cli.mcp_config import _resolve_mcp_server_config
@@ -549,7 +549,8 @@ class TestProbeEnvResolution:
 
 class TestStripBearerPrefix:
     """Pasted tokens that already include ``Bearer `` would otherwise produce
-    ``Bearer Bearer <jwt>`` once the header template adds its own prefix."""
+    ``Bearer Bearer <jwt>`` once the header template adds its own prefix.
+    """
 
     def test_bare_token_unchanged(self):
         from hermes_cli.mcp_config import _strip_bearer_prefix
@@ -585,7 +586,7 @@ class TestStripBearerPrefix:
 
 class TestConfigHelpers:
     def test_save_and_load_mcp_server(self, tmp_path):
-        from hermes_cli.mcp_config import _save_mcp_server, _get_mcp_servers
+        from hermes_cli.mcp_config import _get_mcp_servers, _save_mcp_server
 
         _save_mcp_server("mysvr", {"url": "https://example.com/mcp"})
         servers = _get_mcp_servers()
@@ -594,9 +595,9 @@ class TestConfigHelpers:
 
     def test_remove_mcp_server(self, tmp_path):
         from hermes_cli.mcp_config import (
-            _save_mcp_server,
-            _remove_mcp_server,
             _get_mcp_servers,
+            _remove_mcp_server,
+            _save_mcp_server,
         )
 
         _save_mcp_server("s1", {"command": "test"})

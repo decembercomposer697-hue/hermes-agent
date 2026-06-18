@@ -8,7 +8,6 @@ import threading
 import time
 
 
-
 class TestPersistentPool:
     """_get_parallel_pool returns a persistent ThreadPoolExecutor."""
 

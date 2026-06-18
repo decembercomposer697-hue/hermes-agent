@@ -17,7 +17,6 @@ import sys
 
 import hermes_cli
 
-
 # The exact glyphs the setup wizard / banners print (setup.py ~line 2962+).
 _BANNER = "┌─────┐\n│ ⚕ Hermes │\n└─────┘"
 
@@ -96,7 +95,8 @@ def test_ascii_posix_locale_is_repaired(monkeypatch):
 def test_utf8_stream_left_untouched(monkeypatch):
     """Already-UTF-8 streams are a no-op: object identity preserved AND the
     process environment is left untouched (no PYTHONUTF8/PYTHONIOENCODING
-    burned in on a healthy UTF-8 host)."""
+    burned in on a healthy UTF-8 host).
+    """
     out = _FakeStream("utf-8")
     err = _FakeStream("utf-8")
     sentinel_out, sentinel_err = out, err
@@ -173,7 +173,7 @@ def test_broken_stream_does_not_raise(monkeypatch):
 
 
 def test_none_streams_do_not_raise(monkeypatch):
-    """pythonw / detached streams (sys.stdout is None) must be tolerated."""
+    """Pythonw / detached streams (sys.stdout is None) must be tolerated."""
     monkeypatch.setattr(sys, "stdout", None, raising=False)
     monkeypatch.setattr(sys, "stderr", None, raising=False)
     hermes_cli._ensure_utf8()

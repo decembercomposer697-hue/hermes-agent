@@ -16,7 +16,6 @@ These tests pin the expanded whitelist so it doesn't regress.
 """
 from __future__ import annotations
 
-
 from gateway.run import _ASSISTANT_REPLAY_FIELDS, _build_replay_entry
 
 
@@ -143,7 +142,8 @@ class TestBuildReplayEntry:
 
     def test_assistant_drops_falsy_reasoning(self):
         """Empty/None reasoning fields stay dropped (matching PR #2974
-        behaviour) — empty strings/lists for these fields carry no info."""
+        behaviour) — empty strings/lists for these fields carry no info.
+        """
         msg = {
             "role": "assistant",
             "content": "answer",

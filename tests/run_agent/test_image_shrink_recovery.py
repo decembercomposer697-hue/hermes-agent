@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import base64
 
-
 from agent.error_classifier import FailoverReason, classify_api_error
 
 

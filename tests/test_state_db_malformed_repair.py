@@ -199,7 +199,8 @@ def test_strategy_b_rebuild_when_dedup_insufficient(tmp_path, monkeypatch):
 
 def test_unrepairable_file_fails_safely(tmp_path, monkeypatch):
     """A file too damaged to recover must report failure, keep a backup, and
-    never raise from the repair routine itself."""
+    never raise from the repair routine itself.
+    """
     db_path = tmp_path / "state.db"
     db_path.write_bytes(b"SQLite format 3\x00" + b"\x00\xde\xad\xbe\xef" * 200)
 
@@ -212,7 +213,8 @@ def test_unrepairable_file_fails_safely(tmp_path, monkeypatch):
 
 def test_non_malformed_error_is_not_auto_repaired(tmp_path, monkeypatch):
     """Auto-heal must only trigger for the malformed-schema class, not for
-    e.g. 'file is not a database' — those raise unchanged."""
+    e.g. 'file is not a database' — those raise unchanged.
+    """
     db_path = tmp_path / "state.db"
     db_path.write_bytes(b"this is definitely not a sqlite database")
     monkeypatch.setattr(hermes_state, "_repair_attempted_paths", set())

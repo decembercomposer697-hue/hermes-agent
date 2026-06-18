@@ -89,7 +89,6 @@ class ClassifiedError:
         return self.reason in {FailoverReason.auth, FailoverReason.auth_permanent}
 
 
-
 # ── Provider-specific patterns ──────────────────────────────────────────
 
 # Patterns that indicate billing exhaustion (not transient rate limit)
@@ -468,6 +467,7 @@ def classify_api_error(
 
     Returns:
         ClassifiedError with reason and recovery action hints.
+
     """
     status_code = _extract_status_code(error)
     error_type = type(error).__name__

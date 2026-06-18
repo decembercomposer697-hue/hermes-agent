@@ -61,7 +61,8 @@ class TestExitDeleteFlag:
     def test_quit_alias_q_is_not_quit(self):
         """`/q` is the alias for `/queue`, not `/quit`. This test documents
         that /q --delete does NOT arm session deletion — it would dispatch
-        to /queue instead."""
+        to /queue instead.
+        """
         cli = _make_cli()
         cli._pending_input = __import__("queue").Queue()
         # /q with no args shows a usage error and keeps the CLI running.
@@ -84,7 +85,8 @@ class TestExitDeleteFlag:
     def test_unknown_exit_argument_does_not_exit(self):
         """Unrecognised args should NOT exit the CLI — they surface an
         error message and stay in the session. This prevents accidental
-        session destruction from typos like `/exit -delete`."""
+        session destruction from typos like `/exit -delete`.
+        """
         cli = _make_cli()
         result = cli.process_command("/exit --delte")
         # process_command returns True = keep running
@@ -105,7 +107,8 @@ class TestExitDeleteFlag:
 class TestCommandRegistry:
     def test_quit_command_advertises_delete_flag(self):
         """The CommandDef args_hint should surface `--delete` in /help and
-        CLI autocomplete."""
+        CLI autocomplete.
+        """
         from hermes_cli.commands import resolve_command
         cmd = resolve_command("quit")
         assert cmd is not None

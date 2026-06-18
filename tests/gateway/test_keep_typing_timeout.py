@@ -55,7 +55,8 @@ class TestKeepTypingTimeoutPerTick:
     @pytest.mark.asyncio
     async def test_slow_send_typing_does_not_block_cadence(self, monkeypatch):
         """A send_typing that hangs longer than the per-tick budget must be
-        abandoned so the next scheduled tick can fire a fresh call."""
+        abandoned so the next scheduled tick can fire a fresh call.
+        """
         adapter = _StubAdapter()
         call_events = []
 
@@ -106,7 +107,8 @@ class TestKeepTypingTimeoutPerTick:
     async def test_fast_send_typing_still_gets_awaited(self, monkeypatch):
         """When send_typing is fast (normal case), it must still complete
         normally — the timeout is only an upper bound, not a cap on
-        successful calls."""
+        successful calls.
+        """
         adapter = _StubAdapter()
         completed = []
 
@@ -138,7 +140,8 @@ class TestKeepTypingTimeoutPerTick:
     @pytest.mark.asyncio
     async def test_send_typing_exception_does_not_kill_loop(self, monkeypatch):
         """A send_typing that raises (e.g. transient HTTP 500) must be
-        caught so the loop continues refreshing on schedule."""
+        caught so the loop continues refreshing on schedule.
+        """
         adapter = _StubAdapter()
         tick_count = {"n": 0}
 
@@ -172,7 +175,8 @@ class TestKeepTypingTimeoutPerTick:
     async def test_paused_chat_skips_send_typing(self, monkeypatch):
         """When a chat is in _typing_paused (e.g. awaiting approval), the
         loop must not call send_typing at all. Regression guard — existing
-        behavior, preserved through the timeout change."""
+        behavior, preserved through the timeout change.
+        """
         adapter = _StubAdapter()
         calls = []
 

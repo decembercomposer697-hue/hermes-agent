@@ -26,6 +26,7 @@ def register_provider(provider: DashboardAuthProvider) -> None:
     Raises:
         TypeError: on protocol violation.
         ValueError: if a provider with the same name is already registered.
+
     """
     assert_protocol_compliance(type(provider))
     with _lock:

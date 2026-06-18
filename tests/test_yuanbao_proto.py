@@ -1,5 +1,4 @@
-"""
-test_yuanbao_proto.py - yuanbao_proto 单元测试
+"""test_yuanbao_proto.py - yuanbao_proto 单元测试
 
 测试覆盖：
   1. varint 编解码 round-trip
@@ -11,8 +10,8 @@ test_yuanbao_proto.py - yuanbao_proto 单元测试
   7. auth-bind / ping 编码
 """
 
-import sys
 import os
+import sys
 
 # 确保 hermes-agent 根目录在 sys.path 中
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,39 +19,40 @@ if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
 import pytest
+
 from gateway.platforms.yuanbao_proto import (
-    # 基础工具
-    _encode_varint,
-    _decode_varint,
-    _parse_fields,
-    _fields_to_dict,
-    _encode_msg_body_element,
-    _decode_msg_body_element,
-    encode_conn_msg,
-    decode_conn_msg,
-    encode_conn_msg_full,
-    # biz 层
-    encode_biz_msg,
-    decode_biz_msg,
-    # 入站/出站
-    decode_inbound_push,
-    encode_send_c2c_message,
-    encode_send_group_message,
-    # 帮助函数
-    encode_auth_bind,
-    encode_ping,
-    encode_push_ack,
-    # 常量
-    PB_MSG_TYPES,
     BIZ_SERVICES,
     CMD_TYPE,
+    # 常量
+    PB_MSG_TYPES,
+    _decode_msg_body_element,
+    _decode_varint,
+    _encode_msg_body_element,
+    # 基础工具
+    _encode_varint,
+    _fields_to_dict,
+    _parse_fields,
+    decode_biz_msg,
+    decode_conn_msg,
+    # 入站/出站
+    decode_inbound_push,
+    # 帮助函数
+    encode_auth_bind,
+    # biz 层
+    encode_biz_msg,
+    encode_conn_msg,
+    encode_conn_msg_full,
+    encode_ping,
+    encode_push_ack,
+    encode_send_c2c_message,
+    encode_send_group_message,
     next_seq_no,
 )
-
 
 # ===========================================================
 # 1. varint 编解码
 # ===========================================================
+
 
 class TestVarint:
     def test_small_values(self):
@@ -144,8 +144,7 @@ class TestConnCodec:
 
     # 固定 bytes 常量测试——防协议悄悄改动
     def test_fixed_bytes_simple(self):
-        """
-        encode_conn_msg(msg_type=0, seq_no=1, data=b"") 的固定编码。
+        """encode_conn_msg(msg_type=0, seq_no=1, data=b"") 的固定编码。
         ConnMsg { head { seq_no=1 } }
         head bytes: field3 varint(1) = 0x18 0x01
         head field: field1 len(2) 0x18 0x01 = 0x0a 0x02 0x18 0x01
@@ -270,8 +269,7 @@ class TestMsgBodyElement:
         assert dec["msg_type"] == "TIMTextElem"
 
     def test_fixed_text_elem_bytes(self):
-        """
-        固定 bytes 验证：TIMTextElem { text="hi" }
+        """固定 bytes 验证：TIMTextElem { text="hi" }
         MsgBodyElement:
           field1 (msg_type="TIMTextElem"): 0a 0b 54494d5465787445 6c656d
           field2 (msg_content): 12 <len> <content>
@@ -313,8 +311,12 @@ class TestDecodeInboundPush:
     ) -> bytes:
         """手工构造 InboundMessagePush bytes（与 proto 字段顺序一致）"""
         from gateway.platforms.yuanbao_proto import (
-            _encode_field, _encode_string, _encode_message,
-            _encode_varint, WT_LEN, WT_VARINT,
+            WT_LEN,
+            WT_VARINT,
+            _encode_field,
+            _encode_message,
+            _encode_string,
+            _encode_varint,
         )
         el = {
             "msg_type": "TIMTextElem",
@@ -371,7 +373,9 @@ class TestDecodeInboundPush:
 
     def test_multiple_msg_body_elements(self):
         from gateway.platforms.yuanbao_proto import (
-            _encode_field, _encode_message, WT_LEN,
+            WT_LEN,
+            _encode_field,
+            _encode_message,
         )
         el1 = _encode_msg_body_element(
             {"msg_type": "TIMTextElem", "msg_content": {"text": "part1"}},
@@ -590,7 +594,8 @@ class TestEndToEnd:
 
         # 从 biz payload 中读取 to_account 和 msg_body
         from gateway.platforms.yuanbao_proto import (
-            _get_string, _get_repeated_bytes,
+            _get_repeated_bytes,
+            _get_string,
         )
         biz = dec["data"]
         fdict = _fields_to_dict(_parse_fields(biz))
@@ -606,8 +611,12 @@ class TestEndToEnd:
     def test_inbound_push_full_flow(self):
         """构造服务端 push -> 解码入站消息"""
         from gateway.platforms.yuanbao_proto import (
-            _encode_field, _encode_string, _encode_message,
-            _encode_varint, WT_LEN, WT_VARINT,
+            WT_LEN,
+            WT_VARINT,
+            _encode_field,
+            _encode_message,
+            _encode_string,
+            _encode_varint,
         )
         # 构造入站消息 biz payload
         el_bytes = _encode_msg_body_element(

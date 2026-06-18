@@ -27,9 +27,9 @@ from gateway.platforms.base import (
     MessageEvent,
     MessageType,
     SendResult,
-    cache_image_from_bytes,
     cache_audio_from_bytes,
     cache_document_from_bytes,
+    cache_image_from_bytes,
 )
 from gateway.platforms.helpers import strip_markdown
 
@@ -100,9 +100,6 @@ def _normalize_server_url(raw: str) -> str:
     if not re.match(r"^https?://", value, flags=re.I):
         value = f"http://{value}"
     return value.rstrip("/")
-
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -509,7 +506,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         # Split on paragraph breaks first (double newlines) so each thought
         # becomes its own iMessage bubble, then truncate any that are still
         # too long.
-        paragraphs = [p.strip() for p in re.split(r'\n\s*\n', text) if p.strip()]
+        paragraphs = [p.strip() for p in re.split(r"\n\s*\n", text) if p.strip()]
         chunks: list[str] = []
         for para in (paragraphs or [text]):
             if len(para) <= self.MAX_MESSAGE_LENGTH:

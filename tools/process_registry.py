@@ -1,5 +1,4 @@
-"""
-Process Registry -- In-memory registry for managed background processes.
+"""Process Registry -- In-memory registry for managed background processes.
 
 Tracks processes spawned via terminal(background=true), providing:
   - Output buffering (rolling 200KB window)
@@ -41,12 +40,16 @@ import time
 import uuid
 
 _IS_WINDOWS = platform.system() == "Windows"
-from tools.environments.local import _find_shell, _resolve_safe_cwd, _sanitize_subprocess_env
-from hermes_cli._subprocess_compat import windows_hide_flags
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
+from hermes_cli._subprocess_compat import windows_hide_flags
 from hermes_cli.config import get_hermes_home
+from tools.environments.local import (
+    _find_shell,
+    _resolve_safe_cwd,
+    _sanitize_subprocess_env,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -135,8 +138,7 @@ class ProcessSession:
 
 
 class ProcessRegistry:
-    """
-    In-memory registry of running and finished background processes.
+    """In-memory registry of running and finished background processes.
 
     Thread-safe. Accessed from:
       - Executor threads (terminal_tool, process tool handlers)
@@ -522,8 +524,7 @@ class ProcessRegistry:
         env_vars: dict = None,
         use_pty: bool = False,
     ) -> ProcessSession:
-        """
-        Spawn a background process locally.
+        """Spawn a background process locally.
 
         Only for TERMINAL_ENV=local. Other backends use spawn_via_env().
 
@@ -531,6 +532,7 @@ class ProcessRegistry:
             use_pty: If True, use a pseudo-terminal via ptyprocess for interactive
                      CLI tools (Codex, Claude Code, Python REPL). Falls back to
                      subprocess.Popen if ptyprocess is not installed.
+
         """
         session = ProcessSession(
             id=f"proc_{uuid.uuid4().hex[:12]}",
@@ -659,8 +661,7 @@ class ProcessRegistry:
         session_key: str = "",
         timeout: int = 10,
     ) -> ProcessSession:
-        """
-        Spawn a background process through a non-local environment backend.
+        """Spawn a background process through a non-local environment backend.
 
         For Docker/Singularity/Modal/Daytona/SSH: runs the command inside the sandbox
         using the environment's execute() interface. We wrap the command to
@@ -857,7 +858,7 @@ class ProcessRegistry:
         except Exception as e:
             logger.debug("PTY wait timed out or failed: %s", e)
         session.exited = True
-        session.exit_code = pty.exitstatus if hasattr(pty, 'exitstatus') else -1
+        session.exit_code = pty.exitstatus if hasattr(pty, "exitstatus") else -1
         self._move_to_finished(session)
 
     def _move_to_finished(self, session: ProcessSession):
@@ -1054,8 +1055,7 @@ class ProcessRegistry:
         return result
 
     def wait(self, session_id: str, timeout: int = None) -> dict:
-        """
-        Block until a process exits, timeout, or interrupt.
+        """Block until a process exits, timeout, or interrupt.
 
         Args:
             session_id: The process to wait for.
@@ -1064,6 +1064,7 @@ class ProcessRegistry:
         Returns:
             dict with status ("exited", "timeout", "interrupted", "not_found")
             and output snapshot.
+
         """
         from tools.ansi_strip import strip_ansi
         from tools.interrupt import is_interrupted as _is_interrupted
@@ -1209,7 +1210,7 @@ class ProcessRegistry:
             return {"status": "already_exited", "error": "Process has already finished"}
 
         # PTY mode -- write through pty handle.
-        if hasattr(session, '_pty') and session._pty:
+        if hasattr(session, "_pty") and session._pty:
             try:
                 # pywinpty expects str on Windows; ptyprocess expects bytes on POSIX.
                 if _IS_WINDOWS:
@@ -1243,7 +1244,7 @@ class ProcessRegistry:
         if session.exited:
             return {"status": "already_exited", "error": "Process has already finished"}
 
-        if hasattr(session, '_pty') and session._pty:
+        if hasattr(session, "_pty") and session._pty:
             try:
                 session._pty.sendeof()
                 return {"status": "ok", "message": "EOF sent"}
@@ -1410,8 +1411,7 @@ class ProcessRegistry:
             logger.debug("Failed to write checkpoint file: %s", e, exc_info=True)
 
     def recover_from_checkpoint(self) -> int:
-        """
-        On gateway startup, probe PIDs from checkpoint file.
+        """On gateway startup, probe PIDs from checkpoint file.
 
         Returns the number of processes recovered as detached.
         """

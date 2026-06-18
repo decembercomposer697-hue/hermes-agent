@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-File Operations Module
+"""File Operations Module
 
 Provides file manipulation capabilities (read, write, patch, search) that work
 across all terminal backends (local, docker, ssh, singularity, modal, daytona).
@@ -25,21 +24,22 @@ Usage:
     result = file_ops.search("TODO", path=".", file_glob="*.py")
 """
 
+import difflib
 import os
 import re
-import difflib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any
 from pathlib import Path
-from tools.binary_extensions import BINARY_EXTENSIONS
+from typing import Any, Dict, List, Optional
 
 from agent.file_safety import (
     build_write_denied_paths,
     build_write_denied_prefixes,
+)
+from agent.file_safety import (
     is_write_denied as _shared_is_write_denied,
 )
-
+from tools.binary_extensions import BINARY_EXTENSIONS
 
 # ---------------------------------------------------------------------------
 # Write-path deny list — blocks writes to sensitive system/credential files
@@ -307,7 +307,7 @@ def _split_tool_diagnostics(output: str) -> tuple[str, str]:
     """
     diagnostics: list[str] = []
     payload: list[str] = []
-    for line in output.split('\n'):
+    for line in output.split("\n"):
         if not line.strip():
             continue
         # Tool diagnostics always carry the "<tool>: " prefix (e.g.
@@ -331,7 +331,7 @@ def _split_tool_diagnostics(output: str) -> tuple[str, str]:
             payload.append(line)
         else:
             diagnostics.append(line)
-    return '\n'.join(diagnostics), '\n'.join(payload)
+    return "\n".join(diagnostics), "\n".join(payload)
 
 
 # A real rg/grep output line starts with a path token and is followed by a
@@ -339,7 +339,7 @@ def _split_tool_diagnostics(output: str) -> tuple[str, str]:
 # diagnostics ("rg: ...", "grep: ...", "error: ...", indented carets) never
 # match because the path token forbids whitespace and a leading tool prefix
 # like "rg" is followed by ": " (space) which the negated class rejects.
-_SEARCH_OUTPUT_RE = re.compile(r'^([A-Za-z]:)?[^\s:][^\n]*?[:\-]\d|^[^\s:][^\s]*$')
+_SEARCH_OUTPUT_RE = re.compile(r"^([A-Za-z]:)?[^\s:][^\n]*?[:\-]\d|^[^\s:][^\s]*$")
 
 
 def _parse_search_context_line(line: str) -> tuple[str, int, str] | None:
@@ -354,7 +354,7 @@ def _parse_search_context_line(line: str) -> tuple[str, int, str] | None:
         return None
 
     match = None
-    for candidate in re.finditer(r'-(\d+)-', line):
+    for candidate in re.finditer(r"-(\d+)-", line):
         match = candidate
 
     if match is None:
@@ -438,17 +438,17 @@ class FileOperations(ABC):
 # =============================================================================
 
 # Image extensions (subset of binary that we can return as base64)
-IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.ico'}
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".ico"}
 
 # Shell-based linters by file extension.  Invoked via _exec() with the
 # filesystem path.  Cover languages where a compile/type check needs an
 # external toolchain (py_compile, node, tsc, go vet, rustfmt).
 LINTERS = {
-    '.py': 'python -m py_compile {file} 2>&1',
-    '.js': 'node --check {file} 2>&1',
-    '.ts': 'npx tsc --noEmit {file} 2>&1',
-    '.go': 'go vet {file} 2>&1',
-    '.rs': 'rustfmt --check {file} 2>&1',
+    ".py": "python -m py_compile {file} 2>&1",
+    ".js": "node --check {file} 2>&1",
+    ".ts": "npx tsc --noEmit {file} 2>&1",
+    ".go": "go vet {file} 2>&1",
+    ".rs": "rustfmt --check {file} 2>&1",
 }
 
 # Extensions where the per-file shell linter is structurally weaker than
@@ -487,7 +487,7 @@ LINTERS = {
 # extensions — the ``lsp_diagnostics`` channel carries the real signal.
 # Everything else in ``LINTERS`` (Python ``py_compile``, ``node --check``)
 # is fast, file-local, and correct, so it runs unconditionally.
-_SHELL_LINTER_LSP_REDUNDANT = frozenset({'.ts', '.go', '.rs'})
+_SHELL_LINTER_LSP_REDUNDANT = frozenset({".ts", ".go", ".rs"})
 
 
 # Patterns that indicate the linter base command exists on PATH but
@@ -501,24 +501,24 @@ _SHELL_LINTER_LSP_REDUNDANT = frozenset({'.ts', '.go', '.rs'})
 #
 # Patterns are matched case-insensitively against linter stdout.
 _LINTER_UNUSABLE_PATTERNS = {
-    'npx': (
+    "npx": (
         # npx prints this banner when the package isn't installed locally
         # AND it can't auto-install (no internet, registry off, etc.) or
         # when the binary it tried to run is the wrong one.
-        'this is not the tsc command you are looking for',
+        "this is not the tsc command you are looking for",
         # npx with --no-install resolution failures
-        'could not determine executable to run',
-        'not found in npm registry',
+        "could not determine executable to run",
+        "not found in npm registry",
     ),
-    'rustfmt': (
+    "rustfmt": (
         # rustfmt outside a Cargo project
-        'no input filename given',
-        'error: not a workspace',
+        "no input filename given",
+        "error: not a workspace",
     ),
-    'go': (
+    "go": (
         # ``go vet`` on a file outside a module / GOPATH
-        'cannot find package',
-        'go: cannot find main module',
+        "cannot find package",
+        "go: cannot find main module",
     ),
 }
 
@@ -611,11 +611,11 @@ def _lint_python_inproc(content: str) -> tuple[bool, str]:
 # string of ``"__SKIP__"`` signals the linter isn't available (missing
 # dependency) and should be treated as "no linter".
 LINTERS_INPROC = {
-    '.py': _lint_python_inproc,
-    '.json': _lint_json_inproc,
-    '.yaml': _lint_yaml_inproc,
-    '.yml': _lint_yaml_inproc,
-    '.toml': _lint_toml_inproc,
+    ".py": _lint_python_inproc,
+    ".json": _lint_json_inproc,
+    ".yaml": _lint_yaml_inproc,
+    ".yml": _lint_yaml_inproc,
+    ".toml": _lint_toml_inproc,
 }
 
 # Max limits for read operations
@@ -664,16 +664,14 @@ def normalize_search_pagination(offset: Any = DEFAULT_SEARCH_OFFSET,
 
 
 class ShellFileOperations(FileOperations):
-    """
-    File operations implemented via shell commands.
+    """File operations implemented via shell commands.
     
     Works with ANY terminal backend that has execute(command, cwd) method.
     This includes local, docker, singularity, ssh, modal, and daytona environments.
     """
     
     def __init__(self, terminal_env, cwd: str = None):
-        """
-        Initialize file operations with a terminal environment.
+        """Initialize file operations with a terminal environment.
 
         Args:
             terminal_env: Any object with execute(command, cwd) method.
@@ -694,14 +692,15 @@ class ShellFileOperations(FileOperations):
             after the user ran ``cd`` in the terminal.  Patches would
             claim success and return a plausible diff but land in the
             original directory, producing apparent silent failures.
+
         """
         self.env = terminal_env
         # Determine cwd from various possible sources.
         # IMPORTANT: do NOT fall back to os.getcwd() -- that's the HOST's local
         # path which doesn't exist inside container/cloud backends (modal, docker).
         # If nothing provides a cwd, use "/" as a safe universal default.
-        self.cwd = cwd or getattr(terminal_env, 'cwd', None) or \
-                   getattr(getattr(terminal_env, 'config', None), 'cwd', None) or "/"
+        self.cwd = cwd or getattr(terminal_env, "cwd", None) or \
+                   getattr(getattr(terminal_env, "config", None), "cwd", None) or "/"
 
         # Cache for command availability checks
         self._command_cache: dict[str, bool] = {}
@@ -722,16 +721,17 @@ class ShellFileOperations(FileOperations):
         This ordering ensures relative paths in file operations follow the
         terminal's current directory — not the directory this file_ops was
         originally created in.  See test_file_ops_cwd_tracking.py.
+
         """
         kwargs = {}
         if timeout:
-            kwargs['timeout'] = timeout
+            kwargs["timeout"] = timeout
         if stdin_data is not None:
-            kwargs['stdin_data'] = stdin_data
+            kwargs["stdin_data"] = stdin_data
 
         # Resolve cwd from the live env so `cd` commands are picked up.
         # Fall through to init-time self.cwd only if the env doesn't track cwd.
-        effective_cwd = cwd or getattr(self.env, 'cwd', None) or self.cwd
+        effective_cwd = cwd or getattr(self.env, "cwd", None) or self.cwd
         result = self.env.execute(command, cwd=effective_cwd, **kwargs)
         return ExecuteResult(
             stdout=result.get("output", ""),
@@ -742,12 +742,11 @@ class ShellFileOperations(FileOperations):
         """Check if a command exists in the environment (cached)."""
         if cmd not in self._command_cache:
             result = self._exec(f"command -v {cmd} >/dev/null 2>&1 && echo 'yes'")
-            self._command_cache[cmd] = result.stdout.strip() == 'yes'
+            self._command_cache[cmd] = result.stdout.strip() == "yes"
         return self._command_cache[cmd]
     
     def _is_likely_binary(self, path: str, content_sample: str = None) -> bool:
-        """
-        Check if a file is likely binary.
+        """Check if a file is likely binary.
         
         Uses extension check (fast) + content analysis (fallback).
         """
@@ -758,7 +757,7 @@ class ShellFileOperations(FileOperations):
         # Content analysis: >30% non-printable chars = binary
         if content_sample:
             non_printable = sum(1 for c in content_sample[:1000]
-                               if ord(c) < 32 and c not in '\n\r\t')
+                               if ord(c) < 32 and c not in "\n\r\t")
             return non_printable / min(len(content_sample), 1000) > 0.30
         
         return False
@@ -785,18 +784,17 @@ class ShellFileOperations(FileOperations):
         """
         from tools.tool_output_limits import get_max_line_length
         max_line_length = get_max_line_length()
-        lines = content.split('\n')
+        lines = content.split("\n")
         numbered = []
         for i, line in enumerate(lines, start=start_line):
             # Truncate long lines
             if len(line) > max_line_length:
                 line = line[:max_line_length] + "... [truncated]"
             numbered.append(f"{i}|{line}")
-        return '\n'.join(numbered)
+        return "\n".join(numbered)
     
     def _expand_path(self, path: str) -> str:
-        """
-        Expand shell-style paths like ~ and ~user to absolute paths.
+        """Expand shell-style paths like ~ and ~user to absolute paths.
         
         This must be done BEFORE shell escaping, since ~ doesn't expand
         inside single quotes.
@@ -805,22 +803,22 @@ class ShellFileOperations(FileOperations):
             return path
         
         # Handle ~ and ~user
-        if path.startswith('~'):
+        if path.startswith("~"):
             # Get home directory via the terminal environment
             result = self._exec("echo $HOME")
             if result.exit_code == 0 and result.stdout.strip():
                 home = result.stdout.strip()
-                if path == '~':
+                if path == "~":
                     return home
-                elif path.startswith('~/'):
+                elif path.startswith("~/"):
                     return home + path[1:]  # Replace ~ with home
                 # ~username format - extract and validate username before
                 # letting shell expand it (prevent shell injection via
                 # paths like "~; rm -rf /").
                 rest = path[1:]  # strip leading ~
-                slash_idx = rest.find('/')
+                slash_idx = rest.find("/")
                 username = rest[:slash_idx] if slash_idx >= 0 else rest
-                if username and re.fullmatch(r'[a-zA-Z0-9._-]+', username):
+                if username and re.fullmatch(r"[a-zA-Z0-9._-]+", username):
                     # Only expand ~username (not the full path) to avoid shell
                     # injection via path suffixes like "~user/$(malicious)".
                     expand_result = self._exec(f"echo ~{username}")
@@ -927,7 +925,6 @@ class ShellFileOperations(FileOperations):
             return False
         return _has_bom(head_result.stdout)
 
-
     def _unified_diff(self, old_content: str, new_content: str, filename: str) -> str:
         """Generate unified diff between old and new content."""
         old_lines = old_content.splitlines(keepends=True)
@@ -937,15 +934,14 @@ class ShellFileOperations(FileOperations):
             fromfile=f"a/{filename}",
             tofile=f"b/{filename}",
         )
-        return ''.join(diff)
+        return "".join(diff)
     
     # =========================================================================
     # READ Implementation
     # =========================================================================
     
     def read_file(self, path: str, offset: int = 1, limit: int = 500) -> ReadResult:
-        """
-        Read a file with pagination, binary detection, and line numbers.
+        """Read a file with pagination, binary detection, and line numbers.
         
         Args:
             path: File path (absolute or relative to cwd)
@@ -954,6 +950,7 @@ class ShellFileOperations(FileOperations):
         
         Returns:
             ReadResult with content, metadata, or error info
+
         """
         # Expand ~ and other shell paths
         path = self._expand_path(path)
@@ -1054,7 +1051,7 @@ class ShellFileOperations(FileOperations):
 
         scored: list = []  # (score, filepath) — higher is better
         if ls_result.exit_code == 0 and ls_result.stdout.strip():
-            for f in ls_result.stdout.strip().split('\n'):
+            for f in ls_result.stdout.strip().split("\n"):
                 if not f:
                     continue
                 lf = f.lower()
@@ -1211,8 +1208,7 @@ class ShellFileOperations(FileOperations):
     # =========================================================================
 
     def write_file(self, path: str, content: str) -> WriteResult:
-        """
-        Write content to a file, creating parent directories as needed.
+        """Write content to a file, creating parent directories as needed.
 
         Pipes content through stdin to avoid OS ARG_MAX limits on large
         files. The content never appears in the shell command string —
@@ -1231,6 +1227,7 @@ class ShellFileOperations(FileOperations):
 
         Returns:
             WriteResult with bytes written, lint summary, or error.
+
         """
         # Expand ~ and other shell paths
         path = self._expand_path(path)
@@ -1334,7 +1331,7 @@ class ShellFileOperations(FileOperations):
         try:
             bytes_written = int(stat_result.stdout.strip())
         except ValueError:
-            bytes_written = len(content.encode('utf-8'))
+            bytes_written = len(content.encode("utf-8"))
 
         # Post-write lint with delta refinement.
         lint_result = self._check_lint_delta(path, pre_content=pre_content, post_content=content)
@@ -1366,8 +1363,7 @@ class ShellFileOperations(FileOperations):
     
     def patch_replace(self, path: str, old_string: str, new_string: str,
                       replace_all: bool = False) -> PatchResult:
-        """
-        Replace text in a file using fuzzy matching.
+        """Replace text in a file using fuzzy matching.
 
         Args:
             path: File path to modify
@@ -1377,6 +1373,7 @@ class ShellFileOperations(FileOperations):
 
         Returns:
             PatchResult with diff and lint results
+
         """
         # Expand ~ and other shell paths
         path = self._expand_path(path)
@@ -1488,8 +1485,7 @@ class ShellFileOperations(FileOperations):
         )
     
     def patch_v4a(self, patch_content: str) -> PatchResult:
-        """
-        Apply a V4A format patch.
+        """Apply a V4A format patch.
         
         V4A format:
             *** Begin Patch
@@ -1505,9 +1501,10 @@ class ShellFileOperations(FileOperations):
         
         Returns:
             PatchResult with changes made
+
         """
         # Import patch parser
-        from tools.patch_parser import parse_v4a_patch, apply_v4a_operations
+        from tools.patch_parser import apply_v4a_operations, parse_v4a_patch
         
         operations, parse_error = parse_v4a_patch(patch_content)
         if parse_error:
@@ -1518,8 +1515,7 @@ class ShellFileOperations(FileOperations):
         return result
     
     def _check_lint(self, path: str, content: str | None = None) -> LintResult:
-        """
-        Run syntax check on a file after editing.
+        """Run syntax check on a file after editing.
 
         Prefers the in-process linter for structured formats (JSON, YAML,
         TOML) when possible — those parse via the Python stdlib in
@@ -1536,6 +1532,7 @@ class ShellFileOperations(FileOperations):
 
         Returns:
             LintResult with status and any errors.
+
         """
         ext = os.path.splitext(path)[1].lower()
 
@@ -1607,8 +1604,7 @@ class ShellFileOperations(FileOperations):
 
     def _check_lint_delta(self, path: str, pre_content: str | None,
                           post_content: str | None = None) -> LintResult:
-        """
-        Run post-write syntax lint with pre-write baseline comparison.
+        """Run post-write syntax lint with pre-write baseline comparison.
 
         Two-tier strategy:
 
@@ -1642,6 +1638,7 @@ class ShellFileOperations(FileOperations):
             LintResult.  ``output`` contains either the full post-lint
             errors (no pre-state) or just the new-error lines (delta
             refinement applied).
+
         """
         post = self._check_lint(path, content=post_content)
 
@@ -1864,8 +1861,7 @@ class ShellFileOperations(FileOperations):
     def search(self, pattern: str, path: str = ".", target: str = "content",
                file_glob: str | None = None, limit: int = 50, offset: int = 0,
                output_mode: str = "content", context: int = 0) -> SearchResult:
-        """
-        Search for content or files.
+        """Search for content or files.
         
         Args:
             pattern: Regex (for content) or glob pattern (for files)
@@ -1879,6 +1875,7 @@ class ShellFileOperations(FileOperations):
         
         Returns:
             SearchResult with matches or file list
+
         """
         offset, limit = normalize_search_pagination(offset, limit)
 
@@ -1903,7 +1900,7 @@ class ShellFileOperations(FileOperations):
                 if ls_result.exit_code == 0 and ls_result.stdout.strip():
                     lower_q = basename_query.lower()
                     candidates = []
-                    for entry in ls_result.stdout.strip().split('\n'):
+                    for entry in ls_result.stdout.strip().split("\n"):
                         if not entry:
                             continue
                         le = entry.lower()
@@ -1927,10 +1924,10 @@ class ShellFileOperations(FileOperations):
     def _search_files(self, pattern: str, path: str, limit: int, offset: int) -> SearchResult:
         """Search for files by name pattern (glob-like)."""
         # Auto-prepend **/ for recursive search if not already present
-        if not pattern.startswith('**/') and '/' not in pattern:
+        if not pattern.startswith("**/") and "/" not in pattern:
             search_pattern = pattern
         else:
-            search_pattern = pattern.split('/')[-1]
+            search_pattern = pattern.split("/")[-1]
 
         search_root = Path(path)
         has_hidden_path_ancestor = any(
@@ -1941,11 +1938,11 @@ class ShellFileOperations(FileOperations):
         # Prefer ripgrep: respects .gitignore, excludes hidden dirs by
         # default, and has parallel directory traversal (~200x faster than
         # find on wide trees).  Mirrors _search_content which already uses rg.
-        if self._has_command('rg'):
+        if self._has_command("rg"):
             return self._search_files_rg(search_pattern, path, limit, offset)
 
         # Fallback: find (slower, no .gitignore awareness)
-        if not self._has_command('find'):
+        if not self._has_command("find"):
             return SearchResult(
                 error="File search requires 'rg' (ripgrep) or 'find'. "
                       "Install ripgrep for best results: "
@@ -1975,11 +1972,11 @@ class ShellFileOperations(FileOperations):
             result = self._exec(cmd_simple, timeout=60)
 
         files = []
-        for line in result.stdout.strip().split('\n'):
+        for line in result.stdout.strip().split("\n"):
             if not line:
                 continue
-            parts = line.split(' ', 1)
-            if len(parts) == 2 and parts[0].replace('.', '').isdigit():
+            parts = line.split(" ", 1)
+            if len(parts) == 2 and parts[0].replace(".", "").isdigit():
                 files.append(parts[1])
             else:
                 files.append(line)
@@ -2016,7 +2013,7 @@ class ShellFileOperations(FileOperations):
         """
         # rg --files -g uses glob patterns; wrap bare names so they match
         # at any depth (equivalent to find -name).
-        if '/' not in pattern and not pattern.startswith('*'):
+        if "/" not in pattern and not pattern.startswith("*"):
             glob_pattern = f"*{pattern}"
         else:
             glob_pattern = pattern
@@ -2029,7 +2026,7 @@ class ShellFileOperations(FileOperations):
             f"| head -n {fetch_limit}"
         )
         result = self._exec(cmd_sorted, timeout=60)
-        all_files = [f for f in result.stdout.strip().split('\n') if f]
+        all_files = [f for f in result.stdout.strip().split("\n") if f]
 
         if not all_files:
             # --sortr may have failed on older rg; retry without it.
@@ -2039,7 +2036,7 @@ class ShellFileOperations(FileOperations):
                 f"| head -n {fetch_limit}"
             )
             result = self._exec(cmd_plain, timeout=60)
-            all_files = [f for f in result.stdout.strip().split('\n') if f]
+            all_files = [f for f in result.stdout.strip().split("\n") if f]
 
         page = all_files[offset:offset + limit]
 
@@ -2053,10 +2050,10 @@ class ShellFileOperations(FileOperations):
                         limit: int, offset: int, output_mode: str, context: int) -> SearchResult:
         """Search for content inside files (grep-like)."""
         # Try ripgrep first (fast), fallback to grep (slower but works)
-        if self._has_command('rg'):
+        if self._has_command("rg"):
             return self._search_with_rg(pattern, path, file_glob, limit, offset, 
                                         output_mode, context)
-        elif self._has_command('grep'):
+        elif self._has_command("grep"):
             return self._search_with_grep(pattern, path, file_glob, limit, offset,
                                           output_mode, context)
         else:
@@ -2121,16 +2118,16 @@ class ShellFileOperations(FileOperations):
         stdout = payload
         # Parse results based on output mode
         if output_mode == "files_only":
-            all_files = [f for f in stdout.strip().split('\n') if f]
+            all_files = [f for f in stdout.strip().split("\n") if f]
             total = len(all_files)
             page = all_files[offset:offset + limit]
             return SearchResult(files=page, total_count=total)
         
         elif output_mode == "count":
             counts = {}
-            for line in stdout.strip().split('\n'):
-                if ':' in line:
-                    parts = line.rsplit(':', 1)
+            for line in stdout.strip().split("\n"):
+                if ":" in line:
+                    parts = line.rsplit(":", 1)
                     if len(parts) == 2:
                         try:
                             counts[parts[0]] = int(parts[1])
@@ -2145,9 +2142,9 @@ class ShellFileOperations(FileOperations):
             # rg group seps:    "--"
             # Note: on Windows, paths contain drive letters (e.g. C:\path),
             # so naive split(":") breaks. Use regex to handle both platforms.
-            _match_re = re.compile(r'^([A-Za-z]:)?(.*?):(\d+):(.*)$')
+            _match_re = re.compile(r"^([A-Za-z]:)?(.*?):(\d+):(.*)$")
             matches = []
-            for line in stdout.strip().split('\n'):
+            for line in stdout.strip().split("\n"):
                 if not line or line == "--":
                     continue
                 
@@ -2155,7 +2152,7 @@ class ShellFileOperations(FileOperations):
                 m = _match_re.match(line)
                 if m:
                     matches.append(SearchMatch(
-                        path=(m.group(1) or '') + m.group(2),
+                        path=(m.group(1) or "") + m.group(2),
                         line_number=int(m.group(3)),
                         content=m.group(4)[:500],
                     ))
@@ -2235,16 +2232,16 @@ class ShellFileOperations(FileOperations):
 
         stdout = payload
         if output_mode == "files_only":
-            all_files = [f for f in stdout.strip().split('\n') if f]
+            all_files = [f for f in stdout.strip().split("\n") if f]
             total = len(all_files)
             page = all_files[offset:offset + limit]
             return SearchResult(files=page, total_count=total)
         
         elif output_mode == "count":
             counts = {}
-            for line in stdout.strip().split('\n'):
-                if ':' in line:
-                    parts = line.rsplit(':', 1)
+            for line in stdout.strip().split("\n"):
+                if ":" in line:
+                    parts = line.rsplit(":", 1)
                     if len(parts) == 2:
                         try:
                             counts[parts[0]] = int(parts[1])
@@ -2258,16 +2255,16 @@ class ShellFileOperations(FileOperations):
             # grep group seps:    "--"
             # Note: on Windows, paths contain drive letters (e.g. C:\path),
             # so naive split(":") breaks. Use regex to handle both platforms.
-            _match_re = re.compile(r'^([A-Za-z]:)?(.*?):(\d+):(.*)$')
+            _match_re = re.compile(r"^([A-Za-z]:)?(.*?):(\d+):(.*)$")
             matches = []
-            for line in stdout.strip().split('\n'):
+            for line in stdout.strip().split("\n"):
                 if not line or line == "--":
                     continue
                 
                 m = _match_re.match(line)
                 if m:
                     matches.append(SearchMatch(
-                        path=(m.group(1) or '') + m.group(2),
+                        path=(m.group(1) or "") + m.group(2),
                         line_number=int(m.group(3)),
                         content=m.group(4)[:500],
                     ))
@@ -2282,7 +2279,6 @@ class ShellFileOperations(FileOperations):
                             content=parsed[2][:500],
                         ))
 
-            
             total = len(matches)
             page = matches[offset:offset + limit]
             return SearchResult(

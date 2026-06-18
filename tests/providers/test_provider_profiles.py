@@ -1,7 +1,7 @@
 """Tests for the provider module registry and profiles."""
 
-from providers import get_provider_profile, _REGISTRY
-from providers.base import ProviderProfile, OMIT_TEMPERATURE
+from providers import _REGISTRY, get_provider_profile
+from providers.base import OMIT_TEMPERATURE, ProviderProfile
 
 
 class TestRegistry:
@@ -192,7 +192,8 @@ class TestOpenRouterProfile:
 
     def test_reasoning_disable_kept_for_legacy_anthropic(self):
         """Older Anthropic models still accept an explicit disable form, so the
-        profile must keep forwarding it."""
+        profile must keep forwarding it.
+        """
         p = get_provider_profile("openrouter")
         for model in (
             "anthropic/claude-3.7-sonnet",
@@ -208,7 +209,8 @@ class TestOpenRouterProfile:
 
     def test_reasoning_disable_kept_for_non_anthropic(self):
         """Non-Anthropic models (DeepSeek, Qwen, …) disable reasoning fine; the
-        Anthropic-mandatory guard must not touch them."""
+        Anthropic-mandatory guard must not touch them.
+        """
         p = get_provider_profile("openrouter")
         for model in ("deepseek/deepseek-chat", "qwen/qwen3-max", "openai/gpt-5.4"):
             eb, _ = p.build_api_kwargs_extras(
@@ -309,7 +311,7 @@ class TestOpenRouterProfile:
         return mod._anthropic_reasoning_is_mandatory(model)
 
     def test_mandatory_anthropic_effort_routes_to_verbosity(self):
-        """effort set + reasoning enabled → top-level verbosity == effort,
+        """Effort set + reasoning enabled → top-level verbosity == effort,
         and NO reasoning field in extra_body.
 
         Covers the full real config range produced by
@@ -329,8 +331,9 @@ class TestOpenRouterProfile:
             assert "reasoning" not in eb, (effort, eb)
 
     def test_mandatory_anthropic_effort_without_enabled_key_routes(self):
-        """effort present without an explicit ``enabled`` key still routes to
-        verbosity (enabled defaults to True)."""
+        """Effort present without an explicit ``enabled`` key still routes to
+        verbosity (enabled defaults to True).
+        """
         p = get_provider_profile("openrouter")
         eb, tl = p.build_api_kwargs_extras(
             reasoning_config={"effort": "xhigh"},
@@ -347,7 +350,8 @@ class TestOpenRouterProfile:
         for Claude (live-proven in #43432), so a forward value must survive
         rather than be silently dropped. The OpenAI SDK type only literals
         ``low|medium|high`` but it's a TypedDict (no runtime validation), so the
-        extended scale reaches the wire untouched."""
+        extended scale reaches the wire untouched.
+        """
         p = get_provider_profile("openrouter")
         for effort in ("xhigh", "max"):
             _, tl = p.build_api_kwargs_extras(
@@ -359,7 +363,8 @@ class TestOpenRouterProfile:
 
     def test_mandatory_anthropic_no_verbosity_when_effort_absent(self):
         """No effort / none / disabled → no verbosity emitted, so the model
-        keeps its own adaptive default. Still no reasoning field."""
+        keeps its own adaptive default. Still no reasoning field.
+        """
         p = get_provider_profile("openrouter")
         model = "anthropic/claude-fable-5"
         for cfg in (
@@ -381,7 +386,8 @@ class TestOpenRouterProfile:
     def test_non_mandatory_reasoning_model_unchanged_no_verbosity(self):
         """Non-mandatory reasoning models (DeepSeek, Qwen, GPT) keep getting
         ``reasoning`` in extra_body and never get a ``verbosity`` field — the
-        new path must not touch them."""
+        new path must not touch them.
+        """
         p = get_provider_profile("openrouter")
         for model in ("deepseek/deepseek-chat", "qwen/qwen3-max", "openai/gpt-5.4"):
             assert not self._is_mandatory(model)  # fixture really is non-mandatory
@@ -396,7 +402,8 @@ class TestOpenRouterProfile:
     def test_mandatory_anthropic_verbosity_coexists_with_grok_header(self):
         """A reasoning-mandatory Anthropic model is never a Grok model, but the
         top-level dict must remain a single merged dict — verify the verbosity
-        path doesn't clobber the extra_headers slot used by Grok affinity."""
+        path doesn't clobber the extra_headers slot used by Grok affinity.
+        """
         p = get_provider_profile("openrouter")
         # mandatory anthropic + effort → verbosity, no extra_headers
         _, tl = p.build_api_kwargs_extras(

@@ -1,5 +1,4 @@
-"""
-Browser Provider Registry
+"""Browser Provider Registry
 =========================
 
 Central map of registered cloud browser providers. Populated by plugins at

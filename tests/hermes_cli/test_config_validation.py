@@ -1,7 +1,7 @@
 """Tests for config.yaml structure validation (validate_config_structure)."""
 
 
-from hermes_cli.config import validate_config_structure, ConfigIssue
+from hermes_cli.config import ConfigIssue, validate_config_structure
 
 
 class TestCustomProvidersValidation:

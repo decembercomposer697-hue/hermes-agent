@@ -2,8 +2,9 @@
 import asyncio
 import sys
 import types
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from unittest.mock import MagicMock, patch, AsyncMock
 
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import MessageType
@@ -665,7 +666,8 @@ class TestMatrixBangCommandAlias:
 
     def test_bang_alias_underscore_resolves_to_hyphen_form(self):
         """!set_home must emit a dispatchable token even though set_home is
-        not itself registered — the hyphenated alias set-home is."""
+        not itself registered — the hyphenated alias set-home is.
+        """
         from gateway.platforms.matrix import _normalize_matrix_bang_command
 
         # set_home (underscore) is NOT a registered command/alias, but
@@ -679,7 +681,8 @@ class TestMatrixBangCommandAlias:
     def test_bang_skill_command_normalizes(self):
         """The get_skill_commands() branch normalizes installed skill
         commands, not just built-in gateway commands. Skill keys are stored
-        slash-prefixed (e.g. "/arxiv"), which the resolver must account for."""
+        slash-prefixed (e.g. "/arxiv"), which the resolver must account for.
+        """
         import agent.skill_commands as skill_commands_mod
 
         fake_skills = {"/arxiv": {}, "/obsidian": {}}
@@ -703,7 +706,8 @@ class TestMatrixBangCommandAlias:
     @pytest.mark.asyncio
     async def test_bang_command_in_quoted_reply_normalizes(self):
         """A bang command that follows a Matrix reply-fallback quote is
-        normalized after the quote is stripped, matching /command behavior."""
+        normalized after the quote is stripped, matching /command behavior.
+        """
         captured_event = await self._dispatch_text_reply(
             "> <@bob:example.org> earlier message\n\n!model",
         )
@@ -716,7 +720,8 @@ class TestMatrixBangCommandAlias:
     @pytest.mark.asyncio
     async def test_slash_command_in_quoted_reply_normalizes(self):
         """Sanity: the slash equivalent already works post-strip — the bang
-        form above must reach parity with this."""
+        form above must reach parity with this.
+        """
         captured_event = await self._dispatch_text_reply(
             "> <@bob:example.org> earlier message\n\n/model",
         )
@@ -998,8 +1003,9 @@ class TestMatrixRequirements:
         a confusing ``No module named 'asyncpg'`` deep in
         ``MatrixAdapter.connect()``.
         """
-        from gateway.platforms.matrix import _check_e2ee_deps
         import builtins
+
+        from gateway.platforms.matrix import _check_e2ee_deps
         real_import = builtins.__import__
 
         def _blocking_import(name, *args, **kwargs):
@@ -1016,8 +1022,9 @@ class TestMatrixRequirements:
         Mautrix's ``Database.create("sqlite:///...")`` driver lookup imports
         aiosqlite lazily — without it, connect fails at ``crypto_db.start()``.
         """
-        from gateway.platforms.matrix import _check_e2ee_deps
         import builtins
+
+        from gateway.platforms.matrix import _check_e2ee_deps
         real_import = builtins.__import__
 
         def _blocking_import(name, *args, **kwargs):
@@ -1865,16 +1872,16 @@ class TestMatrixMarkdownHtmlFormatting:
         self.convert = MatrixAdapter._markdown_to_html_fallback
 
     def test_fenced_code_block(self):
-        result = self.convert('```python\ndef hello():\n    pass\n```')
+        result = self.convert("```python\ndef hello():\n    pass\n```")
         assert "<pre><code" in result
         assert "language-python" in result
 
     def test_fenced_code_block_no_lang(self):
-        result = self.convert('```\nsome code\n```')
+        result = self.convert("```\nsome code\n```")
         assert "<pre><code>" in result
 
     def test_code_block_html_escaped(self):
-        result = self.convert('```\n<script>alert(1)</script>\n```')
+        result = self.convert("```\n<script>alert(1)</script>\n```")
         assert "&lt;script&gt;" in result
         assert "<script>" not in result
 
@@ -2285,6 +2292,7 @@ class TestMatrixImageOnlyMediaNormalization:
 # ---------------------------------------------------------------------------
 # Message redaction
 # ---------------------------------------------------------------------------
+
 
 class TestMatrixRedaction:
     def setup_method(self):
@@ -2771,7 +2779,6 @@ class TestMatrixDmAutoThread:
         assert ctx is not None
         _body, _is_dm, _chat_type, thread_id, _display, _source = ctx
         assert thread_id is None
-
 
 
 # ---------------------------------------------------------------------------

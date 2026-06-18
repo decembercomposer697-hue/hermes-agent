@@ -7,8 +7,9 @@ Verifies worktree creation, cleanup, .worktreeinclude handling,
 import os
 import shutil
 import subprocess
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 @pytest.fixture
@@ -973,7 +974,7 @@ class TestOrphanedBranchPruning:
         assert info["branch"] in active_branches  # Protected
 
     def test_preserves_main_branch(self, git_repo):
-        """main branch should never be pruned."""
+        """Main branch should never be pruned."""
         result = subprocess.run(
             ["git", "branch", "--format=%(refname:short)"],
             capture_output=True, text=True, cwd=str(git_repo),

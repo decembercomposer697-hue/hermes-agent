@@ -15,11 +15,10 @@ import sys
 import pytest
 
 from hermes_cli.main import (
-    _UpdateOutputStream,
     _finalize_update_output,
     _install_hangup_protection,
+    _UpdateOutputStream,
 )
-
 
 # -----------------------------------------------------------------------------
 # _UpdateOutputStream
@@ -305,7 +304,8 @@ class TestFinalizeUpdateOutput:
 
     def test_skipped_install_leaves_stdio_alone(self):
         """When install failed (state['installed']=False) finalize should not
-        touch sys.stdout / sys.stderr (they were never wrapped)."""
+        touch sys.stdout / sys.stderr (they were never wrapped).
+        """
         # Build a synthetic state that mimics a failed install.
         sentinel_out = object()
         state = {

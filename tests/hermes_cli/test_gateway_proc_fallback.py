@@ -11,7 +11,6 @@ from unittest.mock import MagicMock, patch
 
 import hermes_cli.gateway as gateway_mod
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -22,7 +21,8 @@ _OTHER_CMD = "python -m some_other_thing"
 
 def _fake_proc_dir(entries: dict):
     """Return side_effects that simulate /proc: isdir → True, listdir → pids,
-    open(cmdline) → null-delimited command bytes."""
+    open(cmdline) → null-delimited command bytes.
+    """
     def _isdir(path):
         return str(path) == "/proc"
 

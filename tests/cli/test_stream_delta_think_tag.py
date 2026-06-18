@@ -1,8 +1,8 @@
 """Tests for _stream_delta's handling of <think> tags in prose vs real reasoning blocks."""
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+import sys
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
 def _make_cli_stub():
@@ -32,6 +32,7 @@ def _make_cli_stub():
 
     # Mock _stream_reasoning_delta
     cli._reasoning_emitted = []
+
     def mock_reasoning(text):
         cli._reasoning_emitted.append(text)
     cli._stream_reasoning_delta = mock_reasoning
@@ -126,8 +127,8 @@ class TestFlushRecovery:
         cli._close_reasoning_box = lambda: None
 
         # Call flush
-        from unittest.mock import patch
         import shutil
+        from unittest.mock import patch
         with patch.object(shutil, "get_terminal_size", return_value=os.terminal_size((80, 24))):
             with patch("cli._cprint"):
                 cli._flush_stream()

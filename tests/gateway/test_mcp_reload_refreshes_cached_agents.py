@@ -85,7 +85,8 @@ def _make_runner_with_cached_agents(num_agents: int = 2):
 @pytest.mark.asyncio
 async def test_reload_mcp_refreshes_cached_agent_tools():
     """After /reload-mcp succeeds, every cached agent gets its tool list
-    replaced with the freshly-discovered set."""
+    replaced with the freshly-discovered set.
+    """
     runner = _make_runner_with_cached_agents(num_agents=3)
 
     # Snapshot the stale state so we can assert it changed.
@@ -150,7 +151,8 @@ async def test_reload_mcp_handles_empty_agent_cache():
 async def test_reload_mcp_preserves_per_agent_toolset_overrides():
     """If a cached agent was built with enabled_toolsets=["safe"], the
     refresh must pass that same list to get_tool_definitions so the agent
-    doesn't silently gain disabled tools after a reload."""
+    doesn't silently gain disabled tools after a reload.
+    """
     runner = _make_runner_with_cached_agents(num_agents=1)
     # Override the toolsets on the cached agent.
     agent, _sig = runner._agent_cache["session-0"]

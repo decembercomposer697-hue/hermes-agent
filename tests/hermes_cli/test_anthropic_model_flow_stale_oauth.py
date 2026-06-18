@@ -14,8 +14,7 @@ class TestStaleOAuthTokenDetection:
     """Bug 3: stale OAuth token must trigger needs_auth=True in _model_flow_anthropic."""
 
     def test_stale_oauth_token_triggers_reauth(self, tmp_path, monkeypatch, capsys):
-        """
-        Scenario: ANTHROPIC_TOKEN is an expired OAuth token and there are no
+        """Scenario: ANTHROPIC_TOKEN is an expired OAuth token and there are no
         valid Claude Code credentials anywhere. The flow MUST offer re-auth
         instead of silently skipping to model selection.
         """
@@ -65,8 +64,7 @@ class TestStaleOAuthTokenDetection:
         )
 
     def test_valid_api_key_skips_stale_check(self, tmp_path, monkeypatch, capsys):
-        """
-        A non-OAuth ANTHROPIC_API_KEY (regular pay-per-token key) must NOT be
+        """A non-OAuth ANTHROPIC_API_KEY (regular pay-per-token key) must NOT be
         flagged as stale even when cc_creds are invalid. Regular API keys don't
         expire the same way OAuth tokens do.
         """
@@ -102,8 +100,7 @@ class TestStaleOAuthTokenDetection:
         assert "Use existing" in output or "credentials" in output.lower()
 
     def test_valid_oauth_token_with_refresh_available_skips_reauth(self, tmp_path, monkeypatch, capsys):
-        """
-        When ANTHROPIC_TOKEN is OAuth and valid cc_creds with refresh exist,
+        """When ANTHROPIC_TOKEN is OAuth and valid cc_creds with refresh exist,
         the flow should use existing credentials (no forced re-auth).
         """
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -150,8 +147,7 @@ class TestStaleOAuthGuardLogic:
     """Unit-level test of the stale-OAuth detection guard logic."""
 
     def test_stale_oauth_flag_logic_no_cc_creds(self):
-        """
-        When existing_key is OAuth and cc_available is False,
+        """When existing_key is OAuth and cc_available is False,
         existing_is_stale_oauth should be True → has_creds = False.
         """
         existing_key = "sk-ant-oat-expiredtoken123"
@@ -169,8 +165,7 @@ class TestStaleOAuthGuardLogic:
         assert has_creds is False
 
     def test_stale_oauth_flag_logic_with_valid_cc_creds(self):
-        """
-        When existing_key is OAuth but cc_available is True (valid creds exist),
+        """When existing_key is OAuth but cc_available is True (valid creds exist),
         has_creds should be True — the cc_creds will be used instead.
         """
         existing_key = "sk-ant-oat-sometoken"
@@ -188,8 +183,7 @@ class TestStaleOAuthGuardLogic:
         assert has_creds is True
 
     def test_non_oauth_key_not_flagged_as_stale(self):
-        """
-        Regular ANTHROPIC_API_KEY (non-OAuth) must not be flagged as stale
+        """Regular ANTHROPIC_API_KEY (non-OAuth) must not be flagged as stale
         even when cc_available is False.
         """
         existing_key = "sk-ant-api03-regular-key"

@@ -10,13 +10,13 @@ from pathlib import Path
 import pytest
 
 from hermes_cli.auth import (
-    AuthError,
     DEFAULT_XAI_OAUTH_BASE_URL,
     PROVIDER_REGISTRY,
     XAI_OAUTH_CLIENT_ID,
     XAI_OAUTH_REDIRECT_HOST,
     XAI_OAUTH_REDIRECT_PATH,
     XAI_OAUTH_SCOPE,
+    AuthError,
     _read_xai_oauth_tokens,
     _save_xai_oauth_tokens,
     _xai_access_token_is_expiring,
@@ -31,7 +31,6 @@ from hermes_cli.auth import (
     resolve_provider,
     resolve_xai_oauth_runtime_credentials,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -214,7 +213,7 @@ def test_xai_validate_loopback_redirect_uri_rejects_missing_port():
 
 
 def _parse_authorize_url(url: str) -> dict:
-    from urllib.parse import urlparse, parse_qs
+    from urllib.parse import parse_qs, urlparse
 
     parsed = urlparse(url)
     return {k: v[0] for k, v in parse_qs(parsed.query).items()}
@@ -222,7 +221,8 @@ def _parse_authorize_url(url: str) -> dict:
 
 def test_xai_oauth_authorize_url_includes_plan_generic():
     """Regression: accounts.x.ai requires `plan=generic` for loopback OAuth on
-    non-allowlisted clients. Must always be present on the authorize URL."""
+    non-allowlisted clients. Must always be present on the authorize URL.
+    """
     url = _xai_oauth_build_authorize_url(
         authorization_endpoint="https://auth.x.ai/oauth2/authorize",
         redirect_uri="http://127.0.0.1:56121/callback",
@@ -236,7 +236,8 @@ def test_xai_oauth_authorize_url_includes_plan_generic():
 
 def test_xai_oauth_authorize_url_includes_referrer_hermes_agent():
     """Attribution: xAI's OAuth server can identify Hermes-originated logins
-    via the referrer query param. Must always be present on the authorize URL."""
+    via the referrer query param. Must always be present on the authorize URL.
+    """
     url = _xai_oauth_build_authorize_url(
         authorization_endpoint="https://auth.x.ai/oauth2/authorize",
         redirect_uri="http://127.0.0.1:56121/callback",
@@ -335,8 +336,8 @@ def test_xai_callback_server_latches_first_terminal_callback_result():
 
 def _get_callback(redirect_uri: str, query: str = "") -> tuple[int, str]:
     """GET the loopback callback URL with an optional query string."""
-    from urllib.request import Request, urlopen
     from urllib.error import HTTPError
+    from urllib.request import Request, urlopen
 
     target = redirect_uri + (("?" + query) if query else "")
     req = Request(target, method="GET")
@@ -974,10 +975,11 @@ def test_refresh_xai_oauth_pure_rejects_response_without_access_token(monkeypatc
 
 
 def test_refresh_xai_oauth_pure_raises_typed_error_on_malformed_json(monkeypatch):
-    """xAI returning HTTP 200 with a non-JSON body (captive portal, proxy
+    """XAI returning HTTP 200 with a non-JSON body (captive portal, proxy
     error page, etc.) must surface a typed AuthError, not a raw
     ``json.JSONDecodeError`` traceback. Matches the qwen-oauth precedent
-    so the upstream UX layer (``format_auth_error``) can map the failure."""
+    so the upstream UX layer (``format_auth_error``) can map the failure.
+    """
     response = _StubHTTPResponse(200, ValueError("not json"))
     response.text = "<html>captive portal</html>"
     _patch_httpx_client(monkeypatch, response)
@@ -993,7 +995,8 @@ def test_xai_oauth_discovery_raises_typed_error_on_malformed_json(monkeypatch):
     200 with a non-JSON body (corporate proxy / captive portal returning
     HTML), surface a typed AuthError rather than letting the
     ``json.JSONDecodeError`` escape — so the message reads as an auth
-    problem instead of an internal parsing crash."""
+    problem instead of an internal parsing crash.
+    """
     from hermes_cli.auth import _xai_oauth_discovery
 
     class _BadJSON:
@@ -1015,7 +1018,8 @@ def test_xai_oauth_discovery_raises_typed_error_on_non_object_payload(monkeypatc
     """A discovery body that decodes as JSON but isn't an object (e.g. a
     bare string or array) must not slip through and trigger an
     ``AttributeError`` on ``payload.get(...)`` later.  Reject loudly
-    with the same incomplete-response code the missing-endpoint path uses."""
+    with the same incomplete-response code the missing-endpoint path uses.
+    """
     from hermes_cli.auth import _xai_oauth_discovery
 
     class _StubResponse:
@@ -1042,7 +1046,8 @@ def test_refresh_xai_oauth_pure_rejects_non_https_token_endpoint(monkeypatch):
     """A poisoned auth.json (from MITM during initial discovery, or an older
     Hermes that didn't validate) must not be silently honored on the refresh
     hot path. A non-HTTPS ``token_endpoint`` would leak the refresh_token in
-    cleartext on every refresh; refuse before the POST."""
+    cleartext on every refresh; refuse before the POST.
+    """
     # No HTTP stub installed — refresh must fail at validation, not at POST.
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
@@ -1056,7 +1061,8 @@ def test_refresh_xai_oauth_pure_rejects_off_origin_token_endpoint(monkeypatch):
     during discovery could persist a token_endpoint on attacker-controlled
     infrastructure — every subsequent refresh would silently leak the
     refresh_token to that attacker. Refuse off-origin endpoints loudly so
-    the user can re-run discovery."""
+    the user can re-run discovery.
+    """
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
             "at", "rt", token_endpoint="https://evil.example.com/token",
@@ -1067,7 +1073,8 @@ def test_refresh_xai_oauth_pure_rejects_off_origin_token_endpoint(monkeypatch):
 def test_refresh_xai_oauth_pure_rejects_lookalike_suffix(monkeypatch):
     """Substring confusion: ``evil-x.ai`` ends in ``x.ai`` but is NOT a
     ``.x.ai`` subdomain. The validator must enforce the leading-dot suffix
-    so attacker-registered apex lookalikes can't slip through."""
+    so attacker-registered apex lookalikes can't slip through.
+    """
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
             "at", "rt", token_endpoint="https://evilx.ai/token",
@@ -1079,7 +1086,8 @@ def test_refresh_xai_oauth_pure_accepts_apex_and_subdomain_endpoints(monkeypatch
     """The validator must accept BOTH the bare xAI apex (``x.ai``) and any
     ``*.x.ai`` subdomain (e.g. ``auth.x.ai`` today, future migrations to
     ``accounts.x.ai`` etc.). Without subdomain support we'd lock the
-    integration to whatever xAI happens to use today."""
+    integration to whatever xAI happens to use today.
+    """
     new_access = _jwt_with_exp(int(time.time()) + 3600)
     response = _StubHTTPResponse(
         200,
@@ -1104,7 +1112,8 @@ def test_xai_oauth_discovery_validates_endpoints(monkeypatch):
     one-time MITM during initial login cannot poison ``auth.json`` with an
     attacker-controlled ``token_endpoint``. (The persistence is what makes
     this attack worth defending against — one MITM = forever credential
-    leak.)"""
+    leak.)
+    """
     from hermes_cli.auth import _xai_oauth_discovery
 
     class _StubGetResponse:
@@ -1136,7 +1145,8 @@ def test_xai_oauth_discovery_validates_authorization_endpoint(monkeypatch):
 
     Both endpoints must be validated independently. This test pins the
     parity so nobody can later "optimise" by validating only the token
-    endpoint and silently lose authorization-endpoint defense."""
+    endpoint and silently lose authorization-endpoint defense.
+    """
     from hermes_cli.auth import _xai_oauth_discovery
 
     class _StubGetResponse:
@@ -1168,7 +1178,8 @@ def test_xai_oauth_discovery_validates_authorization_endpoint(monkeypatch):
 def test_credential_pool_seeds_xai_oauth_from_singleton(tmp_path, monkeypatch):
     """After `hermes model` -> xai-oauth, the singleton holds tokens.  load_pool
     must surface that as a pool entry so `hermes auth list` reflects truth and
-    refreshes route through the pool consistently with codex."""
+    refreshes route through the pool consistently with codex.
+    """
     from agent.credential_pool import load_pool
 
     hermes_home = tmp_path / "hermes"
@@ -1210,7 +1221,8 @@ def test_credential_pool_does_not_seed_when_singleton_missing_access_token(tmp_p
 
 def test_credential_pool_seed_respects_suppression(tmp_path, monkeypatch):
     """`hermes auth remove xai-oauth <N>` for the seeded entry suppresses
-    further re-seeding so the removal is stable across load_pool calls."""
+    further re-seeding so the removal is stable across load_pool calls.
+    """
     from agent.credential_pool import load_pool
 
     hermes_home = tmp_path / "hermes"
@@ -1240,10 +1252,12 @@ def test_auth_remove_xai_oauth_clears_singleton_and_sticks(tmp_path, monkeypatch
     and ``auth_remove_command`` fell through to the "unregistered source —
     nothing to clean up" branch. That branch is correct for ``manual``
     entries (pool-only) but wrong for singleton-seeded loopback_pkce
-    entries (auth.json singleton survives the in-memory removal)."""
+    entries (auth.json singleton survives the in-memory removal).
+    """
+    from types import SimpleNamespace
+
     from agent.credential_pool import load_pool
     from hermes_cli.auth_commands import auth_remove_command
-    from types import SimpleNamespace
 
     hermes_home = tmp_path / "hermes"
     fresh = _jwt_with_exp(int(time.time()) + 3600)
@@ -1286,7 +1300,8 @@ def test_pool_sync_back_writes_to_singleton(tmp_path, monkeypatch):
     """When the pool refreshes a singleton-seeded xAI entry, the new tokens
     must be written back to providers["xai-oauth"] so that
     resolve_xai_oauth_runtime_credentials() (which reads the singleton)
-    doesn't keep using the consumed refresh token."""
+    doesn't keep using the consumed refresh token.
+    """
     from agent.credential_pool import load_pool
 
     hermes_home = tmp_path / "hermes"
@@ -1349,9 +1364,11 @@ def test_runtime_provider_uses_pool_entry_for_xai_oauth(tmp_path, monkeypatch):
 
 def test_runtime_provider_default_base_url_when_pool_entry_missing_url(tmp_path, monkeypatch):
     """Edge case: a pool entry that somehow has an empty base_url should still
-    surface the default xAI inference base URL instead of an empty string."""
-    from agent.credential_pool import load_pool, AUTH_TYPE_OAUTH, PooledCredential
+    surface the default xAI inference base URL instead of an empty string.
+    """
     import uuid
+
+    from agent.credential_pool import AUTH_TYPE_OAUTH, PooledCredential, load_pool
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1394,10 +1411,12 @@ def test_pool_entry_needs_refresh_when_jwt_within_skew(tmp_path, monkeypatch):
     """The pool's proactive-refresh gate must trigger when the JWT exp claim
     is within the XAI_ACCESS_TOKEN_REFRESH_SKEW_SECONDS window — otherwise a
     near-expired token will hit the API and 401 unnecessarily.  Mirrors the
-    Codex skew-window behavior."""
-    from agent.credential_pool import load_pool, AUTH_TYPE_OAUTH, PooledCredential
-    from hermes_cli.auth import XAI_ACCESS_TOKEN_REFRESH_SKEW_SECONDS
+    Codex skew-window behavior.
+    """
     import uuid
+
+    from agent.credential_pool import AUTH_TYPE_OAUTH, PooledCredential, load_pool
+    from hermes_cli.auth import XAI_ACCESS_TOKEN_REFRESH_SKEW_SECONDS
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1425,8 +1444,9 @@ def test_pool_entry_needs_refresh_when_jwt_within_skew(tmp_path, monkeypatch):
 
 def test_pool_entry_no_refresh_for_fresh_jwt(tmp_path, monkeypatch):
     """A fresh JWT beyond the skew window must NOT trigger proactive refresh."""
-    from agent.credential_pool import load_pool, AUTH_TYPE_OAUTH, PooledCredential
     import uuid
+
+    from agent.credential_pool import AUTH_TYPE_OAUTH, PooledCredential, load_pool
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1453,9 +1473,11 @@ def test_pool_entry_no_refresh_for_fresh_jwt(tmp_path, monkeypatch):
 def test_pool_select_proactively_refreshes_expiring_token(tmp_path, monkeypatch):
     """End-to-end: pool.select() with refresh=True on an expiring entry must
     return the refreshed token.  This is the proactive path that runs BEFORE
-    the API call — separate from the 401-reactive path."""
-    from agent.credential_pool import load_pool, AUTH_TYPE_OAUTH, PooledCredential
+    the API call — separate from the 401-reactive path.
+    """
     import uuid
+
+    from agent.credential_pool import AUTH_TYPE_OAUTH, PooledCredential, load_pool
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1507,9 +1529,11 @@ def test_pool_try_refresh_current_handles_xai_oauth(tmp_path, monkeypatch):
     """The reactive 401-recovery path uses pool.try_refresh_current().  This
     must work for xai-oauth alongside openai-codex — otherwise mid-call
     expirations get propagated as hard failures instead of being retried with
-    fresh tokens."""
-    from agent.credential_pool import load_pool, AUTH_TYPE_OAUTH, PooledCredential
+    fresh tokens.
+    """
     import uuid
+
+    from agent.credential_pool import AUTH_TYPE_OAUTH, PooledCredential, load_pool
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1561,10 +1585,12 @@ def test_pool_refresh_marks_entry_exhausted_on_failure(tmp_path, monkeypatch):
     by another process, revoked), the pool must surface the failure cleanly
     rather than silently retaining stale tokens.  This is critical for the
     failover path — _recover_with_credential_pool rotates to the next entry
-    only if try_refresh_current returns None."""
-    from agent.credential_pool import load_pool, AUTH_TYPE_OAUTH, PooledCredential
-    from hermes_cli.auth import AuthError
+    only if try_refresh_current returns None.
+    """
     import uuid
+
+    from agent.credential_pool import AUTH_TYPE_OAUTH, PooledCredential, load_pool
+    from hermes_cli.auth import AuthError
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1601,7 +1627,8 @@ def test_pool_refresh_marks_entry_exhausted_on_failure(tmp_path, monkeypatch):
 def test_pool_seeded_entry_sync_back_after_refresh(tmp_path, monkeypatch):
     """When an entry seeded from the singleton (source='loopback_pkce')
     is refreshed by the pool, the new tokens must be written back so a
-    fresh process load doesn't re-seed the now-consumed refresh token."""
+    fresh process load doesn't re-seed the now-consumed refresh token.
+    """
     from agent.credential_pool import load_pool
 
     hermes_home = tmp_path / "hermes"
@@ -1645,7 +1672,8 @@ def test_pool_refresh_adopts_singleton_tokens_when_consumed_elsewhere(tmp_path, 
 
     Mirrors the proactive sync codex/nous already perform for the same
     reason, and is what makes the pool actually safe to share across
-    profiles + Hermes processes."""
+    profiles + Hermes processes.
+    """
     from agent.credential_pool import load_pool
 
     hermes_home = tmp_path / "hermes"
@@ -1698,7 +1726,8 @@ def test_pool_refresh_recovers_when_other_process_already_refreshed(tmp_path, mo
     BETWEEN our proactive sync and the HTTP POST.  Our refresh fails with a
     consumed-token error; we must re-check auth.json, find the fresh pair
     (written by the racing process), and adopt it instead of marking the
-    entry exhausted."""
+    entry exhausted.
+    """
     from agent.credential_pool import load_pool
 
     hermes_home = tmp_path / "hermes"
@@ -1745,9 +1774,11 @@ def test_pool_exhausted_xai_entry_recovers_after_singleton_refresh(tmp_path, mon
     user runs ``hermes model`` -> xAI Grok OAuth (or another process
     refreshes), the next ``_available_entries`` pass must adopt the fresh
     auth.json tokens instead of leaving the entry frozen until the
-    cooldown elapses.  Mirrors the codex/nous self-heal pattern."""
-    from agent.credential_pool import load_pool, STATUS_EXHAUSTED
+    cooldown elapses.  Mirrors the codex/nous self-heal pattern.
+    """
     from dataclasses import replace
+
+    from agent.credential_pool import STATUS_EXHAUSTED, load_pool
 
     hermes_home = tmp_path / "hermes"
     stale_at = _jwt_with_exp(int(time.time()) + 3600)
@@ -1799,9 +1830,11 @@ def test_pool_manual_xai_entry_not_synced_from_singleton(tmp_path, monkeypatch):
     entry (source='loopback_pkce').  Manually added entries (e.g. via
     ``hermes auth add xai-oauth``) own their own refresh-token lifecycle
     and must not be silently overwritten when the user logs in via
-    ``hermes model``."""
-    from agent.credential_pool import load_pool, AUTH_TYPE_OAUTH, PooledCredential
+    ``hermes model``.
+    """
     import uuid
+
+    from agent.credential_pool import AUTH_TYPE_OAUTH, PooledCredential, load_pool
 
     hermes_home = tmp_path / "hermes"
     singleton_at = _jwt_with_exp(int(time.time()) + 3600)
@@ -1836,9 +1869,11 @@ def test_pool_manual_entry_does_not_sync_back_to_singleton(tmp_path, monkeypatch
     """`hermes auth add xai-oauth` entries (source='manual:xai_pkce') are
     independent credentials and must NOT write to the singleton.  Sync-back
     is restricted to entries seeded from the singleton.  Otherwise adding a
-    second pool credential would silently overwrite the user's main login."""
-    from agent.credential_pool import load_pool, AUTH_TYPE_OAUTH, PooledCredential
+    second pool credential would silently overwrite the user's main login.
+    """
     import uuid
+
+    from agent.credential_pool import AUTH_TYPE_OAUTH, PooledCredential, load_pool
 
     hermes_home = tmp_path / "hermes"
     # Singleton has its own tokens (separate login).
@@ -1904,7 +1939,8 @@ def test_auxiliary_client_routes_xai_oauth_through_responses_api(tmp_path, monke
     their xAI subscription.
 
     Pin the routing contract: ``resolve_provider_client("xai-oauth", model)``
-    must return a non-None client wrapping the xAI Responses API."""
+    must return a non-None client wrapping the xAI Responses API.
+    """
     from agent.auxiliary_client import (
         CodexAuxiliaryClient,
         resolve_provider_client,
@@ -1935,7 +1971,8 @@ def test_auxiliary_client_xai_oauth_returns_none_when_unauthenticated(tmp_path, 
     """No xAI OAuth tokens in the auth store → ``resolve_provider_client``
     must return ``(None, None)`` so ``_resolve_auto`` falls through to the
     next provider in the chain instead of crashing or constructing a
-    misconfigured client."""
+    misconfigured client.
+    """
     from agent.auxiliary_client import resolve_provider_client
 
     hermes_home = tmp_path / "hermes"
@@ -1949,9 +1986,10 @@ def test_auxiliary_client_xai_oauth_returns_none_when_unauthenticated(tmp_path, 
 
 
 def test_auxiliary_client_xai_oauth_requires_explicit_model(tmp_path, monkeypatch):
-    """xAI's Responses API has no safe "cheap aux model" default —
+    """XAI's Responses API has no safe "cheap aux model" default —
     pinning one would silently rot the same way Codex's did.  Callers
-    must pass an explicit model (auxiliary.<task>.model in config.yaml)."""
+    must pass an explicit model (auxiliary.<task>.model in config.yaml).
+    """
     from agent.auxiliary_client import resolve_provider_client
 
     hermes_home = tmp_path / "hermes"
@@ -1976,7 +2014,8 @@ def test_pool_sync_back_preserves_active_provider(tmp_path, monkeypatch):
     multi-provider setup silently overrides the user's chosen active
     provider (visible to ``hermes auth status``, ``hermes setup``, and the
     ``hermes`` no-arg dispatcher).  Pin the ``set_active=False`` contract so
-    no future refactor regresses to the legacy semantic."""
+    no future refactor regresses to the legacy semantic.
+    """
     from agent.credential_pool import load_pool
 
     hermes_home = tmp_path / "hermes"

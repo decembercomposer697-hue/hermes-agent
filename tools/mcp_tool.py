@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-MCP (Model Context Protocol) Client Support
+"""MCP (Model Context Protocol) Client Support
 
 Connects to external MCP servers via stdio, HTTP/StreamableHTTP, or SSE
 transport, discovers their tools, and registers them into the hermes-agent
@@ -223,10 +222,10 @@ try:
     # Notification types for dynamic tool discovery (tools/list_changed)
     try:
         from mcp.types import (
-            ServerNotification,
-            ToolListChangedNotification,
             PromptListChangedNotification,
             ResourceListChangedNotification,
+            ServerNotification,
+            ToolListChangedNotification,
         )
         _MCP_NOTIFICATION_TYPES = True
     except ImportError:
@@ -1305,6 +1304,7 @@ class MCPServerTask:
         Periodically sends a lightweight keepalive (``list_tools``) to
         prevent TCP connections from going stale during long idle
         periods (#17003).  If the keepalive fails, triggers a reconnect.
+
         """
         # Keepalive interval in seconds.  Must be shorter than typical
         # LB / NAT idle-timeout (commonly 300-600s).
@@ -2136,6 +2136,7 @@ def _handle_auth_error_and_retry(
     Returns:
         A JSON string if auth recovery was attempted, or None to fall
         through to the caller's generic error path.
+
     """
     if not _is_auth_error(exc):
         return None
@@ -2300,6 +2301,7 @@ def _handle_session_expired_and_retry(
         a response, or ``None`` to fall through to the caller's
         generic error path (not a session-expired error, no server
         record, reconnect didn't ready in time, or retry also failed).
+
     """
     if not _is_session_expired_error(exc):
         return None
@@ -2471,8 +2473,8 @@ def _run_on_mcp_loop(coro_or_factory, timeout: float = 30):
     Poll in short intervals so the calling agent thread can honor user
     interrupts while the MCP work is still running on the background loop.
     """
-    from tools.interrupt import is_interrupted
     from agent.async_utils import safe_schedule_threadsafe
+    from tools.interrupt import is_interrupted
 
     with _lock:
         loop = _mcp_loop
@@ -2582,6 +2584,7 @@ async def _connect_server(name: str, config: dict) -> MCPServerTask:
         ValueError: if required config keys are missing.
         ImportError: if HTTP transport is needed but not available.
         Exception: on connection or initialization failure.
+
     """
     server = MCPServerTask(name)
     await server.start(config)
@@ -3132,6 +3135,7 @@ def _convert_mcp_schema(server_name: str, mcp_tool) -> dict:
 
     Returns:
         A dict suitable for ``registry.register(schema=...)``.
+
     """
     safe_tool_name = sanitize_mcp_name_component(mcp_tool.name)
     safe_server_name = sanitize_mcp_name_component(server_name)
@@ -3363,6 +3367,7 @@ def _register_server_tools(name: str, server: MCPServerTask, config: dict) -> li
 
     Returns:
         List of registered prefixed tool names.
+
     """
     from tools.registry import registry
 
@@ -3502,6 +3507,7 @@ def register_mcp_servers(servers: dict[str, dict]) -> list[str]:
 
     Returns:
         List of all currently registered MCP tool names.
+
     """
     if not _MCP_AVAILABLE:
         logger.debug("MCP SDK not available -- skipping explicit MCP registration")
@@ -3559,7 +3565,8 @@ def register_mcp_servers(servers: dict[str, dict]) -> list[str]:
     # Temporarily clear the interrupt flag on the current thread so that MCP
     # discovery is never cancelled by a stale interrupt from a prior agent
     # session (executor threads get reused and may carry old interrupt state).
-    from tools.interrupt import is_interrupted as _is_interrupted, set_interrupt as _set_interrupt
+    from tools.interrupt import is_interrupted as _is_interrupted
+    from tools.interrupt import set_interrupt as _set_interrupt
     _was_interrupted = _is_interrupted()
     if _was_interrupted:
         _set_interrupt(False)
@@ -3597,6 +3604,7 @@ def discover_mcp_tools() -> list[str]:
 
     Returns:
         List of all registered MCP tool names.
+
     """
     if not _MCP_AVAILABLE:
         logger.debug("MCP SDK not available -- skipping MCP tool discovery")
@@ -3709,6 +3717,7 @@ def probe_mcp_server_tools() -> dict[str, list[tuple]]:
     Returns:
         Dict mapping server name to list of (tool_name, description) tuples.
         Servers that fail to connect are omitted from the result.
+
     """
     if not _MCP_AVAILABLE:
         return {}

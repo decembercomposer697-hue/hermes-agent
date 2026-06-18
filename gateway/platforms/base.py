@@ -1,5 +1,4 @@
-"""
-Base platform adapter interface.
+"""Base platform adapter interface.
 
 All platform adapters (Telegram, Discord, WhatsApp, Weixin, and more) inherit from this
 and implement the required methods.
@@ -27,12 +26,12 @@ logger = logging.getLogger(__name__)
 # Audio file extensions Hermes recognizes for native audio delivery.
 # Kept in sync with tools/send_message_tool.py and cron/scheduler.py via
 # should_send_media_as_audio() below.
-_AUDIO_EXTS = frozenset({'.ogg', '.opus', '.mp3', '.wav', '.m4a', '.flac'})
+_AUDIO_EXTS = frozenset({".ogg", ".opus", ".mp3", ".wav", ".m4a", ".flac"})
 # Telegram's Bot API sendAudio only accepts MP3 / M4A. Other audio
 # formats either need to go through sendVoice (Opus/OGG) or must be
 # delivered as a regular document.
-_TELEGRAM_AUDIO_ATTACHMENT_EXTS = frozenset({'.mp3', '.m4a'})
-_TELEGRAM_VOICE_EXTS = frozenset({'.ogg', '.opus'})
+_TELEGRAM_AUDIO_ATTACHMENT_EXTS = frozenset({".mp3", ".m4a"})
+_TELEGRAM_VOICE_EXTS = frozenset({".ogg", ".opus"})
 _POST_DELIVERY_CALLBACK_TIMEOUT_SECONDS = 30.0
 
 
@@ -383,6 +382,7 @@ def proxy_kwargs_for_bot(proxy_url: str | None) -> dict:
     ``rdns=True`` forces remote DNS resolution through the proxy — required
     by many SOCKS implementations (Shadowrocket, Clash) and essential for
     bypassing DNS pollution behind the GFW.
+
     """
     if not proxy_url:
         return {}
@@ -474,20 +474,19 @@ def is_host_excluded_by_no_proxy(hostname: str, no_proxy_value: str | None = Non
 
 
 import dataclasses
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple, Union
-from collections.abc import Callable, Awaitable
 from enum import Enum
-
+from pathlib import Path
 from pathlib import Path as _Path
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from gateway.config import Platform, PlatformConfig
 from gateway.session import SessionSource, build_session_key
 from hermes_constants import get_default_hermes_root, get_hermes_dir, get_hermes_home
-
 
 GATEWAY_SECRET_CAPTURE_UNSUPPORTED_MESSAGE = (
     "Secure secret entry is not supported over messaging. "
@@ -586,8 +585,7 @@ def _looks_like_image(data: bytes) -> bool:
 
 
 def cache_image_from_bytes(data: bytes, ext: str = ".jpg") -> str:
-    """
-    Save raw image bytes to the cache and return the absolute file path.
+    """Save raw image bytes to the cache and return the absolute file path.
 
     Args:
         data: Raw image bytes.
@@ -599,6 +597,7 @@ def cache_image_from_bytes(data: bytes, ext: str = ".jpg") -> str:
     Raises:
         ValueError: If *data* does not look like a valid image (e.g. an HTML
             error page returned by the upstream server).
+
     """
     if not _looks_like_image(data):
         snippet = data[:80].decode("utf-8", errors="replace")
@@ -614,8 +613,7 @@ def cache_image_from_bytes(data: bytes, ext: str = ".jpg") -> str:
 
 
 async def cache_image_from_url(url: str, ext: str = ".jpg", retries: int = 2) -> str:
-    """
-    Download an image from a URL and save it to the local cache.
+    """Download an image from a URL and save it to the local cache.
 
     Retries on transient failures (timeouts, 429, 5xx) with exponential
     backoff so a single slow CDN response doesn't lose the media.
@@ -630,6 +628,7 @@ async def cache_image_from_url(url: str, ext: str = ".jpg", retries: int = 2) ->
 
     Raises:
         ValueError: If the URL targets a private/internal network (SSRF protection).
+
     """
     from tools.url_safety import is_safe_url
     if not is_safe_url(url):
@@ -673,8 +672,7 @@ async def cache_image_from_url(url: str, ext: str = ".jpg", retries: int = 2) ->
 
 
 def cleanup_image_cache(max_age_hours: int = 24) -> int:
-    """
-    Delete cached images older than *max_age_hours*.
+    """Delete cached images older than *max_age_hours*.
 
     Returns the number of files removed.
     """
@@ -710,8 +708,7 @@ def get_audio_cache_dir() -> Path:
 
 
 def cache_audio_from_bytes(data: bytes, ext: str = ".ogg") -> str:
-    """
-    Save raw audio bytes to the cache and return the absolute file path.
+    """Save raw audio bytes to the cache and return the absolute file path.
 
     Args:
         data: Raw audio bytes.
@@ -719,6 +716,7 @@ def cache_audio_from_bytes(data: bytes, ext: str = ".ogg") -> str:
 
     Returns:
         Absolute path to the cached audio file as a string.
+
     """
     cache_dir = get_audio_cache_dir()
     filename = f"audio_{uuid.uuid4().hex[:12]}{ext}"
@@ -728,8 +726,7 @@ def cache_audio_from_bytes(data: bytes, ext: str = ".ogg") -> str:
 
 
 async def cache_audio_from_url(url: str, ext: str = ".ogg", retries: int = 2) -> str:
-    """
-    Download an audio file from a URL and save it to the local cache.
+    """Download an audio file from a URL and save it to the local cache.
 
     Retries on transient failures (timeouts, 429, 5xx) with exponential
     backoff so a single slow CDN response doesn't lose the media.
@@ -744,6 +741,7 @@ async def cache_audio_from_url(url: str, ext: str = ".ogg", retries: int = 2) ->
 
     Raises:
         ValueError: If the URL targets a private/internal network (SSRF protection).
+
     """
     from tools.url_safety import is_safe_url
     if not is_safe_url(url):
@@ -1236,8 +1234,7 @@ def get_document_cache_dir() -> Path:
 
 
 def cache_document_from_bytes(data: bytes, filename: str) -> str:
-    """
-    Save raw document bytes to the cache and return the absolute file path.
+    """Save raw document bytes to the cache and return the absolute file path.
 
     The cached filename preserves the original human-readable name with a
     unique prefix: ``doc_{uuid12}_{original_filename}``.
@@ -1251,6 +1248,7 @@ def cache_document_from_bytes(data: bytes, filename: str) -> str:
 
     Raises:
         ValueError: If the sanitized path escapes the cache directory.
+
     """
     cache_dir = get_document_cache_dir()
     # Sanitize: strip directory components, null bytes, and control characters
@@ -1268,8 +1266,7 @@ def cache_document_from_bytes(data: bytes, filename: str) -> str:
 
 
 def cleanup_document_cache(max_age_hours: int = 24) -> int:
-    """
-    Delete cached documents older than *max_age_hours*.
+    """Delete cached documents older than *max_age_hours*.
 
     Returns the number of files removed.
     """
@@ -1412,8 +1409,7 @@ class ProcessingOutcome(Enum):
 
 @dataclass
 class MessageEvent:
-    """
-    Incoming message from a platform.
+    """Incoming message from a platform.
     
     Normalized representation that all adapters produce.
     """
@@ -1792,8 +1788,7 @@ def _strip_media_directives(text: str) -> str:
 
 
 class BasePlatformAdapter(ABC):
-    """
-    Base class for platform adapters.
+    """Base class for platform adapters.
     
     Subclasses implement platform-specific logic for:
     - Connecting and authenticating
@@ -1994,7 +1989,7 @@ class BasePlatformAdapter(ABC):
         Default: map onto the stream consumer's existing primitives, preserving
         today's behavior 1:1.  ``sink`` is a GatewayStreamConsumer.
         """
-        from gateway.stream_events import MessageChunk, MessageStop, Commentary
+        from gateway.stream_events import Commentary, MessageChunk, MessageStop
 
         if isinstance(event, MessageChunk):
             if event.text:
@@ -2151,23 +2146,23 @@ class BasePlatformAdapter(ABC):
         self._platform_lock_scope = scope
         self._platform_lock_identity = identity
         acquired, existing = acquire_scoped_lock(
-            scope, identity, metadata={'platform': self.platform.value},
+            scope, identity, metadata={"platform": self.platform.value},
         )
         if acquired:
             return True
-        owner_pid = existing.get('pid') if isinstance(existing, dict) else None
+        owner_pid = existing.get("pid") if isinstance(existing, dict) else None
         message = (
-            f'{resource_desc} already in use'
-            + (f' (PID {owner_pid})' if owner_pid else '')
-            + '. Stop the other gateway first.'
+            f"{resource_desc} already in use"
+            + (f" (PID {owner_pid})" if owner_pid else "")
+            + ". Stop the other gateway first."
         )
-        logger.error('[%s] %s', self.name, message)
-        self._set_fatal_error(f'{scope}_lock', message, retryable=False)
+        logger.error("[%s] %s", self.name, message)
+        self._set_fatal_error(f"{scope}_lock", message, retryable=False)
         return False
 
     def _release_platform_lock(self) -> None:
         """Release the scoped lock acquired by _acquire_platform_lock."""
-        identity = getattr(self, '_platform_lock_identity', None)
+        identity = getattr(self, "_platform_lock_identity", None)
         if not identity:
             return
         from gateway.status import release_scoped_lock
@@ -2185,8 +2180,7 @@ class BasePlatformAdapter(ABC):
         return self._running
     
     def set_message_handler(self, handler: MessageHandler) -> None:
-        """
-        Set the handler for incoming messages.
+        """Set the handler for incoming messages.
         
         The handler receives a MessageEvent and should return
         an optional response string.
@@ -2232,8 +2226,7 @@ class BasePlatformAdapter(ABC):
         self._busy_session_handler = handler
     
     def set_session_store(self, session_store: Any) -> None:
-        """
-        Set the session store for checking active sessions.
+        """Set the session store for checking active sessions.
         
         Used by adapters that need to check if a thread/conversation
         has an active session before processing messages (e.g., Slack
@@ -2243,8 +2236,7 @@ class BasePlatformAdapter(ABC):
     
     @abstractmethod
     async def connect(self) -> bool:
-        """
-        Connect to the platform and start receiving messages.
+        """Connect to the platform and start receiving messages.
         
         Returns True if connection was successful.
         """
@@ -2263,8 +2255,7 @@ class BasePlatformAdapter(ABC):
         reply_to: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> SendResult:
-        """
-        Send a message to a chat.
+        """Send a message to a chat.
         
         Args:
             chat_id: The chat/channel ID to send to
@@ -2274,6 +2265,7 @@ class BasePlatformAdapter(ABC):
         
         Returns:
             SendResult with success status and message ID
+
         """
         pass
 
@@ -2311,7 +2303,6 @@ class BasePlatformAdapter(ABC):
         """
         return None
 
-
     async def edit_message(
         self,
         chat_id: str,
@@ -2320,8 +2311,7 @@ class BasePlatformAdapter(ABC):
         *,
         finalize: bool = False,
     ) -> SendResult:
-        """
-        Edit a previously sent message. Optional — platforms that don't
+        """Edit a previously sent message. Optional — platforms that don't
         support editing return success=False and callers fall back to
         sending a new message.
 
@@ -2346,8 +2336,7 @@ class BasePlatformAdapter(ABC):
         chat_id: str,
         message_id: str,
     ) -> bool:
-        """
-        Delete a previously sent message.  Optional — platforms that don't
+        """Delete a previously sent message.  Optional — platforms that don't
         support deletion return ``False`` and callers fall back to leaving
         the message in place.
 
@@ -2533,8 +2522,7 @@ class BasePlatformAdapter(ABC):
         )
 
     async def send_typing(self, chat_id: str, metadata=None) -> None:
-        """
-        Send a typing indicator.
+        """Send a typing indicator.
         
         Override in subclasses if the platform supports it.
         metadata: optional dict with platform-specific context (e.g. thread_id for Slack).
@@ -2614,8 +2602,7 @@ class BasePlatformAdapter(ABC):
         reply_to: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> SendResult:
-        """
-        Send an image natively via the platform API.
+        """Send an image natively via the platform API.
         
         Override in subclasses to send images as proper attachments
         instead of plain-text URLs. Default falls back to sending the
@@ -2633,8 +2620,7 @@ class BasePlatformAdapter(ABC):
         reply_to: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> SendResult:
-        """
-        Send an animated GIF natively via the platform API.
+        """Send an animated GIF natively via the platform API.
         
         Override in subclasses to send GIFs as proper animations
         (e.g., Telegram send_animation) so they auto-play inline.
@@ -2645,13 +2631,12 @@ class BasePlatformAdapter(ABC):
     @staticmethod
     def _is_animation_url(url: str) -> bool:
         """Check if a URL points to an animated GIF (vs a static image)."""
-        lower = url.lower().split('?')[0]  # Strip query params
-        return lower.endswith('.gif')
+        lower = url.lower().split("?")[0]  # Strip query params
+        return lower.endswith(".gif")
 
     @staticmethod
     def extract_images(content: str) -> tuple[list[tuple[str, str]], str]:
-        """
-        Extract image URLs from markdown and HTML image tags in a response.
+        """Extract image URLs from markdown and HTML image tags in a response.
         
         Finds patterns like:
         - ![alt text](https://example.com/image.png)
@@ -2663,18 +2648,19 @@ class BasePlatformAdapter(ABC):
         
         Returns:
             Tuple of (list of (url, alt_text) pairs, cleaned content with image tags removed).
+
         """
         images = []
         cleaned = content
         
         # Match markdown images: ![alt](url)
-        md_pattern = r'!\[([^\]]*)\]\((https?://[^\s\)]+)\)'
+        md_pattern = r"!\[([^\]]*)\]\((https?://[^\s\)]+)\)"
         for match in re.finditer(md_pattern, content):
             alt_text = match.group(1)
             url = match.group(2)
             # Only extract URLs that look like actual images
             if any(url.lower().endswith(ext) or ext in url.lower() for ext in
-                   ['.png', '.jpg', '.jpeg', '.gif', '.webp', 'fal.media', 'fal-cdn', 'replicate.delivery']):
+                   [".png", ".jpg", ".jpeg", ".gif", ".webp", "fal.media", "fal-cdn", "replicate.delivery"]):
                 images.append((url, alt_text))
         
         # Match HTML img tags: <img src="url"> or <img src="url"></img> or <img src="url"/>
@@ -2686,13 +2672,14 @@ class BasePlatformAdapter(ABC):
         # Remove only the matched image tags from content (not all markdown images)
         if images:
             extracted_urls = {url for url, _ in images}
+
             def _remove_if_extracted(match):
                 url = match.group(2) if match.lastindex >= 2 else match.group(1)
-                return '' if url in extracted_urls else match.group(0)
+                return "" if url in extracted_urls else match.group(0)
             cleaned = re.sub(md_pattern, _remove_if_extracted, cleaned)
             cleaned = re.sub(html_pattern, _remove_if_extracted, cleaned)
             # Clean up leftover blank lines
-            cleaned = re.sub(r'\n{3,}', '\n\n', cleaned).strip()
+            cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
         
         return images, cleaned
     
@@ -2705,8 +2692,7 @@ class BasePlatformAdapter(ABC):
         metadata: dict[str, Any] | None = None,
         **kwargs,
     ) -> SendResult:
-        """
-        Send an audio file as a native voice message via the platform API.
+        """Send an audio file as a native voice message via the platform API.
         
         Override in subclasses to send audio as voice bubbles (Telegram)
         or file attachments (Discord). Default falls back to sending the
@@ -2722,7 +2708,7 @@ class BasePlatformAdapter(ABC):
 
         Default strips markdown formatting and truncates to 4000 chars.
         """
-        return re.sub(r'[*_`#\[\]()]', '', text)[:4000].strip()
+        return re.sub(r"[*_`#\[\]()]", "", text)[:4000].strip()
 
     async def play_tts(
         self,
@@ -2730,8 +2716,7 @@ class BasePlatformAdapter(ABC):
         audio_path: str,
         **kwargs,
     ) -> SendResult:
-        """
-        Play auto-TTS audio for voice replies.
+        """Play auto-TTS audio for voice replies.
 
         Override in subclasses for invisible playback (e.g. Web UI).
         Default falls back to send_voice (shows audio player).
@@ -2747,8 +2732,7 @@ class BasePlatformAdapter(ABC):
         metadata: dict[str, Any] | None = None,
         **kwargs,
     ) -> SendResult:
-        """
-        Send a video natively via the platform API.
+        """Send a video natively via the platform API.
 
         Override in subclasses to send videos as inline playable media.
         Default falls back to sending the file path as text.
@@ -2768,8 +2752,7 @@ class BasePlatformAdapter(ABC):
         metadata: dict[str, Any] | None = None,
         **kwargs,
     ) -> SendResult:
-        """
-        Send a document/file natively via the platform API.
+        """Send a document/file natively via the platform API.
 
         Override in subclasses to send files as downloadable attachments.
         Default falls back to sending the file path as text.
@@ -2788,8 +2771,7 @@ class BasePlatformAdapter(ABC):
         metadata: dict[str, Any] | None = None,
         **kwargs,
     ) -> SendResult:
-        """
-        Send a local image file natively via the platform API.
+        """Send a local image file natively via the platform API.
 
         Unlike send_image() which takes a URL, this takes a local file path.
         Override in subclasses for native photo attachments.
@@ -2831,7 +2813,6 @@ class BasePlatformAdapter(ABC):
                 logger.warning("Skipping unsafe local file path: %s", _log_safe_path(raw))
         return safe_paths
 
-
     @staticmethod
     def _mask_protected_spans(content: str) -> str:
         """Replace content inside fenced code blocks, inline code spans,
@@ -2848,30 +2829,29 @@ class BasePlatformAdapter(ABC):
         spans: list = []
 
         # Fenced code blocks: ```...```
-        for m in re.finditer(r'```[^\n]*\n.*?```', content, re.DOTALL):
+        for m in re.finditer(r"```[^\n]*\n.*?```", content, re.DOTALL):
             spans.append((m.start(), m.end()))
 
         # Inline code: `...` but NOT backtick-quoted paths in MEDIA: tags
-        for m in re.finditer(r'`[^`\n]+`', content):
+        for m in re.finditer(r"`[^`\n]+`", content):
             start = m.start()
             # Check if this is a backtick-quoted path after MEDIA:
             prefix = content[max(0, start - 20):start]
-            if re.search(r'MEDIA:\s*$', prefix):
+            if re.search(r"MEDIA:\s*$", prefix):
                 continue  # This is a MEDIA path quote, not inline code
             spans.append((start, m.end()))
 
         # Blockquote lines: > at line start
-        for m in re.finditer(r'^>.*$', content, re.MULTILINE):
+        for m in re.finditer(r"^>.*$", content, re.MULTILINE):
             spans.append((m.start(), m.end()))
 
         # Apply masking
         for start, end in spans:
             for i in range(start, end):
-                if chars[i] != '\n':
-                    chars[i] = ' '
+                if chars[i] != "\n":
+                    chars[i] = " "
 
-        return ''.join(chars)
-
+        return "".join(chars)
 
     @staticmethod
     def _mask_json_string_media(content: str) -> str:
@@ -2907,16 +2887,15 @@ class BasePlatformAdapter(ABC):
         # capturing the (escape-aware) string body up to the closing quote.
         for m in re.finditer(r'(?<=[:,{\[])\s*"((?:[^"\\\n]|\\.)*)"', content):
             seg = m.group(1)
-            if re.search(r'MEDIA:\s*(?:~/|/|[A-Za-z]:[/\\])', seg):
+            if re.search(r"MEDIA:\s*(?:~/|/|[A-Za-z]:[/\\])", seg):
                 for i in range(m.start(1), m.end(1)):
-                    if chars[i] != '\n':
-                        chars[i] = ' '
-        return ''.join(chars)
+                    if chars[i] != "\n":
+                        chars[i] = " "
+        return "".join(chars)
 
     @staticmethod
     def extract_media(content: str) -> tuple[list[tuple[str, bool]], str]:
-        """
-        Extract MEDIA:<path> tags and [[audio_as_voice]] directives from response text.
+        """Extract MEDIA:<path> tags and [[audio_as_voice]] directives from response text.
 
         The TTS tool returns responses like:
             [[audio_as_voice]]
@@ -2938,6 +2917,7 @@ class BasePlatformAdapter(ABC):
 
         Returns:
             Tuple of (list of (path, is_voice) pairs, cleaned content with tags removed).
+
         """
         media = []
         cleaned = content
@@ -2993,14 +2973,13 @@ class BasePlatformAdapter(ABC):
                 for start, end in sorted(spans, reverse=True):
                     del chars[start:end]
                 cleaned = "".join(chars)
-                cleaned = re.sub(r'\n{3,}', '\n\n', cleaned).strip()
+                cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
         
         return media, cleaned
 
     @staticmethod
     def extract_local_files(content: str) -> tuple[list[str], str]:
-        """
-        Detect bare local file paths in response text for native delivery.
+        """Detect bare local file paths in response text for native delivery.
 
         Matches absolute paths (/...) and tilde paths (~/) ending in common
         image, video, audio, or document extensions.  Validates each
@@ -3021,24 +3000,25 @@ class BasePlatformAdapter(ABC):
         Returns:
             Tuple of (list of expanded file paths, cleaned text with the
             raw path strings removed).
+
         """
         _LOCAL_MEDIA_EXTS = MEDIA_DELIVERY_EXTS
-        ext_part = '|'.join(e.lstrip('.') for e in _LOCAL_MEDIA_EXTS)
+        ext_part = "|".join(e.lstrip(".") for e in _LOCAL_MEDIA_EXTS)
 
         # (?<![/:\w.]) prevents matching inside URLs (e.g. https://…/img.png)
         #             and relative paths (./foo.png)
         # (?:~/|/)    anchors to absolute or home-relative Unix paths
         # (?:[A-Za-z]:[/\\]) anchors to Windows drive-letter paths (#34632)
         path_re = re.compile(
-            r'(?<![/:\w.])(?:~/|/|[A-Za-z]:[/\\])(?:[\w.\-]+[/\\])*[\w.\-]+\.(?:' + ext_part + r')\b',
+            r"(?<![/:\w.])(?:~/|/|[A-Za-z]:[/\\])(?:[\w.\-]+[/\\])*[\w.\-]+\.(?:" + ext_part + r")\b",
             re.IGNORECASE,
         )
 
         # Build spans covered by fenced code blocks and inline code
         code_spans: list = []
-        for m in re.finditer(r'```[^\n]*\n.*?```', content, re.DOTALL):
+        for m in re.finditer(r"```[^\n]*\n.*?```", content, re.DOTALL):
             code_spans.append((m.start(), m.end()))
-        for m in re.finditer(r'`[^`\n]+`', content):
+        for m in re.finditer(r"`[^`\n]+`", content):
             code_spans.append((m.start(), m.end()))
 
         def _in_code(pos: int) -> bool:
@@ -3077,8 +3057,8 @@ class BasePlatformAdapter(ABC):
         cleaned = content
         if unique:
             for raw, _exp in unique:
-                cleaned = cleaned.replace(raw, '')
-            cleaned = re.sub(r'\n{3,}', '\n\n', cleaned).strip()
+                cleaned = cleaned.replace(raw, "")
+            cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
 
         return paths, cleaned
 
@@ -3089,8 +3069,7 @@ class BasePlatformAdapter(ABC):
         metadata=None,
         stop_event: asyncio.Event | None = None,
     ) -> None:
-        """
-        Continuously send typing indicator until cancelled.
+        """Continuously send typing indicator until cancelled.
         
         Telegram/Discord typing status expires after ~5 seconds, so we refresh every 2
         to recover quickly after progress messages interrupt it.
@@ -3343,8 +3322,7 @@ class BasePlatformAdapter(ABC):
         max_retries: int = 2,
         base_delay: float = 2.0,
     ) -> "SendResult":
-        """
-        Send a message with automatic retry for transient network errors.
+        """Send a message with automatic retry for transient network errors.
 
         On permanent failures (e.g. formatting / permission errors) falls back
         to a plain-text version before giving up. If all attempts fail due to
@@ -3838,8 +3816,7 @@ class BasePlatformAdapter(ABC):
         await self._drain_pending_after_session_command(session_key, command_guard)
 
     async def handle_message(self, event: MessageEvent) -> None:
-        """
-        Process an incoming message.
+        """Process an incoming message.
         
         This method returns quickly by spawning background tasks.
         This allows new messages to be processed even while an agent is running,
@@ -4031,8 +4008,7 @@ class BasePlatformAdapter(ABC):
     
     @staticmethod
     def _get_human_delay() -> float:
-        """
-        Return a random delay in seconds for human-like response pacing.
+        """Return a random delay in seconds for human-like response pacing.
 
         Reads from env vars:
           HERMES_HUMAN_DELAY_MODE: "off" (default) | "natural" | "custom"
@@ -4203,7 +4179,10 @@ class BasePlatformAdapter(ABC):
                         and text_content
                         and not media_files):
                     try:
-                        from tools.tts_tool import text_to_speech_tool, check_tts_requirements
+                        from tools.tts_tool import (
+                            check_tts_requirements,
+                            text_to_speech_tool,
+                        )
                         if check_tts_requirements():
                             import json as _json
                             speech_text = self.prepare_tts_text(text_content)
@@ -4298,10 +4277,9 @@ class BasePlatformAdapter(ABC):
                     except Exception as batch_err:
                         logger.warning("[%s] Error batching images: %s", self.name, batch_err, exc_info=True)
 
-
                 # Send extracted media files — route by file type
-                _VIDEO_EXTS = {'.mp4', '.mov', '.avi', '.mkv', '.webm', '.3gp'}
-                _IMAGE_EXTS = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
+                _VIDEO_EXTS = {".mp4", ".mov", ".avi", ".mkv", ".webm", ".3gp"}
+                _IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 
                 # Partition images out of media_files + local_files so they
                 # can be sent as a single batch (Signal RPC). When
@@ -4708,8 +4686,7 @@ class BasePlatformAdapter(ABC):
     
     @abstractmethod
     async def get_chat_info(self, chat_id: str) -> dict[str, Any]:
-        """
-        Get information about a chat/channel.
+        """Get information about a chat/channel.
         
         Returns dict with at least:
         - name: Chat name
@@ -4718,8 +4695,7 @@ class BasePlatformAdapter(ABC):
         pass
     
     def format_message(self, content: str) -> str:
-        """
-        Format a message for this platform.
+        """Format a message for this platform.
         
         Override in subclasses to handle platform-specific formatting
         (e.g., Telegram MarkdownV2, Discord markdown).
@@ -4734,8 +4710,7 @@ class BasePlatformAdapter(ABC):
         max_length: int = 4096,
         len_fn: Optional["Callable[[str], int]"] = None,
     ) -> list[str]:
-        """
-        Split a long message into chunks, preserving code block boundaries.
+        """Split a long message into chunks, preserving code block boundaries.
 
         When a split falls inside a triple-backtick code block, the fence is
         closed at the end of the current chunk and reopened (with the original
@@ -4752,6 +4727,7 @@ class BasePlatformAdapter(ABC):
 
         Returns:
             List of message chunks
+
         """
         _len = len_fn or len
         if _len(content) <= max_length:

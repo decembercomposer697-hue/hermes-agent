@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from unittest.mock import patch
 
 import pytest
@@ -98,7 +98,7 @@ def test_auth_add_anthropic_oauth_persists_pool_entry(tmp_path, monkeypatch):
 
 
 def test_auth_add_google_gemini_cli_sets_active_provider(tmp_path, monkeypatch):
-    """hermes auth add google-gemini-cli must set active_provider in auth.json.
+    """Hermes auth add google-gemini-cli must set active_provider in auth.json.
 
     Tokens are managed by agent.google_oauth (written to the Google credential
     file by start_oauth_flow). The auth.json entry must record active_provider
@@ -143,7 +143,7 @@ def test_auth_add_google_gemini_cli_sets_active_provider(tmp_path, monkeypatch):
 
 
 def test_auth_add_qwen_oauth_sets_active_provider(tmp_path, monkeypatch):
-    """hermes auth add qwen-oauth must set active_provider in auth.json.
+    """Hermes auth add qwen-oauth must set active_provider in auth.json.
 
     Tokens are managed by the Qwen CLI credential file via
     resolve_qwen_runtime_credentials(). The auth.json entry must record
@@ -447,8 +447,8 @@ def test_auth_add_codex_oauth_keeps_distinct_pool_accounts(tmp_path, monkeypatch
     )
     monkeypatch.setattr("hermes_cli.auth._codex_device_code_login", lambda: next(logins))
 
-    from hermes_cli.auth_commands import auth_add_command
     from agent.credential_pool import load_pool
+    from hermes_cli.auth_commands import auth_add_command
 
     class _Args:
         provider = "openai-codex"
@@ -484,7 +484,7 @@ def test_auth_add_codex_oauth_keeps_distinct_pool_accounts(tmp_path, monkeypatch
 
 
 def test_auth_add_xai_oauth_sets_active_provider(tmp_path, monkeypatch):
-    """hermes auth add xai-oauth must write providers singleton and set active_provider.
+    """Hermes auth add xai-oauth must write providers singleton and set active_provider.
 
     Previously pool.add_entry() was called directly, which wrote only the
     credential-pool entry without setting active_provider. _model_section_has_credentials()
@@ -793,6 +793,7 @@ def test_logout_resets_codex_config_when_auth_state_already_cleared(tmp_path, mo
     )
 
     from types import SimpleNamespace
+
     from hermes_cli.auth import logout_command
 
     logout_command(SimpleNamespace(provider="openai-codex"))
@@ -817,6 +818,7 @@ def test_logout_defaults_to_configured_codex_when_no_active_provider(tmp_path, m
     )
 
     from types import SimpleNamespace
+
     from hermes_cli.auth import logout_command
 
     logout_command(SimpleNamespace(provider=None))
@@ -848,6 +850,7 @@ def test_logout_clears_stale_active_codex_without_provider_credentials(tmp_path,
     )
 
     from types import SimpleNamespace
+
     from hermes_cli.auth import logout_command
 
     logout_command(SimpleNamespace(provider=None))
@@ -1037,7 +1040,8 @@ def test_auth_list_prefers_explicit_reset_time(monkeypatch, capsys):
 
 def test_auth_remove_env_seeded_clears_env_var(tmp_path, monkeypatch):
     """Removing an env-seeded credential should also clear the env var from .env
-    so the entry doesn't get re-seeded on the next load_pool() call."""
+    so the entry doesn't get re-seeded on the next load_pool() call.
+    """
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
     monkeypatch.setenv("HERMES_HOME", str(hermes_home))
@@ -1200,6 +1204,7 @@ def test_auth_remove_claude_code_suppresses_reseed(tmp_path, monkeypatch):
     (hermes_home / "auth.json").write_text(json.dumps(auth_store))
 
     from types import SimpleNamespace
+
     from hermes_cli.auth_commands import auth_remove_command
     auth_remove_command(SimpleNamespace(provider="anthropic", target="1"))
 
@@ -1214,7 +1219,11 @@ def test_unsuppress_credential_source_clears_marker(tmp_path, monkeypatch):
     monkeypatch.setenv("HERMES_HOME", str(tmp_path / "hermes"))
     _write_auth_store(tmp_path, {"version": 1})
 
-    from hermes_cli.auth import suppress_credential_source, unsuppress_credential_source, is_source_suppressed
+    from hermes_cli.auth import (
+        is_source_suppressed,
+        suppress_credential_source,
+        unsuppress_credential_source,
+    )
 
     suppress_credential_source("openai-codex", "device_code")
     assert is_source_suppressed("openai-codex", "device_code") is True
@@ -1245,9 +1254,9 @@ def test_unsuppress_credential_source_preserves_other_markers(tmp_path, monkeypa
     _write_auth_store(tmp_path, {"version": 1})
 
     from hermes_cli.auth import (
+        is_source_suppressed,
         suppress_credential_source,
         unsuppress_credential_source,
-        is_source_suppressed,
     )
 
     suppress_credential_source("openai-codex", "device_code")
@@ -1292,6 +1301,7 @@ def test_auth_remove_codex_device_code_suppresses_reseed(tmp_path, monkeypatch):
     (hermes_home / "auth.json").write_text(json.dumps(auth_store))
 
     from types import SimpleNamespace
+
     from hermes_cli.auth_commands import auth_remove_command
 
     auth_remove_command(SimpleNamespace(provider="openai-codex", target="1"))
@@ -1339,6 +1349,7 @@ def test_auth_remove_codex_manual_source_suppresses_reseed(tmp_path, monkeypatch
     (hermes_home / "auth.json").write_text(json.dumps(auth_store))
 
     from types import SimpleNamespace
+
     from hermes_cli.auth_commands import auth_remove_command
 
     auth_remove_command(SimpleNamespace(provider="openai-codex", target="1"))
@@ -1467,6 +1478,7 @@ def test_auth_remove_env_seeded_suppresses_shell_exported_var(tmp_path, monkeypa
     )
 
     from types import SimpleNamespace
+
     from hermes_cli.auth_commands import auth_remove_command
     auth_remove_command(SimpleNamespace(provider="xai", target="1"))
 
@@ -1519,6 +1531,7 @@ def test_auth_remove_env_seeded_dotenv_only_no_shell_hint(tmp_path, monkeypatch,
     )
 
     from types import SimpleNamespace
+
     from hermes_cli.auth_commands import auth_remove_command
     auth_remove_command(SimpleNamespace(provider="deepseek", target="1"))
 
@@ -1548,6 +1561,7 @@ def test_auth_add_clears_env_suppression_for_provider(tmp_path, monkeypatch):
     )
 
     from types import SimpleNamespace
+
     from hermes_cli.auth import is_source_suppressed
     from hermes_cli.auth_commands import auth_add_command
 
@@ -1617,7 +1631,7 @@ def test_seed_from_env_respects_openrouter_suppression(tmp_path, monkeypatch):
 
 
 def test_seed_from_singletons_respects_nous_suppression(tmp_path, monkeypatch):
-    """nous device_code must not re-seed from auth.json when suppressed."""
+    """Nous device_code must not re-seed from auth.json when suppressed."""
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
     monkeypatch.setenv("HERMES_HOME", str(hermes_home))
@@ -1637,7 +1651,7 @@ def test_seed_from_singletons_respects_nous_suppression(tmp_path, monkeypatch):
 
 
 def test_seed_from_singletons_respects_copilot_suppression(tmp_path, monkeypatch):
-    """copilot gh_cli must not re-seed when suppressed."""
+    """Copilot gh_cli must not re-seed when suppressed."""
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
     monkeypatch.setenv("HERMES_HOME", str(hermes_home))
@@ -1686,7 +1700,7 @@ def test_seed_from_singletons_respects_qwen_suppression(tmp_path, monkeypatch):
 
 
 def test_seed_from_singletons_respects_hermes_pkce_suppression(tmp_path, monkeypatch):
-    """anthropic hermes_pkce must not re-seed from ~/.hermes/.anthropic_oauth.json when suppressed."""
+    """Anthropic hermes_pkce must not re-seed from ~/.hermes/.anthropic_oauth.json when suppressed."""
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
     monkeypatch.setenv("HERMES_HOME", str(hermes_home))
@@ -1787,7 +1801,7 @@ def test_credential_sources_find_step_returns_none_for_manual():
 
 
 def test_credential_sources_find_step_copilot_before_generic_env(tmp_path, monkeypatch):
-    """copilot env:GH_TOKEN must dispatch to the copilot step, not the
+    """Copilot env:GH_TOKEN must dispatch to the copilot step, not the
     generic env-var step.  The copilot step handles the duplicate-source
     problem (same token seeded as both gh_cli and env:<VAR>); the generic
     env step would only suppress one of the variants.
@@ -1826,6 +1840,7 @@ def test_auth_remove_copilot_suppresses_all_variants(tmp_path, monkeypatch):
     )
 
     from types import SimpleNamespace
+
     from hermes_cli.auth import is_source_suppressed
     from hermes_cli.auth_commands import auth_remove_command
 
@@ -1865,6 +1880,7 @@ def test_auth_add_clears_all_suppressions_including_non_env(tmp_path, monkeypatc
     )
 
     from types import SimpleNamespace
+
     from hermes_cli.auth import is_source_suppressed
     from hermes_cli.auth_commands import auth_add_command
 
@@ -1906,6 +1922,7 @@ def test_auth_remove_codex_manual_device_code_suppresses_canonical(tmp_path, mon
     )
 
     from types import SimpleNamespace
+
     from hermes_cli.auth import is_source_suppressed
     from hermes_cli.auth_commands import auth_remove_command
 

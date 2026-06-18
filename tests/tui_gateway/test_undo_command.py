@@ -179,5 +179,6 @@ def test_undo_errors_when_no_active_session(server):
 
 def test_undo_in_pending_input_commands(server):
     """Registry sanity: /undo must be in _PENDING_INPUT_COMMANDS so
-    slash.exec rejects it and the TUI falls through to command.dispatch."""
+    slash.exec rejects it and the TUI falls through to command.dispatch.
+    """
     assert "undo" in server._PENDING_INPUT_COMMANDS

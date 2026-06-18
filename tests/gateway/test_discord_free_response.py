@@ -1,9 +1,9 @@
 """Tests for Discord free-response defaults and mention gating."""
 
-from datetime import datetime, timezone, UTC
+import sys
+from datetime import UTC, datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
-import sys
 
 import pytest
 
@@ -548,8 +548,6 @@ async def test_discord_free_response_channel_skips_auto_thread(adapter, monkeypa
     assert event.source.chat_type == "group"
 
 
-
-
 @pytest.mark.asyncio
 async def test_discord_voice_linked_parent_thread_still_requires_mention(adapter, monkeypatch):
     """Threads under a voice-linked channel should still require @mention."""
@@ -635,7 +633,6 @@ async def test_discord_thread_require_mention_via_config_extra(adapter, monkeypa
     await adapter._handle_message(message)
 
     adapter.handle_message.assert_not_awaited()
-
 
 
 @pytest.mark.asyncio
@@ -828,7 +825,8 @@ async def test_discord_shared_channel_backfill_prepends_context(adapter, monkeyp
 @pytest.mark.asyncio
 async def test_discord_per_user_channel_backfills_too(adapter, monkeypatch):
     """Per-user sessions also benefit from backfill: Alice's session is missing
-    other-channel-participants' context and her own pre-mention messages."""
+    other-channel-participants' context and her own pre-mention messages.
+    """
     monkeypatch.setenv("DISCORD_REQUIRE_MENTION", "true")
     monkeypatch.delenv("DISCORD_FREE_RESPONSE_CHANNELS", raising=False)
     monkeypatch.setenv("DISCORD_AUTO_THREAD", "false")

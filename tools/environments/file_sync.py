@@ -22,8 +22,8 @@ try:
     import fcntl
 except ImportError:
     fcntl = None  # Windows — file locking skipped
-from pathlib import Path
 from collections.abc import Callable
+from pathlib import Path
 
 from hermes_constants import get_hermes_home
 from tools.environments.base import _file_mtime_key

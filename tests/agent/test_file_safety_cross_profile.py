@@ -16,7 +16,6 @@ from pathlib import Path
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Helpers — set up a fake Hermes root with two profiles, monkeypatch the
 # resolver helpers so the classifier sees the test layout.
@@ -169,7 +168,8 @@ class TestClassifyCrossProfileTarget:
 
     def test_hermes_config_not_classified_as_cross_profile(self, fake_hermes, monkeypatch):
         """Files under <root>/config.yaml or <root>/.env are NOT profile-scoped
-        (already covered by build_write_denied_paths). Don't double-warn."""
+        (already covered by build_write_denied_paths). Don't double-warn.
+        """
         _set_active_home(monkeypatch, fake_hermes["security_home"])
         from agent.file_safety import classify_cross_profile_target
         # config.yaml at root level is not in PROFILE_SCOPED_AREAS

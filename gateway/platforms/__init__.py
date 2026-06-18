@@ -1,5 +1,4 @@
-"""
-Platform adapters for messaging integrations.
+"""Platform adapters for messaging integrations.
 
 Each adapter handles:
 - Receiving messages from a platform

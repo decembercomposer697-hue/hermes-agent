@@ -1,5 +1,4 @@
-"""
-test_yuanbao_integration.py - Yuanbao 模块集成测试
+"""test_yuanbao_integration.py - Yuanbao 模块集成测试
 
 验证各模块能正确组装和交互：
   - YuanbaoAdapter 初始化
@@ -11,17 +10,19 @@ test_yuanbao_integration.py - Yuanbao 模块集成测试
   - Toolset 注册
 """
 
-import sys
 import os
+import sys
 
 # 确保 hermes-agent 根目录在 sys.path 中
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
-import pytest
 from unittest.mock import MagicMock, patch
-from gateway.config import Platform, PlatformConfig, GatewayConfig
+
+import pytest
+
+from gateway.config import GatewayConfig, Platform, PlatformConfig
 from gateway.platforms.yuanbao import YuanbaoAdapter
 
 
@@ -179,7 +180,7 @@ class TestProtoRoundTrip:
     """验证 proto 编解码基本功能"""
 
     def test_conn_msg_roundtrip(self):
-        from gateway.platforms.yuanbao_proto import encode_conn_msg, decode_conn_msg
+        from gateway.platforms.yuanbao_proto import decode_conn_msg, encode_conn_msg
         encoded = encode_conn_msg(msg_type=1, seq_no=42, data=b"hello")
         decoded = decode_conn_msg(encoded)
         assert decoded["seq_no"] == 42
@@ -262,7 +263,11 @@ class TestManagerImports:
 
     def test_outbound_composes_sub_managers(self):
         adapter = YuanbaoAdapter(make_config())
-        from gateway.platforms.yuanbao import MessageSender, HeartbeatManager, SlowResponseNotifier
+        from gateway.platforms.yuanbao import (
+            HeartbeatManager,
+            MessageSender,
+            SlowResponseNotifier,
+        )
         assert isinstance(adapter._outbound.sender, MessageSender)
         assert isinstance(adapter._outbound.heartbeat, HeartbeatManager)
         assert isinstance(adapter._outbound.slow_notifier, SlowResponseNotifier)
@@ -274,7 +279,7 @@ class TestManagerImports:
 
 class TestMediaModule:
     def test_import_ok(self):
-        from gateway.platforms.yuanbao_media import upload_to_cos, download_url
+        from gateway.platforms.yuanbao_media import download_url, upload_to_cos
         assert callable(upload_to_cos)
         assert callable(download_url)
 
@@ -329,7 +334,7 @@ class TestP0ReconnectGuard:
 
     def test_reconnecting_flag_initialized(self):
         adapter = YuanbaoAdapter(make_config())
-        assert hasattr(adapter._connection, '_reconnecting')
+        assert hasattr(adapter._connection, "_reconnecting")
         assert adapter._connection._reconnecting is False
 
     def test_schedule_reconnect_skips_when_not_running(self):
@@ -352,7 +357,7 @@ class TestP0InboundTaskTracking:
 
     def test_inbound_tasks_initialized(self):
         adapter = YuanbaoAdapter(make_config())
-        assert hasattr(adapter, '_inbound_tasks')
+        assert hasattr(adapter, "_inbound_tasks")
         assert isinstance(adapter._inbound_tasks, set)
         assert len(adapter._inbound_tasks) == 0
 
@@ -405,8 +410,8 @@ class TestP0PlatformScopedLock:
 
     def test_adapter_has_platform_lock_methods(self):
         adapter = YuanbaoAdapter(make_config())
-        assert hasattr(adapter, '_acquire_platform_lock')
-        assert hasattr(adapter, '_release_platform_lock')
+        assert hasattr(adapter, "_acquire_platform_lock")
+        assert hasattr(adapter, "_release_platform_lock")
 
 
 if __name__ == "__main__":

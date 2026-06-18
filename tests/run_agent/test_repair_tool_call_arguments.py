@@ -84,7 +84,8 @@ class TestRepairToolCallArguments:
 
     def test_already_valid_json_passes_through(self):
         """When json.loads fails for a non-JSON reason (shouldn't normally
-        happen), but the repair pipeline still produces valid output."""
+        happen), but the repair pipeline still produces valid output.
+        """
         raw = '{"path": "/tmp/foo", "content": "hello"}'
         result = _repair_tool_call_arguments(raw, "t")
         parsed = json.loads(result)
@@ -134,7 +135,8 @@ class TestRepairToolCallArguments:
 
     def test_control_chars_with_trailing_comma(self):
         """strict=False fails due to trailing comma, but brace-count pass
-        + control-char escape rescues it."""
+        + control-char escape rescues it.
+        """
         raw = '{"msg": "line\none",}'
         result = _repair_tool_call_arguments(raw, "t")
         parsed = json.loads(result)

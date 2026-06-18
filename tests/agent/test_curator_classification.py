@@ -14,7 +14,7 @@ which misled users into thinking consolidated skills had been pruned.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -30,6 +30,7 @@ def curator_env(tmp_path, monkeypatch):
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
     import importlib
+
     import hermes_constants
     importlib.reload(hermes_constants)
     from agent import curator
@@ -562,7 +563,8 @@ def test_reconcile_model_prunes_with_reason(curator_env):
 def test_reconcile_model_block_visible_in_full_report(curator_env):
     """End-to-end: LLM final response with the YAML block → reasons in REPORT.md."""
     import json as _json
-    from datetime import datetime as _dt, timezone as _tz
+    from datetime import datetime as _dt
+    from datetime import timezone as _tz
 
     start = _dt.now(UTC)
     before = [
@@ -694,7 +696,7 @@ def test_extract_absorbed_into_ignores_non_delete_actions(curator_env):
 
 
 def test_extract_absorbed_into_accepts_dict_arguments(curator_env):
-    """arguments can arrive as a dict (defensive path) — still works."""
+    """Arguments can arrive as a dict (defensive path) — still works."""
     declarations = curator_env._extract_absorbed_into_declarations([
         {
             "name": "skill_manage",
@@ -791,7 +793,8 @@ def test_reconcile_absorbed_into_empty_is_explicit_prune(curator_env):
 def test_reconcile_absorbed_into_nonexistent_target_falls_through(curator_env):
     """If the declared umbrella doesn't exist in destinations, fall through to
     heuristic/YAML logic. Shouldn't happen in practice (the tool validates at
-    delete time) but the reconciler is defensive."""
+    delete time) but the reconciler is defensive.
+    """
     out = curator_env._reconcile_classification(
         removed=["thing"],
         heuristic={
@@ -811,7 +814,8 @@ def test_reconcile_absorbed_into_nonexistent_target_falls_through(curator_env):
 
 def test_reconcile_declaration_preserves_yaml_reason(curator_env):
     """When the model both declared absorbed_into AND emitted YAML with reason,
-    the reason carries through so REPORT.md still has it."""
+    the reason carries through so REPORT.md still has it.
+    """
     out = curator_env._reconcile_classification(
         removed=["narrow"],
         heuristic={"consolidated": [], "pruned": []},

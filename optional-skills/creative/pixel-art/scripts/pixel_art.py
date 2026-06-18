@@ -98,6 +98,7 @@ def pixel_art(input_path, output_path, preset="arcade", **overrides):
 
     Returns:
         The resulting PIL.Image.
+
     """
     if preset not in PRESETS:
         raise ValueError(

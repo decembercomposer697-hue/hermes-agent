@@ -45,7 +45,8 @@ class TestStreamInterruptBeforeRetry:
     def test_interrupt_prevents_stream_retry(self, mock_close, mock_create):
         """When _interrupt_requested is set during a transient stream error,
         the retry loop must NOT retry — it should raise InterruptedError
-        immediately instead of opening a fresh connection."""
+        immediately instead of opening a fresh connection.
+        """
         import httpx
 
         attempt_count = [0]
@@ -83,7 +84,8 @@ class TestStreamInterruptBeforeRetry:
     @patch("run_agent.AIAgent._close_request_openai_client")
     def test_interrupt_before_first_attempt(self, mock_close, mock_create):
         """If _interrupt_requested is already set when the streaming call
-        starts, it should exit immediately without making any API call."""
+        starts, it should exit immediately without making any API call.
+        """
         mock_client = MagicMock()
         mock_create.return_value = mock_client
 

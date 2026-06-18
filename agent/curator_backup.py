@@ -44,12 +44,12 @@ import logging
 import re
 import shutil
 import tarfile
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from hermes_constants import get_hermes_home
 from agent.skill_utils import is_excluded_skill_path
+from hermes_constants import get_hermes_home
 
 logger = logging.getLogger(__name__)
 
@@ -284,7 +284,8 @@ def snapshot_skills(reason: str = "manual") -> Path | None:
 def _prune_old(keep: int) -> list[str]:
     """Delete regular snapshots beyond the newest *keep*. Returns deleted
     ids. Staging dirs (``.rollback-staging-*``) are implementation detail
-    and pruned independently on every call."""
+    and pruned independently on every call.
+    """
     backups = _backups_dir()
     if not backups.exists():
         return []
@@ -336,7 +337,8 @@ def list_backups() -> list[dict[str, Any]]:
     """Return all restorable snapshots, newest first. Only entries with a
     real ``skills.tar.gz`` tarball are listed — transient
     ``.rollback-staging-*`` directories created mid-rollback are
-    implementation detail and not shown."""
+    implementation detail and not shown.
+    """
     backups = _backups_dir()
     if not backups.exists():
         return []
@@ -363,7 +365,8 @@ def list_backups() -> list[dict[str, Any]]:
 
 def _resolve_backup(backup_id: str | None) -> Path | None:
     """Return the path of the requested backup, or the newest one if
-    *backup_id* is None. Returns None if no match."""
+    *backup_id* is None. Returns None if no match.
+    """
     backups = _backups_dir()
     if not backups.exists():
         return None
@@ -456,7 +459,7 @@ def _restore_cron_skill_links(snapshot_dir: Path) -> dict[str, Any]:
 
     # Load and rewrite the live jobs under the scheduler's lock.
     try:
-        from cron.jobs import load_jobs, save_jobs, _jobs_file_lock
+        from cron.jobs import _jobs_file_lock, load_jobs, save_jobs
     except ImportError as e:
         report["error"] = f"cron module unavailable: {e}"
         return report
@@ -523,7 +526,6 @@ def _restore_cron_skill_links(snapshot_dir: Path) -> dict[str, Any]:
         report["error"] = f"restore failed mid-flight: {e}"
 
     return report
-
 
 
 def rollback(backup_id: str | None = None) -> tuple[bool, str, Path | None]:

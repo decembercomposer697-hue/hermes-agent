@@ -478,7 +478,8 @@ class _UnreachableProvider(StubAuthProvider):
 
 def _mint_stub_at(stub: StubAuthProvider) -> str:
     """Mint a valid access-token cookie value from a StubAuthProvider via its
-    own login round trip (so the HMAC signature matches what verify expects)."""
+    own login round trip (so the HMAC signature matches what verify expects).
+    """
     ls = stub.start_login(redirect_uri="https://fly-app.fly.dev/auth/callback")
     state = dict(
         seg.split("=", 1)
@@ -503,7 +504,8 @@ def _mint_stub_at(stub: StubAuthProvider) -> str:
 def _gated_state():
     """Bare gated app-state setup WITHOUT registering any provider, so each
     test controls provider registration order itself. Yields a factory that
-    builds the TestClient after providers are registered."""
+    builds the TestClient after providers are registered.
+    """
     clear_providers()
     prev_host = getattr(web_server.app.state, "bound_host", None)
     prev_port = getattr(web_server.app.state, "bound_port", None)
@@ -549,7 +551,8 @@ def test_unreachable_first_provider_does_not_block_second(_gated_state):
 
 def test_all_providers_unreachable_returns_503(_gated_state):
     """If NO provider can verify the token AND at least one was unreachable,
-    surface 503 (transient outage) rather than forcing a needless re-login."""
+    surface 503 (transient outage) rather than forcing a needless re-login.
+    """
     register_provider(_UnreachableProvider())
     client = _gated_state()
     # Any non-empty cookie — the unreachable provider raises before parsing.
@@ -561,7 +564,8 @@ def test_all_providers_unreachable_returns_503(_gated_state):
 
 def test_unverifiable_token_with_reachable_providers_redirects(_gated_state):
     """When every provider is REACHABLE but none recognises the token (all
-    return None, none raises), the gate falls through to re-login — NOT 503."""
+    return None, none raises), the gate falls through to re-login — NOT 503.
+    """
     register_provider(StubAuthProvider())
     client = _gated_state()
     client.cookies.set(SESSION_AT_COOKIE, "garbage-not-a-real-token")

@@ -21,7 +21,7 @@ These tests pin the corrected behavior.
 """
 import asyncio
 import time
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from unittest.mock import patch
 
 import httpx
@@ -328,7 +328,7 @@ def test_anthropic_pkce_branch_still_works():
 
 
 def test_xai_oauth_listed_as_loopback_flow():
-    """xAI Grok OAuth must surface in the catalog as a first-class loopback flow."""
+    """XAI Grok OAuth must surface in the catalog as a first-class loopback flow."""
     resp = client.get("/api/providers/oauth", headers=HEADERS)
     assert resp.status_code == 200, resp.text
     providers = {p["id"]: p for p in resp.json()["providers"]}

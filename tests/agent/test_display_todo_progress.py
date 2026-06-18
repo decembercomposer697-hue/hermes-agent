@@ -5,6 +5,7 @@ todo tool call paths: read, create (merge=False), update (merge=True).
 """
 
 import json
+
 from agent.display import get_cute_tool_message
 
 
@@ -203,7 +204,7 @@ class TestTodoEdgeCases:
     """Boundary cases that should not crash."""
 
     def test_merge_default_value(self):
-        """merge defaults to False in function signature, should be False when absent."""
+        """Merge defaults to False in function signature, should be False when absent."""
         msg = get_cute_tool_message("todo",
                                     {"todos": [{"id": "a", "content": "x", "status": "pending"}]},
                                     1.0)

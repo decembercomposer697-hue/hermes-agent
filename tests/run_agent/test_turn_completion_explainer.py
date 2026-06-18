@@ -140,7 +140,8 @@ def test_explainer_disabled_via_config():
 # --------------------------------------------------------------------------
 def test_run_conversation_empty_exhausted_surfaces_explanation():
     """Four empty responses in a row should exhaust retries and the final
-    response should be the actionable explanation, not a bare '(empty)'."""
+    response should be the actionable explanation, not a bare '(empty)'.
+    """
     agent = _make_agent(max_iterations=10)
     # 4 empty responses: retries 1..3 then the terminal on the 4th.
     agent.client.chat.completions.create.side_effect = [

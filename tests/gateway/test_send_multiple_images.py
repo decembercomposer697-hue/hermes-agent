@@ -1,5 +1,4 @@
-"""
-Tests for ``send_multiple_images`` native batching across platforms.
+"""Tests for ``send_multiple_images`` native batching across platforms.
 
 Covers:
     - Base default loop (per-image fallback for platforms without native batching)

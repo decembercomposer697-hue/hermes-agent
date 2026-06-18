@@ -1,5 +1,4 @@
-"""
-Tests for document cache utilities in gateway/platforms/base.py.
+"""Tests for document cache utilities in gateway/platforms/base.py.
 
 Covers: get_document_cache_dir, cache_document_from_bytes,
         cleanup_document_cache, SUPPORTED_DOCUMENT_TYPES.
@@ -21,6 +20,7 @@ from gateway.platforms.base import (
 # ---------------------------------------------------------------------------
 # Fixture: redirect DOCUMENT_CACHE_DIR to a temp directory for every test
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(autouse=True)
 def _redirect_cache(tmp_path, monkeypatch):

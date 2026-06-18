@@ -9,8 +9,8 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
-from hermes_constants import reset_hermes_home_override, set_hermes_home_override
 from hermes_cli.active_sessions import active_session_registry_snapshot
+from hermes_constants import reset_hermes_home_override, set_hermes_home_override
 from tui_gateway import server
 
 
@@ -130,7 +130,8 @@ def test_handoff_fail_marks_only_inflight_rows(monkeypatch):
 def test_session_context_explicit_cwd_for_ephemeral_task(monkeypatch, tmp_path):
     """Background/preview tasks use ephemeral ids absent from `_sessions`, so the
     parent workspace is passed explicitly; it must pin instead of clearing back
-    to the gateway launch dir."""
+    to the gateway launch dir.
+    """
     from agent.runtime_cwd import resolve_agent_cwd
 
     project = tmp_path / "project"
@@ -178,7 +179,8 @@ def test_profile_configured_cwd_skips_placeholders_and_missing(tmp_path):
 
 def test_completion_cwd_prefers_profile_over_stale_env(monkeypatch, tmp_path):
     """Issue #40334: a new session bound to another profile must use THAT
-    profile's terminal.cwd, not the launch profile's stale TERMINAL_CWD."""
+    profile's terminal.cwd, not the launch profile's stale TERMINAL_CWD.
+    """
     profile_b = tmp_path / "ef-design"
     profile_b.mkdir()
     home = _write_profile_cfg(tmp_path / "home-b", str(profile_b))
@@ -220,7 +222,8 @@ def test_terminal_task_cwd_ssh_uses_remote_path_unvalidated(monkeypatch):
     """SSH (non-local) backend: the configured remote cwd is used verbatim even
     though it does not exist on the local host. This is the jonbohz fix — host
     `isdir()` validation would otherwise discard the remote path and fall back
-    to os.getcwd(), running commands against the wrong machine."""
+    to os.getcwd(), running commands against the wrong machine.
+    """
     remote = "/home/jonboh/workspace/proj"  # does not exist on this host
     assert not os.path.isdir(remote)
     monkeypatch.setenv("TERMINAL_ENV", "ssh")
@@ -241,7 +244,8 @@ def test_terminal_task_cwd_ssh_falls_back_to_config(monkeypatch):
 
 def test_terminal_task_cwd_ssh_sentinel_cwd_falls_back_to_session(monkeypatch):
     """Sentinel/auto cwd values are not real remote paths, so the SSH branch
-    must defer to the session cwd rather than registering a meaningless dir."""
+    must defer to the session cwd rather than registering a meaningless dir.
+    """
     monkeypatch.setenv("TERMINAL_ENV", "ssh")
     monkeypatch.setenv("TERMINAL_CWD", "auto")
     monkeypatch.setattr(server, "_load_cfg", lambda: {"terminal": {"cwd": "."}})
@@ -1523,7 +1527,8 @@ def test_ensure_session_db_row_persists_explicit_cwd(monkeypatch, tmp_path):
 
 def test_ensure_session_db_row_defaults_to_no_workspace(monkeypatch, tmp_path):
     """Without an explicit workspace, cwd is left null so the session groups
-    under "No workspace" rather than the gateway's launch directory."""
+    under "No workspace" rather than the gateway's launch directory.
+    """
     created = []
 
     class _FakeDB:
@@ -2510,7 +2515,6 @@ def test_config_set_verbose_updates_session_mode_and_agent(tmp_path, monkeypatch
     assert agent.verbose_logging is True
 
 
-
 def test_config_set_model_waits_for_lazy_agent_before_switch(monkeypatch):
     """A model switch against a lazy-created live session must apply to the
     real agent, not just process env, before the prompt is dispatched.
@@ -2551,6 +2555,7 @@ def test_config_set_model_waits_for_lazy_agent_before_switch(monkeypatch):
         assert calls == [("start", "sid"), ("apply", "sid", agent, "new/model")]
     finally:
         server._sessions.pop("sid", None)
+
 
 def test_config_set_model_uses_live_switch_path(monkeypatch):
     server._sessions["sid"] = _session()
@@ -3742,7 +3747,8 @@ def test_session_info_includes_mcp_servers(monkeypatch):
 def test_session_undo_rejects_while_running():
     """Fix for TUI silent-drop #1: /undo must not mutate history
     while the agent is mid-turn — would either clobber the undo or
-    cause prompt.submit to silently drop the agent's response."""
+    cause prompt.submit to silently drop the agent's response.
+    """
     server._sessions["sid"] = _session(
         running=True,
         history=[
@@ -3816,7 +3822,8 @@ def test_prompt_submit_history_version_mismatch_surfaces_warning(monkeypatch):
     """Fix for TUI silent-drop #2: the defensive backstop at prompt.submit
     must attach a 'warning' to message.complete when history was
     mutated externally during the turn (instead of silently dropping
-    the agent's output)."""
+    the agent's output).
+    """
     # Agent bumps history_version itself mid-run to simulate an external
     # mutation slipping past the guards.
     session_ref = {"s": None}
@@ -4019,7 +4026,8 @@ def test_prompt_submit_can_truncate_before_user_ordinal(monkeypatch):
 
 def test_interrupt_only_clears_own_session_pending():
     """session.interrupt on session A must NOT release pending prompts
-    that belong to session B."""
+    that belong to session B.
+    """
     import types
 
     session_a = _session()
@@ -4070,7 +4078,8 @@ def test_interrupt_only_clears_own_session_pending():
 
 def test_interrupt_clears_multiple_own_pending():
     """When a single session has multiple pending prompts (uncommon but
-    possible via nested tool calls), interrupt must release all of them."""
+    possible via nested tool calls), interrupt must release all of them.
+    """
     import types
 
     sess = _session()
@@ -4097,7 +4106,8 @@ def test_interrupt_clears_multiple_own_pending():
 
 def test_clear_pending_without_sid_clears_all():
     """_clear_pending(None) is the shutdown path — must still release
-    every pending prompt regardless of owning session."""
+    every pending prompt regardless of owning session.
+    """
     ev1, ev2, ev3 = threading.Event(), threading.Event(), threading.Event()
     server._pending["a"] = ("sid_x", ev1)
     server._pending["b"] = ("sid_y", ev2)
@@ -4205,7 +4215,8 @@ def test_mirror_slash_side_effects_rejects_mutating_commands_while_running(monke
     """Slash worker passthrough (e.g. /model, /personality, /prompt,
     /compress) must reject during an in-flight turn.  Same race as
     config.set — mutates live agent state while run_conversation is
-    reading it."""
+    reading it.
+    """
     import types
 
     applied = {"model": False, "compress": False}
@@ -4265,7 +4276,8 @@ def test_mirror_slash_side_effects_allowed_when_idle(monkeypatch):
 def test_mirror_slash_compress_does_not_prelock_history(monkeypatch):
     """Regression guard: /compress side effect must not hold history_lock
     when calling _compress_session_history (the helper snapshots under
-    the same non-reentrant lock internally)."""
+    the same non-reentrant lock internally).
+    """
     import types
 
     seen = {"compress": False, "sync": False}
@@ -4307,7 +4319,8 @@ def test_session_create_close_race_does_not_orphan_worker(monkeypatch):
     must detect the orphan and clean up the slash_worker + notify
     registration it's about to install.  Without the cleanup those
     resources leak — the subprocess stays alive until atexit and the
-    notify callback lingers in the global registry."""
+    notify callback lingers in the global registry.
+    """
     import threading
 
     closed_workers: list[str] = []
@@ -4430,7 +4443,8 @@ def test_session_create_close_race_does_not_orphan_worker(monkeypatch):
 def test_session_create_no_race_keeps_worker_alive(monkeypatch):
     """Regression guard: when session.close does NOT race, the build
     thread must install the worker + notify normally and leave them
-    alone (no over-eager cleanup)."""
+    alone (no over-eager cleanup).
+    """
     closed_workers: list[str] = []
     unregistered_keys: list[str] = []
 
@@ -4562,7 +4576,8 @@ def test_session_create_continues_when_state_db_is_unavailable(monkeypatch):
 def test_session_create_lazy_info_reports_desktop_contract(monkeypatch):
     """The lazy session.create info payload must carry desktop_contract, else
     the desktop GUI reads it as undefined and falsely warns "Backend out of
-    date" on every launch even against a current backend."""
+    date" on every launch even against a current backend.
+    """
 
     class _FakeWorker:
         def __init__(self, key, model):
@@ -4663,7 +4678,8 @@ def test_session_delete_fails_closed_when_active_snapshot_raises(monkeypatch):
     """Concurrent ``_sessions`` mutation from another RPC thread can raise
     ``RuntimeError: dictionary changed size during iteration``.  When the
     handler can't enumerate active sessions safely it must refuse the
-    delete (fail closed) rather than fall through and allow it."""
+    delete (fail closed) rather than fall through and allow it.
+    """
 
     class _DB:
         def delete_session(self, *a, **kw):
@@ -4719,7 +4735,8 @@ def test_session_delete_propagates_db_exception(monkeypatch):
 def test_session_delete_success_returns_deleted_id(monkeypatch):
     """Happy path — DB delete succeeds, response carries the deleted id
     and the on-disk sessions dir is forwarded so transcript files get
-    cleaned up alongside the row."""
+    cleaned up alongside the row.
+    """
     captured: dict = {}
 
     class _DB:
@@ -4805,7 +4822,8 @@ def test_model_options_does_not_overwrite_curated_models(monkeypatch):
 
 def test_model_options_propagates_list_exception(monkeypatch):
     """If list_authenticated_providers itself raises, surface as an RPC
-    error rather than swallowing to a blank picker."""
+    error rather than swallowing to a blank picker.
+    """
     monkeypatch.setattr(
         server,
         "_load_cfg",
@@ -4940,7 +4958,8 @@ def test_prompt_submit_skips_auto_title_when_response_empty(monkeypatch):
 def test_prompt_submit_surfaces_backend_error_as_visible_text(monkeypatch):
     """When the backend fails with no visible response (e.g. invalid model slug
     → provider 4xx), the TUI must surface result['error'] as visible text
-    instead of emitting a blank message.complete turn."""
+    instead of emitting a blank message.complete turn.
+    """
 
     class _Agent:
         def run_conversation(
@@ -4987,7 +5006,8 @@ def test_prompt_submit_surfaces_backend_error_as_visible_text(monkeypatch):
 def test_prompt_submit_preserves_empty_response_without_error(monkeypatch):
     """An empty final_response with NO backend error must stay empty — do not
     synthesize an error string. Preserves the existing None/empty-sentinel
-    semantics owned by downstream handlers."""
+    semantics owned by downstream handlers.
+    """
 
     class _Agent:
         def run_conversation(
@@ -5138,7 +5158,6 @@ def test_session_active_list_excludes_finalized_sessions(monkeypatch):
 
     session_rows = resp["result"]["sessions"]
     assert [row["id"] for row in session_rows] == ["sid-live"]
-
 
 
 def test_session_activate_returns_inflight_stream_before_completion(monkeypatch):
@@ -5307,7 +5326,8 @@ def test_session_most_recent_returns_null_when_only_tool_rows(monkeypatch):
 def test_session_most_recent_folds_db_exception_into_null_result(monkeypatch):
     """Per contract, errors are folded into the null-result shape so
     callers don't have to special-case JSON-RPC error envelopes for
-    'no answer' (Copilot review on #17130)."""
+    'no answer' (Copilot review on #17130).
+    """
 
     class _BrokenDB:
         def list_sessions_rich(self, *, source=None, limit=200):
@@ -5396,7 +5416,8 @@ def test_browser_manage_status_reads_env_var(monkeypatch):
 
 def test_browser_manage_status_falls_back_to_config_cdp_url(monkeypatch):
     """When env is unset, status surfaces ``browser.cdp_url`` from
-    config.yaml so users see what the next tool call will read."""
+    config.yaml so users see what the next tool call will read.
+    """
     monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
 
     fake_cfg = types.SimpleNamespace(
@@ -5413,7 +5434,8 @@ def test_browser_manage_status_falls_back_to_config_cdp_url(monkeypatch):
 def test_browser_manage_status_does_not_call_get_cdp_override(monkeypatch):
     """Regression guard for Copilot's "status must not block" review:
     status must NOT route through `_get_cdp_override`, which performs a
-    `/json/version` HTTP probe with a multi-second timeout."""
+    `/json/version` HTTP probe with a multi-second timeout.
+    """
     monkeypatch.setenv("BROWSER_CDP_URL", "http://127.0.0.1:9222")
 
     fake = types.SimpleNamespace(
@@ -5433,7 +5455,8 @@ def test_browser_manage_connect_sets_env_and_cleans_twice(monkeypatch):
     """`/browser connect` must reach the live process: set env, reap browser
     sessions before AND after publishing the new URL.  The double-cleanup
     closes the supervisor swap window where ``_ensure_cdp_supervisor``
-    could re-attach to the *old* CDP endpoint between steps."""
+    could re-attach to the *old* CDP endpoint between steps.
+    """
     monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
     cleanup_calls: list[str] = []
 
@@ -5536,7 +5559,8 @@ def test_browser_manage_connect_default_local_reports_launch_hint(monkeypatch):
 def test_browser_manage_connect_no_session_skips_progress_events(monkeypatch):
     """Without a session_id the TUI prints messages from the response;
     emitting ``browser.progress`` events would double-render. Gate the
-    emit so callers without a session see the bundled list only."""
+    emit so callers without a session see the bundled list only.
+    """
     monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
     emitted: list[tuple[str, dict]] = []
     monkeypatch.setattr(
@@ -5575,7 +5599,8 @@ def test_browser_manage_connect_no_session_skips_progress_events(monkeypatch):
 def test_browser_manage_connect_handles_null_url(monkeypatch):
     """Explicit ``{"url": null}`` (or empty string) must fall back to the
     default loopback URL instead of raising a TypeError that gets swallowed
-    by the outer 5031 catch."""
+    by the outer 5031 catch.
+    """
     monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
     fake = types.SimpleNamespace(
         cleanup_all_browsers=lambda: None,
@@ -5684,7 +5709,8 @@ def test_browser_manage_connect_rejects_unreachable_endpoint(monkeypatch):
 def test_browser_manage_connect_normalizes_bare_host_port(monkeypatch):
     """Persist a parsed `scheme://host:port` URL so `_get_cdp_override`
     can normalize it; storing a bare host:port would break subsequent
-    tool calls (Copilot review on #17120)."""
+    tool calls (Copilot review on #17120).
+    """
     monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
     fake = types.SimpleNamespace(
         cleanup_all_browsers=lambda: None,
@@ -5710,7 +5736,8 @@ def test_browser_manage_connect_strips_discovery_path(monkeypatch):
     """User-supplied discovery paths like `/json` or `/json/version`
     must collapse to bare `scheme://host:port`; otherwise
     ``_resolve_cdp_override`` will append ``/json/version`` again and
-    produce a duplicate path (Copilot review round-2 on #17120)."""
+    produce a duplicate path (Copilot review round-2 on #17120).
+    """
     monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
     fake = types.SimpleNamespace(
         cleanup_all_browsers=lambda: None,
@@ -5733,7 +5760,8 @@ def test_browser_manage_connect_strips_discovery_path(monkeypatch):
 
 def test_browser_manage_connect_preserves_devtools_browser_endpoint(monkeypatch):
     """Concrete devtools websocket endpoints (e.g. Browserbase) must
-    survive verbatim — we only collapse discovery-style paths."""
+    survive verbatim — we only collapse discovery-style paths.
+    """
     monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
     fake = types.SimpleNamespace(
         cleanup_all_browsers=lambda: None,
@@ -5772,7 +5800,8 @@ def test_browser_manage_connect_preserves_devtools_browser_endpoint(monkeypatch)
 def test_browser_manage_connect_local_devtools_ws_preserves_path(monkeypatch):
     """Regression: ``ws://127.0.0.1:9222/devtools/browser/<id>`` is a real
     connectable endpoint; default-local normalization must not strip the
-    ``/devtools/browser/...`` path or it breaks valid local CDP connects."""
+    ``/devtools/browser/...`` path or it breaks valid local CDP connects.
+    """
     monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
     fake = types.SimpleNamespace(
         cleanup_all_browsers=lambda: None,
@@ -5835,7 +5864,8 @@ def test_browser_manage_connect_rejects_missing_host(monkeypatch):
 def test_browser_manage_connect_concrete_ws_skips_http_probe(monkeypatch):
     """Regression for round-2 Copilot review: a hosted CDP endpoint
     (no HTTP discovery) must connect via TCP-only reachability check.
-    The HTTP probe used to reject these even though they're valid."""
+    The HTTP probe used to reject these even though they're valid.
+    """
     monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
     fake = types.SimpleNamespace(
         cleanup_all_browsers=lambda: None,
@@ -5879,7 +5909,8 @@ def test_browser_manage_connect_concrete_ws_skips_http_probe(monkeypatch):
 def test_browser_manage_connect_concrete_ws_tcp_unreachable(monkeypatch):
     """If the TCP reachability check fails for a concrete ws endpoint,
     return a clear 5031 error — no fallback to the HTTP probe (which
-    can never succeed for these URLs anyway)."""
+    can never succeed for these URLs anyway).
+    """
     monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
     fake = types.SimpleNamespace(
         cleanup_all_browsers=lambda: None,
@@ -5939,7 +5970,8 @@ def test_config_get_indicator_normalizes_casing_and_whitespace(monkeypatch):
 
     Frontend's `normalizeIndicatorStyle` lowercases + trims, so config.get
     must do the same — otherwise `/indicator` prints 'EMOJI ' while the
-    UI is actually rendering the kaomoji default."""
+    UI is actually rendering the kaomoji default.
+    """
     monkeypatch.setattr(
         server, "_load_cfg", lambda: {"display": {"tui_status_indicator": " EMOJI "}},
     )
@@ -5951,7 +5983,8 @@ def test_config_get_indicator_normalizes_casing_and_whitespace(monkeypatch):
 
 def test_config_get_indicator_falls_back_to_default_for_unknown(monkeypatch):
     """An unknown value in config.yaml falls back to the same default
-    the frontend uses (`_INDICATOR_DEFAULT`)."""
+    the frontend uses (`_INDICATOR_DEFAULT`).
+    """
     monkeypatch.setattr(
         server, "_load_cfg", lambda: {"display": {"tui_status_indicator": "rainbow"}},
     )
@@ -5993,7 +6026,8 @@ def test_config_set_indicator_accepts_known_value(monkeypatch):
 def test_config_set_indicator_falsy_non_string_surfaces_in_error(monkeypatch):
     """`0` / `False` / `[]` are not valid styles, but the error message
     must still tell the user what they sent — `value or ""` would have
-    erased them to a blank string."""
+    erased them to a blank string.
+    """
     monkeypatch.setattr(server, "_write_config_key", lambda *a, **k: None)
 
     for bad in (0, False, []):
@@ -6032,7 +6066,8 @@ def test_config_set_indicator_none_keeps_blank_repr(monkeypatch):
 
 def test_reload_env_rpc_calls_hermes_cli_reload_env(monkeypatch):
     """reload.env mirrors classic CLI's `/reload` — re-reads ~/.hermes/.env
-    into the gateway process and reports the count of vars updated."""
+    into the gateway process and reports the count of vars updated.
+    """
     calls = {"n": 0}
 
     def _fake_reload():
@@ -6253,6 +6288,7 @@ def test_notification_poller_delivers_completion(monkeypatch):
     class _ImmediateThread:
         def __init__(self, target=None, daemon=None):
             self._target = target
+
         def start(self):
             self._target()
 
@@ -6312,6 +6348,7 @@ def test_notification_poller_skips_consumed(monkeypatch):
     class _ImmediateThread:
         def __init__(self, target=None, daemon=None):
             self._target = target
+
         def start(self):
             self._target()
 
@@ -6867,7 +6904,8 @@ def test_attach_worker_stores_worker_on_live_session():
 
 def test_restart_slash_worker_closes_orphan_when_session_reaped(monkeypatch):
     """Post-turn restart of a session reaped mid-flight (e.g. close_on_disconnect
-    fired while `running` flipped false) must close the fresh worker, not orphan it."""
+    fired while `running` flipped false) must close the fresh worker, not orphan it.
+    """
     closed = []
 
     class _FakeWorker:

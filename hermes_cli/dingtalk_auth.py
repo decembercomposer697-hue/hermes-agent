@@ -1,5 +1,4 @@
-"""
-DingTalk Device Flow authorization.
+"""DingTalk Device Flow authorization.
 
 Implements the same 3-step registration flow as dingtalk-openclaw-connector:
   1. POST /app/registration/init   → get nonce
@@ -13,10 +12,10 @@ automatically.
 
 from __future__ import annotations
 
+import logging
 import os
 import sys
 import time
-import logging
 from typing import Optional, Tuple
 
 import requests
@@ -233,7 +232,7 @@ def dingtalk_qr_auth() -> tuple[str, str] | None:
     Returns (client_id, client_secret) on success, or None if the user
     cancelled or the flow failed.
     """
-    from hermes_cli.setup import print_info, print_success, print_warning, print_error
+    from hermes_cli.setup import print_error, print_info, print_success, print_warning
 
     print()
     print_info("  Initializing DingTalk device authorization...")

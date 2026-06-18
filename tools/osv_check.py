@@ -34,6 +34,7 @@ def check_package_for_malware(
     Returns:
         An error message string if malware is found, or None if clean/unknown.
         Returns None (allow) on network errors or unrecognized commands.
+
     """
     ecosystem = _infer_ecosystem(command)
     if not ecosystem:

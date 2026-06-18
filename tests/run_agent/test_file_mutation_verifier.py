@@ -24,12 +24,11 @@ import json
 import pytest
 
 from run_agent import (
-    AIAgent,
     _FILE_MUTATING_TOOLS,
+    AIAgent,
     _extract_error_preview,
     _extract_file_mutation_targets,
 )
-
 
 # ---------------------------------------------------------------------------
 # _extract_file_mutation_targets
@@ -302,7 +301,8 @@ class TestFormatFooter:
 
     def test_paths_are_backtick_wrapped(self):
         """Footer paths must be inline-code wrapped so the gateway's bare-path
-        media extractor can't auto-attach them (#35584 defense-in-depth)."""
+        media extractor can't auto-attach them (#35584 defense-in-depth).
+        """
         out = AIAgent._format_file_mutation_failure_footer(
             {"/home/u/.hermes/config.yaml": {
                 "tool": "patch",
@@ -325,9 +325,11 @@ class TestFormatFooter:
 
     def test_footer_path_not_extracted_by_gateway(self):
         """End-to-end: the gateway's extract_local_files must NOT pull a
-        config.yaml path out of the rendered footer (#35584)."""
+        config.yaml path out of the rendered footer (#35584).
+        """
         import os
         import tempfile
+
         from gateway.platforms.base import BasePlatformAdapter
 
         tmp = tempfile.mkdtemp(prefix="hermes_footer_")

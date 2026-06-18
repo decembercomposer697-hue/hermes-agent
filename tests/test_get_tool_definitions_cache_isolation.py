@@ -33,7 +33,8 @@ class TestQuietModeCacheIsolation:
 
     def test_first_uncached_call_returns_fresh_list(self):
         """The first quiet_mode call must not alias the cached object \u2014
-        otherwise a caller mutating the returned list mutates the cache."""
+        otherwise a caller mutating the returned list mutates the cache.
+        """
         first = model_tools.get_tool_definitions(quiet_mode=True)
         assert isinstance(first, list)
         # Find the cached value to compare identity.
@@ -54,7 +55,8 @@ class TestQuietModeCacheIsolation:
 
     def test_caller_mutation_does_not_poison_cache(self):
         """Simulate run_agent appending LCM tool schemas to the returned
-        list. A second call must NOT see those appended entries."""
+        list. A second call must NOT see those appended entries.
+        """
         first = model_tools.get_tool_definitions(quiet_mode=True)
         baseline_len = len(first)
         # Caller mutates the returned list (this is what run_agent does
@@ -76,7 +78,8 @@ class TestQuietModeCacheIsolation:
 
     def test_repeated_caller_mutation_does_not_accumulate(self):
         """The original Gateway symptom: every agent init in a long-lived
-        process appends LCM schemas, accumulating duplicates over time."""
+        process appends LCM schemas, accumulating duplicates over time.
+        """
         baseline = len(model_tools.get_tool_definitions(quiet_mode=True))
         for _ in range(5):
             tools = model_tools.get_tool_definitions(quiet_mode=True)
@@ -90,7 +93,8 @@ class TestQuietModeCacheIsolation:
     def test_cache_bounded_by_eviction(self):
         """The cache evicts the oldest entry when it reaches the cap,
         keeping the cache bounded instead of growing unbounded over a
-        long-lived Gateway's lifetime (#19251)."""
+        long-lived Gateway's lifetime (#19251).
+        """
         cap = model_tools._TOOL_DEFS_CACHE_MAX
         # Fill cache to the cap with distinct keys by varying enabled_toolsets.
         for i in range(cap):
@@ -110,6 +114,7 @@ class TestQuietModeCacheIsolation:
 
     def test_non_quiet_mode_does_not_use_cache(self):
         """Sanity: quiet_mode=False (TUI path) skips the cache entirely \u2014
-        explains why the bug only hit Gateway."""
+        explains why the bug only hit Gateway.
+        """
         model_tools.get_tool_definitions(quiet_mode=False)
         assert len(model_tools._tool_defs_cache) == 0

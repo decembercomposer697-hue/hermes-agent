@@ -1,7 +1,7 @@
 """Regression tests for packaging metadata in pyproject.toml."""
 
-from pathlib import Path
 import tomllib
+from pathlib import Path
 
 
 def _load_optional_dependencies():
@@ -205,7 +205,8 @@ def test_messaging_extra_includes_qrcode_for_weixin_setup():
 
 def test_dingtalk_extra_includes_qrcode_for_qr_auth():
     """DingTalk's QR-code device-flow auth (hermes_cli/dingtalk_auth.py)
-    needs the qrcode package."""
+    needs the qrcode package.
+    """
     optional_dependencies = _load_optional_dependencies()
 
     dingtalk_extra = optional_dependencies["dingtalk"]
@@ -214,7 +215,8 @@ def test_dingtalk_extra_includes_qrcode_for_qr_auth():
 
 def test_feishu_extra_includes_qrcode_for_qr_login():
     """Feishu's QR login flow (gateway/platforms/feishu.py) needs the
-    qrcode package."""
+    qrcode package.
+    """
     optional_dependencies = _load_optional_dependencies()
 
     feishu_extra = optional_dependencies["feishu"]
@@ -234,7 +236,8 @@ def test_nemo_relay_extra_uses_official_0_3_distribution():
 def test_dashboard_plugin_manifests_and_assets_are_packaged():
     """Bundled dashboard plugins need their manifests and built assets in
     wheel installs so /api/dashboard/plugins can discover them outside a
-    source checkout."""
+    source checkout.
+    """
     package_data = _load_package_data()
     plugin_data = package_data["plugins"]
 

@@ -32,11 +32,10 @@ import httpx
 import pytest
 
 from hermes_cli.auth import (
-    AuthError,
     XAI_OAUTH_CLIENT_ID,
+    AuthError,
     _xai_oauth_exchange_code_for_tokens,
 )
-
 
 # ---------------------------------------------------------------------------
 # httpx.post recorder
@@ -106,7 +105,8 @@ def test_token_exchange_also_echoes_code_challenge_for_xai(post_recorder):
     """Defense-in-depth for #26990 — xAI re-validates the challenge
     at the token endpoint, not just at authorize.  Without this echo
     we get ``code_challenge is required`` even though we send a valid
-    ``code_verifier``."""
+    ``code_verifier``.
+    """
     _xai_oauth_exchange_code_for_tokens(
         token_endpoint="https://auth.x.ai/oauth2/token",
         code="AUTHCODE",
@@ -121,7 +121,8 @@ def test_token_exchange_also_echoes_code_challenge_for_xai(post_recorder):
 
 def test_token_exchange_uses_correct_grant_and_client(post_recorder):
     """Lock the static fields too — a future refactor must not flip
-    these to ``client_credentials`` or drop ``client_id``."""
+    these to ``client_credentials`` or drop ``client_id``.
+    """
     _xai_oauth_exchange_code_for_tokens(
         token_endpoint="https://auth.x.ai/oauth2/token",
         code="AUTHCODE",
@@ -137,7 +138,7 @@ def test_token_exchange_uses_correct_grant_and_client(post_recorder):
 
 
 def test_token_exchange_uses_form_urlencoded_content_type(post_recorder):
-    """xAI's token endpoint expects ``application/x-www-form-urlencoded``."""
+    """XAI's token endpoint expects ``application/x-www-form-urlencoded``."""
     _xai_oauth_exchange_code_for_tokens(
         token_endpoint="https://auth.x.ai/oauth2/token",
         code="AUTHCODE",
@@ -152,7 +153,8 @@ def test_token_exchange_uses_form_urlencoded_content_type(post_recorder):
 
 def test_token_exchange_targets_the_supplied_endpoint(post_recorder):
     """Some test fixtures sniff the discovered token endpoint dynamically.
-    We must POST to the URL the caller passed, not a hard-coded constant."""
+    We must POST to the URL the caller passed, not a hard-coded constant.
+    """
     _xai_oauth_exchange_code_for_tokens(
         token_endpoint="https://auth.x.ai/some/other/token/path",
         code="AUTHCODE",
@@ -165,7 +167,8 @@ def test_token_exchange_targets_the_supplied_endpoint(post_recorder):
 
 def test_token_exchange_passes_timeout_through(post_recorder):
     """Operators on slow networks pass a higher ``timeout_seconds``;
-    the helper must forward it (and bump the floor to 20s)."""
+    the helper must forward it (and bump the floor to 20s).
+    """
     _xai_oauth_exchange_code_for_tokens(
         token_endpoint="https://auth.x.ai/oauth2/token",
         code="AUTHCODE",
@@ -197,7 +200,8 @@ def test_token_exchange_floor_timeout_is_20s(post_recorder):
 def test_empty_code_verifier_raises_without_posting(post_recorder):
     """If ``code_verifier`` is somehow lost upstream, we must refuse to
     send the request — leaking an authorization code to xAI without a
-    verifier is worse than failing locally with an actionable error."""
+    verifier is worse than failing locally with an actionable error.
+    """
     with pytest.raises(AuthError) as exc_info:
         _xai_oauth_exchange_code_for_tokens(
             token_endpoint="https://auth.x.ai/oauth2/token",
@@ -215,7 +219,8 @@ def test_empty_code_verifier_raises_without_posting(post_recorder):
 def test_missing_code_challenge_omits_echo_but_still_sends_verifier(post_recorder):
     """``code_challenge`` is defensive — if a caller doesn't have it
     handy, we must still send the standards-compliant request rather
-    than refusing.  This keeps RFC-compliant servers happy."""
+    than refusing.  This keeps RFC-compliant servers happy.
+    """
     _xai_oauth_exchange_code_for_tokens(
         token_endpoint="https://auth.x.ai/oauth2/token",
         code="AUTHCODE",
@@ -237,7 +242,8 @@ def test_missing_code_challenge_omits_echo_but_still_sends_verifier(post_recorde
 def test_non_200_response_surfaces_status_and_body(monkeypatch):
     """When xAI returns a 4xx, the operator needs both the HTTP status
     code (to tell 400 from 401 from 403 at a glance) and the response
-    body (the actual server-side reason)."""
+    body (the actual server-side reason).
+    """
     recorder = _PostRecorder(
         _err_response(400, '{"error":"invalid_grant","error_description":"code_challenge is required"}'),
     )
@@ -262,7 +268,8 @@ def test_non_200_response_surfaces_status_and_body(monkeypatch):
 
 def test_transport_error_wraps_as_auth_error(monkeypatch):
     """A connection failure must come back as ``AuthError`` so the
-    surrounding ``format_auth_error`` UI mapping fires correctly."""
+    surrounding ``format_auth_error`` UI mapping fires correctly.
+    """
 
     def _boom(*args, **kwargs):
         raise httpx.ConnectError("dns failure")
@@ -281,8 +288,9 @@ def test_transport_error_wraps_as_auth_error(monkeypatch):
 
 
 def test_non_dict_payload_raises_invalid_json(monkeypatch):
-    """xAI returning ``[]`` or a string at 200 is a server bug — fail
-    with a precise error rather than crashing later in token storage."""
+    """XAI returning ``[]`` or a string at 200 is a server bug — fail
+    with a precise error rather than crashing later in token storage.
+    """
     recorder = _PostRecorder(_ok_response([1, 2, 3]))  # type: ignore[arg-type]
     monkeypatch.setattr("hermes_cli.auth.httpx.post", recorder)
     with pytest.raises(AuthError) as exc_info:
@@ -298,7 +306,8 @@ def test_non_dict_payload_raises_invalid_json(monkeypatch):
 
 def test_success_returns_full_payload_dict(post_recorder):
     """200 happy path: the parsed JSON dict comes back verbatim so the
-    caller can pluck ``access_token`` / ``refresh_token`` etc."""
+    caller can pluck ``access_token`` / ``refresh_token`` etc.
+    """
     out = _xai_oauth_exchange_code_for_tokens(
         token_endpoint="https://auth.x.ai/oauth2/token",
         code="AUTHCODE",
@@ -318,7 +327,8 @@ def test_success_returns_full_payload_dict(post_recorder):
 def test_wire_format_is_form_urlencoded_with_all_pkce_fields(monkeypatch):
     """End-to-end check on the actual bytes httpx puts on the wire.
     If anyone ever swaps ``data=`` for ``json=`` or refactors the dict,
-    xAI will start rejecting again — this catches it locally."""
+    xAI will start rejecting again — this catches it locally.
+    """
 
     captured: dict[str, Any] = {}
 

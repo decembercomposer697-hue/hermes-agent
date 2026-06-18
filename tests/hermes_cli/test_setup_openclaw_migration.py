@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 
 from hermes_cli import setup as setup_mod
 
-
 # ---------------------------------------------------------------------------
 # _offer_openclaw_migration — unit tests
 # ---------------------------------------------------------------------------
@@ -502,7 +501,8 @@ class TestGetSectionConfigSummary:
     def test_model_ignores_bare_gh_token(self):
         """GH_TOKEN is commonly set for `gh` / git and must NOT count as a
         configured inference provider on its own — mirrors the copilot
-        exclusion in resolve_provider()."""
+        exclusion in resolve_provider().
+        """
         def env_side(key):
             return "gho_xxx" if key == "GH_TOKEN" else ""
 
@@ -522,7 +522,8 @@ class TestGetSectionConfigSummary:
     def test_model_ignores_claude_code_oauth_token(self):
         """CLAUDE_CODE_OAUTH_TOKEN is set by Claude Code itself and must not
         trigger skip — mirrors the _IMPLICIT_ENV_VARS guard in
-        is_provider_explicitly_configured()."""
+        is_provider_explicitly_configured().
+        """
         def env_side(key):
             return "sk-ant-oat01-xxx" if key == "CLAUDE_CODE_OAUTH_TOKEN" else ""
 
@@ -532,7 +533,8 @@ class TestGetSectionConfigSummary:
 
     def test_model_copilot_recognised_when_explicitly_chosen(self):
         """If the user picked copilot in config, GH_TOKEN *does* count —
-        only the auto-detect path excludes it."""
+        only the auto-detect path excludes it.
+        """
         def env_side(key):
             return "gho_xxx" if key == "GH_TOKEN" else ""
 
@@ -544,7 +546,8 @@ class TestGetSectionConfigSummary:
     def test_gateway_matches_platform_registry(self):
         """Every built-in platform should be recognised by its primary
         env-var sentinel — i.e. the summary must not drift from the
-        registry used by the setup checklist."""
+        registry used by the setup checklist.
+        """
         from hermes_cli.gateway import _PLATFORMS
 
         for plat in _PLATFORMS:
@@ -555,6 +558,7 @@ class TestGetSectionConfigSummary:
             # Some platforms require a specific value shape (e.g. WhatsApp
             # needs the literal "true"). Use a sentinel that satisfies every
             # real validator _platform_status() currently checks.
+
             def env_side(key, _target=env_var):
                 if key != _target:
                     return ""

@@ -19,22 +19,15 @@ _HAS_TELEGRAM = pytest.importorskip("telegram", reason="python-telegram-bot not 
 @pytest.fixture(autouse=True)
 def _reset_signal_scheduler():
     """Drop the process-wide attachment scheduler so each test gets a
-    fresh token bucket."""
+    fresh token bucket.
+    """
     from gateway.platforms.signal_rate_limit import _reset_scheduler
     _reset_scheduler()
     yield
     _reset_scheduler()
 
 from gateway.config import Platform
-from tools.send_message_tool import (
-    _is_telegram_thread_not_found,
-    _parse_target_ref,
-    _send_matrix_via_adapter,
-    _send_signal,
-    _send_telegram,
-    _send_to_platform,
-    send_message_tool,
-)
+
 # Discord helpers moved to the plugin in #24325.  Import from the new path
 # and provide a thin ``_send_discord(token, ...)`` shim that mirrors the
 # pre-migration signature so the existing test bodies keep working.
@@ -43,6 +36,15 @@ from plugins.platforms.discord.adapter import (
     _probe_is_forum_cached,
     _remember_channel_is_forum,
     _standalone_send,
+)
+from tools.send_message_tool import (
+    _is_telegram_thread_not_found,
+    _parse_target_ref,
+    _send_matrix_via_adapter,
+    _send_signal,
+    _send_telegram,
+    _send_to_platform,
+    send_message_tool,
 )
 
 
@@ -70,9 +72,10 @@ async def _send_discord(
 
 def _discord_entry():
     """Return the live Discord PlatformEntry, importing lazily so plugin
-    discovery is forced exactly once and patches survive across tests."""
-    from hermes_cli.plugins import discover_plugins
+    discovery is forced exactly once and patches survive across tests.
+    """
     from gateway.platform_registry import platform_registry
+    from hermes_cli.plugins import discover_plugins
     discover_plugins()
     return platform_registry.get("discord")
 
@@ -867,7 +870,8 @@ class TestSendToPlatformWhatsapp:
 
 class TestSendTelegramHtmlDetection:
     """Verify that messages containing HTML tags are sent with parse_mode=HTML
-    and that plain / markdown messages use MarkdownV2."""
+    and that plain / markdown messages use MarkdownV2.
+    """
 
     def _make_bot(self):
         bot = MagicMock()
@@ -1854,7 +1858,6 @@ class TestSendDiscordForum:
         assert "403" in result["error"]
 
 
-
 class TestSendToPlatformDiscordForum:
     """_send_to_platform delegates forum detection to _send_discord."""
 
@@ -2186,7 +2189,8 @@ class TestSendSignalChunking:
 
     def test_chunks_attachments_above_max(self, tmp_path, monkeypatch):
         """33 attachments → 2 batches; text only on first batch. Batch 1
-        only needs 1 token and 18 remain after batch 0, so no sleep."""
+        only needs 1 token and 18 remain after batch 0, so no sleep.
+        """
         from gateway.platforms.signal_rate_limit import (
             SIGNAL_MAX_ATTACHMENTS_PER_MSG,
         )
@@ -2230,7 +2234,8 @@ class TestSendSignalChunking:
     def test_full_followup_batch_emits_pacing_notice(self, tmp_path, monkeypatch):
         """64 attachments → 2 full batches. Batch 1 needs 14 more tokens
         than the 18 remaining after batch 0 — 56s wait crossing the 10s
-        notice threshold."""
+        notice threshold.
+        """
         from gateway.platforms.signal_rate_limit import (
             SIGNAL_MAX_ATTACHMENTS_PER_MSG,
             SIGNAL_RATE_LIMIT_BUCKET_CAPACITY,
@@ -2278,7 +2283,8 @@ class TestSendSignalChunking:
         """signal-cli ≥ v0.14.3 surfaces Retry-After under
         error.data.response.results[*].retryAfterSeconds. The scheduler
         calibrates its refill rate from that value; the retry of n=1
-        sleeps the per-token interval."""
+        sleeps the per-token interval.
+        """
         from gateway.platforms.signal_rate_limit import SIGNAL_RPC_ERROR_RATELIMIT
 
         p = tmp_path / "img.png"
@@ -2321,8 +2327,11 @@ class TestSendSignalChunking:
 
     def test_429_without_retry_after_falls_back_to_default(self, tmp_path, monkeypatch):
         """Older signal-cli (< v0.14.3) doesn't surface Retry-After.
-        The scheduler keeps its default rate (1 token / 4s)."""
-        from gateway.platforms.signal_rate_limit import SIGNAL_RATE_LIMIT_DEFAULT_RETRY_AFTER
+        The scheduler keeps its default rate (1 token / 4s).
+        """
+        from gateway.platforms.signal_rate_limit import (
+            SIGNAL_RATE_LIMIT_DEFAULT_RETRY_AFTER,
+        )
 
         p = tmp_path / "img.png"
         p.write_bytes(b"\x89PNG" + b"\x00" * 16)
@@ -2351,7 +2360,8 @@ class TestSendSignalChunking:
     def test_429_retry_exhaust_continues_to_next_batch(self, tmp_path, monkeypatch):
         """Both attempts on batch 0 fail; batch 1 still gets a chance.
         The scheduler's natural pacing (no more cooldown gate) lets the
-        second batch through after its acquire wait."""
+        second batch through after its acquire wait.
+        """
         from gateway.platforms.signal_rate_limit import SIGNAL_RPC_ERROR_RATELIMIT
 
         paths = []
@@ -2452,7 +2462,8 @@ class TestSendSignalChunking:
 
 class _FakePlatform:
     """Stand-in for the gateway.config.Platform enum.  Holds the .value
-    attribute consulted by ``_send_via_adapter`` for registry lookups."""
+    attribute consulted by ``_send_via_adapter`` for registry lookups.
+    """
 
     def __init__(self, value):
         self.value = value
@@ -2514,8 +2525,8 @@ class TestSendViaAdapterStandaloneFallback:
     @pytest.mark.asyncio
     async def test_standalone_sender_fn_called_when_no_adapter(self, monkeypatch):
         """Registry has hook, runner ref returns None: the hook is awaited."""
-        from tools.send_message_tool import _send_via_adapter
         from gateway.platform_registry import platform_registry
+        from tools.send_message_tool import _send_via_adapter
 
         recorded = {}
 
@@ -2548,8 +2559,8 @@ class TestSendViaAdapterStandaloneFallback:
     @pytest.mark.asyncio
     async def test_standalone_sender_fn_kwargs_forwarded(self, monkeypatch):
         """thread_id, media_files, and force_document all reach the hook."""
-        from tools.send_message_tool import _send_via_adapter
         from gateway.platform_registry import platform_registry
+        from tools.send_message_tool import _send_via_adapter
 
         recorded = {}
 
@@ -2583,9 +2594,10 @@ class TestSendViaAdapterStandaloneFallback:
     @pytest.mark.asyncio
     async def test_standalone_sender_fn_absent_returns_helpful_error(self, monkeypatch):
         """Registry entry has no hook: the fall-through error explains both
-        options (gateway-running and standalone hook)."""
-        from tools.send_message_tool import _send_via_adapter
+        options (gateway-running and standalone hook).
+        """
         from gateway.platform_registry import platform_registry
+        from tools.send_message_tool import _send_via_adapter
 
         platform_registry.register(self._make_entry(None))
         try:
@@ -2607,8 +2619,8 @@ class TestSendViaAdapterStandaloneFallback:
     @pytest.mark.asyncio
     async def test_standalone_sender_fn_raises_is_caught_and_formatted(self, monkeypatch):
         """Hook raises: error dict has 'Plugin standalone send failed: ...'"""
-        from tools.send_message_tool import _send_via_adapter
         from gateway.platform_registry import platform_registry
+        from tools.send_message_tool import _send_via_adapter
 
         async def boom(pconfig, chat_id, message, **kwargs):
             raise ValueError("boom!")
@@ -2631,8 +2643,8 @@ class TestSendViaAdapterStandaloneFallback:
     @pytest.mark.asyncio
     async def test_standalone_sender_fn_return_shape_passed_through(self, monkeypatch):
         """Hook returns success dict: passed through unchanged."""
-        from tools.send_message_tool import _send_via_adapter
         from gateway.platform_registry import platform_registry
+        from tools.send_message_tool import _send_via_adapter
 
         async def fake_send(pconfig, chat_id, message, **kwargs):
             return {"success": True, "message_id": "abc-123", "extra_field": "preserved"}
@@ -2675,7 +2687,8 @@ class TestCheckSendMessage:
 
     def test_kanban_task_env_grants_access(self, monkeypatch):
         """Workers spawned by the dispatcher (HERMES_KANBAN_TASK set) must be
-        allowed regardless of session_platform / gateway-pid state."""
+        allowed regardless of session_platform / gateway-pid state.
+        """
         from tools.send_message_tool import _check_send_message
 
         monkeypatch.setenv("HERMES_KANBAN_TASK", "t_abc12345")
@@ -2688,7 +2701,8 @@ class TestCheckSendMessage:
     def test_kanban_task_env_short_circuits_before_gateway_check(self, monkeypatch):
         """Honoring HERMES_KANBAN_TASK must not depend on importing or calling
         gateway.status — the worker may run with a HERMES_HOME that has no
-        gateway.pid, and we don't want that import path to be load-bearing."""
+        gateway.pid, and we don't want that import path to be load-bearing.
+        """
         from tools.send_message_tool import _check_send_message
 
         monkeypatch.setenv("HERMES_KANBAN_TASK", "t_abc12345")
@@ -2703,7 +2717,8 @@ class TestCheckSendMessage:
 
     def test_messaging_platform_session_grants_access(self, monkeypatch):
         """Telegram/Discord/etc. sessions pass via the platform branch even
-        without HERMES_KANBAN_TASK."""
+        without HERMES_KANBAN_TASK.
+        """
         from tools.send_message_tool import _check_send_message
 
         monkeypatch.delenv("HERMES_KANBAN_TASK", raising=False)
@@ -2714,7 +2729,8 @@ class TestCheckSendMessage:
 
     def test_local_platform_falls_through_to_gateway_check(self, monkeypatch):
         """``HERMES_SESSION_PLATFORM=local`` means CLI-style — must defer to
-        is_gateway_running() rather than auto-grant."""
+        is_gateway_running() rather than auto-grant.
+        """
         from tools.send_message_tool import _check_send_message
 
         monkeypatch.delenv("HERMES_KANBAN_TASK", raising=False)
@@ -2726,7 +2742,8 @@ class TestCheckSendMessage:
 
     def test_running_gateway_grants_access(self, monkeypatch):
         """Plain CLI session (no kanban task, empty platform) with a live
-        gateway: tool is callable."""
+        gateway: tool is callable.
+        """
         from tools.send_message_tool import _check_send_message
 
         monkeypatch.delenv("HERMES_KANBAN_TASK", raising=False)
@@ -2747,7 +2764,8 @@ class TestCheckSendMessage:
 
     def test_gateway_status_import_error_is_swallowed(self, monkeypatch):
         """If gateway.status can't be imported (unusual deployment / partial
-        install), the check returns False rather than raising."""
+        install), the check returns False rather than raising.
+        """
         from tools.send_message_tool import _check_send_message
 
         monkeypatch.delenv("HERMES_KANBAN_TASK", raising=False)
@@ -2775,7 +2793,8 @@ class TestSendTelegramThreadNotFoundRetry:
 
     def test_text_send_retries_without_thread_id_on_thread_not_found(self):
         """When thread is not found, the text send should retry without
-        message_thread_id."""
+        message_thread_id.
+        """
         call_args = []
 
         async def fake_retry(bot, *, chat_id, text, parse_mode, **kwargs):

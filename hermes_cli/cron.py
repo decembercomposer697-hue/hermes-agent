@@ -1,5 +1,4 @@
-"""
-Cron subcommand for hermes CLI.
+"""Cron subcommand for hermes CLI.
 
 Handles standalone cron management commands like list, create, edit,
 pause/resume/run/remove, status, and tick.
@@ -8,9 +7,9 @@ pause/resume/run/remove, status, and tick.
 import json
 import re
 import sys
+from collections.abc import Iterable
 from pathlib import Path
 from typing import List, Optional
-from collections.abc import Iterable
 
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -320,10 +319,10 @@ def _job_action(action: str, job_id: str, success_verb: str) -> int:
 
 def cron_command(args):
     """Handle cron subcommands."""
-    subcmd = getattr(args, 'cron_command', None)
+    subcmd = getattr(args, "cron_command", None)
 
     if subcmd is None or subcmd == "list":
-        show_all = getattr(args, 'all', False)
+        show_all = getattr(args, "all", False)
         cron_list(show_all)
         return 0
 

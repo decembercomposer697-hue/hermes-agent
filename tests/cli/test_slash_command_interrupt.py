@@ -81,7 +81,8 @@ class TestSlashCommandKeyboardInterrupt:
 
     def test_slash_command_returning_false_sets_exit(self):
         """The legitimate exit signal — process_command() returning False —
-        still sets _should_exit. This is the path /exit / /quit use."""
+        still sets _should_exit. This is the path /exit / /quit use.
+        """
         cli = _make_cli()
 
         _dispatch(cli, "/exit", process_command_side_effect=[False])
@@ -91,7 +92,8 @@ class TestSlashCommandKeyboardInterrupt:
     def test_other_exceptions_propagate(self):
         """Only KeyboardInterrupt is caught locally. Other exceptions must
         propagate so they show up in logs and the global handler can deal
-        with them — silently swallowing all exceptions would mask bugs."""
+        with them — silently swallowing all exceptions would mask bugs.
+        """
         cli = _make_cli()
 
         class CustomError(Exception):

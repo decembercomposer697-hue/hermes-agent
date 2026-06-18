@@ -12,7 +12,6 @@ behaviour is only observable at runtime under load.
 
 from __future__ import annotations
 
-
 import pytest
 
 
@@ -24,7 +23,8 @@ def _clear_env(monkeypatch):
 
 def test_returns_none_when_httpx_unavailable(monkeypatch):
     """If httpx can't be imported, the helper returns None so callers
-    fall back to httpx's built-in Limits default without raising."""
+    fall back to httpx's built-in Limits default without raising.
+    """
     import gateway.platforms._http_client_limits as mod
     monkeypatch.setattr(mod, "httpx", None)
     assert mod.platform_httpx_limits() is None
@@ -32,6 +32,7 @@ def test_returns_none_when_httpx_unavailable(monkeypatch):
 
 def test_default_limits_tighten_keepalive_below_httpx_default():
     import httpx
+
     from gateway.platforms._http_client_limits import platform_httpx_limits
     limits = platform_httpx_limits()
     assert isinstance(limits, httpx.Limits)
@@ -74,7 +75,8 @@ def test_env_override_rejects_garbage(monkeypatch):
 def test_helper_is_importable_from_every_platform_that_uses_it():
     """Every persistent-httpx-client platform adapter imports this helper.
     If any of those modules fails to import, this test surfaces it before
-    the regression shows up as a runtime adapter-startup crash."""
+    the regression shows up as a runtime adapter-startup crash.
+    """
     # Just importing exercises the helper's import path for each adapter.
 
 
@@ -92,6 +94,7 @@ class TestWhatsappTypingLeakFix:
 
     def test_bare_await_removed(self):
         import inspect
+
         import gateway.platforms.whatsapp as mod
 
         src = inspect.getsource(mod.WhatsAppAdapter.send_typing)

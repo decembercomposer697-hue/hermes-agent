@@ -11,8 +11,11 @@ import time
 from pathlib import Path
 from unittest.mock import patch
 
-
-from hermes_cli.main import _web_ui_build_needed, _build_web_ui, _run_npm_install_deterministic
+from hermes_cli.main import (
+    _build_web_ui,
+    _run_npm_install_deterministic,
+    _web_ui_build_needed,
+)
 
 
 def _touch(path: Path, offset: float = 0.0) -> None:
@@ -189,7 +192,7 @@ class TestBuildWebUISkipsWhenFresh:
         assert kwargs["cwd"] == web_dir
 
     def test_web_build_uses_idle_timeout_helper(self, tmp_path):
-        """npm run build now goes through _run_with_idle_timeout (issue #33788).
+        """Npm run build now goes through _run_with_idle_timeout (issue #33788).
 
         The install step keeps its capture_output behavior (the existing
         retry-on-EPERM contract depends on it); only the long-running build

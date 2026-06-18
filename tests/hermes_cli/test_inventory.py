@@ -21,13 +21,11 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-
 from hermes_cli.inventory import (
     ConfigContext,
     build_models_payload,
     load_picker_context,
 )
-
 
 # ─── load_picker_context ───────────────────────────────────────────────
 
@@ -106,7 +104,8 @@ def _empty_ctx(provider="orig", model="orig-model", base_url="orig-url"):
 
 def test_with_overrides_truthy_only_strings():
     """Empty strings must NOT clobber disk config — TUI calls this with
-    empty getattr(agent, 'provider', '') when no agent is spawned yet."""
+    empty getattr(agent, 'provider', '') when no agent is spawned yet.
+    """
     ctx = _empty_ctx()
     overlaid = ctx.with_overrides(
         current_provider="",
@@ -280,7 +279,8 @@ def test_pricing_can_force_fresh_nous_tier():
 def test_include_unconfigured_appends_canonical_skeletons():
     """include_unconfigured=True adds CANONICAL_PROVIDERS rows that
     list_authenticated_providers didn't emit. Skeleton rows have empty
-    models and source='canonical'."""
+    models and source='canonical'.
+    """
     rows = [
         {"slug": "openrouter", "name": "OpenRouter", "models": ["m1"],
          "total_models": 1, "is_current": True, "is_user_defined": False,
@@ -305,7 +305,8 @@ def test_include_unconfigured_appends_canonical_skeletons():
 
 def test_include_unconfigured_skips_already_present_slugs():
     """If list_authenticated_providers already returned a row for a
-    canonical slug, include_unconfigured must NOT duplicate it."""
+    canonical slug, include_unconfigured must NOT duplicate it.
+    """
     rows = [
         {"slug": "openrouter", "name": "OpenRouter", "models": ["m1"],
          "total_models": 1, "is_current": True, "is_user_defined": False,
@@ -336,7 +337,8 @@ def test_picker_hints_marks_authed_rows_authenticated():
 
 def test_picker_hints_adds_warning_to_skeleton_rows():
     """Skeleton rows (unconfigured canonical providers) must carry the
-    setup hint the picker UI displays."""
+    setup hint the picker UI displays.
+    """
     rows = []
     ctx = _empty_ctx()
     with _list_auth_returning(rows):
@@ -360,7 +362,8 @@ def test_picker_hints_adds_warning_to_skeleton_rows():
 
 def test_picker_hints_api_key_warning_format():
     """For api_key providers with a defined env var, the warning must
-    point to that env var."""
+    point to that env var.
+    """
     rows = []
     ctx = _empty_ctx()
     with _list_auth_returning(rows):
@@ -447,7 +450,8 @@ def test_canonical_order_with_unconfigured_preserves_full_universe():
 def test_end_to_end_with_real_context_no_credentials_leak(monkeypatch):
     """Full pipeline: real load_picker_context + real
     list_authenticated_providers. Verify no credential string ever
-    appears in the returned payload, even with picker_hints=True."""
+    appears in the returned payload, even with picker_hints=True.
+    """
     canary = "sk-canary-XYZ-must-not-appear"
     monkeypatch.setenv("OPENROUTER_API_KEY", canary)
     monkeypatch.setenv("ANTHROPIC_API_KEY", canary)

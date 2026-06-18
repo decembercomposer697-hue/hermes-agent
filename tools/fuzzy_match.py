@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Fuzzy Matching Module for File Operations
+"""Fuzzy Matching Module for File Operations
 
 Implements a multi-strategy matching chain to robustly find and replace text,
 accommodating variations in whitespace, indentation, and escaping common
@@ -30,9 +29,9 @@ Usage:
 """
 
 import re
-from typing import Tuple, Optional, List
 from collections.abc import Callable
 from difflib import SequenceMatcher
+from typing import List, Optional, Tuple
 
 UNICODE_MAP = {
     "\u201c": '"', "\u201d": '"',  # smart double quotes
@@ -40,6 +39,7 @@ UNICODE_MAP = {
     "\u2014": "--", "\u2013": "-", # em/en dashes
     "\u2026": "...", "\u00a0": " ", # ellipsis and non-breaking space
 }
+
 
 def _unicode_normalize(text: str) -> str:
     """Normalizes Unicode characters to their standard ASCII equivalents."""
@@ -50,8 +50,7 @@ def _unicode_normalize(text: str) -> str:
 
 def fuzzy_find_and_replace(content: str, old_string: str, new_string: str,
                             replace_all: bool = False) -> tuple[str, int, str | None, str | None]:
-    """
-    Find and replace text using a chain of increasingly fuzzy matching strategies.
+    """Find and replace text using a chain of increasingly fuzzy matching strategies.
 
     Args:
         content: The file content to search in
@@ -63,6 +62,7 @@ def fuzzy_find_and_replace(content: str, old_string: str, new_string: str,
         Tuple of (new_content, match_count, strategy_name, error_message)
         - If successful: (modified_content, number_of_replacements, strategy_used, None)
         - If failed: (original_content, 0, None, error_description)
+
     """
     if not old_string:
         return content, 0, None, "old_string cannot be empty"
@@ -307,8 +307,7 @@ def _maybe_unescape_new_string(new_string: str,
 
 def _apply_replacements(content: str, matches: list[tuple[int, int]],
                         new_string: str, old_string: str | None = None) -> str:
-    """
-    Apply replacements at the given positions.
+    """Apply replacements at the given positions.
 
     Args:
         content: Original content
@@ -320,6 +319,7 @@ def _apply_replacements(content: str, matches: list[tuple[int, int]],
 
     Returns:
         Content with replacements applied
+
     """
     # Sort matches by position (descending) to replace from end to start
     # This preserves positions of earlier matches
@@ -355,16 +355,15 @@ def _strategy_exact(content: str, pattern: str) -> list[tuple[int, int]]:
 
 
 def _strategy_line_trimmed(content: str, pattern: str) -> list[tuple[int, int]]:
-    """
-    Strategy 2: Match with line-by-line whitespace trimming.
+    """Strategy 2: Match with line-by-line whitespace trimming.
     
     Strips leading/trailing whitespace from each line before matching.
     """
     # Normalize pattern and content by trimming each line
-    pattern_lines = [line.strip() for line in pattern.split('\n')]
-    pattern_normalized = '\n'.join(pattern_lines)
+    pattern_lines = [line.strip() for line in pattern.split("\n")]
+    pattern_normalized = "\n".join(pattern_lines)
     
-    content_lines = content.split('\n')
+    content_lines = content.split("\n")
     content_normalized_lines = [line.strip() for line in content_lines]
     
     # Build mapping from normalized positions back to original positions
@@ -375,12 +374,11 @@ def _strategy_line_trimmed(content: str, pattern: str) -> list[tuple[int, int]]:
 
 
 def _strategy_whitespace_normalized(content: str, pattern: str) -> list[tuple[int, int]]:
-    """
-    Strategy 3: Collapse multiple whitespace to single space.
+    """Strategy 3: Collapse multiple whitespace to single space.
     """
     def normalize(s):
         # Collapse multiple spaces/tabs to single space, preserve newlines
-        return re.sub(r'[ \t]+', ' ', s)
+        return re.sub(r"[ \t]+", " ", s)
     
     pattern_normalized = normalize(pattern)
     content_normalized = normalize(content)
@@ -396,30 +394,28 @@ def _strategy_whitespace_normalized(content: str, pattern: str) -> list[tuple[in
 
 
 def _strategy_indentation_flexible(content: str, pattern: str) -> list[tuple[int, int]]:
-    """
-    Strategy 4: Ignore indentation differences entirely.
+    """Strategy 4: Ignore indentation differences entirely.
     
     Strips all leading whitespace from lines before matching.
     """
-    content_lines = content.split('\n')
+    content_lines = content.split("\n")
     content_stripped_lines = [line.lstrip() for line in content_lines]
-    pattern_lines = [line.lstrip() for line in pattern.split('\n')]
+    pattern_lines = [line.lstrip() for line in pattern.split("\n")]
     
     return _find_normalized_matches(
         content, content_lines, content_stripped_lines,
-        pattern, '\n'.join(pattern_lines),
+        pattern, "\n".join(pattern_lines),
     )
 
 
 def _strategy_escape_normalized(content: str, pattern: str) -> list[tuple[int, int]]:
-    """
-    Strategy 5: Convert escape sequences to actual characters.
+    """Strategy 5: Convert escape sequences to actual characters.
     
     Handles \\n -> newline, \\t -> tab, etc.
     """
     def unescape(s):
         # Convert common escape sequences
-        return s.replace('\\n', '\n').replace('\\t', '\t').replace('\\r', '\r')
+        return s.replace("\\n", "\n").replace("\\t", "\t").replace("\\r", "\r")
     
     pattern_unescaped = unescape(pattern)
     
@@ -431,12 +427,11 @@ def _strategy_escape_normalized(content: str, pattern: str) -> list[tuple[int, i
 
 
 def _strategy_trimmed_boundary(content: str, pattern: str) -> list[tuple[int, int]]:
-    """
-    Strategy 6: Trim whitespace from first and last lines only.
+    """Strategy 6: Trim whitespace from first and last lines only.
     
     Useful when the pattern boundaries have whitespace differences.
     """
-    pattern_lines = pattern.split('\n')
+    pattern_lines = pattern.split("\n")
     if not pattern_lines:
         return []
     
@@ -445,9 +440,9 @@ def _strategy_trimmed_boundary(content: str, pattern: str) -> list[tuple[int, in
     if len(pattern_lines) > 1:
         pattern_lines[-1] = pattern_lines[-1].strip()
     
-    modified_pattern = '\n'.join(pattern_lines)
+    modified_pattern = "\n".join(pattern_lines)
     
-    content_lines = content.split('\n')
+    content_lines = content.split("\n")
     
     # Search through content for matching block
     matches = []
@@ -462,7 +457,7 @@ def _strategy_trimmed_boundary(content: str, pattern: str) -> list[tuple[int, in
         if len(check_lines) > 1:
             check_lines[-1] = check_lines[-1].strip()
         
-        if '\n'.join(check_lines) == modified_pattern:
+        if "\n".join(check_lines) == modified_pattern:
             # Found match - calculate original positions
             start_pos, end_pos = _calculate_line_positions(
                 content_lines, i, i + pattern_line_count, len(content),
@@ -554,15 +549,14 @@ def _strategy_unicode_normalized(content: str, pattern: str) -> list[tuple[int, 
 
 
 def _strategy_block_anchor(content: str, pattern: str) -> list[tuple[int, int]]:
-    """
-    Strategy 8: Match by anchoring on first and last lines.
+    """Strategy 8: Match by anchoring on first and last lines.
     Adjusted with permissive thresholds and unicode normalization.
     """
     # Normalize both strings for comparison while keeping original content for offset calculation
     norm_pattern = _unicode_normalize(pattern)
     norm_content = _unicode_normalize(content)
     
-    pattern_lines = norm_pattern.split('\n')
+    pattern_lines = norm_pattern.split("\n")
     if len(pattern_lines) < 2:
         return []
     
@@ -570,9 +564,9 @@ def _strategy_block_anchor(content: str, pattern: str) -> list[tuple[int, int]]:
     last_line = pattern_lines[-1].strip()
     
     # Use normalized lines for matching logic
-    norm_content_lines = norm_content.split('\n')
+    norm_content_lines = norm_content.split("\n")
     # BUT use original lines for calculating start/end positions to prevent index shift
-    orig_content_lines = content.split('\n')
+    orig_content_lines = content.split("\n")
     
     pattern_line_count = len(pattern_lines)
     
@@ -595,8 +589,8 @@ def _strategy_block_anchor(content: str, pattern: str) -> list[tuple[int, int]]:
             similarity = 1.0
         else:
             # Compare normalized middle sections
-            content_middle = '\n'.join(norm_content_lines[i+1:i+pattern_line_count-1])
-            pattern_middle = '\n'.join(pattern_lines[1:-1])
+            content_middle = "\n".join(norm_content_lines[i+1:i+pattern_line_count-1])
+            pattern_middle = "\n".join(pattern_lines[1:-1])
             similarity = SequenceMatcher(None, content_middle, pattern_middle).ratio()
         
         if similarity >= threshold:
@@ -610,13 +604,12 @@ def _strategy_block_anchor(content: str, pattern: str) -> list[tuple[int, int]]:
 
 
 def _strategy_context_aware(content: str, pattern: str) -> list[tuple[int, int]]:
-    """
-    Strategy 9: Line-by-line similarity with 50% threshold.
+    """Strategy 9: Line-by-line similarity with 50% threshold.
     
     Finds blocks where at least 50% of lines have high similarity.
     """
-    pattern_lines = pattern.split('\n')
-    content_lines = content.split('\n')
+    pattern_lines = pattern.split("\n")
+    content_lines = content.split("\n")
     
     if not pattern_lines:
         return []
@@ -660,6 +653,7 @@ def _calculate_line_positions(content_lines: list[str], start_line: int,
 
     Returns:
         Tuple of (start_pos, end_pos) in the original content
+
     """
     start_pos = sum(len(line) + 1 for line in content_lines[:start_line])
     end_pos = sum(len(line) + 1 for line in content_lines[:end_line]) - 1
@@ -670,8 +664,7 @@ def _calculate_line_positions(content_lines: list[str], start_line: int,
 def _find_normalized_matches(content: str, content_lines: list[str],
                               content_normalized_lines: list[str],
                               pattern: str, pattern_normalized: str) -> list[tuple[int, int]]:
-    """
-    Find matches in normalized content and map back to original positions.
+    """Find matches in normalized content and map back to original positions.
     
     Args:
         content: Original content string
@@ -682,15 +675,16 @@ def _find_normalized_matches(content: str, content_lines: list[str],
     
     Returns:
         List of (start, end) positions in the original content
+
     """
-    pattern_norm_lines = pattern_normalized.split('\n')
+    pattern_norm_lines = pattern_normalized.split("\n")
     num_pattern_lines = len(pattern_norm_lines)
     
     matches = []
     
     for i in range(len(content_normalized_lines) - num_pattern_lines + 1):
         # Check if this block matches
-        block = '\n'.join(content_normalized_lines[i:i + num_pattern_lines])
+        block = "\n".join(content_normalized_lines[i:i + num_pattern_lines])
         
         if block == pattern_normalized:
             # Found a match - calculate original positions
@@ -704,8 +698,7 @@ def _find_normalized_matches(content: str, content_lines: list[str],
 
 def _map_normalized_positions(original: str, normalized: str,
                                normalized_matches: list[tuple[int, int]]) -> list[tuple[int, int]]:
-    """
-    Map positions from normalized string back to original.
+    """Map positions from normalized string back to original.
     
     This is a best-effort mapping that works for whitespace normalization.
     """
@@ -723,14 +716,14 @@ def _map_normalized_positions(original: str, normalized: str,
             orig_to_norm.append(norm_idx)
             orig_idx += 1
             norm_idx += 1
-        elif original[orig_idx] in ' \t' and normalized[norm_idx] == ' ':
+        elif original[orig_idx] in " \t" and normalized[norm_idx] == " ":
             # Original has space/tab, normalized collapsed to space
             orig_to_norm.append(norm_idx)
             orig_idx += 1
             # Don't advance norm_idx yet - wait until all whitespace consumed
-            if orig_idx < len(original) and original[orig_idx] not in ' \t':
+            if orig_idx < len(original) and original[orig_idx] not in " \t":
                 norm_idx += 1
-        elif original[orig_idx] in ' \t':
+        elif original[orig_idx] in " \t":
             # Extra whitespace in original
             orig_to_norm.append(norm_idx)
             orig_idx += 1
@@ -770,7 +763,7 @@ def _map_normalized_positions(original: str, normalized: str,
             orig_end = orig_start + (norm_end - norm_start)
         
         # Expand to include trailing whitespace that was normalized
-        while orig_end < len(original) and original[orig_end] in ' \t':
+        while orig_end < len(original) and original[orig_end] in " \t":
             orig_end += 1
         
         original_matches.append((orig_start, min(orig_end, len(original))))

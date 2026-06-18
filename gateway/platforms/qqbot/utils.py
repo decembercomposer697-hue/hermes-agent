@@ -8,10 +8,10 @@ from typing import Any, Dict, List
 
 from .constants import QQBOT_VERSION
 
-
 # ---------------------------------------------------------------------------
 # User-Agent
 # ---------------------------------------------------------------------------
+
 
 def _get_hermes_version() -> str:
     """Return the hermes-agent package version, or 'dev' if unavailable."""

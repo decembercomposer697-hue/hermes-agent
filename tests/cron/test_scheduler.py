@@ -3,13 +3,21 @@
 import json
 import logging
 import os
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from cron.scheduler import _resolve_origin, _resolve_delivery_target, _deliver_result, _send_media_via_adapter, run_job, SILENT_MARKER, _build_job_prompt
-from tools.env_passthrough import clear_env_passthrough
+from cron.scheduler import (
+    SILENT_MARKER,
+    _build_job_prompt,
+    _deliver_result,
+    _resolve_delivery_target,
+    _resolve_origin,
+    _send_media_via_adapter,
+    run_job,
+)
 from tools.credential_files import clear_credential_files
+from tools.env_passthrough import clear_env_passthrough
 
 
 class TestResolveOrigin:
@@ -606,9 +614,11 @@ class TestDeliverResultWrapping:
     def test_live_adapter_sends_media_as_attachments(self, tmp_path, monkeypatch):
         """When a live adapter is available, MEDIA files should be sent as native
         platform attachments (e.g., Discord voice, Telegram audio) rather than
-        as literal 'MEDIA:/path' text."""
-        from gateway.config import Platform
+        as literal 'MEDIA:/path' text.
+        """
         from concurrent.futures import Future
+
+        from gateway.config import Platform
         media_path = self._safe_media_path(tmp_path, monkeypatch, "cron-voice.mp3")
 
         adapter = AsyncMock()
@@ -659,8 +669,9 @@ class TestDeliverResultWrapping:
 
     def test_live_adapter_routes_image_to_send_image_file(self, tmp_path, monkeypatch):
         """Image MEDIA files should be routed to send_image_file, not send_voice."""
-        from gateway.config import Platform
         from concurrent.futures import Future
+
+        from gateway.config import Platform
         media_path = self._safe_media_path(tmp_path, monkeypatch, "chart.png")
 
         adapter = AsyncMock()
@@ -703,8 +714,9 @@ class TestDeliverResultWrapping:
 
     def test_live_adapter_media_only_no_text(self, tmp_path, monkeypatch):
         """When content is ONLY a MEDIA tag with no text, media should still be sent."""
-        from gateway.config import Platform
         from concurrent.futures import Future
+
+        from gateway.config import Platform
         media_path = self._safe_media_path(tmp_path, monkeypatch, "voice.ogg")
 
         adapter = AsyncMock()
@@ -747,9 +759,11 @@ class TestDeliverResultWrapping:
 
     def test_live_adapter_sends_cleaned_text_not_raw(self):
         """The live adapter path must send cleaned text (MEDIA tags stripped),
-        not the raw delivery_content with embedded MEDIA: tags."""
-        from gateway.config import Platform
+        not the raw delivery_content with embedded MEDIA: tags.
+        """
         from concurrent.futures import Future
+
+        from gateway.config import Platform
 
         adapter = AsyncMock()
         adapter.send.return_value = MagicMock(success=True)
@@ -1127,7 +1141,8 @@ class TestRunJobSessionPersistence:
 
     def test_run_job_per_job_toolsets_win_over_platform_config(self, tmp_path):
         """Per-job enabled_toolsets (via cronjob tool) always take precedence
-        over the platform-level ``hermes tools`` config."""
+        over the platform-level ``hermes tools`` config.
+        """
         job = {
             "id": "override-job",
             "name": "test",
@@ -2107,9 +2122,10 @@ class TestRunJobWakeGate:
     def test_wake_false_skips_agent_and_returns_silent(self, caplog):
         """When _run_job_script output ends with {wakeAgent: false}, the agent
         is not invoked and run_job returns the SILENT marker so delivery is
-        suppressed."""
-        from cron.scheduler import SILENT_MARKER
+        suppressed.
+        """
         import cron.scheduler as scheduler
+        from cron.scheduler import SILENT_MARKER
 
         with patch.object(scheduler, "_run_job_script",
                           return_value=(True, '{"wakeAgent": false}')), \
@@ -2124,7 +2140,8 @@ class TestRunJobWakeGate:
 
     def test_wake_true_runs_agent_with_injected_output(self):
         """When the script returns {wakeAgent: true, data: ...}, the agent is
-        invoked and the data line still shows up in the prompt."""
+        invoked and the data line still shows up in the prompt.
+        """
         import cron.scheduler as scheduler
 
         script_output = '{"wakeAgent": true, "data": {"new": 3}}'
@@ -2149,10 +2166,12 @@ class TestRunJobWakeGate:
     def test_script_runs_only_once_on_wake(self):
         """Wake-true path must not re-run the script inside _build_job_prompt
         (script would execute twice otherwise, wasting work and risking
-        double-side-effects)."""
+        double-side-effects).
+        """
         import cron.scheduler as scheduler
 
         call_count = 0
+
         def _script_stub(path):
             nonlocal call_count
             call_count += 1
@@ -2170,7 +2189,8 @@ class TestRunJobWakeGate:
 
     def test_script_failure_does_not_trigger_gate(self):
         """If _run_job_script returns success=False, the gate is NOT evaluated
-        and the agent still runs (the failure is reported as context)."""
+        and the agent still runs (the failure is reported as context).
+        """
         import cron.scheduler as scheduler
 
         # Malicious or broken script whose stderr happens to contain the
@@ -2407,7 +2427,7 @@ class TestParallelTick:
         def mock_run_job(job):
             origin = job.get("origin", {})
             # run_job sets ContextVars — verify each job sees its own
-            from gateway.session_context import set_session_vars, clear_session_vars
+            from gateway.session_context import clear_session_vars, set_session_vars
             tokens = set_session_vars(
                 platform=origin.get("platform", ""),
                 chat_id=str(origin.get("chat_id", "")),
@@ -2481,9 +2501,11 @@ class TestDeliverResultTimeoutCancelsFuture:
     def test_live_adapter_timeout_cancels_future_and_falls_back(self):
         """End-to-end: live adapter hangs past the 60s budget, _deliver_result
         patches the timeout down to a fast value, confirms future.cancel() fires,
-        and verifies the standalone fallback path still delivers."""
-        from gateway.config import Platform
+        and verifies the standalone fallback path still delivers.
+        """
         from concurrent.futures import Future
+
+        from gateway.config import Platform
 
         # Live adapter whose send() coroutine never resolves within the budget
         adapter = AsyncMock()
@@ -2544,9 +2566,10 @@ class TestDeliverResultTimeoutCancelsFuture:
         """A cron target with an explicit topic must not be marked clean if
         Telegram falls back to the base chat after "thread not found".
         """
+        from concurrent.futures import Future
+
         from gateway.config import Platform
         from gateway.platforms.base import SendResult
-        from concurrent.futures import Future
 
         send_result = SendResult(
             success=True,
@@ -2609,7 +2632,8 @@ class TestSendMediaTimeoutCancelsFuture:
     def test_media_send_timeout_cancels_future_and_continues(self, tmp_path, monkeypatch):
         """End-to-end: _send_media_via_adapter with a future whose .result()
         raises TimeoutError. Assert cancel() fires and the loop proceeds
-        to the next file rather than hanging or crashing."""
+        to the next file rather than hanging or crashing.
+        """
         from concurrent.futures import Future
 
         adapter = MagicMock()

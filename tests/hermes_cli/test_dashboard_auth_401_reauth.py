@@ -42,7 +42,6 @@ from hermes_cli.dashboard_auth.cookies import (
 )
 from tests.hermes_cli.conftest_dashboard_auth import StubAuthProvider
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -107,7 +106,8 @@ class TestRefreshTokenCookieDeprecation:
     def test_clear_session_cookies_still_emits_rt_deletion(self):
         """Even when we never wrote the RT cookie, logout/clear should
         emit a Max-Age=0 deletion to flush stale cookies from old
-        deployments."""
+        deployments.
+        """
         app = FastAPI()
 
         @app.get("/clear")
@@ -154,7 +154,8 @@ class TestApi401Envelope:
 
     def test_invalid_cookie_clears_dead_cookie(self, gated_app):
         """Dead-cookie cleanup — Phase 6 requirement so the browser
-        doesn't keep replaying the stale token on every request."""
+        doesn't keep replaying the stale token on every request.
+        """
         gated_app.cookies.set(SESSION_AT_COOKIE, "garbage")
         r = gated_app.get("/api/sessions")
         set_cookies = r.headers.get_list("set-cookie")
@@ -185,7 +186,8 @@ class TestApi401Envelope:
         """Specific repro for the ``/api/analytics/models?days=30``
         case Ben reported: page on /models, session expires, SPA fires
         getModelsAnalytics(), 401 envelope carries ``next=``, user ends
-        up staring at JSON post-callback."""
+        up staring at JSON post-callback.
+        """
         r = gated_app.get("/api/analytics/models?days=30")
         body = r.json()
         assert body["login_url"] == "/login"
@@ -220,6 +222,7 @@ class TestTransparentRefreshOnAccessTokenEviction:
         signature + exp), then send ONLY that RT cookie.
         """
         import time as _t
+
         from tests.hermes_cli.conftest_dashboard_auth import _sign
 
         clear_providers()
@@ -255,7 +258,8 @@ class TestTransparentRefreshOnAccessTokenEviction:
 
     def test_no_cookies_at_all_still_bounces(self, gated_app):
         """Guard the fix didn't over-reach: a request with NEITHER cookie
-        must still 401 to login (nothing to verify or refresh)."""
+        must still 401 to login (nothing to verify or refresh).
+        """
         self._build_rt_only_app()
         gated_app.cookies.clear()
         r = gated_app.get("/api/sessions")
@@ -264,7 +268,8 @@ class TestTransparentRefreshOnAccessTokenEviction:
 
     def test_dead_rt_only_bounces_to_login(self, gated_app):
         """An RT-only request whose RT is dead/expired must bounce (the
-        refresh raises RefreshExpiredError → clear + relogin), not 500."""
+        refresh raises RefreshExpiredError → clear + relogin), not 500.
+        """
         clear_providers()
         # default_ttl=0 → the stub treats the minted RT as born-expired,
         # so refresh_session raises RefreshExpiredError.
@@ -273,6 +278,7 @@ class TestTransparentRefreshOnAccessTokenEviction:
         gated_app.cookies.clear()
         # A syntactically-real but expired RT (signed with exp<=now).
         import time as _t
+
         from tests.hermes_cli.conftest_dashboard_auth import _sign
         dead_rt = _sign({"sub": "u", "kind": "refresh", "exp": int(_t.time()) - 1})
         gated_app.cookies.set(SESSION_RT_COOKIE, dead_rt)
@@ -293,7 +299,8 @@ class TestHtmlRedirectNext:
 
     def test_login_loop_avoided(self, gated_app):
         """A request to /login itself must not produce ``?next=/login``
-        because that'd be a loop after re-auth."""
+        because that'd be a loop after re-auth.
+        """
         # /login is on the public allowlist so it doesn't go through the
         # 401 path. But sanity: the page renders.
         r = gated_app.get("/login")
@@ -301,7 +308,8 @@ class TestHtmlRedirectNext:
 
     def test_auth_loop_avoided(self, gated_app):
         """A failed cookie on /auth/me (auth-required path) must drop
-        the next= rather than risk a /login?next=/api/auth/me loop."""
+        the next= rather than risk a /login?next=/api/auth/me loop.
+        """
         # /api/auth/me requires auth. Without cookie → 401 with login_url
         # but next= must NOT point at /api/auth/.
         r = gated_app.get("/api/auth/me")
@@ -391,7 +399,8 @@ class TestNextSameOriginValidation:
 
     def test_safe_next_validator_does_not_reject_api_prefix_lookalikes(self):
         """Negative guard: ``/api-docs`` or ``/apis`` aren't ``/api/*``
-        and must remain valid landing targets."""
+        and must remain valid landing targets.
+        """
         from hermes_cli.dashboard_auth.middleware import _safe_next_target
 
         class FakeRequest:
@@ -441,7 +450,8 @@ class TestAuthCallbackNext:
         smuggled. ``expect_next_in_button`` controls whether the
         rendered /login page is expected to thread next= into the
         provider button — False for cases where the same-origin
-        validator drops the value (e.g. //evil.com, /login)."""
+        validator drops the value (e.g. //evil.com, /login).
+        """
         login_path = "/login"
         if next_path:
             login_path = f"/login?next={quote(next_path, safe='')}"
@@ -526,7 +536,8 @@ class TestAuthCallbackNext:
         """Hardening: even if an attacker crafts a callback URL with a
         rogue ``next=`` query parameter, the server reads from the PKCE
         cookie (server-set) and ignores the URL value. This pins the
-        fix against a regression that re-introduces the URL read."""
+        fix against a regression that re-introduces the URL read.
+        """
         # Drive a clean login with no next=.
         r_login = gated_app.get("/login", follow_redirects=False)
         assert r_login.status_code == 200
@@ -610,7 +621,8 @@ class TestValidatePostLoginTarget:
     def test_rejects_api_paths(self):
         """Bug fix: any ``/api/*`` target is dropped at the callback
         boundary. Pin both the exact match and the trailing-slash forms
-        plus a few realistic SPA-API endpoints."""
+        plus a few realistic SPA-API endpoints.
+        """
         from hermes_cli.dashboard_auth.routes import _validate_post_login_target
         assert _validate_post_login_target("/api") == ""
         assert _validate_post_login_target("/api/analytics/models") == ""
@@ -639,7 +651,8 @@ class TestValidatePostLoginTarget:
 class TestRenderLoginHtmlNext:
     """Cover ``render_login_html`` directly so a regression that drops
     the ``next_path`` parameter is caught at the function boundary, not
-    only via the full integration walk."""
+    only via the full integration walk.
+    """
 
     def setup_method(self):
         clear_providers()
@@ -667,7 +680,8 @@ class TestRenderLoginHtmlNext:
     def test_next_with_html_metacharacters_is_escaped(self):
         """Defence in depth: even though the caller validates next_path,
         we still HTML-escape the rendered value so a regression in the
-        caller can't trivially produce an HTML-injection sink."""
+        caller can't trivially produce an HTML-injection sink.
+        """
         from hermes_cli.dashboard_auth.login_page import render_login_html
         # `"` in a path is already URL-encoded by quote() to %22, so it
         # never reaches the HTML escaper as a raw quote. This test pins
@@ -713,7 +727,8 @@ class TestAuthLoginPkceCookieNext:
         """The validator at /auth/login refuses //evil.com BEFORE
         storing it. Defence in depth: even if a regression leaks next=
         through /login's button rendering, /auth/login is the second
-        boundary."""
+        boundary.
+        """
         r = gated_app.get(
             f"/auth/login?provider=stub&next={quote('//evil.com/x', safe='')}",
             follow_redirects=False,

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Domain Intelligence — Passive OSINT via Python stdlib.
+"""Domain Intelligence — Passive OSINT via Python stdlib.
 
 Usage:
     python domain_intel.py subdomains example.com
@@ -19,13 +18,13 @@ import re
 import socket
 import ssl
 import sys
-import urllib.request
 import urllib.parse
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone, UTC
-
+from datetime import UTC, datetime, timezone
 
 # ─── Subdomain Discovery (crt.sh) ──────────────────────────────────────────
+
 
 def subdomains(domain, include_expired=False, limit=200):
     """Find subdomains via Certificate Transparency logs."""

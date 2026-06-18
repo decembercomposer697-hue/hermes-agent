@@ -1,29 +1,30 @@
 """Tests for tools/file_operations.py — deny list, result dataclasses, helpers."""
 
 import os
-import pytest
 import subprocess
 from pathlib import Path
 from unittest.mock import MagicMock
 
+import pytest
+
 from tools.file_operations import (
-    _is_write_denied,
-    ReadResult,
-    WriteResult,
-    PatchResult,
-    SearchResult,
-    SearchMatch,
-    LintResult,
-    ShellFileOperations,
     MAX_LINE_LENGTH,
+    LintResult,
+    PatchResult,
+    ReadResult,
+    SearchMatch,
+    SearchResult,
+    ShellFileOperations,
+    WriteResult,
+    _is_write_denied,
     normalize_read_pagination,
     normalize_search_pagination,
 )
 
-
 # =========================================================================
 # Write deny list
 # =========================================================================
+
 
 class TestIsWriteDenied:
     def test_ssh_authorized_keys_denied(self):
@@ -165,7 +166,6 @@ class TestIsWriteDenied:
         # Root pairing entries (profile mode — same shape as mcp-tokens gap)
         assert _is_write_denied(str(root / "pairing" / "telegram-approved.json")) is True
         assert _is_write_denied(str(root / "pairing")) is True
-
 
 
 # =========================================================================
@@ -481,6 +481,7 @@ class TestSearchPathValidation:
     def test_search_rg_error_exit_code(self, mock_env):
         """search() should report error when rg returns exit code 2."""
         call_count = {"n": 0}
+
         def side_effect(command, **kwargs):
             call_count["n"] += 1
             if "test -e" in command:
@@ -600,7 +601,8 @@ class TestPatchReplacePostWriteVerification:
 
     def test_patch_replace_fails_when_file_not_persisted(self, mock_env):
         """write_file reports success but the re-read returns old content:
-        patch_replace must return an error, not success-with-diff."""
+        patch_replace must return an error, not success-with-diff.
+        """
         file_contents = {"/tmp/test/a.py": "hello world\n"}
 
         def side_effect(command, **kwargs):

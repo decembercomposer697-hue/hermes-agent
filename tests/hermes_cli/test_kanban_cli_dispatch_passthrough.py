@@ -30,7 +30,8 @@ def isolated_kanban_home(monkeypatch):
 def test_cli_dispatch_passes_max_in_progress_from_config(isolated_kanban_home, monkeypatch):
     """#33488: hermes kanban dispatch must pass kanban.max_in_progress from
     config to dispatch_once. Without this, the global concurrency cap is
-    unreachable from the CLI even though it works from the gateway."""
+    unreachable from the CLI even though it works from the gateway.
+    """
     from hermes_cli import kanban as kb_cli
     from hermes_cli import kanban_db
 
@@ -71,7 +72,8 @@ def test_cli_dispatch_passes_max_in_progress_from_config(isolated_kanban_home, m
 
 def test_cli_max_flag_overrides_config_max_spawn(isolated_kanban_home, monkeypatch):
     """--max on the CLI takes precedence over kanban.max_spawn in config.
-    The CLI flag is the explicit operator signal; config is the default."""
+    The CLI flag is the explicit operator signal; config is the default.
+    """
     from hermes_cli import kanban as kb_cli
     from hermes_cli import kanban_db
 
@@ -94,7 +96,8 @@ def test_cli_max_flag_overrides_config_max_spawn(isolated_kanban_home, monkeypat
 
 def test_cli_invalid_max_in_progress_silently_disables(isolated_kanban_home, monkeypatch):
     """Invalid kanban.max_in_progress values (0, negative, non-int) should
-    silently fall through to None — no crash, no surprise behavior."""
+    silently fall through to None — no crash, no surprise behavior.
+    """
     from hermes_cli import kanban as kb_cli
     from hermes_cli import kanban_db
 
@@ -120,7 +123,8 @@ def test_kanban_swarm_uses_existing_humanizer_skill():
     crashed with 'Unknown skill(s): avoid-ai-writing' on every retry.
 
     Verify the synthesizer card now uses the bundled 'humanizer' skill
-    which actually exists at skills/creative/humanizer/SKILL.md."""
+    which actually exists at skills/creative/humanizer/SKILL.md.
+    """
     import pathlib
 
     swarm_path = (

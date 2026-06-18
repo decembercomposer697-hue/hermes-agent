@@ -20,11 +20,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from hermes_constants import PARTIAL_STREAM_STUB_ID, FINISH_REASON_LENGTH
 from agent.conversation_loop import _get_continuation_prompt
-
+from hermes_constants import FINISH_REASON_LENGTH, PARTIAL_STREAM_STUB_ID
 
 # ── Helpers (mirrors test_streaming.py) ────────────────────────────────────
+
 
 def _make_stream_chunk(content=None, tool_calls=None, finish_reason=None):
     delta = SimpleNamespace(
@@ -59,13 +59,15 @@ def _make_agent():
 
 class TestPartialStreamStubFinishReason:
     """The stub returned by interruptible_streaming_api_call when the
-    upstream connection dies mid-flight."""
+    upstream connection dies mid-flight.
+    """
 
     @patch("run_agent.AIAgent._create_request_openai_client")
     @patch("run_agent.AIAgent._close_request_openai_client")
     def test_text_only_partial_returns_length(self, _mock_close, mock_create, monkeypatch):
         """#30963: text-only partials must classify as length so the loop
-        keeps continuing instead of exiting with budget remaining."""
+        keeps continuing instead of exiting with budget remaining.
+        """
 
         def _stalling_stream():
             yield _make_stream_chunk(content="Here's my answer so far")
@@ -96,7 +98,8 @@ class TestPartialStreamStubFinishReason:
         """Mid-tool-call partials now use finish_reason=length so the
         conversation loop's continuation machinery fires — bounded 3-retry
         with guidance to break output into smaller chunks (#31998).
-        tool_calls=None is preserved, so no tool auto-executes."""
+        tool_calls=None is preserved, so no tool auto-executes.
+        """
 
         def _stalling_stream():
             yield _make_stream_chunk(content="Let me write the audit: ")
@@ -199,7 +202,8 @@ class TestCleanStreamEndMidToolCall:
     ):
         """Control: when the provider DOES send finish_reason='length' with
         partial tool args, it is a genuine output cap — keep the existing
-        non-stub behaviour (boost max_tokens and retry)."""
+        non-stub behaviour (boost max_tokens and retry).
+        """
 
         def _capped_stream():
             yield _make_stream_chunk(tool_calls=[
@@ -236,11 +240,13 @@ class TestCleanStreamEndMidToolCall:
 class TestLengthContinuationPromptBranching:
     """When finish_reason=length, the continuation prompt that reaches the
     model has to tell the truth: real truncation vs. network interruption
-    vs. dropped tool call (#31998).  Three distinct prompts now exist."""
+    vs. dropped tool call (#31998).  Three distinct prompts now exist.
+    """
 
     def _simulate_branch(self, response_id: str, dropped_tools=None) -> str:
         """Return the continuation prompt text the loop would inject for
-        a `finish_reason=length` response with the given id."""
+        a `finish_reason=length` response with the given id.
+        """
         is_partial = response_id == PARTIAL_STREAM_STUB_ID
         return _get_continuation_prompt(is_partial, dropped_tools)
 
@@ -261,7 +267,8 @@ class TestLengthContinuationPromptBranching:
     def test_dropped_tool_call_uses_chunking_prompt(self):
         """When the stub dropped a tool call, the continuation prompt
         must guide the model to break its output into smaller chunks
-        instead of retrying the same large tool call (#31998)."""
+        instead of retrying the same large tool call (#31998).
+        """
         prompt = self._simulate_branch(
             PARTIAL_STREAM_STUB_ID, dropped_tools=["write_file"],
         )
@@ -277,7 +284,8 @@ class TestLengthContinuationPromptBranching:
 @pytest.fixture
 def loop_agent():
     """AIAgent with a mocked OpenAI client (mirrors test_run_agent's fixture)
-    so we can stage a stub + continuation pair on .chat.completions.create."""
+    so we can stage a stub + continuation pair on .chat.completions.create.
+    """
     from run_agent import AIAgent
     with (
         patch("run_agent.get_tool_definitions", return_value=[]),
@@ -302,15 +310,17 @@ def loop_agent():
 
 class TestConversationLoopPartialStreamContinuation:
     """End-to-end: a partial-stream stub feeds the loop and the loop
-    asks for continuation instead of exiting with finish_reason=stop."""
+    asks for continuation instead of exiting with finish_reason=stop.
+    """
 
     def test_partial_stream_stub_does_not_exit_loop_immediately(self, loop_agent):
         """The stub from chat_completion_helpers used to exit the loop with
         text_response(finish_reason=stop). Now finish_reason=length routes
         through length_continue_retries — the loop persists the partial
-        content and asks the model to continue."""
+        content and asks the model to continue.
+        """
 
-        from tests.run_agent.test_run_agent import _mock_response, _mock_assistant_msg
+        from tests.run_agent.test_run_agent import _mock_assistant_msg, _mock_response
 
         # First API call: the partial-stream stub (length on partial-stream-stub id).
         partial_stub = SimpleNamespace(

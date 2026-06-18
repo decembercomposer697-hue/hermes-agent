@@ -61,7 +61,8 @@ class TestGetDefaultHermesRoot:
 
     def test_docker_profile_active(self, tmp_path, monkeypatch):
         """When a Docker profile is active (HERMES_HOME=<root>/profiles/<name>),
-        returns the Docker root, not the profile dir."""
+        returns the Docker root, not the profile dir.
+        """
         docker_root = tmp_path / "opt" / "data"
         profile = docker_root / "profiles" / "coder"
         profile.mkdir(parents=True)
@@ -254,6 +255,7 @@ class TestSecureParentDir:
 
         # Mock Path.resolve to return a short path regardless of OS quirks
         original_resolve = Path.resolve
+
         def mock_resolve(self):
             if str(self) == "/x/y":
                 return Path("/x")

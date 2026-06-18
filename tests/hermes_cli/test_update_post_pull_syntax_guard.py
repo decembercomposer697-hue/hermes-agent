@@ -19,10 +19,10 @@ from types import SimpleNamespace
 
 from hermes_cli import main as hermes_main
 
-
 # ---------------------------------------------------------------------------
 # _capture_head_sha
 # ---------------------------------------------------------------------------
+
 
 def test_capture_head_sha_returns_stripped_sha(monkeypatch, tmp_path):
     def fake_run(cmd, **kwargs):
@@ -118,7 +118,8 @@ def test_validate_critical_files_syntax_detects_break_in_main_py(tmp_path):
 
 def test_validate_critical_files_syntax_tolerates_missing_files(tmp_path):
     """A refactor may legitimately remove one of the critical files — the
-    guard should skip missing files, not falsely flag the install as broken."""
+    guard should skip missing files, not falsely flag the install as broken.
+    """
     # Populate everything except hermes_constants.py
     for relpath in hermes_main._UPDATE_CRITICAL_FILES:
         if relpath == "hermes_constants.py":

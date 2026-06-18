@@ -19,9 +19,7 @@ if sys.platform == "win32":
 import curses
 import re
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-
-
+from unittest.mock import MagicMock, patch
 
 # Path to the source files under test
 _SRC_ROOT = Path(__file__).parent.parent.parent / "hermes_cli"
@@ -113,7 +111,7 @@ class TestSourceCodeGuardrails:
     introduced by copy-paste of the old pattern.
     """
 
-    _RAW_COLOR_8_PATTERN = re.compile(r'init_pair\(\d+,\s*8\s*,')
+    _RAW_COLOR_8_PATTERN = re.compile(r"init_pair\(\d+,\s*8\s*,")
 
     def test_no_raw_color_8_in_plugins_cmd(self):
         source = (_SRC_ROOT / "plugins_cmd.py").read_text()

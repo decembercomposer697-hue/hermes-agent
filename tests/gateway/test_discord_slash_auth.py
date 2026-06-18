@@ -19,7 +19,6 @@ import pytest
 
 from gateway.config import PlatformConfig
 
-
 # ---------------------------------------------------------------------------
 # Discord module mock — borrowed from test_discord_slash_commands.py so this
 # file runs on machines without discord.py installed.
@@ -105,7 +104,8 @@ def _isolate_discord_env(monkeypatch):
 def _stub_discord_permissions(monkeypatch):
     """Pin discord.Permissions to a plain stand-in so tests can assert the
     bitfield value regardless of whether real discord.py or a sibling test
-    module's MagicMock is loaded."""
+    module's MagicMock is loaded.
+    """
     import discord
 
     class _Perm:
@@ -396,6 +396,7 @@ def test_visibility_hide_helper_zeroes_perms(adapter):
 def test_visibility_hide_tolerates_unsetable_command(adapter, caplog):
     class _Frozen:
         __slots__ = ("name",)
+
         def __init__(self, name):
             self.name = name
 
@@ -412,7 +413,6 @@ def test_visibility_hide_tolerates_unsetable_command(adapter, caplog):
 # os import for test_visibility_hide_off_by_default_is_noop
 import os
 
-
 # ---------------------------------------------------------------------------
 # Fail-closed parity on malformed slash auth context
 # ---------------------------------------------------------------------------
@@ -424,7 +424,8 @@ async def test_missing_channel_id_rejected_when_channel_policy_configured(
 ):
     """A guild interaction without a resolvable channel id must fail
     closed when DISCORD_ALLOWED_CHANNELS is configured. Without this
-    guard the entire channel-policy block silently fell through."""
+    guard the entire channel-policy block silently fell through.
+    """
     monkeypatch.setenv("DISCORD_ALLOWED_CHANNELS", "1111,2222")
     interaction = _make_interaction("100200300", channel_id=None)
     assert await adapter._check_slash_authorization(interaction, "/help") is False
@@ -434,7 +435,8 @@ async def test_missing_channel_id_rejected_when_channel_policy_configured(
 @pytest.mark.asyncio
 async def test_missing_channel_id_allowed_when_no_channel_policy(adapter):
     """No DISCORD_ALLOWED_CHANNELS configured + missing channel id: still
-    pass through the channel block (matches no-allowlist default)."""
+    pass through the channel block (matches no-allowlist default).
+    """
     interaction = _make_interaction("100200300", channel_id=None)
     assert await adapter._check_slash_authorization(interaction, "/help") is True
 
@@ -442,7 +444,8 @@ async def test_missing_channel_id_allowed_when_no_channel_policy(adapter):
 @pytest.mark.asyncio
 async def test_missing_user_rejected_when_allowlist_configured(adapter):
     """interaction.user is None with a user/role allowlist active:
-    fail closed without raising AttributeError."""
+    fail closed without raising AttributeError.
+    """
     adapter._allowed_user_ids = {"100200300"}
     interaction = _make_interaction("100200300", user=None)
     # Must not raise — must return False with an ephemeral rejection
@@ -454,7 +457,8 @@ async def test_missing_user_rejected_when_allowlist_configured(adapter):
 async def test_missing_user_allowed_when_no_allowlist_configured(adapter):
     """interaction.user is None but no allowlist configured: allow
     (preserves no-allowlist back-compat -- anyone is allowed when no
-    policy is in effect)."""
+    policy is in effect).
+    """
     interaction = _make_interaction("100200300", user=None)
     assert await adapter._check_slash_authorization(interaction, "/help") is True
 
@@ -467,7 +471,8 @@ async def test_missing_user_allowed_when_no_allowlist_configured(adapter):
 @pytest.mark.asyncio
 async def test_thread_parent_in_allowlist_passes(adapter, monkeypatch):
     """Thread whose parent channel is on DISCORD_ALLOWED_CHANNELS passes
-    even though the thread id itself isn't on the list."""
+    even though the thread id itself isn't on the list.
+    """
     monkeypatch.setenv("DISCORD_ALLOWED_CHANNELS", "5555")
     interaction = _make_interaction(
         "100200300", channel_id=9999, in_thread=True, parent_channel_id=5555,
@@ -478,7 +483,8 @@ async def test_thread_parent_in_allowlist_passes(adapter, monkeypatch):
 @pytest.mark.asyncio
 async def test_thread_parent_in_ignorelist_rejects(adapter, monkeypatch):
     """Thread whose parent channel is on DISCORD_IGNORED_CHANNELS rejects
-    even when the thread id itself isn't ignored."""
+    even when the thread id itself isn't ignored.
+    """
     monkeypatch.setenv("DISCORD_IGNORED_CHANNELS", "5555")
     interaction = _make_interaction(
         "100200300", channel_id=9999, in_thread=True, parent_channel_id=5555,
@@ -490,7 +496,8 @@ async def test_thread_parent_in_ignorelist_rejects(adapter, monkeypatch):
 async def test_ignored_beats_allowed(adapter, monkeypatch):
     """Channel listed in BOTH allowed and ignored: the ignored entry wins.
     Anything else would be a foot-gun where adding to ignored does nothing
-    if the channel is also explicitly allowed."""
+    if the channel is also explicitly allowed.
+    """
     monkeypatch.setenv("DISCORD_ALLOWED_CHANNELS", "1111")
     monkeypatch.setenv("DISCORD_IGNORED_CHANNELS", "1111")
     interaction = _make_interaction("100200300", channel_id=1111)
@@ -506,7 +513,8 @@ async def test_ignored_beats_allowed(adapter, monkeypatch):
 async def test_notify_falls_back_to_slack_on_telegram_soft_fail(adapter):
     """adapter.send returning SendResult(success=False) must NOT short-
     circuit the fallback chain. Treating a soft failure as delivered
-    means a Telegram outage swallows alerts silently."""
+    means a Telegram outage swallows alerts silently.
+    """
     from gateway.session import Platform
 
     soft_fail = SimpleNamespace(success=False, error="rate limited")
@@ -534,7 +542,8 @@ async def test_notify_falls_back_to_slack_on_telegram_soft_fail(adapter):
 async def test_notify_returns_on_telegram_truthy_success(adapter):
     """adapter.send returning SendResult(success=True) -- or any object
     without a falsy success attribute -- should still short-circuit at
-    Telegram. (This guards against the soft-fail patch over-correcting.)"""
+    Telegram. (This guards against the soft-fail patch over-correcting.)
+    """
     from gateway.session import Platform
 
     ok = SimpleNamespace(success=True, message_id="m1")
@@ -620,7 +629,8 @@ async def test_skill_autocomplete_returns_empty_for_unauthorized(
 ):
     """Autocomplete must not leak the installed skill catalog to users
     who can't run /skill. With DISCORD_ALLOWED_USERS configured and the
-    interaction user outside it, the autocomplete callback returns []."""
+    interaction user outside it, the autocomplete callback returns [].
+    """
     adapter._allowed_user_ids = {"100200300"}
     entries = [
         ("alpha", "First skill", "/alpha"),
@@ -662,7 +672,8 @@ async def test_skill_handler_rejects_before_dispatch_for_unauthorized(
     """The /skill handler must call _check_slash_authorization BEFORE
     skill_lookup. Otherwise unknown vs known names produce divergent
     responses ("Unknown skill: foo" vs auth rejection) which is a
-    catalog-probing oracle."""
+    catalog-probing oracle.
+    """
     adapter._allowed_user_ids = {"100200300"}
     entries = [("alpha", "First skill", "/alpha")]
     handler, _autocomplete = _capture_skill_registration(
@@ -697,7 +708,8 @@ async def test_skill_handler_known_and_unknown_produce_same_rejection(
 ):
     """An unauthorized user probing for valid skill names must see the
     same rejection text regardless of whether the name they tried is
-    on the registered catalog."""
+    on the registered catalog.
+    """
     adapter._allowed_user_ids = {"100200300"}
     entries = [("alpha", "First skill", "/alpha")]
     handler, _ = _capture_skill_registration(adapter, monkeypatch, entries)
@@ -724,7 +736,8 @@ async def test_skill_handler_dispatches_for_authorized(
     adapter, monkeypatch,
 ):
     """Sanity: an authorized user reaches _run_simple_slash with the
-    resolved cmd_key and arguments."""
+    resolved cmd_key and arguments.
+    """
     adapter._allowed_user_ids = {"100200300"}
     entries = [("alpha", "First skill", "/alpha")]
     handler, _ = _capture_skill_registration(adapter, monkeypatch, entries)

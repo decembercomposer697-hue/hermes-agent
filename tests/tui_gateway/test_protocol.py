@@ -104,11 +104,13 @@ def test_write_json_unicode_encode_error_re_raises(server):
     """A non-UTF-8 stdout encoding raises UnicodeEncodeError (a ValueError
     subclass).  It must NOT be swallowed as 'peer gone' — that would let
     `entry.py` exit cleanly via the False path and hide the real config
-    bug.  We re-raise so the existing crash-log infrastructure records it."""
+    bug.  We re-raise so the existing crash-log infrastructure records it.
+    """
 
     class _AsciiOnly:
         def write(self, line):
             line.encode("ascii")  # raises UnicodeEncodeError on non-ascii
+
         def flush(self): pass
 
     server._real_stdout = _AsciiOnly()
@@ -118,7 +120,8 @@ def test_write_json_unicode_encode_error_re_raises(server):
 
 def test_write_json_unrelated_value_error_re_raises(server):
     """Only ValueError('...closed file...') means peer gone.  Other
-    ValueErrors are programming errors and must surface."""
+    ValueErrors are programming errors and must surface.
+    """
 
     class _BadValue:
         def write(self, _): raise ValueError("something else entirely")
@@ -132,7 +135,8 @@ def test_write_json_unrelated_value_error_re_raises(server):
 def test_write_json_non_serializable_payload_re_raises(server):
     """Non-JSON-safe payloads are programming errors — they must NOT be
     silently dropped via the False path (which would trigger a clean exit
-    in entry.py and mask the real bug)."""
+    in entry.py and mask the real bug).
+    """
     import io
 
     server._real_stdout = io.StringIO()
@@ -142,7 +146,8 @@ def test_write_json_non_serializable_payload_re_raises(server):
 
 def test_write_json_peer_gone_oserror_on_flush_returns_false(server):
     """A flush that raises a peer-gone OSError (EPIPE) must not strand
-    the lock or crash; it returns False so the dispatcher exits cleanly."""
+    the lock or crash; it returns False so the dispatcher exits cleanly.
+    """
     import errno
 
     written = []
@@ -159,7 +164,8 @@ def test_write_json_peer_gone_oserror_on_flush_returns_false(server):
 def test_write_json_non_peer_gone_oserror_re_raises(server):
     """Host I/O failures (ENOSPC, EACCES, EIO …) are NOT peer-gone — they
     must re-raise so the crash log records them instead of looking like
-    a clean disconnect via the False path."""
+    a clean disconnect via the False path.
+    """
     import errno
 
     class _DiskFull:
@@ -203,7 +209,8 @@ def test_disable_flush_env_var_actually_wires_to_module_constant(monkeypatch):
     `tui_gateway.transport` fresh actually flips `_DISABLE_FLUSH` true.
 
     Reloads only the transport module — server.py is untouched so its
-    atexit hooks/worker pool stay intact."""
+    atexit hooks/worker pool stay intact.
+    """
     import importlib
 
     monkeypatch.setenv("HERMES_TUI_GATEWAY_NO_FLUSH", "1")
@@ -338,7 +345,8 @@ def test_session_resume_returns_hydrated_messages(server, monkeypatch):
 
 def test_session_resume_handles_multimodal_list_content(server, monkeypatch):
     """A user message persisted with list-shaped multimodal content used to
-    crash session resume with ``'list' object has no attribute 'strip'``."""
+    crash session resume with ``'list' object has no attribute 'strip'``.
+    """
 
     multimodal_user = {
         "role": "user",

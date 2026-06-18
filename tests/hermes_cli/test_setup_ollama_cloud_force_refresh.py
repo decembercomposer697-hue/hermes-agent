@@ -6,14 +6,14 @@ serving a stale cache (models.dev only, no live API probe) for up to an hour.
 from __future__ import annotations
 
 
-
 def test_setup_ollama_cloud_passes_force_refresh(monkeypatch):
     """The provider-setup model-fetch for ollama-cloud must pass ``force_refresh=True``."""
     # The ollama-cloud branch lives in ``_model_flow_api_key_provider``, which was
     # extracted from main.py into hermes_cli/model_setup_flows.py (god-file
     # decomposition Phase 2). Inspect the module the code now lives in.
-    import hermes_cli.model_setup_flows as flows_mod
     import inspect
+
+    import hermes_cli.model_setup_flows as flows_mod
 
     src = inspect.getsource(flows_mod)
 

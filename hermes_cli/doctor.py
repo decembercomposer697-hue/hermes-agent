@@ -1,16 +1,15 @@
-"""
-Doctor command for hermes CLI.
+"""Doctor command for hermes CLI.
 
 Diagnoses issues with Hermes Agent setup.
 """
 
 import os
-import sys
-import subprocess
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
-from hermes_cli.config import get_project_root, get_hermes_home, get_env_path
+from hermes_cli.config import get_env_path, get_hermes_home, get_project_root
 from hermes_cli.env_loader import load_hermes_dotenv
 from hermes_constants import display_hermes_home
 
@@ -26,7 +25,6 @@ from hermes_cli.colors import Colors, color
 from hermes_cli.models import _HERMES_USER_AGENT
 from hermes_constants import OPENROUTER_MODELS_URL
 from utils import base_url_host_matches
-
 
 _PROVIDER_ENV_HINTS = (
     "OPENROUTER_API_KEY",
@@ -182,11 +180,14 @@ def _has_healthy_oauth_fallback_for_apikey_provider(provider_label: str) -> bool
 def check_ok(text: str, detail: str = ""):
     print(f"  {color('✓', Colors.GREEN)} {text}" + (f" {color(detail, Colors.DIM)}" if detail else ""))
 
+
 def check_warn(text: str, detail: str = ""):
     print(f"  {color('⚠', Colors.YELLOW)} {text}" + (f" {color(detail, Colors.DIM)}" if detail else ""))
 
+
 def check_fail(text: str, detail: str = ""):
     print(f"  {color('✗', Colors.RED)} {text}" + (f" {color(detail, Colors.DIM)}" if detail else ""))
+
 
 def check_info(text: str):
     print(f"    {color('→', Colors.CYAN)} {text}")
@@ -361,24 +362,24 @@ def _build_apikey_providers_list() -> list:
     already present — adding plugins/model-providers/<name>/ is sufficient to get into doctor.
     """
     _static = [
-        ("Z.AI / GLM",      ("GLM_API_KEY", "ZAI_API_KEY", "Z_AI_API_KEY"), "https://api.z.ai/api/paas/v4/models", "GLM_BASE_URL", True),
-        ("Kimi / Moonshot",  ("KIMI_API_KEY",),                              "https://api.moonshot.ai/v1/models",   "KIMI_BASE_URL", True),
-        ("StepFun Step Plan", ("STEPFUN_API_KEY",),                          "https://api.stepfun.ai/step_plan/v1/models", "STEPFUN_BASE_URL", True),
-        ("Kimi / Moonshot (China)", ("KIMI_CN_API_KEY",),                    "https://api.moonshot.cn/v1/models",   None, True),
-        ("Arcee AI",         ("ARCEEAI_API_KEY",),                           "https://api.arcee.ai/api/v1/models",  "ARCEE_BASE_URL", True),
-        ("GMI Cloud",        ("GMI_API_KEY",),                               "https://api.gmi-serving.com/v1/models", "GMI_BASE_URL", True),
-        ("DeepSeek",         ("DEEPSEEK_API_KEY",),                          "https://api.deepseek.com/v1/models",  "DEEPSEEK_BASE_URL", True),
-        ("Hugging Face",     ("HF_TOKEN",),                                  "https://router.huggingface.co/v1/models", "HF_BASE_URL", True),
-        ("NVIDIA NIM",       ("NVIDIA_API_KEY",),                            "https://integrate.api.nvidia.com/v1/models", "NVIDIA_BASE_URL", True),
-        ("Alibaba/DashScope", ("DASHSCOPE_API_KEY",),                        "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/models", "DASHSCOPE_BASE_URL", True),
+        ("Z.AI / GLM", ("GLM_API_KEY", "ZAI_API_KEY", "Z_AI_API_KEY"), "https://api.z.ai/api/paas/v4/models", "GLM_BASE_URL", True),
+        ("Kimi / Moonshot", ("KIMI_API_KEY",), "https://api.moonshot.ai/v1/models", "KIMI_BASE_URL", True),
+        ("StepFun Step Plan", ("STEPFUN_API_KEY",), "https://api.stepfun.ai/step_plan/v1/models", "STEPFUN_BASE_URL", True),
+        ("Kimi / Moonshot (China)", ("KIMI_CN_API_KEY",), "https://api.moonshot.cn/v1/models", None, True),
+        ("Arcee AI", ("ARCEEAI_API_KEY",), "https://api.arcee.ai/api/v1/models", "ARCEE_BASE_URL", True),
+        ("GMI Cloud", ("GMI_API_KEY",), "https://api.gmi-serving.com/v1/models", "GMI_BASE_URL", True),
+        ("DeepSeek", ("DEEPSEEK_API_KEY",), "https://api.deepseek.com/v1/models", "DEEPSEEK_BASE_URL", True),
+        ("Hugging Face", ("HF_TOKEN",), "https://router.huggingface.co/v1/models", "HF_BASE_URL", True),
+        ("NVIDIA NIM", ("NVIDIA_API_KEY",), "https://integrate.api.nvidia.com/v1/models", "NVIDIA_BASE_URL", True),
+        ("Alibaba/DashScope", ("DASHSCOPE_API_KEY",), "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/models", "DASHSCOPE_BASE_URL", True),
         # MiniMax global: /v1 endpoint supports /models.
-        ("MiniMax",          ("MINIMAX_API_KEY",),                           "https://api.minimax.io/v1/models",    "MINIMAX_BASE_URL", True),
+        ("MiniMax", ("MINIMAX_API_KEY",), "https://api.minimax.io/v1/models", "MINIMAX_BASE_URL", True),
         # MiniMax CN: /v1 endpoint does NOT support /models (returns 404).
-        ("MiniMax (China)",  ("MINIMAX_CN_API_KEY",),                        "https://api.minimaxi.com/v1/models",  "MINIMAX_CN_BASE_URL", False),
-        ("Kilo Code",        ("KILOCODE_API_KEY",),                          "https://api.kilo.ai/api/gateway/models", "KILOCODE_BASE_URL", True),
-        ("OpenCode Zen",     ("OPENCODE_ZEN_API_KEY",),                      "https://opencode.ai/zen/v1/models",  "OPENCODE_ZEN_BASE_URL", True),
+        ("MiniMax (China)", ("MINIMAX_CN_API_KEY",), "https://api.minimaxi.com/v1/models", "MINIMAX_CN_BASE_URL", False),
+        ("Kilo Code", ("KILOCODE_API_KEY",), "https://api.kilo.ai/api/gateway/models", "KILOCODE_BASE_URL", True),
+        ("OpenCode Zen", ("OPENCODE_ZEN_API_KEY",), "https://opencode.ai/zen/v1/models", "OPENCODE_ZEN_BASE_URL", True),
         # OpenCode Go has no shared /models endpoint; skip the health check.
-        ("OpenCode Go",      ("OPENCODE_GO_API_KEY",),                       None,                                  "OPENCODE_GO_BASE_URL", False),
+        ("OpenCode Go", ("OPENCODE_GO_API_KEY",), None, "OPENCODE_GO_BASE_URL", False),
     ]
     _known_names = {t[0] for t in _static}
     # Also index by profile canonical name so profiles without display_name
@@ -447,8 +448,8 @@ def _build_apikey_providers_list() -> list:
 
 def run_doctor(args):
     """Run diagnostic checks."""
-    should_fix = getattr(args, 'fix', False)
-    ack_target = getattr(args, 'ack', None)
+    should_fix = getattr(args, "fix", False)
+    ack_target = getattr(args, "ack", None)
 
     # Doctor runs from the interactive CLI, so CLI-gated tool availability
     # checks (like cronjob management) should see the same context as `hermes`.
@@ -599,7 +600,7 @@ def run_doctor(args):
     
     _section("Configuration Files")
     # Check ~/.hermes/.env (primary location for user config)
-    env_path = HERMES_HOME / '.env'
+    env_path = HERMES_HOME / ".env"
     if env_path.exists():
         check_ok(f"{_DHH}/.env file exists")
         
@@ -615,7 +616,7 @@ def run_doctor(args):
             issues.append("Run 'hermes setup' to configure API keys")
     else:
         # Also check project root as fallback
-        fallback_env = PROJECT_ROOT / '.env'
+        fallback_env = PROJECT_ROOT / ".env"
         if fallback_env.exists():
             check_ok(".env file exists (in project directory)")
         else:
@@ -638,7 +639,7 @@ def run_doctor(args):
                 issues.append("Run 'hermes setup' to create .env")
     
     # Check ~/.hermes/config.yaml (primary) or project cli-config.yaml (fallback)
-    config_path = HERMES_HOME / 'config.yaml'
+    config_path = HERMES_HOME / "config.yaml"
     if config_path.exists():
         check_ok(f"{_DHH}/config.yaml exists")
 
@@ -655,6 +656,8 @@ def run_doctor(args):
             try:
                 from hermes_cli.auth import (
                     PROVIDER_REGISTRY,
+                )
+                from hermes_cli.auth import (
                     resolve_provider as _resolve_auth_provider,
                 )
                 known_providers = set(PROVIDER_REGISTRY.keys()) | {"openrouter", "custom", "auto"}
@@ -662,9 +665,13 @@ def run_doctor(args):
                 _resolve_auth_provider = None
                 pass
             try:
-                from hermes_cli.config import get_compatible_custom_providers as _compatible_custom_providers
+                from hermes_cli.config import (
+                    get_compatible_custom_providers as _compatible_custom_providers,
+                )
                 from hermes_cli.providers import (
                     normalize_provider as _normalize_catalog_provider,
+                )
+                from hermes_cli.providers import (
                     resolve_provider_full as _resolve_provider_full,
                 )
             except Exception:
@@ -817,13 +824,13 @@ def run_doctor(args):
         except Exception as e:
             check_warn("Could not validate model/provider config", f"({e})")
     else:
-        fallback_config = PROJECT_ROOT / 'cli-config.yaml'
+        fallback_config = PROJECT_ROOT / "cli-config.yaml"
         if fallback_config.exists():
             check_ok("cli-config.yaml exists (in project directory)")
         else:
             if should_fix:
                 config_path.parent.mkdir(parents=True, exist_ok=True)
-                example_config = PROJECT_ROOT / 'cli-config.yaml.example'
+                example_config = PROJECT_ROOT / "cli-config.yaml.example"
                 if example_config.exists():
                     shutil.copy2(str(example_config), str(config_path))
                     check_ok(f"Created {_DHH}/config.yaml from cli-config.yaml.example")
@@ -836,7 +843,7 @@ def run_doctor(args):
                 check_warn("config.yaml not found", "(using defaults)")
 
     # Check config version and stale keys
-    config_path = HERMES_HOME / 'config.yaml'
+    config_path = HERMES_HOME / "config.yaml"
     if config_path.exists():
         try:
             from hermes_cli.config import check_config_version, migrate_config
@@ -911,6 +918,7 @@ def run_doctor(args):
         # which the startup bridge may already have overridden.
         try:
             import yaml
+
             from hermes_cli.config import load_env, remove_env_value
             with open(config_path, encoding="utf-8") as f:
                 raw_config = yaml.safe_load(f) or {}
@@ -1003,10 +1011,10 @@ def run_doctor(args):
 
     try:
         from hermes_cli.auth import (
-            get_nous_auth_status,
             get_codex_auth_status,
             get_gemini_oauth_auth_status,
             get_minimax_oauth_auth_status,
+            get_nous_auth_status,
         )
 
         nous_status = get_nous_auth_status()
@@ -1459,9 +1467,9 @@ def run_doctor(args):
                 # to eagerly load in every `hermes doctor` invocation.
                 from tools.browser_tool import (
                     _chromium_installed,
-                    _is_camofox_mode,
-                    _get_cloud_provider,
                     _get_cdp_override,
+                    _get_cloud_provider,
+                    _is_camofox_mode,
                     _using_lightpanda_engine,
                 )
             except Exception:
@@ -1662,11 +1670,12 @@ def run_doctor(args):
             return _ConnectivityResult("Anthropic API", [], [])
         try:
             import httpx
+
             from agent.anthropic_adapter import (
-                _is_oauth_token,
                 _COMMON_BETAS,
-                _OAUTH_ONLY_BETAS,
                 _CONTEXT_1M_BETA,
+                _OAUTH_ONLY_BETAS,
+                _is_oauth_token,
             )
             headers = {"anthropic-version": "2023-06-01"}
             is_oauth = _is_oauth_token(key)
@@ -1887,8 +1896,8 @@ def run_doctor(args):
 
         try:
             from agent.azure_identity_adapter import (
-                EntraIdentityConfig,
                 SCOPE_AI_AZURE_DEFAULT,
+                EntraIdentityConfig,
                 describe_active_credential,
                 has_azure_identity_installed,
             )
@@ -2008,7 +2017,7 @@ def run_doctor(args):
     try:
         # Add project root to path for imports
         sys.path.insert(0, str(PROJECT_ROOT))
-        from model_tools import check_tool_availability, TOOLSET_REQUIREMENTS
+        from model_tools import TOOLSET_REQUIREMENTS, check_tool_availability
         
         available, unavailable = check_tool_availability()
         available, unavailable = _apply_doctor_tool_availability_overrides(available, unavailable)
@@ -2089,7 +2098,10 @@ def run_doctor(args):
         check_ok("Built-in memory active", "(no external provider configured — this is fine)")
     elif _active_memory_provider == "honcho":
         try:
-            from plugins.memory.honcho.client import HonchoClientConfig, resolve_config_path
+            from plugins.memory.honcho.client import (
+                HonchoClientConfig,
+                resolve_config_path,
+            )
             hcfg = HonchoClientConfig.from_global_config()
             _honcho_cfg_path = resolve_config_path()
 
@@ -2113,7 +2125,10 @@ def run_doctor(args):
                     issues,
                 )
             else:
-                from plugins.memory.honcho.client import get_honcho_client, reset_honcho_client
+                from plugins.memory.honcho.client import (
+                    get_honcho_client,
+                    reset_honcho_client,
+                )
                 reset_honcho_client()
                 try:
                     get_honcho_client(hcfg)
@@ -2171,8 +2186,9 @@ def run_doctor(args):
             check_warn(f"{_active_memory_provider} check failed", str(_e))
 
     try:
-        from hermes_cli.profiles import list_profiles, _get_wrapper_dir, profile_exists
         import re as _re
+
+        from hermes_cli.profiles import _get_wrapper_dir, list_profiles, profile_exists
 
         named_profiles = [p for p in list_profiles() if not p.is_default]
         if named_profiles:

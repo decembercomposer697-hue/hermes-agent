@@ -131,11 +131,11 @@ def _cmd_tools(args) -> int:
 
     # Static catalog — the partners Tool Gateway routes to today.
     catalog = [
-        ("web",       "Web search & extract",  "Firecrawl"),
-        ("image_gen", "Image generation",      "FAL"),
-        ("tts",       "Text-to-speech",        "OpenAI TTS"),
-        ("browser",   "Browser automation",    "Browser Use"),
-        ("modal",     "Cloud terminal",        "Modal"),
+        ("web", "Web search & extract", "Firecrawl"),
+        ("image_gen", "Image generation", "FAL"),
+        ("tts", "Text-to-speech", "OpenAI TTS"),
+        ("browser", "Browser automation", "Browser Use"),
+        ("modal", "Cloud terminal", "Modal"),
     ]
 
     print()

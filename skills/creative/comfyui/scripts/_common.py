@@ -1,5 +1,4 @@
-"""
-_common.py — Shared logic for ComfyUI skill scripts.
+"""_common.py — Shared logic for ComfyUI skill scripts.
 
 Single source of truth for:
 - HTTP transport (with retry/backoff, streaming, timeout handling)
@@ -21,10 +20,10 @@ import re
 import sys
 import time
 import uuid
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-from collections.abc import Iterator
 from urllib.parse import urlparse
 
 # Optional: prefer `requests` if installed (better redirects, streaming, header handling)
@@ -832,5 +831,5 @@ def emit_json(obj: Any, *, indent: int = 2) -> None:
 
 
 def log(msg: str) -> None:
-    """stderr log with consistent prefix (so JSON stdout stays clean)."""
+    """Stderr log with consistent prefix (so JSON stdout stays clean)."""
     print(f"[comfyui-skill] {msg}", file=sys.stderr)

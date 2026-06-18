@@ -73,7 +73,8 @@ def _sk(chat_id="42"):
 async def test_pending_drain_keeps_active_session_guard_live():
     """Fix for R5: during pending-drain cleanup, _active_sessions must stay
     populated so concurrent inbound messages can't spawn a duplicate
-    _process_message_background.  We only CLEAR the Event, never delete."""
+    _process_message_background.  We only CLEAR the Event, never delete.
+    """
     adapter = _make_adapter()
     sk = _sk()
 
@@ -134,7 +135,8 @@ async def test_pending_drain_keeps_active_session_guard_live():
 async def test_finally_cleanup_drains_late_arrival_pending():
     """Fix for R6: if a message lands in _pending_messages during the
     finally-block cleanup awaits, the finally must spawn a drain task
-    instead of deleting _active_sessions and dropping the message."""
+    instead of deleting _active_sessions and dropping the message.
+    """
     adapter = _make_adapter()
     sk = _sk()
 
@@ -187,7 +189,8 @@ async def test_finally_cleanup_drains_late_arrival_pending():
 @pytest.mark.asyncio
 async def test_no_pending_cleans_up_normally():
     """Regression guard: when no pending message exists, the finally
-    block must still delete _active_sessions as before (no leak)."""
+    block must still delete _active_sessions as before (no leak).
+    """
     adapter = _make_adapter()
     sk = _sk()
 

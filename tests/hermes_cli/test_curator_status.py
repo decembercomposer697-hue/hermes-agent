@@ -68,6 +68,7 @@ def curator_status_env(tmp_path, monkeypatch):
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
     import importlib
+
     import hermes_constants
     importlib.reload(hermes_constants)
     from tools import skill_usage
@@ -152,7 +153,8 @@ def test_status_shows_most_and_least_used_sections(curator_status_env):
 
 def test_status_hides_most_active_when_all_zero(curator_status_env):
     """If no skills have any activity, skip the most-active block — it's noise.
-    Least-active still shows so the user sees their catalog."""
+    Least-active still shows so the user sees their catalog.
+    """
     env = curator_status_env
     env["make_skill"]("a")
     env["make_skill"]("b")

@@ -63,7 +63,8 @@ class TestEnrichMessageWithVision:
     def test_fenced_leak_stripped_plugin_header_preserved(self, gateway_runner):
         """The fenced wrapper is stripped; plugin-specific text outside the
         fence (e.g. a "## Honcho Context" header) is left to the plugin layer.
-        Gateway core stays plugin-agnostic."""
+        Gateway core stays plugin-agnostic.
+        """
         leaked = (
             "<memory-context>\n"
             "[System note: The following is recalled memory context, NOT new "

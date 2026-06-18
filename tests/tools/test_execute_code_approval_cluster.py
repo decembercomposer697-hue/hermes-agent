@@ -24,10 +24,10 @@ import pytest
 from tools import approval as A
 from tools.thread_context import propagate_context_to_thread
 
-
 # ---------------------------------------------------------------------------
 # 1. Context + callback propagation helper
 # ---------------------------------------------------------------------------
+
 
 def test_helper_propagates_contextvar_and_approval_callback():
     from tools import terminal_tool as TT
@@ -57,7 +57,8 @@ def test_helper_propagates_contextvar_and_approval_callback():
 
 def test_helper_clears_callbacks_on_teardown():
     """A recycled worker thread must not retain the propagated callback after
-    the wrapped target finishes (mirrors the GHSA-qg5c-hvr5-hjgr teardown)."""
+    the wrapped target finishes (mirrors the GHSA-qg5c-hvr5-hjgr teardown).
+    """
     from tools import terminal_tool as TT
 
     sentinel = object()
@@ -84,8 +85,10 @@ def test_helper_clears_callbacks_on_teardown():
 def test_both_rpc_threads_use_propagation_helper():
     """Source guard: both execute_code RPC threads must wrap their target with
     propagate_context_to_thread, or the gateway approval bypass (#33057)
-    silently returns."""
+    silently returns.
+    """
     import inspect
+
     import tools.code_execution_tool as cet
 
     src = inspect.getsource(cet)
@@ -106,7 +109,8 @@ def test_both_rpc_threads_use_propagation_helper():
 @pytest.fixture
 def gw_session(monkeypatch):
     """A clean gateway session: HERMES_GATEWAY_SESSION set, a bound session
-    key, and isolated gateway queues/callbacks. Yields the session_key."""
+    key, and isolated gateway queues/callbacks. Yields the session_key.
+    """
     monkeypatch.setenv("HERMES_GATEWAY_SESSION", "1")
     monkeypatch.delenv("HERMES_INTERACTIVE", raising=False)
     monkeypatch.delenv("HERMES_CRON_SESSION", raising=False)
@@ -130,7 +134,8 @@ def gw_session(monkeypatch):
 
 def _register_resolver(session_key: str, result):
     """Register a gateway notify callback that immediately resolves the most
-    recent queued approval entry with *result* (simulating a user response)."""
+    recent queued approval entry with *result* (simulating a user response).
+    """
     def cb(_approval_data):
         with A._lock:
             entries = A._gateway_queues.get(session_key, [])
@@ -310,7 +315,8 @@ def test_env_scrub_hermes_allowlist_and_secret_blocks():
 
 def test_env_scrub_passthrough_overrides_secret_block():
     """A skill/config-declared passthrough var is an explicit user opt-in and
-    passes even if it matches a secret substring (precedence is intentional)."""
+    passes even if it matches a secret substring (precedence is intentional).
+    """
     from tools.code_execution_tool import _scrub_child_env
 
     env = {"MY_SERVICE_DSN": "value"}
@@ -326,7 +332,8 @@ def test_env_scrub_passthrough_overrides_secret_block():
 def test_execute_code_entry_blocks_before_spawn_when_guard_denies(monkeypatch, tmp_path):
     """Behavioral wiring test: execute_code() consults the entry guard and, on
     denial, returns the block message WITHOUT spawning the child — proven by a
-    marker file the script would create that never appears."""
+    marker file the script would create that never appears.
+    """
     import json
 
     import tools.code_execution_tool as cet
@@ -356,7 +363,8 @@ def test_env_scrub_logs_dropped_hermes_vars(caplog):
     """Dropping a non-allowlisted, non-secret HERMES_* var must be diagnosable:
     the scrub emits a one-shot debug log naming the dropped vars and pointing at
     the env_passthrough opt-in, so the silent behavior change (#27303) doesn't
-    leave users guessing why a sandbox script sees an unset HERMES_* var."""
+    leave users guessing why a sandbox script sees an unset HERMES_* var.
+    """
     import logging
 
     from tools.code_execution_tool import _scrub_child_env

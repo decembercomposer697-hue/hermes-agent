@@ -314,7 +314,7 @@ def test_compute_desktop_content_hash_stable(tmp_path, monkeypatch):
     root = _make_desktop_tree(tmp_path)
     (root / "apps" / "desktop" / "main.js").write_text("console.log('hi')", encoding="utf-8")
     (root / "package.json").write_text('{"name":"hermes"}', encoding="utf-8")
-    (root / "package-lock.json").write_text('{}', encoding="utf-8")
+    (root / "package-lock.json").write_text("{}", encoding="utf-8")
     monkeypatch.setattr(cli_main, "PROJECT_ROOT", root)
 
     h1 = cli_main._compute_desktop_content_hash(root)
@@ -428,7 +428,8 @@ def test_purge_electron_build_cache_clears_all_zips_and_unpacked_dir(tmp_path, m
     """Purge is unconditional: it removes every electron-*.zip (regardless of
     whether stdlib zipfile thinks it's corrupt) plus the half-written unpacked
     dir, because @electron/get's own SHASUM check on re-download is the real
-    validator — not a self-rolled one."""
+    validator — not a self-rolled one.
+    """
     cache = tmp_path / "electron-cache"
     # A "clean" zip and a prepended-junk zip — the latter is the real-world
     # corruption that zipfile.testzip() silently passes (it reads from the
@@ -459,7 +460,8 @@ def test_purge_electron_build_cache_clears_all_zips_and_unpacked_dir(tmp_path, m
 
 def test_purge_electron_build_cache_empty_when_nothing_present(tmp_path, monkeypatch):
     """No cached zips and no unpacked dir → nothing removed, so the caller
-    knows a retry is pointless."""
+    knows a retry is pointless.
+    """
     cache = tmp_path / "electron-cache"
     cache.mkdir()
     desktop_dir = tmp_path / "apps" / "desktop"
@@ -500,7 +502,8 @@ def test_gui_retries_pack_once_after_purging_build_cache(tmp_path, monkeypatch):
 
 def test_gui_falls_back_to_mirror_when_purge_finds_nothing(tmp_path, monkeypatch, capsys):
     """Purge clears nothing (not a cache problem) → fall back to an Electron
-    mirror once before failing, so a GitHub-blocked download self-heals."""
+    mirror once before failing, so a GitHub-blocked download self-heals.
+    """
     root = _make_desktop_tree(tmp_path)
     monkeypatch.setattr(cli_main, "PROJECT_ROOT", root)
     _make_packaged_executable(root, monkeypatch, platform="linux")
@@ -529,7 +532,8 @@ def test_gui_falls_back_to_mirror_when_purge_finds_nothing(tmp_path, monkeypatch
 
 def test_gui_does_not_override_user_electron_mirror(tmp_path, monkeypatch, capsys):
     """A user-pinned ELECTRON_MIRROR is respected: no extra mirror fallback
-    attempt (and we never swap in our default mirror)."""
+    attempt (and we never swap in our default mirror).
+    """
     root = _make_desktop_tree(tmp_path)
     monkeypatch.setattr(cli_main, "PROJECT_ROOT", root)
     _make_packaged_executable(root, monkeypatch, platform="linux")

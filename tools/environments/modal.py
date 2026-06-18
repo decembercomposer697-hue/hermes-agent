@@ -17,9 +17,9 @@ from typing import Any, Optional
 from hermes_constants import get_hermes_home
 from tools.environments.base import (
     BaseEnvironment,
-    _ThreadedProcessHandle,
     _load_json_store,
     _save_json_store,
+    _ThreadedProcessHandle,
 )
 from tools.environments.file_sync import (
     FileSyncManager,
@@ -207,8 +207,8 @@ class ModalEnvironment(BaseEnvironment):
         try:
             from tools.credential_files import (
                 get_credential_file_mounts,
-                iter_skills_files,
                 iter_cache_files,
+                iter_skills_files,
             )
 
             for mount_entry in get_credential_file_mounts():

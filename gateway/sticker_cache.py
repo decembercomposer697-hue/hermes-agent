@@ -1,5 +1,4 @@
-"""
-Sticker description cache for Telegram.
+"""Sticker description cache for Telegram.
 
 When users send stickers, we describe them via the vision tool and cache
 the descriptions keyed by file_unique_id so we don't re-analyze the same
@@ -15,7 +14,6 @@ import time
 from typing import Optional
 
 from hermes_cli.config import get_hermes_home
-
 
 CACHE_PATH = get_hermes_home() / "sticker_cache.json"
 
@@ -57,11 +55,11 @@ def _save_cache(cache: dict) -> None:
 
 
 def get_cached_description(file_unique_id: str) -> dict | None:
-    """
-    Look up a cached sticker description.
+    """Look up a cached sticker description.
 
     Returns:
         dict with keys {description, emoji, set_name, cached_at} or None.
+
     """
     cache = _load_cache()
     return cache.get(file_unique_id)
@@ -73,14 +71,14 @@ def cache_sticker_description(
     emoji: str = "",
     set_name: str = "",
 ) -> None:
-    """
-    Store a sticker description in the cache.
+    """Store a sticker description in the cache.
 
     Args:
         file_unique_id: Telegram's stable sticker identifier.
         description:    Vision-generated description text.
         emoji:          Associated emoji (e.g. "😀").
         set_name:       Sticker set name if available.
+
     """
     cache = _load_cache()
     cache[file_unique_id] = {
@@ -97,8 +95,7 @@ def build_sticker_injection(
     emoji: str = "",
     set_name: str = "",
 ) -> str:
-    """
-    Build the warm-style injection text for a sticker description.
+    """Build the warm-style injection text for a sticker description.
 
     Returns a string like:
       [The user sent a sticker 😀 from "MyPack"~ It shows: "A cat waving" (=^.w.^=)]
@@ -113,8 +110,7 @@ def build_sticker_injection(
 
 
 def build_animated_sticker_injection(emoji: str = "") -> str:
-    """
-    Build injection text for animated/video stickers we can't analyze.
+    """Build injection text for animated/video stickers we can't analyze.
     """
     if emoji:
         return (

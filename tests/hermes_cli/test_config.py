@@ -9,19 +9,19 @@ import yaml
 
 from hermes_cli.config import (
     DEFAULT_CONFIG,
+    _sanitize_env_lines,
     check_config_version,
-    get_hermes_home,
     ensure_hermes_home,
     get_compatible_custom_providers,
+    get_hermes_home,
     load_config,
     load_env,
     migrate_config,
     remove_env_value,
+    sanitize_env_file,
     save_config,
     save_env_value,
     save_env_value_secure,
-    sanitize_env_file,
-    _sanitize_env_lines,
 )
 
 
@@ -142,6 +142,7 @@ class TestLoadConfigParseFailure:
 
     def test_rewarns_after_file_edit(self, tmp_path, capsys):
         import time
+
         from hermes_cli import config as cfg_mod
         cfg_mod._CONFIG_PARSE_WARNED.clear()
 
@@ -185,7 +186,8 @@ class TestLoadConfigParseFailure:
 
     def test_backup_skips_when_same_size_bak_exists(self, tmp_path, capsys):
         """Don't churn backups: if a corrupt backup of the same size already
-        exists (same corruption already preserved), skip making another."""
+        exists (same corruption already preserved), skip making another.
+        """
         from hermes_cli import config as cfg_mod
         cfg_mod._CONFIG_PARSE_WARNED.clear()
 
@@ -204,7 +206,8 @@ class TestLoadConfigParseFailure:
 
     def test_corrupt_symlink_config_not_backed_up(self, tmp_path):
         """Symlinked config.yaml is not copied (mirrors Gemini #21541 lstat
-        guard) — avoids clobbering whatever the symlink points at."""
+        guard) — avoids clobbering whatever the symlink points at.
+        """
         import sys as _sys
         if _sys.platform == "win32":
             pytest.skip("symlink creation requires privileges on Windows")
@@ -629,6 +632,7 @@ class TestConfigMigrationSecretPrompts:
             if required_only
             else [],
         )
+
         def fake_masked_secret_prompt(prompt):
             saved["prompt"] = prompt
             return "secret"
@@ -814,7 +818,8 @@ class TestCustomProviderCompatibility:
 
     def test_providers_dict_resolves_at_runtime(self, tmp_path):
         """After migration deleted custom_providers, get_compatible_custom_providers
-        still finds entries from the providers dict."""
+        still finds entries from the providers dict.
+        """
         config_path = tmp_path / "config.yaml"
         config_path.write_text(
             yaml.safe_dump(
@@ -1034,7 +1039,8 @@ class TestEnvWriteDenylist:
     )
     def test_denylisted_keys_rejected(self, denied_key):
         """Each denylisted name raises ``ValueError`` and never reaches
-        the on-disk ``.env`` file."""
+        the on-disk ``.env`` file.
+        """
         with pytest.raises(ValueError, match="denylist"):
             save_env_value(denied_key, "anything")
 
@@ -1057,7 +1063,8 @@ class TestEnvWriteDenylist:
         location names (HOME/PROFILE/CONFIG/ENV) are. Integration
         credentials following the ``HERMES_*`` convention must keep
         working or we'd regress every provider setup wizard that
-        currently writes one of these (auth.py, Spotify, Langfuse, …)."""
+        currently writes one of these (auth.py, Spotify, Langfuse, …).
+        """
         save_env_value(allowed_key, "test-value-123")
         env = load_env()
         assert env[allowed_key] == "test-value-123"
@@ -1071,14 +1078,16 @@ class TestEnvWriteDenylist:
     def test_arbitrary_user_key_still_works(self):
         """Plugin / user-defined env vars (anything outside the
         denylist and outside ``HERMES_*``) keep working. The denylist
-        is narrow on purpose."""
+        is narrow on purpose.
+        """
         save_env_value("MY_PLUGIN_TOKEN", "plugin-secret-123")
         env = load_env()
         assert env["MY_PLUGIN_TOKEN"] == "plugin-secret-123"
 
     def test_save_env_value_secure_inherits_denylist(self):
         """The ``_secure`` variant goes through ``save_env_value`` so
-        it inherits the gate — verify, don't assume."""
+        it inherits the gate — verify, don't assume.
+        """
         with pytest.raises(ValueError, match="denylist"):
             save_env_value_secure("LD_PRELOAD", "/tmp/evil.so")
 
@@ -1086,7 +1095,8 @@ class TestEnvWriteDenylist:
         """The gate is on *write*. If ``.env`` already contains
         ``LD_PRELOAD`` (set out-of-band by the operator before this
         change shipped, or hand-edited), we don't blow up — we just
-        refuse to add or update it via the API."""
+        refuse to add or update it via the API.
+        """
         env_path = tmp_path / ".env"
         env_path.write_text("LD_PRELOAD=/something/legit.so\n")
 

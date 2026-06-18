@@ -18,9 +18,8 @@ import threading
 import time
 from unittest.mock import MagicMock
 
-
-from gateway.run import _run_planned_stop_watcher
 from gateway import status as status_mod
+from gateway.run import _run_planned_stop_watcher
 
 
 def _write_self_marker(marker, *, stale: bool = False):
@@ -253,6 +252,7 @@ def test_watcher_tolerates_marker_path_resolution_errors(tmp_path, monkeypatch, 
     from gateway import status as status_mod
 
     call_count = [0]
+
     def explode():
         call_count[0] += 1
         # First call (the one outside the loop, at thread start) is fine —

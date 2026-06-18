@@ -26,13 +26,12 @@ from unittest.mock import patch
 
 import pytest
 
+from tools.skills_guard import content_hash
 from tools.skills_hub import (
     SkillBundle,
     bundle_content_hash,
     uninstall_skill,
 )
-from tools.skills_guard import content_hash
-
 
 # =============================================================================
 # uninstall_skill: path traversal guard
@@ -129,7 +128,8 @@ class TestUninstallPathTraversal:
 
     def test_symlink_escape_rejected(self, tmp_path, hub_setup):
         """Symlinks inside SKILLS_DIR that point outside must be refused
-        after realpath resolution."""
+        after realpath resolution.
+        """
         skills_dir, hub_dir, victim = hub_setup
         # Create a "skill" that's actually a symlink to victim
         evil_link = skills_dir / "trapdoor"
@@ -196,7 +196,8 @@ class TestBundleHashFilenameSensitivity:
     def test_filename_swap_changes_hash(self):
         """Swapping content between SKILL.md and scripts/run.sh must
         produce a different hash. Without the filename in the hash,
-        these two bundles would have looked identical."""
+        these two bundles would have looked identical.
+        """
         a = self._make_bundle({"SKILL.md": "hello", "scripts/run.sh": "world"})
         b = self._make_bundle({"SKILL.md": "world", "scripts/run.sh": "hello"})
         assert bundle_content_hash(a) != bundle_content_hash(b)
@@ -209,7 +210,8 @@ class TestBundleHashFilenameSensitivity:
 
     def test_disk_hash_changes_on_filename_swap(self, tmp_path):
         """``content_hash`` on disk must also be filename-sensitive,
-        so it stays symmetric with ``bundle_content_hash``."""
+        so it stays symmetric with ``bundle_content_hash``.
+        """
         skill_a = tmp_path / "a"
         skill_a.mkdir()
         (skill_a / "SKILL.md").write_text("hello")
@@ -227,7 +229,8 @@ class TestBundleHashFilenameSensitivity:
         """Symmetry contract: the same skill, expressed as a SkillBundle
         and as a directory tree, must produce the same digest. If this
         fails, ``check_for_skill_updates`` will flag every clean
-        install as drifted."""
+        install as drifted.
+        """
         skill_dir = tmp_path / "skill"
         skill_dir.mkdir()
         (skill_dir / "SKILL.md").write_text("hello")
@@ -250,12 +253,14 @@ class TestBundleHashFilenameSensitivity:
 class TestListPendingLock:
     """list_pending writes via _cleanup_expired. Without the lock,
     a concurrent generate_code or approve_code can race against the
-    write, potentially clobbering a pending approval."""
+    write, potentially clobbering a pending approval.
+    """
 
     def test_list_pending_acquires_lock(self, tmp_path):
         """Source-grep contract: ``list_pending`` body must be wrapped
         in ``with self._lock:``. If anyone unwraps it again, the TOCTOU
-        bug returns."""
+        bug returns.
+        """
         import gateway.pairing as _pairing_mod
         source = Path(_pairing_mod.__file__).read_text(encoding="utf-8")
         # Find the list_pending function body and assert the lock

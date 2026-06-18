@@ -12,10 +12,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Imports — guarded since plugins/memory lives outside the standard test path
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(autouse=True)
 def _isolate_env(tmp_path, monkeypatch):
@@ -55,21 +55,22 @@ def _cap_retaindb_sleeps(monkeypatch):
 
 # We need the repo root on sys.path so the plugin can import agent.memory_provider
 import sys
+
 _repo_root = str(Path(__file__).resolve().parents[2])
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 
 from plugins.memory.retaindb import (
+    RetainDBMemoryProvider,
+    _build_overlay,
     _Client,
     _WriteQueue,
-    _build_overlay,
-    RetainDBMemoryProvider,
 )
-
 
 # ===========================================================================
 # _Client tests
 # ===========================================================================
+
 
 class TestClient:
     """Test the HTTP client with mocked requests."""
@@ -106,6 +107,7 @@ class TestClient:
     def test_add_memory_tries_fallback(self):
         c = self._make_client()
         call_count = 0
+
         def fake_request(method, path, **kwargs):
             nonlocal call_count
             call_count += 1
@@ -121,6 +123,7 @@ class TestClient:
     def test_delete_memory_tries_fallback(self):
         c = self._make_client()
         call_count = 0
+
         def fake_request(method, path, **kwargs):
             nonlocal call_count
             call_count += 1
@@ -136,6 +139,7 @@ class TestClient:
 # ===========================================================================
 # _WriteQueue tests
 # ===========================================================================
+
 
 class TestWriteQueue:
     """Test the SQLite-backed write queue with real SQLite."""

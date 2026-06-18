@@ -158,6 +158,7 @@ def strip_nullable_unions(
     Returns:
         The schema with nullable unions collapsed. Non-union nodes are
         returned unchanged.
+
     """
     if isinstance(schema, list):
         return [strip_nullable_unions(item, keep_nullable_hint=keep_nullable_hint) for item in schema]
@@ -330,6 +331,7 @@ def strip_pattern_and_format(tools: list[dict]) -> tuple[list[dict], int]:
     Returns:
         ``(tools, stripped_count)`` — the same list reference plus a count of
         how many ``pattern``/``format`` keywords were removed across all tools.
+
     """
     if not tools:
         return tools, 0
@@ -402,6 +404,7 @@ def strip_slash_enum(tools: list[dict]) -> tuple[list[dict], int]:
     Returns:
         ``(tools, stripped_count)`` — same list reference plus a count of
         how many ``enum`` keywords were removed.
+
     """
     if not tools:
         return tools, 0

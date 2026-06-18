@@ -1,5 +1,4 @@
-"""
-Cron job scheduling system for Hermes Agent.
+"""Cron job scheduling system for Hermes Agent.
 
 This module provides scheduled task execution, allowing the agent to:
 - Run automated tasks on schedules (cron expressions, intervals, one-shot)
@@ -16,15 +15,15 @@ duplicate execution if multiple processes overlap.
 """
 
 from cron.jobs import (
+    JOBS_FILE,
     create_job,
     get_job,
     list_jobs,
-    remove_job,
-    update_job,
     pause_job,
+    remove_job,
     resume_job,
     trigger_job,
-    JOBS_FILE,
+    update_job,
 )
 from cron.scheduler import tick
 

@@ -48,7 +48,8 @@ def _plugin_frontend_bundles() -> list[Path]:
 
 def test_there_are_plugin_bundles_to_check() -> None:
     """Sanity: the glob actually finds the bundles, so a future layout change
-    doesn't silently turn this guard into a no-op."""
+    doesn't silently turn this guard into a no-op.
+    """
     bundles = _plugin_frontend_bundles()
     names = {b.parent.parent.parent.name for b in bundles}
     # kanban + hermes-achievements are bundled today; assert at least one is

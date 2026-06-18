@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import AsyncMock
+
+import pytest
 
 from gateway.config import GatewayConfig, Platform, PlatformConfig
 from gateway.platforms.base import BasePlatformAdapter
@@ -196,8 +197,10 @@ async def test_start_gateway_replace_force_uses_terminate_pid(monkeypatch, tmp_p
     # get_running_pid returns 42 before we kill the old gateway, then None
     # after remove_pid_file() clears the record (reflects real behavior).
     _pid_state = {"alive": True}
+
     def _mock_get_running_pid():
         return 42 if _pid_state["alive"] else None
+
     def _mock_remove_pid_file():
         _pid_state["alive"] = False
     monkeypatch.setattr("gateway.status.get_running_pid", _mock_get_running_pid)
@@ -209,6 +212,7 @@ async def test_start_gateway_replace_force_uses_terminate_pid(monkeypatch, tmp_p
     # force-kill reaps the process: terminate_pid(force=True) flips it dead,
     # and the post-kill re-poll via _pid_exists then sees it gone so the
     # replacement proceeds.
+
     def _mock_terminate_pid(pid, force=False):
         calls.append((pid, force))
         if force:
@@ -342,8 +346,10 @@ async def test_start_gateway_replace_writes_takeover_marker_before_sigterm(
             return None
 
     _pid_state = {"alive": True}
+
     def _mock_get_running_pid():
         return 42 if _pid_state["alive"] else None
+
     def _mock_remove_pid_file():
         _pid_state["alive"] = False
     monkeypatch.setattr("gateway.status.get_running_pid", _mock_get_running_pid)
@@ -383,7 +389,8 @@ async def test_start_gateway_replace_clears_marker_on_permission_denied(
     monkeypatch, tmp_path,
 ):
     """If we fail to kill the existing PID (permission denied), clean up the
-    marker so it doesn't grief an unrelated future shutdown."""
+    marker so it doesn't grief an unrelated future shutdown.
+    """
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
     def write_marker(target_pid: int) -> bool:
@@ -425,7 +432,8 @@ async def test_runner_degrades_gracefully_when_all_adapters_missing(monkeypatch,
 
     In fleet deployments the same config.yaml is shared across nodes that may only
     have credentials for a subset of platforms.  Requiring perfect credentials on
-    every node makes fleet operation impossible."""
+    every node makes fleet operation impossible.
+    """
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     config = GatewayConfig(
         platforms={

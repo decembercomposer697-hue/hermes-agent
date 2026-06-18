@@ -233,7 +233,6 @@ _COMBINED_REVIEW_PROMPT = (
 )
 
 
-
 def summarize_background_review_actions(
     review_messages: list[dict],
     prior_snapshot: list[dict],
@@ -461,11 +460,11 @@ def _run_review_in_thread(
             # agent.compression_enabled, so this short-circuits both paths.
             review_agent.compression_enabled = False
 
-            from model_tools import get_tool_definitions
             from hermes_cli.plugins import (
-                set_thread_tool_whitelist,
                 clear_thread_tool_whitelist,
+                set_thread_tool_whitelist,
             )
+            from model_tools import get_tool_definitions
 
             review_whitelist = {
                 t["function"]["name"]

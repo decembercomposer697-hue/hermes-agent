@@ -15,13 +15,13 @@ the ``platform_registry``.
 from __future__ import annotations
 
 import asyncio
+from datetime import UTC
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from gateway.config import PlatformConfig
 from tests.gateway._plugin_adapter_loader import load_plugin_adapter
-from datetime import UTC
 
 _ntfy = load_plugin_adapter("ntfy")
 
@@ -490,7 +490,8 @@ class TestSend:
     def test_send_emits_echo_tag_header(self):
         """Outgoing messages carry the echo-prevention tag so the adapter
         can recognise and skip its own replies when subscribe topic ==
-        publish topic (the default config that causes the loop)."""
+        publish topic (the default config that causes the loop).
+        """
         adapter = self._make_adapter(topic="hermes-in")
         mock_resp = MagicMock()
         mock_resp.status_code = 200
@@ -563,7 +564,8 @@ class TestOnMessage:
     def test_own_tagged_message_skipped(self):
         """An incoming event carrying the adapter's echo tag is the agent's
         own reply echoed back by ntfy — it must not be dispatched, otherwise
-        the agent replies to itself forever (issue #34447)."""
+        the agent replies to itself forever (issue #34447).
+        """
         adapter = self._make_adapter()
         calls = []
 
@@ -583,7 +585,8 @@ class TestOnMessage:
 
     def test_message_with_other_tags_still_dispatched(self):
         """Tags unrelated to the echo sentinel must not suppress genuine
-        user messages."""
+        user messages.
+        """
         adapter = self._make_adapter()
         calls = []
 
@@ -638,7 +641,7 @@ class TestOnMessage:
         assert captured[0].message_id == "ntfy-id-42"
 
     def test_title_not_used_as_user_id(self):
-        """title field must not be used for identity — it is publisher-controlled."""
+        """Title field must not be used for identity — it is publisher-controlled."""
         adapter = self._make_adapter()
         captured = []
 
@@ -802,7 +805,8 @@ class TestStandaloneSend:
 
     def test_emits_echo_tag_header(self, monkeypatch):
         """Out-of-process cron / send_message deliveries also carry the echo
-        tag, so a gateway subscribed to the same topic skips them too."""
+        tag, so a gateway subscribed to the same topic skips them too.
+        """
         monkeypatch.setenv("NTFY_TOPIC", "hermes-in")
         pconfig = MagicMock()
         pconfig.extra = {"topic": "hermes-in"}
@@ -927,7 +931,8 @@ def test_adapter_factory_returns_ntfy_adapter():
 
 class TestTokenHygiene:
     """``_build_auth_header`` must strip pasted-token whitespace; pasted
-    tokens often carry trailing newlines that break the Authorization line."""
+    tokens often carry trailing newlines that break the Authorization line.
+    """
 
     def test_trailing_whitespace_stripped(self):
         assert _ntfy._build_auth_header("  tok123  ") == {"Authorization": "Bearer tok123"}
@@ -946,7 +951,8 @@ class TestTokenHygiene:
 
     def test_adapter_strips_token_via_helper(self):
         """The adapter delegates to _build_auth_header, so token whitespace
-        passed via config.extra is also stripped."""
+        passed via config.extra is also stripped.
+        """
         config = PlatformConfig(enabled=True, extra={"topic": "t", "token": "  tok\n"})
         adapter = NtfyAdapter(config)
         assert adapter._auth_headers() == {"Authorization": "Bearer tok"}
@@ -955,7 +961,8 @@ class TestTokenHygiene:
 class TestFatalErrorPropagation:
     """When the stream hits 401/404, the adapter must transition to the
     ``fatal`` state via ``_set_fatal_error`` so the gateway's runtime
-    status reflects reality instead of staying 'connected'."""
+    status reflects reality instead of staying 'connected'.
+    """
 
     def test_401_sets_fatal_unauthorized(self):
         adapter = NtfyAdapter(PlatformConfig(enabled=True, extra={"topic": "t"}))
@@ -1006,7 +1013,8 @@ class TestFatalErrorPropagation:
 class TestTruncateHelper:
     """``_truncate_body`` is shared between adapter.send() (inline truncation
     today, may migrate) and ``_standalone_send``. It must cap to
-    MAX_MESSAGE_LENGTH and return bytes."""
+    MAX_MESSAGE_LENGTH and return bytes.
+    """
 
     def test_short_message_passes_through(self):
         assert _ntfy._truncate_body("hi", context="test") == b"hi"

@@ -27,8 +27,8 @@ diff regions.
 from __future__ import annotations
 
 import difflib
-from typing import Any, Dict, List, Optional
 from collections.abc import Callable
+from typing import Any, Dict, List, Optional
 
 
 def build_line_shift(pre_text: str, post_text: str) -> Callable[[int], int | None]:

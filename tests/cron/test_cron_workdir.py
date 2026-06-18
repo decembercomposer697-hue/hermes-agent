@@ -197,8 +197,7 @@ class TestCronjobToolWorkdir:
 # ---------------------------------------------------------------------------
 
 class TestTickWorkdirPartition:
-    """
-    tick() must run workdir jobs sequentially (outside the ThreadPoolExecutor)
+    """tick() must run workdir jobs sequentially (outside the ThreadPoolExecutor)
     because run_job mutates os.environ["TERMINAL_CWD"], which is process-global.
     We verify the partition without booting the real scheduler by patching the
     pieces tick() calls.
@@ -257,8 +256,7 @@ class TestTickWorkdirPartition:
 # ---------------------------------------------------------------------------
 
 class TestRunJobTerminalCwd:
-    """
-    run_job sets TERMINAL_CWD + flips skip_context_files=False when workdir
+    """run_job sets TERMINAL_CWD + flips skip_context_files=False when workdir
     is set, and restores the prior TERMINAL_CWD in finally — even on error.
     We stub AIAgent so no real API call happens.
     """
@@ -268,6 +266,7 @@ class TestRunJobTerminalCwd:
         """Patch enough of run_job's deps that it executes without real creds."""
         import os
         import sys
+
         import cron.scheduler as sched
 
         class FakeAgent:
@@ -322,6 +321,7 @@ class TestRunJobTerminalCwd:
         self, tmp_path, monkeypatch,
     ):
         import os
+
         import cron.scheduler as sched
 
         # Make sure the test's TERMINAL_CWD starts at a known non-workdir value.
@@ -361,6 +361,7 @@ class TestRunJobTerminalCwd:
         check it's unchanged by run_job.
         """
         import os
+
         import cron.scheduler as sched
 
         # Pin TERMINAL_CWD to a sentinel via monkeypatch so we control both

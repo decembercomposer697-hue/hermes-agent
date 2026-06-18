@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Session Search Tool - Long-Term Conversation Recall
+"""Session Search Tool - Long-Term Conversation Recall
 
 Single-shape tool with three calling modes (inferred from args, no explicit
 mode parameter):

@@ -23,7 +23,6 @@ import platform
 import subprocess
 from typing import Optional
 
-
 _BLACKHOLE_DEVICE = "BlackHole 2ch"
 
 
@@ -209,7 +208,7 @@ class AudioBridge:
 
     @staticmethod
     def _parse_module_id(stdout: str) -> int:
-        """pactl load-module prints the new module ID to stdout."""
+        """Pactl load-module prints the new module ID to stdout."""
         text = (stdout or "").strip()
         if not text:
             raise RuntimeError("pactl load-module returned empty stdout")

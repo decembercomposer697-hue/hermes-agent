@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 import re
 import tomllib
-from pathlib import Path
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "acp_registry" / "agent.json"
@@ -60,7 +60,8 @@ def test_agent_json_version_matches_pyproject():
 
 def test_agent_json_pins_uvx_package_to_pyproject_version():
     """The registry CI rejects ``@latest`` and floating pins; the manifest must
-    always reference the exact PyPI version listed in pyproject.toml."""
+    always reference the exact PyPI version listed in pyproject.toml.
+    """
     assert _manifest()["distribution"]["uvx"]["package"] == (
         f"hermes-agent[acp]=={_pyproject_version()}"
     )

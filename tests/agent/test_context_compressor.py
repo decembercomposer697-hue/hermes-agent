@@ -1,9 +1,10 @@
 """Tests for agent/context_compressor.py — compression logic, thresholds, truncation fallback."""
 
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from agent.context_compressor import ContextCompressor, SUMMARY_PREFIX
+import pytest
+
+from agent.context_compressor import SUMMARY_PREFIX, ContextCompressor
 
 
 @pytest.fixture
@@ -36,7 +37,6 @@ class TestShouldCompress:
     def test_explicit_tokens(self, compressor):
         assert compressor.should_compress(prompt_tokens=90000) is True
         assert compressor.should_compress(prompt_tokens=50000) is False
-
 
 
 class TestUpdateFromResponse:
@@ -81,7 +81,6 @@ class TestPreflightDeferral:
         compressor.last_rough_tokens_when_real_prompt_fit = 90_000
 
         assert compressor.should_defer_preflight_to_real_usage(93_000) is False
-
 
 
 class TestCompress:
@@ -366,7 +365,8 @@ class TestSummaryFallbackToMainModel:
     call fails, the compressor should retry once on the main model before
     giving up — losing N turns of context is almost always worse than one
     extra summary attempt.  Covers both the fast-path (explicit
-    model-not-found errors) and the unknown-error best-effort retry."""
+    model-not-found errors) and the unknown-error best-effort retry.
+    """
 
     def _msgs(self):
         return [
@@ -376,7 +376,8 @@ class TestSummaryFallbackToMainModel:
 
     def test_model_not_found_404_falls_back_to_main_and_succeeds(self):
         """Classic misconfiguration: ``auxiliary.compression.model`` points at
-        a model the main provider doesn't serve → 404 → retry on main."""
+        a model the main provider doesn't serve → 404 → retry on main.
+        """
         mock_ok = MagicMock()
         mock_ok.choices = [MagicMock()]
         mock_ok.choices[0].message.content = "summary via main model"
@@ -414,7 +415,8 @@ class TestSummaryFallbackToMainModel:
     def test_unknown_error_falls_back_to_main_and_succeeds(self):
         """Errors that don't match the 404/503/model_not_found fast-path
         (400s, provider-specific 'no route', aggregator rejections) should
-        ALSO trigger a best-effort retry on main before entering cooldown."""
+        ALSO trigger a best-effort retry on main before entering cooldown.
+        """
         mock_ok = MagicMock()
         mock_ok.choices = [MagicMock()]
         mock_ok.choices[0].message.content = "summary via main model"
@@ -449,7 +451,8 @@ class TestSummaryFallbackToMainModel:
 
     def test_no_fallback_when_summary_model_equals_main_model(self):
         """If the aux model IS the main model, there's nowhere to fall back
-        to — go straight to cooldown, don't loop retrying the same call."""
+        to — go straight to cooldown, don't loop retrying the same call.
+        """
         err = Exception("500 internal error")
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
@@ -473,7 +476,8 @@ class TestSummaryFallbackToMainModel:
 
     def test_fallback_only_happens_once_per_compressor(self):
         """If the retry-on-main ALSO fails, don't loop forever — enter
-        cooldown like the normal failure path."""
+        cooldown like the normal failure path.
+        """
         err1 = Exception("400 aux model rejected")
         err2 = Exception("500 main model also exploded")
 
@@ -499,7 +503,8 @@ class TestSummaryFallbackToMainModel:
         """JSONDecodeError from the OpenAI SDK's ``response.json()`` (raised
         when a misconfigured proxy returns HTML/plain-text with
         ``Content-Type: application/json``) should trigger the same
-        retry-on-main path as 404/timeout.  Issue #22244."""
+        retry-on-main path as 404/timeout.  Issue #22244.
+        """
         import json as _json
 
         mock_ok = MagicMock()
@@ -541,7 +546,8 @@ class TestSummaryFallbackToMainModel:
         ``APIResponseValidationError`` (or similar), ``isinstance`` no longer
         matches but the substring "expecting value" still appears in
         ``str(e)``.  We detect this case by string match and fall back the
-        same way."""
+        same way.
+        """
         mock_ok = MagicMock()
         mock_ok.choices = [MagicMock()]
         mock_ok.choices[0].message.content = "summary via main model"
@@ -571,7 +577,8 @@ class TestSummaryFallbackToMainModel:
         """When already on the main model (no separate summary_model, or
         fallback already happened), a JSONDecodeError should set the short
         30s cooldown, not the default 60s — provider bodies tend to
-        recover quickly when an upstream proxy comes back online."""
+        recover quickly when an upstream proxy comes back online.
+        """
         import json as _json
 
         err_json = _json.JSONDecodeError("Expecting value", "<html/>", 0)
@@ -614,7 +621,8 @@ class TestStreamingClosedFallback:
 
     def test_incomplete_chunked_read_falls_back_to_main(self):
         """``httpcore.RemoteProtocolError: incomplete chunked read`` triggers
-        the retry-on-main path when ``_is_connection_error`` returns True."""
+        the retry-on-main path when ``_is_connection_error`` returns True.
+        """
         mock_ok = MagicMock()
         mock_ok.choices = [MagicMock()]
         mock_ok.choices[0].message.content = "summary via main model"
@@ -672,7 +680,8 @@ class TestStreamingClosedFallback:
 
     def test_streaming_closed_on_main_uses_short_cooldown(self):
         """When already on the main model, a streaming-closed error should use
-        the 30s cooldown, not the default 60s — these errors are transient."""
+        the 30s cooldown, not the default 60s — these errors are transient.
+        """
         err = Exception("RemoteProtocolError: response ended prematurely")
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
@@ -697,7 +706,8 @@ class TestStreamingClosedFallback:
 
     def test_non_streaming_unknown_error_still_uses_long_cooldown(self):
         """Unclassified errors should retain the 60s default cooldown to
-        prevent hammering a broken provider."""
+        prevent hammering a broken provider.
+        """
         err = Exception("Internal Server Error: something unexpected happened")
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
@@ -724,7 +734,8 @@ class TestAuxModelFallbackSurfacedToCallers:
     expose the aux-model failure via _last_aux_model_failure_{model,error}
     so gateway /compress and CLI callers can warn the user about their
     broken auxiliary.compression.model config — silent recovery would hide
-    a misconfiguration only the user can fix."""
+    a misconfiguration only the user can fix.
+    """
 
     def _make_msgs(self):
         return [
@@ -774,7 +785,8 @@ class TestAuxModelFallbackSurfacedToCallers:
 
     def test_compress_clears_aux_failure_fields_at_start_of_next_call(self):
         """A subsequent successful compression must clear the aux-failure
-        fields so the warning doesn't persist forever."""
+        fields so the warning doesn't persist forever.
+        """
         mock_ok = MagicMock()
         mock_ok.choices = [MagicMock()]
         mock_ok.choices[0].message.content = "summary via main"
@@ -814,7 +826,8 @@ class TestSummaryFailureTrackingForGatewayWarning:
     """Default behavior (compression.abort_on_summary_failure=False):
     summary-generation failure inserts a static fallback placeholder and
     records dropped count + fallback flag so gateway hygiene & /compress
-    can surface a visible warning."""
+    can surface a visible warning.
+    """
 
     def test_compress_records_fallback_and_dropped_count_on_summary_failure(self):
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
@@ -995,7 +1008,8 @@ class TestAbortOnSummaryFailure:
     """Opt-in behavior (compression.abort_on_summary_failure=True):
     summary-generation failure ABORTS compression entirely — returns the
     original messages unchanged and sets _last_compress_aborted=True so
-    gateway hygiene & /compress can surface a visible warning."""
+    gateway hygiene & /compress can surface a visible warning.
+    """
 
     def _make_msgs(self):
         return [
@@ -1060,7 +1074,8 @@ class TestAbortOnSummaryFailure:
     def test_force_true_bypasses_failure_cooldown(self):
         """Manual /compress passes force=True so it can retry immediately
         after an auto-compress abort instead of waiting out the 30-60s
-        cooldown."""
+        cooldown.
+        """
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = "summary text"
@@ -1315,7 +1330,8 @@ class TestCompressWithClient:
 
     def test_summary_role_flips_to_avoid_tail_collision(self):
         """When summary role collides with the first tail message but flipping
-        doesn't collide with head, the role should be flipped."""
+        doesn't collide with head, the role should be flipped.
+        """
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = "summary text"
@@ -1430,7 +1446,8 @@ class TestCompressWithClient:
 
     def test_double_collision_user_head_assistant_tail(self):
         """Reverse double collision: head ends with 'user', tail starts with 'assistant'.
-        summary='assistant' collides with tail, 'user' collides with head → merge."""
+        summary='assistant' collides with tail, 'user' collides with head → merge.
+        """
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = "summary text"
@@ -1472,7 +1489,8 @@ class TestCompressWithClient:
 
     def test_no_collision_scenarios_still_work(self):
         """Verify that the common no-collision cases (head=assistant/tail=assistant,
-        head=user/tail=user) still produce a standalone summary message."""
+        head=user/tail=user) still produce a standalone summary message.
+        """
         mock_response = MagicMock()
         mock_response.choices = [MagicMock()]
         mock_response.choices[0].message.content = "summary text"
@@ -1611,7 +1629,8 @@ class TestSummaryTargetRatio:
     def test_protect_first_n_override(self):
         """protect_first_n=0 should be honoured — for users who rely on rolling
         compaction and want NOTHING pinned at head except the system prompt
-        (always implicitly protected)."""
+        (always implicitly protected).
+        """
         with patch("agent.context_compressor.get_model_context_length", return_value=100_000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=0)
         assert c.protect_first_n == 0
@@ -1623,7 +1642,8 @@ class TestSummaryTargetRatio:
 
         This is the cleanest configuration for long-running rolling-compaction
         sessions — no user/assistant turn gets pinned verbatim forever just
-        because it happened to be early in the session."""
+        because it happened to be early in the session.
+        """
         with patch("agent.context_compressor.get_model_context_length", return_value=100_000):
             c = ContextCompressor(
                 model="test",
@@ -1660,7 +1680,8 @@ class TestSummaryTargetRatio:
         that meant protect_first_n=1 would pin the first user turn of the
         session forever — a user-reported complaint that a week-old
         resolved question kept getting reinserted into every compaction
-        summary."""
+        summary.
+        """
         with patch("agent.context_compressor.get_model_context_length", return_value=100_000):
             c = ContextCompressor(
                 model="test",
@@ -1708,7 +1729,8 @@ class TestTokenBudgetTailProtection:
     def test_large_tool_outputs_no_longer_block_compaction(self, budget_compressor):
         """The motivating scenario: 20 messages with large tool outputs should
         NOT prevent compaction.  With message-count tail protection they would
-        all be protected, leaving nothing to summarize."""
+        all be protected, leaving nothing to summarize.
+        """
         c = budget_compressor
         messages = [
             {"role": "user", "content": "Start task"},
@@ -1759,7 +1781,8 @@ class TestTokenBudgetTailProtection:
 
     def test_soft_ceiling_allows_oversized_message(self, budget_compressor):
         """The 1.5x soft ceiling allows an oversized message to be included
-        rather than splitting it."""
+        rather than splitting it.
+        """
         c = budget_compressor
         # Set a small budget — 500 tokens
         c.tail_token_budget = 500
@@ -1783,7 +1806,8 @@ class TestTokenBudgetTailProtection:
 
     def test_small_conversation_still_compresses(self, budget_compressor):
         """With the new min of 8 messages (head=2 + 3 + 1 guard + 2 middle),
-        a small but compressible conversation should still compress."""
+        a small but compressible conversation should still compress.
+        """
         c = budget_compressor
         # 9 messages: head(2) + 4 middle + 3 tail = compressible
         messages = []
@@ -1961,7 +1985,8 @@ class TestTokenBudgetTailProtection:
         self, budget_compressor,
     ):
         """A budget that covers the whole transcript must prune nothing —
-        ``protect_tail_count`` is a minimum floor, not a ceiling."""
+        ``protect_tail_count`` is a minimum floor, not a ceiling.
+        """
         c = budget_compressor
 
         # 100 alternating assistant/tool messages.  Each tool result has
@@ -2114,7 +2139,8 @@ class TestTruncateToolCallArgsJson:
 
     def test_pass3_emits_valid_json_for_downstream_provider(self):
         """End-to-end: Pass 3 must never produce the exact failure payload
-        that caused the 400 loop (unterminated string, missing brace)."""
+        that caused the 400 loop (unterminated string, missing brace).
+        """
         import json as _json
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(

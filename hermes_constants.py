@@ -10,7 +10,6 @@ import sysconfig
 from contextvars import ContextVar, Token
 from pathlib import Path
 
-
 _profile_fallback_warned: bool = False
 _UNSET = object()
 _HERMES_HOME_OVERRIDE: ContextVar[str | object] = ContextVar(
@@ -234,6 +233,7 @@ def get_hermes_dir(new_subpath: str, old_name: str) -> Path:
 
     Returns:
         Absolute ``Path`` — old location if it exists on disk, otherwise the new one.
+
     """
     home = get_hermes_home()
     old_path = home / old_name
@@ -406,7 +406,6 @@ def get_config_path() -> Path:
 def get_skills_dir() -> Path:
     """Return the path to the skills directory under HERMES_HOME."""
     return get_hermes_home() / "skills"
-
 
 
 def get_env_path() -> Path:

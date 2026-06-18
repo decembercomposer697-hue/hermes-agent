@@ -31,9 +31,9 @@ import json
 import logging
 import math
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
-from collections.abc import Iterable
 
 logger = logging.getLogger("tools.tool_search")
 

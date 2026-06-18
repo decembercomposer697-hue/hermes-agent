@@ -1,5 +1,4 @@
-"""
-Gateway subcommand for hermes CLI.
+"""Gateway subcommand for hermes CLI.
 
 Handles: hermes gateway [run|start|stop|restart|status|install|uninstall|setup]
 """
@@ -17,12 +16,13 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 
-from gateway.status import terminate_pid
 from gateway.restart import (
     DEFAULT_GATEWAY_RESTART_DRAIN_TIMEOUT,
     GATEWAY_SERVICE_RESTART_EXIT_CODE,
     parse_restart_drain_timeout,
 )
+from gateway.status import terminate_pid
+from hermes_cli.colors import Colors, color
 from hermes_cli.config import (
     get_env_value,
     get_hermes_home,
@@ -35,16 +35,15 @@ from hermes_cli.config import (
 # display_hermes_home is imported lazily at call sites to avoid ImportError
 # when hermes_constants is cached from a pre-update version during `hermes update`.
 from hermes_cli.setup import (
+    print_error,
     print_header,
     print_info,
     print_success,
     print_warning,
-    print_error,
     prompt,
     prompt_choice,
     prompt_yes_no,
 )
-from hermes_cli.colors import Colors, color
 
 logger = logging.getLogger(__name__)
 
@@ -245,6 +244,7 @@ def _graceful_restart_via_sigusr1(pid: int, drain_timeout: float) -> bool:
         True if the PID was signalled and exited within the timeout.
         False if SIGUSR1 couldn't be sent or the process didn't exit in
         time (caller should fall back to a harder restart path).
+
     """
     if not hasattr(signal, "SIGUSR1"):
         return False
@@ -567,6 +567,7 @@ def find_gateway_pids(
             needs this because a code update affects every profile.
             When ``False`` (default), only PIDs belonging to the current
             Hermes profile are returned.
+
     """
     _exclude = set(exclude_pids or set())
     pids: list[int] = []
@@ -1192,7 +1193,7 @@ def _gateway_list() -> None:
     check each profile individually.
     """
     try:
-        from hermes_cli.profiles import list_profiles, get_active_profile_name
+        from hermes_cli.profiles import get_active_profile_name, list_profiles
     except Exception:
         print("Unable to list profiles.")
         return
@@ -1236,6 +1237,7 @@ def kill_gateway_processes(
             restarted and should not be killed).
         all_profiles: When ``True``, kill across all profiles.  Passed
             through to :func:`find_gateway_pids`.
+
     """
     pids = find_gateway_pids(exclude_pids=exclude_pids, all_profiles=all_profiles)
     killed = 0
@@ -1289,6 +1291,7 @@ def stop_profile_gateway() -> bool:
     # Wait briefly for it to exit. On Windows, os.kill(pid, 0) is NOT
     # a no-op — route through the cross-platform existence check.
     import time as _time
+
     from gateway.status import _pid_exists
 
     for _ in range(20):
@@ -1305,8 +1308,9 @@ def is_linux() -> bool:
     return sys.platform.startswith("linux")
 
 
-from hermes_constants import is_container, is_termux, is_wsl
 from datetime import UTC
+
+from hermes_constants import is_container, is_termux, is_wsl
 
 
 def _wsl_systemd_operational() -> bool:
@@ -1412,6 +1416,7 @@ def _profile_suffix() -> str:
     """
     import hashlib
     import re
+
     from hermes_constants import get_default_hermes_root
 
     home = get_hermes_home().resolve()
@@ -1441,8 +1446,10 @@ def _profile_arg(hermes_home: str | None = None) -> str:
         hermes_home: Optional explicit HERMES_HOME path. Defaults to the current
             ``get_hermes_home()`` value. Should be passed when generating a
             service definition for a different user (e.g. system service).
+
     """
     import re
+
     from hermes_constants import get_default_hermes_root
 
     home = Path(hermes_home or str(get_hermes_home())).resolve()
@@ -1837,6 +1844,7 @@ def remove_legacy_hermes_units(
     Returns:
         ``(removed_count, remaining_paths)`` — remaining includes units we
         couldn't remove (typically system-scope when not running as root).
+
     """
     legacy = _find_legacy_hermes_units()
     if not legacy:
@@ -2058,6 +2066,7 @@ def get_systemd_linger_status() -> tuple[bool | None, str]:
         (True, "") when linger is enabled.
         (False, "") when linger is disabled.
         (None, detail) when the status could not be determined.
+
     """
     if is_termux():
         return None, "not supported in Termux"
@@ -3541,8 +3550,10 @@ def _wait_for_gateway_exit(
     Args:
         timeout: Total seconds to wait before giving up.
         force_after: Seconds of graceful waiting before escalating to force-kill.
+
     """
     import time
+
     from gateway.status import get_running_pid
 
     deadline = time.monotonic() + timeout
@@ -3723,6 +3734,7 @@ def run_gateway(verbose: int = 0, quiet: bool = False, replace: bool = False):
         replace: If True, kill any existing gateway instance before starting.
                  This prevents systemd restart loops when the old process
                  hasn't fully exited yet.
+
     """
     _guard_official_docker_root_gateway()
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -3807,7 +3819,8 @@ def run_gateway(verbose: int = 0, quiet: bool = False, replace: bool = False):
     # chasing the Windows lifecycle bug).
     import atexit as _atexit
     import traceback as _traceback
-    from datetime import datetime as _dt, timezone as _tz
+    from datetime import datetime as _dt
+    from datetime import timezone as _tz
 
     def _exit_diag(tag: str, **extra: object) -> None:
         if os.environ.get("HERMES_GATEWAY_EXIT_DIAG", "1") != "1":
@@ -4803,8 +4816,9 @@ def _setup_standard_platform(platform: dict):
 
 def _setup_whatsapp():
     """Delegate to the existing WhatsApp setup flow."""
-    from hermes_cli.main import cmd_whatsapp
     import argparse
+
+    from hermes_cli.main import cmd_whatsapp
 
     cmd_whatsapp(argparse.Namespace())
 
@@ -4812,10 +4826,10 @@ def _setup_whatsapp():
 def _setup_dingtalk():
     """Configure DingTalk — QR scan (recommended) or manual credential entry."""
     from hermes_cli.setup import (
-        prompt_choice,
-        prompt_yes_no,
         print_success,
         print_warning,
+        prompt_choice,
+        prompt_yes_no,
     )
 
     dingtalk_platform = next(p for p in _PLATFORMS if p["key"] == "dingtalk")
@@ -6123,7 +6137,6 @@ def _dispatch_all_via_service_manager_if_s6(action: str) -> bool:
     return True
 
 
-
 def gateway_command(args):
     """Handle gateway subcommands."""
     try:
@@ -6318,9 +6331,9 @@ def _gateway_command_inner(args):
 
             gateway_windows.install(
                 force=force,
-                start_now=getattr(args, 'start_now', None),
-                start_on_login=getattr(args, 'start_on_login', None),
-                elevated_handoff=getattr(args, 'elevated_handoff', False),
+                start_now=getattr(args, "start_now", None),
+                start_on_login=getattr(args, "start_on_login", None),
+                elevated_handoff=getattr(args, "elevated_handoff", False),
             )
         elif is_wsl():
             print("WSL detected but systemd is not running.")

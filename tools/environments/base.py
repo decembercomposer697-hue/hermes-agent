@@ -17,9 +17,9 @@ import threading
 import time
 import uuid
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from pathlib import Path
 from typing import IO, Protocol
-from collections.abc import Callable
 
 from hermes_constants import get_hermes_home
 from tools.interrupt import is_interrupted
@@ -417,7 +417,8 @@ class BaseEnvironment(ABC):
 
     def _wrap_command(self, command: str, cwd: str) -> str:
         """Build the full bash script that sources snapshot, cd's, runs command,
-        re-dumps env vars, and emits CWD markers."""
+        re-dumps env vars, and emits CWD markers.
+        """
         escaped = command.replace("'", "'\\''")
 
         # Quote the snapshot / cwd-file paths so Git Bash on Windows handles

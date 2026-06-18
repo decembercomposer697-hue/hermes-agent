@@ -19,7 +19,8 @@ from unittest.mock import patch
 
 def _make_cli_stub():
     """Build a minimal HermesCLI-shaped object that can run ``process_command``
-    for the destructive-slash branches without spinning up a real TUI."""
+    for the destructive-slash branches without spinning up a real TUI.
+    """
     from cli import HermesCLI
 
     new_session_calls = []

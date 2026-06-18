@@ -11,7 +11,8 @@ from unittest.mock import MagicMock, patch
 
 def test_make_agent_passes_resolved_provider():
     """_make_agent forwards provider/base_url/api_key/api_mode from
-    resolve_runtime_provider to AIAgent."""
+    resolve_runtime_provider to AIAgent.
+    """
 
     fake_runtime = {
         "provider": "anthropic",
@@ -62,7 +63,8 @@ def test_make_agent_passes_resolved_provider():
 
 def test_make_agent_ignores_display_personality_without_system_prompt():
     """The TUI matches the classic CLI: personality only becomes active once
-    it has been saved to agent.system_prompt."""
+    it has been saved to agent.system_prompt.
+    """
 
     fake_runtime = {
         "provider": "openrouter",
@@ -142,7 +144,8 @@ def test_make_agent_honors_tui_launch_env_flags():
 
 def test_probe_config_health_flags_null_sections():
     """Bare YAML keys (`agent:` with no value) parse as None and silently
-    drop nested settings; probe must surface them so users can fix."""
+    drop nested settings; probe must surface them so users can fix.
+    """
     from tui_gateway.server import _probe_config_health
 
     assert _probe_config_health({"agent": {"x": 1}}) == ""
@@ -171,7 +174,8 @@ def test_make_agent_tolerates_null_config_sections():
     """Bare `agent:` / `display:` keys in ~/.hermes/config.yaml parse as
     None. cfg.get("agent", {}) returns None (default only fires on missing
     key), so downstream .get() chains must be guarded. Reported via Twitter
-    against the new TUI."""
+    against the new TUI.
+    """
 
     fake_runtime = {
         "provider": "openrouter",

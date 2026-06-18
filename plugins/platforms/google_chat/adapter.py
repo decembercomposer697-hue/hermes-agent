@@ -1,5 +1,4 @@
-"""
-Google Chat platform adapter.
+"""Google Chat platform adapter.
 
 Uses Google Cloud Pub/Sub (pull subscription) for inbound events and the
 Google Chat REST API for outbound messages. Pattern parallels Slack Socket
@@ -43,9 +42,9 @@ import logging
 import os
 import random
 import re
+from collections.abc import Callable
 from pathlib import Path as _Path
 from typing import Any, Dict, List, Optional, Tuple
-from collections.abc import Callable
 
 # Heavy google-cloud + googleapiclient imports are deferred to first
 # adapter use. Importing them eagerly here added ~110ms wall and ~33MB
@@ -96,8 +95,8 @@ def _load_google_modules() -> bool:
     _google_modules_loaded = True
     try:
         import httplib2 as _httplib2
-        from google.cloud import pubsub_v1 as _pubsub_v1
         from google.api_core import exceptions as _gax_exceptions
+        from google.cloud import pubsub_v1 as _pubsub_v1
         from google.oauth2 import service_account as _service_account
         from google_auth_httplib2 import AuthorizedHttp as _AuthorizedHttp
         from googleapiclient.discovery import build as _build_service
@@ -128,7 +127,6 @@ from gateway.config import Platform, PlatformConfig
 # Built-ins avoid this because they have explicit enum members; plugin
 # platforms earn the attribute by asking for it once.
 Platform("google_chat")
-from gateway.platforms.helpers import MessageDeduplicator
 from gateway.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
@@ -140,7 +138,7 @@ from gateway.platforms.base import (
     cache_image_from_bytes,
     cache_video_from_bytes,
 )
-
+from gateway.platforms.helpers import MessageDeduplicator
 
 # Pin the logger name to the legacy module path so operator log filters,
 # grep aliases, and the gateway's bundled log views keep matching after
@@ -401,7 +399,8 @@ class _ThreadCountStore:
     def incr(self, chat_id: str, thread_name: str) -> int:
         """Increment count and write through to disk. Returns the
         PRE-increment value (the heuristic input — "have we seen this
-        thread before this message?")."""
+        thread before this message?").
+        """
         chat_counts = self._counts.setdefault(chat_id, {})
         prev = chat_counts.get(thread_name, 0)
         chat_counts[thread_name] = prev + 1
@@ -428,8 +427,7 @@ class _ThreadCountStore:
 
 
 class GoogleChatAdapter(BasePlatformAdapter):
-    """
-    Google Chat bot adapter using Pub/Sub pull + Chat REST API.
+    """Google Chat bot adapter using Pub/Sub pull + Chat REST API.
 
     Required environment (see gateway/config.py Google Chat block):
       GOOGLE_CHAT_PROJECT_ID           (or GOOGLE_CLOUD_PROJECT fallback)
@@ -817,9 +815,13 @@ class GoogleChatAdapter(BasePlatformAdapter):
         # attachments degrade to a setup-instructions text notice.
         try:
             from .oauth import (
-                load_user_credentials as _load_user_creds,
                 build_user_chat_service as _build_user_chat,
+            )
+            from .oauth import (
                 list_authorized_emails as _list_emails,
+            )
+            from .oauth import (
+                load_user_credentials as _load_user_creds,
             )
             user_creds = await asyncio.to_thread(_load_user_creds)
             if user_creds is not None:
@@ -1404,8 +1406,8 @@ class GoogleChatAdapter(BasePlatformAdapter):
             try:
                 # Reuse the helper logic but capture stdout via a sync
                 # thread so we don't print to the gateway terminal.
-                import io
                 import contextlib
+                import io
                 buf = io.StringIO()
                 with contextlib.redirect_stdout(buf):
                     await asyncio.to_thread(
@@ -1438,8 +1440,8 @@ class GoogleChatAdapter(BasePlatformAdapter):
 
         if arg == "revoke":
             try:
-                import io
                 import contextlib
+                import io
                 buf = io.StringIO()
                 with contextlib.redirect_stdout(buf):
                     await asyncio.to_thread(oauth_helper.revoke, sender_key)
@@ -1469,8 +1471,8 @@ class GoogleChatAdapter(BasePlatformAdapter):
         # Anything else is treated as the auth code or the failed-redirect
         # URL the user pasted.
         try:
-            import io
             import contextlib
+            import io
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf):
                 await asyncio.to_thread(
@@ -1700,8 +1702,9 @@ class GoogleChatAdapter(BasePlatformAdapter):
                 req = self._chat_api.media().download_media(
                     resourceName=resource_name,
                 )
-                from googleapiclient.http import MediaIoBaseDownload
                 import io
+
+                from googleapiclient.http import MediaIoBaseDownload
 
                 buf = io.BytesIO()
                 downloader = MediaIoBaseDownload(buf, req)
@@ -2621,8 +2624,12 @@ class GoogleChatAdapter(BasePlatformAdapter):
         text-notice fallback if the user has revoked).
         """
         from .oauth import (
-            load_user_credentials as _load,
             build_user_chat_service as _build,
+        )
+        from .oauth import (
+            load_user_credentials as _load,
+        )
+        from .oauth import (
             refresh_or_none as _refresh,
         )
 

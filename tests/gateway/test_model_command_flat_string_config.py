@@ -11,8 +11,8 @@ before mutation, so ``--global`` succeeds and the config is rewritten in
 the proper ``model: {default: ..., provider: ...}`` form.
 """
 
-import yaml
 import pytest
+import yaml
 
 from gateway.config import Platform
 from gateway.platforms.base import MessageEvent, MessageType

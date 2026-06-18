@@ -18,17 +18,17 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from hermes_cli.config import get_hermes_home, get_config_path, load_config, save_config
-from hermes_constants import get_optional_skills_dir
+from hermes_cli.config import get_config_path, get_hermes_home, load_config, save_config
 from hermes_cli.setup import (
     Colors,
     color,
+    print_error,
     print_header,
     print_info,
     print_success,
-    print_error,
     prompt_yes_no,
 )
+from hermes_constants import get_optional_skills_dir
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +54,7 @@ _OPENCLAW_SCRIPT_INSTALLED = (
 
 # Known OpenClaw directory names (current + legacy)
 _OPENCLAW_DIR_NAMES = (".openclaw", ".clawdbot", ".moltbot")
+
 
 def _detect_openclaw_processes() -> list[str]:
     """Detect running OpenClaw processes and services.
@@ -508,7 +509,7 @@ def _cmd_migrate(args):
     backup_archive: Path | None = None
     if not no_backup:
         try:
-            from hermes_cli.backup import create_pre_migration_backup, _format_size
+            from hermes_cli.backup import _format_size, create_pre_migration_backup
             backup_archive = create_pre_migration_backup(hermes_home=hermes_home)
             if backup_archive:
                 size_str = _format_size(backup_archive.stat().st_size)

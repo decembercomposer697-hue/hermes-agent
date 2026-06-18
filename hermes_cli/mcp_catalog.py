@@ -32,15 +32,15 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
-from hermes_constants import get_hermes_home, get_optional_mcps_dir
+from hermes_cli.cli_output import prompt as _prompt_input
 from hermes_cli.colors import Colors, color
 from hermes_cli.config import (
+    get_env_value,
     load_config,
     save_config,
-    get_env_value,
     save_env_value,
 )
-from hermes_cli.cli_output import prompt as _prompt_input
+from hermes_constants import get_hermes_home, get_optional_mcps_dir
 
 _MANIFEST_VERSION = 1
 
@@ -373,7 +373,8 @@ def _run_bootstrap(cwd: Path, commands: list[str]) -> None:
 
 def _do_git_install(entry: CatalogEntry) -> Path:
     """Clone the entry's repo into ``~/.hermes/mcp-installs/<name>`` and run
-    bootstrap commands. Returns the install directory."""
+    bootstrap commands. Returns the install directory.
+    """
     assert entry.install is not None and entry.install.type == "git"
     install = entry.install
     dest = _install_root() / entry.name
@@ -435,7 +436,8 @@ def _expand_install_dir(value: str, install_dir: Path | None) -> str:
 
 def _prompt_env_vars(specs: list[EnvVarSpec]) -> dict[str, str]:
     """Walk the env spec list, prompting the user for each. Writes secrets and
-    non-secrets alike to ~/.hermes/.env via save_env_value()."""
+    non-secrets alike to ~/.hermes/.env via save_env_value().
+    """
     collected: dict[str, str] = {}
     for spec in specs:
         existing = get_env_value(spec.name)
@@ -461,7 +463,8 @@ def _build_server_config(
     entry: CatalogEntry, install_dir: Path | None,
 ) -> dict:
     """Translate a manifest into the ``mcp_servers.<name>`` block format used
-    by hermes_cli/mcp_config.py."""
+    by hermes_cli/mcp_config.py.
+    """
     cfg: dict = {}
     t = entry.transport
     if t.type == "stdio":
@@ -753,7 +756,8 @@ def install_entry(entry: CatalogEntry, *, enable: bool = True) -> None:
 
 def uninstall_entry(name: str, *, purge_install_dir: bool = True) -> bool:
     """Remove a catalog-installed MCP from config and (optionally) wipe its
-    clone directory. Returns True if anything was removed."""
+    clone directory. Returns True if anything was removed.
+    """
     cfg = load_config()
     servers = cfg.get("mcp_servers") or {}
     removed = False

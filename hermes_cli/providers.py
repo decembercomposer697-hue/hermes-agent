@@ -1,5 +1,4 @@
-"""
-Single source of truth for provider identity in Hermes Agent.
+"""Single source of truth for provider identity in Hermes Agent.
 
 Two data sources, merged at runtime:
 
@@ -488,8 +487,6 @@ def get_label(provider_id: str) -> str:
     return canonical
 
 
-
-
 def is_aggregator(provider: str) -> bool:
     """Return True when the provider is a multi-model aggregator."""
     provider_norm = normalize_provider(provider or "")
@@ -552,6 +549,7 @@ def resolve_user_provider(name: str, user_config: dict[str, Any]) -> ProviderDef
 
     Returns:
         ProviderDef if found, else None.
+
     """
     if not user_config or not isinstance(user_config, dict):
         return None
@@ -677,6 +675,7 @@ def resolve_provider_full(
 
     Returns:
         ProviderDef if found, else None.
+
     """
     canonical = normalize_provider(name)
     raw = name.strip().lower()

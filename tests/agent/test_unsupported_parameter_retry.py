@@ -16,15 +16,15 @@ These tests lock in:
     legacy ``"max_tokens"`` / ``"unsupported_parameter"`` substring checks
 """
 
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from agent.auxiliary_client import (
-    call_llm,
-    async_call_llm,
     _is_unsupported_parameter_error,
     _is_unsupported_temperature_error,
+    async_call_llm,
+    call_llm,
 )
 
 
@@ -114,7 +114,6 @@ class TestMaxTokensRetryHardening:
 
         # Only the initial attempt — no retry because the gate blocked it
         assert client.chat.completions.create.call_count == 1
-
 
     @pytest.mark.asyncio
     async def test_async_max_tokens_retry_skipped_when_max_tokens_is_none(self):

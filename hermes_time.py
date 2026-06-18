@@ -1,5 +1,4 @@
-"""
-Timezone-aware clock for Hermes.
+"""Timezone-aware clock for Hermes.
 
 Provides a single ``now()`` helper that returns a timezone-aware datetime
 based on the user's configured IANA timezone (e.g. ``Asia/Kolkata``).
@@ -16,8 +15,9 @@ crashes due to a bad timezone string.
 import logging
 import os
 from datetime import datetime
-from hermes_constants import get_config_path
 from typing import Optional
+
+from hermes_constants import get_config_path
 
 logger = logging.getLogger(__name__)
 
@@ -102,8 +102,7 @@ def reset_cache() -> None:
 
 
 def now() -> datetime:
-    """
-    Return the current time as a timezone-aware datetime.
+    """Return the current time as a timezone-aware datetime.
 
     If a valid timezone is configured, returns wall-clock time in that zone.
     Otherwise returns the server's local time (via ``astimezone()``).

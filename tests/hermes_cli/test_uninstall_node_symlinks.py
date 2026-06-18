@@ -16,7 +16,8 @@ import hermes_cli.uninstall as uninstall
 @pytest.fixture
 def fake_home(tmp_path, monkeypatch):
     """Redirect Path.home() at the home both the installer-symlink target and
-    the ~/.local/bin links live under the same temp dir."""
+    the ~/.local/bin links live under the same temp dir.
+    """
     home = tmp_path / "home"
     home.mkdir()
     monkeypatch.setattr(Path, "home", classmethod(lambda cls: home))
@@ -96,7 +97,8 @@ def test_handles_missing_local_bin(fake_home):
 
 def test_removes_dangling_symlink_into_hermes_node(fake_home):
     """A link into the Hermes node dir is removed even if the target file is
-    already gone (dangling) \u2014 the link still shadows PATH."""
+    already gone (dangling) \u2014 the link still shadows PATH.
+    """
     hermes_home = fake_home / ".hermes"
     node_bin = hermes_home / "node" / "bin"
     node_bin.mkdir(parents=True)

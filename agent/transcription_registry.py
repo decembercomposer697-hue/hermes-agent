@@ -1,5 +1,4 @@
-"""
-Transcription Provider Registry
+"""Transcription Provider Registry
 ================================
 
 Central map of registered STT providers. Populated by plugins at

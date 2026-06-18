@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for file staleness detection in write_file and patch.
+"""Tests for file staleness detection in write_file and patch.
 
 When a file is modified externally between the agent's read and write,
 the write should include a warning so the agent can re-read and verify.
@@ -14,21 +13,21 @@ import tempfile
 import time
 import unittest
 from types import SimpleNamespace
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from tools import file_state
 from tools.file_tools import (
-    read_file_tool,
-    write_file_tool,
-    patch_tool,
     _check_file_staleness,
     _read_tracker,
+    patch_tool,
+    read_file_tool,
+    write_file_tool,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 class _FakeReadResult:
     def __init__(self, content="line1\nline2\n", total_lines=2, file_size=100):

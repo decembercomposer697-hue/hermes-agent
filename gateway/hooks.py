@@ -1,5 +1,4 @@
-"""
-Event Hook System
+"""Event Hook System
 
 A lightweight event-driven system that fires handlers at key lifecycle points.
 Hooks are discovered from ~/.hermes/hooks/ directories, each containing:
@@ -39,20 +38,18 @@ and ``thread_id`` is non-empty.
 import asyncio
 import importlib.util
 import sys
-from typing import Any, Dict, List, Optional
 from collections.abc import Callable
+from typing import Any, Dict, List, Optional
 
 import yaml
 
 from hermes_cli.config import get_hermes_home
 
-
 HOOKS_DIR = get_hermes_home() / "hooks"
 
 
 class HookRegistry:
-    """
-    Discovers, loads, and fires event hooks.
+    """Discovers, loads, and fires event hooks.
 
     Usage:
         registry = HookRegistry()
@@ -80,8 +77,7 @@ class HookRegistry:
         return
 
     def discover_and_load(self) -> None:
-        """
-        Scan the hooks directory for hook directories and load their handlers.
+        """Scan the hooks directory for hook directories and load their handlers.
 
         Also registers built-in hooks that are always active.
 
@@ -174,8 +170,7 @@ class HookRegistry:
         return handlers
 
     async def emit(self, event_type: str, context: dict[str, Any] | None = None) -> None:
-        """
-        Fire all handlers registered for an event, discarding return values.
+        """Fire all handlers registered for an event, discarding return values.
 
         Supports wildcard matching: handlers registered for "command:*" will
         fire for any "command:..." event. Handlers registered for a base type
@@ -185,6 +180,7 @@ class HookRegistry:
         Args:
             event_type: The event identifier (e.g. "agent:start").
             context:    Optional dict with event-specific data.
+
         """
         if context is None:
             context = {}

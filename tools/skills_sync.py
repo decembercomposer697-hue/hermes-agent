@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Skills Sync -- Manifest-based seeding and updating of bundled skills.
+"""Skills Sync -- Manifest-based seeding and updating of bundled skills.
 
 Copies bundled skills from the repo's skills/ directory into ~/.hermes/skills/
 and uses a manifest to track which skills have been synced and their origin hash.
@@ -26,11 +25,16 @@ import json
 import logging
 import os
 import shutil
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path, PurePosixPath
-from hermes_constants import get_bundled_skills_dir, get_hermes_home, get_optional_skills_dir
-from agent.skill_utils import is_excluded_skill_path
 from typing import Dict, List, Tuple
+
+from agent.skill_utils import is_excluded_skill_path
+from hermes_constants import (
+    get_bundled_skills_dir,
+    get_hermes_home,
+    get_optional_skills_dir,
+)
 from utils import atomic_replace
 
 logger = logging.getLogger(__name__)
@@ -66,8 +70,7 @@ def _get_optional_dir() -> Path:
 
 
 def _read_manifest() -> dict[str, str]:
-    """
-    Read the manifest as a dict of {skill_name: origin_hash}.
+    """Read the manifest as a dict of {skill_name: origin_hash}.
 
     Handles both v1 (plain names) and v2 (name:hash) formats.
     v1 entries get an empty hash string which triggers migration on next sync.
@@ -173,8 +176,7 @@ def _read_skill_name(skill_md: Path, fallback: str) -> str:
 
 
 def _discover_bundled_skills(bundled_dir: Path) -> list[tuple[str, Path]]:
-    """
-    Find all SKILL.md files in the bundled directory.
+    """Find all SKILL.md files in the bundled directory.
     Returns list of (skill_name, skill_directory_path) tuples.
     """
     skills = []
@@ -192,8 +194,7 @@ def _discover_bundled_skills(bundled_dir: Path) -> list[tuple[str, Path]]:
 
 
 def _compute_relative_dest(skill_dir: Path, bundled_dir: Path) -> Path:
-    """
-    Compute the destination path in SKILLS_DIR preserving the category structure.
+    """Compute the destination path in SKILLS_DIR preserving the category structure.
     e.g., bundled/skills/mlops/axolotl -> ~/.hermes/skills/mlops/axolotl
     """
     rel = skill_dir.relative_to(bundled_dir)
@@ -452,12 +453,12 @@ def _backfill_optional_provenance(quiet: bool = False) -> list[str]:
 
 
 def sync_skills(quiet: bool = False) -> dict:
-    """
-    Sync bundled skills into ~/.hermes/skills/ using the manifest.
+    """Sync bundled skills into ~/.hermes/skills/ using the manifest.
 
     Returns:
         dict with keys: copied (list), updated (list), skipped (int),
                         user_modified (list), cleaned (list), total_bundled (int)
+
     """
     # Opt-out: a profile (named or the default ~/.hermes) that wrote the
     # .no-bundled-skills marker gets zero bundled-skill seeding. Returning the
@@ -652,8 +653,7 @@ def _rmtree_writable(path: Path) -> None:
 
 
 def reset_bundled_skill(name: str, restore: bool = False) -> dict:
-    """
-    Reset a bundled skill's manifest tracking so future syncs work normally.
+    """Reset a bundled skill's manifest tracking so future syncs work normally.
 
     When a user edits a bundled skill, subsequent syncs mark it as
     ``user_modified`` and skip it forever — even if the user later copies
@@ -674,6 +674,7 @@ def reset_bundled_skill(name: str, restore: bool = False) -> dict:
                     "bundled_missing"
           - message: human-readable description
           - synced: dict from sync_skills() if a sync was triggered, else None
+
     """
     manifest = _read_manifest()
     bundled_dir = _get_bundled_dir()
@@ -763,6 +764,7 @@ def set_bundled_skills_opt_out(enabled: bool) -> dict:
     Returns:
         dict with keys: ok (bool), changed (bool), marker (str path),
                         message (str).
+
     """
     marker = HERMES_HOME / NO_BUNDLED_SKILLS_MARKER
     existed = marker.exists()
@@ -827,6 +829,7 @@ def remove_pristine_bundled_skills(dry_run: bool = False) -> dict:
         dict with keys: ok (bool), removed (list[str]),
                         skipped (list[dict]) where each dict is
                         {name, reason}, dry_run (bool), message (str).
+
     """
     manifest = _read_manifest()
     bundled_dir = _get_bundled_dir()

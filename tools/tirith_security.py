@@ -48,6 +48,7 @@ _COSIGN_ISSUER = "https://token.actions.githubusercontent.com"
 # Config helpers
 # ---------------------------------------------------------------------------
 
+
 def _env_bool(key: str, default: bool) -> bool:
     val = os.getenv(key)
     if val is None:
@@ -113,7 +114,8 @@ _warned_lock = threading.Lock()
 def _warn_once(key: str, message: str, *args) -> None:
     """``logger.warning`` but at-most-once per ``key`` for the process
     lifetime. Used to avoid drowning the log when a fail-open tirith
-    misconfiguration fires on every command."""
+    misconfiguration fires on every command.
+    """
     with _warned_lock:
         if key in _warned_messages:
             return
@@ -184,6 +186,7 @@ def _mark_install_failed(reason: str = ""):
         reason: Short tag identifying the failure cause. Use "cosign_missing"
                 when cosign is not on PATH so the marker can be auto-cleared
                 once cosign becomes available.
+
     """
     try:
         p = _failure_marker_path()
@@ -271,6 +274,7 @@ def _verify_cosign(checksums_path: str, sig_path: str, cert_path: str) -> bool |
 
     The caller treats both False and None as "abort auto-install" — only
     True allows the install to proceed.
+
     """
     cosign = shutil.which("cosign")
     if not cosign:
@@ -703,6 +707,7 @@ def check_command_security(command: str) -> dict:
 
     Returns:
         {"action": "allow"|"warn"|"block", "findings": [...], "summary": str}
+
     """
     cfg = _load_security_config()
 

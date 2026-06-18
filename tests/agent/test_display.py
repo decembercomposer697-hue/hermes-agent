@@ -1,19 +1,20 @@
 """Tests for agent/display.py — build_tool_preview() and inline diff previews."""
 
 import json
-import pytest
 from unittest.mock import MagicMock
 
+import pytest
+
 from agent.display import (
+    _render_inline_unified_diff,
+    _summarize_rendered_diff_sections,
+    _used_free_parallel,
     build_tool_preview,
     capture_local_edit_snapshot,
     extract_edit_diff,
     get_cute_tool_message,
-    set_tool_preview_max_len,
-    _render_inline_unified_diff,
-    _summarize_rendered_diff_sections,
-    _used_free_parallel,
     render_edit_diff_with_delta,
+    set_tool_preview_max_len,
 )
 
 
@@ -198,7 +199,7 @@ class TestWebProviderLabel:
         assert _used_free_parallel(json.dumps({"provider": "exa"})) is False
         assert _used_free_parallel(json.dumps({"provider": "firecrawl"})) is False
         assert _used_free_parallel(json.dumps({"success": True, "data": {}})) is False
-        assert _used_free_parallel('not json') is False
+        assert _used_free_parallel("not json") is False
         assert _used_free_parallel(None) is False
 
     def test_free_extract_verb_is_parallel(self):

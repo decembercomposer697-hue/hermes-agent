@@ -52,7 +52,8 @@ async def test_send_succeeds_when_path_healthy():
 @pytest.mark.asyncio
 async def test_send_short_circuits_when_path_degraded():
     """Degraded adapter returns failure WITHOUT calling send_message,
-    so cron's live-adapter branch falls through to standalone HTTP."""
+    so cron's live-adapter branch falls through to standalone HTTP.
+    """
     adapter = _make_adapter()
     adapter._send_path_degraded = True
 
@@ -67,7 +68,8 @@ async def test_send_short_circuits_when_path_degraded():
 @pytest.mark.asyncio
 async def test_reconnect_storm_sets_and_heartbeat_clears_flag(monkeypatch):
     """_handle_polling_network_error sets the flag; a successful heartbeat
-    probe in _verify_polling_after_reconnect clears it."""
+    probe in _verify_polling_after_reconnect clears it.
+    """
     adapter = _make_adapter()
     adapter._app = MagicMock()
     adapter._app.updater = MagicMock()

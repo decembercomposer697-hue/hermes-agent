@@ -4,12 +4,11 @@ get_model_context_length.
 All tests use synthetic inputs — no filesystem or live server required.
 """
 
-import sys
 import os
+import sys
 from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 
 
 # ---------------------------------------------------------------------------
@@ -195,6 +194,7 @@ class TestQueryLocalContextLengthModelsList:
         })
 
         call_count = [0]
+
         def side_effect(url, **kwargs):
             call_count[0] += 1
             if call_count[0] == 1:
@@ -223,6 +223,7 @@ class TestQueryLocalContextLengthModelsList:
         })
 
         call_count = [0]
+
         def side_effect(url, **kwargs):
             call_count[0] += 1
             if call_count[0] == 1:
@@ -547,7 +548,7 @@ class TestGetModelContextLengthLocalFallback:
 
     def test_local_endpoint_server_returns_none_falls_back_to_2m(self):
         """When local server returns None, still falls back to 2M probe tier."""
-        from agent.model_metadata import get_model_context_length, CONTEXT_PROBE_TIERS
+        from agent.model_metadata import CONTEXT_PROBE_TIERS, get_model_context_length
 
         with patch("agent.model_metadata.get_cached_context_length", return_value=None), \
              patch("agent.model_metadata.fetch_endpoint_model_metadata", return_value={}), \

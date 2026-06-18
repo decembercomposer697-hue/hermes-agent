@@ -27,7 +27,8 @@ def _slugs(rows):
 
 def test_groups_reference_real_canonical_slugs():
     """Every group member must be an actual provider slug. Guards typos and
-    stale group entries after a provider is renamed/removed."""
+    stale group entries after a provider is renamed/removed.
+    """
     canonical = {p.slug for p in CANONICAL_PROVIDERS}
     for gid, (label, desc, members) in PROVIDER_GROUPS.items():
         assert label, f"group {gid} has empty label"
@@ -74,7 +75,8 @@ def test_multi_member_group_folds_to_one_row():
 
 def test_group_appears_at_first_member_position():
     """The group row takes the slot of its earliest-listed present member,
-    and later members do not re-emit."""
+    and later members do not re-emit.
+    """
     rows = group_providers(["nous", "minimax", "deepseek", "minimax-cn"])
     kinds = [(r["kind"], r.get("group_id") or r.get("slug")) for r in rows]
     assert kinds == [
@@ -96,7 +98,8 @@ def test_single_present_member_degrades_to_single_row():
 
 def test_member_order_follows_declaration_not_input():
     """Inside a folded group, members are ordered by PROVIDER_GROUPS, not by
-    the order they appeared in the input list."""
+    the order they appeared in the input list.
+    """
     rows = group_providers(["minimax-cn", "minimax", "minimax-oauth"])
     assert rows[0]["members"] == ["minimax", "minimax-oauth", "minimax-cn"]
 
@@ -108,7 +111,8 @@ def test_duplicate_slugs_ignored():
 
 def test_fold_is_lossless_for_present_slugs():
     """Every input slug (deduped) must still be reachable through the folded
-    rows — grouping hides nothing."""
+    rows — grouping hides nothing.
+    """
     flat = [p.slug for p in CANONICAL_PROVIDERS]
     rows = group_providers(flat)
     assert set(_slugs(rows)) == set(flat)
@@ -116,7 +120,8 @@ def test_fold_is_lossless_for_present_slugs():
 
 def test_canonical_fold_row_count_shrinks():
     """Folding the full canonical list produces fewer top-level rows than the
-    flat list (proves grouping actually consolidates)."""
+    flat list (proves grouping actually consolidates).
+    """
     flat = [p.slug for p in CANONICAL_PROVIDERS]
     rows = group_providers(flat)
     assert len(rows) < len(flat)

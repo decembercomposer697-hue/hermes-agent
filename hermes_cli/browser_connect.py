@@ -10,7 +10,6 @@ import subprocess
 
 from hermes_constants import get_hermes_home
 
-
 DEFAULT_BROWSER_CDP_PORT = 9222
 DEFAULT_BROWSER_CDP_URL = f"http://127.0.0.1:{DEFAULT_BROWSER_CDP_PORT}"
 

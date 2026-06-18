@@ -3,20 +3,19 @@
 import json
 from unittest.mock import ANY, call, patch
 
-
 from model_tools import (
-    handle_function_call,
-    get_all_tool_names,
-    get_toolset_for_tool,
     _AGENT_LOOP_TOOLS,
     _LEGACY_TOOLSET_MAP,
     TOOL_TO_TOOLSET_MAP,
+    get_all_tool_names,
+    get_toolset_for_tool,
+    handle_function_call,
 )
-
 
 # =========================================================================
 # handle_function_call
 # =========================================================================
+
 
 class TestHandleFunctionCall:
     def test_agent_loop_tool_returns_error(self):
@@ -424,7 +423,8 @@ class TestBackwardCompat:
 class TestCoerceNumberInfNan:
     """_coerce_number must honor its documented contract ("Returns original
     string on failure") for inf/nan inputs, because float('inf') and
-    float('nan') are not JSON-compliant under strict serialization."""
+    float('nan') are not JSON-compliant under strict serialization.
+    """
 
     def test_inf_returns_original_string(self):
         from model_tools import _coerce_number
@@ -445,7 +445,8 @@ class TestCoerceNumberInfNan:
 
     def test_coerced_result_is_strict_json_safe(self):
         """Whatever _coerce_number returns for inf/nan must round-trip
-        through strict (allow_nan=False) json.dumps without raising."""
+        through strict (allow_nan=False) json.dumps without raising.
+        """
         from model_tools import _coerce_number
         for s in ("inf", "-inf", "nan", "Infinity"):
             result = _coerce_number(s)

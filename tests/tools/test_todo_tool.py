@@ -148,7 +148,8 @@ class TestTodoStoreBounds:
 
     def test_merge_update_content_is_capped(self):
         """The merge path updates content directly, bypassing _validate —
-        verify it is capped too."""
+        verify it is capped too.
+        """
         from tools.todo_tool import MAX_TODO_CONTENT_CHARS
         store = TodoStore()
         store.write([{"id": "1", "content": "short", "status": "pending"}])
@@ -166,7 +167,8 @@ class TestTodoStoreBounds:
 
     def test_normal_list_is_unchanged(self):
         """No regression: ordinary plans pass through untouched (no marker,
-        same content, same order)."""
+        same content, same order).
+        """
         store = TodoStore()
         store.write([
             {"id": "1", "content": "write the report", "status": "in_progress"},

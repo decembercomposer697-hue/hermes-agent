@@ -55,7 +55,8 @@ class TestAsyncClientLazyCreation:
 
     def test_get_async_client_creates_fresh_each_call(self):
         """Each call to _get_async_client() creates a NEW client instance,
-        so it binds to the current event loop."""
+        so it binds to the current event loop.
+        """
         from trajectory_compressor import TrajectoryCompressor
 
         comp = TrajectoryCompressor.__new__(TrajectoryCompressor)
@@ -118,7 +119,11 @@ class TestSourceLineVerification:
 @pytest.mark.asyncio
 async def test_generate_summary_async_kimi_omits_temperature():
     """Kimi models should have temperature omitted — server manages it."""
-    from trajectory_compressor import CompressionConfig, TrajectoryCompressor, TrajectoryMetrics
+    from trajectory_compressor import (
+        CompressionConfig,
+        TrajectoryCompressor,
+        TrajectoryMetrics,
+    )
 
     config = CompressionConfig(
         summarization_model="kimi-for-coding",
@@ -146,7 +151,11 @@ async def test_generate_summary_async_kimi_omits_temperature():
 @pytest.mark.asyncio
 async def test_generate_summary_async_public_moonshot_kimi_k2_5_omits_temperature():
     """kimi-k2.5 on the public Moonshot API should not get a forced temperature."""
-    from trajectory_compressor import CompressionConfig, TrajectoryCompressor, TrajectoryMetrics
+    from trajectory_compressor import (
+        CompressionConfig,
+        TrajectoryCompressor,
+        TrajectoryMetrics,
+    )
 
     config = CompressionConfig(
         summarization_model="kimi-k2.5",
@@ -175,7 +184,11 @@ async def test_generate_summary_async_public_moonshot_kimi_k2_5_omits_temperatur
 @pytest.mark.asyncio
 async def test_generate_summary_async_public_moonshot_cn_kimi_k2_5_omits_temperature():
     """kimi-k2.5 on api.moonshot.cn should not get a forced temperature."""
-    from trajectory_compressor import CompressionConfig, TrajectoryCompressor, TrajectoryMetrics
+    from trajectory_compressor import (
+        CompressionConfig,
+        TrajectoryCompressor,
+        TrajectoryMetrics,
+    )
 
     config = CompressionConfig(
         summarization_model="kimi-k2.5",

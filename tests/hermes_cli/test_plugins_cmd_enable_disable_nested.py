@@ -30,7 +30,8 @@ def _make_category_plugin(parent: Path, category: str, name: str, manifest: dict
 @pytest.fixture
 def nested_plugin_env(tmp_path):
     """A user-plugins dir containing one nested and one flat plugin, with the
-    bundled dir pointed at an empty path. Returns the tmp_path."""
+    bundled dir pointed at an empty path. Returns the tmp_path.
+    """
     _make_category_plugin(tmp_path, "observability", "nemo_relay", {
         "name": "nemo_relay", "version": "1.0.0", "description": "relay obs",
     })

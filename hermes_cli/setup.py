@@ -1,5 +1,4 @@
-"""
-Interactive setup wizard for Hermes Agent.
+"""Interactive setup wizard for Hermes Agent.
 
 Modular wizard with independently-runnable sections:
   1. Model & Provider — choose your AI provider and model
@@ -11,20 +10,20 @@ Modular wizard with independently-runnable sections:
 Config files are stored in ~/.hermes/ for easy access.
 """
 
+import copy
 import importlib.util
 import logging
 import os
 import re
 import shutil
 import sys
-import copy
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 from hermes_cli.nous_subscription import get_nous_subscription_features
+from hermes_constants import get_optional_skills_dir
 from tools.tool_backend_helpers import managed_nous_tools_enabled
 from utils import base_url_hostname
-from hermes_constants import get_optional_skills_dir
 
 logger = logging.getLogger(__name__)
 
@@ -126,25 +125,22 @@ def _set_reasoning_effort(config: dict[str, Any], effort: str) -> None:
     agent_cfg["reasoning_effort"] = effort
 
 
-
-
 # Import config helpers
+# display_hermes_home imported lazily at call sites (stale-module safety during hermes update)
+from hermes_cli.colors import Colors, color
 from hermes_cli.config import (
-    cfg_get,
     DEFAULT_CONFIG,
-    get_hermes_home,
+    cfg_get,
+    ensure_hermes_home,
     get_config_path,
     get_env_path,
+    get_env_value,
+    get_hermes_home,
     load_config,
+    remove_env_value,
     save_config,
     save_env_value,
-    remove_env_value,
-    get_env_value,
-    ensure_hermes_home,
 )
-# display_hermes_home imported lazily at call sites (stale-module safety during hermes update)
-
-from hermes_cli.colors import Colors, color
 
 
 def print_header(title: str):
@@ -228,7 +224,6 @@ def _curses_prompt_choice(question: str, choices: list, default: int = 0, descri
     return curses_radiolist(question, choices, selected=default, cancel_returns=-1, description=description)
 
 
-
 def prompt_choice(question: str, choices: list, default: int = 0, description: str | None = None) -> int:
     """Prompt for a choice from a list with arrow key navigation.
 
@@ -297,8 +292,7 @@ def prompt_yes_no(question: str, default: bool = True) -> bool:
 
 
 def prompt_checklist(title: str, items: list, pre_selected: list = None) -> list:
-    """
-    Display a multi-select checklist and return the indices of selected items.
+    """Display a multi-select checklist and return the indices of selected items.
 
     Each item in `items` is a display string. `pre_selected` is a list of
     indices that should be checked by default. A "Continue →" option is
@@ -310,6 +304,7 @@ def prompt_checklist(title: str, items: list, pre_selected: list = None) -> list
 
     Returns:
         List of selected indices (not including the Continue option).
+
     """
     if pre_selected is None:
         pre_selected = []
@@ -690,7 +685,6 @@ def _prompt_container_resources(config: dict):
 # =============================================================================
 
 
-
 def setup_model_provider(config: dict, *, quick: bool = False):
     """Configure the inference provider and default model.
 
@@ -1052,7 +1046,6 @@ def _setup_tts_provider(config: dict):
             if voice_id and voice_id.strip():
                 config.setdefault("tts", {}).setdefault("xai", {})["voice_id"] = voice_id.strip()
                 print_success(f"xAI voice_id set to: {voice_id.strip()}")
-
 
     elif selected == "minimax":
         existing = get_env_value("MINIMAX_API_KEY")
@@ -1956,7 +1949,8 @@ def _setup_matrix():
         # aiosqlite uninstalled and broke E2EE connect with
         # ``No module named 'asyncpg'`` on every fresh install (#31116).
         try:
-            from tools.lazy_deps import ensure as _lazy_ensure, feature_missing
+            from tools.lazy_deps import ensure as _lazy_ensure
+            from tools.lazy_deps import feature_missing
             _missing_before = feature_missing("platform.matrix")
             if _missing_before:
                 print_info(
@@ -2142,7 +2136,7 @@ def _setup_webhooks():
 
 def setup_gateway(config: dict):
     """Configure messaging platform integrations."""
-    from hermes_cli.gateway import _all_platforms, _platform_status, _configure_platform
+    from hermes_cli.gateway import _all_platforms, _configure_platform, _platform_status
 
     print_header("Messaging Platforms")
     print_info("Connect to messaging platforms to chat with Hermes from anywhere.")
@@ -2227,23 +2221,23 @@ def setup_gateway(config: dict):
         _is_windows = _platform.system() == "Windows"
 
         from hermes_cli.gateway import (
+            SystemScopeRequiresRootError,
+            UserSystemdUnavailableError,
             _is_service_installed,
             _is_service_running,
-            supports_systemd_services,
+            _print_system_scope_remediation,
+            _system_scope_wizard_would_need_root,
             has_conflicting_systemd_units,
             has_legacy_hermes_units,
             install_linux_gateway_from_setup,
-            print_systemd_scope_conflict_warning,
-            print_legacy_unit_warning,
-            systemd_start,
-            systemd_restart,
             launchd_install,
-            launchd_start,
             launchd_restart,
-            UserSystemdUnavailableError,
-            SystemScopeRequiresRootError,
-            _system_scope_wizard_would_need_root,
-            _print_system_scope_remediation,
+            launchd_start,
+            print_legacy_unit_warning,
+            print_systemd_scope_conflict_warning,
+            supports_systemd_services,
+            systemd_restart,
+            systemd_start,
         )
 
         service_installed = _is_service_installed()
@@ -2389,6 +2383,7 @@ def setup_tools(config: dict, first_install: bool = False):
     Args:
         first_install: When True, uses the simplified first-install flow
             (no platform menu, prompts for all unconfigured API keys).
+
     """
     from hermes_cli.tools_config import tools_command
 
@@ -2936,7 +2931,7 @@ def run_setup_wizard(args):
         _backup_path = None
 
     # Detect non-interactive environments (headless SSH, Docker, CI/CD)
-    non_interactive = getattr(args, 'non_interactive', False)
+    non_interactive = getattr(args, "non_interactive", False)
     if not non_interactive and not is_interactive_stdin():
         non_interactive = True
 
@@ -3198,9 +3193,9 @@ def _run_first_time_quick_setup(config: dict, hermes_home, is_existing: bool):
 def _run_quick_setup(config: dict, hermes_home):
     """Quick setup — only configure items that are missing."""
     from hermes_cli.config import (
-        get_missing_env_vars,
-        get_missing_config_fields,
         check_config_version,
+        get_missing_config_fields,
+        get_missing_env_vars,
     )
 
     print()

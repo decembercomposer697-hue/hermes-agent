@@ -11,8 +11,8 @@ import asyncio
 import json
 import logging
 from collections import deque
-from typing import Any, Deque, Dict
 from collections.abc import Callable
+from typing import Any, Deque, Dict
 
 import acp
 from acp.schema import AgentPlanUpdate, PlanEntry
@@ -167,7 +167,10 @@ def make_tool_progress_cb(
         edit_diff = None
         if name in {"write_file", "patch"} and edit_approval_policy_getter is not None:
             try:
-                from acp_adapter.edit_approval import build_edit_proposal, should_auto_approve_edit
+                from acp_adapter.edit_approval import (
+                    build_edit_proposal,
+                    should_auto_approve_edit,
+                )
 
                 proposal = build_edit_proposal(name, args)
                 if proposal is not None:

@@ -1,5 +1,4 @@
-"""
-Channel directory -- cached map of reachable channels/contacts per platform.
+"""Channel directory -- cached map of reachable channels/contacts per platform.
 
 Built on gateway startup, refreshed periodically (every 5 min), and saved to
 ~/.hermes/channel_directory.json.  The send_message tool reads this file for
@@ -58,8 +57,7 @@ def _session_entry_name(origin: dict[str, Any]) -> str:
 # ---------------------------------------------------------------------------
 
 async def build_channel_directory(adapters: dict[Any, Any]) -> dict[str, Any]:
-    """
-    Build a channel directory from connected platform adapters and session data.
+    """Build a channel directory from connected platform adapters and session data.
 
     Returns the directory dict and writes it to DIRECTORY_PATH.
     """
@@ -265,8 +263,7 @@ def lookup_channel_type(platform_name: str, chat_id: str) -> str | None:
 
 
 def resolve_channel_name(platform_name: str, name: str) -> str | None:
-    """
-    Resolve a human-friendly channel name to a numeric ID.
+    """Resolve a human-friendly channel name to a numeric ID.
 
     Matching strategy (case-insensitive, first match wins):
     - Discord: "bot-home", "#bot-home", "GuildName/bot-home"

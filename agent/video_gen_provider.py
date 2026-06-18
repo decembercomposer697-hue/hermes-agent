@@ -1,5 +1,4 @@
-"""
-Video Generation Provider ABC
+"""Video Generation Provider ABC
 =============================
 
 Defines the pluggable-backend interface for video generation. Providers register

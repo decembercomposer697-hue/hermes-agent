@@ -8,20 +8,19 @@ after the agent finishes its current task — not silently dropped.
 import asyncio
 from unittest.mock import MagicMock
 
-
-from gateway.run import _dequeue_pending_event
 from gateway.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
-    PlatformConfig,
     Platform,
+    PlatformConfig,
 )
-
+from gateway.run import _dequeue_pending_event
 
 # ---------------------------------------------------------------------------
 # Minimal adapter for testing pending message storage
 # ---------------------------------------------------------------------------
+
 
 class _StubAdapter(BasePlatformAdapter):
     def __init__(self):
@@ -145,7 +144,8 @@ class TestQueueConsumptionAfterCompletion:
 
     def test_pending_message_available_after_normal_completion(self):
         """After agent finishes without interrupt, pending message should
-        still be retrievable from adapter._pending_messages."""
+        still be retrievable from adapter._pending_messages.
+        """
         adapter = _StubAdapter()
         session_key = "telegram:user:123"
 
@@ -248,7 +248,8 @@ class TestQueueConsumptionAfterCompletion:
 
     def test_promote_stages_overflow_when_slot_already_populated(self):
         """If the slot was re-populated (e.g. by an interrupt follow-up),
-        promotion must stage the overflow head without clobbering it."""
+        promotion must stage the overflow head without clobbering it.
+        """
         from gateway.run import GatewayRunner
 
         runner = GatewayRunner.__new__(GatewayRunner)

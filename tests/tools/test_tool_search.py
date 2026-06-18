@@ -10,9 +10,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from typing import Dict, Any
-
-
+from typing import Any, Dict
 
 _REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if _REPO_ROOT not in sys.path:
@@ -101,14 +99,15 @@ class TestClassification:
             )
 
     def test_bridge_tools_never_defer(self):
-        from tools.tool_search import is_deferrable_tool_name, BRIDGE_TOOL_NAMES
+        from tools.tool_search import BRIDGE_TOOL_NAMES, is_deferrable_tool_name
         for name in BRIDGE_TOOL_NAMES:
             assert not is_deferrable_tool_name(name)
 
     def test_unknown_tool_not_deferrable(self):
         """Defensive: a tool name we cannot resolve to a registry entry must
         not be claimed as deferrable. This protects against the OpenClaw
-        cron regression where unresolved tools were silently dropped."""
+        cron regression where unresolved tools were silently dropped.
+        """
         from tools.tool_search import is_deferrable_tool_name
         assert not is_deferrable_tool_name("xx_definitely_not_a_tool_xx")
 
@@ -186,7 +185,7 @@ class TestThresholdGate:
 class TestRetrieval:
     def _fake_catalog(self):
         """Build a catalog directly without touching the registry."""
-        from tools.tool_search import CatalogEntry, _tokenize, _entry_search_text
+        from tools.tool_search import CatalogEntry, _entry_search_text, _tokenize
         defs = [
             _td("github_create_issue", "Open a new issue in a GitHub repository",
                 {"title": {"type": "string"}, "body": {"type": "string"}}),
@@ -239,7 +238,7 @@ class TestRetrieval:
 class TestAssembly:
     def test_no_deferrable_returns_unchanged(self):
         """Pure-core toolset: pass-through, no bridge tools added."""
-        from tools.tool_search import assemble_tool_defs, ToolSearchConfig
+        from tools.tool_search import ToolSearchConfig, assemble_tool_defs
         defs = [_td("terminal", "Run shell"), _td("read_file", "Read a file")]
         result = assemble_tool_defs(
             defs,
@@ -251,7 +250,7 @@ class TestAssembly:
 
     def test_below_threshold_returns_unchanged(self):
         """Tiny deferrable surface: don't bother."""
-        from tools.tool_search import assemble_tool_defs, ToolSearchConfig
+        from tools.tool_search import ToolSearchConfig, assemble_tool_defs
         # _td renders to ~80 chars / 20 tokens. 3 of them = ~60 tokens.
         # 10% of 200K = 20K. Way below.
         defs = [_td("unknown_tool_a"), _td("unknown_tool_b"), _td("unknown_tool_c")]
@@ -265,7 +264,7 @@ class TestAssembly:
         assert "tool_search" not in names
 
     def test_idempotent_when_bridge_already_present(self):
-        from tools.tool_search import assemble_tool_defs, ToolSearchConfig
+        from tools.tool_search import ToolSearchConfig, assemble_tool_defs
         defs = [_td("terminal", "Run shell"), _td("tool_search", "old")]
         result = assemble_tool_defs(
             defs,
@@ -296,7 +295,8 @@ class TestBridgeDispatch:
 
     def test_tool_describe_rejects_non_deferrable(self):
         """If the model asks to describe a core tool, refuse — it's already
-        in the visible list."""
+        in the visible list.
+        """
         from tools.tool_search import dispatch_tool_describe
         result = dispatch_tool_describe(
             {"name": "terminal"}, current_tool_defs=[_td("terminal", "Run shell")],
@@ -336,7 +336,7 @@ class TestBridgeDispatch:
 
     def test_resolve_underlying_call_rejects_recursion(self):
         """tool_call cannot invoke tool_call itself."""
-        from tools.tool_search import resolve_underlying_call, TOOL_CALL_NAME
+        from tools.tool_search import TOOL_CALL_NAME, resolve_underlying_call
         name, args, err = resolve_underlying_call({
             "name": TOOL_CALL_NAME,
             "arguments": {},
@@ -378,7 +378,9 @@ class TestRegression_OpenClawCron84141:
 
     def test_core_tool_survives_alongside_many_mcp_tools(self):
         from tools.tool_search import (
-            assemble_tool_defs, ToolSearchConfig, classify_tools,
+            ToolSearchConfig,
+            assemble_tool_defs,
+            classify_tools,
         )
         # 1 core tool + 50 unknown/MCP-shaped tools (deferrable).
         defs = [_td("terminal", "Run shell commands")]
@@ -404,7 +406,8 @@ class TestRegression_OpenClawCron84141:
 
     def test_unwrap_rejects_core_tool_attempt(self):
         """Even if the model tries to invoke a core tool through tool_call,
-        we reject the call and tell the model to use it directly."""
+        we reject the call and tell the model to use it directly.
+        """
         from tools.tool_search import resolve_underlying_call
         _, _, err = resolve_underlying_call({
             "name": "terminal",

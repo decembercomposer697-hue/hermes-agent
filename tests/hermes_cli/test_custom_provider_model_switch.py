@@ -34,7 +34,8 @@ class TestCustomProviderModelSwitch:
 
     def test_saved_model_still_probes_endpoint(self, config_home):
         """When a model is already saved, the function must still call
-        fetch_api_models to probe the endpoint — not skip with early return."""
+        fetch_api_models to probe the endpoint — not skip with early return.
+        """
         from hermes_cli.main import _model_flow_named_custom
 
         provider_info = {
@@ -60,6 +61,7 @@ class TestCustomProviderModelSwitch:
     def test_can_switch_to_different_model(self, config_home):
         """User selects a different model than the saved one."""
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         provider_info = {
@@ -83,6 +85,7 @@ class TestCustomProviderModelSwitch:
     def test_probe_failure_falls_back_to_saved(self, config_home):
         """When endpoint probe fails and user presses Enter, saved model is used."""
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         provider_info = {
@@ -106,6 +109,7 @@ class TestCustomProviderModelSwitch:
     def test_no_saved_model_still_works(self, config_home):
         """First-time flow (no saved model) still works as before."""
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         provider_info = {
@@ -129,6 +133,7 @@ class TestCustomProviderModelSwitch:
     def test_api_mode_set_from_provider_info(self, config_home):
         """When custom_providers entry has api_mode, it should be applied."""
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         provider_info = {
@@ -159,6 +164,7 @@ class TestCustomProviderModelSwitch:
     def test_api_mode_cleared_when_not_specified(self, config_home):
         """When custom_providers entry has no api_mode, stale api_mode is removed."""
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         # Pre-seed a stale api_mode in config
@@ -186,6 +192,7 @@ class TestCustomProviderModelSwitch:
     def test_env_template_api_key_is_preserved_in_model_config(self, config_home, monkeypatch):
         """Selecting an env-backed custom provider must not inline the secret."""
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         config_path = config_home / "config.yaml"
@@ -228,6 +235,7 @@ class TestCustomProviderModelSwitch:
     def test_key_env_custom_provider_persists_reference_not_secret(self, config_home, monkeypatch):
         """key_env custom providers should also avoid writing plaintext keys."""
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         config_path = config_home / "config.yaml"
@@ -275,6 +283,7 @@ class TestCustomProviderModelSwitch:
         ``config.yaml``. This test drives the real picker-callsite code path.
         """
         import yaml
+
         from hermes_cli.main import select_provider_and_model
 
         config_path = config_home / "config.yaml"
@@ -391,8 +400,10 @@ class TestCustomProviderModelSwitch:
         self, config_home, monkeypatch,
     ):
         """Selecting an env-backed custom provider should not expand its
-        ``base_url`` template into ``model.base_url`` on disk."""
+        ``base_url`` template into ``model.base_url`` on disk.
+        """
         import yaml
+
         from hermes_cli.main import select_provider_and_model
 
         config_path = config_home / "config.yaml"
@@ -453,6 +464,7 @@ class TestCustomProviderModelSwitch:
         ``api_key`` belongs on disk.
         """
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         config_path = config_home / "config.yaml"
@@ -517,8 +529,10 @@ class TestCustomProviderModelSwitch:
     ):
         """A ``providers:`` entry that already has an inline ``api_key``
         template must keep it untouched. Only entries that never declared
-        an ``api_key`` should skip the write."""
+        an ``api_key`` should skip the write.
+        """
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         config_path = config_home / "config.yaml"
@@ -568,11 +582,13 @@ class TestCustomProviderModelSwitch:
 class TestCustomProviderDiscoverModels:
     """#18726: honor ``discover_models: false`` in the terminal ``hermes model``
     named-custom flow so the picker shows the configured ``models:`` subset
-    instead of the endpoint's full live catalog."""
+    instead of the endpoint's full live catalog.
+    """
 
     def test_discover_false_uses_configured_list_and_skips_probe(self, config_home):
         """discover_models: false + configured models → no live probe, the
-        configured list is used verbatim."""
+        configured list is used verbatim.
+        """
         from hermes_cli.main import _model_flow_named_custom
 
         provider_info = {
@@ -596,6 +612,7 @@ class TestCustomProviderDiscoverModels:
     def test_discover_false_saves_choice_from_configured_list(self, config_home):
         """User picks the 2nd configured model; it persists, list-driven."""
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         provider_info = {
@@ -621,7 +638,8 @@ class TestCustomProviderDiscoverModels:
 
     def test_default_still_probes_when_discover_unset(self, config_home):
         """Default (discover_models unset → True) keeps live-probe behaviour
-        even when a models: list is configured — Option B opt-out semantics."""
+        even when a models: list is configured — Option B opt-out semantics.
+        """
         from hermes_cli.main import _model_flow_named_custom
 
         provider_info = {
@@ -650,8 +668,10 @@ class TestCustomProviderDiscoverModels:
 
     def test_probe_empty_falls_back_to_configured_list(self, config_home):
         """When discovery is on but the probe returns nothing, fall back to the
-        configured models: list instead of forcing manual entry."""
+        configured models: list instead of forcing manual entry.
+        """
         import yaml
+
         from hermes_cli.main import _model_flow_named_custom
 
         provider_info = {

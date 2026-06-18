@@ -1,8 +1,7 @@
 """Tests for Bug #12905 fixes in agent/anthropic_adapter.py — macOS Keychain support."""
 
 import json
-from unittest.mock import patch, MagicMock
-
+from unittest.mock import MagicMock, patch
 
 from agent.anthropic_adapter import (
     _read_claude_code_credentials_from_keychain,
@@ -30,7 +29,7 @@ class TestReadClaudeCodeCredentialsFromKeychain:
             assert _read_claude_code_credentials_from_keychain() is None
 
     def test_returns_none_on_nonzero_exit_code(self):
-        """security returns non-zero when the Keychain entry doesn't exist."""
+        """Security returns non-zero when the Keychain entry doesn't exist."""
         with patch("agent.anthropic_adapter.platform.system", return_value="Darwin"), \
              patch("agent.anthropic_adapter.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(returncode=1, stdout="", stderr="")

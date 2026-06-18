@@ -1,5 +1,4 @@
-"""
-Canonical model catalogs and lightweight validation helpers.
+"""Canonical model catalogs and lightweight validation helpers.
 
 Add, remove, or reorder entries here — both `hermes setup` and
 `hermes` provider-selection will pick up the change automatically.
@@ -9,9 +8,9 @@ from __future__ import annotations
 
 import json
 import os
-import urllib.request
-import urllib.error
 import time
+import urllib.error
+import urllib.request
 from difflib import get_close_matches
 from pathlib import Path
 from typing import Any, NamedTuple, Optional
@@ -33,57 +32,55 @@ COPILOT_REASONING_EFFORTS_O_SERIES = ["low", "medium", "high"]
 # (model_id, display description shown in menus)
 OPENROUTER_MODELS: list[tuple[str, str]] = [
     # Anthropic
-    ("anthropic/claude-fable-5",               ""),
-    ("anthropic/claude-opus-4.8",              ""),
-    ("anthropic/claude-opus-4.8-fast",         "2x price, higher output speed"),
-    ("anthropic/claude-sonnet-4.6",            ""),
-    ("anthropic/claude-haiku-4.5",             ""),
+    ("anthropic/claude-fable-5", ""),
+    ("anthropic/claude-opus-4.8", ""),
+    ("anthropic/claude-opus-4.8-fast", "2x price, higher output speed"),
+    ("anthropic/claude-sonnet-4.6", ""),
+    ("anthropic/claude-haiku-4.5", ""),
     # OpenAI
-    ("openai/gpt-5.5",                         ""),
-    ("openai/gpt-5.5-pro",                     ""),
-    ("openai/gpt-5.4-mini",                    ""),
+    ("openai/gpt-5.5", ""),
+    ("openai/gpt-5.5-pro", ""),
+    ("openai/gpt-5.4-mini", ""),
     # Google
-    ("google/gemini-3-pro-preview",            ""),
-    ("google/gemini-3.1-pro-preview",          ""),
-    ("google/gemini-3.5-flash",                ""),
+    ("google/gemini-3-pro-preview", ""),
+    ("google/gemini-3.1-pro-preview", ""),
+    ("google/gemini-3.5-flash", ""),
     # xAI
-    ("x-ai/grok-4.3",                          ""),
+    ("x-ai/grok-4.3", ""),
     # DeepSeek
-    ("deepseek/deepseek-v4-pro",               ""),
-    ("deepseek/deepseek-v4-flash",             ""),
+    ("deepseek/deepseek-v4-pro", ""),
+    ("deepseek/deepseek-v4-flash", ""),
     # Qwen
-    ("qwen/qwen3.7-max",                       ""),
-    ("qwen/qwen3.7-plus",                      ""),
-    ("qwen/qwen3.6-35b-a3b",                   ""),
+    ("qwen/qwen3.7-max", ""),
+    ("qwen/qwen3.7-plus", ""),
+    ("qwen/qwen3.6-35b-a3b", ""),
     # MoonshotAI
-    ("moonshotai/kimi-k2.6",                   "recommended"),
+    ("moonshotai/kimi-k2.6", "recommended"),
     # MiniMax
-    ("minimax/minimax-m3",                     ""),
+    ("minimax/minimax-m3", ""),
     # Z-AI
-    ("z-ai/glm-5.1",                           ""),
+    ("z-ai/glm-5.1", ""),
     # Xiaomi
-    ("xiaomi/mimo-v2.5-pro",                   ""),
+    ("xiaomi/mimo-v2.5-pro", ""),
     # Tencent
-    ("tencent/hy3-preview",                    ""),
+    ("tencent/hy3-preview", ""),
     # StepFun
-    ("stepfun/step-3.7-flash",                 ""),
+    ("stepfun/step-3.7-flash", ""),
     # NVIDIA
-    ("nvidia/nemotron-3-super-120b-a12b",      ""),
+    ("nvidia/nemotron-3-super-120b-a12b", ""),
     # OpenRouter routers
-    ("openrouter/pareto-code",                 "auto-routes to cheapest coder meeting openrouter.min_coding_score"),
+    ("openrouter/pareto-code", "auto-routes to cheapest coder meeting openrouter.min_coding_score"),
     # Free tier
-    ("openrouter/elephant-alpha",              "free"),
-    ("openrouter/owl-alpha",                   "free"),
-    ("poolside/laguna-m.1:free",               "free"),
-    ("tencent/hy3-preview:free",               "free"),
+    ("openrouter/elephant-alpha", "free"),
+    ("openrouter/owl-alpha", "free"),
+    ("poolside/laguna-m.1:free", "free"),
+    ("tencent/hy3-preview:free", "free"),
     ("nvidia/nemotron-3-super-120b-a12b:free", "free"),
     ("nvidia/nemotron-3-ultra-550b-a55b:free", "free"),
-    ("inclusionai/ring-2.6-1t:free",           "free"),
+    ("inclusionai/ring-2.6-1t:free", "free"),
 ]
 
 _openrouter_catalog_cache: list[tuple[str, str]] | None = None
-
-
 
 
 def _codex_curated_models() -> list[str]:
@@ -989,41 +986,41 @@ class ProviderEntry(NamedTuple):
     tui_desc: str   # detailed description for `hermes model` TUI
 
 CANONICAL_PROVIDERS: list[ProviderEntry] = [
-    ProviderEntry("nous",           "Nous Portal",              "Nous Portal (Everything your agent needs, 300+ models with bundled tool use)"),
-    ProviderEntry("openrouter",     "OpenRouter",               "OpenRouter (Pay-per-use API aggregator)"),
-    ProviderEntry("novita",         "NovitaAI",                 "NovitaAI (Cloud: Model API, Agent Sandbox, GPU Cloud)"),
-    ProviderEntry("lmstudio",       "LM Studio",                "LM Studio (Local desktop app with built-in model server)"),
-    ProviderEntry("anthropic",      "Anthropic",                "Anthropic (Claude models via API key or Claude Code)"),
-    ProviderEntry("openai-codex",   "OpenAI Codex",             "OpenAI Codex (Codex CLI via ChatGPT subscription or API key)"),
-    ProviderEntry("openai-api",     "OpenAI API",               "OpenAI API (api.openai.com, API key)"),
-    ProviderEntry("alibaba",        "Qwen Cloud",               "Qwen Cloud / DashScope (Qwen + multi-provider)"),
-    ProviderEntry("xai-oauth",      "xAI Grok OAuth (SuperGrok / Premium+)", "xAI Grok OAuth (SuperGrok / Premium+ subscription)"),
-    ProviderEntry("xiaomi",         "Xiaomi MiMo",              "Xiaomi MiMo (MiMo-V2.5 and V2 models: pro, omni, flash)"),
-    ProviderEntry("tencent-tokenhub", "Tencent TokenHub",       "Tencent TokenHub (Hy3 Preview via tokenhub.tencentmaas.com)"),
-    ProviderEntry("nvidia",         "NVIDIA NIM",               "NVIDIA NIM (Nemotron models via build.nvidia.com or local NIM)"),
-    ProviderEntry("copilot",        "GitHub Copilot",           "GitHub Copilot (Uses GITHUB_TOKEN or gh auth token)"),
-    ProviderEntry("copilot-acp",    "GitHub Copilot ACP",       "GitHub Copilot ACP (Spawns copilot --acp --stdio)"),
-    ProviderEntry("huggingface",    "Hugging Face",             "Hugging Face Inference Providers"),
-    ProviderEntry("gemini",         "Google AI Studio",         "Google AI Studio (Native Gemini API)"),
-    ProviderEntry("google-gemini-cli", "Google Gemini (OAuth)",   "Google Gemini via OAuth + Code Assist (Code Assist OAuth flow)"),
-    ProviderEntry("deepseek",       "DeepSeek",                 "DeepSeek (V3, R1, coder, direct API)"),
-    ProviderEntry("xai",            "xAI",                      "xAI Grok (Direct API)"),
-    ProviderEntry("zai",            "Z.AI / GLM",               "Z.AI / GLM (Zhipu direct API)"),
-    ProviderEntry("kimi-coding",    "Kimi / Kimi Coding Plan",  "Kimi Coding Plan (api.kimi.com & Moonshot API)"),
-    ProviderEntry("kimi-coding-cn", "Kimi / Moonshot (China)",  "Kimi / Moonshot China (Domestic direct API)"),
-    ProviderEntry("stepfun",        "StepFun Step Plan",       "StepFun Step Plan (Agent / coding models via Step Plan API)"),
-    ProviderEntry("minimax",        "MiniMax",                  "MiniMax (Global direct API)"),
-    ProviderEntry("minimax-oauth",  "MiniMax (OAuth)",          "MiniMax via OAuth browser login (Coding Plan, minimax.io)"),
-    ProviderEntry("minimax-cn",     "MiniMax (China)",          "MiniMax China (Domestic direct API)"),
-    ProviderEntry("ollama-cloud",   "Ollama Cloud",             "Ollama Cloud (Cloud-hosted open models, ollama.com)"),
-    ProviderEntry("arcee",          "Arcee AI",                 "Arcee AI (Trinity models, direct API)"),
-    ProviderEntry("gmi",            "GMI Cloud",                "GMI Cloud (Multi-model direct API)"),
-    ProviderEntry("kilocode",       "Kilo Code",                "Kilo Code (Kilo Gateway API)"),
-    ProviderEntry("opencode-zen",   "OpenCode Zen",             "OpenCode Zen (Curated models, pay-as-you-go)"),
-    ProviderEntry("opencode-go",    "OpenCode Go",              "OpenCode Go (Open models subscription)"),
-    ProviderEntry("bedrock",        "AWS Bedrock",              "AWS Bedrock (Claude, Nova, Llama, DeepSeek; IAM or API key)"),
-    ProviderEntry("azure-foundry",  "Azure Foundry",            "Azure Foundry (OpenAI-style or Anthropic-style endpoint, your Azure AI deployment)"),
-    ProviderEntry("qwen-oauth",     "Qwen OAuth (Portal)",      "Qwen OAuth (Reuses local Qwen CLI login)"),
+    ProviderEntry("nous", "Nous Portal", "Nous Portal (Everything your agent needs, 300+ models with bundled tool use)"),
+    ProviderEntry("openrouter", "OpenRouter", "OpenRouter (Pay-per-use API aggregator)"),
+    ProviderEntry("novita", "NovitaAI", "NovitaAI (Cloud: Model API, Agent Sandbox, GPU Cloud)"),
+    ProviderEntry("lmstudio", "LM Studio", "LM Studio (Local desktop app with built-in model server)"),
+    ProviderEntry("anthropic", "Anthropic", "Anthropic (Claude models via API key or Claude Code)"),
+    ProviderEntry("openai-codex", "OpenAI Codex", "OpenAI Codex (Codex CLI via ChatGPT subscription or API key)"),
+    ProviderEntry("openai-api", "OpenAI API", "OpenAI API (api.openai.com, API key)"),
+    ProviderEntry("alibaba", "Qwen Cloud", "Qwen Cloud / DashScope (Qwen + multi-provider)"),
+    ProviderEntry("xai-oauth", "xAI Grok OAuth (SuperGrok / Premium+)", "xAI Grok OAuth (SuperGrok / Premium+ subscription)"),
+    ProviderEntry("xiaomi", "Xiaomi MiMo", "Xiaomi MiMo (MiMo-V2.5 and V2 models: pro, omni, flash)"),
+    ProviderEntry("tencent-tokenhub", "Tencent TokenHub", "Tencent TokenHub (Hy3 Preview via tokenhub.tencentmaas.com)"),
+    ProviderEntry("nvidia", "NVIDIA NIM", "NVIDIA NIM (Nemotron models via build.nvidia.com or local NIM)"),
+    ProviderEntry("copilot", "GitHub Copilot", "GitHub Copilot (Uses GITHUB_TOKEN or gh auth token)"),
+    ProviderEntry("copilot-acp", "GitHub Copilot ACP", "GitHub Copilot ACP (Spawns copilot --acp --stdio)"),
+    ProviderEntry("huggingface", "Hugging Face", "Hugging Face Inference Providers"),
+    ProviderEntry("gemini", "Google AI Studio", "Google AI Studio (Native Gemini API)"),
+    ProviderEntry("google-gemini-cli", "Google Gemini (OAuth)", "Google Gemini via OAuth + Code Assist (Code Assist OAuth flow)"),
+    ProviderEntry("deepseek", "DeepSeek", "DeepSeek (V3, R1, coder, direct API)"),
+    ProviderEntry("xai", "xAI", "xAI Grok (Direct API)"),
+    ProviderEntry("zai", "Z.AI / GLM", "Z.AI / GLM (Zhipu direct API)"),
+    ProviderEntry("kimi-coding", "Kimi / Kimi Coding Plan", "Kimi Coding Plan (api.kimi.com & Moonshot API)"),
+    ProviderEntry("kimi-coding-cn", "Kimi / Moonshot (China)", "Kimi / Moonshot China (Domestic direct API)"),
+    ProviderEntry("stepfun", "StepFun Step Plan", "StepFun Step Plan (Agent / coding models via Step Plan API)"),
+    ProviderEntry("minimax", "MiniMax", "MiniMax (Global direct API)"),
+    ProviderEntry("minimax-oauth", "MiniMax (OAuth)", "MiniMax via OAuth browser login (Coding Plan, minimax.io)"),
+    ProviderEntry("minimax-cn", "MiniMax (China)", "MiniMax China (Domestic direct API)"),
+    ProviderEntry("ollama-cloud", "Ollama Cloud", "Ollama Cloud (Cloud-hosted open models, ollama.com)"),
+    ProviderEntry("arcee", "Arcee AI", "Arcee AI (Trinity models, direct API)"),
+    ProviderEntry("gmi", "GMI Cloud", "GMI Cloud (Multi-model direct API)"),
+    ProviderEntry("kilocode", "Kilo Code", "Kilo Code (Kilo Gateway API)"),
+    ProviderEntry("opencode-zen", "OpenCode Zen", "OpenCode Zen (Curated models, pay-as-you-go)"),
+    ProviderEntry("opencode-go", "OpenCode Go", "OpenCode Go (Open models subscription)"),
+    ProviderEntry("bedrock", "AWS Bedrock", "AWS Bedrock (Claude, Nova, Llama, DeepSeek; IAM or API key)"),
+    ProviderEntry("azure-foundry", "Azure Foundry", "Azure Foundry (OpenAI-style or Anthropic-style endpoint, your Azure AI deployment)"),
+    ProviderEntry("qwen-oauth", "Qwen OAuth (Portal)", "Qwen OAuth (Reuses local Qwen CLI login)"),
 ]
 
 # Auto-extend CANONICAL_PROVIDERS with any provider registered in providers/
@@ -1074,12 +1071,12 @@ _PROVIDER_LABELS["custom"] = "Custom endpoint"  # special case: not a named prov
 # ---------------------------------------------------------------------------
 PROVIDER_GROUPS: dict[str, tuple[str, str, list[str]]] = {
     "kimi":     ("Kimi / Moonshot", "Coding Plan, Moonshot global & China endpoints", ["kimi-coding", "kimi-coding-cn"]),
-    "minimax":  ("MiniMax",         "Global, OAuth Coding Plan & China endpoints",     ["minimax", "minimax-oauth", "minimax-cn"]),
-    "xai":      ("xAI Grok",        "Direct API or SuperGrok / Premium+ OAuth",        ["xai", "xai-oauth"]),
-    "google":   ("Google Gemini",   "AI Studio API or OAuth + Code Assist",            ["gemini", "google-gemini-cli"]),
-    "openai":   ("OpenAI",          "Codex CLI or direct OpenAI API",                  ["openai-codex", "openai-api"]),
-    "opencode": ("OpenCode",        "Zen pay-as-you-go or Go subscription",            ["opencode-zen", "opencode-go"]),
-    "copilot":  ("GitHub Copilot",  "GitHub token API or copilot --acp process",       ["copilot", "copilot-acp"]),
+    "minimax":  ("MiniMax", "Global, OAuth Coding Plan & China endpoints", ["minimax", "minimax-oauth", "minimax-cn"]),
+    "xai":      ("xAI Grok", "Direct API or SuperGrok / Premium+ OAuth", ["xai", "xai-oauth"]),
+    "google":   ("Google Gemini", "AI Studio API or OAuth + Code Assist", ["gemini", "google-gemini-cli"]),
+    "openai":   ("OpenAI", "Codex CLI or direct OpenAI API", ["openai-codex", "openai-api"]),
+    "opencode": ("OpenCode", "Zen pay-as-you-go or Go subscription", ["opencode-zen", "opencode-go"]),
+    "copilot":  ("GitHub Copilot", "GitHub token API or copilot --acp process", ["copilot", "copilot-acp"]),
 }
 
 # Reverse index: member slug -> group_id. Built once at import.
@@ -1423,6 +1420,7 @@ def _format_price_per_mtok(per_token_str: str) -> str:
         "0.0000001"  → "$0.10"
         "0.00018"    → "$180.00"
         "0"          → "free"
+
     """
     try:
         val = float(per_token_str)
@@ -2190,7 +2188,10 @@ def provider_model_ids(provider: str | None, *, force_refresh: bool = False) -> 
     if normalized == "nous":
         # Try live Nous Portal /models endpoint
         try:
-            from hermes_cli.auth import fetch_nous_models, resolve_nous_runtime_credentials
+            from hermes_cli.auth import (
+                fetch_nous_models,
+                resolve_nous_runtime_credentials,
+            )
             creds = resolve_nous_runtime_credentials()
             if creds:
                 live = fetch_nous_models(api_key=creds.get("api_key", ""), inference_base_url=creds.get("base_url", ""))
@@ -2314,8 +2315,8 @@ def provider_model_ids(provider: str | None, *, force_refresh: bool = False) -> 
     # Handles any provider registered in providers/ with auth_type="api_key".
     # Replaces per-provider copy-paste blocks (stepfun, gmi, zai, etc.).
     try:
-        from providers import get_provider_profile
         from hermes_cli.auth import resolve_api_key_provider_credentials
+        from providers import get_provider_profile
 
         _p = get_provider_profile(normalized)
         if _p and _p.auth_type == "api_key" and _p.base_url:
@@ -2550,7 +2551,7 @@ def _fetch_anthropic_models(timeout: float = 5.0) -> list[str] | None:
     Claude Code auto-discovery).  Returns sorted model IDs or None.
     """
     try:
-        from agent.anthropic_adapter import resolve_anthropic_token, _is_oauth_token
+        from agent.anthropic_adapter import _is_oauth_token, resolve_anthropic_token
     except ImportError:
         return None
 
@@ -2562,7 +2563,11 @@ def _fetch_anthropic_models(timeout: float = 5.0) -> list[str] | None:
     is_oauth = _is_oauth_token(token)
     if is_oauth:
         headers["Authorization"] = f"Bearer {token}"
-        from agent.anthropic_adapter import _COMMON_BETAS, _OAUTH_ONLY_BETAS, _CONTEXT_1M_BETA
+        from agent.anthropic_adapter import (
+            _COMMON_BETAS,
+            _CONTEXT_1M_BETA,
+            _OAUTH_ONLY_BETAS,
+        )
         headers["anthropic-beta"] = ",".join(_COMMON_BETAS + _OAUTH_ONLY_BETAS)
     else:
         headers["x-api-key"] = token
@@ -3389,7 +3394,6 @@ def fetch_api_models(
 # ---------------------------------------------------------------------------
 
 
-
 _OLLAMA_CLOUD_CACHE_TTL = 3600  # 1 hour
 
 
@@ -3417,6 +3421,7 @@ def _load_ollama_cloud_cache(*, ignore_ttl: bool = False) -> dict | None:
 
     Args:
         ignore_ttl: If True, return data even if the TTL has expired (stale fallback).
+
     """
     try:
         cache_path = _ollama_cloud_cache_path()
@@ -3525,8 +3530,7 @@ def validate_requested_model(
     base_url: str | None = None,
     api_mode: str | None = None,
 ) -> dict[str, Any]:
-    """
-    Validate a ``/model`` value for the active provider.
+    """Validate a ``/model`` value for the active provider.
 
     Performs format checks first, then probes the live API to confirm
     the model actually exists.
@@ -3894,7 +3898,10 @@ def validate_requested_model(
     # AWS SDK control plane (ListFoundationModels + ListInferenceProfiles).
     if normalized == "bedrock":
         try:
-            from agent.bedrock_adapter import discover_bedrock_models, resolve_bedrock_region
+            from agent.bedrock_adapter import (
+                discover_bedrock_models,
+                resolve_bedrock_region,
+            )
             region = resolve_bedrock_region()
             discovered = discover_bedrock_models(region)
             discovered_ids = {m["id"] for m in discovered}

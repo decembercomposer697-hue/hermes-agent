@@ -74,7 +74,7 @@ class TestDetectDangerousSudo:
         assert "pipe" in desc.lower() or "shell" in desc.lower()
 
     def test_shell_via_lc_flag(self):
-        """bash -lc should be treated as dangerous just like bash -c."""
+        """Bash -lc should be treated as dangerous just like bash -c."""
         is_dangerous, key, desc = detect_dangerous_command("bash -lc 'echo pwned'")
         assert is_dangerous is True
         assert key is not None
@@ -87,7 +87,7 @@ class TestDetectDangerousSudo:
         assert key is not None
 
     def test_ksh_via_c_flag(self):
-        """ksh -c should be caught by the expanded pattern."""
+        """Ksh -c should be caught by the expanded pattern."""
         is_dangerous, key, desc = detect_dangerous_command("ksh -c 'echo test'")
         assert is_dangerous is True
         assert key is not None
@@ -174,8 +174,6 @@ class TestSessionKeyContext:
 
         assert "set_current_session_key" in called_names
         assert "reset_current_session_key" in called_names
-
-
 
 
 class TestRmFalsePositiveFix:
@@ -395,7 +393,8 @@ class TestHermesConfigWriteProtection:
     ~/.hermes/config.yaml (#14639). config.yaml IS the security policy
     (approvals.mode/yolo live there, mtime-keyed cache reloads mid-session),
     so a write_file deny without terminal-side coverage is unpaired theater.
-    These pin every terminal write idiom against the config file."""
+    These pin every terminal write idiom against the config file.
+    """
 
     def test_redirect_overwrite(self):
         dangerous, key, desc = detect_dangerous_command("echo 'approvals:' > ~/.hermes/config.yaml")
@@ -644,7 +643,8 @@ class TestProjectSensitiveTeePattern:
 class TestPatternKeyUniqueness:
     """Bug: pattern_key is derived by splitting on \\b and taking [1], so
     patterns starting with the same word (e.g. find -exec rm and find -delete)
-    produce the same key. Approving one silently approves the other."""
+    produce the same key. Approving one silently approves the other.
+    """
 
     def test_find_exec_rm_and_find_delete_have_different_keys(self):
         _, key_exec, _ = detect_dangerous_command("find . -exec rm {} \\;")
@@ -774,14 +774,14 @@ class TestGatewayProtection:
         assert dangerous is False
 
     def test_systemctl_restart_flagged(self):
-        """systemctl restart kills running agents and should require approval."""
+        """Systemctl restart kills running agents and should require approval."""
         cmd = "systemctl --user restart hermes-gateway"
         dangerous, key, desc = detect_dangerous_command(cmd)
         assert dangerous is True
         assert "stop/restart" in desc
 
     def test_pkill_hermes_detected(self):
-        """pkill targeting hermes/gateway processes must be caught."""
+        """Pkill targeting hermes/gateway processes must be caught."""
         cmd = 'pkill -f "cli.py --gateway"'
         dangerous, key, desc = detect_dangerous_command(cmd)
         assert dangerous is True
@@ -799,7 +799,7 @@ class TestGatewayProtection:
         assert dangerous is True
 
     def test_pkill_unrelated_not_flagged(self):
-        """pkill targeting unrelated processes should not be flagged."""
+        """Pkill targeting unrelated processes should not be flagged."""
         cmd = "pkill -f nginx"
         dangerous, key, desc = detect_dangerous_command(cmd)
         assert dangerous is False
@@ -1006,7 +1006,7 @@ class TestGitDestructiveOps:
         assert dangerous is False
 
     def test_git_branch_lowercase_d_also_flagged(self):
-        """git branch -d triggers approval too — IGNORECASE is global.
+        """Git branch -d triggers approval too — IGNORECASE is global.
 
         This is intentional: -d is safer than -D but an approval prompt
         for branch deletion is reasonable. The user can still approve.
@@ -1038,7 +1038,7 @@ class TestChmodExecuteCombo:
         assert dangerous is True
 
     def test_safe_chmod_without_execute_not_flagged(self):
-        """chmod +x alone without immediate execution must not be flagged."""
+        """Chmod +x alone without immediate execution must not be flagged."""
         cmd = "chmod +x script.sh"
         dangerous, _, _ = detect_dangerous_command(cmd)
         assert dangerous is False
@@ -1056,6 +1056,7 @@ class TestFailClosedUnderPromptToolkit:
 
     def test_denies_when_prompt_toolkit_active_and_no_callback(self):
         import threading
+
         import prompt_toolkit.application.current as ptc
 
         orig = ptc.get_app_or_none
@@ -1352,7 +1353,7 @@ class TestKillallKillSignals:
         assert dangerous is True
 
     def test_killall_regex(self):
-        """killall -r <regex> is a broad sweep; require approval."""
+        """Killall -r <regex> is a broad sweep; require approval."""
         dangerous, _, desc = detect_dangerous_command("killall -r 'fire.*'")
         assert dangerous is True
         assert "regex" in desc.lower() or "kill" in desc.lower()
@@ -1550,7 +1551,8 @@ class TestApprovalTimeoutIsNotConsent:
 
     def test_explicit_deny_carries_same_no_consent_shape(self):
         """An explicit /deny must produce the same shape as timeout —
-        the agent should treat both identically."""
+        the agent should treat both identically.
+        """
         from tools import approval as mod
 
         notified = []
@@ -1558,6 +1560,7 @@ class TestApprovalTimeoutIsNotConsent:
 
         # Spawn the approval wait in a thread, then resolve it with "deny".
         result_holder = {}
+
         def _check():
             result_holder["r"] = mod.check_all_command_guards("rm -rf .git", "local")
         t = threading.Thread(target=_check)

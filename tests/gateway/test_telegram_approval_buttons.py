@@ -46,8 +46,8 @@ def _ensure_telegram_mock():
 
 _ensure_telegram_mock()
 
-from gateway.platforms.telegram import TelegramAdapter
 from gateway.config import Platform, PlatformConfig
+from gateway.platforms.telegram import TelegramAdapter
 
 
 def _make_adapter(extra=None):
@@ -235,6 +235,7 @@ class TestTelegramExecApproval:
 # _handle_callback_query — approval button clicks
 # ===========================================================================
 
+
 class TestTelegramApprovalCallback:
     """Test the approval callback handling in _handle_callback_query."""
 
@@ -306,7 +307,8 @@ class TestTelegramApprovalCallback:
     @pytest.mark.asyncio
     async def test_typing_stays_paused_when_resolve_returns_zero(self):
         """If resolve_gateway_approval reports 0 resolves, the agent thread
-        was never unblocked, so typing should NOT be force-resumed."""
+        was never unblocked, so typing should NOT be force-resumed.
+        """
         adapter = _make_adapter()
         adapter._approval_state[6] = "agent:main:telegram:group:12345:99"
         adapter.pause_typing_for_chat("12345")

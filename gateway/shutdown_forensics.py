@@ -26,7 +26,6 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-
 _SIGNAL_NAME_BY_NUM: dict[int, str] = {}
 for _name in ("SIGTERM", "SIGINT", "SIGHUP", "SIGQUIT", "SIGUSR1", "SIGUSR2"):
     _val = getattr(signal, _name, None)

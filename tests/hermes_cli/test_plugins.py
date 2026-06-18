@@ -9,6 +9,12 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 
+from hermes_cli.middleware import (
+    VALID_MIDDLEWARE,
+    apply_llm_request_middleware,
+    apply_tool_request_middleware,
+    run_tool_execution_middleware,
+)
 from hermes_cli.plugins import (
     ENTRY_POINTS_GROUP,
     VALID_HOOKS,
@@ -21,13 +27,6 @@ from hermes_cli.plugins import (
     has_middleware,
     resolve_plugin_command_result,
 )
-from hermes_cli.middleware import (
-    VALID_MIDDLEWARE,
-    apply_llm_request_middleware,
-    apply_tool_request_middleware,
-    run_tool_execution_middleware,
-)
-
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -736,6 +735,7 @@ class TestPluginHooks:
 
         assert any("on_banana" in record.message for record in caplog.records)
 
+
 class TestPreToolCallBlocking:
     """Tests for the pre_tool_call block directive helper."""
 
@@ -785,8 +785,8 @@ class TestThreadToolWhitelist:
 
     def test_allowed_tool_passes_through_to_hooks(self, monkeypatch):
         from hermes_cli.plugins import (
-            set_thread_tool_whitelist,
             clear_thread_tool_whitelist,
+            set_thread_tool_whitelist,
         )
 
         monkeypatch.setattr(
@@ -801,8 +801,8 @@ class TestThreadToolWhitelist:
 
     def test_disallowed_tool_blocked_with_message(self, monkeypatch):
         from hermes_cli.plugins import (
-            set_thread_tool_whitelist,
             clear_thread_tool_whitelist,
+            set_thread_tool_whitelist,
         )
 
         monkeypatch.setattr(
@@ -820,8 +820,8 @@ class TestThreadToolWhitelist:
 
     def test_clear_restores_unrestricted_behavior(self, monkeypatch):
         from hermes_cli.plugins import (
-            set_thread_tool_whitelist,
             clear_thread_tool_whitelist,
+            set_thread_tool_whitelist,
         )
 
         monkeypatch.setattr(
@@ -839,8 +839,8 @@ class TestThreadToolWhitelist:
         import threading
 
         from hermes_cli.plugins import (
-            set_thread_tool_whitelist,
             clear_thread_tool_whitelist,
+            set_thread_tool_whitelist,
         )
 
         monkeypatch.setattr(
@@ -1124,7 +1124,6 @@ class TestPluginManagerList:
             assert "enabled" in p
             assert "tools" in p
             assert "hooks" in p
-
 
 
 class TestPreLlmCallTargetRouting:

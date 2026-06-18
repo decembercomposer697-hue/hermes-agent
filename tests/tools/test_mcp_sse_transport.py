@@ -29,7 +29,8 @@ async def _noop_initialize():
 def _build_server_with_sse(oauth: bool = False):
     """Stand up an MCPServerTask configured for SSE transport, with mocks
     threaded through so ``_run_http`` can enter the SSE branch without a
-    real network call."""
+    real network call.
+    """
     from tools.mcp_tool import MCPServerTask
 
     server = MCPServerTask("sse-test")
@@ -83,7 +84,8 @@ class TestSSEReadTimeout:
     def test_sse_read_timeout_is_300s_not_tool_timeout(self, patch_sse_client):
         """``sse_read_timeout`` must be 300s regardless of the configured
         ``timeout``. Using the tool timeout (60s default) causes Cloudflare-
-        Workers-style SSE MCP servers to drop the connection at ~60s idle."""
+        Workers-style SSE MCP servers to drop the connection at ~60s idle.
+        """
         from tools.mcp_tool import MCPServerTask
 
         server = _build_server_with_sse()
@@ -114,7 +116,8 @@ class TestSSEReadTimeout:
     def test_sse_read_timeout_still_300s_when_tool_timeout_is_large(self, patch_sse_client):
         """Even if user sets a large ``timeout``, ``sse_read_timeout`` stays
         decoupled — it's a transport-level budget for inter-event silence,
-        not a per-call budget."""
+        not a per-call budget.
+        """
         from tools.mcp_tool import MCPServerTask
 
         server = _build_server_with_sse()
@@ -144,7 +147,8 @@ class TestSSEOAuthForwarding:
     def test_sse_client_receives_oauth_auth_when_configured(self, patch_sse_client):
         """If ``_auth_type == 'oauth'``, ``sse_client`` must receive the
         constructed OAuth provider via ``auth=``. Previously the provider
-        was built but never forwarded to the SSE path."""
+        was built but never forwarded to the SSE path.
+        """
         from tools.mcp_tool import MCPServerTask
 
         server = _build_server_with_sse(oauth=True)
@@ -180,7 +184,8 @@ class TestSSEOAuthForwarding:
     def test_sse_client_omits_auth_when_no_oauth_configured(self, patch_sse_client):
         """Without OAuth, ``sse_client`` should not receive an ``auth=`` kwarg.
         Passing ``None`` would be equally fine but the current code path only
-        sets it when configured — lock that in."""
+        sets it when configured — lock that in.
+        """
         from tools.mcp_tool import MCPServerTask
 
         server = _build_server_with_sse(oauth=False)

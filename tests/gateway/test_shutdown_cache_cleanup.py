@@ -19,10 +19,10 @@ import pytest
 # Import the module (not the class) to reach stop() and helpers
 import gateway.run as gw_mod
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 class _FakeGateway:
     """Minimal stand-in with just enough state for ``stop()`` to run."""
@@ -105,7 +105,8 @@ def _make_mock_agent():
 class TestCachedAgentCleanupOnShutdown:
     """Verify that ``stop()`` calls ``_cleanup_agent_resources`` on idle
     cached agents, triggering ``shutdown_memory_provider()`` (which calls
-    ``on_session_end``)."""
+    ``on_session_end``).
+    """
 
     @pytest.mark.asyncio
     async def test_cached_agent_memory_provider_shut_down(self):
@@ -202,7 +203,8 @@ class TestRunningAgentsNotDoubleCleaned:
     @pytest.mark.asyncio
     async def test_running_and_cached_agent_cleaned_at_least_once(self):
         """An agent in both _running_agents and _agent_cache gets
-        shutdown_memory_provider called at least once."""
+        shutdown_memory_provider called at least once.
+        """
         gw = _FakeGateway()
         shared = _make_mock_agent()
 

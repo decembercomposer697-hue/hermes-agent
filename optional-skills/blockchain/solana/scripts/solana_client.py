@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Solana Blockchain CLI Tool for Hermes Agent
+"""Solana Blockchain CLI Tool for Hermes Agent
 --------------------------------------------
 Queries the Solana JSON-RPC API and CoinGecko for enriched on-chain data.
 Uses only Python standard library — no external packages required.
@@ -24,8 +23,8 @@ import json
 import os
 import sys
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 from typing import Any, Dict, List, Optional
 
 RPC_URL = os.environ.get(
@@ -38,28 +37,28 @@ LAMPORTS_PER_SOL = 1_000_000_000
 # Well-known Solana token names — avoids API calls for common tokens.
 # Maps mint address → (symbol, name).
 KNOWN_TOKENS: dict[str, tuple] = {
-    "So11111111111111111111111111111111111111112":  ("SOL",   "Solana"),
-    "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": ("USDC",  "USD Coin"),
-    "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB":  ("USDT",  "Tether"),
-    "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263": ("BONK",  "Bonk"),
-    "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN":  ("JUP",   "Jupiter"),
-    "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs": ("WETH",  "Wrapped Ether"),
-    "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL":  ("JTO",   "Jito"),
-    "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So":  ("mSOL",  "Marinade Staked SOL"),
+    "So11111111111111111111111111111111111111112":  ("SOL", "Solana"),
+    "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": ("USDC", "USD Coin"),
+    "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB":  ("USDT", "Tether"),
+    "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263": ("BONK", "Bonk"),
+    "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN":  ("JUP", "Jupiter"),
+    "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs": ("WETH", "Wrapped Ether"),
+    "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL":  ("JTO", "Jito"),
+    "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So":  ("mSOL", "Marinade Staked SOL"),
     "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj": ("stSOL", "Lido Staked SOL"),
-    "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3": ("PYTH",  "Pyth Network"),
-    "RLBxxFkseAZ4RgJH3Sqn8jXxhmGoz9jWxDNJMh8pL7a":  ("RLBB",  "Rollbit"),
-    "hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux":  ("HNT",   "Helium"),
-    "rndrizKT3MK1iimdxRdWabcF7Zg7AR5T4nud4EkHBof":  ("RNDR",  "Render"),
-    "WENWENvqqNya429ubCdR81ZmD69brwQaaBYY6p91oHQQ":  ("WEN",   "Wen"),
-    "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ": ("W",     "Wormhole"),
-    "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6":  ("TNSR",  "Tensor"),
+    "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3": ("PYTH", "Pyth Network"),
+    "RLBxxFkseAZ4RgJH3Sqn8jXxhmGoz9jWxDNJMh8pL7a":  ("RLBB", "Rollbit"),
+    "hntyVP6YFm1Hg25TN9WGLqM12b8TQmcknKrdu1oxWux":  ("HNT", "Helium"),
+    "rndrizKT3MK1iimdxRdWabcF7Zg7AR5T4nud4EkHBof":  ("RNDR", "Render"),
+    "WENWENvqqNya429ubCdR81ZmD69brwQaaBYY6p91oHQQ":  ("WEN", "Wen"),
+    "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ": ("W", "Wormhole"),
+    "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6":  ("TNSR", "Tensor"),
     "DriFtupJYLTosbwoN8koMbEYSx54aFAVLddWsbksjwg7":  ("DRIFT", "Drift"),
-    "bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1":  ("bSOL",  "BlazeStake Staked SOL"),
-    "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4": ("JLP",   "Jupiter LP"),
-    "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm": ("WIF",   "dogwifhat"),
-    "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5":  ("MEW",   "cat in a dogs world"),
-    "ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82":  ("BOME",  "Book of Meme"),
+    "bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1":  ("bSOL", "BlazeStake Staked SOL"),
+    "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4": ("JLP", "Jupiter LP"),
+    "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm": ("WIF", "dogwifhat"),
+    "MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5":  ("MEW", "cat in a dogs world"),
+    "ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82":  ("BOME", "Book of Meme"),
     "A8C3xuqscfmyLrte3VwJvtPHXvcSN3FjDbUaSMAkQrCS": ("PENGU", "Pudgy Penguins"),
 }
 
@@ -407,7 +406,7 @@ def cmd_tx(args):
     msg          = result.get("transaction", {}).get("message", {})
     account_keys = msg.get("accountKeys", [])
 
-    pre  = meta.get("preBalances",  [])
+    pre  = meta.get("preBalances", [])
     post = meta.get("postBalances", [])
 
     balance_changes = []
@@ -573,7 +572,7 @@ def cmd_whales(args):
 
         msg          = tx["transaction"].get("message", {})
         account_keys = msg.get("accountKeys", [])
-        pre          = meta.get("preBalances",  [])
+        pre          = meta.get("preBalances", [])
         post         = meta.get("postBalances", [])
 
         for i in range(len(pre)):

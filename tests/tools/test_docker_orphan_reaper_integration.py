@@ -24,7 +24,8 @@ def test_maybe_reap_runs_once_per_process(monkeypatch):
     """The reaper sweep must run at most once per Python interpreter.
     Parallel subagents that each call _create_environment(env_type='docker')
     would otherwise fire N concurrent docker ps + inspect storms against the
-    daemon and waste 5–10s of startup."""
+    daemon and waste 5–10s of startup.
+    """
     _reset_reaper_gate()
     call_count = {"reap": 0}
 
@@ -47,7 +48,8 @@ def test_maybe_reap_respects_disable_flag(monkeypatch):
     """``terminal.docker_orphan_reaper: false`` (via container_config) must
     skip the sweep entirely — no docker ps, no inspect, no rm. The escape
     hatch for operators running multiple Hermes processes in the same
-    profile."""
+    profile.
+    """
     _reset_reaper_gate()
     call_count = {"reap": 0}
 
@@ -67,7 +69,8 @@ def test_maybe_reap_respects_disable_flag(monkeypatch):
 def test_maybe_reap_doubles_lifetime_for_max_age(monkeypatch):
     """The reaper's age threshold is ``2 × lifetime_seconds`` (with a 60s
     floor). Generous default — gives sibling Hermes processes ample grace
-    to be replaced without their just-exited containers being yanked."""
+    to be replaced without their just-exited containers being yanked.
+    """
     _reset_reaper_gate()
     captured_args = {}
 
@@ -87,7 +90,8 @@ def test_maybe_reap_doubles_lifetime_for_max_age(monkeypatch):
 def test_maybe_reap_floors_at_60_seconds(monkeypatch):
     """A user pinning TERMINAL_LIFETIME_SECONDS=0 (or any value <30) would
     otherwise get an effective age threshold of zero, which would race the
-    user's own just-started container creation. Floor at 60s × 2 = 120s."""
+    user's own just-started container creation. Floor at 60s × 2 = 120s.
+    """
     _reset_reaper_gate()
     captured_args = {}
 
@@ -107,7 +111,8 @@ def test_maybe_reap_floors_at_60_seconds(monkeypatch):
 def test_maybe_reap_passes_current_profile_as_filter(monkeypatch):
     """The reaper must be scoped to the current Hermes profile — a research
     profile must NEVER reap default's containers. Verifies the
-    profile-filter wiring."""
+    profile-filter wiring.
+    """
     _reset_reaper_gate()
     captured_args = {}
 
@@ -127,7 +132,8 @@ def test_maybe_reap_passes_current_profile_as_filter(monkeypatch):
 def test_maybe_reap_swallows_exceptions(monkeypatch):
     """A reaper crash (docker daemon down, parse error in helper) must NOT
     block env creation. The reaper is best-effort plumbing, not a critical
-    path; failures get logged at debug level and execution continues."""
+    path; failures get logged at debug level and execution continues.
+    """
     _reset_reaper_gate()
 
     def _exploding_reap(**kwargs):

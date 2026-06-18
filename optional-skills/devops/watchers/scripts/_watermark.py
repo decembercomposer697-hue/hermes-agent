@@ -23,9 +23,9 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from collections.abc import Iterable
 
 
 def _state_dir() -> Path:

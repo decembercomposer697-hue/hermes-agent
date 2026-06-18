@@ -338,7 +338,8 @@ def _task_summary_dict(kb, conn, task) -> dict[str, Any]:
 
 def _handle_show(args: dict, **kw) -> str:
     """Read a task's full state: task row, parents, children, comments,
-    runs (attempt history), and the last N events."""
+    runs (attempt history), and the last N events.
+    """
     tid = _default_task_id(args.get("task_id"))
     if not tid:
         return tool_error(

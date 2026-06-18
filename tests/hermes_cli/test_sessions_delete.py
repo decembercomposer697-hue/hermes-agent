@@ -65,7 +65,7 @@ def test_sessions_delete_reports_not_found_when_prefix_is_unknown(monkeypatch, c
 
 
 def test_sessions_delete_handles_eoferror_on_confirm(monkeypatch, capsys):
-    """sessions delete should not crash when stdin is closed (non-TTY)."""
+    """Sessions delete should not crash when stdin is closed (non-TTY)."""
     import hermes_cli.main as main_mod
     import hermes_state
 
@@ -93,7 +93,7 @@ def test_sessions_delete_handles_eoferror_on_confirm(monkeypatch, capsys):
 
 
 def test_sessions_prune_handles_eoferror_on_confirm(monkeypatch, capsys):
-    """sessions prune should not crash when stdin is closed (non-TTY)."""
+    """Sessions prune should not crash when stdin is closed (non-TTY)."""
     import hermes_cli.main as main_mod
     import hermes_state
 

@@ -1,7 +1,10 @@
 """Regression test for #17929: AIAgent.__init__ should try fallback_model
-when primary provider credentials are exhausted."""
+when primary provider credentials are exhausted.
+"""
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
 from run_agent import AIAgent
 
 
@@ -20,7 +23,8 @@ def _mock_client(api_key="fb-key-1234567890", base_url="https://fb.example.com/v
 
 def test_init_tries_fallback_when_primary_returns_none():
     """When resolve_provider_client returns None for primary but succeeds for
-    a fallback entry, __init__ should NOT raise RuntimeError."""
+    a fallback entry, __init__ should NOT raise RuntimeError.
+    """
     fb = _mock_client()
 
     def fake_resolve(provider, model=None, raw_codex=False,

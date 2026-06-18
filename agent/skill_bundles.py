@@ -272,7 +272,7 @@ def build_bundle_invocation_message(
 
     # Late import to avoid pulling tools/* at module import time and to
     # keep skill_bundles cheap to import in test environments.
-    from agent.skill_commands import _load_skill_payload, _build_skill_message
+    from agent.skill_commands import _build_skill_message, _load_skill_payload
 
     loaded_names: list[str] = []
     missing: list[str] = []

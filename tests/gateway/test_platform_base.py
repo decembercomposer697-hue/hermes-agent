@@ -7,13 +7,13 @@ from unittest.mock import patch
 import pytest
 
 from gateway.platforms.base import (
-    BasePlatformAdapter,
     GATEWAY_SECRET_CAPTURE_UNSUPPORTED_MESSAGE,
+    BasePlatformAdapter,
     MessageEvent,
-    safe_url_for_log,
-    utf16_len,
     _log_safe_path,
     _prefix_within_utf16_limit,
+    safe_url_for_log,
+    utf16_len,
 )
 
 
@@ -241,7 +241,8 @@ class TestExtractImages:
 
     def test_non_image_link_preserved_when_mixed_with_images(self):
         """Regression: non-image markdown links must not be silently removed
-        when the response also contains real images."""
+        when the response also contains real images.
+        """
         content = (
             "Here is the image: ![photo](https://fal.media/cat.png)\n"
             "And a doc: ![report](https://example.com/report.pdf)"
@@ -333,7 +334,8 @@ class TestExtractMedia:
     def test_as_document_directive_stripped_from_cleaned_text(self):
         """[[as_document]] is a routing directive — strip it from
         user-visible text just like [[audio_as_voice]]. Callers detect the
-        directive on the original content (before extract_media)."""
+        directive on the original content (before extract_media).
+        """
         content = "Here is your infographic:\n[[as_document]]\nMEDIA:/tmp/x.jpg"
         media, cleaned = BasePlatformAdapter.extract_media(content)
         assert media == [("/tmp/x.jpg", False)]
@@ -342,7 +344,8 @@ class TestExtractMedia:
 
     def test_as_document_directive_alone_does_not_attach_voice_flag(self):
         """[[as_document]] is independent of [[audio_as_voice]] — combining
-        them in the same response should not entangle the flags."""
+        them in the same response should not entangle the flags.
+        """
         content = "[[as_document]]\nMEDIA:/tmp/x.jpg"
         media, cleaned = BasePlatformAdapter.extract_media(content)
         assert media == [("/tmp/x.jpg", False)]  # voice flag stays False
@@ -351,7 +354,8 @@ class TestExtractMedia:
     def test_both_directives_can_coexist(self):
         """A response could (rarely) contain both [[audio_as_voice]] for an
         ogg file AND [[as_document]] for an attached image. The voice flag
-        propagates per-tuple; [[as_document]] is detected at dispatch."""
+        propagates per-tuple; [[as_document]] is detected at dispatch.
+        """
         content = "[[audio_as_voice]]\n[[as_document]]\nMEDIA:/tmp/x.ogg"
         media, cleaned = BasePlatformAdapter.extract_media(content)
         # Voice flag is propagated to every media tuple (this matches the
@@ -432,7 +436,8 @@ class TestExtractMedia:
 
     def test_media_mixed_code_and_prose(self):
         """Real MEDIA: in prose + example in code block: only prose extracted,
-        and the code block survives verbatim in the delivered text."""
+        and the code block survives verbatim in the delivered text.
+        """
         content = (
             "Here is your file:\n"
             "MEDIA:/output/report.pdf\n"
@@ -452,7 +457,8 @@ class TestExtractMedia:
 
     def test_inline_code_survives_when_real_media_present(self):
         """When a real MEDIA: tag is delivered, an inline-code example in the
-        same reply must not be blanked to whitespace."""
+        same reply must not be blanked to whitespace.
+        """
         content = "See MEDIA:/r/a.png and `MEDIA:/ex/b.png` inline"
         media, cleaned = BasePlatformAdapter.extract_media(content)
         assert [p for p, _ in media] == ["/r/a.png"]
@@ -529,7 +535,8 @@ class TestMediaInsideSerializedJson:
 
     def test_json_embedded_media_kept_verbatim_in_cleaned_text(self):
         """A real tag is delivered+stripped; a JSON-embedded MEDIA: stays as
-        literal text (stored data must read back unchanged)."""
+        literal text (stored data must read back unchanged).
+        """
         content = 'MEDIA:/real/r.png\nlog: {"old":"MEDIA:/stale/s.png"}'
         media, cleaned = BasePlatformAdapter.extract_media(content)
         assert [p for p, _ in media] == ["/real/r.png"]
@@ -538,7 +545,8 @@ class TestMediaInsideSerializedJson:
 
     def test_cleaned_text_after_directive_not_truncated(self):
         """Stripping a tag preceded by a [[as_document]] directive must not
-        shift offsets and chop the path or trailing text."""
+        shift offsets and chop the path or trailing text.
+        """
         content = "See [[as_document]] MEDIA:/d/report.pdf now"
         media, cleaned = BasePlatformAdapter.extract_media(content)
         assert [p for p, _ in media] == ["/d/report.pdf"]
@@ -577,7 +585,8 @@ class TestMediaExtensionAllowlistParity:
     def test_unknown_extension_not_black_holed_by_cleanup(self):
         """A MEDIA: tag with an unknown extension is NOT stripped from the
         body — it survives so extract_local_files can still see the bare path,
-        rather than vanishing entirely (the core of issue #34517)."""
+        rather than vanishing entirely (the core of issue #34517).
+        """
         from gateway.platforms.base import MEDIA_TAG_CLEANUP_RE
         text = "Saved to MEDIA:/tmp/data.weirdext done"
         media, _ = BasePlatformAdapter.extract_media(text)
@@ -1407,6 +1416,7 @@ class TestProxyKwargsForAiohttp:
     def test_http_proxy_uses_connector_when_aiohttp_socks_available(self):
         pytest.importorskip("aiohttp_socks")
         from unittest.mock import MagicMock
+
         from gateway.platforms.base import proxy_kwargs_for_aiohttp
 
         sentinel = MagicMock(name="ProxyConnector")
@@ -1421,6 +1431,7 @@ class TestProxyKwargsForAiohttp:
     def test_socks_proxy_uses_connector(self):
         pytest.importorskip("aiohttp_socks")
         from unittest.mock import MagicMock
+
         from gateway.platforms.base import proxy_kwargs_for_aiohttp
 
         sentinel = MagicMock(name="ProxyConnector")

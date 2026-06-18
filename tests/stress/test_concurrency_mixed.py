@@ -327,7 +327,7 @@ def main():
     for s, n in sorted(status_counts.items()):
         print(f"  {s:<10} {n}")
     print("Final run outcomes:")
-    for o, n in sorted(run_outcome_counts.items(), key=lambda x: (x[0] or '',)):
+    for o, n in sorted(run_outcome_counts.items(), key=lambda x: (x[0] or "",)):
         print(f"  {o:<12} {n}")
     print(f"  active       {active_runs}")
 

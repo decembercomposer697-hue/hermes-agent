@@ -93,8 +93,12 @@ class TestDynamicSchemaBuilder:
 
     def test_does_not_mention_edit_or_extend(self, cfg_home):
         """The simplified surface only does text→video and image→video.
-        The description must not mention edit/extend anywhere."""
-        from tools.video_generation_tool import _build_dynamic_video_schema, _GENERIC_DESCRIPTION
+        The description must not mention edit/extend anywhere.
+        """
+        from tools.video_generation_tool import (
+            _GENERIC_DESCRIPTION,
+            _build_dynamic_video_schema,
+        )
 
         desc = _build_dynamic_video_schema()["description"]
         # Block words that would suggest functionality we removed

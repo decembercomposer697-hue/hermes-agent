@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone, UTC
+from datetime import UTC, datetime, timedelta, timezone
 from typing import Any
 
 from plugins.teams_pipeline.models import GraphSubscription
-from plugins.teams_pipeline.store import TeamsPipelineStore, resolve_teams_pipeline_store_path
+from plugins.teams_pipeline.store import (
+    TeamsPipelineStore,
+    resolve_teams_pipeline_store_path,
+)
 from tools.microsoft_graph_auth import MicrosoftGraphTokenProvider
 from tools.microsoft_graph_client import MicrosoftGraphClient
 

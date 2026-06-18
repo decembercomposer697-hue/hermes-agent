@@ -1,5 +1,4 @@
-"""
-show_snapshot.py — Dump the population from a darwinian-evolver snapshot pickle.
+"""show_snapshot.py — Dump the population from a darwinian-evolver snapshot pickle.
 
 Usage:
     python show_snapshot.py PATH/TO/iteration_N.pkl [--field prompt_template]

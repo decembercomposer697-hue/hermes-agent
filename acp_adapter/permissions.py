@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable
 from concurrent.futures import TimeoutError as FutureTimeout
 from itertools import count
-from collections.abc import Callable
 
 from acp.schema import (
     AllowedOutcome,
@@ -110,8 +110,7 @@ def make_approval_callback(
     session_id: str,
     timeout: float = 60.0,
 ) -> Callable[..., str]:
-    """
-    Return a Hermes-compatible approval callback that bridges to ACP.
+    """Return a Hermes-compatible approval callback that bridges to ACP.
 
     The callback accepts ``command`` and ``description`` plus optional
     keyword arguments such as ``allow_permanent`` used by
@@ -122,6 +121,7 @@ def make_approval_callback(
         loop: The event loop on which the ACP connection lives.
         session_id: Current ACP session id.
         timeout: Seconds to wait for a response before auto-denying.
+
     """
 
     def _callback(

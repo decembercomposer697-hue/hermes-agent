@@ -78,7 +78,8 @@ class TestNormalizeVoiceRecordKeyForPromptToolkit:
         would crash the classic CLI at startup if passed through. Fall
         back to the documented default; the CLI binding site is
         expected to warn so users know the shortcut is TUI-only
-        (Copilot round-11 on #19835)."""
+        (Copilot round-11 on #19835).
+        """
         from hermes_cli.voice import normalize_voice_record_key_for_prompt_toolkit
 
         assert normalize_voice_record_key_for_prompt_toolkit("super+b") == "c-b"
@@ -89,7 +90,8 @@ class TestNormalizeVoiceRecordKeyForPromptToolkit:
     def test_strips_whitespace_within_and_around(self):
         """``ctrl + b`` / ``  option + space  `` are accepted by the TUI
         parser; the CLI normalizer must mirror that or the same config
-        binds different shortcuts across runtimes."""
+        binds different shortcuts across runtimes.
+        """
         from hermes_cli.voice import normalize_voice_record_key_for_prompt_toolkit
 
         assert normalize_voice_record_key_for_prompt_toolkit("ctrl + b") == "c-b"
@@ -98,7 +100,8 @@ class TestNormalizeVoiceRecordKeyForPromptToolkit:
     def test_named_key_aliases_collapse_to_prompt_toolkit_canonical(self):
         """TUI accepts ``return`` / ``esc`` / ``bs`` / ``del`` etc.;
         CLI must collapse to prompt_toolkit's canonical spelling
-        (``enter`` / ``escape`` / ``backspace`` / ``delete``)."""
+        (``enter`` / ``escape`` / ``backspace`` / ``delete``).
+        """
         from hermes_cli.voice import normalize_voice_record_key_for_prompt_toolkit
 
         assert normalize_voice_record_key_for_prompt_toolkit("ctrl+return") == "c-enter"
@@ -108,7 +111,8 @@ class TestNormalizeVoiceRecordKeyForPromptToolkit:
 
     def test_typoed_named_keys_fall_back_to_default(self):
         """``ctrl+spcae`` would otherwise pass through as ``c-spcae`` and
-        prompt_toolkit would reject it at startup — fall back instead."""
+        prompt_toolkit would reject it at startup — fall back instead.
+        """
         from hermes_cli.voice import normalize_voice_record_key_for_prompt_toolkit
 
         assert normalize_voice_record_key_for_prompt_toolkit("ctrl+spcae") == "c-b"
@@ -116,7 +120,8 @@ class TestNormalizeVoiceRecordKeyForPromptToolkit:
 
     def test_bare_char_and_multi_modifier_fall_back(self):
         """TUI parser rejects bare-char (``o``) and multi-modifier
-        (``ctrl+alt+r``) configs; the CLI normalizer must match."""
+        (``ctrl+alt+r``) configs; the CLI normalizer must match.
+        """
         from hermes_cli.voice import normalize_voice_record_key_for_prompt_toolkit
 
         assert normalize_voice_record_key_for_prompt_toolkit("o") == "c-b"
@@ -126,7 +131,8 @@ class TestNormalizeVoiceRecordKeyForPromptToolkit:
     def test_reserved_ctrl_chars_fall_back(self):
         """``ctrl+c`` / ``ctrl+d`` / ``ctrl+l`` are always claimed by
         the CLI's prompt_toolkit input layer or terminal driver; match
-        the TUI parser's rejection to keep /voice status honest."""
+        the TUI parser's rejection to keep /voice status honest.
+        """
         from hermes_cli.voice import normalize_voice_record_key_for_prompt_toolkit
 
         assert normalize_voice_record_key_for_prompt_toolkit("ctrl+c") == "c-b"
@@ -135,7 +141,8 @@ class TestNormalizeVoiceRecordKeyForPromptToolkit:
 
     def test_unknown_modifier_falls_back(self):
         """``meta+b`` is ambiguous on the wire (Alt on xterm, Cmd on
-        legacy macOS), same class as the TUI parser's rejection."""
+        legacy macOS), same class as the TUI parser's rejection.
+        """
         from hermes_cli.voice import normalize_voice_record_key_for_prompt_toolkit
 
         assert normalize_voice_record_key_for_prompt_toolkit("meta+b") == "c-b"
@@ -207,7 +214,8 @@ class TestVoiceRecordKeyFromConfig:
 
     def test_normalizer_accepts_extractor_output_directly(self):
         """voice_record_key_from_config + normalize_… must compose —
-        None / non-string scalars all fall back to c-b."""
+        None / non-string scalars all fall back to c-b.
+        """
         from hermes_cli.voice import (
             normalize_voice_record_key_for_prompt_toolkit,
             voice_record_key_from_config,
@@ -283,7 +291,8 @@ class TestSpeakTextGuards:
     def test_empty_text_is_noop(self, text):
         """Empty / whitespace-only text must return without importing tts_tool
         (the gateway spawns a thread per call, so a no-op on empty input
-        keeps the thread pool from churning on trivial inputs)."""
+        keeps the thread pool from churning on trivial inputs).
+        """
         from hermes_cli.voice import speak_text
 
         # Should simply return None without raising.
@@ -316,7 +325,8 @@ class TestContinuousAPI:
 
     def test_stop_continuous_idempotent_when_inactive(self, monkeypatch):
         """stop_continuous must not raise when no loop is active — the
-        gateway's voice.toggle off path calls it unconditionally."""
+        gateway's voice.toggle off path calls it unconditionally.
+        """
         import hermes_cli.voice as voice
 
         monkeypatch.setattr(voice, "_continuous_active", False)
@@ -329,7 +339,8 @@ class TestContinuousAPI:
     def test_double_start_is_idempotent(self, monkeypatch):
         """A second start_continuous while already active is a no-op — prevents
         two overlapping capture threads fighting over the microphone when the
-        UI double-fires (e.g. both /voice on and Ctrl+B within the same tick)."""
+        UI double-fires (e.g. both /voice on and Ctrl+B within the same tick).
+        """
         import hermes_cli.voice as voice
 
         monkeypatch.setattr(voice, "_continuous_active", True)
@@ -681,7 +692,8 @@ class TestContinuousLoopSimulation:
 
     def test_stop_during_transcription_discards_restart(self, fake_recorder, monkeypatch):
         """User hits Ctrl+B mid-transcription: the in-flight transcript must
-        still fire (it's a real utterance), but the loop must NOT restart."""
+        still fire (it's a real utterance), but the loop must NOT restart.
+        """
         import hermes_cli.voice as voice
 
         stop_triggered = {"flag": False}

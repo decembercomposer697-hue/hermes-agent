@@ -4,15 +4,15 @@ import importlib
 import os
 import sys
 from types import SimpleNamespace
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from trajectory_compressor import (
-    CompressionConfig,
-    TrajectoryMetrics,
     AggregateMetrics,
+    CompressionConfig,
     TrajectoryCompressor,
+    TrajectoryMetrics,
 )
 
 
@@ -300,8 +300,8 @@ def _make_compressor(config=None):
     """Create a TrajectoryCompressor with mocked tokenizer and summarizer."""
     if config is None:
         config = CompressionConfig()
-    with patch.object(TrajectoryCompressor, '_init_tokenizer'), \
-         patch.object(TrajectoryCompressor, '_init_summarizer'):
+    with patch.object(TrajectoryCompressor, "_init_tokenizer"), \
+         patch.object(TrajectoryCompressor, "_init_summarizer"):
         compressor = TrajectoryCompressor(config)
     # Provide a simple token counter for tests (1 token per 4 chars)
     compressor.tokenizer = MagicMock()

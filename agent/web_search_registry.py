@@ -1,5 +1,4 @@
-"""
-Web Search Provider Registry
+"""Web Search Provider Registry
 ============================
 
 Central map of registered web providers. Populated by plugins at import-time

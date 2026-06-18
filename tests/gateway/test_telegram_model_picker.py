@@ -104,7 +104,8 @@ class TestTelegramModelPicker:
         edit the picker message to show the confirmation and remove the
         buttons.  An earlier revision of this PR over-indented the
         edit_message_text block so it lived inside the except branch and
-        only fired when the callback raised."""
+        only fired when the callback raised.
+        """
         adapter = _make_adapter()
         callback = AsyncMock(return_value="Switched to `gpt-5`")
         adapter._model_picker_state["12345"] = {
@@ -146,7 +147,8 @@ class TestTelegramModelPicker:
         Inspects callback_data by recording every InlineKeyboardButton built,
         which is robust to whether `telegram` is the real SDK or the module
         mock (the SDK markup objects don't expose a plain iterable under the
-        mock)."""
+        mock).
+        """
         import gateway.platforms.telegram as tg
 
         built: list = []

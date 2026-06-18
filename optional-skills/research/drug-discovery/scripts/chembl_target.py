@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""
-chembl_target.py — Search ChEMBL for a target and retrieve top active compounds.
+"""chembl_target.py — Search ChEMBL for a target and retrieve top active compounds.
 Usage: python3 chembl_target.py "EGFR" --min-pchembl 7 --limit 20
 No external dependencies.
 """
-import sys, json, time, argparse
-import urllib.request, urllib.parse
+import argparse
+import json
+import sys
+import time
+import urllib.parse
+import urllib.request
 
 BASE = "https://www.ebi.ac.uk/chembl/api/data"
+
 
 def get(endpoint):
     try:
@@ -16,6 +20,7 @@ def get(endpoint):
             return json.loads(r.read())
     except Exception as e:
         print(f"API error: {e}", file=sys.stderr); return None
+
 
 def main():
     parser = argparse.ArgumentParser(description="ChEMBL target → active compounds")

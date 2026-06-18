@@ -146,6 +146,7 @@ class TestSlashCommands:
         runner.config.quick_commands = {
             "s": {"type": "alias", "target": "/status extra-arg"},
         }
+
         async def _handle_status(event):
             assert event.get_command_args() == "extra-arg"
             return "status via alias"
@@ -159,7 +160,6 @@ class TestSlashCommands:
         assert response_text == "status via alias"
         runner._handle_status_command.assert_awaited_once()
         runner._handle_message_with_agent.assert_not_awaited()
-
 
 
 class TestSessionLifecycle:

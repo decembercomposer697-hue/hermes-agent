@@ -11,7 +11,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 pytestmark = pytest.mark.usefixtures("disable_lazy_stt_install")
 
 
@@ -46,6 +45,7 @@ class TestProviderSelectionGate:
         not freeze that temporary helper into this module forever.
         """
         import importlib
+
         import hermes_cli.config as config_mod
         from tools import transcription_tools as tt
 
@@ -64,8 +64,9 @@ class TestProviderSelectionGate:
             importlib.reload(tt)
 
     def test_xai_resolver_import_after_config_env_patch_uses_restored_dotenv_loader(self):
-        """xAI HTTP auth must not cache a temporarily patched env helper."""
+        """XAI HTTP auth must not cache a temporarily patched env helper."""
         import importlib
+
         import hermes_cli.config as config_mod
         from tools import xai_http
 
@@ -131,7 +132,8 @@ class TestProviderSelectionGate:
     def test_auto_detect_sees_dotenv_groq(self):
         """No local backend, no explicit provider — auto-detect should fall
         through to Groq when its key lives in dotenv only. Before the fix
-        it would return 'none'."""
+        it would return 'none'.
+        """
         from tools import transcription_tools as tt
 
         with patch.object(tt, "_HAS_FASTER_WHISPER", False), \
@@ -148,7 +150,8 @@ class TestProviderSelectionGate:
 class TestTranscribeCallSitesReadDotenv:
     """The actual transcribe functions must forward the dotenv-resolved
     key into the provider SDK / HTTP call. We mock ``get_env_value`` and
-    capture what gets passed through."""
+    capture what gets passed through.
+    """
 
     def test_transcribe_groq_forwards_dotenv_key(self):
         from tools import transcription_tools as tt
@@ -160,6 +163,7 @@ class TestTranscribeCallSitesReadDotenv:
                 seen_keys.append(api_key)
                 self.audio = MagicMock()
                 self.audio.transcriptions.create.return_value = "hello"
+
             def close(self):
                 pass
 
@@ -190,6 +194,7 @@ class TestTranscribeCallSitesReadDotenv:
                 completion = MagicMock()
                 completion.text = "hi"
                 self.audio.transcriptions.complete.return_value = completion
+
             def __enter__(self): return self
             def __exit__(self, *a): return False
 
@@ -205,7 +210,7 @@ class TestTranscribeCallSitesReadDotenv:
         assert seen_keys == ["mistral-dotenv-key"]
 
     def test_transcribe_xai_forwards_dotenv_key(self):
-        """xAI STT now resolves credentials through ``tools.xai_http`` so the
+        """XAI STT now resolves credentials through ``tools.xai_http`` so the
         OAuth bearer wins when present and ``XAI_API_KEY`` is the fallback.
         Patch the resolver's ``get_env_value`` to simulate a dotenv-only key
         and confirm it reaches the HTTP call. The per-call-site
@@ -271,7 +276,8 @@ class TestEndToEndRegressionGuard:
     """End-to-end probe: patch ``hermes_cli.config.load_env`` to simulate
     ``~/.hermes/.env`` carrying the key while ``os.environ`` does not.
     Before the fix ``_transcribe_xai`` called ``os.getenv("XAI_API_KEY")``
-    directly and returned ``XAI_API_KEY not set``."""
+    directly and returned ``XAI_API_KEY not set``.
+    """
 
     def test_xai_key_only_in_dotenv_before_fix(self, monkeypatch):
         from tools import transcription_tools as tt

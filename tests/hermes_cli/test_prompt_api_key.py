@@ -144,7 +144,8 @@ def test_lmstudio_first_time_empty_uses_placeholder(profile_env):
 def test_lmstudio_replace_empty_does_not_overwrite_with_placeholder(profile_env):
     """On REPLACE with empty input, preserve the user's existing key — do NOT
     silently substitute the placeholder.  The placeholder path only fires for
-    first-time configuration where the user has made no explicit choice yet."""
+    first-time configuration where the user has made no explicit choice yet.
+    """
     from hermes_cli.config import get_env_value, save_env_value
     save_env_value("LM_API_KEY", "my-real-lmstudio-key")
 

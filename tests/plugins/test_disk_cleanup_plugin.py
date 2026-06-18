@@ -15,10 +15,10 @@ Covers the bundled plugin at ``plugins/disk-cleanup/``:
 import importlib
 import json
 import sys
+from datetime import UTC
 from pathlib import Path
 
 import pytest
-from datetime import UTC
 
 
 @pytest.fixture(autouse=True)
@@ -231,7 +231,8 @@ class TestStaleCronEntryMigration:
 
     def test_quick_skips_protected_cron_paths_defense_in_depth(self, _isolate_env):
         """Defense-in-depth: even if guess_category returned cron-output
-        (hypothetically), protected cron paths are never deleted."""
+        (hypothetically), protected cron paths are never deleted.
+        """
         dg = _load_lib()
         cron_dir = _isolate_env / "cron"
         cron_dir.mkdir()
@@ -283,7 +284,7 @@ class TestStaleCronEntryMigration:
         run_md.write_text("x")
 
         # Old enough to be deleted (>14 days)
-        from datetime import datetime, timezone, timedelta
+        from datetime import datetime, timedelta, timezone
         old_ts = (datetime.now(UTC) - timedelta(days=20)).isoformat()
 
         tracked_file = _isolate_env / "disk-cleanup" / "tracked.json"
@@ -574,7 +575,8 @@ class TestBundledDiscovery:
 
     def test_memory_and_context_engine_subdirs_skipped(self, _isolate_env):
         """Bundled scan must NOT pick up plugins/memory or plugins/context_engine
-        as top-level plugins — they have their own discovery paths."""
+        as top-level plugins — they have their own discovery paths.
+        """
         self._write_enabled_config(
             _isolate_env, ["memory", "context_engine", "disk-cleanup"],
         )

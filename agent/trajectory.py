@@ -37,6 +37,7 @@ def save_trajectory(trajectory: list[dict[str, Any]], model: str,
         completed: Whether the conversation completed successfully.
         filename: Override output filename. Defaults to trajectory_samples.jsonl
                   or failed_trajectories.jsonl based on ``completed``.
+
     """
     if filename is None:
         filename = "trajectory_samples.jsonl" if completed else "failed_trajectories.jsonl"

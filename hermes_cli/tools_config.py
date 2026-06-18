@@ -1,5 +1,4 @@
-"""
-Unified tool configuration for Hermes Agent.
+"""Unified tool configuration for Hermes Agent.
 
 `hermes tools` and `hermes setup tools` both enter this module.
 Select a platform → toggle toolsets on/off → for newly enabled tools
@@ -18,17 +17,19 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Set
 
-
+from hermes_cli.colors import Colors, color
 from hermes_cli.config import (
     cfg_get,
-    load_config, save_config, get_env_value, save_env_value,
+    get_env_value,
+    load_config,
+    save_config,
+    save_env_value,
 )
-from hermes_cli.colors import Colors, color
+from hermes_cli.nous_account import format_nous_portal_entitlement_message
 from hermes_cli.nous_subscription import (
     apply_nous_managed_defaults,
     get_nous_subscription_features,
 )
-from hermes_cli.nous_account import format_nous_portal_entitlement_message
 from tools.tool_backend_helpers import fal_key_is_configured
 from utils import base_url_hostname, is_truthy_value
 
@@ -41,9 +42,17 @@ PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 
 from hermes_cli.cli_output import (
     print_error as _print_error,
+)
+from hermes_cli.cli_output import (
     print_info as _print_info,
+)
+from hermes_cli.cli_output import (
     print_success as _print_success,
+)
+from hermes_cli.cli_output import (
     print_warning as _print_warning,
+)
+from hermes_cli.cli_output import (
     prompt as _prompt,
 )
 
@@ -53,33 +62,33 @@ from hermes_cli.cli_output import (
 # Each entry: (toolset_name, label, description)
 # These map to keys in toolsets.py TOOLSETS dict.
 CONFIGURABLE_TOOLSETS = [
-    ("web",             "🔍 Web Search & Scraping",    "web_search, web_extract"),
-    ("browser",         "🌐 Browser Automation",       "navigate, click, type, scroll"),
-    ("terminal",        "💻 Terminal & Processes",      "terminal, process"),
-    ("file",            "📁 File Operations",           "read, write, patch, search"),
-    ("code_execution",  "⚡ Code Execution",            "execute_code"),
-    ("vision",          "👁️  Vision / Image Analysis",  "vision_analyze"),
-    ("video",           "🎬 Video Analysis",            "video_analyze (requires video-capable model)"),
-    ("image_gen",       "🎨 Image Generation",          "image_generate"),
-    ("video_gen",       "🎬 Video Generation",          "video_generate (text-to-video + image-to-video)"),
-    ("x_search",        "🐦 X (Twitter) Search",        "x_search (requires xAI OAuth or XAI_API_KEY)"),
-    ("moa",             "🧠 Mixture of Agents",         "mixture_of_agents"),
-    ("tts",             "🔊 Text-to-Speech",            "text_to_speech"),
-    ("skills",          "📚 Skills",                    "list, view, manage"),
-    ("todo",            "📋 Task Planning",             "todo"),
-    ("memory",          "💾 Memory",                    "persistent memory across sessions"),
-    ("context_engine",  "🧩 Context Engine",            "runtime tools from the active context engine"),
-    ("session_search",  "🔎 Session Search",            "search past conversations"),
-    ("clarify",         "❓ Clarifying Questions",      "clarify"),
-    ("delegation",      "👥 Task Delegation",           "delegate_task"),
-    ("cronjob",         "⏰ Cron Jobs",                 "create/list/update/pause/resume/run, with optional attached skills"),
-    ("messaging",       "📨 Cross-Platform Messaging",  "send_message"),
-    ("homeassistant",    "🏠 Home Assistant",           "smart home device control"),
-    ("spotify",          "🎵 Spotify",                  "playback, search, playlists, library"),
-    ("discord",         "💬 Discord (read/participate)", "fetch messages, search members, create thread"),
-    ("discord_admin",   "🛡️  Discord Server Admin",    "list channels/roles, pin, assign roles"),
-    ("yuanbao",          "🤖 Yuanbao",                  "group info, member queries, DM"),
-    ("computer_use",     "🖱️  Computer Use (macOS)",     "background desktop control via cua-driver"),
+    ("web", "🔍 Web Search & Scraping", "web_search, web_extract"),
+    ("browser", "🌐 Browser Automation", "navigate, click, type, scroll"),
+    ("terminal", "💻 Terminal & Processes", "terminal, process"),
+    ("file", "📁 File Operations", "read, write, patch, search"),
+    ("code_execution", "⚡ Code Execution", "execute_code"),
+    ("vision", "👁️  Vision / Image Analysis", "vision_analyze"),
+    ("video", "🎬 Video Analysis", "video_analyze (requires video-capable model)"),
+    ("image_gen", "🎨 Image Generation", "image_generate"),
+    ("video_gen", "🎬 Video Generation", "video_generate (text-to-video + image-to-video)"),
+    ("x_search", "🐦 X (Twitter) Search", "x_search (requires xAI OAuth or XAI_API_KEY)"),
+    ("moa", "🧠 Mixture of Agents", "mixture_of_agents"),
+    ("tts", "🔊 Text-to-Speech", "text_to_speech"),
+    ("skills", "📚 Skills", "list, view, manage"),
+    ("todo", "📋 Task Planning", "todo"),
+    ("memory", "💾 Memory", "persistent memory across sessions"),
+    ("context_engine", "🧩 Context Engine", "runtime tools from the active context engine"),
+    ("session_search", "🔎 Session Search", "search past conversations"),
+    ("clarify", "❓ Clarifying Questions", "clarify"),
+    ("delegation", "👥 Task Delegation", "delegate_task"),
+    ("cronjob", "⏰ Cron Jobs", "create/list/update/pause/resume/run, with optional attached skills"),
+    ("messaging", "📨 Cross-Platform Messaging", "send_message"),
+    ("homeassistant", "🏠 Home Assistant", "smart home device control"),
+    ("spotify", "🎵 Spotify", "playback, search, playlists, library"),
+    ("discord", "💬 Discord (read/participate)", "fetch messages, search members, create thread"),
+    ("discord_admin", "🛡️  Discord Server Admin", "list channels/roles, pin, assign roles"),
+    ("yuanbao", "🤖 Yuanbao", "group info, member queries, DM"),
+    ("computer_use", "🖱️  Computer Use (macOS)", "background desktop control via cua-driver"),
 ]
 
 
@@ -567,8 +576,8 @@ TOOL_CATEGORIES = {
 # Simple env-var requirements for toolsets NOT in TOOL_CATEGORIES.
 # Used as a fallback for tools like vision/moa that just need an API key.
 TOOLSET_ENV_REQUIREMENTS = {
-    "vision":     [("OPENROUTER_API_KEY",   "https://openrouter.ai/keys")],
-    "moa":        [("OPENROUTER_API_KEY",   "https://openrouter.ai/keys")],
+    "vision":     [("OPENROUTER_API_KEY", "https://openrouter.ai/keys")],
+    "moa":        [("OPENROUTER_API_KEY", "https://openrouter.ai/keys")],
 }
 
 
@@ -646,7 +655,6 @@ def _pip_install(
         pip_cmd + ["install", *args],
         capture_output=capture_output, text=True, timeout=timeout,
     )
-
 
 
 def _check_cua_driver_asset_for_arch() -> bool:
@@ -1129,12 +1137,14 @@ def _run_post_setup(post_setup_key: str):
 
         _print_info("    xAI needs credentials. Choose one:")
         try:
+            from hermes_cli.config import save_env_value
             from hermes_cli.setup import (
                 _run_xai_oauth_login_from_setup,
                 prompt_choice,
+            )
+            from hermes_cli.setup import (
                 prompt as _setup_prompt,
             )
-            from hermes_cli.config import save_env_value
         except Exception as exc:
             _print_warning(f"    Could not load setup helpers: {exc}")
             _print_info("    Run later: hermes auth add xai-oauth   (or set XAI_API_KEY)")
@@ -1292,7 +1302,7 @@ def _get_platform_tools(
     include_default_mcp_servers: bool = True,
 ) -> set[str]:
     """Resolve which individual toolset names are enabled for a platform."""
-    from toolsets import resolve_toolset, TOOLSETS
+    from toolsets import TOOLSETS, resolve_toolset
 
     platform_toolsets = config.get("platform_toolsets") or {}
     toolset_names = platform_toolsets.get(platform)
@@ -2453,7 +2463,7 @@ def _detect_active_provider_index(
 
 def _fal_model_catalog():
     """Lazy-load the FAL model catalog from the tool module."""
-    from tools.image_generation_tool import FAL_MODELS, DEFAULT_MODEL
+    from tools.image_generation_tool import DEFAULT_MODEL, FAL_MODELS
     return FAL_MODELS, DEFAULT_MODEL
 
 
@@ -3388,6 +3398,7 @@ def tools_command(args=None, first_install: bool = False, config: dict = None):
         config: Optional config dict to use.  When called from the setup
             wizard, the wizard passes its own dict so that platform_toolsets
             are written into it and survive the wizard's final save_config().
+
     """
     if config is None:
         config = load_config()

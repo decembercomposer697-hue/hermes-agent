@@ -23,12 +23,11 @@ These are different and the old code conflated them; the fix keeps them
 separate.
 """
 
-import sys
 import os
+import sys
 from unittest.mock import MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 
 
 # ---------------------------------------------------------------------------
@@ -117,9 +116,11 @@ class TestContextOverflowLimitSelection:
     """
 
     def test_generic_overflow_without_provider_limit_keeps_context_length(self):
-        from agent.model_metadata import get_context_length_from_provider_error
-        from agent.model_metadata import get_next_probe_tier
-        from agent.model_metadata import parse_context_limit_from_error
+        from agent.model_metadata import (
+            get_context_length_from_provider_error,
+            get_next_probe_tier,
+            parse_context_limit_from_error,
+        )
 
         old_ctx = 1_000_000
         error_msg = (
@@ -203,7 +204,8 @@ class TestEphemeralMaxOutputTokens:
 
     def _make_agent(self):
         """Return a minimal AIAgent with api_mode='anthropic_messages' and
-        a stubbed context_compressor, bypassing full __init__ cost."""
+        a stubbed context_compressor, bypassing full __init__ cost.
+        """
         from run_agent import AIAgent
         agent = object.__new__(AIAgent)
         # Minimal attributes used by _build_api_kwargs
@@ -273,8 +275,8 @@ class TestContextNotHalvedOnOutputCapError:
     """
 
     def _make_agent_with_compressor(self, context_length=200_000):
-        from run_agent import AIAgent
         from agent.context_compressor import ContextCompressor
+        from run_agent import AIAgent
 
         agent = object.__new__(AIAgent)
         agent.api_mode = "anthropic_messages"
@@ -304,7 +306,8 @@ class TestContextNotHalvedOnOutputCapError:
 
     def test_output_cap_error_sets_ephemeral_not_context_length(self):
         """On 'max_tokens too large' error, _ephemeral_max_output_tokens is set
-        and compressor.context_length is left unchanged."""
+        and compressor.context_length is left unchanged.
+        """
         from agent.model_metadata import parse_available_output_tokens_from_error
 
         error_msg = (
@@ -328,8 +331,10 @@ class TestContextNotHalvedOnOutputCapError:
 
     def test_prompt_too_long_with_explicit_limit_uses_provider_limit(self):
         """Prompt-too-long errors only change context_length when they report a concrete limit."""
-        from agent.model_metadata import get_context_length_from_provider_error
-        from agent.model_metadata import parse_available_output_tokens_from_error
+        from agent.model_metadata import (
+            get_context_length_from_provider_error,
+            parse_available_output_tokens_from_error,
+        )
 
         error_msg = "prompt is too long: 205000 tokens > 200000 maximum"
 

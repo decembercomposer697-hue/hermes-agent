@@ -11,9 +11,8 @@ import ast
 import json
 from unittest.mock import MagicMock
 
-
-from hermes_state import SessionDB
 from acp_adapter.session import SessionManager
+from hermes_state import SessionDB
 
 
 def _tmp_db(tmp_path):

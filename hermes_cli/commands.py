@@ -688,6 +688,7 @@ def _collect_gateway_skill_entries(
         ``(name, description, cmd_key)`` triples and *hidden_count* is the
         number of skill entries dropped due to the cap.  ``cmd_key`` is the
         original ``/skill-name`` key from :func:`get_skill_commands`.
+
     """
     all_entries: list[tuple[str, str, str]] = []
 
@@ -724,8 +725,8 @@ def _collect_gateway_skill_entries(
     skill_triples: list[tuple[str, str, str]] = []
     try:
         from agent.skill_commands import get_skill_commands
-        from tools.skills_tool import SKILLS_DIR
         from agent.skill_utils import get_external_skills_dirs
+        from tools.skills_tool import SKILLS_DIR
         _skills_dir = str(SKILLS_DIR.resolve())
         _hub_dir = str((SKILLS_DIR / ".hub").resolve()).rstrip("/") + "/"
         # Build set of allowed directory prefixes: local skills dir + any
@@ -795,6 +796,7 @@ def telegram_menu_commands(max_commands: int = 100) -> tuple[list[tuple[str, str
     Returns:
         (menu_commands, hidden_count) where hidden_count is the number of
         commands omitted due to the cap.
+
     """
     core_commands = _prioritize_telegram_menu_commands(list(telegram_bot_commands()))
     reserved_names = {n for n, _ in core_commands}
@@ -835,6 +837,7 @@ def discord_skill_commands(
         ``(entries, hidden_count)`` where *entries* is a list of
         ``(discord_name, description, cmd_key)`` triples.  ``cmd_key`` is
         the original ``/skill-name`` key needed for the slash handler callback.
+
     """
     return _collect_gateway_skill_entries(
         platform="discord",
@@ -881,6 +884,7 @@ def discord_skill_commands_by_category(
         - *uncategorized*: ``[(name, description, cmd_key), ...]``
         - *hidden_count*: skills dropped due to name clamp collisions
           against already-registered command names.
+
     """
     from pathlib import Path as _P
 
@@ -1349,7 +1353,7 @@ class SlashCommandCompleter(Completer):
 
             if word == bare or word.startswith(prefix):
                 want_dir = prefix == "@folder:"
-                path_part = '' if word == bare else word[len(prefix):]
+                path_part = "" if word == bare else word[len(prefix):]
                 expanded = os.path.expanduser(path_part)
 
                 if not expanded or expanded == ".":

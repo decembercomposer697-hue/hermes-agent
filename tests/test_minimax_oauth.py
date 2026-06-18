@@ -14,32 +14,32 @@ import base64
 import hashlib
 import json
 import time
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from hermes_cli.auth import (
-    PROVIDER_REGISTRY,
-    AuthError,
     MINIMAX_OAUTH_CLIENT_ID,
     MINIMAX_OAUTH_GLOBAL_BASE,
     MINIMAX_OAUTH_GLOBAL_INFERENCE,
     MINIMAX_OAUTH_REFRESH_SKEW_SECONDS,
+    PROVIDER_REGISTRY,
+    AuthError,
     _minimax_pkce_pair,
-    _minimax_request_user_code,
     _minimax_poll_token,
+    _minimax_request_user_code,
     _minimax_resolve_token_expiry_unix,
     _refresh_minimax_oauth_state,
-    resolve_minimax_oauth_runtime_credentials,
-    get_minimax_oauth_auth_status,
     get_auth_status,
+    get_minimax_oauth_auth_status,
+    resolve_minimax_oauth_runtime_credentials,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_httpx_response(status_code: int, body: dict | None = None, text: str = ""):
     """Return a minimal mock that quacks like httpx.Response."""
@@ -711,7 +711,8 @@ def test_token_provider_refreshes_when_near_expiry():
 
 def test_token_provider_rereads_state_each_call():
     """Each callable invocation re-reads auth.json so cross-process refreshes
-    persisted by another hermes process are immediately visible."""
+    persisted by another hermes process are immediately visible.
+    """
     from hermes_cli.auth import build_minimax_oauth_token_provider
 
     states = [
@@ -757,7 +758,8 @@ def test_token_provider_raises_not_logged_in_when_state_missing():
 
 def test_token_provider_quarantines_state_on_terminal_refresh():
     """When refresh returns invalid_grant, callable raises AuthError AND
-    wipes the dead tokens so subsequent calls fail fast without network."""
+    wipes the dead tokens so subsequent calls fail fast without network.
+    """
     from hermes_cli.auth import build_minimax_oauth_token_provider
 
     state = {
@@ -803,7 +805,8 @@ def test_token_provider_quarantines_state_on_terminal_refresh():
 
 def test_resolve_returns_callable_when_as_token_provider_true():
     """Explicit opt-in path: resolve_minimax_oauth_runtime_credentials(as_token_provider=True)
-    returns a callable api_key."""
+    returns a callable api_key.
+    """
     state = {
         "access_token": "tok",
         "refresh_token": "rt",

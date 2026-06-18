@@ -1,5 +1,4 @@
-"""
-Platform Adapter Registry
+"""Platform Adapter Registry
 
 Allows platform adapters (built-in and plugin) to self-register so the gateway
 can discover and instantiate them without hardcoded if/elif chains.
@@ -29,9 +28,9 @@ Usage (gateway side):
 """
 
 import logging
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from typing import Any, Optional
-from collections.abc import Awaitable, Callable
 
 logger = logging.getLogger(__name__)
 

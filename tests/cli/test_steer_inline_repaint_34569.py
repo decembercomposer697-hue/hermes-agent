@@ -63,7 +63,8 @@ def _is_invalidate(node: ast.stmt) -> bool:
 
 def _collect_reset_blocks(func: ast.FunctionDef) -> list[list[ast.stmt]]:
     """Find every statement sequence (a block body/orelse/finalbody) within
-    ``handle_enter`` that contains a ``buffer.reset()`` call."""
+    ``handle_enter`` that contains a ``buffer.reset()`` call.
+    """
     blocks: list[list[ast.stmt]] = []
     for node in ast.walk(func):
         for attr in ("body", "orelse", "finalbody"):
@@ -77,7 +78,8 @@ def _collect_reset_blocks(func: ast.FunctionDef) -> list[list[ast.stmt]]:
 
 def test_inline_command_reset_branches_invalidate():
     """Every handle_enter branch that resets the buffer and then returns must
-    invalidate the app first (issue #34569)."""
+    invalidate the app first (issue #34569).
+    """
     func = _load_handle_enter_node()
     reset_blocks = _collect_reset_blocks(func)
 

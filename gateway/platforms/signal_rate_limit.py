@@ -1,5 +1,4 @@
-"""
-Signal attachment rate-limit scheduler.
+"""Signal attachment rate-limit scheduler.
 
 Process-wide token-bucket simulator that mirrors the per-account
 attachment rate limit signal-cli/Signal-Server enforce. Producers
@@ -41,8 +40,7 @@ SIGNAL_RPC_ERROR_RATELIMIT = -5  # signal-cli (v0.14.3+) JSON-RPC error code for
 # ---------------------------------------------------------------------------
 
 class SignalRateLimitError(Exception):
-    """
-    Raised by ``SignalAdapter._rpc`` for rate-limit responses when the
+    """Raised by ``SignalAdapter._rpc`` for rate-limit responses when the
     caller has opted in via ``raise_on_rate_limit=True``.
 
     Carries the server-supplied per-token Retry-After (in seconds) on
@@ -364,6 +362,7 @@ def get_scheduler() -> SignalAttachmentScheduler:
 
 def _reset_scheduler() -> None:
     """Drop the cached scheduler so the next ``get_scheduler`` call
-    builds a fresh one. Test-only — never call from production paths."""
+    builds a fresh one. Test-only — never call from production paths.
+    """
     global _scheduler
     _scheduler = None

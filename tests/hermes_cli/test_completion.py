@@ -9,12 +9,12 @@ import tempfile
 
 import pytest
 
-from hermes_cli.completion import _walk, generate_bash, generate_zsh, generate_fish
-
+from hermes_cli.completion import _walk, generate_bash, generate_fish, generate_zsh
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_parser() -> argparse.ArgumentParser:
     """Build a minimal parser that mirrors the real hermes structure."""
@@ -142,7 +142,7 @@ class TestGenerateZsh:
 
     def test_registers_compdef_instead_of_invoking_completion_function(self):
         out = generate_zsh(_make_parser())
-        assert 'compdef _hermes hermes' in out
+        assert "compdef _hermes hermes" in out
         assert '_hermes "$@"' not in out
 
     def test_preserves_valid_zsh_arguments_alias_syntax(self):
@@ -232,10 +232,11 @@ class TestSubcommandDrift:
         multi-word session names after -c/-r are never accidentally split.
         """
         import inspect
+
         from hermes_cli.main import _coalesce_session_name_args
 
         source = inspect.getsource(_coalesce_session_name_args)
-        match = re.search(r'_SUBCOMMANDS\s*=\s*\{([^}]+)\}', source, re.DOTALL)
+        match = re.search(r"_SUBCOMMANDS\s*=\s*\{([^}]+)\}", source, re.DOTALL)
         assert match, "_SUBCOMMANDS block not found in _coalesce_session_name_args()"
         defined = set(re.findall(r'"(\w+)"', match.group(1)))
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Skills Tool Module
+"""Skills Tool Module
 
 This module provides tools for listing and viewing skill documents.
 Skills are organized as directories containing a SKILL.md file (the main instructions)
@@ -68,18 +67,17 @@ Usage:
 
 import json
 import logging
-
-from hermes_constants import get_hermes_home, display_hermes_home
 import os
 import re
 from enum import Enum
 from pathlib import Path, PurePosixPath, PureWindowsPath
-from typing import Dict, Any, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
-from tools.registry import registry, tool_error
-from hermes_cli.config import cfg_get
-from utils import env_var_enabled
 from agent.skill_utils import EXCLUDED_SKILL_DIRS as _EXCLUDED_SKILL_DIRS
+from hermes_cli.config import cfg_get
+from hermes_constants import display_hermes_home, get_hermes_home
+from tools.registry import registry, tool_error
+from utils import env_var_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -490,8 +488,7 @@ def _parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
 
 
 def _get_category_from_path(skill_path: Path) -> str | None:
-    """
-    Extract category from skill path based on directory structure.
+    """Extract category from skill path based on directory structure.
 
     For paths like: ~/.hermes/skills/mlops/axolotl/SKILL.md -> "mlops"
     Also works for external skill dirs configured via skills.external_dirs.
@@ -516,8 +513,7 @@ def _get_category_from_path(skill_path: Path) -> str | None:
 
 
 def _parse_tags(tags_value) -> list[str]:
-    """
-    Parse tags from frontmatter value.
+    """Parse tags from frontmatter value.
 
     Handles:
     - Already-parsed list (from yaml.safe_load): [tag1, tag2]
@@ -529,6 +525,7 @@ def _parse_tags(tags_value) -> list[str]:
 
     Returns:
         List of tag strings
+
     """
     if not tags_value:
         return []
@@ -543,7 +540,6 @@ def _parse_tags(tags_value) -> list[str]:
         tags_value = tags_value[1:-1]
 
     return [t.strip().strip("\"'") for t in tags_value.split(",") if t.strip()]
-
 
 
 def _get_disabled_skill_names() -> set[str]:
@@ -602,6 +598,7 @@ def _find_all_skills(*, skip_disabled: bool = False) -> list[dict[str, Any]]:
 
     Returns:
         List of skill metadata dicts (name, description, category).
+
     """
     from agent.skill_utils import get_external_skills_dirs, iter_skill_index_files
 
@@ -678,8 +675,7 @@ def _sort_skills(skills: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def skills_list(category: str = None, task_id: str = None) -> str:
-    """
-    List all available skills (progressive disclosure tier 1 - minimal metadata).
+    """List all available skills (progressive disclosure tier 1 - minimal metadata).
 
     Returns only name + description to minimize token usage. Use skill_view() to
     load full content, tags, related files, etc.
@@ -690,6 +686,7 @@ def skills_list(category: str = None, task_id: str = None) -> str:
 
     Returns:
         JSON string with minimal skill info: name, description, category
+
     """
     try:
         if not SKILLS_DIR.exists():
@@ -858,8 +855,7 @@ def skill_view(
     task_id: str = None,
     preprocess: bool = True,
 ) -> str:
-    """
-    View the content of a skill or a specific file within a skill directory.
+    """View the content of a skill or a specific file within a skill directory.
 
     Args:
         name: Name or path of the skill (e.g., "axolotl" or "03-fine-tuning/axolotl").
@@ -872,6 +868,7 @@ def skill_view(
 
     Returns:
         JSON string with skill content or error message
+
     """
     try:
         # Validate before the ':' qualified-name dispatch so a Windows drive
@@ -1165,7 +1162,7 @@ def skill_view(
 
         # If a specific file path is requested, read that instead
         if file_path and skill_dir:
-            from tools.path_security import validate_within_dir, has_traversal_component
+            from tools.path_security import has_traversal_component, validate_within_dir
 
             # Security: Prevent path traversal attacks
             if has_traversal_component(file_path):
@@ -1484,8 +1481,6 @@ def skill_view(
         return tool_error(str(e), success=False)
 
 
-
-
 if __name__ == "__main__":
     """Test the skills tool"""
     print("🎯 Skills Tool Test")
@@ -1577,9 +1572,12 @@ registry.register(
     check_fn=check_skills_requirements,
     emoji="📚",
 )
+
+
 def _skill_view_with_bump(args, **kw):
     """Invoke skill_view, then bump view_count on success. Best-effort: a
-    telemetry failure never breaks the tool call."""
+    telemetry failure never breaks the tool call.
+    """
     name = args.get("name", "")
     result = skill_view(
         name, file_path=args.get("file_path"), task_id=kw.get("task_id"),

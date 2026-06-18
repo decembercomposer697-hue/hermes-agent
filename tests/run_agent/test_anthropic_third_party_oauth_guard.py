@@ -24,7 +24,6 @@ import pytest
 
 from run_agent import AIAgent
 
-
 # A plausible-looking OAuth token (``sk-ant-`` without the ``-api`` suffix).
 _OAUTH_LIKE_TOKEN = "sk-ant-oauth-example-1234567890abcdef"
 _API_KEY_TOKEN = "sk-ant-api-abcdef1234567890"
@@ -56,7 +55,8 @@ class TestOAuthFlagOnRefresh:
         """Refresh path returns False immediately when provider != anthropic — the
         OAuth flag can never be mutated for third-party providers. Double-defended
         by the per-assignment guard at line ~5393 so future refactors can't
-        reintroduce the bug."""
+        reintroduce the bug.
+        """
         agent.api_mode = "anthropic_messages"
         agent.provider = "minimax"          # ← third-party
         agent._anthropic_api_key = "***"

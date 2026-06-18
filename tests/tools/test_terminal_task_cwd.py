@@ -192,7 +192,8 @@ def test_registering_cwd_override_updates_live_env_cwd(monkeypatch):
 
 def test_registering_cwd_override_noop_when_no_live_env(monkeypatch):
     """Registering an override before the env exists must not crash; the cwd
-    is applied at env creation time instead."""
+    is applied at env creation time instead.
+    """
     monkeypatch.setattr(terminal_tool, "_active_environments", {})
     monkeypatch.setattr(terminal_tool, "_task_env_overrides", {})
 
@@ -204,7 +205,8 @@ def test_registering_cwd_override_noop_when_no_live_env(monkeypatch):
 
 def test_registering_non_cwd_override_leaves_live_env_cwd_untouched(monkeypatch):
     """A non-cwd override (e.g. a per-task Modal image) must not disturb the
-    live env's cwd."""
+    live env's cwd.
+    """
 
     class FakeEnv:
         env = {}

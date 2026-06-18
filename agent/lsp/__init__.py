@@ -96,7 +96,8 @@ def shutdown_service() -> None:
 def _atexit_shutdown() -> None:
     """atexit-registered wrapper.  Logs at debug because by the time
     atexit fires the user has already seen the agent's final output —
-    a noisy shutdown line on top of that is just clutter."""
+    a noisy shutdown line on top of that is just clutter.
+    """
     try:
         shutdown_service()
     except Exception as e:

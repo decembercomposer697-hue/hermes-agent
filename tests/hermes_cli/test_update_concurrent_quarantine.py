@@ -18,7 +18,6 @@ import pytest
 
 from hermes_cli import main as cli_main
 
-
 # Tests in this module either exercise the REAL _detect_concurrent_hermes_instances
 # helper (and need the autouse stub in tests/hermes_cli/conftest.py disabled),
 # or supply their own explicit return value via patch.object. Mark the whole
@@ -454,7 +453,8 @@ def test_quarantine_actionable_warning_when_everything_fails(
 @patch.object(cli_main, "_is_windows", return_value=True)
 def test_cmd_update_aborts_on_concurrent_instance(_winp, tmp_path, capsys):
     """If another hermes.exe is running, the update bails out before
-    touching the working tree (exit code 2)."""
+    touching the working tree (exit code 2).
+    """
     scripts_dir = tmp_path / "Scripts"
     scripts_dir.mkdir()
 
@@ -496,7 +496,8 @@ def test_cmd_update_aborts_on_concurrent_instance(_winp, tmp_path, capsys):
 @patch.object(cli_main, "_is_windows", return_value=True)
 def test_cmd_update_force_bypasses_concurrent_check(_winp, tmp_path):
     """--force lets the update proceed past the concurrent-instance gate
-    (subsequent steps are mocked so we only verify the gate is skipped)."""
+    (subsequent steps are mocked so we only verify the gate is skipped).
+    """
     scripts_dir = tmp_path / "Scripts"
     scripts_dir.mkdir()
 

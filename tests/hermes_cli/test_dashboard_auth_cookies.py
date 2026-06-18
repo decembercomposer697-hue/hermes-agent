@@ -57,7 +57,8 @@ def _build_app(use_https: bool = True, prefix: str = ""):
 
 def test_session_cookies_use_host_prefix_on_https_direct():
     """HTTPS + no proxy prefix → __Host- prefix (strongest spec
-    hardening: bound to exact origin, requires Path=/, requires Secure)."""
+    hardening: bound to exact origin, requires Path=/, requires Secure).
+    """
     client = TestClient(_build_app(use_https=True, prefix=""))
     r = client.get("/set")
     cookies = r.headers.get_list("set-cookie")
@@ -72,7 +73,8 @@ def test_session_cookies_use_host_prefix_on_https_direct():
 
 def test_session_cookies_use_secure_prefix_when_proxied():
     """HTTPS + /hermes prefix → __Secure- prefix (__Host- forbids
-    Path != "/"; __Secure- keeps the Secure-required hardening)."""
+    Path != "/"; __Secure- keeps the Secure-required hardening).
+    """
     client = TestClient(_build_app(use_https=True, prefix="/hermes"))
     r = client.get("/set")
     cookies = r.headers.get_list("set-cookie")
@@ -87,7 +89,8 @@ def test_session_cookies_use_secure_prefix_when_proxied():
 
 def test_session_cookies_use_bare_name_on_http():
     """Loopback HTTP dev: __Host- / __Secure- both require Secure, which
-    we can't set on HTTP. Use bare cookie names."""
+    we can't set on HTTP. Use bare cookie names.
+    """
     client = TestClient(_build_app(use_https=False))
     r = client.get("/set")
     cookies = r.headers.get_list("set-cookie")
@@ -117,7 +120,8 @@ def test_clear_session_cookies_emits_expired_at_and_rt():
     """``clear_session_cookies`` emits Max-Age=0 deletions for every
     plausible cookie-name variant under the active prefix so we flush
     stale cookies that an older deploy may have set under a different
-    prefix."""
+    prefix.
+    """
     client = TestClient(_build_app())
     r = client.get("/clear")
     cookies = r.headers.get_list("set-cookie")
@@ -162,7 +166,8 @@ def test_read_session_cookies_from_request_bare_name():
 
 def test_read_session_cookies_from_request_host_prefix():
     """Reader also finds cookies set with the __Host- variant
-    (HTTPS direct deploy)."""
+    (HTTPS direct deploy).
+    """
     scope = {
         "type": "http",
         "method": "GET",
@@ -181,7 +186,8 @@ def test_read_session_cookies_from_request_host_prefix():
 
 def test_read_session_cookies_from_request_secure_prefix():
     """Reader also finds cookies set with the __Secure- variant
-    (HTTPS behind a proxy prefix)."""
+    (HTTPS behind a proxy prefix).
+    """
     scope = {
         "type": "http",
         "method": "GET",

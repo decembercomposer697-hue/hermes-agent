@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Mixture-of-Agents Tool Module
+"""Mixture-of-Agents Tool Module
 
 This module implements the Mixture-of-Agents (MoA) methodology that leverages
 the collective strengths of multiple LLMs through a layered architecture to
@@ -45,16 +44,18 @@ Usage:
     )
 """
 
+import asyncio
+import datetime
 import json
 import logging
 import os
-import asyncio
-import datetime
-from typing import Dict, Any, List, Optional
-from tools.openrouter_client import get_async_client as _get_openrouter_client, check_api_key as check_openrouter_api_key
+import sys
+from typing import Any, Dict, List, Optional
+
 from agent.auxiliary_client import extract_content_or_reasoning
 from tools.debug_helpers import DebugSession
-import sys
+from tools.openrouter_client import check_api_key as check_openrouter_api_key
+from tools.openrouter_client import get_async_client as _get_openrouter_client
 
 logger = logging.getLogger(__name__)
 
@@ -88,8 +89,7 @@ _debug = DebugSession("moa_tools", env_var="MOA_TOOLS_DEBUG")
 
 
 def _construct_aggregator_prompt(system_prompt: str, responses: list[str]) -> str:
-    """
-    Construct the final system prompt for the aggregator including all model responses.
+    """Construct the final system prompt for the aggregator including all model responses.
     
     Args:
         system_prompt (str): Base system prompt for aggregation
@@ -97,6 +97,7 @@ def _construct_aggregator_prompt(system_prompt: str, responses: list[str]) -> st
         
     Returns:
         str: Complete system prompt with enumerated responses
+
     """
     response_text = "\n".join([f"{i+1}. {response}" for i, response in enumerate(responses)])
     return f"{system_prompt}\n\n{response_text}"
@@ -109,8 +110,7 @@ async def _run_reference_model_safe(
     max_tokens: int = 32000,
     max_retries: int = 6,
 ) -> tuple[str, str, bool]:
-    """
-    Run a single reference model with retry logic and graceful failure handling.
+    """Run a single reference model with retry logic and graceful failure handling.
     
     Args:
         model (str): Model identifier to use
@@ -121,6 +121,7 @@ async def _run_reference_model_safe(
         
     Returns:
         tuple[str, str, bool]: (model_name, response_content_or_error, success_flag)
+
     """
     for attempt in range(max_retries):
         try:
@@ -141,7 +142,7 @@ async def _run_reference_model_safe(
             
             # GPT models (especially gpt-4o-mini) don't support custom temperature values
             # Only include temperature for non-GPT models
-            if not model.lower().startswith('gpt-'):
+            if not model.lower().startswith("gpt-"):
                 api_params["temperature"] = temperature
             
             response = await _get_openrouter_client().chat.completions.create(**api_params)
@@ -184,8 +185,7 @@ async def _run_aggregator_model(
     temperature: float = AGGREGATOR_TEMPERATURE,
     max_tokens: int = None,
 ) -> str:
-    """
-    Run the aggregator model to synthesize the final response.
+    """Run the aggregator model to synthesize the final response.
     
     Args:
         system_prompt (str): System prompt with all reference responses
@@ -195,6 +195,7 @@ async def _run_aggregator_model(
         
     Returns:
         str: Synthesized final response
+
     """
     logger.info("Running aggregator model: %s", AGGREGATOR_MODEL)
 
@@ -216,7 +217,7 @@ async def _run_aggregator_model(
 
     # GPT models (especially gpt-4o-mini) don't support custom temperature values
     # Only include temperature for non-GPT models
-    if not AGGREGATOR_MODEL.lower().startswith('gpt-'):
+    if not AGGREGATOR_MODEL.lower().startswith("gpt-"):
         api_params["temperature"] = temperature
 
     response = await _get_openrouter_client().chat.completions.create(**api_params)
@@ -238,8 +239,7 @@ async def mixture_of_agents_tool(
     reference_models: list[str] | None = None,
     aggregator_model: str | None = None,
 ) -> str:
-    """
-    Process a complex query using the Mixture-of-Agents methodology.
+    """Process a complex query using the Mixture-of-Agents methodology.
     
     This tool leverages multiple frontier language models to collaboratively solve
     extremely difficult problems requiring intense reasoning. It's particularly
@@ -273,6 +273,7 @@ async def mixture_of_agents_tool(
     
     Raises:
         Exception: If MoA processing fails or API key is not set
+
     """
     start_time = datetime.datetime.now()
     
@@ -332,7 +333,7 @@ async def mixture_of_agents_tool(
         logger.info("Reference model results: %s successful, %s failed", successful_count, failed_count)
         
         if failed_models:
-            logger.warning("Failed models: %s", ', '.join(failed_models))
+            logger.warning("Failed models: %s", ", ".join(failed_models))
         
         # Check if we have enough successful responses to proceed
         if successful_count < MIN_SUCCESSFUL_REFERENCES:
@@ -410,22 +411,21 @@ async def mixture_of_agents_tool(
 
 
 def check_moa_requirements() -> bool:
-    """
-    Check if all requirements for MoA tools are met.
+    """Check if all requirements for MoA tools are met.
     
     Returns:
         bool: True if requirements are met, False otherwise
+
     """
     return check_openrouter_api_key()
 
 
-
 def get_moa_configuration() -> dict[str, Any]:
-    """
-    Get the current MoA configuration settings.
+    """Get the current MoA configuration settings.
     
     Returns:
         Dict[str, Any]: Dictionary containing all configuration parameters
+
     """
     return {
         "reference_models": REFERENCE_MODELS,

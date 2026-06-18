@@ -22,9 +22,9 @@ import json
 import logging
 import time
 import uuid
+from collections.abc import Iterator
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional
-from collections.abc import Iterator
 
 import httpx
 

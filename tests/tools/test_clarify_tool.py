@@ -3,12 +3,11 @@
 import json
 from typing import List, Optional
 
-
 from tools.clarify_tool import (
-    clarify_tool,
-    check_clarify_requirements,
-    MAX_CHOICES,
     CLARIFY_SCHEMA,
+    MAX_CHOICES,
+    check_clarify_requirements,
+    clarify_tool,
 )
 
 
@@ -160,7 +159,7 @@ class TestCheckClarifyRequirements:
     """Tests for the requirements check function."""
 
     def test_always_returns_true(self):
-        """clarify tool has no external requirements."""
+        """Clarify tool has no external requirements."""
         assert check_clarify_requirements() is True
 
 

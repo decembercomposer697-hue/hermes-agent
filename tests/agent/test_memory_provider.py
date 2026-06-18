@@ -1,11 +1,12 @@
 """Tests for the memory provider interface, manager, and builtin provider."""
 
 import json
-import pytest
 from unittest.mock import MagicMock
 
-from agent.memory_provider import MemoryProvider
+import pytest
+
 from agent.memory_manager import MemoryManager
+from agent.memory_provider import MemoryProvider
 
 # ---------------------------------------------------------------------------
 # Concrete test provider
@@ -491,7 +492,7 @@ class TestUserInstalledProviderDiscovery:
 
     def test_bundled_takes_precedence(self, tmp_path, monkeypatch):
         """Bundled provider wins when user plugin has the same name."""
-        from plugins.memory import load_memory_provider, discover_memory_providers
+        from plugins.memory import discover_memory_providers, load_memory_provider
         # Create user plugin named "holographic" (same as bundled)
         plugin_dir = tmp_path / "plugins" / "holographic"
         plugin_dir.mkdir(parents=True)
@@ -903,7 +904,7 @@ class TestSetupFieldFiltering:
         assert model_default == "gpt-4o-mini"
 
     def test_when_and_default_from_combined(self):
-        """when clause and default_from work together correctly."""
+        """When clause and default_from work together correctly."""
         provider_models = {"groq": "openai/gpt-oss-120b", "openai": "gpt-4o-mini"}
         schema = [
             {"key": "mode", "default": "local"},
@@ -935,7 +936,8 @@ class TestSetupFieldFiltering:
 
 class TestMemoryContextFencing:
     """Prefetch context must be wrapped in <memory-context> fence so the model
-    does not treat recalled memory as user discourse."""
+    does not treat recalled memory as user discourse.
+    """
 
     def test_build_memory_context_block_wraps_content(self):
         from agent.memory_manager import build_memory_context_block
@@ -1193,6 +1195,7 @@ class TestHonchoCadenceTracking:
         p._recall_mode = "context"
         p._session_key = "test-session"
         # Simulate a manager that records prefetch calls
+
         class FakeManager:
             def prefetch_context(self, key, query=None):
                 pass

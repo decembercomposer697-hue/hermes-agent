@@ -559,6 +559,7 @@ def test_find_gateway_pids_falls_back_to_pid_file_when_process_scan_fails(monkey
     # /proc walk is the first path tried (#22693). Force os.listdir on /proc
     # to raise so the function falls back to ps, where fake_run takes over.
     _real_listdir = gateway.os.listdir
+
     def _no_proc_listdir(path):
         if path == "/proc":
             raise OSError("test stub: /proc unavailable")
@@ -636,6 +637,7 @@ class TestWaitForGatewayExit:
 
         # Simulate monotonic time advancing past force_after
         call_num = 0
+
         def fake_monotonic():
             nonlocal call_num
             call_num += 1
@@ -644,6 +646,7 @@ class TestWaitForGatewayExit:
             return call_num * 2.0  # 2, 4, 6, 8, ...
 
         kills = []
+
         def mock_terminate(pid, force=False):
             kills.append((pid, force))
 
@@ -663,6 +666,7 @@ class TestWaitForGatewayExit:
         """ProcessLookupError during force-kill is not fatal."""
 
         call_num = 0
+
         def fake_monotonic():
             nonlocal call_num
             call_num += 1

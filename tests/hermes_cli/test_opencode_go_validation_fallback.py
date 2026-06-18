@@ -16,7 +16,6 @@ from unittest.mock import patch
 
 from hermes_cli.models import validate_requested_model
 
-
 _UNREACHABLE_PROBE = {
     "models": None,
     "probed_url": "https://opencode.ai/zen/go/v1/models",
@@ -28,7 +27,8 @@ _UNREACHABLE_PROBE = {
 
 def _patched(func):
     """Decorator: force fetch_api_models / probe_api_models to simulate an
-    unreachable /models endpoint, proving the catalog path is used."""
+    unreachable /models endpoint, proving the catalog path is used.
+    """
     def wrapper(*args, **kwargs):
         with patch("hermes_cli.models.fetch_api_models", return_value=None), \
              patch("hermes_cli.models.probe_api_models", return_value=_UNREACHABLE_PROBE):
@@ -45,7 +45,8 @@ def _patched(func):
 @_patched
 def test_opencode_go_known_model_accepted():
     """A model present in the opencode-go curated catalog must be accepted
-    even when /models is unreachable."""
+    even when /models is unreachable.
+    """
     result = validate_requested_model("kimi-k2.6", "opencode-go")
     assert result["accepted"] is True
     assert result["persist"] is True
@@ -64,7 +65,8 @@ def test_opencode_go_known_model_case_insensitive():
 @_patched
 def test_opencode_go_typo_auto_corrected():
     """A close typo (>= 0.9 similarity) is auto-corrected to the catalog
-    entry."""
+    entry.
+    """
     # 'kimi-k2.55' vs 'kimi-k2.5' ratio ≈ 0.95 — within the 0.9 cutoff.
     result = validate_requested_model("kimi-k2.55", "opencode-go")
     assert result["accepted"] is True
@@ -77,7 +79,8 @@ def test_opencode_go_unknown_model_accepted_with_suggestion():
     """An unknown model that has a medium-similarity match (>= 0.5 but < 0.9)
     is accepted with recognized=False and a 'similar models' hint.  The key
     invariant: the gateway MUST be able to persist this override, so
-    accepted/persist must both be True."""
+    accepted/persist must both be True.
+    """
     # 'kimi-k3-preview' vs 'kimi-k2.6' — similar enough to suggest, not to auto-correct.
     result = validate_requested_model("kimi-k3-preview", "opencode-go")
     assert result["accepted"] is True
@@ -91,7 +94,8 @@ def test_opencode_go_unknown_model_accepted_with_suggestion():
 def test_opencode_go_totally_unknown_model_still_accepted():
     """A model with zero similarity to the catalog is still accepted (no
     suggestion line) so the user can try a model that hasn't made it into the
-    curated list yet."""
+    curated list yet.
+    """
     result = validate_requested_model("some-brand-new-model", "opencode-go")
     assert result["accepted"] is True
     assert result["persist"] is True
@@ -124,7 +128,8 @@ def test_provider_without_catalog_accepts_with_warning():
     """When a provider has no entry in _PROVIDER_MODELS and /models is
     unreachable, accept the model with a 'Note:' warning rather than reject.
     This matches the in-code comment: 'Accept and persist, but warn so typos
-    don't silently break things.'"""
+    don't silently break things.'
+    """
     # Use a made-up provider name that won't resolve to any catalog.
     result = validate_requested_model("some-model", "provider-that-does-not-exist")
     assert result["accepted"] is True

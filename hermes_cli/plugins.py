@@ -1,5 +1,4 @@
-"""
-Hermes Plugin System
+"""Hermes Plugin System
 ====================
 
 Discovers, loads, and manages plugins from four sources:
@@ -42,15 +41,15 @@ import os
 import sys
 import threading
 import types
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Union
-from collections.abc import Callable
 
-from hermes_constants import get_hermes_home
-from utils import env_var_enabled
 from hermes_cli.config import cfg_get
 from hermes_cli.middleware import OBSERVER_SCHEMA_VERSION, VALID_MIDDLEWARE
+from hermes_constants import get_hermes_home
+from utils import env_var_enabled
 
 
 def get_bundled_plugins_dir() -> Path:
@@ -309,7 +308,8 @@ class PluginContext:
         profile) is fail-closed by default and gated through
         ``plugins.entries.<plugin_id>.llm.*`` config keys.
 
-        See :mod:`agent.plugin_llm` for the full surface."""
+        See :mod:`agent.plugin_llm` for the full surface.
+        """
         if self._llm is None:
             from agent.plugin_llm import PluginLlm
             plugin_id = self.manifest.key or self.manifest.name
@@ -400,7 +400,8 @@ class PluginContext:
 
         The *setup_fn* receives an argparse subparser and should add any
         arguments/sub-subparsers.  If *handler_fn* is provided it is set
-        as the default dispatch function via ``set_defaults(func=...)``."""
+        as the default dispatch function via ``set_defaults(func=...)``.
+        """
         self._manager._cli_commands[name] = {
             "name": name,
             "help": help,
@@ -484,6 +485,7 @@ class PluginContext:
 
         Returns:
             JSON string from the tool handler (same format as model tool calls).
+
         """
         from tools.registry import registry
 
@@ -573,7 +575,8 @@ class PluginContext:
         ``register_image_gen_provider``.
         """
         from hermes_cli.dashboard_auth import (
-            DashboardAuthProvider, register_provider,
+            DashboardAuthProvider,
+            register_provider,
         )
 
         if not isinstance(provider, DashboardAuthProvider):
@@ -609,7 +612,9 @@ class PluginContext:
         tool calls.
         """
         from agent.video_gen_provider import VideoGenProvider
-        from agent.video_gen_registry import register_provider as _register_video_provider
+        from agent.video_gen_registry import (
+            register_provider as _register_video_provider,
+        )
 
         if not isinstance(provider, VideoGenProvider):
             logger.warning(
@@ -637,7 +642,9 @@ class PluginContext:
         tool calls.
         """
         from agent.web_search_provider import WebSearchProvider
-        from agent.web_search_registry import register_provider as _register_web_provider
+        from agent.web_search_registry import (
+            register_provider as _register_web_provider,
+        )
 
         if not isinstance(provider, WebSearchProvider):
             logger.warning(
@@ -669,7 +676,9 @@ class PluginContext:
         consults the registry built up by these calls.
         """
         from agent.browser_provider import BrowserProvider
-        from agent.browser_registry import register_provider as _register_browser_provider
+        from agent.browser_registry import (
+            register_provider as _register_browser_provider,
+        )
 
         if not isinstance(provider, BrowserProvider):
             logger.warning(
@@ -751,7 +760,9 @@ class PluginContext:
         backends).
         """
         from agent.transcription_provider import TranscriptionProvider
-        from agent.transcription_registry import register_provider as _register_stt_provider
+        from agent.transcription_registry import (
+            register_provider as _register_stt_provider,
+        )
 
         if not isinstance(provider, TranscriptionProvider):
             logger.warning(
@@ -800,7 +811,7 @@ class PluginContext:
                 setup_fn=irc_interactive_setup,
             )
         """
-        from gateway.platform_registry import platform_registry, PlatformEntry
+        from gateway.platform_registry import PlatformEntry, platform_registry
 
         entry_kwargs.setdefault("plugin_name", self.manifest.name)
         entry = PlatformEntry(
@@ -876,6 +887,7 @@ class PluginContext:
                 description="hindsight pre-retain dedup/extract",
                 defaults={"provider": "auto", "timeout": 30},
             )
+
         """
         # Validate key shape
         if not key or not isinstance(key, str):
@@ -994,6 +1006,7 @@ class PluginContext:
         Raises:
             ValueError: if *name* contains ``':'`` or invalid characters.
             FileNotFoundError: if *path* does not exist.
+
         """
         from agent.skill_utils import _NAMESPACE_RE
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Memory Tool Module - Persistent Curated Memory
+"""Memory Tool Module - Persistent Curated Memory
 
 Provides bounded, file-backed memory that persists across sessions. Two stores:
   - MEMORY.md: agent's personal notes and observations (environment facts, project
@@ -30,9 +29,9 @@ import tempfile
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from hermes_constants import get_hermes_home
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
+from hermes_constants import get_hermes_home
 from utils import atomic_replace
 
 # fcntl is Unix-only; on Windows use msvcrt for file locking
@@ -47,6 +46,7 @@ except ImportError:
         pass
 
 logger = logging.getLogger(__name__)
+
 
 # Where memory files live — resolved dynamically so profile overrides
 # (HERMES_HOME env var changes) are always respected.  The old module-level
@@ -111,8 +111,7 @@ def _drift_error(path: "Path", bak_path: str) -> dict[str, Any]:
 
 
 class MemoryStore:
-    """
-    Bounded curated memory with file persistence. One instance per AIAgent.
+    """Bounded curated memory with file persistence. One instance per AIAgent.
 
     Maintains two parallel states:
       - _system_prompt_snapshot: frozen at load time, used for system prompt injection.
@@ -448,8 +447,7 @@ class MemoryStore:
         return self._success_response(target, "Entry removed.")
 
     def format_for_system_prompt(self, target: str) -> str | None:
-        """
-        Return the frozen snapshot for system prompt injection.
+        """Return the frozen snapshot for system prompt injection.
 
         This returns the state captured at load_from_disk() time, NOT the live
         state. Mid-session writes do not affect this. This keeps the system
@@ -670,8 +668,7 @@ def memory_tool(
     old_text: str = None,
     store: MemoryStore | None = None,
 ) -> str:
-    """
-    Single entry point for the memory tool. Dispatches to MemoryStore methods.
+    """Single entry point for the memory tool. Dispatches to MemoryStore methods.
 
     Returns JSON string with results.
     """

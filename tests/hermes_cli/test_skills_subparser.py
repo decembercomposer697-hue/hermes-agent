@@ -20,8 +20,8 @@ def test_no_duplicate_skills_subparser():
     import sys
 
     # Remove cached module if present
-    if 'hermes_cli.main' in sys.modules:
-        del sys.modules['hermes_cli.main']
+    if "hermes_cli.main" in sys.modules:
+        del sys.modules["hermes_cli.main"]
 
     try:
         pass

@@ -1,5 +1,6 @@
 """Regression tests for numbered fallbacks when the interactive curses menu
-cannot initialize (e.g. non-TTY, curses unavailable, terminal error)."""
+cannot initialize (e.g. non-TTY, curses unavailable, terminal error).
+"""
 
 import subprocess
 from types import SimpleNamespace

@@ -92,7 +92,8 @@ class TestCopilotCatalogApiKeyResolution:
 
     def test_skips_pool_entry_that_fails_to_exchange(self):
         """If the first entry won't exchange, try the next — an unsupported pool[0]
-        must not wedge a later valid entry (Copilot review #16868 finding)."""
+        must not wedge a later valid entry (Copilot review #16868 finding).
+        """
         attempts: list[str] = []
 
         def fake_exchange(raw_token: str):

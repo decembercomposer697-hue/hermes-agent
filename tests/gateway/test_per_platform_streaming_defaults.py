@@ -20,9 +20,10 @@ def test_default_per_platform_streaming_flags():
 
 def test_resolver_telegram_on_discord_off_when_global_enabled():
     """With global streaming on, the per-platform defaults make Telegram stream
-    and Discord not — matching the platforms' actual streaming quality."""
-    from hermes_cli.config import DEFAULT_CONFIG
+    and Discord not — matching the platforms' actual streaming quality.
+    """
     from gateway.display_config import resolve_display_setting
+    from hermes_cli.config import DEFAULT_CONFIG
 
     cfg = dict(DEFAULT_CONFIG)
     cfg["streaming"] = {"enabled": True, "transport": "auto"}
@@ -40,7 +41,8 @@ def test_resolver_telegram_on_discord_off_when_global_enabled():
 
 def test_user_override_wins_over_default():
     """A user who explicitly enables Discord streaming keeps their value — the
-    default false must not clobber it (config deep-merge: user wins)."""
+    default false must not clobber it (config deep-merge: user wins).
+    """
     from hermes_cli.config import DEFAULT_CONFIG, _deep_merge
 
     user = {"display": {"platforms": {"discord": {"streaming": True}}}}
@@ -52,7 +54,8 @@ def test_user_override_wins_over_default():
 
 def test_dashboard_schema_exposes_per_platform_streaming():
     """Because the web settings schema is built from DEFAULT_CONFIG, the
-    per-platform streaming toggles surface in the dashboard automatically."""
+    per-platform streaming toggles surface in the dashboard automatically.
+    """
     import pytest
     pytest.importorskip("fastapi")  # web_server requires fastapi/uvicorn
     from hermes_cli.web_server import CONFIG_SCHEMA

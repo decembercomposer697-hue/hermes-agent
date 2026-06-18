@@ -4,13 +4,13 @@ Covers the monthly_credits denominator path added when the portal /api/oauth/acc
 subscription block began carrying `monthly_credits`. Magnitudes-only fallback, clamp,
 and the non-finite / rollover guards (surfaced by adversarial review) are all asserted.
 """
+from agent.account_usage import build_nous_credits_snapshot, render_account_usage_lines
 from hermes_cli.nous_account import (
-    NousPortalAccountInfo,
     NousPaidServiceAccessInfo,
+    NousPortalAccountInfo,
     NousPortalSubscriptionInfo,
     _subscription_from_payload,
 )
-from agent.account_usage import build_nous_credits_snapshot, render_account_usage_lines
 
 
 def _acct(**kwargs):
@@ -96,7 +96,8 @@ def test_no_monthly_credits_falls_back_to_magnitudes():
 
 def test_nan_remaining_no_window_no_nan_string():
     """json.loads parses bare NaN by default; isinstance(nan, float) is True.
-    The gauge must reject it rather than render '$nan' + a false 100% used."""
+    The gauge must reject it rather than render '$nan' + a false 100% used.
+    """
     snap = build_nous_credits_snapshot(_acct(
         paid_service_access=True,
         subscription=NousPortalSubscriptionInfo(monthly_credits=220, credits_remaining=float("nan")),
@@ -116,8 +117,9 @@ def test_inf_cap_no_window():
 
 
 def test_rollover_balance_exceeds_cap_no_window():
-    """remaining > cap (rollover spanning the period) makes monthly_credits a
-    nonsensical denominator → suppress the gauge, keep magnitudes."""
+    """Remaining > cap (rollover spanning the period) makes monthly_credits a
+    nonsensical denominator → suppress the gauge, keep magnitudes.
+    """
     snap = build_nous_credits_snapshot(_acct(
         paid_service_access=True,
         subscription=NousPortalSubscriptionInfo(monthly_credits=220, credits_remaining=300, rollover_credits=80),

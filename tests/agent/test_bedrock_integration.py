@@ -109,7 +109,8 @@ class TestResolveProvider:
 
     def test_auto_detect_with_aws_credentials(self, monkeypatch):
         """When AWS credentials are present and no other provider is configured,
-        auto-detect should find bedrock."""
+        auto-detect should find bedrock.
+        """
         from hermes_cli.auth import resolve_provider
 
         # Clear all other provider env vars
@@ -163,9 +164,10 @@ class TestRuntimeProvider:
 
     def test_bedrock_runtime_no_credentials_raises_on_auto_detect(self, monkeypatch):
         """When bedrock is auto-detected (not explicitly requested) and no
-        credentials are found, runtime resolution should raise AuthError."""
-        from hermes_cli.runtime_provider import resolve_runtime_provider
+        credentials are found, runtime resolution should raise AuthError.
+        """
         from hermes_cli.auth import AuthError
+        from hermes_cli.runtime_provider import resolve_runtime_provider
 
         # Clear all AWS env vars
         for var in ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_PROFILE",
@@ -187,7 +189,8 @@ class TestRuntimeProvider:
 
     def test_bedrock_runtime_explicit_skips_credential_check(self, monkeypatch):
         """When user explicitly requests bedrock, trust boto3's credential chain
-        even if env-var detection finds nothing (covers IMDS, SSO, etc.)."""
+        even if env-var detection finds nothing (covers IMDS, SSO, etc.).
+        """
         from hermes_cli.runtime_provider import resolve_runtime_provider
 
         # No AWS env vars set — but explicit bedrock request should not raise
@@ -297,7 +300,8 @@ class TestPackaging:
 
 class TestBedrockPreserveDotsFlag:
     """``AIAgent._anthropic_preserve_dots`` must return True on Bedrock so
-    inference-profile IDs survive the normalize step intact."""
+    inference-profile IDs survive the normalize step intact.
+    """
 
     def test_bedrock_provider_preserves_dots(self):
         from types import SimpleNamespace
@@ -308,7 +312,8 @@ class TestBedrockPreserveDotsFlag:
     def test_bedrock_runtime_us_east_1_url_preserves_dots(self):
         """Defense-in-depth: even without an explicit ``provider="bedrock"``,
         a ``bedrock-runtime.us-east-1.amazonaws.com`` base URL must not
-        mangle dots."""
+        mangle dots.
+        """
         from types import SimpleNamespace
         agent = SimpleNamespace(
             provider="custom",
@@ -319,7 +324,8 @@ class TestBedrockPreserveDotsFlag:
 
     def test_bedrock_runtime_ap_northeast_2_url_preserves_dots(self):
         """Reporter-reported region (ap-northeast-2) exercises the same
-        base-URL heuristic."""
+        base-URL heuristic.
+        """
         from types import SimpleNamespace
         agent = SimpleNamespace(
             provider="custom",
@@ -332,7 +338,8 @@ class TestBedrockPreserveDotsFlag:
         """Unrelated AWS endpoints (e.g. ``s3.us-east-1.amazonaws.com``)
         must not accidentally activate the dot-preservation heuristic —
         the heuristic is scoped to the ``bedrock-runtime.`` substring
-        specifically."""
+        specifically.
+        """
         from types import SimpleNamespace
         agent = SimpleNamespace(
             provider="custom",
@@ -344,7 +351,8 @@ class TestBedrockPreserveDotsFlag:
     def test_anthropic_native_still_does_not_preserve_dots(self):
         """Canary: adding Bedrock to the allowlist must not weaken the
         existing Anthropic native behaviour — ``claude-sonnet-4.6`` still
-        becomes ``claude-sonnet-4-6`` for the Anthropic API."""
+        becomes ``claude-sonnet-4-6`` for the Anthropic API.
+        """
         from types import SimpleNamespace
         agent = SimpleNamespace(provider="anthropic", base_url="https://api.anthropic.com")
         from run_agent import AIAgent
@@ -354,7 +362,8 @@ class TestBedrockPreserveDotsFlag:
 class TestBedrockModelNameNormalization:
     """End-to-end: ``normalize_model_name`` + the preserve-dots flag
     reproduce the exact production request shape for each Bedrock model
-    family, confirming the fix resolves the reporter's HTTP 400."""
+    family, confirming the fix resolves the reporter's HTTP 400.
+    """
 
     def test_global_anthropic_inference_profile_preserved(self):
         """The reporter's exact model ID."""
@@ -382,7 +391,8 @@ class TestBedrockModelNameNormalization:
         """Bedrock inference profile IDs are auto-detected by prefix and
         always returned unmangled -- ``preserve_dots`` is irrelevant for
         these IDs because the dots are namespace separators, not version
-        separators.  Regression for #12295."""
+        separators.  Regression for #12295.
+        """
         from agent.anthropic_adapter import normalize_model_name
         assert normalize_model_name(
             "global.anthropic.claude-opus-4-7", preserve_dots=False,
@@ -392,7 +402,8 @@ class TestBedrockModelNameNormalization:
         """Non-inference-profile Bedrock IDs
         (e.g. ``anthropic.claude-3-5-sonnet-20241022-v2:0``) use dots as
         vendor separators and must also survive intact under
-        ``preserve_dots=True``."""
+        ``preserve_dots=True``.
+        """
         from agent.anthropic_adapter import normalize_model_name
         assert normalize_model_name(
             "anthropic.claude-3-5-sonnet-20241022-v2:0",
@@ -405,7 +416,8 @@ class TestBedrockBuildAnthropicKwargsEndToEnd:
     shaped model ID and ``preserve_dots=True`` produces the unmangled
     model string in the outgoing kwargs — the exact body sent to the
     ``bedrock-runtime.`` endpoint.  This is the integration-level
-    regression for the reporter's HTTP 400."""
+    regression for the reporter's HTTP 400.
+    """
 
     def test_bedrock_inference_profile_survives_build_kwargs(self):
         from agent.anthropic_adapter import build_anthropic_kwargs
@@ -426,7 +438,8 @@ class TestBedrockBuildAnthropicKwargsEndToEnd:
         """Bedrock inference profile IDs survive ``build_anthropic_kwargs``
         even without ``preserve_dots=True`` -- the prefix auto-detection
         in ``normalize_model_name`` is the load-bearing piece.
-        Regression for #12295."""
+        Regression for #12295.
+        """
         from agent.anthropic_adapter import build_anthropic_kwargs
         kwargs = build_anthropic_kwargs(
             model="global.anthropic.claude-opus-4-7",
@@ -442,7 +455,8 @@ class TestBedrockBuildAnthropicKwargsEndToEnd:
 class TestBedrockModelIdDetection:
     """Tests for ``_is_bedrock_model_id`` and the auto-detection that
     makes ``normalize_model_name`` preserve dots for Bedrock IDs
-    regardless of ``preserve_dots``.  Regression for #12295."""
+    regardless of ``preserve_dots``.  Regression for #12295.
+    """
 
     def test_bare_bedrock_id_detected(self):
         from agent.anthropic_adapter import _is_bedrock_model_id
@@ -471,7 +485,8 @@ class TestBedrockModelIdDetection:
     def test_bare_bedrock_id_preserved_without_flag(self):
         """The primary bug from #12295: ``anthropic.claude-opus-4-7``
         sent to bedrock-mantle via auxiliary clients that don't pass
-        ``preserve_dots=True``."""
+        ``preserve_dots=True``.
+        """
         from agent.anthropic_adapter import normalize_model_name
         assert normalize_model_name(
             "anthropic.claude-opus-4-7", preserve_dots=False,
@@ -484,7 +499,8 @@ class TestBedrockModelIdDetection:
 
     def test_bare_bedrock_id_survives_build_kwargs(self):
         """End-to-end: bare Bedrock ID through ``build_anthropic_kwargs``
-        without ``preserve_dots=True`` -- the auxiliary client path."""
+        without ``preserve_dots=True`` -- the auxiliary client path.
+        """
         from agent.anthropic_adapter import build_anthropic_kwargs
         kwargs = build_anthropic_kwargs(
             model="anthropic.claude-opus-4-7",
@@ -517,7 +533,10 @@ class TestAuxiliaryClientBedrockResolution:
         mock_anthropic_bedrock = MagicMock()
         with patch("agent.anthropic_adapter.build_anthropic_bedrock_client",
                    return_value=mock_anthropic_bedrock):
-            from agent.auxiliary_client import resolve_provider_client, AnthropicAuxiliaryClient
+            from agent.auxiliary_client import (
+                AnthropicAuxiliaryClient,
+                resolve_provider_client,
+            )
             client, model = resolve_provider_client("bedrock", None)
 
         assert client is not None, (
@@ -573,7 +592,10 @@ class TestAuxiliaryClientBedrockResolution:
 
         with patch("agent.anthropic_adapter.build_anthropic_bedrock_client",
                    return_value=MagicMock()):
-            from agent.auxiliary_client import resolve_provider_client, AsyncAnthropicAuxiliaryClient
+            from agent.auxiliary_client import (
+                AsyncAnthropicAuxiliaryClient,
+                resolve_provider_client,
+            )
             client, model = resolve_provider_client("bedrock", None, async_mode=True)
 
         assert client is not None

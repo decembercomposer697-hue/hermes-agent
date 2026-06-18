@@ -65,7 +65,8 @@ def test_ghostty_tmux_session_preserves_ctrl_j_newline():
 
 def test_pure_local_linux_does_not_preserve():
     """A bare local Linux TTY (no SSH/WSL/WT/Ghostty) keeps c-j → submit so docker exec
-    style Enter-as-LF stays usable."""
+    style Enter-as-LF stays usable.
+    """
     import cli as cli_mod
     # Stub out /proc reads — those are the WSL fallback signal.
     with patch.object(sys, "platform", "linux"):
@@ -76,11 +77,13 @@ def test_pure_local_linux_does_not_preserve():
 
 def test_proc_version_microsoft_marker_preserves_newline():
     """WSL detection via /proc when env vars are scrubbed (sudo etc.)."""
-    import cli as cli_mod
     from io import StringIO
+
+    import cli as cli_mod
     with patch.object(sys, "platform", "linux"):
         with patch.dict(os.environ, {}, clear=True):
             real_open = open
+
             def _fake_open(path, *args, **kwargs):
                 if "/proc/version" in str(path) or "/proc/sys/kernel/osrelease" in str(path):
                     return StringIO("Linux version 5.15.167.4-microsoft-standard-WSL2")
@@ -96,10 +99,12 @@ def test_proc_version_microsoft_marker_preserves_newline():
 
 def test_install_ctrl_enter_alias_maps_csi_u_sequences():
     """Kitty / xterm modifyOtherKeys / mintty Ctrl+Enter sequences alias to
-    Alt+Enter (Escape, ControlM) so the existing newline handler fires."""
-    from hermes_cli.pt_input_extras import install_ctrl_enter_alias
+    Alt+Enter (Escape, ControlM) so the existing newline handler fires.
+    """
     from prompt_toolkit.input.ansi_escape_sequences import ANSI_SEQUENCES
     from prompt_toolkit.keys import Keys
+
+    from hermes_cli.pt_input_extras import install_ctrl_enter_alias
 
     install_ctrl_enter_alias()
     alt_enter = (Keys.Escape, Keys.ControlM)

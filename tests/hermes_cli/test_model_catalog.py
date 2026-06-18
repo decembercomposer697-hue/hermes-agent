@@ -21,6 +21,7 @@ def isolated_home(tmp_path, monkeypatch):
 
     # Force a fresh catalog module state for each test.
     import importlib
+
     from hermes_cli import model_catalog
     importlib.reload(model_catalog)
     yield home
@@ -228,7 +229,8 @@ class TestFallbackChain:
 
     def test_dedupes_when_primary_equals_fallback(self, isolated_home):
         """Operator who configured ``model_catalog.url`` to the raw GitHub URL
-        should not get a duplicate fetch from the fallback list."""
+        should not get a duplicate fetch from the fallback list.
+        """
         from hermes_cli import model_catalog
 
         with patch.object(model_catalog, "_fetch_manifest", return_value=None) as fetch:
@@ -238,7 +240,8 @@ class TestFallbackChain:
 
     def test_get_catalog_uses_fallback_chain(self, isolated_home):
         """End-to-end: ``get_catalog`` routes through the fallback helper so
-        a primary URL failure transparently produces a working catalog."""
+        a primary URL failure transparently produces a working catalog.
+        """
         from hermes_cli import model_catalog
         manifest = _valid_manifest()
         calls: list[str] = []
@@ -350,7 +353,7 @@ class TestIntegrationWithModelsModule:
         self, isolated_home,
     ):
         from hermes_cli import model_catalog
-        from hermes_cli.models import get_curated_nous_model_ids, _PROVIDER_MODELS
+        from hermes_cli.models import _PROVIDER_MODELS, get_curated_nous_model_ids
 
         with patch.object(model_catalog, "_fetch_manifest", return_value=None):
             result = get_curated_nous_model_ids()
@@ -382,6 +385,7 @@ class TestIntegrationWithModelsModule:
         # seat-belt thinks is the "real" user store. Use the autouse
         # ``_hermetic_environment`` HERMES_HOME directly instead.
         import importlib
+
         from hermes_cli import model_catalog
         from hermes_cli.models import get_curated_nous_model_ids
         importlib.reload(model_catalog)

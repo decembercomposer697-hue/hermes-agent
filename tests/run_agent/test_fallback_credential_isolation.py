@@ -14,9 +14,8 @@ fallback calls, contaminating primary state with fallback-provider errors.
 import sys
 from unittest.mock import MagicMock
 
-
-
 # ── Helpers ──────────────────────────────────────────────────────────
+
 
 def _make_pool(provider, n_entries=1):
     """Create a mock credential pool with N entries."""
@@ -130,7 +129,8 @@ class TestRecoveryProviderGuard:
 
     def test_recovery_skips_mismatched_pool(self):
         """_recover_with_credential_pool should not mutate a pool belonging
-        to a different provider than the active agent provider."""
+        to a different provider than the active agent provider.
+        """
         agent = _make_agent(provider="openrouter")
         # Pool still belongs to primary (openai-codex) — mismatch
         agent._credential_pool = _make_pool("openai-codex")
@@ -163,7 +163,8 @@ class TestRecoveryProviderGuard:
 
     def test_recovery_429_from_zai_does_not_exhaust_codex_pool(self):
         """Regression test for GH #33088: zai 429 should NOT exhaust
-        openai-codex credential pool."""
+        openai-codex credential pool.
+        """
         agent = _make_agent(provider="zai", base_url="https://api.z.com/v1")
         # Stale codex pool from primary
         codex_pool = _make_pool("openai-codex")
@@ -185,7 +186,8 @@ class TestBaseUrlLeak:
 
     def test_client_kwargs_base_url_preserved_after_pool_clear(self):
         """After fallback activation clears the pool, _client_kwargs should
-        still have the fallback base_url, not the primary's."""
+        still have the fallback base_url, not the primary's.
+        """
         agent = _make_agent(
             provider="openai-codex",
             base_url="https://chatgpt.com/backend-api/codex",
@@ -209,7 +211,8 @@ class TestBaseUrlLeak:
 
     def test_swap_credential_does_not_restore_primary_url(self):
         """_swap_credential should not be called when pool is None,
-        preventing it from overwriting base_url back to primary's."""
+        preventing it from overwriting base_url back to primary's.
+        """
         agent = _make_agent(provider="openrouter", base_url="https://openrouter.ai/api/v1/")
         agent._credential_pool = None  # Cleared by fallback isolation
 

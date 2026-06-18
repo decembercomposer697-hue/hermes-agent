@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-health_check.py — One-stop verification that the ComfyUI environment is ready.
+"""health_check.py — One-stop verification that the ComfyUI environment is ready.
 
 Runs through the verification checklist:
   1. comfy-cli on PATH
@@ -26,8 +25,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _common import (
-    DEFAULT_LOCAL_HOST, ENV_API_KEY, emit_json, http_get, parse_model_list,
-    resolve_api_key, resolve_url, unwrap_workflow,
+    DEFAULT_LOCAL_HOST,
+    ENV_API_KEY,
+    emit_json,
+    http_get,
+    parse_model_list,
+    resolve_api_key,
+    resolve_url,
+    unwrap_workflow,
 )
 
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-MCP OAuth 2.1 Client Support
+"""MCP OAuth 2.1 Client Support
 
 Implements the browser-based OAuth 2.1 authorization code flow with PKCE
 for MCP servers that require OAuth authentication instead of static bearer
@@ -48,6 +47,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
+
 from hermes_constants import secure_parent_dir
 
 logger = logging.getLogger(__name__)
@@ -467,6 +467,7 @@ async def _wait_for_callback() -> tuple[str, str | None]:
         RuntimeError: If ``_oauth_port`` has not been set, which would indicate
             that ``build_oauth_auth`` was skipped — the asserting form below
             was a silent bug when running Python with ``-O``/``-OO``.
+
     """
     if _oauth_port is None:
         raise RuntimeError(
@@ -741,6 +742,7 @@ def build_oauth_auth(
     Returns:
         An ``OAuthClientProvider`` instance, or None if the MCP SDK lacks
         OAuth support.
+
     """
     if not _OAUTH_AVAILABLE:
         logger.warning(

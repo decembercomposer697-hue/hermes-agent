@@ -1,5 +1,4 @@
-"""
-QQ Bot platform adapter using the Official QQ Bot API (v2).
+"""QQ Bot platform adapter using the Official QQ Bot API (v2).
 
 Connects to the QQ Bot WebSocket Gateway for inbound events and uses the
 REST API (``api.sgroup.qq.com``) for outbound messages and media uploads.
@@ -39,10 +38,10 @@ import mimetypes
 import os
 import time
 import uuid
-from datetime import datetime, timezone, UTC
+from collections.abc import Awaitable, Callable
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-from collections.abc import Awaitable, Callable
 from urllib.parse import urlparse
 
 try:
@@ -92,38 +91,34 @@ class QQCloseError(Exception):
 # Constants — imported from the shared constants module.
 # ---------------------------------------------------------------------------
 
-from gateway.platforms.qqbot.constants import (
-    API_BASE,
-    TOKEN_URL,
-    GATEWAY_URL_PATH,
-    DEFAULT_API_TIMEOUT,
-    FILE_UPLOAD_TIMEOUT,
-    CONNECT_TIMEOUT_SECONDS,
-    RECONNECT_BACKOFF,
-    MAX_RECONNECT_ATTEMPTS,
-    RATE_LIMIT_DELAY,
-    QUICK_DISCONNECT_THRESHOLD,
-    MAX_QUICK_DISCONNECT_COUNT,
-    MAX_MESSAGE_LENGTH,
-    DEDUP_WINDOW_SECONDS,
-    DEDUP_MAX_SIZE,
-    MSG_TYPE_TEXT,
-    MSG_TYPE_MARKDOWN,
-    MSG_TYPE_MEDIA,
-    MSG_TYPE_INPUT_NOTIFY,
-    MEDIA_TYPE_IMAGE,
-    MEDIA_TYPE_VIDEO,
-    MEDIA_TYPE_VOICE,
-    MEDIA_TYPE_FILE,
-)
-from gateway.platforms.qqbot.utils import (
-    coerce_list as _coerce_list_impl,
-    build_user_agent,
-)
 from gateway.platforms.qqbot.chunked_upload import (
     ChunkedUploader,
     UploadDailyLimitExceededError,
     UploadFileTooLargeError,
+)
+from gateway.platforms.qqbot.constants import (
+    API_BASE,
+    CONNECT_TIMEOUT_SECONDS,
+    DEDUP_MAX_SIZE,
+    DEDUP_WINDOW_SECONDS,
+    DEFAULT_API_TIMEOUT,
+    FILE_UPLOAD_TIMEOUT,
+    GATEWAY_URL_PATH,
+    MAX_MESSAGE_LENGTH,
+    MAX_QUICK_DISCONNECT_COUNT,
+    MAX_RECONNECT_ATTEMPTS,
+    MEDIA_TYPE_FILE,
+    MEDIA_TYPE_IMAGE,
+    MEDIA_TYPE_VIDEO,
+    MEDIA_TYPE_VOICE,
+    MSG_TYPE_INPUT_NOTIFY,
+    MSG_TYPE_MARKDOWN,
+    MSG_TYPE_MEDIA,
+    MSG_TYPE_TEXT,
+    QUICK_DISCONNECT_THRESHOLD,
+    RATE_LIMIT_DELAY,
+    RECONNECT_BACKOFF,
+    TOKEN_URL,
 )
 from gateway.platforms.qqbot.keyboards import (
     ApprovalRequest,
@@ -134,6 +129,12 @@ from gateway.platforms.qqbot.keyboards import (
     parse_approval_button_data,
     parse_interaction_event,
     parse_update_prompt_button_data,
+)
+from gateway.platforms.qqbot.utils import (
+    build_user_agent,
+)
+from gateway.platforms.qqbot.utils import (
+    coerce_list as _coerce_list_impl,
 )
 
 

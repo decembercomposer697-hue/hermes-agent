@@ -14,8 +14,8 @@ import pytest
 
 from gateway.config import Platform, PlatformConfig
 
-
 # ── Config loading ──────────────────────────────────────────────────
+
 
 class TestSmsConfigLoading:
     """Verify _apply_env_overrides wires SMS correctly."""
@@ -54,6 +54,7 @@ class TestSmsConfigLoading:
             assert hc.platform == Platform.SMS
 
 # ── Format / truncate ───────────────────────────────────────────────
+
 
 class TestSmsFormatAndTruncate:
     """Test SmsAdapter.format_message strips markdown."""
@@ -479,7 +480,8 @@ class TestWebhookSignatureEnforcement:
     @pytest.mark.asyncio
     async def test_insecure_flag_with_url_still_validates(self):
         """When both SMS_WEBHOOK_URL and SMS_INSECURE_NO_SIGNATURE are set,
-        validation stays active (URL takes precedence)."""
+        validation stays active (URL takes precedence).
+        """
         adapter = self._make_adapter(webhook_url="https://example.com/webhooks/twilio")
         body = b"From=%2B15551234567&To=%2B15550001111&Body=hello&MessageSid=SM123"
         request = self._mock_request(body, headers={})

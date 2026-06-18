@@ -31,7 +31,7 @@ class TestInterpretExitCode:
         assert "no matches" in result.lower()
 
     def test_grep_real_error_no_note(self):
-        """grep exit 2+ is a real error — should return None."""
+        """Grep exit 2+ is a real error — should return None."""
         assert _interpret_exit_code("grep 'foo' bar", 2) is None
         assert _interpret_exit_code("rg 'foo' .", 2) is None
 

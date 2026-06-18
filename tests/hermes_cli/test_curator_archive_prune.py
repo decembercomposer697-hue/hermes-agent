@@ -15,7 +15,6 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 
-
 def _ns(**kwargs):
     return SimpleNamespace(**kwargs)
 
@@ -237,6 +236,7 @@ def test_prune_reports_partial_failure(monkeypatch, capsys):
 
 def test_archive_and_prune_registered():
     import argparse
+
     import hermes_cli.curator as curator_cli
 
     parser = argparse.ArgumentParser(prog="hermes curator")
@@ -255,6 +255,7 @@ def test_archive_and_prune_registered():
 
 def test_prune_defaults():
     import argparse
+
     import hermes_cli.curator as curator_cli
 
     parser = argparse.ArgumentParser(prog="hermes curator")

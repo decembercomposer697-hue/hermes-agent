@@ -104,7 +104,8 @@ def log_clean(server_id: str, file_path: str) -> None:
 
 def log_disabled(server_id: str, file_path: str, reason: str) -> None:
     """LSP intentionally skipped for this file (feature off, ext unmapped,
-    backend not local, etc.).  DEBUG."""
+    backend not local, etc.).  DEBUG.
+    """
     _emit(server_id, logging.DEBUG, f"skipped: {reason} ({_short_path(file_path)})")
 
 
@@ -124,13 +125,15 @@ def log_active(server_id: str, workspace_root: str) -> None:
 def log_diagnostics(server_id: str, file_path: str, count: int) -> None:
     """Diagnostics arrived for a file.  INFO every time — these are the
     failure signals users actually want to grep for, and they are
-    inherently rare per edit."""
+    inherently rare per edit.
+    """
     _emit(server_id, logging.INFO, f"{count} diags ({_short_path(file_path)})")
 
 
 def log_no_project_root(server_id: str, file_path: str) -> None:
     """File had no recognised project marker.  INFO once per file,
-    DEBUG thereafter."""
+    DEBUG thereafter.
+    """
     key = (server_id, file_path)
     if _announce_once(_announced_no_root, key):
         _emit(server_id, logging.INFO, f"no project root for {_short_path(file_path)}")
@@ -141,7 +144,8 @@ def log_no_project_root(server_id: str, file_path: str) -> None:
 def log_server_unavailable(server_id: str, binary_or_pkg: str) -> None:
     """The server binary couldn't be resolved.  WARNING once per
     (server_id, binary), DEBUG thereafter so a hundred subsequent
-    .py edits don't spam the log."""
+    .py edits don't spam the log.
+    """
     key = (server_id, binary_or_pkg)
     if _announce_once(_announced_unavailable, key):
         _emit(
@@ -162,7 +166,8 @@ def log_no_server_configured(server_id: str) -> None:
 
 def log_timeout(server_id: str, file_path: str, kind: str = "diagnostics") -> None:
     """A request to the server timed out.  WARNING every time — these are
-    inherently novel events worth surfacing on each occurrence."""
+    inherently novel events worth surfacing on each occurrence.
+    """
     _emit(
         server_id,
         logging.WARNING,

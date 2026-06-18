@@ -1,6 +1,6 @@
 """Tests for named custom provider and 'main' alias resolution in auxiliary_client."""
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -340,7 +340,8 @@ class TestProvidersDictApiModeAnthropicMessages:
 
     def test_resolve_provider_client_returns_anthropic_client(self, tmp_path, monkeypatch):
         """Named custom provider with api_mode=anthropic_messages must
-        route through AnthropicAuxiliaryClient."""
+        route through AnthropicAuxiliaryClient.
+        """
         monkeypatch.setenv("MYRELAY_API_KEY", "sk-test")
         _write_config(tmp_path, {
             "providers": {
@@ -354,9 +355,9 @@ class TestProvidersDictApiModeAnthropicMessages:
             },
         })
         from agent.auxiliary_client import (
-            resolve_provider_client,
             AnthropicAuxiliaryClient,
             AsyncAnthropicAuxiliaryClient,
+            resolve_provider_client,
         )
         sync_client, sync_model = resolve_provider_client("myrelay", async_mode=False)
         assert isinstance(sync_client, AnthropicAuxiliaryClient), (
@@ -372,7 +373,8 @@ class TestProvidersDictApiModeAnthropicMessages:
 
     def test_aux_task_override_routes_named_provider_to_anthropic(self, tmp_path, monkeypatch):
         """The full chain: auxiliary.<task>.provider: myrelay with
-        api_mode anthropic_messages must produce an Anthropic client."""
+        api_mode anthropic_messages must produce an Anthropic client.
+        """
         monkeypatch.setenv("MYRELAY_API_KEY", "sk-test")
         _write_config(tmp_path, {
             "providers": {
@@ -393,10 +395,10 @@ class TestProvidersDictApiModeAnthropicMessages:
             "model": {"provider": "openrouter", "default": "anthropic/claude-sonnet-4.6"},
         })
         from agent.auxiliary_client import (
-            get_async_text_auxiliary_client,
-            get_text_auxiliary_client,
             AnthropicAuxiliaryClient,
             AsyncAnthropicAuxiliaryClient,
+            get_async_text_auxiliary_client,
+            get_text_auxiliary_client,
         )
         async_client, async_model = get_async_text_auxiliary_client("compression")
         assert isinstance(async_client, AsyncAnthropicAuxiliaryClient)
@@ -408,7 +410,8 @@ class TestProvidersDictApiModeAnthropicMessages:
 
     def test_provider_without_api_mode_still_uses_openai(self, tmp_path):
         """Named providers that don't declare api_mode should still go
-        through the plain OpenAI-wire path (no regression)."""
+        through the plain OpenAI-wire path (no regression).
+        """
         _write_config(tmp_path, {
             "providers": {
                 "localchat": {
@@ -419,8 +422,9 @@ class TestProvidersDictApiModeAnthropicMessages:
                 },
             },
         })
+        from openai import AsyncOpenAI, OpenAI
+
         from agent.auxiliary_client import resolve_provider_client
-        from openai import OpenAI, AsyncOpenAI
         sync_client, _ = resolve_provider_client("localchat", async_mode=False)
         # sync returns the raw OpenAI client
         assert isinstance(sync_client, OpenAI)
@@ -450,8 +454,9 @@ class TestCustomProviderAliasCollision:
                 },
             ],
         })
-        from agent.auxiliary_client import resolve_provider_client
         from openai import OpenAI
+
+        from agent.auxiliary_client import resolve_provider_client
         client, model = resolve_provider_client("kimi", model="my-kimi-model", raw_codex=True)
         assert isinstance(client, OpenAI)
         assert "my-custom-kimi.example.com" in str(client.base_url)
@@ -460,7 +465,8 @@ class TestCustomProviderAliasCollision:
 
     def test_bare_kimi_without_custom_still_routes_to_builtin(self, tmp_path, monkeypatch):
         """Regression guard: bare 'kimi' with no custom entry must still
-        reach the built-in kimi-coding provider."""
+        reach the built-in kimi-coding provider.
+        """
         _write_config(tmp_path, {
             "model": {"provider": "openrouter", "default": "anthropic/claude-sonnet-4.6"},
         })
@@ -476,13 +482,15 @@ class TestCustomProviderAliasCollision:
         """Explicit base_url/api_key from the caller must override the
         registered provider's defaults on the API-key branch.  Used by
         _try_activate_fallback to route a fallback through a built-in
-        provider name but targeting a user-supplied endpoint."""
+        provider name but targeting a user-supplied endpoint.
+        """
         _write_config(tmp_path, {
             "model": {"provider": "openrouter", "default": "anthropic/claude-sonnet-4.6"},
         })
         monkeypatch.setenv("KIMI_API_KEY", "builtin-kimi-key")
-        from agent.auxiliary_client import resolve_provider_client
         from openai import OpenAI
+
+        from agent.auxiliary_client import resolve_provider_client
         client, _ = resolve_provider_client(
             "kimi-coding", model="kimi-k2", raw_codex=True,
             explicit_base_url="https://override.example.com",

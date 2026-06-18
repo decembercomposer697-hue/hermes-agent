@@ -10,9 +10,15 @@ import os
 import sys
 from pathlib import Path
 
-from hermes_constants import get_hermes_home
-from plugins.memory.honcho.client import _host_block, profile_host_key, resolve_active_host, resolve_config_path, HOST
 from hermes_cli.config import cfg_get
+from hermes_constants import get_hermes_home
+from plugins.memory.honcho.client import (
+    HOST,
+    _host_block,
+    profile_host_key,
+    resolve_active_host,
+    resolve_config_path,
+)
 
 
 def clone_honcho_for_profile(profile_name: str) -> bool:
@@ -788,7 +794,11 @@ def cmd_setup(args) -> None:
     # --- Test connection ---
     print("  Testing connection... ", end="", flush=True)
     try:
-        from plugins.memory.honcho.client import HonchoClientConfig, get_honcho_client, reset_honcho_client
+        from plugins.memory.honcho.client import (
+            HonchoClientConfig,
+            get_honcho_client,
+            reset_honcho_client,
+        )
         reset_honcho_client()
         hcfg = HonchoClientConfig.from_global_config(host=_host_key())
         get_honcho_client(hcfg)
@@ -1069,7 +1079,7 @@ def cmd_map(args) -> None:
         return
 
     import re
-    sanitized = re.sub(r'[^a-zA-Z0-9_-]', '-', session_name).strip('-')
+    sanitized = re.sub(r"[^a-zA-Z0-9_-]", "-", session_name).strip("-")
     if sanitized != session_name:
         print(f"  Session name sanitized to: {sanitized}")
         session_name = sanitized
@@ -1095,8 +1105,8 @@ def cmd_peer(args) -> None:
         # Show current values
         hosts = cfg.get("hosts", {})
         hermes = hosts.get(_host_key(), {})
-        user = hermes.get('peerName') or cfg.get('peerName') or '(not set)'
-        ai = hermes.get('aiPeer') or cfg.get('aiPeer') or _host_key()
+        user = hermes.get("peerName") or cfg.get("peerName") or "(not set)"
+        ai = hermes.get("aiPeer") or cfg.get("aiPeer") or _host_key()
         lvl = hermes.get("dialecticReasoningLevel") or cfg.get("dialecticReasoningLevel") or "low"
         max_chars = hermes.get("dialecticMaxChars") or cfg.get("dialecticMaxChars") or 600
         print("\nHoncho peers\n" + "─" * 40)

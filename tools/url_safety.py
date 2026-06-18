@@ -23,11 +23,11 @@ Limitations (documented, not fixable at pre-flight level):
     where redirect handling is on their servers.
 """
 
+import asyncio
 import ipaddress
 import logging
 import os
 import socket
-import asyncio
 from urllib.parse import quote, urlparse, urlsplit, urlunsplit
 
 from utils import is_truthy_value

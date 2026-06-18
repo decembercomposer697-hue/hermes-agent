@@ -22,12 +22,12 @@ Usage examples::
 import re
 import sys
 import time
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
-from collections.abc import Sequence
 
-from hermes_constants import get_hermes_home, display_hermes_home
+from hermes_constants import display_hermes_home, get_hermes_home
 
 # Known log files (name → filename)
 LOG_FILES = {
@@ -168,6 +168,7 @@ def tail_log(
         Relative time string (e.g. ``"1h"``, ``"30m"``).
     component
         Component name to filter by (e.g. ``"gateway"``, ``"tools"``).
+
     """
     filename = LOG_FILES.get(log_name)
     if filename is None:

@@ -40,7 +40,8 @@ def test_regular_escape_shortcuts_still_parse_normally():
 
 def test_install_is_idempotent_and_setdefault_safe():
     """Second call should return 0 (no new mappings); existing user
-    registrations must not be overwritten."""
+    registrations must not be overwritten.
+    """
     first = install_ignored_terminal_sequences()
     second = install_ignored_terminal_sequences()
     # At most first should be 2 (both CSI I + CSI O), second always 0

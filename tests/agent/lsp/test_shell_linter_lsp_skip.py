@@ -72,7 +72,8 @@ def test_shell_linter_skipped_when_lsp_will_handle(ext, tmp_path):
 @pytest.mark.parametrize("ext", [".ts", ".go", ".rs"])
 def test_shell_linter_runs_when_lsp_inactive(ext, tmp_path):
     """When LSP is inactive (default config, no service, remote backend, ...),
-    the shell linter runs as before — no behavior change."""
+    the shell linter runs as before — no behavior change.
+    """
     fops = _make_fops()
     src = tmp_path / f"clean{ext}"
     src.write_text("// content\n")
@@ -122,7 +123,8 @@ def test_lsp_does_not_skip_non_redundant_extensions(ext, tmp_path):
 def test_lsp_will_handle_returns_false_when_service_is_none(tmp_path):
     """``_lsp_will_handle`` must return False when the LSP service hasn't
     been initialized — otherwise we'd accidentally skip the shell linter
-    on systems where LSP isn't configured at all."""
+    on systems where LSP isn't configured at all.
+    """
     fops = _make_fops()
     src = tmp_path / "foo.ts"
     src.write_text("const x = 1\n")
@@ -136,7 +138,8 @@ def test_lsp_will_handle_returns_false_on_remote_backend(tmp_path):
     """LSP servers run on the host process — remote backends (Docker,
     SSH, Modal, …) keep files inside the sandbox where the host LSP
     can't reach them.  ``_lsp_will_handle`` must short-circuit before
-    calling into the service in that case."""
+    calling into the service in that case.
+    """
     fops = _make_fops()
     src = tmp_path / "foo.ts"
     src.write_text("const x = 1\n")
@@ -153,7 +156,8 @@ def test_lsp_will_handle_returns_false_on_remote_backend(tmp_path):
 def test_lsp_will_handle_swallows_enabled_for_exception(tmp_path):
     """A flaky LSP service must never break the shell-linter fallback —
     if ``enabled_for`` raises, we treat the file as "not handled" so the
-    shell linter still runs."""
+    shell linter still runs.
+    """
     fops = _make_fops()
     src = tmp_path / "foo.ts"
     src.write_text("const x = 1\n")
@@ -181,7 +185,7 @@ def test_tsx_stays_out_of_linters_table_for_default_compatibility():
     ``.tsx`` in its extensions list) — the diagnostics show up in the
     ``lsp_diagnostics`` field, not the ``lint`` field.
     """
-    from tools.file_operations import LINTERS, _SHELL_LINTER_LSP_REDUNDANT
+    from tools.file_operations import _SHELL_LINTER_LSP_REDUNDANT, LINTERS
 
     assert ".tsx" not in LINTERS
     assert ".tsx" not in _SHELL_LINTER_LSP_REDUNDANT
@@ -190,7 +194,8 @@ def test_tsx_stays_out_of_linters_table_for_default_compatibility():
 def test_tsx_default_check_lint_returns_skipped(tmp_path):
     """End-to-end: ``.tsx`` files get ``LintResult(skipped=True)`` from
     ``_check_lint`` regardless of LSP status — this is the no-regression
-    contract that addresses Copilot review #3271017282."""
+    contract that addresses Copilot review #3271017282.
+    """
     fops = _make_fops()
     src = tmp_path / "foo.tsx"
     src.write_text("export const X = () => <div/>\n")

@@ -15,8 +15,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from tools.delegate_tool import delegate_task
 from hermes_cli import plugins
+from tools.delegate_tool import delegate_task
 
 
 def _make_parent(depth: int = 0, session_id: str = "parent-1"):
@@ -46,7 +46,8 @@ def _make_parent(depth: int = 0, session_id: str = "parent-1"):
 @pytest.fixture(autouse=True)
 def _fresh_plugin_manager():
     """Each test gets a fresh PluginManager so hook callbacks don't
-    leak between tests."""
+    leak between tests.
+    """
     original = plugins._plugin_manager
     plugins._plugin_manager = plugins.PluginManager()
     yield
@@ -57,7 +58,8 @@ def _fresh_plugin_manager():
 def _stub_child_builder(monkeypatch):
     """Replace _build_child_agent with a MagicMock factory so delegate_task
     never transitively imports run_agent / openai.  Keeps the test runnable
-    in environments without heavyweight runtime deps installed."""
+    in environments without heavyweight runtime deps installed.
+    """
     def _fake_build_child(task_index, **kwargs):
         child = MagicMock()
         child._delegate_saved_tool_names = []
@@ -208,7 +210,8 @@ class TestPayloadShape:
 
     def test_result_does_not_leak_child_role_field(self):
         """The internal _child_role key must be stripped before the
-        result dict is serialised to JSON."""
+        result dict is serialised to JSON.
+        """
         _register_capturing_hook()
 
         with patch("tools.delegate_tool._run_single_child") as mock_run:

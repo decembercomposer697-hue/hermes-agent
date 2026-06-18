@@ -124,7 +124,8 @@ def test_component_check_role_only_user_with_matching_role_passes():
     empty) where the user is not in the empty user list but DOES carry a
     matching role: must pass. This is the regression that prompted the
     fix -- previously _check_auth allowed everyone when the user set was
-    empty, ignoring the role allowlist."""
+    empty, ignoring the role allowlist.
+    """
     interaction = _interaction(99999, role_ids=[42])
     assert _component_check_auth(interaction, set(), {42}) is True
 
@@ -136,7 +137,8 @@ def test_component_check_accepts_role_allowlist_sequences():
 
 def test_component_check_role_only_user_without_matching_role_rejected():
     """Role-only deployment where the user has no matching role: reject.
-    Previously this allowed everyone because allowed_user_ids was empty."""
+    Previously this allowed everyone because allowed_user_ids was empty.
+    """
     interaction = _interaction(99999, role_ids=[7, 8])
     assert _component_check_auth(interaction, set(), {42}) is False
 
@@ -165,14 +167,16 @@ def test_component_check_user_or_role_neither_match():
 def test_component_check_role_policy_with_no_roles_attr_rejects():
     """Role allowlist configured but interaction.user has no .roles
     attribute (DM-context Member, raw User payload): must reject. A user
-    without resolvable roles cannot satisfy a role allowlist."""
+    without resolvable roles cannot satisfy a role allowlist.
+    """
     interaction = _interaction(11111, drop_roles=True)
     assert _component_check_auth(interaction, set(), {42}) is False
 
 
 def test_component_check_missing_user_with_allowlist_rejects():
     """interaction.user is None with any allowlist configured: fail
-    closed without raising AttributeError."""
+    closed without raising AttributeError.
+    """
     interaction = _interaction(0, drop_user=True)
     assert _component_check_auth(interaction, {"11111"}, set()) is False
     assert _component_check_auth(interaction, set(), {42}) is False
@@ -198,7 +202,8 @@ def test_exec_approval_view_accepts_role_allowlist():
 
 def test_exec_approval_view_role_default_is_empty_set():
     """Existing call sites that pass only allowed_user_ids must continue
-    working with the legacy semantics (no role gate)."""
+    working with the legacy semantics (no role gate).
+    """
     view = ExecApprovalView(session_key="sess-1", allowed_user_ids={"11111"})
     assert view.allowed_role_ids == set()
     assert view._check_auth(_interaction(11111)) is True

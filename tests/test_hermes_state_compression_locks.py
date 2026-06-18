@@ -124,7 +124,8 @@ def test_holder_empty_session_id_returns_none(db: SessionDB) -> None:
 
 def test_concurrent_acquire_only_one_winner(db: SessionDB) -> None:
     """Damien's race shape: N threads call acquire on the same session_id;
-    exactly one must win, the rest must be cleanly rejected."""
+    exactly one must win, the rest must be cleanly rejected.
+    """
     results: list[bool] = []
     barrier = threading.Barrier(8)
     lock = threading.Lock()

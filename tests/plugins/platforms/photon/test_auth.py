@@ -11,9 +11,9 @@ import pytest
 
 from plugins.platforms.photon import auth as photon_auth
 
-
 # ---------------------------------------------------------------------------
 # Fake httpx — we don't want to hit the real Photon API in unit tests.
+
 
 class _FakeResponse:
     def __init__(

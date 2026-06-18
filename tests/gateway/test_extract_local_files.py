@@ -1,5 +1,4 @@
-"""
-Tests for extract_local_files() — auto-detection of bare local file paths
+"""Tests for extract_local_files() — auto-detection of bare local file paths
 in model response text for native media delivery.
 
 Covers: path matching, code-block exclusion, URL rejection, tilde expansion,
@@ -14,14 +13,13 @@ import pytest
 
 from gateway.platforms.base import BasePlatformAdapter
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _extract(content: str, existing_files: set[str] | None = None):
-    """
-    Run extract_local_files with os.path.isfile mocked to return True
+    """Run extract_local_files with os.path.isfile mocked to return True
     for any path in *existing_files* (expanded form).  If *existing_files*
     is None every path passes.
     """
@@ -363,7 +361,8 @@ class TestEdgeCases:
     def test_relative_windows_path_not_matched(self):
         """A bare Windows-style filename without a drive letter must still
         not match (e.g. ``foo\\bar.png`` is treated as relative, like its
-        Unix sibling ``foo/bar.png``)."""
+        Unix sibling ``foo/bar.png``).
+        """
         paths, _ = _extract("File at foo\\bar.png here")
         assert paths == []
 

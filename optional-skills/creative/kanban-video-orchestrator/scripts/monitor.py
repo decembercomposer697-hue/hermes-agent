@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Monitor a running video-production kanban. Polls `hermes kanban list` and
+"""Monitor a running video-production kanban. Polls `hermes kanban list` and
 `events` for a tenant and surfaces issues (stuck tasks, missing heartbeats,
 repeated retries, dependency deadlocks).
 
@@ -32,7 +31,8 @@ def hermes_available() -> bool:
 
 def kanban_list(tenant: str) -> list[dict]:
     """Returns parsed task rows. Falls back to plain stdout parsing if JSON
-    output isn't supported by the installed hermes CLI."""
+    output isn't supported by the installed hermes CLI.
+    """
     try:
         out = subprocess.run(
             ["hermes", "kanban", "list", "--tenant", tenant, "--json"],

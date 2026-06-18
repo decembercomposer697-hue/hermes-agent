@@ -104,7 +104,8 @@ def test_non_mcp_content_type_raises(content_type):
 
 def test_non_mcp_error_is_non_retryable_connection_error():
     """NonMcpEndpointError must subclass ConnectionError (retry loop skips it
-    via an explicit except; broad ConnectionError catchers still work)."""
+    via an explicit except; broad ConnectionError catchers still work).
+    """
     assert issubclass(NonMcpEndpointError, ConnectionError)
 
 

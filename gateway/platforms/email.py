@@ -1,5 +1,4 @@
-"""
-Email platform adapter for the Hermes gateway.
+"""Email platform adapter for the Hermes gateway.
 
 Allows users to interact with Hermes by sending emails.
 Uses IMAP to receive and SMTP to send messages.
@@ -24,15 +23,16 @@ import re
 import smtplib
 import ssl
 import uuid
+from email import encoders
 from email.header import decode_header
+from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
 from email.utils import formatdate
-from email import encoders
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
@@ -41,7 +41,6 @@ from gateway.platforms.base import (
     cache_document_from_bytes,
     cache_image_from_bytes,
 )
-from gateway.config import Platform, PlatformConfig
 
 logger = logging.getLogger(__name__)
 # Automated sender patterns — emails from these are silently ignored
@@ -64,6 +63,7 @@ MAX_MESSAGE_LENGTH = 50_000
 
 # Supported image extensions for inline detection
 _IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
 
 def _send_imap_id(imap: "imaplib.IMAP4") -> None:
     """Send RFC 2971 IMAP ID command identifying this client.
@@ -99,6 +99,7 @@ def _is_automated_sender(address: str, headers: dict) -> bool:
             return True
     return False
     
+
 def check_email_requirements() -> bool:
     """Check if email platform dependencies are available."""
     addr = os.getenv("EMAIL_ADDRESS")

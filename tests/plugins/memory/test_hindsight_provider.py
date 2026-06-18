@@ -16,17 +16,16 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from plugins.memory.hindsight import (
-    HindsightMemoryProvider,
     RECALL_SCHEMA,
     REFLECT_SCHEMA,
     RETAIN_SCHEMA,
-    _load_config,
+    HindsightMemoryProvider,
     _build_embedded_profile_env,
+    _load_config,
     _normalize_retain_tags,
     _resolve_bank_id_template,
     _sanitize_bank_segment,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -407,7 +406,6 @@ class TestPostSetup:
         assert profile_env.exists()
         assert "HINDSIGHT_API_LLM_API_KEY=existing-key\n" in profile_env.read_text()
 
-
     def test_local_embedded_setup_blank_inputs_preserve_existing_config(self, tmp_path, monkeypatch):
         """Pressing Enter through setup should keep existing Hindsight values."""
         hermes_home = tmp_path / "hermes-home"
@@ -454,7 +452,6 @@ class TestPostSetup:
         assert saved["HINDSIGHT_EMBED_DAEMON_IDLE_TIMEOUT"] == "0"
         assert saved["HINDSIGHT_API_CONSOLIDATION_LLM_BATCH_SIZE"] == "1"
         assert saved["timeout"] == 120
-
 
 
 # ---------------------------------------------------------------------------
@@ -808,7 +805,10 @@ class TestSyncTurn:
             "plugins.memory.hindsight._fetch_hindsight_api_version",
             lambda *a, **kw: "0.5.6",
         )
-        from plugins.memory.hindsight import _append_capability_cache, _append_capability_lock
+        from plugins.memory.hindsight import (
+            _append_capability_cache,
+            _append_capability_lock,
+        )
         # Clear before AND after: the capability cache is module-global and keyed
         # per api_url, so a stale entry would leak into other tests.
         with _append_capability_lock:
@@ -859,7 +859,8 @@ class TestSyncTurn:
 
     def test_resume_creates_new_document(self, tmp_path, monkeypatch):
         """Resuming a session (re-initializing) gets a new document_id
-        so previously stored content is not overwritten."""
+        so previously stored content is not overwritten.
+        """
         config = {"mode": "cloud", "apiKey": "k", "api_url": "http://x", "bank_id": "b"}
         config_path = tmp_path / "hindsight" / "config.json"
         config_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1007,7 +1008,8 @@ class TestSessionSwitchBufferFlush:
     def test_buffered_turns_flushed_before_clear(self, provider_with_config):
         """retain_every_n_turns > 1 must not silently drop partial buffers
         on session switch. Whatever's in _session_turns at switch time
-        should land in the OLD document under the OLD session id."""
+        should land in the OLD document under the OLD session id.
+        """
         p = provider_with_config(retain_every_n_turns=3, retain_async=False)
         old_doc = p._document_id
 
@@ -1053,7 +1055,8 @@ class TestSessionSwitchBufferFlush:
 
     def test_prefetch_result_cleared_on_switch(self, provider):
         """Stale recall text from the old session must not leak into the
-        next session's first prefetch read."""
+        next session's first prefetch read.
+        """
         provider._prefetch_result = "old-session recall: User likes Rust"
         provider.on_session_switch("new-sid")
         assert provider._prefetch_result == ""
@@ -1063,7 +1066,8 @@ class TestSessionSwitchBufferFlush:
     def test_in_flight_prefetch_thread_drained_on_switch(self, provider, monkeypatch):
         """on_session_switch must wait for an in-flight prefetch from the
         old session to settle before clearing _prefetch_result, otherwise
-        the thread can race and re-populate the field after the clear."""
+        the thread can race and re-populate the field after the clear.
+        """
         import threading
 
         gate = threading.Event()
@@ -1149,13 +1153,17 @@ class TestSessionSwitchBufferFlush:
 
 class TestUpdateModeAppendCapability:
     def _clear_capability_cache(self):
-        from plugins.memory.hindsight import _append_capability_cache, _append_capability_lock
+        from plugins.memory.hindsight import (
+            _append_capability_cache,
+            _append_capability_lock,
+        )
         with _append_capability_lock:
             _append_capability_cache.clear()
 
     def test_legacy_api_falls_back_to_per_process_doc_id(self, provider, monkeypatch):
         """API returns no /version (or pre-0.5.0) — sync_turn must use the
-        per-process unique doc_id and NOT pass update_mode."""
+        per-process unique doc_id and NOT pass update_mode.
+        """
         self._clear_capability_cache()
         monkeypatch.setattr(
             "plugins.memory.hindsight._fetch_hindsight_api_version",
@@ -1228,7 +1236,8 @@ class TestUpdateModeAppendCapability:
         self, provider_with_config, monkeypatch,
     ):
         """When the API supports append, the flush on /reset must land
-        in the OLD session's stable document, not a per-process id."""
+        in the OLD session's stable document, not a per-process id.
+        """
         self._clear_capability_cache()
         monkeypatch.setattr(
             "plugins.memory.hindsight._fetch_hindsight_api_version",

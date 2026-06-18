@@ -108,7 +108,8 @@ EXPOSED_TOOLS: tuple[str, ...] = (
 def _build_server() -> Any:
     """Create the FastMCP server with Hermes tools attached. Lazy imports
     so the module can be imported without the mcp package installed
-    (we degrade to a clear error only when actually run)."""
+    (we degrade to a clear error only when actually run).
+    """
     try:
         from mcp.server.fastmcp import FastMCP
     except ImportError as exc:  # pragma: no cover - install hint

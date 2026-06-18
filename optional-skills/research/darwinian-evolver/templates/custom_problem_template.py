@@ -1,5 +1,4 @@
-"""
-Template: a custom darwinian-evolver problem.
+"""Template: a custom darwinian-evolver problem.
 
 Copy this file, fill in the THREE marked spots (Organism, Evaluator, Mutator),
 then run it as a driver script. The skeleton handles all the wiring so you only
@@ -20,8 +19,6 @@ import os
 import sys
 from pathlib import Path
 
-from openai import OpenAI
-
 # Upstream types (AGPL — invoked via subprocess in production; importing here
 # is fine for skill-side driver scripts the user owns).
 from darwinian_evolver.cli_common import (
@@ -39,6 +36,7 @@ from darwinian_evolver.problem import (
     Organism,
     Problem,
 )
+from openai import OpenAI
 
 DEFAULT_MODEL = os.environ.get("EVOLVER_MODEL", "openai/gpt-4o-mini")
 
@@ -76,7 +74,8 @@ class MyOrganism(Organism):
 
     def run(self, *inputs) -> str:
         """Exercise the organism on a test input. Return whatever your
-        evaluator wants to score."""
+        evaluator wants to score.
+        """
         # TODO: implement. For prompt evolution this typically calls _prompt_llm
         # with the artifact rendered against the input. For regex/SQL it would
         # call `re.findall(self.artifact, input)` / execute SQL / etc.

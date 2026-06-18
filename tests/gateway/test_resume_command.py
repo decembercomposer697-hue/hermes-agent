@@ -283,6 +283,7 @@ class TestHandleResumeCommand:
         writing into the wrong session. See #6672.
         """
         import threading
+
         from hermes_state import SessionDB
         db = SessionDB(db_path=tmp_path / "state.db")
         db.create_session("old_session", "telegram")

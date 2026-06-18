@@ -31,10 +31,10 @@ def kanban_home(tmp_path, monkeypatch):
 @pytest.mark.parametrize(
     "value,expected",
     [
-        ("scratch",              ("scratch", None)),
-        ("worktree",              ("worktree", None)),
-        ("worktree:/tmp/wt",       ("worktree", "/tmp/wt")),
-        ("dir:/tmp/work",         ("dir", "/tmp/work")),
+        ("scratch", ("scratch", None)),
+        ("worktree", ("worktree", None)),
+        ("worktree:/tmp/wt", ("worktree", "/tmp/wt")),
+        ("dir:/tmp/work", ("dir", "/tmp/work")),
     ],
 )
 def test_parse_workspace_flag_valid(value, expected):
@@ -51,6 +51,7 @@ def test_parse_workspace_flag_expands_user():
     assert kind == "worktree"
     assert path.endswith("/trees/t6-wire")
     assert not path.startswith("~")
+
 
 @pytest.mark.parametrize("bad", ["cloud", "dir:", "worktree:", ""])
 def test_parse_workspace_flag_rejects(bad):
@@ -196,7 +197,8 @@ def test_run_slash_tenant_filter(kanban_home):
 
 def test_run_slash_session_filter(kanban_home):
     """`hermes kanban list --session <id>` filters by the originating
-    chat session id stamped on tasks created from inside an ACP loop."""
+    chat session id stamped on tasks created from inside an ACP loop.
+    """
     from hermes_cli import kanban_db as kb
     with kb.connect() as conn:
         kb.create_task(
@@ -221,7 +223,8 @@ def test_run_slash_session_filter(kanban_home):
 
 def test_kanban_list_json_includes_session_id(kanban_home):
     """JSON output exposes `session_id` so external clients (Scarf, web
-    dashboards) don't need a side query to filter by chat session."""
+    dashboards) don't need a side query to filter by chat session.
+    """
     from hermes_cli import kanban_db as kb
     with kb.connect() as conn:
         kb.create_task(
@@ -370,8 +373,9 @@ def test_kanban_not_gateway_only():
 
 def test_run_slash_reclaim_running_task(kanban_home):
     import re
-    import time
     import secrets
+    import time
+
     from hermes_cli import kanban_db as kb
 
     out1 = kc.run_slash("create 'stuck worker task' --assignee broken-model")
@@ -408,8 +412,9 @@ def test_run_slash_reclaim_running_task(kanban_home):
 
 def test_run_slash_reassign_with_reclaim_flag(kanban_home):
     import re
-    import time
     import secrets
+    import time
+
     from hermes_cli import kanban_db as kb
 
     out1 = kc.run_slash("create 'switch model' --assignee orig")
@@ -449,7 +454,8 @@ def test_run_slash_reassign_with_reclaim_flag(kanban_home):
 def test_run_slash_specify_end_to_end(kanban_home, monkeypatch):
     """The /kanban specify slash command routes through run_slash, which
     both the interactive CLI and every gateway platform use. This test
-    covers both surfaces."""
+    covers both surfaces.
+    """
     from unittest.mock import MagicMock
 
     # Create a triage task via the same slash surface.
@@ -487,7 +493,8 @@ def test_run_slash_specify_end_to_end(kanban_home, monkeypatch):
 def test_run_slash_specify_help_is_reachable(kanban_home):
     """`-h`/`--help` on a subcommand returns the actual help text — see
     issue #21794. argparse writes help to stdout and exits 0; run_slash
-    must capture both streams and treat exit 0 as success, not error."""
+    must capture both streams and treat exit 0 as success, not error.
+    """
     out = kc.run_slash("specify --help")
     assert "specify" in out.lower()
     # Help dump should NOT come back wrapped as a usage error.
@@ -500,7 +507,8 @@ def test_run_slash_specify_help_is_reachable(kanban_home):
 
 def test_run_slash_bare_returns_curated_help(kanban_home):
     """Bare `/kanban` returns the curated short-help block — not a 5KB
-    argparse usage dump."""
+    argparse usage dump.
+    """
     out = kc.run_slash("")
     assert "/kanban" in out
     assert "list" in out
@@ -521,7 +529,8 @@ def test_run_slash_help_aliases_match_bare(kanban_home, alias):
 
 def test_run_slash_subcommand_help_returns_help_text(kanban_home):
     """`/kanban show -h` returns the actual subcommand help, not a
-    fake `(usage error: 0)` sentinel."""
+    fake `(usage error: 0)` sentinel.
+    """
     out = kc.run_slash("show -h")
     assert "task_id" in out
     assert "/kanban show" in out
@@ -531,7 +540,8 @@ def test_run_slash_subcommand_help_returns_help_text(kanban_home):
 def test_run_slash_unknown_action_friendly_error(kanban_home):
     """Unknown subcommand surfaces a single-line usage error prefixed
     with our marker — no `(usage error: 2)` wrapping, no doubled
-    `kanban kanban` prog string."""
+    `kanban kanban` prog string.
+    """
     out = kc.run_slash("frobnicate")
     assert "/kanban" in out
     assert "frobnicate" in out
@@ -542,7 +552,8 @@ def test_run_slash_unknown_action_friendly_error(kanban_home):
 
 def test_run_slash_missing_required_arg_friendly_error(kanban_home):
     """Missing positional argument shows the subcommand-scoped usage
-    line, not the top-level kanban tree."""
+    line, not the top-level kanban tree.
+    """
     out = kc.run_slash("show")
     assert "/kanban show" in out
     assert "task_id" in out

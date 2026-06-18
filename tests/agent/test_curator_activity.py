@@ -1,7 +1,7 @@
 """Regression tests for curator skill activity timestamps."""
 
 import importlib
-from datetime import datetime, timedelta, timezone, UTC
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -23,8 +23,8 @@ def curator_modules(tmp_path, monkeypatch):
     monkeypatch.setenv("HERMES_HOME", str(home))
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
-    import tools.skill_usage as skill_usage
     import agent.curator as curator
+    import tools.skill_usage as skill_usage
 
     importlib.reload(skill_usage)
     importlib.reload(curator)

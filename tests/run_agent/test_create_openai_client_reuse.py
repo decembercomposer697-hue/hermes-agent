@@ -190,7 +190,7 @@ def test_replace_primary_openai_client_survives_repeated_rebuilds():
 
 
 def test_force_close_tcp_sockets_descends_httpcore_1_connection_wrapper():
-    """httpcore 1.x stores the real stream below conn._connection.
+    """Httpcore 1.x stores the real stream below conn._connection.
 
     Post-#29507: the helper must shut sockets down but must NOT release the
     FD via ``sock.close()`` — that race recycled FDs into unrelated file

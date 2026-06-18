@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -371,7 +371,8 @@ def _cmd_prune(args) -> int:
 
 def _cmd_backup(args) -> int:
     """Take a manual snapshot of the skills tree. Same mechanism as the
-    automatic pre-run snapshot, just user-initiated."""
+    automatic pre-run snapshot, just user-initiated.
+    """
     from agent import curator_backup
     if not curator_backup.is_enabled():
         print(

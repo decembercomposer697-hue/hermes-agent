@@ -49,7 +49,8 @@ class TestJSONDecodeErrorIsRetryable:
 
     def test_json_decode_error_is_not_local_validation(self):
         """Provider returning malformed JSON surfaces as JSONDecodeError —
-        must be treated as transient so the retry path runs."""
+        must be treated as transient so the retry path runs.
+        """
         try:
             json.loads("{not valid json")
         except json.JSONDecodeError as exc:
@@ -71,7 +72,8 @@ class TestJSONDecodeErrorIsRetryable:
 
     def test_bare_value_error_is_local_validation(self):
         """Programming bugs that raise bare ValueError must still be
-        classified as local validation errors (non-retryable)."""
+        classified as local validation errors (non-retryable).
+        """
         assert _mirror_agent_predicate(ValueError("bad arg"))
 
     def test_bare_type_error_is_local_validation(self):
@@ -81,10 +83,12 @@ class TestJSONDecodeErrorIsRetryable:
 class TestAgentLoopSourceStillHasCarveOut:
     """Belt-and-suspenders: the production source must actually include
     the json.JSONDecodeError carve-out. Protects against an accidental
-    revert that happens to leave the test file intact."""
+    revert that happens to leave the test file intact.
+    """
 
     def test_run_agent_excludes_jsondecodeerror_from_local_validation(self):
         import inspect
+
         from agent import conversation_loop
         # The agent loop body lives in agent/conversation_loop.py after
         # the run_agent.py refactor.  Assert the carve-out is present in
@@ -101,7 +105,6 @@ class TestAgentLoopSourceStillHasCarveOut:
             "agent/conversation_loop.py must carve out json.JSONDecodeError "
             "from the is_local_validation_error classification — see #14782."
         )
-
 
 
 class TestNoneTypeNotIterableIsRetryable:
@@ -146,6 +149,7 @@ class TestAgentLoopSourceHasNoneTypeCarveOut:
 
     def test_conversation_loop_excludes_nonetype_not_iterable_from_local_validation(self):
         import inspect
+
         from agent import conversation_loop
         src = inspect.getsource(conversation_loop)
         assert "is_local_validation_error" in src

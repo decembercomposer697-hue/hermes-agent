@@ -6,14 +6,14 @@ must NOT be mangled to hyphens (minimax-m2-7).
 import pytest
 
 from hermes_cli.model_normalize import (
-    normalize_model_for_provider,
     _DOT_TO_HYPHEN_PROVIDERS,
     _normalize_for_deepseek,
     detect_vendor,
+    normalize_model_for_provider,
 )
 
-
 # ── Regression: issue #5211 ────────────────────────────────────────────
+
 
 class TestIssue5211OpenCodeGoDotPreservation:
     """OpenCode Go model names with dots must pass through unchanged."""
@@ -107,35 +107,35 @@ class TestCopilotModelNormalization:
 
     @pytest.mark.parametrize("model,expected", [
         # Vendor-prefixed Anthropic IDs — prefix must be stripped.
-        ("anthropic/claude-opus-4.6",   "claude-opus-4.6"),
+        ("anthropic/claude-opus-4.6", "claude-opus-4.6"),
         ("anthropic/claude-sonnet-4.6", "claude-sonnet-4.6"),
         ("anthropic/claude-sonnet-4.5", "claude-sonnet-4.5"),
-        ("anthropic/claude-haiku-4.5",  "claude-haiku-4.5"),
+        ("anthropic/claude-haiku-4.5", "claude-haiku-4.5"),
         # Vendor-prefixed OpenAI IDs — prefix must be stripped.
-        ("openai/gpt-5.4",              "gpt-5.4"),
-        ("openai/gpt-4o",               "gpt-4o"),
-        ("openai/gpt-4o-mini",          "gpt-4o-mini"),
+        ("openai/gpt-5.4", "gpt-5.4"),
+        ("openai/gpt-4o", "gpt-4o"),
+        ("openai/gpt-4o-mini", "gpt-4o-mini"),
         # Dash-notation Claude IDs — must be converted to dot-notation.
-        ("claude-opus-4-6",             "claude-opus-4.6"),
-        ("claude-sonnet-4-6",           "claude-sonnet-4.6"),
-        ("claude-sonnet-4-5",           "claude-sonnet-4.5"),
-        ("claude-haiku-4-5",            "claude-haiku-4.5"),
+        ("claude-opus-4-6", "claude-opus-4.6"),
+        ("claude-sonnet-4-6", "claude-sonnet-4.6"),
+        ("claude-sonnet-4-5", "claude-sonnet-4.5"),
+        ("claude-haiku-4-5", "claude-haiku-4.5"),
         # Combined: vendor-prefixed + dash-notation.
-        ("anthropic/claude-opus-4-6",   "claude-opus-4.6"),
+        ("anthropic/claude-opus-4-6", "claude-opus-4.6"),
         ("anthropic/claude-sonnet-4-6", "claude-sonnet-4.6"),
         # Already-canonical inputs pass through unchanged.
-        ("claude-sonnet-4.6",           "claude-sonnet-4.6"),
-        ("gpt-5.4",                     "gpt-5.4"),
-        ("gpt-5-mini",                  "gpt-5-mini"),
+        ("claude-sonnet-4.6", "claude-sonnet-4.6"),
+        ("gpt-5.4", "gpt-5.4"),
+        ("gpt-5-mini", "gpt-5-mini"),
     ])
     def test_copilot_normalization(self, model, expected):
         assert normalize_model_for_provider(model, "copilot") == expected
 
     @pytest.mark.parametrize("model,expected", [
         ("anthropic/claude-sonnet-4.6", "claude-sonnet-4.6"),
-        ("claude-sonnet-4-6",           "claude-sonnet-4.6"),
-        ("claude-opus-4-6",             "claude-opus-4.6"),
-        ("openai/gpt-5.4",              "gpt-5.4"),
+        ("claude-sonnet-4-6", "claude-sonnet-4.6"),
+        ("claude-opus-4-6", "claude-opus-4.6"),
+        ("openai/gpt-5.4", "gpt-5.4"),
     ])
     def test_copilot_acp_normalization(self, model, expected):
         """Copilot ACP shares the same API expectations as HTTP Copilot."""
@@ -220,7 +220,8 @@ class TestDeepseekVSeriesPassThrough:
 
     def test_deepseek_provider_preserves_v4_pro(self):
         """End-to-end via normalize_model_for_provider — user selecting
-        V4 Pro must reach DeepSeek's API as V4 Pro, not V3 alias."""
+        V4 Pro must reach DeepSeek's API as V4 Pro, not V3 alias.
+        """
         result = normalize_model_for_provider("deepseek-v4-pro", "deepseek")
         assert result == "deepseek-v4-pro"
 

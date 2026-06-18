@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Grep-based checker for Windows cross-platform footguns.
+"""Grep-based checker for Windows cross-platform footguns.
 
 Flags common patterns that break silently on Windows. Run before PRs —
 cheap, fast, catches regressions in a codebase that runs on three OSes.
@@ -33,9 +32,9 @@ import os
 import re
 import subprocess
 import sys
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from collections.abc import Iterable
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 

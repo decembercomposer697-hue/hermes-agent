@@ -17,7 +17,6 @@ import pytest
 from hermes_cli import kanban_db as kb
 from hermes_cli import kanban_diagnostics as kd
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -153,7 +152,8 @@ def test_repeated_failures_fires_at_threshold_on_spawn():
 def test_repeated_failures_fires_on_timeout_loop():
     """The rule surfaces for timeout loops too — that's the point of
     unifying the counter. Suggested action is 'check logs', not
-    'fix profile'."""
+    'fix profile'.
+    """
     task = _task(status="ready", consecutive_failures=3,
                  last_failure_error="elapsed 600s > limit 300s")
     runs = [
@@ -345,7 +345,8 @@ def test_repeated_failures_surfaces_actual_error_in_title():
 def test_repeated_crashes_truncates_huge_tracebacks():
     """Full Python tracebacks can be tens of KB. The title stays one
     line (≤160 chars); the detail caps at 500 chars + ellipsis so the
-    card doesn't explode visually."""
+    card doesn't explode visually.
+    """
     huge = "Traceback (most recent call last):\n" + ("  File\n" * 500)
     task = _task(status="ready")
     runs = [
@@ -368,7 +369,8 @@ def test_repeated_crashes_truncates_huge_tracebacks():
 
 def test_diagnostics_sorted_critical_first():
     """A task with both a critical (many spawn failures) and a warning
-    (prose phantoms) diagnostic should list the critical one first."""
+    (prose phantoms) diagnostic should list the critical one first.
+    """
     task = _task(status="done", consecutive_failures=10,
                  last_failure_error="nope")
     events = [
@@ -453,7 +455,8 @@ def test_broken_rule_is_isolated(monkeypatch):
 
 def test_stranded_in_ready_fires_when_age_exceeds_threshold():
     """Default threshold = 30 min. A ready task promoted 45 min ago
-    with no claim should fire as a warning."""
+    with no claim should fire as a warning.
+    """
     now = 100_000
     task = _task(status="ready", assignee="demo", claim_lock=None)
     # 45 min = 2700s, threshold = 1800s.
@@ -477,7 +480,8 @@ def test_stranded_in_ready_silent_below_threshold():
 
 def test_stranded_in_ready_skips_non_ready_status():
     """Tasks not in ready status are out of scope (running tasks have
-    their own crash / failure rules)."""
+    their own crash / failure rules).
+    """
     now = 100_000
     for status in ("running", "blocked", "done", "todo", "triage"):
         task = _task(status=status, assignee="demo")
@@ -488,7 +492,8 @@ def test_stranded_in_ready_skips_non_ready_status():
 
 def test_stranded_in_ready_skips_unassigned_tasks():
     """Empty assignee = `skipped_unassigned` on the dispatcher already.
-    Don't double-flag here."""
+    Don't double-flag here.
+    """
     now = 100_000
     task = _task(status="ready", assignee="", claim_lock=None)
     events = [_event("created", ts=now - 6 * 3600)]
@@ -498,7 +503,8 @@ def test_stranded_in_ready_skips_unassigned_tasks():
 
 def test_stranded_in_ready_skips_claimed_tasks():
     """A live claim_lock means a worker is on it — even an old one. Don't
-    second-guess: the run-level liveness signal owns that decision."""
+    second-guess: the run-level liveness signal owns that decision.
+    """
     now = 100_000
     task = _task(
         status="ready", assignee="demo", claim_lock="run_xyz",
@@ -511,7 +517,8 @@ def test_stranded_in_ready_skips_claimed_tasks():
 def test_stranded_in_ready_uses_latest_ready_transition():
     """When multiple ready-transition events exist, the rule should
     age-from the most recent — a task reclaimed 20 min ago is NOT
-    stranded for 6h even if it was first created 6h ago."""
+    stranded for 6h even if it was first created 6h ago.
+    """
     now = 100_000
     task = _task(status="ready", assignee="demo")
     events = [
@@ -523,7 +530,7 @@ def test_stranded_in_ready_uses_latest_ready_transition():
 
 
 def test_stranded_in_ready_severity_escalates_with_age():
-    """warning → error → critical at 2x and 6x threshold."""
+    """Warning → error → critical at 2x and 6x threshold."""
     now = 100_000
     task = _task(status="ready", assignee="demo")
     # Default threshold = 1800s.
@@ -562,7 +569,8 @@ def test_stranded_in_ready_respects_config_override():
 def test_stranded_in_ready_falls_back_to_created_at():
     """When events have no ready-transition kind, the rule falls back
     to the task's ``created_at`` so an ancient stranded task isn't
-    invisible just because its events got pruned."""
+    invisible just because its events got pruned.
+    """
     now = 100_000
     task = _task(
         status="ready", assignee="demo", created_at=now - 4 * 3600,
@@ -577,7 +585,8 @@ def test_stranded_in_ready_falls_back_to_created_at():
 
 def test_stranded_in_ready_works_on_real_db_row(kanban_home):
     """Round-trip through real kanban_db.connect() — confirms the rule
-    works on sqlite3.Row objects, not just dicts."""
+    works on sqlite3.Row objects, not just dicts.
+    """
     import time as _t
     conn = kb.connect()
     try:
@@ -613,7 +622,6 @@ def test_stranded_in_ready_works_on_real_db_row(kanban_home):
         assert stranded[0].data["assignee"] == "ghost"
     finally:
         conn.close()
-
 
 
 # ---------------------------------------------------------------------------

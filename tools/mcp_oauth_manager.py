@@ -407,8 +407,8 @@ class MCPOAuthManager:
 
         # Local imports avoid circular deps at module import time.
         from tools.mcp_oauth import (
-            HermesTokenStorage,
             _OAUTH_AVAILABLE,
+            HermesTokenStorage,
             _build_client_metadata,
             _configure_callback_port,
             _is_interactive,
@@ -520,6 +520,7 @@ class MCPOAuthManager:
         Thundering-herd protection: if N concurrent tool calls hit 401 with
         the same ``failed_access_token``, only one recovery attempt fires.
         Others await the same future.
+
         """
         entry = self._entries.get(server_name)
         if entry is None or entry.provider is None:

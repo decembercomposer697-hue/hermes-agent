@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -53,8 +53,10 @@ class TestDashboardStatus:
     def test_status_does_not_try_to_import_fastapi(self):
         """`--status` must not require dashboard runtime deps — it's a
         process-table scan only.  We prove this by making fastapi import
-        fail and confirming --status still succeeds."""
+        fail and confirming --status still succeeds.
+        """
         orig_import = __import__
+
         def fake_import(name, *a, **kw):
             if name == "fastapi":
                 raise ImportError("fastapi missing")
@@ -98,7 +100,8 @@ class TestDashboardStop:
 
     def test_stop_exits_nonzero_if_kill_leaves_survivors(self):
         """If the second scan still finds PIDs, we exit 1 so scripts can
-        detect that the stop didn't succeed (e.g. permission denied)."""
+        detect that the stop didn't succeed (e.g. permission denied).
+        """
         scans = iter([[12345], [12345]])  # both scans find the same PID
         with patch("hermes_cli.main._find_stale_dashboard_pids",
                    side_effect=lambda: next(scans)), \
@@ -110,6 +113,7 @@ class TestDashboardStop:
     def test_stop_does_not_try_to_import_fastapi(self):
         """Like --status, --stop must work without dashboard runtime deps."""
         orig_import = __import__
+
         def fake_import(name, *a, **kw):
             if name == "fastapi":
                 raise ImportError("fastapi missing")
@@ -128,7 +132,8 @@ class TestLifecycleFlagsTakePrecedence:
     first in cmd_dashboard).  Neither is allowed to fall through to the
     server-start path, which is the critical safety property — a user
     who typed ``hermes dashboard --stop`` must not end up ALSO starting
-    a new server."""
+    a new server.
+    """
 
     def test_status_wins_over_stop(self, capsys):
         with patch("hermes_cli.main._find_stale_dashboard_pids",
@@ -141,8 +146,10 @@ class TestLifecycleFlagsTakePrecedence:
 
     def test_stop_does_not_fall_through_to_server_start(self):
         """Covers the worst-case regression: if --stop ever stopped exiting
-        early, the user would start the dashboard they just asked to stop."""
+        early, the user would start the dashboard they just asked to stop.
+        """
         called = {"start": False}
+
         def fake_start_server(**kw):
             called["start"] = True
 
@@ -160,7 +167,8 @@ class TestLifecycleFlagsTakePrecedence:
 
 class TestArgparseWiring:
     """Confirm the flags are exposed via the real argparse tree so
-    ``hermes dashboard --stop`` / ``--status`` actually parse."""
+    ``hermes dashboard --stop`` / ``--status`` actually parse.
+    """
 
     def test_flags_are_registered(self):
         # Rebuild the argparse tree by re-running the section of main()

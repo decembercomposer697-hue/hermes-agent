@@ -25,7 +25,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO_ROOT)
@@ -33,7 +33,7 @@ sys.path.insert(0, REPO_ROOT)
 # Ensure HERMES_HOME is set for imports that touch it at module level.
 os.environ.setdefault("HERMES_HOME", os.path.join(os.path.expanduser("~"), ".hermes"))
 
-from hermes_cli.models import OPENROUTER_MODELS, _PROVIDER_MODELS
+from hermes_cli.models import _PROVIDER_MODELS, OPENROUTER_MODELS
 
 OUTPUT_PATH = os.path.join(REPO_ROOT, "website", "static", "api", "model-catalog.json")
 CATALOG_VERSION = 1

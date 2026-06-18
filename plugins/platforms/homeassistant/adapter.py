@@ -1,5 +1,4 @@
-"""
-Home Assistant platform adapter.
+"""Home Assistant platform adapter.
 
 Connects to the HA WebSocket API for real-time event monitoring.
 State-change events are converted to MessageEvent objects and forwarded
@@ -49,8 +48,7 @@ def check_ha_requirements() -> bool:
 
 
 class HomeAssistantAdapter(BasePlatformAdapter):
-    """
-    Home Assistant WebSocket adapter.
+    """Home Assistant WebSocket adapter.
 
     Subscribes to ``state_changed`` events and forwards them as
     MessageEvent objects.  Supports domain/entity filtering and

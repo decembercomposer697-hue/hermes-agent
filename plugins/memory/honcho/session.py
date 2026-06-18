@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import queue
 import re
-import logging
 import threading
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from plugins.memory.honcho.client import get_honcho_client
 
@@ -26,8 +26,7 @@ _PEER_ID_HASH_ESCALATION_LENGTHS = (_PEER_ID_HASH_LEN, 12, 16, 24, 32, 64)
 
 @dataclass
 class HonchoSession:
-    """
-    A conversation session backed by Honcho.
+    """A conversation session backed by Honcho.
 
     Provides a local message cache that syncs to Honcho's
     AI-native memory system for user modeling.
@@ -69,8 +68,7 @@ class HonchoSession:
 
 
 class HonchoSessionManager:
-    """
-    Manages conversation sessions using Honcho.
+    """Manages conversation sessions using Honcho.
 
     Runs alongside hermes' existing SQLite state and file-based memory,
     adding persistent cross-session user modeling via Honcho's AI-native memory.
@@ -84,8 +82,7 @@ class HonchoSessionManager:
         runtime_user_peer_name: str | None = None,
         runtime_user_peer_name_alt: str | None = None,
     ):
-        """
-        Initialize the session manager.
+        """Initialize the session manager.
 
         Args:
             honcho: Optional Honcho client. If not provided, uses the singleton.
@@ -94,6 +91,7 @@ class HonchoSessionManager:
                     write_frequency, observation, etc.).
             runtime_user_peer_name: Gateway user identity for per-user memory scoping.
             runtime_user_peer_name_alt: Optional stable alternate gateway identity.
+
         """
         self._honcho = honcho
         self._context_tokens = context_tokens
@@ -160,8 +158,7 @@ class HonchoSessionManager:
         return self._honcho
 
     def _get_or_create_peer(self, peer_id: str) -> Any:
-        """
-        Get or create a Honcho peer.
+        """Get or create a Honcho peer.
 
         Peers are lazy -- no API call until first use.
         Observation settings are controlled per-session via SessionPeerConfig.
@@ -178,11 +175,11 @@ class HonchoSessionManager:
     def _get_or_create_honcho_session(
         self, session_id: str, user_peer: Any, assistant_peer: Any,
     ) -> tuple[Any, list]:
-        """
-        Get or create a Honcho session with peers configured.
+        """Get or create a Honcho session with peers configured.
 
         Returns:
             Tuple of (honcho_session, existing_messages).
+
         """
         with self._cache_lock:
             if session_id in self._sessions_cache:
@@ -271,7 +268,7 @@ class HonchoSessionManager:
 
     def _sanitize_id(self, id_str: str) -> str:
         """Sanitize an ID to match Honcho's pattern: ^[a-zA-Z0-9_-]+"""
-        return re.sub(r'[^a-zA-Z0-9_-]', '-', id_str)
+        return re.sub(r"[^a-zA-Z0-9_-]", "-", id_str)
 
     def _runtime_user_ids(self) -> list[str]:
         """Return runtime identity candidates in lookup order."""
@@ -358,14 +355,14 @@ class HonchoSessionManager:
         return self._session_key_fallback_peer_id(key)
 
     def get_or_create(self, key: str) -> HonchoSession:
-        """
-        Get an existing session or create a new one.
+        """Get an existing session or create a new one.
 
         Args:
             key: Session key (usually channel:chat_id).
 
         Returns:
             The session.
+
         """
         with self._cache_lock:
             if key in self._cache:
@@ -558,8 +555,7 @@ class HonchoSessionManager:
         return False
 
     def new_session(self, key: str) -> HonchoSession:
-        """
-        Create a new session, preserving the old one for user modeling.
+        """Create a new session, preserving the old one for user modeling.
 
         Creates a fresh session with a new ID while keeping the old
         session's data in Honcho for continued user modeling.
@@ -600,8 +596,7 @@ class HonchoSessionManager:
         reasoning_level: str | None = None,
         peer: str = "user",
     ) -> str:
-        """
-        Query Honcho's dialectic endpoint about a peer.
+        """Query Honcho's dialectic endpoint about a peer.
 
         Runs an LLM on Honcho's backend against the target peer's full
         representation. Higher latency than context() — callers run this in
@@ -617,6 +612,7 @@ class HonchoSessionManager:
 
         Returns:
             Honcho's synthesized answer, or empty string on failure.
+
         """
         session = self._cache.get(session_key)
         if not session:
@@ -661,8 +657,7 @@ class HonchoSessionManager:
             return ""
 
     def prefetch_context(self, session_key: str, user_message: str | None = None) -> None:
-        """
-        Fire get_prefetch_context in a background thread, caching the result.
+        """Fire get_prefetch_context in a background thread, caching the result.
 
         Non-blocking. Consumed next turn via pop_context_result(). This avoids
         a synchronous HTTP round-trip blocking every response.
@@ -683,8 +678,7 @@ class HonchoSessionManager:
             self._context_cache[session_key] = result
 
     def pop_context_result(self, session_key: str) -> dict[str, str]:
-        """
-        Return and clear the cached context result for this session.
+        """Return and clear the cached context result for this session.
 
         Returns empty dict if no result is ready yet (first turn).
         """
@@ -692,8 +686,7 @@ class HonchoSessionManager:
             return self._context_cache.pop(session_key, {})
 
     def get_prefetch_context(self, session_key: str, user_message: str | None = None) -> dict[str, str]:
-        """
-        Pre-fetch user and AI peer context from Honcho.
+        """Pre-fetch user and AI peer context from Honcho.
 
         Fetches peer_representation and peer_card for both peers, plus the
         session summary when available. When user_message is provided, it is
@@ -709,6 +702,7 @@ class HonchoSessionManager:
         Returns:
             Dictionary with 'representation', 'card', 'ai_representation',
             'ai_card', and optionally 'summary' keys.
+
         """
         session = self._cache.get(session_key)
         if not session:
@@ -747,8 +741,7 @@ class HonchoSessionManager:
         return result
 
     def migrate_local_history(self, session_key: str, messages: list[dict[str, Any]]) -> bool:
-        """
-        Upload local session history to Honcho as a file.
+        """Upload local session history to Honcho as a file.
 
         Used when Honcho activates mid-conversation to preserve prior context.
 
@@ -758,6 +751,7 @@ class HonchoSessionManager:
 
         Returns:
             True if upload succeeded, False otherwise.
+
         """
         session = self._cache.get(session_key)
         if not session:
@@ -819,8 +813,7 @@ class HonchoSessionManager:
         return "\n".join(lines).encode("utf-8")
 
     def migrate_memory_files(self, session_key: str, memory_dir: str) -> bool:
-        """
-        Upload MEMORY.md and USER.md to Honcho as files.
+        """Upload MEMORY.md and USER.md to Honcho as files.
 
         Used when Honcho activates on an instance that already has locally
         consolidated memory. Backwards compatible -- skips if files don't exist.
@@ -831,6 +824,7 @@ class HonchoSessionManager:
 
         Returns:
             True if at least one file was uploaded, False otherwise.
+
         """
         from pathlib import Path
         memory_path = Path(memory_dir)
@@ -1074,8 +1068,7 @@ class HonchoSessionManager:
         return target_peer_id, None
 
     def get_peer_card(self, session_key: str, peer: str = "user") -> list[str]:
-        """
-        Fetch a peer card — a curated list of key facts.
+        """Fetch a peer card — a curated list of key facts.
 
         Fast, no LLM reasoning. Returns raw structured facts Honcho has
         inferred about the target peer (name, role, preferences, patterns).
@@ -1106,8 +1099,7 @@ class HonchoSessionManager:
         max_tokens: int = 800,
         peer: str = "user",
     ) -> str:
-        """
-        Semantic search over Honcho session context.
+        """Semantic search over Honcho session context.
 
         Returns raw excerpts ranked by relevance to the query. No LLM
         reasoning — cheaper and faster than dialectic_query. Good for
@@ -1121,6 +1113,7 @@ class HonchoSessionManager:
 
         Returns:
             Relevant context excerpts as a string, or empty string if none.
+
         """
         session = self._cache.get(session_key)
         if not session:
@@ -1159,6 +1152,7 @@ class HonchoSessionManager:
 
         Returns:
             True on success, False on failure.
+
         """
         if not content or not content.strip():
             return False
@@ -1204,6 +1198,7 @@ class HonchoSessionManager:
 
         Returns:
             True on success, False on failure.
+
         """
         session = self._cache.get(session_key)
         if not session:
@@ -1236,6 +1231,7 @@ class HonchoSessionManager:
 
         Returns:
             Updated card on success, None on failure.
+
         """
         session = self._cache.get(session_key)
         if not session:
@@ -1263,8 +1259,7 @@ class HonchoSessionManager:
             return None
 
     def seed_ai_identity(self, session_key: str, content: str, source: str = "manual") -> bool:
-        """
-        Seed the AI peer's Honcho representation from text content.
+        """Seed the AI peer's Honcho representation from text content.
 
         Useful for priming AI identity from SOUL.md, exported chats, or
         any structured description. The content is sent as an assistant
@@ -1277,6 +1272,7 @@ class HonchoSessionManager:
 
         Returns:
             True on success, False on failure.
+
         """
         if not content or not content.strip():
             return False
@@ -1308,11 +1304,11 @@ class HonchoSessionManager:
             return False
 
     def get_ai_representation(self, session_key: str) -> dict[str, str]:
-        """
-        Fetch the AI peer's current Honcho representation.
+        """Fetch the AI peer's current Honcho representation.
 
         Returns:
             Dict with 'representation' and 'card' keys, empty strings if unavailable.
+
         """
         session = self._cache.get(session_key)
         if not session:

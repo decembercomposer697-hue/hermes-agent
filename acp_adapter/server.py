@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone, UTC
 import base64
 import contextvars
 import json
@@ -11,6 +10,7 @@ import logging
 import os
 from collections import defaultdict, deque
 from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Deque, Optional
 from urllib.parse import unquote, urlparse
@@ -20,6 +20,7 @@ from acp.schema import (
     AgentCapabilities,
     AgentMessageChunk,
     AgentThoughtChunk,
+    AudioContentBlock,
     AuthenticateResponse,
     AvailableCommand,
     AvailableCommandsUpdate,
@@ -28,7 +29,6 @@ from acp.schema import (
     EmbeddedResourceContentBlock,
     ForkSessionResponse,
     ImageContentBlock,
-    AudioContentBlock,
     Implementation,
     InitializeResponse,
     ListSessionsResponse,
@@ -40,20 +40,20 @@ from acp.schema import (
     NewSessionResponse,
     PromptCapabilities,
     PromptResponse,
-    ResumeSessionResponse,
-    SetSessionConfigOptionResponse,
-    SetSessionModelResponse,
-    SetSessionModeResponse,
     ResourceContentBlock,
+    ResumeSessionResponse,
     SessionCapabilities,
     SessionForkCapabilities,
+    SessionInfo,
     SessionInfoUpdate,
     SessionListCapabilities,
     SessionMode,
-    SessionModeState,
     SessionModelState,
+    SessionModeState,
     SessionResumeCapabilities,
-    SessionInfo,
+    SetSessionConfigOptionResponse,
+    SetSessionModelResponse,
+    SetSessionModeResponse,
     TextContentBlock,
     TextResourceContents,
     UnstructuredCommandInput,
@@ -62,7 +62,11 @@ from acp.schema import (
     UserMessageChunk,
 )
 
-from acp_adapter.auth import TERMINAL_SETUP_AUTH_METHOD_ID, build_auth_methods, detect_provider
+from acp_adapter.auth import (
+    TERMINAL_SETUP_AUTH_METHOD_ID,
+    build_auth_methods,
+    detect_provider,
+)
 from acp_adapter.events import (
     _build_plan_update_from_todo_result,
     make_message_cb,
@@ -72,7 +76,11 @@ from acp_adapter.events import (
 )
 from acp_adapter.permissions import make_approval_callback
 from acp_adapter.provenance import session_provenance_meta
-from acp_adapter.session import SessionManager, SessionState, _expand_acp_enabled_toolsets
+from acp_adapter.session import (
+    SessionManager,
+    SessionState,
+    _expand_acp_enabled_toolsets,
+)
 from acp_adapter.tools import build_tool_complete, build_tool_start
 
 logger = logging.getLogger(__name__)
@@ -526,7 +534,6 @@ class HermesACPAgent(acp.Agent):
         self._conn = conn
         logger.info("ACP client connected")
 
-
     def _session_modes(self, state: SessionState) -> SessionModeState:
         """Return ACP session modes while preserving Zed's separate model picker.
 
@@ -582,7 +589,11 @@ class HermesACPAgent(acp.Agent):
         provider = getattr(state.agent, "provider", None) or detect_provider() or "openrouter"
 
         try:
-            from hermes_cli.models import curated_models_for_provider, normalize_provider, provider_label
+            from hermes_cli.models import (
+                curated_models_for_provider,
+                normalize_provider,
+                provider_label,
+            )
 
             normalized_provider = normalize_provider(provider)
             provider_name = provider_label(normalized_provider)
@@ -1529,7 +1540,9 @@ class HermesACPAgent(acp.Agent):
                         logger.debug("Could not restore approval callback", exc_info=True)
                 if edit_approval_token is not None:
                     try:
-                        from acp_adapter.edit_approval import reset_edit_approval_requester
+                        from acp_adapter.edit_approval import (
+                            reset_edit_approval_requester,
+                        )
 
                         reset_edit_approval_requester(edit_approval_token)
                     except Exception:

@@ -22,7 +22,6 @@ import pytest
 
 from agent.lsp.install import INSTALL_RECIPES
 
-
 # ---------------------------------------------------------------------------
 # Fix 1: typescript install recipe carries the typescript SDK
 # ---------------------------------------------------------------------------
@@ -112,7 +111,7 @@ def test_existing_binary_finds_windows_wrapper_in_staging(tmp_path, monkeypatch)
 
 
 def test_install_pip_finds_windows_scripts_launcher(tmp_path, monkeypatch):
-    """pip console scripts can land in Scripts/ on native Windows."""
+    """Pip console scripts can land in Scripts/ on native Windows."""
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
     from agent.lsp import install as install_mod
@@ -250,7 +249,8 @@ def test_unknown_base_cmd_returns_false():
 
 def test_check_lint_returns_skipped_when_npx_tsc_unusable(tmp_path):
     """Integration: _check_lint sees npx exit non-zero with the npx banner
-    and returns a ``skipped`` LintResult so LSP can still run."""
+    and returns a ``skipped`` LintResult so LSP can still run.
+    """
     from tools.environments.local import LocalEnvironment
     from tools.file_operations import ShellFileOperations
 

@@ -1,5 +1,4 @@
-"""
-Photon Spectrum (iMessage) platform adapter for Hermes Agent.
+"""Photon Spectrum (iMessage) platform adapter for Hermes Agent.
 
 Both directions of traffic flow through a small supervised Node sidecar
 (see ``sidecar/index.mjs``) that runs the ``spectrum-ts`` SDK — the SDK is
@@ -35,7 +34,7 @@ import signal
 import subprocess
 import sys
 import time
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 

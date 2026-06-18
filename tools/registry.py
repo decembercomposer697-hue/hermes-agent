@@ -20,9 +20,9 @@ import json
 import logging
 import threading
 import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import Dict, List, Optional, Set
-from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -144,7 +144,8 @@ def _check_fn_cached(fn: Callable) -> bool:
 
 def invalidate_check_fn_cache() -> None:
     """Drop all cached ``check_fn`` results. Call after config changes that
-    affect tool availability (e.g. ``hermes tools enable``)."""
+    affect tool availability (e.g. ``hermes tools enable``).
+    """
     with _check_fn_cache_lock:
         _check_fn_cache.clear()
 

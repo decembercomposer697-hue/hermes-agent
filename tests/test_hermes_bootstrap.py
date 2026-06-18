@@ -88,7 +88,8 @@ class TestWindowsBehavior:
     )
     def test_child_process_inherits_utf8_mode(self):
         """A subprocess spawned from this process should inherit
-        PYTHONUTF8=1 and be able to print non-ASCII to stdout."""
+        PYTHONUTF8=1 and be able to print non-ASCII to stdout.
+        """
         _fresh_import()
         # Non-ASCII chars that would crash under cp1252: arrow, emoji.
         script = textwrap.dedent("""
@@ -116,7 +117,8 @@ class TestWindowsBehavior:
 
 class TestUserOptOut:
     """If the user has explicitly set PYTHONUTF8 / PYTHONIOENCODING in
-    their environment, we respect that (setdefault, not overwrite)."""
+    their environment, we respect that (setdefault, not overwrite).
+    """
 
     @pytest.mark.skipif(
         sys.platform != "win32",
@@ -142,11 +144,13 @@ class TestUserOptOut:
 class TestPosixNoOp:
     """POSIX: zero behavior change.  We don't touch LANG, LC_*, or any
     stdio.  The goal is that Linux/macOS behave identically before and
-    after this module is imported."""
+    after this module is imported.
+    """
 
     def test_noop_on_fake_posix(self, monkeypatch):
         """Even when imported, the bootstrap function must return False
-        and leave env untouched when _IS_WINDOWS is False."""
+        and leave env untouched when _IS_WINDOWS is False.
+        """
         hb = _fresh_import()
         # Reset + fake POSIX
         hb._IS_WINDOWS = False
@@ -167,7 +171,8 @@ class TestPosixNoOp:
     )
     def test_real_posix_bootstrap_is_noop(self, monkeypatch):
         """On actual Linux/macOS, importing the module must not set
-        PYTHONUTF8 or reconfigure stdio."""
+        PYTHONUTF8 or reconfigure stdio.
+        """
         monkeypatch.delenv("PYTHONUTF8", raising=False)
         monkeypatch.delenv("PYTHONIOENCODING", raising=False)
         hb = _fresh_import()
@@ -196,11 +201,13 @@ class TestIdempotence:
 class TestStdioReconfigureErrorHandling:
     """If sys.stdout/stderr/stdin have been replaced with streams that
     don't support reconfigure (e.g. by a test harness), the bootstrap
-    must degrade gracefully rather than crash."""
+    must degrade gracefully rather than crash.
+    """
 
     def test_non_reconfigurable_stream_does_not_crash(self, monkeypatch):
         """Replace sys.stdout with a BytesIO (no reconfigure method),
-        then run the bootstrap and make sure it doesn't raise."""
+        then run the bootstrap and make sure it doesn't raise.
+        """
         hb = _fresh_import()
         hb._IS_WINDOWS = True
         hb._bootstrap_applied = False
@@ -215,13 +222,15 @@ class TestStdioReconfigureErrorHandling:
 
     def test_reconfigure_oserror_is_caught(self, monkeypatch):
         """If reconfigure() itself raises (closed stream, etc.), swallow
-        the error — the env-var half of the fix still applies."""
+        the error — the env-var half of the fix still applies.
+        """
         hb = _fresh_import()
         hb._IS_WINDOWS = True
         hb._bootstrap_applied = False
 
         class _BrokenStream:
             encoding = "utf-8"
+
             def reconfigure(self, **kwargs):
                 raise OSError("simulated: stream already closed")
 
@@ -235,7 +244,8 @@ class TestEntryPointsImportBootstrap:
     """Every Hermes entry point must import hermes_bootstrap as its
     first non-docstring import.  We check this by scanning source files
     rather than invoking the entry points (which would require a full
-    agent context)."""
+    agent context).
+    """
 
     # Entry points that invoke Hermes as a process.  Each one must
     # import hermes_bootstrap before doing any file I/O or stdout writes.

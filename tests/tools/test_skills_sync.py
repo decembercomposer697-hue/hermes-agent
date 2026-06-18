@@ -5,16 +5,16 @@ from pathlib import Path
 from unittest.mock import patch
 
 from tools.skills_sync import (
+    _compute_relative_dest,
+    _dir_hash,
+    _discover_bundled_skills,
     _get_bundled_dir,
     _read_manifest,
     _read_skill_name,
     _write_manifest,
-    _discover_bundled_skills,
-    _compute_relative_dest,
-    _dir_hash,
-    sync_skills,
     reset_bundled_skill,
     restore_official_optional_skill,
+    sync_skills,
 )
 
 
@@ -869,7 +869,8 @@ class TestResetBundledSkill:
     def test_reset_restore_succeeds_on_readonly_nix_tree(self, tmp_path):
         """#34972: --restore must succeed even when the user copy is a fully
         read-only tree (r-xr-xr-x dirs + files), as produced by copying a
-        Nix-store source. The manifest is re-baselined and bundled re-copied."""
+        Nix-store source. The manifest is re-baselined and bundled re-copied.
+        """
         import os
         import stat
 
@@ -917,7 +918,8 @@ class TestResetBundledSkill:
     def test_reset_restore_preserves_manifest_on_rmtree_failure(self, tmp_path):
         """#34972: when the user copy genuinely cannot be removed, the manifest
         entry must NOT be deleted — otherwise the skill enters a limbo state
-        where future syncs silently skip it forever."""
+        where future syncs silently skip it forever.
+        """
         bundled = self._setup_bundled(tmp_path)
         skills_dir = tmp_path / "user_skills"
         manifest_file = skills_dir / ".bundled_manifest"
@@ -1017,7 +1019,8 @@ class TestOptOutToggleAndRemove:
 
     def test_marker_toggle(self, tmp_path):
         from tools.skills_sync import (
-            set_bundled_skills_opt_out, is_bundled_skills_opt_out,
+            is_bundled_skills_opt_out,
+            set_bundled_skills_opt_out,
         )
         home = tmp_path / "home"
         home.mkdir()
@@ -1036,7 +1039,8 @@ class TestOptOutToggleAndRemove:
 
     def test_remove_keeps_user_modified(self, tmp_path):
         from tools.skills_sync import (
-            sync_skills, remove_pristine_bundled_skills,
+            remove_pristine_bundled_skills,
+            sync_skills,
         )
         bundled = self._setup_bundled(tmp_path)
         skills_dir = tmp_path / "user_skills"

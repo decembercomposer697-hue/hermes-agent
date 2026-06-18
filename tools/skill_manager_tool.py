@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Skill Manager Tool -- Agent-Managed Skill Creation & Editing
+"""Skill Manager Tool -- Agent-Managed Skill Creation & Editing
 
 Allows the agent to create, update, and delete skills, turning successful
 approaches into reusable procedural knowledge. New skills are created in
@@ -39,18 +38,18 @@ import re
 import shutil
 import tempfile
 from pathlib import Path
-from hermes_constants import get_hermes_home, display_hermes_home
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-from utils import atomic_replace, is_truthy_value
 from hermes_cli.config import cfg_get
+from hermes_constants import display_hermes_home, get_hermes_home
+from utils import atomic_replace, is_truthy_value
 
 logger = logging.getLogger(__name__)
 
 # Import security scanner — external hub installs always get scanned;
 # agent-created skills only get scanned when skills.guard_agent_created is on.
 try:
-    from tools.skills_guard import scan_skill, should_allow_install, format_scan_report
+    from tools.skills_guard import format_scan_report, scan_skill, should_allow_install
     _GUARD_AVAILABLE = True
 except ImportError:
     _GUARD_AVAILABLE = False
@@ -102,7 +101,6 @@ def _security_scan_skill(skill_dir: Path) -> str | None:
     return None
 
 import yaml
-
 
 # All skills live in ~/.hermes/skills/ (single source of truth)
 HERMES_HOME = get_hermes_home()
@@ -165,7 +163,7 @@ MAX_SKILL_CONTENT_CHARS = 100_000   # ~36k tokens at 2.75 chars/token
 MAX_SKILL_FILE_BYTES = 1_048_576    # 1 MiB per supporting file
 
 # Characters allowed in skill names (filesystem-safe, URL-friendly)
-VALID_NAME_RE = re.compile(r'^[a-z0-9][a-z0-9._-]*$')
+VALID_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
 
 # Subdirectories allowed for write_file/remove_file
 ALLOWED_SUBDIRS = {"references", "templates", "scripts", "assets"}
@@ -215,8 +213,7 @@ def _validate_category(category: str | None) -> str | None:
 
 
 def _validate_frontmatter(content: str) -> str | None:
-    """
-    Validate that SKILL.md content has proper frontmatter with required fields.
+    """Validate that SKILL.md content has proper frontmatter with required fields.
     Returns error message or None if valid.
     """
     if not content.strip():
@@ -225,7 +222,7 @@ def _validate_frontmatter(content: str) -> str | None:
     if not content.startswith("---"):
         return "SKILL.md must start with YAML frontmatter (---). See existing skills for format."
 
-    end_match = re.search(r'\n---\s*\n', content[3:])
+    end_match = re.search(r"\n---\s*\n", content[3:])
     if not end_match:
         return "SKILL.md frontmatter is not closed. Ensure you have a closing '---' line."
 
@@ -276,8 +273,7 @@ def _resolve_skill_dir(name: str, category: str = None) -> Path:
 
 
 def _find_skill(name: str) -> dict[str, Any] | None:
-    """
-    Find a skill by name across all skill directories.
+    """Find a skill by name across all skill directories.
 
     Searches the local skills dir (~/.hermes/skills/) first, then any
     external dirs configured via skills.external_dirs.  Returns
@@ -306,8 +302,8 @@ def _find_skill_in_other_profiles(name: str) -> list[tuple[str, Path]]:
     """
     matches: list[tuple[str, Path]] = []
     try:
-        from hermes_constants import get_default_hermes_root
         from agent.skill_utils import is_excluded_skill_path
+        from hermes_constants import get_default_hermes_root
     except Exception:
         return matches
 
@@ -399,8 +395,7 @@ def _skill_not_found_error(name: str, suffix: str = "") -> str:
 
 
 def _validate_file_path(file_path: str) -> str | None:
-    """
-    Validate a file path for write_file/remove_file.
+    """Validate a file path for write_file/remove_file.
     Must be under an allowed subdirectory and not escape the skill dir.
     """
     from tools.path_security import has_traversal_component
@@ -447,8 +442,7 @@ def _resolve_skill_target(skill_dir: Path, file_path: str) -> tuple[Path | None,
 
 
 def _atomic_write_text(file_path: Path, content: str, encoding: str = "utf-8") -> None:
-    """
-    Atomically write text content to a file.
+    """Atomically write text content to a file.
     
     Uses a temporary file in the same directory and os.replace() to ensure
     the target file is never left in a partially-written state if the process
@@ -458,6 +452,7 @@ def _atomic_write_text(file_path: Path, content: str, encoding: str = "utf-8") -
         file_path: Target file path
         content: Content to write
         encoding: Text encoding (default: utf-8)
+
     """
     file_path.parent.mkdir(parents=True, exist_ok=True)
     fd, temp_path = tempfile.mkstemp(
@@ -825,6 +820,7 @@ def _remove_file(name: str, file_path: str) -> dict[str, Any]:
 # ContextVar bypass: set while replaying an already-approved staged skill write
 # so skill_manage() does not re-gate (and re-stage) it.
 import contextvars as _ctxvars
+
 _skill_gate_bypass: "_ctxvars.ContextVar[bool]" = _ctxvars.ContextVar(
     "skill_gate_bypass", default=False,
 )
@@ -903,8 +899,7 @@ def skill_manage(
     replace_all: bool = False,
     absorbed_into: str = None,
 ) -> str:
-    """
-    Manage user-created skills. Dispatches to the appropriate action handler.
+    """Manage user-created skills. Dispatches to the appropriate action handler.
 
     Returns JSON string with results.
     """
@@ -969,8 +964,8 @@ def skill_manage(
         # user-directed, and those skills belong to the user (the curator must
         # not touch them). Best-effort; telemetry failures never break the tool.
         try:
-            from tools.skill_usage import bump_patch, forget, mark_agent_created
             from tools.skill_provenance import is_background_review
+            from tools.skill_usage import bump_patch, forget, mark_agent_created
             if action == "create":
                 if is_background_review():
                     mark_agent_created(name)

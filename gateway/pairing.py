@@ -1,5 +1,4 @@
-"""
-DM Pairing System
+"""DM Pairing System
 
 Code-based approval flow for authorizing new users on messaging platforms.
 Instead of static allowlists with user IDs, unknown users receive a one-time
@@ -34,7 +33,6 @@ from gateway.whatsapp_identity import (
 )
 from hermes_constants import get_hermes_dir
 from utils import atomic_replace
-
 
 # Unambiguous alphabet -- excludes 0/O, 1/I to prevent confusion
 ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
@@ -79,8 +77,7 @@ def _secure_write(path: Path, data: str) -> None:
 
 
 class PairingStore:
-    """
-    Manages pairing codes and approved user lists.
+    """Manages pairing codes and approved user lists.
 
     Data files per platform:
       - {platform}-pending.json   : pending pairing requests
@@ -204,8 +201,7 @@ class PairingStore:
     def generate_code(
         self, platform: str, user_id: str, user_name: str = "",
     ) -> str | None:
-        """
-        Generate a pairing code for a new user.
+        """Generate a pairing code for a new user.
 
         Returns the code string, or None if:
           - User is rate-limited (too recent request)
@@ -258,8 +254,7 @@ class PairingStore:
             return code
 
     def approve_code(self, platform: str, code: str) -> dict | None:
-        """
-        Approve a pairing code. Adds the user to the approved list.
+        """Approve a pairing code. Adds the user to the approved list.
 
         Returns ``{user_id, user_name}`` on success, ``None`` if the code is
         invalid/expired OR the platform is currently locked out after

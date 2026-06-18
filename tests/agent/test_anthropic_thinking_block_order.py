@@ -35,8 +35,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from agent.transports import get_transport
 from agent.anthropic_adapter import convert_messages_to_anthropic
+from agent.transports import get_transport
 
 
 def _thinking_block(text: str, signature: str) -> SimpleNamespace:
@@ -117,7 +117,8 @@ def _replayed_block_order(assistant_content) -> list:
 class TestInterleavedThinkingBlockOrder:
     def test_normalize_response_loses_interleaving(self):
         """Confirm the lossy split: normalize_response stores thinking and
-        tool_use in independent fields with no positional linkage."""
+        tool_use in independent fields with no positional linkage.
+        """
         transport = get_transport("anthropic_messages")
         normalized = transport.normalize_response(_interleaved_response())
 

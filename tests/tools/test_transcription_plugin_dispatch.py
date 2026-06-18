@@ -93,7 +93,8 @@ class TestBuiltinAlwaysWins:
 
     def test_dispatcher_short_circuits_none(self):
         """The ``none`` sentinel from _get_provider() means no provider
-        available — must not reach plugin registry."""
+        available — must not reach plugin registry.
+        """
         result = transcription_tools._dispatch_to_plugin_provider(
             "/tmp/audio.mp3", "none",
         )
@@ -135,7 +136,8 @@ class TestPluginDispatch:
 
     def test_unregistered_name_returns_none(self):
         """Unknown name + no plugin → return None so the caller surfaces
-        the legacy 'No STT provider available' error."""
+        the legacy 'No STT provider available' error.
+        """
         result = transcription_tools._dispatch_to_plugin_provider(
             "/tmp/audio.mp3", "unknown-stt",
         )
@@ -186,7 +188,8 @@ class TestPluginDispatch:
 
     def test_provider_field_stamped_if_missing(self):
         """If a plugin forgets to set ``provider`` in its result, the
-        dispatcher stamps it from the registered name."""
+        dispatcher stamps it from the registered name.
+        """
         provider = _FakeProvider(
             name="openrouter",
             result={"success": True, "transcript": "hi"},  # no provider key
@@ -232,7 +235,8 @@ class TestTranscribeAudioE2E:
     def test_unknown_name_without_plugin_falls_to_legacy_error(self):
         """When no plugin is registered for the unknown name, the
         dispatcher returns None and transcribe_audio falls through to
-        the legacy 'No STT provider available' error message."""
+        the legacy 'No STT provider available' error message.
+        """
         from unittest.mock import patch
 
         with patch("tools.transcription_tools._validate_audio_file", return_value=None), \
@@ -248,7 +252,8 @@ class TestTranscribeAudioE2E:
         """Even if a plugin's name collides with a built-in (which the
         registry blocks, but defense in depth matters), transcribe_audio
         with provider='groq' goes through the legacy elif chain, never
-        the plugin dispatcher."""
+        the plugin dispatcher.
+        """
         from unittest.mock import patch
         # Register a plugin that WOULD respond to 'openrouter' — but
         # we're asking for 'groq', so it shouldn't be called.
@@ -314,7 +319,8 @@ class TestAvailabilityGate:
 
     def test_is_available_raising_treated_as_unavailable(self):
         """Per the ABC contract ``is_available()`` MUST NOT raise; we
-        defend anyway so a buggy plugin can't break dispatch."""
+        defend anyway so a buggy plugin can't break dispatch.
+        """
         provider = _FakeProvider(
             name="openrouter",
             available_raises=RuntimeError("creds check exploded"),
@@ -366,7 +372,8 @@ class TestLanguageForwardingFromConfig:
 
     def test_language_read_from_provider_namespaced_config(self):
         """``stt.openrouter.language: ja`` reaches the plugin's
-        transcribe() call as language='ja'."""
+        transcribe() call as language='ja'.
+        """
         from unittest.mock import patch
         provider = _FakeProvider(name="openrouter")
         transcription_registry.register_provider(provider)
@@ -387,7 +394,8 @@ class TestLanguageForwardingFromConfig:
     def test_model_from_provider_namespaced_config(self):
         """``stt.openrouter.model: whisper-large-v3`` reaches the
         plugin as model='whisper-large-v3' when caller doesn't
-        override."""
+        override.
+        """
         from unittest.mock import patch
         provider = _FakeProvider(name="openrouter")
         transcription_registry.register_provider(provider)
@@ -406,7 +414,8 @@ class TestLanguageForwardingFromConfig:
 
     def test_caller_model_overrides_config_model(self):
         """An explicit ``model`` arg to transcribe_audio wins over
-        ``stt.<provider>.model`` in config."""
+        ``stt.<provider>.model`` in config.
+        """
         from unittest.mock import patch
         provider = _FakeProvider(name="openrouter")
         transcription_registry.register_provider(provider)
@@ -427,7 +436,8 @@ class TestLanguageForwardingFromConfig:
 
     def test_missing_provider_namespace_passes_none(self):
         """No ``stt.<provider>`` subsection → language is None,
-        model falls back to caller arg or None. No crash."""
+        model falls back to caller arg or None. No crash.
+        """
         from unittest.mock import patch
         provider = _FakeProvider(name="openrouter")
         transcription_registry.register_provider(provider)
@@ -444,7 +454,8 @@ class TestLanguageForwardingFromConfig:
     def test_non_dict_provider_namespace_does_not_crash(self):
         """If someone accidentally writes ``stt.openrouter: "foo"`` (a
         string instead of a dict), we should not crash — treat as
-        empty config."""
+        empty config.
+        """
         from unittest.mock import patch
         provider = _FakeProvider(name="openrouter")
         transcription_registry.register_provider(provider)

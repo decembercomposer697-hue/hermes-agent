@@ -16,7 +16,6 @@ import yaml
 
 from hermes_cli.plugins import PluginManager
 
-
 # ── Helpers ────────────────────────────────────────────────────────────────
 
 
@@ -73,7 +72,8 @@ def _enable(hermes_home: Path, name: str) -> None:
 class TestCategoryNamespaceRecursion:
     def test_category_namespace_discovered(self, tmp_path, monkeypatch):
         """``<root>/image_gen/openai/plugin.yaml`` is discovered with key
-        ``image_gen/openai`` when the ``image_gen`` parent has no manifest."""
+        ``image_gen/openai`` when the ``image_gen`` parent has no manifest.
+        """
         import os
         hermes_home = Path(os.environ["HERMES_HOME"])  # set by hermetic conftest fixture
         user_plugins = hermes_home / "plugins"
@@ -128,7 +128,8 @@ class TestCategoryNamespaceRecursion:
 
     def test_category_dir_with_manifest_is_leaf(self, tmp_path, monkeypatch):
         """If ``image_gen/plugin.yaml`` exists, ``image_gen`` itself IS the
-        plugin and its children are ignored."""
+        plugin and its children are ignored.
+        """
         import os
         hermes_home = Path(os.environ["HERMES_HOME"])  # set by hermetic conftest fixture
         user_plugins = hermes_home / "plugins"
@@ -212,7 +213,8 @@ class TestKindField:
 class TestBackendGate:
     def test_user_backend_still_gated_by_enabled(self, tmp_path, monkeypatch):
         """User-installed ``kind: backend`` plugins still require opt-in —
-        they're not trusted by default."""
+        they're not trusted by default.
+        """
         import os
         hermes_home = Path(os.environ["HERMES_HOME"])  # set by hermetic conftest fixture
         user_plugins = hermes_home / "plugins"
@@ -250,7 +252,8 @@ class TestBackendGate:
 
     def test_exclusive_kind_skipped(self, tmp_path, monkeypatch):
         """``kind: exclusive`` plugins are recorded but not loaded — the
-        category's own discovery system handles them (memory today)."""
+        category's own discovery system handles them (memory today).
+        """
         import os
         hermes_home = Path(os.environ["HERMES_HOME"])  # set by hermetic conftest fixture
         _write_plugin(
@@ -274,7 +277,8 @@ class TestBackendGate:
 class TestBundledBackendAutoLoad:
     def test_bundled_image_gen_openai_autoloads(self, tmp_path, monkeypatch):
         """The bundled ``plugins/image_gen/openai/`` plugin loads without
-        any opt-in — it's ``kind: backend`` and shipped in-repo."""
+        any opt-in — it's ``kind: backend`` and shipped in-repo.
+        """
         import os
         hermes_home = Path(os.environ["HERMES_HOME"])  # set by hermetic conftest fixture
 

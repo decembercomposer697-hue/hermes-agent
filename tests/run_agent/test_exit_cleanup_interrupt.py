@@ -16,8 +16,10 @@ def _mock_runtime_provider(monkeypatch):
     """run_job calls resolve_runtime_provider which can try real network
     auto-detection (~4s of socket timeouts in hermetic CI). Mock it out
     since these tests don't care about provider resolution — the agent
-    is mocked too."""
+    is mocked too.
+    """
     import hermes_cli.runtime_provider as rp
+
     def _fake_resolve(*args, **kwargs):
         return {
             "provider": "openrouter",

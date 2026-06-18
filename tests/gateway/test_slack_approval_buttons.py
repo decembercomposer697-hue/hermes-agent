@@ -41,8 +41,8 @@ def _ensure_slack_mock():
 
 _ensure_slack_mock()
 
+from gateway.config import Platform, PlatformConfig
 from gateway.platforms.slack import SlackAdapter
-from gateway.config import PlatformConfig, Platform
 
 
 def _make_adapter():
@@ -390,7 +390,8 @@ class TestSlackThreadContext:
 
         Regression guard for the fix in _fetch_thread_context: previously ALL
         bot messages were dropped, which lost context when the bot was replying
-        to a cron-posted thread parent."""
+        to a cron-posted thread parent.
+        """
         adapter = _make_adapter()
         mock_client = adapter._team_clients["T1"]
         mock_client.conversations_replies = AsyncMock(return_value={
@@ -449,7 +450,8 @@ class TestSlackThreadContext:
     @pytest.mark.asyncio
     async def test_fetch_thread_context_includes_bot_parent(self):
         """The thread parent posted by a bot (e.g. a cron summary) must be
-        included in the context, prefixed with ``[thread parent]``."""
+        included in the context, prefixed with ``[thread parent]``.
+        """
         adapter = _make_adapter()
         mock_client = adapter._team_clients["T1"]
         mock_client.conversations_replies = AsyncMock(return_value={
@@ -481,7 +483,8 @@ class TestSlackThreadContext:
     @pytest.mark.asyncio
     async def test_fetch_thread_context_excludes_self_bot_replies(self):
         """Parent (non-self bot) is kept, self-bot child replies are dropped,
-        user replies are kept."""
+        user replies are kept.
+        """
         adapter = _make_adapter()
         mock_client = adapter._team_clients["T1"]
         mock_client.conversations_replies = AsyncMock(return_value={
@@ -516,7 +519,8 @@ class TestSlackThreadContext:
     async def test_fetch_thread_context_multi_workspace(self):
         """Self-bot filtering must use the per-workspace bot user id so a
         self-bot id that belongs to a different workspace does not accidentally
-        filter out a legitimate message in the current workspace."""
+        filter out a legitimate message in the current workspace.
+        """
         adapter = _make_adapter()
         # Add a second workspace with a different bot user id
         adapter._team_clients["T2"] = AsyncMock()
@@ -562,7 +566,8 @@ class TestSlackThreadContext:
     async def test_fetch_thread_context_current_ts_excluded(self):
         """Regression guard: the message whose ts == current_ts must never
         appear in the context output (it will be delivered as the user
-        message itself)."""
+        message itself).
+        """
         adapter = _make_adapter()
         mock_client = adapter._team_clients["T1"]
         mock_client.conversations_replies = AsyncMock(return_value={
@@ -583,7 +588,8 @@ class TestSlackThreadContext:
     @pytest.mark.asyncio
     async def test_fetch_thread_parent_text_from_cache(self):
         """_fetch_thread_parent_text should reuse the thread-context cache
-        when it is warm, avoiding an extra conversations.replies call."""
+        when it is warm, avoiding an extra conversations.replies call.
+        """
         adapter = _make_adapter()
         mock_client = adapter._team_clients["T1"]
         mock_client.conversations_replies = AsyncMock(return_value={

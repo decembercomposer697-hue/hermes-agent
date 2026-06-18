@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Code Execution Tool -- Programmatic Tool Calling (PTC)
+"""Code Execution Tool -- Programmatic Tool Calling (PTC)
 
 Lets the LLM write a Python script that calls Hermes tools via RPC,
 collapsing multi-step tool chains into a single inference turn.
@@ -258,8 +257,7 @@ _TOOL_STUBS = {
 
 def generate_hermes_tools_module(enabled_tools: list[str],
                                  transport: str = "uds") -> str:
-    """
-    Build the source code for the hermes_tools.py stub module.
+    """Build the source code for the hermes_tools.py stub module.
 
     Only tools in both SANDBOX_ALLOWED_TOOLS and enabled_tools get stubs.
 
@@ -267,6 +265,7 @@ def generate_hermes_tools_module(enabled_tools: list[str],
         enabled_tools: Tool names enabled in the current session.
         transport: ``"uds"`` for Unix domain socket (local backend) or
                    ``"file"`` for file-based RPC (remote backends).
+
     """
     tools_to_generate = sorted(SANDBOX_ALLOWED_TOOLS & set(enabled_tools))
 
@@ -473,8 +472,7 @@ def _rpc_server_loop(
     max_tool_calls: int,
     allowed_tools: frozenset,
 ):
-    """
-    Accept one client connection and dispatch tool-call requests until
+    """Accept one client connection and dispatch tool-call requests until
     the client disconnects or the call limit is reached.
     """
     from model_tools import handle_function_call
@@ -597,10 +595,16 @@ def _get_or_create_env(task_id: str):
     Returns ``(env, env_type)`` tuple.
     """
     from tools.terminal_tool import (
-        _active_environments, _env_lock, _create_environment,
-        _get_env_config, _last_activity, _start_cleanup_thread,
-        _creation_locks, _creation_locks_lock, _task_env_overrides,
+        _active_environments,
+        _create_environment,
+        _creation_locks,
+        _creation_locks_lock,
+        _env_lock,
+        _get_env_config,
+        _last_activity,
         _resolve_container_task_id,
+        _start_cleanup_thread,
+        _task_env_overrides,
     )
 
     effective_task_id = _resolve_container_task_id(task_id)
@@ -1068,8 +1072,7 @@ def execute_code(
     task_id: str | None = None,
     enabled_tools: list[str] | None = None,
 ) -> str:
-    """
-    Run a Python script in a sandboxed child process with RPC access
+    """Run a Python script in a sandboxed child process with RPC access
     to a subset of Hermes tools.
 
     Dispatches to the local (UDS) or remote (file-based RPC) path
@@ -1083,6 +1086,7 @@ def execute_code(
 
     Returns:
         JSON string with execution results.
+
     """
     if not SANDBOX_AVAILABLE:
         return json.dumps({

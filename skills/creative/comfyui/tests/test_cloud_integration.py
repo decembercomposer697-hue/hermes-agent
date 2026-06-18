@@ -8,9 +8,7 @@ verify the read-only endpoints we rely on.
 from __future__ import annotations
 
 import pytest
-
 from _common import http_get, parse_model_list, resolve_url
-
 
 pytestmark = pytest.mark.cloud
 
@@ -69,7 +67,8 @@ class TestCloudCheckDepsLive:
 
     def test_flux_workflow_models_resolved_via_aliases(self, cloud_key, flux_workflow):
         """Flux uses unet/clip folders; cloud has them in diffusion_models/text_encoders.
-        With folder aliasing, the check should still find them."""
+        With folder aliasing, the check should still find them.
+        """
         from check_deps import check_deps
         report = check_deps(flux_workflow, host="https://cloud.comfy.org", api_key=cloud_key)
         # The exact required Flux files (flux1-dev.safetensors, t5xxl_fp16, clip_l, ae)

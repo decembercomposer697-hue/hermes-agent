@@ -33,8 +33,8 @@ import json
 import logging
 import re
 import time
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, timezone, UTC
+from dataclasses import asdict, dataclass, field
+from datetime import UTC, datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
@@ -188,7 +188,8 @@ class GoalState:
 
     def render_subgoals_block(self) -> str:
         """Render the subgoals as a numbered ``- N. text`` block. Empty
-        when no subgoals exist."""
+        when no subgoals exist.
+        """
         if not self.subgoals:
             return ""
         return "\n".join(f"- {i}. {text}" for i, text in enumerate(self.subgoals, start=1))
@@ -402,7 +403,10 @@ def judge_goal(
         return "continue", "empty response (nothing to evaluate)", False
 
     try:
-        from agent.auxiliary_client import get_auxiliary_extra_body, get_text_auxiliary_client
+        from agent.auxiliary_client import (
+            get_auxiliary_extra_body,
+            get_text_auxiliary_client,
+        )
     except Exception as exc:
         logger.debug("goal judge: auxiliary client import failed: %s", exc)
         return "continue", "auxiliary client unavailable", False
@@ -483,6 +487,7 @@ class GoalManager:
       and return a decision dict the caller uses to drive the next turn.
     - ``next_continuation_prompt()`` — the canonical user-role message to
       feed back into ``run_conversation``.
+
     """
 
     def __init__(self, session_id: str, *, default_max_turns: int = DEFAULT_MAX_TURNS):

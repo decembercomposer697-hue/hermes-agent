@@ -12,7 +12,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Fast-path dispatch: tools.browser_tool._browser_eval
 # ---------------------------------------------------------------------------
@@ -78,7 +77,7 @@ class TestBrowserEvalSupervisorPath:
             lambda *a, **kw: pytest.fail("subprocess path must not run"),
         )
 
-        out = json.loads(bt._browser_eval('JSON.stringify({a:1,b:[2,3]})'))
+        out = json.loads(bt._browser_eval("JSON.stringify({a:1,b:[2,3]})"))
         assert out["success"] is True
         assert out["result"] == {"a": 1, "b": [2, 3]}
         # result_type reflects the parsed Python type, not the raw JS type.
@@ -192,7 +191,8 @@ class TestBrowserEvalSupervisorPath:
     def test_subprocess_reference_chain_error_becomes_guidance(self, monkeypatch):
         """The CLI subprocess can't retry with returnByValue=False, so the
         cryptic 'Object reference chain is too long' CDP error must be turned
-        into actionable guidance instead of surfaced raw."""
+        into actionable guidance instead of surfaced raw.
+        """
         import tools.browser_tool as bt
 
         # No supervisor → subprocess path runs.
@@ -349,6 +349,7 @@ class TestEvaluateRuntimeResponseShaping:
     def test_inactive_supervisor_returns_error_without_dispatch(self):
         """Inactive supervisor short-circuits before even touching the loop."""
         import threading
+
         from tools.browser_supervisor import CDPSupervisor
 
         sup = object.__new__(CDPSupervisor)
@@ -366,6 +367,7 @@ class TestEvaluateRuntimeResponseShaping:
     def test_no_session_attached_returns_error(self):
         import asyncio
         import threading
+
         from tools.browser_supervisor import CDPSupervisor
 
         sup = object.__new__(CDPSupervisor)

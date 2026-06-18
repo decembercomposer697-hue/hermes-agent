@@ -36,7 +36,6 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import Optional
 
-
 # ─── Public types ───────────────────────────────────────────────────────
 
 
@@ -218,7 +217,7 @@ def _apply_capabilities(rows: list[dict]) -> None:
 
 def _append_unconfigured_rows(rows: list[dict], ctx: ConfigContext) -> list[dict]:
     """Build skeleton rows for canonical providers missing from ``rows``."""
-    from hermes_cli.models import CANONICAL_PROVIDERS, _PROVIDER_LABELS
+    from hermes_cli.models import _PROVIDER_LABELS, CANONICAL_PROVIDERS
 
     seen = {r["slug"].lower() for r in rows}
     cur = (ctx.current_provider or "").lower()

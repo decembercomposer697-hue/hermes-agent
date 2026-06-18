@@ -10,14 +10,14 @@ so it can run without optional dependencies like firecrawl.
 
 import asyncio
 import threading
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Minimal stubs so we can import _get_cached_client without the full tree
 # ---------------------------------------------------------------------------
+
 
 def _stub_resolve_provider_client(provider, model, async_mode, **kw):
     """Return a unique mock client each time, simulating AsyncOpenAI creation."""
@@ -94,7 +94,8 @@ class TestCrossLoopCacheIsolation:
 
     def test_sync_clients_not_affected(self):
         """Sync clients (async_mode=False) should still be cached globally,
-        since httpx.Client (sync) doesn't bind to an event loop."""
+        since httpx.Client (sync) doesn't bind to an event loop.
+        """
         from agent.auxiliary_client import _get_cached_client
 
         results = {}
@@ -120,7 +121,8 @@ class TestCrossLoopCacheIsolation:
     def test_gateway_simulation_no_deadlock(self):
         """Simulate gateway mode: _run_async spawns a thread with asyncio.run(),
         which creates a new loop. The cached client must be created on THAT loop,
-        not reused from a different one."""
+        not reused from a different one.
+        """
         from agent.auxiliary_client import _get_cached_client
 
         # Simulate: first call on "gateway loop"
@@ -134,6 +136,7 @@ class TestCrossLoopCacheIsolation:
 
         # Simulate: _run_async spawns a thread with asyncio.run()
         worker_client_id = [None]
+
         def _worker():
             async def _inner():
                 with patch("agent.auxiliary_client.resolve_provider_client",

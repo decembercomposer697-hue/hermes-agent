@@ -43,8 +43,9 @@ def test_schtasks_encoding_falls_back_to_utf8(monkeypatch):
 
 
 def test_exec_schtasks_decodes_with_replace_errors(monkeypatch):
-    """schtasks output must be decoded with errors='replace' so localized
-    (non-UTF-8) bytes never surface a UnicodeDecodeError traceback (#38172)."""
+    """Schtasks output must be decoded with errors='replace' so localized
+    (non-UTF-8) bytes never surface a UnicodeDecodeError traceback (#38172).
+    """
 
     captured: dict[str, object] = {}
 
@@ -643,6 +644,7 @@ def test_stop_waits_for_graceful_drain_before_force_kill(monkeypatch):
 
     # Simulate the gateway exiting cleanly after one poll tick.
     poll_count = [0]
+
     def fake_pid_exists(check_pid):
         poll_count[0] += 1
         return poll_count[0] < 2  # alive on first poll, gone on second
@@ -773,6 +775,7 @@ def test_drain_helper_still_waits_if_marker_write_fails(monkeypatch):
     platform after all) still gets observed cleanly.
     """
     pid = 44444
+
     def fake_write(target_pid):
         raise OSError("disk full")
 

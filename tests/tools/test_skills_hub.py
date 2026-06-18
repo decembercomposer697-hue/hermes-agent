@@ -3,7 +3,7 @@
 import json
 import time
 from typing import List, Optional
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
@@ -11,26 +11,25 @@ import pytest
 from tools.skills_hub import (
     GitHubAuth,
     GitHubSource,
+    HubLockFile,
     LobeHubSource,
-    SkillsShSource,
-    UrlSource,
-    WellKnownSkillSource,
     OptionalSkillSource,
-    SkillSource,
     SkillBundle,
     SkillMeta,
-    HubLockFile,
+    SkillSource,
+    SkillsShSource,
     TapsManager,
+    UrlSource,
+    WellKnownSkillSource,
+    _skill_meta_to_dict,
+    append_audit_log,
     bundle_content_hash,
     check_for_skill_updates,
     create_source_router,
     parallel_search_sources,
-    unified_search,
-    append_audit_log,
-    _skill_meta_to_dict,
     quarantine_bundle,
+    unified_search,
 )
-
 
 # ---------------------------------------------------------------------------
 # GitHubSource._parse_frontmatter_quick
@@ -558,7 +557,8 @@ class TestSkillsShSource:
         self, mock_fetch, mock_get, _mock_read_cache, _mock_write_cache,
     ):
         """Skills in deeply nested dirs (e.g. cli-tool/components/skills/dev/my-skill/)
-        are found via the GitHub Trees API when candidate paths and shallow scan fail."""
+        are found via the GitHub Trees API when candidate paths and shallow scan fail.
+        """
         tree_entries = [
             {"path": "README.md", "type": "blob"},
             {"path": "cli-tool/components/skills/development/my-skill/SKILL.md", "type": "blob"},
@@ -2161,7 +2161,8 @@ class TestInstallPathSafety:
 
     def test_install_from_quarantine_rejects_symlinks(self, tmp_path):
         """Skill install must not follow symlinks that leak file contents
-        from outside the quarantine directory."""
+        from outside the quarantine directory.
+        """
         import tools.skills_hub as hub
         from tools.skills_guard import ScanResult
 
@@ -2250,7 +2251,8 @@ class TestParallelSearchSourcesTimeout:
         """A source sleeping well past overall_timeout must not stall the
         return. Before the fix the executor's `with` block waited on the slow
         worker (~5s); now the call returns promptly and reports the source as
-        timed out."""
+        timed out.
+        """
         fast = _FakeSource("fast", sleep=0.0, results=[self._meta("fast")])
         slow = _FakeSource("slow", sleep=5.0, results=[self._meta("slow")])
 
@@ -2270,7 +2272,8 @@ class TestParallelSearchSourcesTimeout:
 
     def test_all_fast_sources_complete_without_timeout(self):
         """Happy path: when every source finishes within budget, none are
-        flagged and all results are collected."""
+        flagged and all results are collected.
+        """
         a = _FakeSource("a", results=[self._meta("a")])
         b = _FakeSource("b", results=[self._meta("b")])
 

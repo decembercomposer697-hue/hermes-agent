@@ -19,7 +19,6 @@ from fastapi.testclient import TestClient
 
 from hermes_cli import kanban_db as kb
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -240,7 +239,7 @@ def test_dashboard_initial_board_uses_backend_current_when_unpinned():
     bundle = repo_root / "plugins" / "kanban" / "dashboard" / "dist" / "index.js"
     js = bundle.read_text()
 
-    assert 'useState(() => readSelectedBoard() || null)' in js
+    assert "useState(() => readSelectedBoard() || null)" in js
     assert "const storedBoard = readSelectedBoard();" in js
     assert "if (!storedBoard && !board && data && data.current)" in js
     assert "setBoard(data.current);" in js
@@ -348,7 +347,8 @@ def test_patch_drag_drop_move_todo_to_ready(client):
     dedicated verb (e.g. manually promoting todo -> ready).
 
     Promoting a child whose parent is not done is rejected (409).
-    Promoting a child whose parent IS done is accepted (200)."""
+    Promoting a child whose parent IS done is accepted (200).
+    """
     parent = client.post("/api/plugins/kanban/tasks", json={"title": "p"}).json()["task"]
     child = client.post(
         "/api/plugins/kanban/tasks",
@@ -739,7 +739,8 @@ def test_ws_events_rejects_when_token_required(tmp_path, monkeypatch):
     policy-violation; the correct token is accepted. The kanban WS now
     delegates to web_server._ws_auth_ok, so we stub that with the real
     loopback-token semantics (auth_required False → constant-time token
-    compare)."""
+    compare).
+    """
     home = tmp_path / ".hermes"
     home.mkdir()
     monkeypatch.setenv("HERMES_HOME", str(home))
@@ -748,8 +749,9 @@ def test_ws_events_rejects_when_token_required(tmp_path, monkeypatch):
 
     # Stub web_server with a loopback-mode _ws_auth_ok (auth_required False →
     # accept only the correct ?token=). Mirrors the real gate's loopback path.
-    import hermes_cli
     import types
+
+    import hermes_cli
 
     def _fake_ws_auth_ok(ws):
         return ws.query_params.get("token", "") == "secret-xyz"
@@ -790,15 +792,17 @@ def test_ws_events_accepts_gated_ticket(tmp_path, monkeypatch):
     a bare ?token=, even one matching _SESSION_TOKEN). This is the regression
     for the hosted-dashboard bug where the kanban live-events WS 1008'd on
     every gated deployment because its bespoke check only knew _SESSION_TOKEN.
-    We stub _ws_auth_ok with the real gated semantics (ticket-only)."""
+    We stub _ws_auth_ok with the real gated semantics (ticket-only).
+    """
     home = tmp_path / ".hermes"
     home.mkdir()
     monkeypatch.setenv("HERMES_HOME", str(home))
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
     kb.init_db()
 
-    import hermes_cli
     import types
+
+    import hermes_cli
 
     def _fake_ws_auth_ok(ws):
         # Gated mode: only a known ticket is accepted; token path rejected.
@@ -859,8 +863,9 @@ def test_ws_events_board_query_param_default_overrides_current_board_pointer(tmp
 
     kb.set_current_board("other")
 
-    import hermes_cli
     import types
+
+    import hermes_cli
 
     stub = types.SimpleNamespace(
         _SESSION_TOKEN="secret-xyz",
@@ -1129,7 +1134,8 @@ def test_bulk_unassign_via_empty_string(client):
 
 def test_bulk_partial_failure_doesnt_abort_siblings(client):
     """One bad id in the middle of a batch must not prevent others from
-    applying."""
+    applying.
+    """
     a = client.post("/api/plugins/kanban/tasks", json={"title": "a"}).json()["task"]
     c2 = client.post("/api/plugins/kanban/tasks", json={"title": "c"}).json()["task"]
     r = client.post("/api/plugins/kanban/tasks/bulk",
@@ -1226,7 +1232,8 @@ def test_task_detail_includes_runs(client):
 
 def test_task_detail_runs_empty_before_claim(client):
     """A task that's never been claimed has an empty runs[] list, not
-    a missing key."""
+    a missing key.
+    """
     r = client.post("/api/plugins/kanban/tasks", json={"title": "fresh"}).json()
     d = client.get(f"/api/plugins/kanban/tasks/{r['task']['id']}").json()
     assert d["runs"] == []
@@ -1234,7 +1241,8 @@ def test_task_detail_runs_empty_before_claim(client):
 
 def test_patch_status_done_with_summary_and_metadata(client):
     """PATCH /tasks/:id with status=done + summary + metadata must
-    reach complete_task, so the dashboard has CLI parity."""
+    reach complete_task, so the dashboard has CLI parity.
+    """
     # Create + claim.
     r = client.post("/api/plugins/kanban/tasks", json={"title": "x", "assignee": "worker"})
     tid = r.json()["task"]["id"]
@@ -1341,7 +1349,6 @@ def test_event_dict_includes_run_id(client):
     assert comp[0]["run_id"] == run_id
 
 
-
 # ---------------------------------------------------------------------------
 # Per-task force-loaded skills via REST
 # ---------------------------------------------------------------------------
@@ -1367,7 +1374,8 @@ def test_create_task_with_skills_roundtrips(client):
 
 def test_create_task_without_skills_defaults_to_empty_list(client):
     """_task_dict serializes Task.skills=None as [] so the drawer can
-    always .length check without guarding against null."""
+    always .length check without guarding against null.
+    """
     r = client.post(
         "/api/plugins/kanban/tasks",
         json={"title": "no skills", "assignee": "x"},
@@ -1394,14 +1402,14 @@ def test_create_task_with_toolset_name_in_skills_is_rejected(client):
     assert "toolset name" in r.json()["detail"]
 
 
-
 # ---------------------------------------------------------------------------
 # Dispatcher-presence warning in POST /tasks response
 # ---------------------------------------------------------------------------
 
 def test_create_task_includes_warning_when_no_dispatcher(client, monkeypatch):
     """ready+assigned task + no gateway -> response has `warning` field
-    so the dashboard UI can surface a banner."""
+    so the dashboard UI can surface a banner.
+    """
     # Force the dispatcher probe to report "not running".
     monkeypatch.setattr(
         "hermes_cli.kanban._check_dispatcher_presence",
@@ -1433,7 +1441,8 @@ def test_create_task_no_warning_when_dispatcher_up(client, monkeypatch):
 
 def test_create_task_no_warning_on_triage(client, monkeypatch):
     """Triage tasks never get the warning (they can't be dispatched
-    anyway until promoted)."""
+    anyway until promoted).
+    """
     monkeypatch.setattr(
         "hermes_cli.kanban._check_dispatcher_presence",
         lambda: (False, "oh no"),
@@ -1542,7 +1551,6 @@ def test_create_task_probe_error_does_not_break_create(client, monkeypatch):
     assert r.json()["task"]["title"] == "resilient"
 
 
-
 # ---------------------------------------------------------------------------
 # Home-channel subscription endpoints (#19534 follow-up: GUI opt-in)
 # ---------------------------------------------------------------------------
@@ -1569,7 +1577,8 @@ def with_home_channels(monkeypatch):
 
 def test_home_channels_lists_only_platforms_with_home(client, with_home_channels):
     """GET /home-channels returns entries only for platforms where the
-    user has set a home; untoggled-subscribed bool is false by default."""
+    user has set a home; untoggled-subscribed bool is false by default.
+    """
     r = client.get("/api/plugins/kanban/home-channels")
     assert r.status_code == 200
     platforms = {h["platform"] for h in r.json()["home_channels"]}
@@ -1589,7 +1598,8 @@ def test_home_channels_no_task_id_all_unsubscribed(client, with_home_channels):
 
 def test_home_subscribe_creates_notify_sub_row(client, with_home_channels):
     """POST .../home-subscribe/telegram writes a kanban_notify_subs row
-    keyed to the telegram home's (chat_id, thread_id)."""
+    keyed to the telegram home's (chat_id, thread_id).
+    """
     from hermes_cli import kanban_db as kb
     t = client.post("/api/plugins/kanban/tasks", json={"title": "x"}).json()["task"]
 
@@ -1611,7 +1621,8 @@ def test_home_subscribe_creates_notify_sub_row(client, with_home_channels):
 
 def test_home_subscribe_flips_subscribed_flag_in_subsequent_get(client, with_home_channels):
     """After subscribe, the GET endpoint reports subscribed=true for that
-    platform and false for the others."""
+    platform and false for the others.
+    """
     t = client.post("/api/plugins/kanban/tasks", json={"title": "x"}).json()["task"]
     client.post(f"/api/plugins/kanban/tasks/{t['id']}/home-subscribe/telegram")
 
@@ -1776,7 +1787,8 @@ def test_board_surfaces_warnings_field_for_hallucinated_completions(client):
 
 def test_board_warnings_cleared_after_clean_completion(client):
     """A completed or edited event after a hallucination event clears
-    the warning badge — we don't mark tasks permanently."""
+    the warning badge — we don't mark tasks permanently.
+    """
     conn = kb.connect()
     try:
         parent = kb.create_task(conn, title="parent", assignee="alice")
@@ -1811,7 +1823,8 @@ def test_board_warnings_cleared_after_clean_completion(client):
 
 def test_reclaim_endpoint_releases_running_claim(client):
     """POST /tasks/<id>/reclaim drops the claim, returns ok, and emits
-    a manual reclaimed event."""
+    a manual reclaimed event.
+    """
     import secrets
     conn = kb.connect()
     try:
@@ -1918,7 +1931,8 @@ def test_reassign_endpoint_409_on_running_without_reclaim(client):
 
 def test_reassign_endpoint_with_reclaim_first_succeeds_on_running(client):
     """With reclaim_first=true, a running task is reclaimed+reassigned in
-    one call."""
+    one call.
+    """
     import secrets
     conn = kb.connect()
     try:
@@ -1997,7 +2011,8 @@ def test_diagnostics_endpoint_surfaces_blocked_hallucination(client):
 
 def test_diagnostics_endpoint_severity_filter(client):
     """Severity filter is at-or-above: warning includes warning+error+critical,
-    error includes error+critical, critical is exact (no higher level)."""
+    error includes error+critical, critical is exact (no higher level).
+    """
     conn = kb.connect()
     try:
         # A warning-severity diagnostic (prose phantom) on one task.
@@ -2066,7 +2081,8 @@ def test_board_exposes_diagnostics_list_and_summary(client):
 
 def _patch_specifier_response(monkeypatch, *, content, model="test-model"):
     """Helper: install a fake auxiliary client so the specifier endpoint
-    can run without hitting any real provider."""
+    can run without hitting any real provider.
+    """
     from unittest.mock import MagicMock
 
     resp = MagicMock()
@@ -2118,7 +2134,8 @@ def test_specify_happy_path(client, monkeypatch):
 def test_specify_non_triage_returns_ok_false_not_http_error(client, monkeypatch):
     """The endpoint intentionally returns ``{ok: false, reason: ...}`` for
     "task not in triage" rather than a 4xx — the dashboard renders the
-    reason inline so the user can fix it without a page reload."""
+    reason inline so the user can fix it without a page reload.
+    """
     # Create a normal (ready) task — not in triage.
     t = client.post("/api/plugins/kanban/tasks", json={"title": "x"}).json()["task"]
 
@@ -2202,7 +2219,8 @@ def test_dashboard_requests_default_board_explicitly():
 
 def test_dashboard_search_includes_body_and_result():
     """Client-side search must match body, result, latest_summary, and summary
-    so full card contents are findable."""
+    so full card contents are findable.
+    """
     repo_root = Path(__file__).resolve().parents[2]
     dist = (repo_root / "plugins" / "kanban" / "dashboard" / "dist" / "index.js").read_text()
 

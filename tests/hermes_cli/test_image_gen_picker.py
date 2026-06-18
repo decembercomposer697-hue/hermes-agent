@@ -153,7 +153,8 @@ class TestPluginCatalog:
 class TestConfigPrompt:
     def test_image_gen_satisfied_by_plugin_provider(self, monkeypatch, tmp_path):
         """When a plugin provider reports is_available(), the picker should
-        not force a setup prompt on the user."""
+        not force a setup prompt on the user.
+        """
         from hermes_cli import tools_config
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -178,7 +179,8 @@ class TestConfigWriting:
     def test_picking_plugin_provider_writes_provider_and_model(self, monkeypatch, tmp_path):
         """When a user picks a plugin-backed image_gen provider with no
         env vars needed, ``_configure_provider`` should write both
-        ``image_gen.provider`` and ``image_gen.model``."""
+        ``image_gen.provider`` and ``image_gen.model``.
+        """
         from hermes_cli import tools_config
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -205,7 +207,8 @@ class TestConfigWriting:
 
     def test_reconfiguring_plugin_provider_writes_provider_and_model(self, monkeypatch, tmp_path):
         """The reconfigure path should switch image_gen away from managed FAL
-        and onto the selected plugin provider."""
+        and onto the selected plugin provider.
+        """
         from hermes_cli import tools_config
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))

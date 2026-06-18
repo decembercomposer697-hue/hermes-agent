@@ -96,16 +96,17 @@ def detect_service_manager() -> ServiceManagerKind:
     host call sites continue to use that. It exists for new backend-
     agnostic code (profile create/delete hooks, the s6 dispatch path
     in ``hermes gateway start/stop/restart``).
+
     """
     # Imports deferred so importing this module doesn't drag in the
     # whole gateway dependency graph for callers that only need the
     # Protocol type or validate_profile_name().
-    from hermes_constants import is_container
     from hermes_cli.gateway import (
         is_macos,
         is_windows,
         supports_systemd_services,
     )
+    from hermes_constants import is_container
 
     if is_container() and _s6_running():
         return "s6"
@@ -296,6 +297,7 @@ def get_service_manager() -> ServiceManager:
 
     Raises:
         RuntimeError: when no supported backend is available.
+
     """
     kind = detect_service_manager()
     if kind == "systemd":
@@ -736,6 +738,7 @@ class S6ServiceManager:
             GatewayNotRegisteredError: no service directory for ``name``.
             S6CommandError: s6-svc exited non-zero for any other reason
                 (permission denied on the supervise FIFO, timeout, etc.).
+
         """
         self._run_svc("-u", "start", name)
 
@@ -779,6 +782,7 @@ class S6ServiceManager:
         Raises:
             GatewayNotRegisteredError: no service directory for ``name``.
             S6CommandError: s6-svc exited non-zero for any other reason.
+
         """
         pid = self._supervised_pid(name)
         if pid is not None:
@@ -796,6 +800,7 @@ class S6ServiceManager:
         Raises:
             GatewayNotRegisteredError: no service directory for ``name``.
             S6CommandError: s6-svc exited non-zero for any other reason.
+
         """
         self._run_svc("-t", "restart", name)
 
@@ -832,6 +837,7 @@ class S6ServiceManager:
             ValueError: if the profile name is invalid or the service
                 directory already exists.
             RuntimeError: if ``s6-svscanctl`` fails.
+
         """
         import shutil
         import subprocess

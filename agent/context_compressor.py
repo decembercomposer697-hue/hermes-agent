@@ -23,12 +23,12 @@ import re
 import time
 from typing import Any, Dict, List, Optional
 
-from agent.auxiliary_client import call_llm, _is_connection_error
+from agent.auxiliary_client import _is_connection_error, call_llm
 from agent.context_engine import ContextEngine
 from agent.model_metadata import (
     MINIMUM_CONTEXT_LENGTH,
-    get_model_context_length,
     estimate_messages_tokens_rough,
+    get_model_context_length,
 )
 from agent.redact import redact_sensitive_text
 
@@ -1251,6 +1251,7 @@ Summary generation was unavailable, so this is a best-effort deterministic fallb
         Returns None if all attempts fail — the caller should drop
         the middle turns without a summary rather than inject a useless
         placeholder.
+
         """
         now = time.monotonic()
         if now < self._summary_failure_cooldown_until:
@@ -1699,6 +1700,7 @@ The user has requested that this compaction PRIORITISE preserving all informatio
         Examples:
           protect_first_n=0 → system prompt only (or nothing if no system msg)
           protect_first_n=3 → system + first 3 non-system messages
+
         """
         head = 0
         if messages and messages[0].get("role") == "system":
@@ -1927,6 +1929,7 @@ The user has requested that this compaction PRIORITISE preserving all informatio
             force: If True, clear any active summary-failure cooldown before
                 running so a manual ``/compress`` can retry immediately after
                 an auto-compression abort.  Auto-compress callers pass False.
+
         """
         # Reset per-call summary failure state — callers inspect these fields
         # after compress() returns to decide whether to surface a warning.

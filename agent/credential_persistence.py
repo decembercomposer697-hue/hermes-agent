@@ -11,9 +11,8 @@ from __future__ import annotations
 
 import hashlib
 import re
-from typing import Any, Dict
 from collections.abc import Mapping
-
+from typing import Any, Dict
 
 # Sources Hermes owns and can intentionally persist in auth.json.  Everything
 # else with a non-empty source is treated as borrowed/reference-only by default

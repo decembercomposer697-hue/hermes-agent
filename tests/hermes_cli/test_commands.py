@@ -4,17 +4,17 @@ from prompt_toolkit.completion import CompleteEvent
 from prompt_toolkit.document import Document
 
 from hermes_cli.commands import (
-    COMMAND_REGISTRY,
-    COMMANDS,
-    COMMANDS_BY_CATEGORY,
-    CommandDef,
-    GATEWAY_KNOWN_COMMANDS,
-    SUBCOMMANDS,
-    SlashCommandAutoSuggest,
-    SlashCommandCompleter,
     _CMD_NAME_LIMIT,
     _SLACK_RESERVED_COMMANDS,
     _TG_NAME_LIMIT,
+    COMMAND_REGISTRY,
+    COMMANDS,
+    COMMANDS_BY_CATEGORY,
+    GATEWAY_KNOWN_COMMANDS,
+    SUBCOMMANDS,
+    CommandDef,
+    SlashCommandAutoSuggest,
+    SlashCommandCompleter,
     _clamp_command_names,
     _clamp_telegram_names,
     _sanitize_telegram_name,
@@ -205,7 +205,7 @@ class TestGatewayHelpLines:
         for cmd in COMMAND_REGISTRY:
             if cmd.cli_only and not cmd.gateway_config_gate:
                 # Word-boundary match so `/reload` doesn't match `/reload-mcp`
-                pattern = rf'`/{re.escape(cmd.name)}(?![-_\w])'
+                pattern = rf"`/{re.escape(cmd.name)}(?![-_\w])"
                 assert not re.search(pattern, joined), \
                     f"cli_only command /{cmd.name} should not be in gateway help"
 
@@ -246,7 +246,8 @@ class TestTelegramBotCommands:
     def test_includes_builtin_commands_with_required_args(self):
         """Built-in arg-taking commands (e.g. /queue, /steer, /background)
         are now included because their handlers return usage text when
-        invoked without arguments — issue #24312."""
+        invoked without arguments — issue #24312.
+        """
         names = {name for name, _ in telegram_bot_commands()}
         assert "background" in names
         assert "queue" in names
@@ -284,7 +285,8 @@ class TestSlackSubcommandMap:
 class TestSlackNativeSlashes:
     """Slack native slash command generation — used to register every
     COMMAND_REGISTRY entry as a first-class Slack slash, matching Discord
-    and Telegram."""
+    and Telegram.
+    """
 
     def test_returns_triples(self):
         slashes = slack_native_slashes()
@@ -299,7 +301,8 @@ class TestSlackNativeSlashes:
     def test_hermes_catchall_is_first(self):
         """``/hermes`` must be reserved as the first slot so the legacy
         ``/hermes <subcommand>`` form keeps working after we add new
-        commands and hit the 50-slash cap."""
+        commands and hit the 50-slash cap.
+        """
         slashes = slack_native_slashes()
         assert slashes[0][0] == "hermes"
 
@@ -328,7 +331,8 @@ class TestSlackNativeSlashes:
     def test_excludes_slack_reserved_commands(self):
         """Slack built-in commands (e.g. /status, /me, /join) cannot be
         registered by apps and must be excluded from the manifest.
-        Users can still reach them via /hermes <command>."""
+        Users can still reach them via /hermes <command>.
+        """
         names = {n for n, _d, _h in slack_native_slashes()}
         for reserved in _SLACK_RESERVED_COMMANDS:
             assert reserved not in names, (
@@ -370,6 +374,7 @@ class TestSlackNativeSlashes:
         tg_names = {n for n, _d in telegram_bot_commands()}
         # Some Telegram names have underscores where Slack uses hyphens
         # (e.g. set_home vs sethome). Normalize both sides for comparison.
+
         def _norm(s: str) -> str:
             return s.replace("-", "_").replace("__", "_").strip("_")
 
@@ -403,7 +408,8 @@ class TestSlackAppManifest:
 
     def test_btw_is_in_manifest(self):
         """Regression: /btw must be a native Slack slash, not just a
-        /hermes subcommand."""
+        /hermes subcommand.
+        """
         m = slack_app_manifest()
         commands = [c["command"] for c in m["features"]["slash_commands"]]
         assert "/btw" in commands
@@ -1150,6 +1156,7 @@ class TestTelegramMenuCommands:
     def test_includes_plugin_commands_via_lazy_discovery(self, tmp_path, monkeypatch):
         """Telegram menu generation should discover plugin slash commands on first access."""
         from unittest.mock import patch
+
         import hermes_cli.plugins as plugins_mod
 
         plugin_dir = tmp_path / "plugins" / "cmd-plugin"
@@ -1283,8 +1290,8 @@ class TestTelegramMenuCommands:
 
     def test_special_chars_in_skill_names_sanitized(self, tmp_path, monkeypatch):
         """Skills with +, /, or other special chars produce valid Telegram names."""
-        from unittest.mock import patch
         import re
+        from unittest.mock import patch
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 

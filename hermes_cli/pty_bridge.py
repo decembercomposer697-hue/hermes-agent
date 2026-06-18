@@ -37,8 +37,8 @@ import struct
 import sys
 import termios
 import time
-from typing import Optional
 from collections.abc import Sequence
+from typing import Optional
 
 try:
     import ptyprocess  # type: ignore
@@ -179,6 +179,7 @@ class PtyBridge:
 
         Never blocks longer than ``timeout`` seconds.  Safe to call after
         :meth:`close`; returns ``None`` in that case.
+
         """
         if self._closed:
             return None

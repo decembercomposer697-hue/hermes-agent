@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Image Generation Tools Module
+"""Image Generation Tools Module
 
 Provides image generation via FAL.ai. Multiple FAL models are supported and
 selectable via ``hermes tools`` → Image Generation; the active model is
@@ -20,10 +19,10 @@ Pricing shown in UI strings is as-of the initial commit; we accept drift and
 update when it's noticed.
 """
 
+import datetime
 import json
 import logging
 import os
-import datetime
 import threading
 import uuid
 from typing import Any, Dict, Optional
@@ -58,8 +57,8 @@ def _load_fal_client() -> Any:
 
 from tools.debug_helpers import DebugSession
 from tools.fal_common import (
-    _ManagedFalSyncClient,
     _extract_http_status,
+    _ManagedFalSyncClient,
     _normalize_fal_queue_url_format,
 )
 from tools.managed_tool_gateway import resolve_managed_tool_gateway
@@ -400,7 +399,8 @@ _managed_fal_client_lock = threading.Lock()
 # ---------------------------------------------------------------------------
 def _resolve_managed_fal_gateway():
     """Return managed fal-queue gateway config when the user prefers the gateway
-    or direct FAL credentials are absent."""
+    or direct FAL credentials are absent.
+    """
     if fal_key_is_configured() and not prefers_gateway("image_gen"):
         return None
     return resolve_managed_tool_gateway("fal-queue")

@@ -1,5 +1,4 @@
-"""
-Tests for MEDIA tag extraction from tool results.
+"""Tests for MEDIA tag extraction from tool results.
 
 Verifies that MEDIA tags (e.g., from TTS tool) are only extracted from
 messages in the CURRENT turn, not from the full conversation history.
@@ -11,13 +10,13 @@ make_image tool several turns earlier must not leak onto a later
 text-only reply, even when the path-based dedup set fails to capture it.
 """
 
-import pytest
 import re
+
+import pytest
 
 
 def extract_media_tags_fixed(result_messages, history_len):
-    """
-    Extract MEDIA tags from tool results, but ONLY from new messages
+    """Extract MEDIA tags from tool results, but ONLY from new messages
     (those added after history_len). This is the fixed behavior.
     
     Args:
@@ -26,6 +25,7 @@ def extract_media_tags_fixed(result_messages, history_len):
         
     Returns:
         Tuple of (media_tags list, has_voice_directive bool)
+
     """
     media_tags = []
     has_voice_directive = False
@@ -37,7 +37,7 @@ def extract_media_tags_fixed(result_messages, history_len):
         if msg.get("role") == "tool" or msg.get("role") == "function":
             content = msg.get("content", "")
             if "MEDIA:" in content:
-                for match in re.finditer(r'MEDIA:(\S+)', content):
+                for match in re.finditer(r"MEDIA:(\S+)", content):
                     path = match.group(1).strip().rstrip('",}')
                     if path:
                         media_tags.append(f"MEDIA:{path}")
@@ -68,7 +68,7 @@ def extract_media_tags_production(result_messages, history_len, history_media_pa
         if msg.get("role") == "tool" or msg.get("role") == "function":
             content = msg.get("content", "")
             if "MEDIA:" in content:
-                for match in re.finditer(r'MEDIA:(\S+)', content):
+                for match in re.finditer(r"MEDIA:(\S+)", content):
                     path = match.group(1).strip().rstrip('",}')
                     if path and path not in history_media_paths:
                         media_tags.append(f"MEDIA:{path}")
@@ -79,8 +79,7 @@ def extract_media_tags_production(result_messages, history_len, history_media_pa
 
 
 def extract_media_tags_broken(result_messages):
-    """
-    The BROKEN behavior: extract MEDIA tags from ALL messages including history.
+    """The BROKEN behavior: extract MEDIA tags from ALL messages including history.
     This causes TTS voice messages to accumulate and be re-sent on every reply.
     """
     media_tags = []
@@ -90,7 +89,7 @@ def extract_media_tags_broken(result_messages):
         if msg.get("role") == "tool" or msg.get("role") == "function":
             content = msg.get("content", "")
             if "MEDIA:" in content:
-                for match in re.finditer(r'MEDIA:(\S+)', content):
+                for match in re.finditer(r"MEDIA:(\S+)", content):
                     path = match.group(1).strip().rstrip('",}')
                     if path:
                         media_tags.append(f"MEDIA:{path}")
@@ -162,7 +161,8 @@ caption
 
     def test_gateway_auto_append_image_generate_json_path(self):
         """image_generate returns a local path in JSON (no MEDIA: tag); it is
-        auto-appended so delivery doesn't depend on the model restating it."""
+        auto-appended so delivery doesn't depend on the model restating it.
+        """
         from gateway.run import _collect_auto_append_media_tags
 
         messages = [
@@ -318,13 +318,13 @@ caption
         # History with multiple TTS calls
         history = [
             {"role": "user", "content": "Say hello"},
-            {"role": "tool", "tool_call_id": "1", "content": 'MEDIA:/audio/hello.ogg'},
+            {"role": "tool", "tool_call_id": "1", "content": "MEDIA:/audio/hello.ogg"},
             {"role": "assistant", "content": "Done!"},
             {"role": "user", "content": "Say goodbye"},
-            {"role": "tool", "tool_call_id": "2", "content": 'MEDIA:/audio/goodbye.ogg'},
+            {"role": "tool", "tool_call_id": "2", "content": "MEDIA:/audio/goodbye.ogg"},
             {"role": "assistant", "content": "Done!"},
             {"role": "user", "content": "Say thanks"},
-            {"role": "tool", "tool_call_id": "3", "content": 'MEDIA:/audio/thanks.ogg'},
+            {"role": "tool", "tool_call_id": "3", "content": "MEDIA:/audio/thanks.ogg"},
             {"role": "assistant", "content": "Done!"},
         ]
         
@@ -352,9 +352,9 @@ caption
         # Current turn with multiple tool calls producing same media
         new_messages = [
             {"role": "user", "content": "Multiple TTS"},
-            {"role": "tool", "tool_call_id": "1", "content": 'MEDIA:/audio/same.ogg'},
-            {"role": "tool", "tool_call_id": "2", "content": 'MEDIA:/audio/same.ogg'},  # duplicate
-            {"role": "tool", "tool_call_id": "3", "content": 'MEDIA:/audio/different.ogg'},
+            {"role": "tool", "tool_call_id": "1", "content": "MEDIA:/audio/same.ogg"},
+            {"role": "tool", "tool_call_id": "2", "content": "MEDIA:/audio/same.ogg"},  # duplicate
+            {"role": "tool", "tool_call_id": "3", "content": "MEDIA:/audio/different.ogg"},
             {"role": "assistant", "content": "Done!"},
         ]
         
@@ -449,7 +449,8 @@ class TestStaleToolMediaLeak:
     def test_compression_shrink_falls_back_to_path_dedup(self):
         """When the list is shorter than history_len (mid-run compression),
         fall back to scanning everything with path-based dedup so the #160
-        compression-safe guarantee is preserved."""
+        compression-safe guarantee is preserved.
+        """
         # Post-compression list is shorter than the original history length.
         compressed_messages = [
             {"role": "user", "content": "summary so far..."},

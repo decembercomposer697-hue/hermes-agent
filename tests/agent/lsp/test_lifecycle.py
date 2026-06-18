@@ -33,7 +33,8 @@ def test_get_service_registers_atexit_handler_once(monkeypatch):
     """First call to ``get_service`` must register an atexit handler;
     subsequent calls must NOT register another one (Python's ``atexit``
     runs every registered callable, so a duplicate would shutdown
-    twice — harmless but wasteful)."""
+    twice — harmless but wasteful).
+    """
     fake_svc = MagicMock()
     fake_svc.is_active.return_value = True
     monkeypatch.setattr(
@@ -62,7 +63,8 @@ def test_get_service_registers_atexit_handler_once(monkeypatch):
 def test_atexit_shutdown_calls_shutdown_service(monkeypatch):
     """The atexit-registered wrapper invokes ``shutdown_service`` and
     swallows any exception — by the time atexit fires, the user has
-    already seen the response and a noisy traceback would be clutter."""
+    already seen the response and a noisy traceback would be clutter.
+    """
     called = []
     monkeypatch.setattr(
         lsp_module, "shutdown_service", lambda: called.append("shutdown"),
@@ -82,7 +84,8 @@ def test_atexit_shutdown_swallows_exceptions(monkeypatch):
 
 def test_shutdown_service_idempotent(monkeypatch):
     """Calling shutdown twice must be safe — first call cleans up,
-    second call no-ops (nothing to shut down)."""
+    second call no-ops (nothing to shut down).
+    """
     fake_svc = MagicMock()
     fake_svc.is_active.return_value = True
     fake_svc.shutdown = MagicMock()
@@ -105,7 +108,8 @@ def test_shutdown_service_no_op_when_never_started():
 
 def test_shutdown_service_swallows_exception(monkeypatch):
     """An exception during ``svc.shutdown()`` must not propagate —
-    the caller (often atexit) has nothing useful to do with it."""
+    the caller (often atexit) has nothing useful to do with it.
+    """
     fake_svc = MagicMock()
     fake_svc.is_active.return_value = True
     fake_svc.shutdown = MagicMock(side_effect=RuntimeError("kill -9 already"))
@@ -120,7 +124,8 @@ def test_shutdown_service_swallows_exception(monkeypatch):
 
 def test_get_service_returns_none_for_inactive_service(monkeypatch):
     """A service whose ``is_active()`` returns False is treated as
-    not running — callers see ``None`` and fall back."""
+    not running — callers see ``None`` and fall back.
+    """
     fake_svc = MagicMock()
     fake_svc.is_active.return_value = False
     monkeypatch.setattr(

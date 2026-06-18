@@ -16,11 +16,11 @@ import pytest
 
 from hermes_cli.profile_distribution import (
     DEFAULT_DIST_OWNED,
+    MANIFEST_FILENAME,
+    USER_OWNED_EXCLUDE,
     DistributionError,
     DistributionManifest,
     EnvRequirement,
-    MANIFEST_FILENAME,
-    USER_OWNED_EXCLUDE,
     _env_template_from_manifest,
     _looks_like_git_url,
     _parse_semver,
@@ -32,7 +32,6 @@ from hermes_cli.profile_distribution import (
     update_distribution,
     write_manifest,
 )
-
 
 # ---------------------------------------------------------------------------
 # Isolated profile env (matches tests/hermes_cli/test_profiles.py)
@@ -466,7 +465,8 @@ class TestSecurity:
 
     def test_install_does_not_import_credentials_from_staging(self, profile_env):
         """If an author accidentally ships auth.json or .env in their
-        staging dir, the installer must NOT copy them to the target profile."""
+        staging dir, the installer must NOT copy them to the target profile.
+        """
         staged = _make_staging_dir(profile_env, "src")
         # Author leaks credentials into the staging tree (shouldn't happen, but...)
         (staged / "auth.json").write_text('{"leaked": true}')
@@ -506,7 +506,8 @@ class TestNestedUserOwnedExcludeNotFiltered:
 
     def test_nested_bin_dir_is_preserved(self, profile_env):
         """"A distribution shipping tools/bin/ must not have tools/bin/ dropped
-        during install even though 'bin' is in USER_OWNED_EXCLUDE."""
+        during install even though 'bin' is in USER_OWNED_EXCLUDE.
+        """
         staged = _make_staging_dir(profile_env, "src")
         (staged / "tools" / "bin").mkdir(parents=True)
         (staged / "tools" / "bin" / "tool.py").write_text("# tool\n")
@@ -539,7 +540,8 @@ class TestNestedUserOwnedExcludeNotFiltered:
 
         Note: _bootstrap_user_dirs creates some of these (logs/, sessions/,
         memories/) in every fresh profile, so we check that the *staged content*
-        did not leak through rather than asserting the directory doesn't exist."""
+        did not leak through rather than asserting the directory doesn't exist.
+        """
         staged = _make_staging_dir(profile_env, "src")
         # Add top-level excluded entries alongside the legit ones
         (staged / "bin").mkdir(exist_ok=True)
@@ -595,6 +597,7 @@ class TestInstalledAtStamp:
         # update writes a NEW stamp (installs within the same second otherwise
         # collide at iso-8601 seconds resolution).
         import datetime as _dt
+
         class _FakeDT(_dt.datetime):
             @classmethod
             def now(cls, tz=None):
@@ -640,7 +643,7 @@ class TestProfileInfoDistribution:
         assert rows["plain"].distribution_version is None
 
     def test_malformed_manifest_does_not_break_list(self, profile_env):
-        from hermes_cli.profiles import create_profile, list_profiles, get_profile_dir
+        from hermes_cli.profiles import create_profile, get_profile_dir, list_profiles
         create_profile(name="brokenmeta", no_alias=True)
         # Write a distribution.yaml that isn't a valid mapping
         (get_profile_dir("brokenmeta") / "distribution.yaml").write_text(

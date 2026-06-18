@@ -93,7 +93,8 @@ class TestMaybeApplyCodexAppServerRuntime:
     )
     def test_other_providers_never_rerouted(self, provider) -> None:
         """Non-OpenAI providers MUST NOT be rerouted even with the flag set —
-        codex's app-server can only run OpenAI/Codex auth flows."""
+        codex's app-server can only run OpenAI/Codex auth flows.
+        """
         got = _maybe_apply_codex_app_server_runtime(
             provider=provider,
             api_mode="anthropic_messages",
@@ -159,8 +160,10 @@ class TestSpawnEnvIsolation:
 
     def test_spawn_env_preserves_HOME(self, monkeypatch):
         """The spawn env must contain the parent process's HOME unchanged.
-        Verifies via a subprocess-monkey-patch."""
+        Verifies via a subprocess-monkey-patch.
+        """
         import subprocess
+
         from agent.transports import codex_app_server as cas
 
         captured = {}
@@ -203,8 +206,10 @@ class TestSpawnEnvIsolation:
 
     def test_spawn_env_sets_CODEX_HOME_when_provided(self, monkeypatch):
         """CODEX_HOME isolation must still work — that's the whole point
-        of the codex_home arg."""
+        of the codex_home arg.
+        """
         import subprocess
+
         from agent.transports import codex_app_server as cas
 
         captured = {}
@@ -249,6 +254,7 @@ class TestSpawnEnvIsolation:
         for the Kanban root only.
         """
         import subprocess
+
         from agent.transports import codex_app_server as cas
 
         captured = {}

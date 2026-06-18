@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Vision Tools Module
+"""Vision Tools Module
 
 This module provides vision analysis tools that work with image URLs.
 Uses the centralized auxiliary vision router, which can select OpenRouter,
@@ -32,21 +31,24 @@ import base64
 import json
 import logging
 import os
+import sys
 import uuid
+from collections.abc import Awaitable
 from pathlib import Path
 from typing import Any, Dict, Optional
-from collections.abc import Awaitable
 from urllib.parse import urlparse
+
 import httpx
+
 from agent.auxiliary_client import async_call_llm, extract_content_or_reasoning
 from hermes_constants import get_hermes_dir
 from tools.debug_helpers import DebugSession
 from tools.website_policy import check_website_access
-import sys
 
 logger = logging.getLogger(__name__)
 
 _debug = DebugSession("vision_tools", env_var="VISION_TOOLS_DEBUG")
+
 
 # Configurable HTTP download timeout for _download_image().
 # Separate from auxiliary.vision.timeout which governs the LLM API call.
@@ -154,8 +156,7 @@ def _is_retryable_download_error(error: Exception) -> bool:
 
 
 async def _download_image(image_url: str, destination: Path, max_retries: int = 3) -> Path:
-    """
-    Download an image from a URL to a local destination (async) with retry logic.
+    """Download an image from a URL to a local destination (async) with retry logic.
     
     Args:
         image_url (str): The URL of the image to download
@@ -167,6 +168,7 @@ async def _download_image(image_url: str, destination: Path, max_retries: int = 
         
     Raises:
         Exception: If download fails after all retries
+
     """
     import asyncio
     
@@ -265,31 +267,30 @@ async def _download_image(image_url: str, destination: Path, max_retries: int = 
 
 
 def _determine_mime_type(image_path: Path) -> str:
-    """
-    Determine the MIME type of an image based on its file extension.
+    """Determine the MIME type of an image based on its file extension.
     
     Args:
         image_path (Path): Path to the image file
         
     Returns:
         str: The MIME type (defaults to image/jpeg if unknown)
+
     """
     extension = image_path.suffix.lower()
     mime_types = {
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.png': 'image/png',
-        '.gif': 'image/gif',
-        '.bmp': 'image/bmp',
-        '.webp': 'image/webp',
-        '.svg': 'image/svg+xml',
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".gif": "image/gif",
+        ".bmp": "image/bmp",
+        ".webp": "image/webp",
+        ".svg": "image/svg+xml",
     }
-    return mime_types.get(extension, 'image/jpeg')
+    return mime_types.get(extension, "image/jpeg")
 
 
 def _image_to_base64_data_url(image_path: Path, mime_type: str | None = None) -> str:
-    """
-    Convert an image file to a base64-encoded data URL.
+    """Convert an image file to a base64-encoded data URL.
     
     Args:
         image_path (Path): Path to the image file
@@ -297,6 +298,7 @@ def _image_to_base64_data_url(image_path: Path, mime_type: str | None = None) ->
         
     Returns:
         str: Base64-encoded data URL (e.g., "data:image/jpeg;base64,...")
+
     """
     # Read the image as bytes
     data = image_path.read_bytes()
@@ -386,6 +388,7 @@ def _resize_image_for_vision(image_path: Path, mime_type: str | None = None,
             of the 5 MB byte cap.
 
     Returns the base64 data URL string.
+
     """
     # Quick file-size estimate: base64 expands by ~4/3, plus data URL header.
     # Skip the expensive full-read + encode if Pillow can resize directly.
@@ -414,8 +417,9 @@ def _resize_image_for_vision(image_path: Path, mime_type: str | None = None,
 
     # Attempt auto-resize with Pillow (soft dependency)
     try:
-        from PIL import Image
         import io as _io
+
+        from PIL import Image
     except ImportError:
         # Pillow is a lazy-installable soft dependency. Try a best-effort
         # install (respects security.allow_lazy_installs; no-op if disabled or
@@ -428,8 +432,9 @@ def _resize_image_for_vision(image_path: Path, mime_type: str | None = None,
             # input() deadlocks the terminal (#40490). The install is already
             # gated by security.allow_lazy_installs, so reaching here is opt-in.
             _ensure_dep("tool.vision", prompt=False)
-            from PIL import Image
             import io as _io
+
+            from PIL import Image
         except Exception:
             logger.info("Pillow not installed — cannot auto-resize oversized image")
             if data_url is None:
@@ -613,8 +618,8 @@ def _should_use_native_vision_fast_path() -> bool:
     the caller falls back to the legacy aux-LLM path.
     """
     try:
-        from agent.auxiliary_client import _read_main_provider, _read_main_model
-        from agent.image_routing import decide_image_input_mode, _lookup_supports_vision
+        from agent.auxiliary_client import _read_main_model, _read_main_provider
+        from agent.image_routing import _lookup_supports_vision, decide_image_input_mode
         from hermes_cli.config import load_config
 
         provider = _read_main_provider()
@@ -701,6 +706,7 @@ async def _vision_analyze_native(
         A ``_multimodal`` envelope dict on success.
         A JSON error string on failure (matches the existing tool-result
         contract so the agent loop displays errors normally).
+
     """
     if not isinstance(image_url, str) or not image_url.strip():
         return tool_error("image_url is required", success=False)
@@ -804,8 +810,7 @@ async def vision_analyze_tool(
     user_prompt: str,
     model: str = None,
 ) -> str:
-    """
-    Analyze an image from a URL or local file path using vision AI.
+    """Analyze an image from a URL or local file path using vision AI.
     
     This tool accepts either an HTTP/HTTPS URL or a local file path. For URLs,
     it downloads the image first. In both cases, the image is converted to base64
@@ -835,6 +840,7 @@ async def vision_analyze_tool(
         - For URLs, temporary images are stored under $HERMES_HOME/cache/vision/ and cleaned up
         - For local file paths, the file is used directly and NOT deleted
         - Supports common image formats (JPEG, PNG, GIF, WebP, etc.)
+
     """
     if not isinstance(user_prompt, str):
         user_prompt = str(user_prompt) if user_prompt is not None else ""
@@ -1106,7 +1112,6 @@ def check_vision_requirements() -> bool:
         return client is not None
     except Exception:
         return False
-
 
 
 if __name__ == "__main__":

@@ -154,7 +154,8 @@ def test_anthropic_client_rebuild_failure_rolls_back_to_original_state():
 
 def test_cross_branch_anthropic_to_openai_rebuild_failure_rolls_back():
     """Switching from anthropic_messages to chat_completions: failure must
-    restore the anthropic state, not leave the agent half-converted."""
+    restore the anthropic state, not leave the agent half-converted.
+    """
     agent = _make_agent_anthropic()
 
     original_anthropic_client = agent._anthropic_client

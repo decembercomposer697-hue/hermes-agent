@@ -71,7 +71,8 @@ def _sk(chat_id="42"):
 def _count_pmb_frames() -> int:
     """Walk the current call stack and count nested
     ``_process_message_background`` frames.  Used to detect recursive
-    in-band drains."""
+    in-band drains.
+    """
     f = sys._getframe()
     n = 0
     while f is not None:
@@ -208,7 +209,8 @@ async def test_normal_path_releases_session_guard():
     conditional.  For the 99%-common case (no pending message, no
     handoff) ``current_task`` IS the stored task, so the guard must
     still fire.  This test would fail if the conditional were ever
-    tightened in a way that dropped the normal path."""
+    tightened in a way that dropped the normal path.
+    """
     adapter = _make_adapter()
     sk = _sk()
 
@@ -248,7 +250,8 @@ async def test_drain_task_cancellation_releases_session():
     the drain task; the drain task's ``except asyncio.CancelledError``
     branch must then own the cleanup.  Without this test a future
     refactor could move cancellation handling in a way that leaves
-    the session permanently pinned as busy after a cancel."""
+    the session permanently pinned as busy after a cancel.
+    """
     adapter = _make_adapter()
     sk = _sk()
 
@@ -313,7 +316,8 @@ async def test_late_arrival_drain_still_fires_when_no_in_band_drain():
     Queue a pending message *after* M0's handler returns (so the
     in-band drain block sees nothing) but *before* ``finally`` runs
     the late-arrival check — we do this by hooking ``_stop_typing``,
-    which runs in finally before the late-arrival check."""
+    which runs in finally before the late-arrival check.
+    """
     adapter = _make_adapter()
     sk = _sk()
 

@@ -139,7 +139,8 @@ class TestCmdSetupLocalJwt:
     def test_local_setup_stores_jwt_under_host_block(self, monkeypatch, tmp_path):
         """Self-hosted users supplying a JWT must have it written under hosts.<host>.apiKey,
         not as the top-level cloud apiKey, so cloud/hybrid switching is preserved and
-        get_honcho_client treats it as an explicit local auth opt-in."""
+        get_honcho_client treats it as an explicit local auth opt-in.
+        """
         cfg = self._run_setup(
             monkeypatch,
             tmp_path,
@@ -160,7 +161,8 @@ class TestCmdSetupLocalJwt:
 
     def test_local_setup_blank_jwt_keeps_local_no_auth(self, monkeypatch, tmp_path):
         """Blank JWT prompt response on a fresh local config must not introduce an apiKey
-        anywhere (local no-auth Honcho deployments must still work out of the box)."""
+        anywhere (local no-auth Honcho deployments must still work out of the box).
+        """
         cfg = self._run_setup(
             monkeypatch,
             tmp_path,
@@ -252,6 +254,7 @@ class TestCloneHonchoForProfile:
         monkeypatch.setattr(honcho_cli, "_local_config_path", lambda: cfg_path)
         monkeypatch.setattr(honcho_cli, "_ensure_peer_exists", lambda host_key=None: True)
         written = {}
+
         def _write(c, path=None):
             written["cfg"] = c
         monkeypatch.setattr(honcho_cli, "_write_config", _write)
@@ -380,6 +383,7 @@ class TestSetupWizardDeploymentShape:
 
         # Scripted _prompt: pop answers in order. Default-return for unconsumed prompts.
         answer_iter = iter(answers)
+
         def _scripted_prompt(label, default=None, secret=False):
             try:
                 return next(answer_iter)

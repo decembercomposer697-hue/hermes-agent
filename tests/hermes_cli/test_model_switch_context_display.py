@@ -77,7 +77,8 @@ class TestResolveDisplayContextLength:
 
     def test_prefers_resolver_even_when_model_info_has_larger_value(self):
         """Invariant: provider-aware resolver is authoritative, even if models.dev
-        reports a bigger window."""
+        reports a bigger window.
+        """
         fake_mi = _FakeModelInfo(2_000_000)
         with patch(
             "agent.model_metadata.get_model_context_length", return_value=128_000,
@@ -104,6 +105,7 @@ class TestResolveDisplayContextLength:
         # Real resolver call — no mock — so the override path is exercised
         # through agent.model_metadata.get_model_context_length.
         from unittest.mock import patch as _p
+
         from agent import model_metadata as _mm
         with _p.object(_mm, "get_cached_context_length", return_value=None), \
              _p.object(_mm, "fetch_endpoint_model_metadata", return_value={}), \
@@ -133,6 +135,7 @@ class TestResolveDisplayContextLength:
             },
         ]
         from unittest.mock import patch as _p
+
         from agent import model_metadata as _mm
         with _p.object(_mm, "get_cached_context_length", return_value=None), \
              _p.object(_mm, "fetch_endpoint_model_metadata", return_value={}), \

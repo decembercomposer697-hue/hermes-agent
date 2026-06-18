@@ -1,5 +1,4 @@
-"""
-Browser Provider ABC
+"""Browser Provider ABC
 ====================
 
 Defines the pluggable-backend interface for cloud browser providers
@@ -39,7 +38,6 @@ from __future__ import annotations
 
 import abc
 from typing import Any, Dict
-
 
 # ---------------------------------------------------------------------------
 # ABC

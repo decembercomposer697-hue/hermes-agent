@@ -23,16 +23,15 @@ class CLIAgentSetupMixin:
     """Agent construction + session-resume display methods for ``HermesCLI``."""
 
     def _ensure_runtime_credentials(self) -> bool:
-        """
-        Ensure runtime credentials are resolved before agent use.
+        """Ensure runtime credentials are resolved before agent use.
         Re-resolves provider credentials so key rotation and token refresh
         are picked up without restarting the CLI.
         Returns True if credentials are ready, False on auth failure.
         """
         from cli import ChatConsole, _cprint, logger
         from hermes_cli.runtime_provider import (
-            resolve_runtime_provider,
             format_runtime_provider_error,
+            resolve_runtime_provider,
         )
 
         _primary_exc = None
@@ -216,14 +215,23 @@ class CLIAgentSetupMixin:
         return route
 
     def _init_agent(self, *, model_override: str = None, runtime_override: dict = None, request_overrides: dict | None = None) -> bool:
-        """
-        Initialize the agent on first use.
+        """Initialize the agent on first use.
         When resuming a session, restores conversation history from SQLite.
         
         Returns:
             bool: True if successful, False otherwise
+
         """
-        from cli import AIAgent, ChatConsole, _DIM, _RST, _accent_hex, _cprint, _prepare_deferred_agent_startup, logger
+        from cli import (
+            _DIM,
+            _RST,
+            AIAgent,
+            ChatConsole,
+            _accent_hex,
+            _cprint,
+            _prepare_deferred_agent_startup,
+            logger,
+        )
         if self.agent is not None:
             return True
 
@@ -520,7 +528,12 @@ class CLIAgentSetupMixin:
         last ``MAX_DISPLAY_EXCHANGES`` user/assistant exchanges and shows
         an indicator for earlier hidden messages.
         """
-        from cli import CLI_CONFIG, _record_output_history_entry, _strip_reasoning_tags, _suspend_output_history
+        from cli import (
+            CLI_CONFIG,
+            _record_output_history_entry,
+            _strip_reasoning_tags,
+            _suspend_output_history,
+        )
         if not self.conversation_history:
             return
 

@@ -20,7 +20,6 @@ from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import BasePlatformAdapter, MessageEvent, MessageType
 from gateway.session import SessionSource, build_session_key
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -281,7 +280,8 @@ class TestAllResolvableCommandsBypassGuard:
     """Every recognized slash command must bypass the Level-1 active-session
     guard. Without this, commands the user fires mid-run interrupt the agent
     AND get silently discarded by the slash-command safety net (zero-char
-    response)."""
+    response).
+    """
 
     @pytest.mark.parametrize(
         "command_text,canonical",
@@ -403,7 +403,8 @@ class TestNoActiveSessionNormalDispatch:
     @pytest.mark.asyncio
     async def test_stop_when_no_session_active(self):
         """/stop without an active session spawns a background task
-        (the Level 2 handler will return 'No active task')."""
+        (the Level 2 handler will return 'No active task').
+        """
         adapter = _make_adapter()
         sk = _session_key()
 
@@ -424,11 +425,13 @@ class TestNoActiveSessionNormalDispatch:
 
 class TestPendingCommandSafetyNet:
     """The safety net in gateway/run.py _run_agent must discard command text
-    that leaks into the pending queue via interrupt_message fallback."""
+    that leaks into the pending queue via interrupt_message fallback.
+    """
 
     def test_stop_command_detected(self):
         """resolve_command must recognize /stop so the safety net can
-        discard it."""
+        discard it.
+        """
         from hermes_cli.commands import resolve_command
 
         assert resolve_command("stop") is not None

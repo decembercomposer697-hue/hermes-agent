@@ -62,7 +62,8 @@ class TestKimiReasoningWireShape:
     @pytest.mark.parametrize("effort", ["", "garbage", "xhigh", "max"])
     def test_unrecognized_effort_falls_back_to_thinking(self, kimi_profile, effort):
         """Unknown/strong efforts aren't in Moonshot's low|medium|high set, so
-        we drop to the thinking toggle rather than sending an invalid effort."""
+        we drop to the thinking toggle rather than sending an invalid effort.
+        """
         extra_body, top_level = kimi_profile.build_api_kwargs_extras(
             reasoning_config={"enabled": True, "effort": effort},
         )

@@ -1,5 +1,4 @@
-"""
-Session mirroring for cross-platform message delivery.
+"""Session mirroring for cross-platform message delivery.
 
 When a message is sent to a platform (via send_message or cron delivery),
 this module appends a "delivery-mirror" record to the target session's
@@ -30,8 +29,7 @@ def mirror_to_session(
     thread_id: str | None = None,
     user_id: str | None = None,
 ) -> bool:
-    """
-    Append a delivery-mirror message to the target session's transcript.
+    """Append a delivery-mirror message to the target session's transcript.
 
     Finds the gateway session that matches the given platform + chat_id,
     then writes a mirror entry to both the JSONL transcript and SQLite DB.
@@ -87,8 +85,7 @@ def _find_session_id(
     thread_id: str | None = None,
     user_id: str | None = None,
 ) -> str | None:
-    """
-    Find the active session_id for a platform + chat_id pair.
+    """Find the active session_id for a platform + chat_id pair.
 
     Scans sessions.json entries and matches where origin.chat_id == chat_id
     on the right platform.  DM session keys don't embed the chat_id
@@ -147,7 +144,6 @@ def _find_session_id(
 
     best_entry = max(candidates, key=lambda entry: entry.get("updated_at", ""))
     return best_entry.get("session_id")
-
 
 
 def _append_to_sqlite(session_id: str, message: dict) -> None:

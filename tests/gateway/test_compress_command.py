@@ -135,7 +135,8 @@ async def test_compress_command_appends_warning_when_compression_aborts():
     messages unchanged), /compress must append a visible ⚠️ warning to its
     reply telling the user nothing was dropped and how to retry. Otherwise
     the failure is silently logged and the user has no idea why nothing
-    happened."""
+    happened.
+    """
     history = _make_history()
     # Abort path: compressor returns the input messages unchanged.
     compressed = list(history)
@@ -189,7 +190,8 @@ async def test_compress_command_surfaces_aux_model_failure_even_when_recovered()
     """When the user's configured ``auxiliary.compression.model`` errors out
     but compression recovers by retrying on the main model, /compress must
     STILL inform the user.  Silent recovery hides broken config the user
-    needs to fix."""
+    needs to fix.
+    """
     history = _make_history()
     # Compressed transcript — normal successful compression, no placeholder.
     compressed = [

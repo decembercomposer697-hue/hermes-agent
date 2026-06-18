@@ -47,8 +47,8 @@ import threading
 import time
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
-from urllib.parse import urlparse, parse_qs, urlunparse
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+from urllib.parse import parse_qs, urlparse, urlunparse
 
 # NOTE: `from openai import OpenAI` is deliberately NOT at module top — the
 # openai SDK pulls a large type tree (~240 ms cold, including responses/*,
@@ -102,7 +102,12 @@ OpenAI = _OpenAIProxy()  # module-level name, resolves lazily on call/isinstance
 from agent.credential_pool import load_pool
 from hermes_cli.config import get_hermes_home
 from hermes_constants import OPENROUTER_BASE_URL
-from utils import base_url_host_matches, base_url_hostname, model_forces_max_completion_tokens, normalize_proxy_env_vars
+from utils import (
+    base_url_host_matches,
+    base_url_hostname,
+    model_forces_max_completion_tokens,
+    normalize_proxy_env_vars,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -244,6 +249,7 @@ def _fixed_temperature_for_model(
         ``float`` — a specific value the caller must use (reserved for future
             models with fixed-temperature contracts).
         ``None`` — no override; caller should use its own default.
+
     """
     if _is_kimi_model(model):
         logger.debug("Omitting temperature for Kimi model %r (server-managed)", model)
@@ -280,6 +286,7 @@ def _compression_threshold_for_model(
     if allow_codex_gpt55_autoraise and _is_codex_gpt55(model, provider):
         return _CODEX_GPT55_COMPACTION_THRESHOLD
     return None
+
 
 # Default auxiliary models for direct API-key providers (cheap/fast for side tasks)
 def _get_aux_model_for_provider(provider_id: str) -> str:
@@ -450,7 +457,6 @@ def build_nvidia_nim_headers(base_url: str | None) -> dict:
     if base_url_host_matches(str(base_url or ""), "integrate.api.nvidia.com"):
         return dict(_NVIDIA_NIM_CLOUD_HEADERS)
     return {}
-
 
 
 # Nous Portal extra_body for product attribution.
@@ -639,7 +645,8 @@ def _pool_runtime_base_url(entry: Any, fallback: str = "") -> str:
 
 class _CodexCompletionsAdapter:
     """Drop-in shim that accepts chat.completions.create() kwargs and
-    routes them through the Codex Responses streaming API."""
+    routes them through the Codex Responses streaming API.
+    """
 
     def __init__(self, real_client: OpenAI, model: str):
         self._client = real_client
@@ -740,6 +747,7 @@ class _CodexCompletionsAdapter:
             # constraints after the first auxiliary xAI call.  See #27907.
             try:
                 import copy as _copy
+
                 from tools.schema_sanitizer import (
                     strip_pattern_and_format,
                     strip_slash_enum,
@@ -1430,7 +1438,10 @@ def _resolve_api_key_provider() -> tuple[OpenAI | None, str | None]:
     credentials, or (None, None) if none are configured.
     """
     try:
-        from hermes_cli.auth import PROVIDER_REGISTRY, resolve_api_key_provider_credentials
+        from hermes_cli.auth import (
+            PROVIDER_REGISTRY,
+            resolve_api_key_provider_credentials,
+        )
     except ImportError:
         logger.debug("Could not import PROVIDER_REGISTRY for API-key fallback")
         return None, None
@@ -1466,7 +1477,10 @@ def _resolve_api_key_provider() -> tuple[OpenAI | None, str | None]:
                 continue  # skip provider if we don't know a valid aux model
             logger.debug("Auxiliary text client: %s (%s) via pool", pconfig.name, model)
             if provider_id == "gemini":
-                from agent.gemini_native_adapter import GeminiNativeClient, is_native_gemini_base_url
+                from agent.gemini_native_adapter import (
+                    GeminiNativeClient,
+                    is_native_gemini_base_url,
+                )
 
                 if is_native_gemini_base_url(base_url):
                     return GeminiNativeClient(api_key=api_key, base_url=base_url), model
@@ -1506,7 +1520,10 @@ def _resolve_api_key_provider() -> tuple[OpenAI | None, str | None]:
             continue  # skip provider if we don't know a valid aux model
         logger.debug("Auxiliary text client: %s (%s)", pconfig.name, model)
         if provider_id == "gemini":
-            from agent.gemini_native_adapter import GeminiNativeClient, is_native_gemini_base_url
+            from agent.gemini_native_adapter import (
+                GeminiNativeClient,
+                is_native_gemini_base_url,
+            )
 
             if is_native_gemini_base_url(base_url):
                 return GeminiNativeClient(api_key=api_key, base_url=base_url), model
@@ -1538,7 +1555,6 @@ def _resolve_api_key_provider() -> tuple[OpenAI | None, str | None]:
 
 
 # ── Provider resolution helpers ─────────────────────────────────────────────
-
 
 
 def _try_openrouter(explicit_api_key: str = None, model: str = None) -> tuple[OpenAI | None, str | None]:
@@ -2053,9 +2069,9 @@ def _try_azure_foundry(
     Returns ``(client, model)`` or ``(None, None)`` on failure.
     """
     try:
-        from hermes_cli.runtime_provider import _resolve_azure_foundry_runtime
         from hermes_cli.auth import AuthError
         from hermes_cli.config import load_config
+        from hermes_cli.runtime_provider import _resolve_azure_foundry_runtime
     except ImportError:
         return None, None
 
@@ -2139,7 +2155,10 @@ def _try_azure_foundry(
 
 def _try_anthropic(explicit_api_key: str = None) -> tuple[Any | None, str | None]:
     try:
-        from agent.anthropic_adapter import build_anthropic_client, resolve_anthropic_token
+        from agent.anthropic_adapter import (
+            build_anthropic_client,
+            resolve_anthropic_token,
+        )
     except ImportError:
         return None, None
 
@@ -2344,7 +2363,8 @@ def _log_skip_unhealthy(label: str, task: str | None = None) -> None:
 
 def _reset_aux_unhealthy_cache() -> None:
     """Clear the unhealthy cache. Used by tests and by a future explicit
-    user trigger (e.g. ``hermes config aux reset``)."""
+    user trigger (e.g. ``hermes config aux reset``).
+    """
     _aux_unhealthy_until.clear()
     _aux_unhealthy_logged_at.clear()
 
@@ -2912,7 +2932,11 @@ def _refresh_provider_credentials(provider: str) -> bool:
             _evict_cached_clients(normalized)
             return True
         if normalized == "anthropic":
-            from agent.anthropic_adapter import read_claude_code_credentials, _refresh_oauth_token, resolve_anthropic_token
+            from agent.anthropic_adapter import (
+                _refresh_oauth_token,
+                read_claude_code_credentials,
+                resolve_anthropic_token,
+            )
 
             creds = read_claude_code_credentials()
             token = _refresh_oauth_token(creds) if isinstance(creds, dict) and creds.get("refreshToken") else None
@@ -2958,6 +2982,7 @@ def _try_payment_fallback(
 
     Returns:
         (client, model, provider_label) or (None, None, "") if no fallback.
+
     """
     # Normalise the failed provider label for matching.
     skip = failed_provider.lower().strip()
@@ -3014,6 +3039,7 @@ def _try_main_agent_model_fallback(
 
     Returns:
         (client, model, provider_label) or (None, None, "") if no fallback.
+
     """
     main_provider = (_read_main_provider() or "").strip()
     main_model = (_read_main_model() or "").strip()
@@ -3059,6 +3085,7 @@ def _try_configured_fallback_chain(
 
     Returns:
         (client, model, provider_label) or (None, None, "") if no fallback.
+
     """
     if not task:
         return None, None, ""
@@ -3123,6 +3150,7 @@ def _resolve_single_provider(
         api_key=api_key,
     )
     return client
+
 
 def _resolve_auto(main_runtime: dict[str, Any] | None = None) -> tuple[OpenAI | None, str | None]:
     """Full auto-detection chain.
@@ -3271,7 +3299,10 @@ def _to_async_client(sync_client, model: str, is_vision: bool = False):
     if isinstance(sync_client, AnthropicAuxiliaryClient):
         return AsyncAnthropicAuxiliaryClient(sync_client), model
     try:
-        from agent.gemini_native_adapter import GeminiNativeClient, AsyncGeminiNativeClient
+        from agent.gemini_native_adapter import (
+            AsyncGeminiNativeClient,
+            GeminiNativeClient,
+        )
 
         if isinstance(sync_client, GeminiNativeClient):
             return AsyncGeminiNativeClient(sync_client), model
@@ -3373,6 +3404,7 @@ def resolve_provider_client(
 
     Returns:
         (client, resolved_model) or (None, None) if auth is unavailable.
+
     """
     _validate_proxy_env_urls()
     # Preserve the original provider name before alias normalization so a
@@ -3829,7 +3861,10 @@ def resolve_provider_client(
         final_model = _normalize_resolved_model(model or default_model, provider)
 
         if provider == "gemini":
-            from agent.gemini_native_adapter import GeminiNativeClient, is_native_gemini_base_url
+            from agent.gemini_native_adapter import (
+                GeminiNativeClient,
+                is_native_gemini_base_url,
+            )
 
             if is_native_gemini_base_url(base_url):
                 client = GeminiNativeClient(api_key=api_key, base_url=base_url)
@@ -3938,8 +3973,11 @@ def resolve_provider_client(
         # AWS SDK providers (Bedrock) — use the Anthropic Bedrock client via
         # boto3's credential chain (IAM roles, SSO, env vars, instance metadata).
         try:
-            from agent.bedrock_adapter import has_aws_credentials, resolve_bedrock_region
             from agent.anthropic_adapter import build_anthropic_bedrock_client
+            from agent.bedrock_adapter import (
+                has_aws_credentials,
+                resolve_bedrock_region,
+            )
         except ImportError:
             logger.warning("resolve_provider_client: bedrock requested but "
                            "boto3 or anthropic SDK not installed")
@@ -4000,6 +4038,7 @@ def get_text_auxiliary_client(
 
     Callers may override the returned model via config.yaml
     (e.g. auxiliary.compression.model, auxiliary.web_extract.model).
+
     """
     provider, model, base_url, api_key, api_mode = _resolve_task_provider_model(task or None)
     return resolve_provider_client(
@@ -4923,7 +4962,6 @@ def _convert_openai_images_to_anthropic(messages: list) -> list:
     return converted
 
 
-
 def _build_call_kwargs(
     provider: str,
     model: str,
@@ -5081,6 +5119,7 @@ def call_llm(
 
     Raises:
         RuntimeError: If no provider is configured.
+
     """
     resolved_provider, resolved_model, resolved_base_url, resolved_api_key, resolved_api_mode = _resolve_task_provider_model(
         task, provider, model, base_url, api_key)

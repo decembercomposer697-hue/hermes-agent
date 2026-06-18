@@ -3,7 +3,7 @@ so that _resolve_auto() can route custom: providers in Step 1.
 
 Fixes https://github.com/NousResearch/hermes-agent/issues/34777
 """
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 
 def _get_globals(mod):
@@ -151,7 +151,8 @@ class TestResolveAutoCustomEndToEnd:
     def test_config_less_custom_endpoint_routes_via_global(self, tmp_path, monkeypatch):
         """custom:<name> with NO config entry: the live base_url carried by
         set_runtime_main() must build a real client at that endpoint — not
-        fall through to Step 2 (the regression in #34777)."""
+        fall through to Step 2 (the regression in #34777).
+        """
         import agent.auxiliary_client as mod
 
         # Hermetic: no aggregator creds, no stale OPENAI_BASE_URL.
@@ -191,7 +192,8 @@ class TestResolveAutoCustomEndToEnd:
         """Regression guard: custom:<name> WITH a custom_providers entry must
         still resolve to that entry's endpoint.  An earlier competing fix
         collapsed the provider to bare ``custom`` before resolution, which
-        broke the named-custom branch and returned None here."""
+        broke the named-custom branch and returned None here.
+        """
         import agent.auxiliary_client as mod
 
         for var in ("OPENROUTER_API_KEY", "NOUS_API_KEY", "OPENAI_API_KEY",

@@ -8,15 +8,15 @@ Combines functionality from:
 - PR #790 (0xbyt4): reasoning display toggle and rendering
 """
 
+import re
 import unittest
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
-import re
-
 
 # ---------------------------------------------------------------------------
 # Effort level parsing
 # ---------------------------------------------------------------------------
+
 
 class TestParseReasoningConfig(unittest.TestCase):
     """Verify _parse_reasoning_config handles all effort levels."""
@@ -459,7 +459,8 @@ class TestExtractReasoningFormats(unittest.TestCase):
 
 class TestInlineThinkBlockExtraction(unittest.TestCase):
     """Test _build_assistant_message extracts inline <think> blocks as reasoning
-    when no structured API-level reasoning fields are present."""
+    when no structured API-level reasoning fields are present.
+    """
 
     def _build_msg(self, content, reasoning=None, reasoning_content=None, reasoning_details=None, tool_calls=None):
         """Create a mock API response message."""
@@ -623,7 +624,8 @@ class TestEndToEndPipeline(unittest.TestCase):
 
 class TestReasoningDeltasFiredFlag(unittest.TestCase):
     """_build_assistant_message should not re-fire reasoning_callback when
-    reasoning was already streamed via _fire_reasoning_delta."""
+    reasoning was already streamed via _fire_reasoning_delta.
+    """
 
     def _make_agent(self):
         from run_agent import AIAgent
@@ -643,7 +645,8 @@ class TestReasoningDeltasFiredFlag(unittest.TestCase):
 
     def test_build_assistant_message_skips_callback_when_already_streamed(self):
         """When streaming already fired reasoning deltas, the post-stream
-        _build_assistant_message should NOT re-fire the callback."""
+        _build_assistant_message should NOT re-fire the callback.
+        """
         agent = self._make_agent()
         captured = []
         agent.reasoning_callback = lambda t: captured.append(t)
@@ -667,7 +670,8 @@ class TestReasoningDeltasFiredFlag(unittest.TestCase):
         """When streaming is active, callback should NEVER fire from
         _build_assistant_message — reasoning was already displayed during the
         stream (either via reasoning_content deltas or content tag extraction).
-        Any missed reasoning is caught by the CLI post-response fallback."""
+        Any missed reasoning is caught by the CLI post-response fallback.
+        """
         agent = self._make_agent()
         captured = []
         agent.reasoning_callback = lambda t: captured.append(t)
@@ -690,7 +694,8 @@ class TestReasoningDeltasFiredFlag(unittest.TestCase):
 
     def test_build_assistant_message_fires_callback_without_streaming(self):
         """When no streaming is active, callback always fires for structured
-        reasoning."""
+        reasoning.
+        """
         agent = self._make_agent()
         captured = []
         agent.reasoning_callback = lambda t: captured.append(t)
@@ -711,7 +716,8 @@ class TestReasoningDeltasFiredFlag(unittest.TestCase):
 
 class TestReasoningShownThisTurnFlag(unittest.TestCase):
     """Post-response reasoning display should be suppressed when reasoning
-    was already shown during streaming in a tool-calling loop."""
+    was already shown during streaming in a tool-calling loop.
+    """
 
     def _make_cli(self):
         from cli import HermesCLI
@@ -741,7 +747,8 @@ class TestReasoningShownThisTurnFlag(unittest.TestCase):
     @patch("cli._cprint")
     def test_turn_flag_survives_reset_stream_state(self, mock_cprint):
         """_reasoning_shown_this_turn must NOT be cleared by
-        _reset_stream_state (called at intermediate turn boundaries)."""
+        _reset_stream_state (called at intermediate turn boundaries).
+        """
         cli = self._make_cli()
         cli._stream_reasoning_delta("Thinking...")
         self.assertTrue(cli._reasoning_shown_this_turn)
@@ -755,7 +762,8 @@ class TestReasoningShownThisTurnFlag(unittest.TestCase):
     @patch("cli._cprint")
     def test_turn_flag_cleared_before_new_turn(self, mock_cprint):
         """The turn flag should be reset at the start of a new user turn.
-        This happens outside _reset_stream_state, at the call site."""
+        This happens outside _reset_stream_state, at the call site.
+        """
         cli = self._make_cli()
         cli._reasoning_shown_this_turn = True
 

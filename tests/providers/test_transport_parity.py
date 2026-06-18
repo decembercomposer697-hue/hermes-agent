@@ -7,6 +7,7 @@ a behavioral regression.
 """
 
 import pytest
+
 from agent.transports.chat_completions import ChatCompletionsTransport
 from providers import get_provider_profile
 
@@ -172,7 +173,8 @@ class TestOpenRouterParity:
     def test_reasoning_omitted_for_mandatory_anthropic(self, transport):
         """Adaptive-thinking Anthropic models (4.6+/fable) get NO reasoning
         field — sending one makes OpenRouter emit thinking.type.disabled on
-        tool-replay turns, which the model 400s on."""
+        tool-replay turns, which the model 400s on.
+        """
         kw = transport.build_kwargs(
             model="anthropic/claude-sonnet-4.6",
             messages=_simple_messages(),

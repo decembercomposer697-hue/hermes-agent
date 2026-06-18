@@ -11,11 +11,10 @@ from __future__ import annotations
 from types import SimpleNamespace
 from unittest.mock import patch
 
-
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_tool_use_block(name: str, block_id: str = "tc_1", input_data: dict | None = None):
     """Create a fake Anthropic tool_use content block."""
@@ -186,7 +185,8 @@ class TestAnthropicMcpPrefixStrip:
 class TestAnthropicOAuthOutgoingPrefix:
     """Verify the outgoing-side companion fix: build_anthropic_kwargs must not
     double-prefix tool names that already start with ``mcp_`` (native MCP server
-    tools registered as ``mcp_<server>_<tool>``). GH-25255."""
+    tools registered as ``mcp_<server>_<tool>``). GH-25255.
+    """
 
     def _build(self, tools, is_oauth=True):
         from agent.anthropic_adapter import build_anthropic_kwargs

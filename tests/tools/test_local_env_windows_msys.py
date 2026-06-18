@@ -20,7 +20,6 @@ on the real OS.
 
 from unittest.mock import patch
 
-
 from tools.environments import local as local_mod
 from tools.environments.local import (
     LocalEnvironment,
@@ -28,10 +27,10 @@ from tools.environments.local import (
     _resolve_safe_cwd,
 )
 
-
 # ---------------------------------------------------------------------------
 # _msys_to_windows_path — pure-function unit tests
 # ---------------------------------------------------------------------------
+
 
 class TestMsysToWindowsPath:
     def test_noop_on_non_windows(self, monkeypatch):
@@ -60,7 +59,8 @@ class TestMsysToWindowsPath:
     def test_does_not_translate_multi_char_first_segment(self, monkeypatch):
         """``/tmp/foo`` and ``/home/x`` must NOT be misread as drive paths
         just because they start with ``/`` and a single letter — the regex
-        only matches when the first segment is exactly one character."""
+        only matches when the first segment is exactly one character.
+        """
         monkeypatch.setattr(local_mod, "_IS_WINDOWS", True)
         assert _msys_to_windows_path("/tmp/foo") == "/tmp/foo"
         assert _msys_to_windows_path("/home/x") == "/home/x"
@@ -80,7 +80,8 @@ class TestResolveSafeCwdWindows:
     ):
         """The whole point of this fix: a Git Bash ``/c/Users/x`` value
         should resolve to its native equivalent if that native dir exists,
-        WITHOUT falling back to the temp dir."""
+        WITHOUT falling back to the temp dir.
+        """
         monkeypatch.setattr(local_mod, "_IS_WINDOWS", True)
 
         # tmp_path is a real native dir on the test host. Build a fake
@@ -107,7 +108,8 @@ class TestUpdateCwdWindowsMsys:
         """When Git Bash writes ``/c/Users/x`` to the cwd marker file on
         Windows, ``_update_cwd`` must translate to native form before
         validating and storing — otherwise ``os.path.isdir`` rejects a
-        perfectly real directory."""
+        perfectly real directory.
+        """
         original = tmp_path / "starting"
         original.mkdir()
 
@@ -146,7 +148,8 @@ class TestExtractCwdFromOutputWindowsMsys:
     def test_stale_msys_marker_does_not_clobber_cwd(self, monkeypatch, tmp_path):
         """When the cwd marker in stdout points at a non-existent path,
         ``LocalEnvironment._extract_cwd_from_output`` must roll back to
-        the previous cwd instead of propagating a bad value."""
+        the previous cwd instead of propagating a bad value.
+        """
         original = tmp_path / "starting"
         original.mkdir()
 

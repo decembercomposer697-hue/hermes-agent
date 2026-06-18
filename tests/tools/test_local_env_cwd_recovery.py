@@ -46,7 +46,8 @@ class TestResolveSafeCwd:
     def test_returns_root_when_only_root_exists(self, monkeypatch):
         """If every ancestor except the filesystem root is gone, the root
         itself is still a valid recovery target — don't skip it just because
-        ``os.path.dirname('/') == '/'`` is the loop's exit condition."""
+        ``os.path.dirname('/') == '/'`` is the loop's exit condition.
+        """
         sep = os.path.sep
         monkeypatch.setattr(os.path, "isdir", lambda p: p == sep)
         assert _resolve_safe_cwd("/no/such/deep/dir") == sep
@@ -98,7 +99,8 @@ class TestRunBashCwdRecovery:
     def test_recovers_when_cwd_deleted_after_init(self, tmp_path, caplog):
         """Reproduces the wedge from #17558: cwd was valid when the
         snapshot was taken, but a subsequent command deleted it before the
-        next ``Popen``."""
+        next ``Popen``.
+        """
         wedged = tmp_path / "wedge-repro"
         wedged.mkdir()
 

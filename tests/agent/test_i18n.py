@@ -9,7 +9,6 @@ import yaml
 
 from agent import i18n
 
-
 LOCALES_DIR = Path(__file__).resolve().parents[2] / "locales"
 
 
@@ -185,7 +184,8 @@ def test_locales_dir_env_override_used_when_dir_exists(tmp_path, monkeypatch):
 
 def test_locales_dir_env_override_ignored_when_missing(tmp_path, monkeypatch):
     """A bogus HERMES_BUNDLED_LOCALES falls through to source/wheel resolution
-    instead of returning a path that doesn't exist."""
+    instead of returning a path that doesn't exist.
+    """
     monkeypatch.setenv("HERMES_BUNDLED_LOCALES", str(tmp_path / "does-not-exist"))
     result = i18n._locales_dir()
     assert result != tmp_path / "does-not-exist"
@@ -195,7 +195,8 @@ def test_locales_dir_env_override_ignored_when_missing(tmp_path, monkeypatch):
 
 def test_locales_dir_falls_back_to_data_scheme(tmp_path, monkeypatch):
     """When neither the env override nor a source-adjacent locales/ exists,
-    _locales_dir uses sysconfig's data scheme (the pip-wheel layout)."""
+    _locales_dir uses sysconfig's data scheme (the pip-wheel layout).
+    """
     import sysconfig
 
     # No env override.
@@ -224,6 +225,7 @@ def test_locales_dir_falls_back_to_data_scheme(tmp_path, monkeypatch):
 def test_t_resolves_real_string_in_source_checkout():
     """Sanity: in the test environment (a source checkout) t() must return a
     human string, never the bare key path. Guards against catalog-load
-    regressions independent of packaging."""
+    regressions independent of packaging.
+    """
     assert i18n.t("gateway.reset.header_default", lang="en") != "gateway.reset.header_default"
     assert i18n.t("gateway.status.header", lang="en") != "gateway.status.header"

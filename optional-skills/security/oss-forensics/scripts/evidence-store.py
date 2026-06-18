@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-OSS Forensics Evidence Store Manager
+"""OSS Forensics Evidence Store Manager
 Manages a JSON-based evidence store for forensic investigations.
 
 Commands:
@@ -21,11 +20,11 @@ Usage example:
   python3 evidence-store.py --store evidence.json export > evidence-table.md
 """
 
-import json
 import argparse
-import os
 import datetime
 import hashlib
+import json
+import os
 import sys
 
 EVIDENCE_TYPES = [

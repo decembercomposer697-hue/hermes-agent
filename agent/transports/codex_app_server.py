@@ -148,7 +148,8 @@ class CodexAppServerClient:
         timeout: float = 10.0,
     ) -> dict:
         """Send `initialize` + `initialized` handshake. Returns the server's
-        InitializeResponse (userAgent, codexHome, platformFamily, platformOs)."""
+        InitializeResponse (userAgent, codexHome, platformFamily, platformOs).
+        """
         if self._initialized:
             raise RuntimeError("already initialized")
         params = {
@@ -199,7 +200,8 @@ class CodexAppServerClient:
         timeout: float = 30.0,
     ) -> dict:
         """Send a JSON-RPC request and block on the response. Returns `result`,
-        raises CodexAppServerError on `error`."""
+        raises CodexAppServerError on `error`.
+        """
         rid = self._take_id()
         q: queue.Queue = queue.Queue(maxsize=1)
         with self._pending_lock:
@@ -243,7 +245,8 @@ class CodexAppServerClient:
         """Pop the next streaming notification, or return None on timeout.
 
         timeout=0.0 means non-blocking. Use small positive timeouts inside the
-        AIAgent turn loop to interleave reads with interrupt checks."""
+        AIAgent turn loop to interleave reads with interrupt checks.
+        """
         try:
             if timeout <= 0:
                 return self._notifications.get_nowait()
@@ -371,7 +374,8 @@ def check_codex_binary(
 ) -> tuple[bool, str]:
     """Verify codex CLI is installed and meets minimum version.
 
-    Returns (ok, message). Used by setup wizard and runtime startup."""
+    Returns (ok, message). Used by setup wizard and runtime startup.
+    """
     try:
         proc = subprocess.run(
             [codex_bin, "--version"],

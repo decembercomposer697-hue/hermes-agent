@@ -28,9 +28,9 @@ import logging
 import os
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Optional
-from collections.abc import Callable
 
 from agent.codex_responses_adapter import _format_responses_error
 from agent.redact import redact_sensitive_text
@@ -183,7 +183,8 @@ class _ServerRequestRouting:
     """Default policies for codex-side approval requests when no interactive
     callback is wired in. These are only used by tests + cron / non-interactive
     contexts; the live CLI path passes an approval_callback that defers to
-    tools.approval.prompt_dangerous_approval()."""
+    tools.approval.prompt_dangerous_approval().
+    """
 
     auto_approve_exec: bool = False
     auto_approve_apply_patch: bool = False
@@ -240,7 +241,8 @@ class CodexAppServerSession:
     def ensure_started(self) -> str:
         """Spawn the subprocess, do the initialize handshake, and start a
         thread. Returns the codex thread id. Idempotent — repeated calls
-        return the same thread id."""
+        return the same thread id.
+        """
         if self._thread_id is not None:
             return self._thread_id
         if self._client is None:
@@ -319,7 +321,8 @@ class CodexAppServerSession:
 
     def request_interrupt(self) -> None:
         """Idempotent: signal the active turn loop to issue turn/interrupt
-        and unwind. Called by AIAgent's _interrupt_requested path."""
+        and unwind. Called by AIAgent's _interrupt_requested path.
+        """
         self._interrupt_event.set()
 
     # ---------- diagnostics ----------
@@ -762,7 +765,8 @@ class CodexAppServerSession:
     def _track_pending_file_change(self, note: dict) -> None:
         """Maintain self._pending_file_changes from item/started + item/completed
         notifications. Lets the apply_patch approval prompt show what's
-        actually changing — codex's approval params don't carry the data."""
+        actually changing — codex's approval params don't carry the data.
+        """
         method = note.get("method", "")
         params = note.get("params") or {}
         item = params.get("item") or {}
@@ -800,7 +804,8 @@ class CodexAppServerSession:
         """Look up an in-progress fileChange item by id and summarize its
         changes for the approval prompt. Returns None when we don't have
         the item cached (e.g. approval arrived before item/started, or
-        fileChange item content not tracked yet)."""
+        fileChange item content not tracked yet).
+        """
         if not item_id:
             return None
         cached = self._pending_file_changes.get(item_id)

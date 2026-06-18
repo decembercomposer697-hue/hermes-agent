@@ -19,7 +19,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # _resolve_client_cert helper
 # ---------------------------------------------------------------------------
@@ -159,7 +158,8 @@ class TestResolveClientCert:
 class TestHTTPClientCert:
     def test_cert_forwarded_to_async_client(self, tmp_path):
         """When client_cert is set, the new-SDK HTTP path passes ``cert=``
-        into ``httpx.AsyncClient``."""
+        into ``httpx.AsyncClient``.
+        """
         from tools.mcp_tool import MCPServerTask
 
         cert = tmp_path / "client.pem"
@@ -280,7 +280,8 @@ class TestHTTPClientCert:
 
     def test_no_cert_means_no_cert_kwarg(self):
         """When client_cert is unset, ``cert`` is not passed to ``httpx.AsyncClient``
-        (matches SDK defaults)."""
+        (matches SDK defaults).
+        """
         from tools.mcp_tool import MCPServerTask
 
         server = MCPServerTask("remote")
@@ -400,7 +401,8 @@ def patch_sse_client():
 class TestSSEClientCert:
     def test_no_factory_when_defaults(self, patch_sse_client):
         """With no cert and ssl_verify=True (default), the SDK's own factory is
-        used — we don't inject one."""
+        used — we don't inject one.
+        """
         from tools.mcp_tool import MCPServerTask
 
         server = MCPServerTask("sse-test")
@@ -427,7 +429,8 @@ class TestSSEClientCert:
 
     def test_factory_injected_when_cert_set(self, patch_sse_client, tmp_path):
         """With client_cert set, an httpx_client_factory is injected that
-        applies the cert (and follow_redirects=True to match the SDK)."""
+        applies the cert (and follow_redirects=True to match the SDK).
+        """
         from tools.mcp_tool import MCPServerTask
 
         cert = tmp_path / "client.pem"

@@ -1,5 +1,4 @@
-"""
-MCP Server Management CLI — ``hermes mcp`` subcommand.
+"""MCP Server Management CLI — ``hermes mcp`` subcommand.
 
 Implements ``hermes mcp add/remove/list/test/configure`` for interactive
 MCP server lifecycle management (issue #690 Phase 2).
@@ -15,15 +14,15 @@ import re
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
+from hermes_cli.colors import Colors, color
 from hermes_cli.config import (
     cfg_get,
+    get_env_value,
+    get_hermes_home,
     load_config,
     save_config,
-    get_env_value,
     save_env_value,
-    get_hermes_home,
 )
-from hermes_cli.colors import Colors, color
 from hermes_constants import display_hermes_home
 from tools.mcp_tool import _ENV_VAR_PATTERN
 
@@ -45,11 +44,14 @@ _MCP_PRESETS: dict[str, dict[str, Any]] = {
 def _info(text: str):
     print(color(f"  {text}", Colors.DIM))
 
+
 def _success(text: str):
     print(color(f"  ✓ {text}", Colors.GREEN))
 
+
 def _warning(text: str):
     print(color(f"  ⚠ {text}", Colors.YELLOW))
+
 
 def _error(text: str):
     print(color(f"  ✗ {text}", Colors.RED))
@@ -209,9 +211,9 @@ def _probe_single_server(
     Raises on connection failure.
     """
     from tools.mcp_tool import (
+        _connect_server,
         _ensure_mcp_loop,
         _run_on_mcp_loop,
-        _connect_server,
         _stop_mcp_loop,
     )
 
@@ -316,8 +318,8 @@ def cmd_mcp_add(args):
         _error("Must specify --url <endpoint>, --command <cmd>, or --preset <name>")
         _info("Examples:")
         _info('  hermes mcp add ink --url "https://mcp.ml.ink/mcp"')
-        _info('  hermes mcp add github --command npx --args @modelcontextprotocol/server-github')
-        _info('  hermes mcp add myserver --preset mypreset')
+        _info("  hermes mcp add github --command npx --args @modelcontextprotocol/server-github")
+        _info("  hermes mcp add myserver --preset mypreset")
         return
 
     # Check if server already exists
@@ -336,7 +338,6 @@ def cmd_mcp_add(args):
             server_config["args"] = cmd_args
         if explicit_env:
             server_config["env"] = explicit_env
-
 
     # ── Authentication ────────────────────────────────────────────────
 
@@ -517,8 +518,8 @@ def cmd_mcp_list(args=None):
         _info("No MCP servers configured.")
         print()
         _info("Add one with:")
-        _info('  hermes mcp add <name> --url <endpoint>')
-        _info('  hermes mcp add <name> --command <cmd> --args <args...>')
+        _info("  hermes mcp add <name> --url <endpoint>")
+        _info("  hermes mcp add <name> --command <cmd> --args <args...>")
         print()
         return
 
@@ -847,8 +848,9 @@ def mcp_command(args):
         show_catalog()
         return
     if action == "install":
-        from hermes_cli.mcp_picker import install_by_name
         import sys as _sys
+
+        from hermes_cli.mcp_picker import install_by_name
         rc = install_by_name(getattr(args, "identifier", "") or "")
         if rc:
             _sys.exit(rc)

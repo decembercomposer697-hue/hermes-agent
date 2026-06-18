@@ -1,7 +1,8 @@
 """Tests for CodexEventProjector — codex item/* events → Hermes messages list.
 
 Drives projection against fixture notifications captured from codex 0.130.0
-plus synthetic ones for item types we couldn't auth-test live."""
+plus synthetic ones for item types we couldn't auth-test live.
+"""
 
 from __future__ import annotations
 
@@ -14,7 +15,6 @@ from agent.transports.codex_event_projector import (
     _deterministic_call_id,
     _format_tool_args,
 )
-
 
 # --- Fixture: real `commandExecution` notification captured from codex 0.130.0
 COMMAND_EXEC_COMPLETED = {
@@ -274,7 +274,8 @@ class TestHelpers:
 
 class TestRoleAlternationInvariant:
     """The project must never emit two assistant messages back-to-back from
-    one item — that breaks Hermes' message alternation invariant."""
+    one item — that breaks Hermes' message alternation invariant.
+    """
 
     @pytest.mark.parametrize(
         "item",

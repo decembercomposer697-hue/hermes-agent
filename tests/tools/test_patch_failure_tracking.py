@@ -18,13 +18,18 @@ import pytest
 def hermes_home(monkeypatch, tmp_path):
     """Isolate HERMES_HOME and clear module-level caches afterward so the
     real shell-out side effects from _handle_patch don't leak into
-    subsequent tests (see test_line_ending_preservation.py for details)."""
+    subsequent tests (see test_line_ending_preservation.py for details).
+    """
     home = tmp_path / "hermes"
     home.mkdir()
     monkeypatch.setenv("HERMES_HOME", str(home))
     yield home
     try:
-        from tools.file_tools import clear_file_ops_cache, _read_tracker_lock, _read_tracker
+        from tools.file_tools import (
+            _read_tracker,
+            _read_tracker_lock,
+            clear_file_ops_cache,
+        )
         clear_file_ops_cache()
         with _read_tracker_lock:
             _read_tracker.clear()
@@ -41,8 +46,9 @@ def hermes_home(monkeypatch, tmp_path):
 @pytest.fixture
 def fresh_tracker():
     """Reset the module-level tracker before each test so the count starts
-    at zero regardless of prior test order."""
-    from tools.file_tools import _patch_failure_tracker, _patch_failure_lock
+    at zero regardless of prior test order.
+    """
+    from tools.file_tools import _patch_failure_lock, _patch_failure_tracker
 
     with _patch_failure_lock:
         _patch_failure_tracker.clear()

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from decimal import Decimal
 from typing import Any, Dict, Literal, Optional
 
@@ -868,7 +868,6 @@ def has_known_pricing(
         return True
     entry = get_pricing_entry(model_name, provider=provider, base_url=base_url, api_key=api_key)
     return entry is not None
-
 
 
 def format_duration_compact(seconds: float) -> str:

@@ -10,16 +10,15 @@ import asyncio
 import queue
 from unittest.mock import AsyncMock, MagicMock, patch
 
-
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_adapter():
     """Build a minimal APIServerAdapter with mocked internals."""
-    from gateway.platforms.api_server import APIServerAdapter
     from gateway.config import PlatformConfig
+    from gateway.platforms.api_server import APIServerAdapter
 
     config = PlatformConfig(enabled=True, token="test-key")
     adapter = APIServerAdapter(config)
@@ -42,7 +41,8 @@ class TestSSEAgentCancelOnDisconnect:
 
     def test_agent_task_cancelled_on_client_disconnect(self):
         """When response.write raises ConnectionResetError (client dropped),
-        the agent task must be cancelled."""
+        the agent task must be cancelled.
+        """
         adapter = _make_adapter()
 
         stream_q = queue.Queue()
@@ -73,7 +73,7 @@ class TestSSEAgentCancelOnDisconnect:
             mock_response.write = AsyncMock(side_effect=write_side_effect)
             mock_response.prepare = AsyncMock()
 
-            with patch.object(type(adapter), '_write_sse_chat_completion',
+            with patch.object(type(adapter), "_write_sse_chat_completion",
                               adapter._write_sse_chat_completion):
                 # Patch StreamResponse creation
                 with patch("gateway.platforms.api_server.web.StreamResponse",
@@ -197,7 +197,8 @@ class TestSSEAgentCancelOnDisconnect:
 
     def test_agent_interrupt_called_on_disconnect(self):
         """When the client disconnects, agent.interrupt() must be called
-        so the agent thread stops making LLM API calls."""
+        so the agent thread stops making LLM API calls.
+        """
         adapter = _make_adapter()
 
         stream_q = queue.Queue()
@@ -247,7 +248,8 @@ class TestSSEAgentCancelOnDisconnect:
 
     def test_agent_ref_none_still_cancels_task(self):
         """When agent_ref is not provided (None), the task is still cancelled
-        on disconnect — just without the interrupt() call."""
+        on disconnect — just without the interrupt() call.
+        """
         adapter = _make_adapter()
 
         stream_q = queue.Queue()

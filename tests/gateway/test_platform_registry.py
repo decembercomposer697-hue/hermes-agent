@@ -1,12 +1,12 @@
 """Tests for the platform adapter registry and dynamic Platform enum."""
 
 import os
-import pytest
 from unittest.mock import MagicMock
 
-from gateway.platform_registry import PlatformRegistry, PlatformEntry
-from gateway.config import Platform, GatewayConfig
+import pytest
 
+from gateway.config import GatewayConfig, Platform
+from gateway.platform_registry import PlatformEntry, PlatformRegistry
 
 # ── Platform enum dynamic members ─────────────────────────────────────────
 
@@ -352,14 +352,14 @@ class TestPlatformsMerge:
     """Test get_all_platforms() merges with registry."""
 
     def test_get_all_platforms_includes_builtins(self):
-        from hermes_cli.platforms import get_all_platforms, PLATFORMS
+        from hermes_cli.platforms import PLATFORMS, get_all_platforms
         merged = get_all_platforms()
         for key in PLATFORMS:
             assert key in merged
 
     def test_get_all_platforms_includes_plugin(self):
-        from hermes_cli.platforms import get_all_platforms
         from gateway.platform_registry import platform_registry as _reg
+        from hermes_cli.platforms import get_all_platforms
 
         _reg.register(PlatformEntry(
             name="testmerge",
@@ -377,8 +377,8 @@ class TestPlatformsMerge:
             _reg.unregister("testmerge")
 
     def test_platform_label_plugin_fallback(self):
-        from hermes_cli.platforms import platform_label
         from gateway.platform_registry import platform_registry as _reg
+        from hermes_cli.platforms import platform_label
 
         _reg.register(PlatformEntry(
             name="labeltest",
@@ -674,7 +674,8 @@ class TestPluginPlatformSharedKeyBridge:
 
     def test_shared_keys_bridged_for_plugin_platform(self, tmp_path, monkeypatch):
         """A plugin platform's ``require_mention``/``dm_policy``/etc. flow into
-        ``PlatformConfig.extra`` without the plugin needing its own bridge."""
+        ``PlatformConfig.extra`` without the plugin needing its own bridge.
+        """
         from gateway.platform_registry import platform_registry as _reg
 
         _reg.register(PlatformEntry(
@@ -695,7 +696,7 @@ class TestPluginPlatformSharedKeyBridge:
             )
             monkeypatch.setenv("HERMES_HOME", str(home))
 
-            from gateway.config import load_gateway_config, Platform
+            from gateway.config import Platform, load_gateway_config
             cfg = load_gateway_config()
 
             plat = Platform("mysharedplat")
@@ -751,7 +752,7 @@ class TestPluginEnablementGate:
             home = self._write_config(tmp_path)
             monkeypatch.setenv("HERMES_HOME", str(home))
 
-            from gateway.config import load_gateway_config, Platform
+            from gateway.config import Platform, load_gateway_config
             cfg = load_gateway_config()
 
             plat = Platform("myunconfiguredplat")
@@ -781,7 +782,7 @@ class TestPluginEnablementGate:
             home = self._write_config(tmp_path)
             monkeypatch.setenv("HERMES_HOME", str(home))
 
-            from gateway.config import load_gateway_config, Platform
+            from gateway.config import Platform, load_gateway_config
             cfg = load_gateway_config()
 
             plat = Platform("myconfiguredplat")
@@ -813,7 +814,7 @@ class TestPluginEnablementGate:
             home = self._write_config(tmp_path)
             monkeypatch.setenv("HERMES_HOME", str(home))
 
-            from gateway.config import load_gateway_config, Platform
+            from gateway.config import Platform, load_gateway_config
             cfg = load_gateway_config()
 
             plat = Platform("mylegacyplat")
@@ -846,7 +847,7 @@ class TestPluginEnablementGate:
             home = self._write_config(tmp_path)
             monkeypatch.setenv("HERMES_HOME", str(home))
 
-            from gateway.config import load_gateway_config, Platform
+            from gateway.config import Platform, load_gateway_config
             cfg = load_gateway_config()
 
             plat = Platform("mybadprobeplat")
@@ -883,7 +884,7 @@ class TestPluginEnablementGate:
             )
             monkeypatch.setenv("HERMES_HOME", str(home))
 
-            from gateway.config import load_gateway_config, Platform
+            from gateway.config import Platform, load_gateway_config
             cfg = load_gateway_config()
 
             plat = Platform("myexplicitplat")
@@ -932,7 +933,7 @@ class TestPluginEnablementGate:
             home = self._write_config(tmp_path)
             monkeypatch.setenv("HERMES_HOME", str(home))
 
-            from gateway.config import load_gateway_config, Platform
+            from gateway.config import Platform, load_gateway_config
             cfg = load_gateway_config()
 
             plat = Platform("myextrasplat")
@@ -971,7 +972,7 @@ class TestPluginEnablementGate:
             home = self._write_config(tmp_path)
             monkeypatch.setenv("HERMES_HOME", str(home))
 
-            from gateway.config import load_gateway_config, Platform
+            from gateway.config import Platform, load_gateway_config
             cfg = load_gateway_config()
 
             plat = Platform("myrejectedplat")

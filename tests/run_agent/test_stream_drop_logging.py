@@ -21,7 +21,6 @@ import logging
 import time
 from unittest.mock import patch
 
-
 from run_agent import AIAgent
 
 
@@ -171,7 +170,7 @@ def test_log_stream_retry_includes_diagnostic_fields(caplog):
 
 
 def test_log_stream_retry_works_without_diag(caplog):
-    """diag is optional — older callers / unit tests still work."""
+    """Diag is optional — older callers / unit tests still work."""
     agent = _make_agent()
     agent._delegate_depth = 0
     agent.provider = "openrouter"

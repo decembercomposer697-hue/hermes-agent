@@ -40,7 +40,7 @@ def _call(limit: int | None = None):
 
 
 def test_session_list_surfaces_all_user_facing_sources(monkeypatch):
-    """acp / webhook / custom sources should all appear; only ``tool`` is hidden."""
+    """Acp / webhook / custom sources should all appear; only ``tool`` is hidden."""
     rows = [
         {"id": "tui-1", "source": "tui", "started_at": 9},
         {"id": "tool-1", "source": "tool", "started_at": 8},

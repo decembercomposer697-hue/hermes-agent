@@ -1,5 +1,4 @@
-"""
-Multi-provider authentication system for Hermes Agent.
+"""Multi-provider authentication system for Hermes Agent.
 
 Supports OAuth device code flows (Nous Portal, future: OpenAI Codex) and
 traditional API key providers (OpenRouter, custom endpoints). Auth state
@@ -18,35 +17,35 @@ Nous authentication paths:
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import json
 import logging
 import os
-import shutil
 import shlex
+import shutil
 import ssl
 import stat
-import sys
-import base64
-import hashlib
 import subprocess
+import sys
 import threading
 import time
 import uuid
 import webbrowser
+from collections.abc import Callable
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Dict, FrozenSet, List, Optional, Tuple
-from collections.abc import Callable
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
 
-from hermes_cli.config import get_hermes_home, get_config_path, read_raw_config
-from hermes_constants import OPENROUTER_BASE_URL, secure_parent_dir
 from agent.credential_persistence import sanitize_borrowed_credential_payload
+from hermes_cli.config import get_config_path, get_hermes_home, read_raw_config
+from hermes_constants import OPENROUTER_BASE_URL, secure_parent_dir
 from utils import atomic_replace, atomic_yaml_write, is_truthy_value
 
 logger = logging.getLogger(__name__)
@@ -532,7 +531,6 @@ def _resolve_kimi_base_url(api_key: str, default_url: str, env_override: str) ->
     return default_url
 
 
-
 _PLACEHOLDER_SECRET_VALUES = {
     "*",
     "**",
@@ -568,7 +566,10 @@ def _resolve_api_key_provider_secret(
     if provider_id == "copilot":
         # Use the dedicated copilot auth module for proper token validation
         try:
-            from hermes_cli.copilot_auth import resolve_copilot_token, get_copilot_api_token
+            from hermes_cli.copilot_auth import (
+                get_copilot_api_token,
+                resolve_copilot_token,
+            )
             token, source = resolve_copilot_token()
             if token:
                 return get_copilot_api_token(token), source
@@ -615,10 +616,10 @@ def _resolve_api_key_provider_secret(
 
 ZAI_ENDPOINTS = [
     # (id, base_url, probe_models, label)
-    ("global",        "https://api.z.ai/api/paas/v4",        ["glm-5"],   "Global"),
-    ("cn",            "https://open.bigmodel.cn/api/paas/v4", ["glm-5"],   "China"),
-    ("coding-global", "https://api.z.ai/api/coding/paas/v4",  ["glm-5.1", "glm-5v-turbo", "glm-4.7"], "Global (Coding Plan)"),
-    ("coding-cn",     "https://open.bigmodel.cn/api/coding/paas/v4", ["glm-5.1", "glm-5v-turbo", "glm-4.7"], "China (Coding Plan)"),
+    ("global", "https://api.z.ai/api/paas/v4", ["glm-5"], "Global"),
+    ("cn", "https://open.bigmodel.cn/api/paas/v4", ["glm-5"], "China"),
+    ("coding-global", "https://api.z.ai/api/coding/paas/v4", ["glm-5.1", "glm-5v-turbo", "glm-4.7"], "Global (Coding Plan)"),
+    ("coding-cn", "https://open.bigmodel.cn/api/coding/paas/v4", ["glm-5.1", "glm-5v-turbo", "glm-4.7"], "China (Coding Plan)"),
 ]
 
 
@@ -1399,8 +1400,7 @@ def is_provider_explicitly_configured(provider_id: str) -> bool:
 
 
 def clear_provider_auth(provider_id: str | None = None) -> bool:
-    """
-    Clear auth state for a provider. Used by `hermes logout`.
+    """Clear auth state for a provider. Used by `hermes logout`.
     If provider_id is None, clears the active provider.
     Returns True if something was cleared.
     """
@@ -1439,8 +1439,7 @@ def clear_provider_auth(provider_id: str | None = None) -> bool:
 
 
 def deactivate_provider() -> None:
-    """
-    Clear active_provider in auth.json without deleting credentials.
+    """Clear active_provider in auth.json without deleting credentials.
     Used when the user switches to a non-OAuth provider (OpenRouter, custom)
     so auto-resolution doesn't keep picking the OAuth provider.
     """
@@ -1486,8 +1485,7 @@ def resolve_provider(
     explicit_api_key: str | None = None,
     explicit_base_url: str | None = None,
 ) -> str:
-    """
-    Determine which inference provider to use.
+    """Determine which inference provider to use.
 
     Priority (when requested="auto" or None):
     1. active_provider in auth.json with valid credentials
@@ -3093,6 +3091,7 @@ def login_spotify_command(args) -> None:
 # =============================================================================
 # SSH / remote session detection
 # =============================================================================
+
 
 def _is_remote_session() -> bool:
     """Detect environments where loopback OAuth can't reach the local browser.
@@ -5273,8 +5272,7 @@ def resolve_nous_runtime_credentials(
     ca_bundle: str | None = None,
     force_refresh: bool = False,
 ) -> dict[str, Any]:
-    """
-    Resolve Nous inference credentials for runtime use.
+    """Resolve Nous inference credentials for runtime use.
 
     Ensures access_token is a valid inference-scoped JWT, refreshing it when
     needed. Concurrent processes coordinate through the auth store file lock.
@@ -5894,7 +5892,7 @@ def _get_azure_foundry_auth_status() -> dict[str, Any]:
     """
     info: dict[str, Any] = {"provider": "azure-foundry"}
     try:
-        from hermes_cli.config import load_config, get_env_value
+        from hermes_cli.config import get_env_value, load_config
         cfg = load_config()
     except Exception:
         cfg = {}
@@ -5911,8 +5909,8 @@ def _get_azure_foundry_auth_status() -> dict[str, Any]:
     if auth_mode == "entra_id":
         try:
             from agent.azure_identity_adapter import (
-                EntraIdentityConfig,
                 SCOPE_AI_AZURE_DEFAULT,
+                EntraIdentityConfig,
                 has_azure_identity_installed,
             )
             installed = has_azure_identity_installed()
@@ -6417,7 +6415,7 @@ def _save_model_choice(model_id: str) -> None:
     The model is stored in config.yaml only — NOT in .env.  This avoids
     conflicts in multi-agent setups where env vars would stomp each other.
     """
-    from hermes_cli.config import save_config, load_config
+    from hermes_cli.config import load_config, save_config
 
     config = load_config()
     # Always use dict format so provider/base_url can be stored alongside
@@ -7720,8 +7718,10 @@ def _login_nous(args, pconfig: ProviderConfig) -> None:
                 )
 
             from hermes_cli.models import (
-                get_curated_nous_model_ids, get_pricing_for_provider,
-                check_nous_free_tier, partition_nous_models_by_tier,
+                check_nous_free_tier,
+                get_curated_nous_model_ids,
+                get_pricing_for_provider,
+                partition_nous_models_by_tier,
                 union_with_portal_free_recommendations,
                 union_with_portal_paid_recommendations,
             )

@@ -125,6 +125,7 @@ class TestPlatformNameCaseInsensitivity:
         assert target.platform == Platform.TELEGRAM
         assert target.chat_id == "12345"
 
+
 class RecordingAdapter:
     def __init__(self):
         self.calls = []

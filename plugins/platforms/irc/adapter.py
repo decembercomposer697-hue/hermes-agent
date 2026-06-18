@@ -1,5 +1,4 @@
-"""
-IRC Platform Adapter for Hermes Agent.
+"""IRC Platform Adapter for Hermes Agent.
 
 A plugin-based gateway adapter that connects to an IRC server and relays
 messages to/from the Hermes agent.  Zero external dependencies — uses
@@ -43,18 +42,18 @@ logger = logging.getLogger(__name__)
 # is discovered but the gateway hasn't been fully initialised yet.
 # ---------------------------------------------------------------------------
 
+from gateway.config import Platform
 from gateway.platforms.base import (
     BasePlatformAdapter,
-    SendResult,
     MessageEvent,
     MessageType,
+    SendResult,
 )
-from gateway.config import Platform
-
 
 # ---------------------------------------------------------------------------
 # IRC protocol helpers
 # ---------------------------------------------------------------------------
+
 
 def _parse_irc_message(raw: str) -> dict:
     """Parse a raw IRC protocol line into components.
@@ -542,14 +541,14 @@ def interactive_setup() -> None:
     in non-CLI contexts (gateway runtime, tests).
     """
     from hermes_cli.setup import (
-        prompt,
-        prompt_yes_no,
-        save_env_value,
         get_env_value,
         print_header,
         print_info,
-        print_warning,
         print_success,
+        print_warning,
+        prompt,
+        prompt_yes_no,
+        save_env_value,
     )
 
     print_header("IRC")

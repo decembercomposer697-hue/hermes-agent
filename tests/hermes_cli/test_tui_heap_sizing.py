@@ -101,7 +101,8 @@ class TestResolveTuiHeapMb:
 
 class TestNodeOptionsTokenMerge:
     """The _launch_tui token-merge block must add the sized cap unless the user
-    already supplied one, and must preserve unrelated NODE_OPTIONS flags."""
+    already supplied one, and must preserve unrelated NODE_OPTIONS flags.
+    """
 
     def _merge(self, node_options, limit_bytes):
         with mock.patch.object(m, "_read_cgroup_memory_limit", return_value=limit_bytes):

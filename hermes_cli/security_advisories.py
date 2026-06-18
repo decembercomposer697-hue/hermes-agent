@@ -1,5 +1,4 @@
-"""
-Security advisory checker for Hermes Agent.
+"""Security advisory checker for Hermes Agent.
 
 Detects known-compromised Python packages installed in the active venv
 (supply-chain attacks like the Mini Shai-Hulud worm of May 2026 that
@@ -36,10 +35,10 @@ from __future__ import annotations
 import logging
 import os
 import sys
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
-from collections.abc import Iterable
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +80,7 @@ class Advisory:
             should be the uninstall command; subsequent steps the credential
             audit / rotation guidance.
         published: ISO date string for sort order.
+
     """
 
     id: str

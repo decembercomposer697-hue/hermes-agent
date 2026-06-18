@@ -7,13 +7,12 @@ import json
 import os
 import threading
 from copy import deepcopy
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict, Optional
 
 from hermes_constants import get_hermes_home
-
 
 DEFAULT_TEAMS_PIPELINE_STORE_FILENAME = "teams_pipeline_store.json"
 

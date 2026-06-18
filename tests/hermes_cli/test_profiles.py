@@ -5,40 +5,40 @@ management, export/import, renaming, alias collision checks, profile isolation,
 and shell completion generation.
 """
 
-import json
 import io
+import json
 import tarfile
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from hermes_cli.profiles import (
-    normalize_profile_name,
-    validate_profile_name,
-    get_profile_dir,
+    NO_BUNDLED_SKILLS_MARKER,
+    _get_default_hermes_home,
+    _get_profiles_root,
+    check_alias_collision,
     create_profile,
     delete_profile,
-    list_profiles,
-    set_active_profile,
+    export_profile,
     get_active_profile,
     get_active_profile_name,
-    resolve_profile_env,
-    check_alias_collision,
-    rename_profile,
-    export_profile,
-    import_profile,
-    _get_profiles_root,
-    _get_default_hermes_home,
-    seed_profile_skills,
+    get_profile_dir,
     has_bundled_skills_opt_out,
-    NO_BUNDLED_SKILLS_MARKER,
+    import_profile,
+    list_profiles,
+    normalize_profile_name,
+    rename_profile,
+    resolve_profile_env,
+    seed_profile_skills,
+    set_active_profile,
+    validate_profile_name,
 )
-
 
 # ---------------------------------------------------------------------------
 # Shared fixture: redirect Path.home() and HERMES_HOME for profile tests
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def profile_env(tmp_path, monkeypatch):
@@ -117,7 +117,8 @@ class TestValidateProfileName:
     def test_reserved_names_rejected(self, name):
         """Reserved names collide with the Hermes install itself or with
         common system binaries — reject them at validate time so
-        create/install/rename all share one gate."""
+        create/install/rename all share one gate.
+        """
         with pytest.raises(ValueError, match="reserved"):
             validate_profile_name(name)
 
@@ -352,7 +353,8 @@ class TestNoSkillsOptOut:
 
     def test_seed_profile_skills_respects_marker(self, profile_env):
         """seed_profile_skills() must no-op on opted-out profiles even when
-        called directly (e.g. by `hermes update`'s all-profile sync loop)."""
+        called directly (e.g. by `hermes update`'s all-profile sync loop).
+        """
         profile_dir = create_profile("orchestrator", no_alias=True, no_skills=True)
 
         # Call seed_profile_skills() directly — it should NOT invoke subprocess,
@@ -368,7 +370,8 @@ class TestNoSkillsOptOut:
     def test_default_profile_gets_skills_seeded(self, profile_env, monkeypatch):
         """Sanity: without --no-skills, seed_profile_skills() runs the real
         subprocess path. Mock the subprocess so the test is hermetic, and
-        just confirm the marker is NOT checked in the non-opt-out case."""
+        just confirm the marker is NOT checked in the non-opt-out case.
+        """
         import subprocess as _sp
 
         profile_dir = create_profile("coder", no_alias=True)

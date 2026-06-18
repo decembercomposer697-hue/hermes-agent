@@ -16,7 +16,6 @@ The gateway classifier must distinguish:
 """
 
 
-
 def _classify(agent_result: dict, history_len: int) -> tuple[bool, bool]:
     """Replicate the gateway classifier from GatewayRunner._run_agent.
 
@@ -72,7 +71,8 @@ class TestContextOverflowStillSkipsTranscript:
 
 class TestTransientFailureKeepsUserMessage:
     """Transient provider failures must NOT skip the transcript — doing so
-    drops the user message and the agent forgets the turn. (#7100)"""
+    drops the user message and the agent forgets the turn. (#7100)
+    """
 
     def test_rate_limit_429_is_not_context_overflow(self):
         agent_result = {
@@ -115,7 +115,8 @@ class TestTransientFailureKeepsUserMessage:
 
     def test_generic_400_on_short_session_is_not_context_overflow(self):
         """A 400 on a short session is a real client error, not context
-        overflow — still not a reason to drop the user turn."""
+        overflow — still not a reason to drop the user turn.
+        """
         agent_result = {
             "failed": True,
             "error": "error code: 400 - invalid model",

@@ -4,7 +4,6 @@ from types import SimpleNamespace
 
 import pytest
 
-
 sys.modules.setdefault("fire", types.SimpleNamespace(Fire=lambda *a, **k: None))
 sys.modules.setdefault("firecrawl", types.SimpleNamespace(Firecrawl=object))
 sys.modules.setdefault("fal_client", types.SimpleNamespace())
@@ -15,7 +14,8 @@ import run_agent
 @pytest.fixture(autouse=True)
 def _no_codex_backoff(monkeypatch):
     """Short-circuit retry backoff so Codex retry tests don't block on real
-    wall-clock waits (5s jittered_backoff base delay + tight time.sleep loop)."""
+    wall-clock waits (5s jittered_backoff base delay + tight time.sleep loop).
+    """
     import time as _time
     monkeypatch.setattr(run_agent, "jittered_backoff", lambda *a, **k: 0.0)
     monkeypatch.setattr(_time, "sleep", lambda *_a, **_k: None)
@@ -507,7 +507,8 @@ def test_build_api_kwargs_xai_does_not_mutate_agent_tools(monkeypatch):
 
 def test_build_api_kwargs_xai_is_idempotent_across_repeated_calls(monkeypatch):
     """Multiple xAI requests must each produce the same sanitized output
-    AND must not progressively erode the source schema."""
+    AND must not progressively erode the source schema.
+    """
     agent = _build_xai_agent_with_slash_enum_tool(monkeypatch)
 
     kwargs1 = agent._build_api_kwargs([{"role": "user", "content": "first"}])
@@ -689,7 +690,8 @@ def test_run_conversation_codex_plain_text(monkeypatch):
 def test_run_conversation_codex_empty_output_with_output_text(monkeypatch):
     """Regression: empty response.output + valid output_text should succeed,
     not trigger retry/fallback. The validation stage must defer to
-    _normalize_codex_response which synthesizes output from output_text."""
+    _normalize_codex_response which synthesizes output from output_text.
+    """
     agent = _build_agent(monkeypatch)
 
     def _empty_output_response(api_kwargs):
@@ -711,7 +713,8 @@ def test_run_conversation_codex_empty_output_with_output_text(monkeypatch):
 
 def test_run_conversation_codex_empty_output_no_output_text_retries(monkeypatch):
     """When both output and output_text are empty, validation should
-    correctly mark the response as invalid and trigger retry."""
+    correctly mark the response as invalid and trigger retry.
+    """
     agent = _build_agent(monkeypatch)
     calls = {"api": 0}
 
@@ -798,7 +801,8 @@ def test_build_api_kwargs_xai_oauth_sends_cache_key_via_extra_body(monkeypatch):
     ``Responses.stream()``. Older or trimmed SDK builds drop it from the
     signature and would otherwise raise ``TypeError`` before the request
     reaches api.x.ai. The ``x-grok-conv-id`` header is retained as a
-    belt-and-braces fallback for clients/proxies that route on headers."""
+    belt-and-braces fallback for clients/proxies that route on headers.
+    """
     agent = _build_xai_oauth_agent(monkeypatch)
     kwargs = agent._build_api_kwargs(
         [
@@ -829,7 +833,8 @@ def test_run_conversation_xai_oauth_refreshes_after_401_and_retries(monkeypatch)
     handler that fires for openai-codex must also fire for xai-oauth — the
     bug it caught: the gating condition checked only ``provider == "openai-codex"``,
     so xai-oauth 401s leaked straight to non-retryable abort path with no
-    chance to swap in a freshly refreshed access token."""
+    chance to swap in a freshly refreshed access token.
+    """
     agent = _build_xai_oauth_agent(monkeypatch)
     calls = {"api": 0, "refresh": 0}
 
@@ -865,7 +870,8 @@ def test_try_refresh_codex_client_credentials_handles_xai_oauth(monkeypatch):
     client with freshly resolved xAI OAuth credentials when the active
     provider is xai-oauth.  The function name is shared between codex and
     xai-oauth (both speak codex_responses) — covering both cases prevents
-    silent regressions where the function gets gated to a single provider."""
+    silent regressions where the function gets gated to a single provider.
+    """
     agent = _build_xai_oauth_agent(monkeypatch)
     closed = {"value": False}
     rebuilt = {"kwargs": None}
@@ -917,7 +923,8 @@ def test_try_refresh_codex_client_credentials_skips_xai_oauth_when_singleton_dif
 
     The credential pool's reactive recovery is the right channel for
     pool-managed credentials; this fallback path is for the singleton-
-    only case and must short-circuit when the active key differs."""
+    only case and must short-circuit when the active key differs.
+    """
     agent = _build_xai_oauth_agent(monkeypatch)
     # Agent is using "xai-oauth-token" (per the builder); singleton holds
     # a *different* account's token.  No force_refresh should fire.
@@ -1458,7 +1465,8 @@ def test_normalize_codex_response_ignores_tool_call_text_when_real_tool_call_pre
 
 def test_normalize_codex_response_no_leak_passes_through(monkeypatch):
     """Sanity: normal assistant content that doesn't contain the leak pattern
-    is returned verbatim with finish_reason=stop."""
+    is returned verbatim with finish_reason=stop.
+    """
     agent = _build_agent(monkeypatch)
     from agent.codex_responses_adapter import _normalize_codex_response
 
@@ -1526,7 +1534,8 @@ def test_interim_commentary_is_not_marked_already_streamed_when_stream_callback_
 def test_interim_commentary_preserves_assistant_content(monkeypatch):
     """Interim commentary must not silently mutate assistant text containing
     literal <memory-context> markers — that's legitimate model output (docs,
-    code).  Streaming-path leak prevention happens delta-by-delta upstream."""
+    code).  Streaming-path leak prevention happens delta-by-delta upstream.
+    """
     agent = _build_agent(monkeypatch)
     observed = {}
     agent.interim_assistant_callback = lambda text, *, already_streamed=False: observed.update(
@@ -1643,7 +1652,8 @@ def test_stream_delta_preserves_mid_stream_leading_newlines(monkeypatch):
 
 def test_stream_delta_preserves_code_fence_newlines(monkeypatch):
     """Code blocks span multiple deltas.  A "\\n```python\\n" boundary
-    is the canonical case where stripping leading newlines corrupts output."""
+    is the canonical case where stripping leading newlines corrupts output.
+    """
     agent = _build_agent(monkeypatch)
     observed = []
     agent.stream_delta_callback = observed.append
@@ -1904,7 +1914,8 @@ def test_run_conversation_codex_continues_after_reasoning_only_response(monkeypa
 
 def test_run_conversation_codex_preserves_encrypted_reasoning_in_interim(monkeypatch):
     """Encrypted codex_reasoning_items must be preserved in interim messages
-    even when there is no visible reasoning text or content."""
+    even when there is no visible reasoning text or content.
+    """
     agent = _build_agent(monkeypatch)
     # Response with encrypted reasoning but no human-readable summary
     reasoning_response = SimpleNamespace(
@@ -1945,7 +1956,8 @@ def test_run_conversation_codex_preserves_encrypted_reasoning_in_interim(monkeyp
 def test_chat_messages_to_responses_input_reasoning_only_has_following_item(monkeypatch):
     """When converting a reasoning-only interim message to Responses API input,
     the reasoning items must be followed by an assistant message (even if empty)
-    to satisfy the API's 'required following item' constraint."""
+    to satisfy the API's 'required following item' constraint.
+    """
     agent = _build_agent(monkeypatch)
     messages = [
         {"role": "user", "content": "think hard"},
@@ -2013,7 +2025,8 @@ def test_codex_message_item_status_survives_conversion_and_preflight(monkeypatch
 
 def test_duplicate_detection_distinguishes_different_codex_reasoning(monkeypatch):
     """Two consecutive reasoning-only responses with different encrypted content
-    must NOT be treated as duplicates."""
+    must NOT be treated as duplicates.
+    """
     agent = _build_agent(monkeypatch)
     responses = [
         # First reasoning-only response
@@ -2115,7 +2128,8 @@ def test_duplicate_detection_distinguishes_different_codex_message_items(monkeyp
 
 def test_chat_messages_to_responses_input_deduplicates_reasoning_ids(monkeypatch):
     """Duplicate reasoning item IDs across multi-turn incomplete responses
-    must be deduplicated so the Responses API doesn't reject with HTTP 400."""
+    must be deduplicated so the Responses API doesn't reject with HTTP 400.
+    """
     agent = _build_agent(monkeypatch)
     messages = [
         {"role": "user", "content": "think hard"},

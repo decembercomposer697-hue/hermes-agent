@@ -1,5 +1,4 @@
-"""
-Configuration management for Hermes Agent.
+"""Configuration management for Hermes Agent.
 
 Config files are stored in ~/.hermes/ for easy access:
 - ~/.hermes/config.yaml  - All settings (model, toolsets, terminal, etc.)
@@ -27,7 +26,7 @@ import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from hermes_cli.secret_prompt import masked_secret_prompt
 
@@ -293,7 +292,6 @@ import yaml
 from hermes_cli.colors import Colors, color
 from hermes_cli.default_soul import DEFAULT_SOUL_MD
 
-
 # =============================================================================
 # Managed mode (NixOS declarative config)
 # =============================================================================
@@ -530,6 +528,7 @@ def format_managed_message(action: str = "modify this Hermes installation") -> s
         "Use your package manager to upgrade or reinstall Hermes."
     )
 
+
 def managed_error(action: str = "modify configuration"):
     """Print user-friendly error for managed mode."""
     print(format_managed_message(action), file=sys.stderr)
@@ -592,17 +591,21 @@ def get_container_exec_info() -> dict | None:
 from hermes_constants import get_hermes_home
 from utils import atomic_replace
 
+
 def get_config_path() -> Path:
     """Get the main config file path."""
     return get_hermes_home() / "config.yaml"
+
 
 def get_env_path() -> Path:
     """Get the .env file path (for API keys)."""
     return get_hermes_home() / ".env"
 
+
 def get_project_root() -> Path:
     """Get the project installation directory."""
     return Path(__file__).parent.parent.resolve()
+
 
 def _resolve_hermes_uid_gid() -> tuple[int | None, int | None]:
     """Read the HERMES_UID / HERMES_GID env vars set by Docker deployments.
@@ -3593,8 +3596,7 @@ OPTIONAL_ENV_VARS = {
 
 
 def get_missing_env_vars(required_only: bool = False) -> list[dict[str, Any]]:
-    """
-    Check which environment variables are missing.
+    """Check which environment variables are missing.
     
     Returns list of dicts with var info for missing variables.
     """
@@ -3666,8 +3668,7 @@ def _set_nested(config, dotted_key: str, value):
 
 
 def get_missing_config_fields() -> list[dict[str, Any]]:
-    """
-    Check which config fields are missing or outdated (recursive).
+    """Check which config fields are missing or outdated (recursive).
     
     Walks the DEFAULT_CONFIG tree at arbitrary depth and reports any keys
     present in defaults but absent from the user's loaded config.
@@ -3677,7 +3678,7 @@ def get_missing_config_fields() -> list[dict[str, Any]]:
 
     def _check(defaults: dict, current: dict, prefix: str = ""):
         for key, default_value in defaults.items():
-            if key.startswith('_'):
+            if key.startswith("_"):
                 continue
             full_key = key if not prefix else f"{prefix}.{key}"
             if key not in current:
@@ -3701,7 +3702,10 @@ def get_missing_skill_config_vars() -> list[dict[str, Any]]:
     config.yaml.  Returns a list of dicts suitable for prompting.
     """
     try:
-        from agent.skill_utils import discover_all_skill_config_vars, SKILL_CONFIG_PREFIX
+        from agent.skill_utils import (
+            SKILL_CONFIG_PREFIX,
+            discover_all_skill_config_vars,
+        )
     except Exception:
         return []
 
@@ -4049,8 +4053,7 @@ def _coerce_config_version(value: Any) -> int:
 
 
 def check_config_version() -> tuple[int, int]:
-    """
-    Check the raw on-disk config schema version.
+    """Check the raw on-disk config schema version.
 
     ``load_config()`` deliberately starts from ``DEFAULT_CONFIG`` and deep-merges
     the user's file, which is correct for runtime reads but wrong for deciding
@@ -4327,8 +4330,7 @@ def warn_deprecated_cwd_env_vars(config: dict[str, Any] | None = None) -> None:
 
 
 def migrate_config(interactive: bool = True, quiet: bool = False) -> dict[str, Any]:
-    """
-    Migrate config to latest version, prompting for new required fields.
+    """Migrate config to latest version, prompting for new required fields.
     
     Args:
         interactive: If True, prompt user for missing values
@@ -4336,6 +4338,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> dict[str, A
         
     Returns:
         Dict with migration results: {"env_added": [...], "config_added": [...], "warnings": [...]}
+
     """
     results = {"env_added": [], "config_added": [], "warnings": []}
 
@@ -5148,6 +5151,7 @@ def cfg_get(cfg: dict[str, Any] | None, *keys: str, default: Any = None) -> Any:
         >>> cfg_get({"a": {"b": None}}, "a", "b", default="def")  # explicit None preserved
         >>> cfg_get({"a": {"b": False}}, "a", "b", default=True)  # falsy values preserved
         False
+
     """
     if not isinstance(cfg, dict):
         return default
@@ -5159,7 +5163,6 @@ def cfg_get(cfg: dict[str, Any] | None, *keys: str, default: Any = None) -> Any:
             return default
         node = node[key]
     return node
-
 
 
 def read_raw_config() -> dict[str, Any]:
@@ -5553,8 +5556,8 @@ def load_env() -> dict[str, str]:
         lines = _sanitize_env_lines(raw_lines)
         for line in lines:
             line = line.strip()
-            if line and not line.startswith('#') and '=' in line:
-                key, _, value = line.partition('=')
+            if line and not line.startswith("#") and "=" in line:
+                key, _, value = line.partition("=")
                 env_vars[key.strip()] = value.strip().strip('"\'')
 
     if cache_key is not None:
@@ -5769,7 +5772,7 @@ def save_env_value(key: str, value: str):
             lines[-1] += "\n"
         lines.append(f"{key}={value}\n")
     
-    fd, tmp_path = tempfile.mkstemp(dir=str(env_path.parent), suffix='.tmp', prefix='.env_')
+    fd, tmp_path = tempfile.mkstemp(dir=str(env_path.parent), suffix=".tmp", prefix=".env_")
     # Preserve original permissions so Docker volume mounts aren't clobbered.
     original_mode = None
     if env_path.exists():
@@ -5778,7 +5781,7 @@ def save_env_value(key: str, value: str):
         except OSError:
             pass
     try:
-        with os.fdopen(fd, 'w', **write_kw) as f:
+        with os.fdopen(fd, "w", **write_kw) as f:
             f.writelines(lines)
             f.flush()
             os.fsync(f.fileno())
@@ -5829,7 +5832,7 @@ def remove_env_value(key: str) -> bool:
     found = len(new_lines) < len(lines)
 
     if found:
-        fd, tmp_path = tempfile.mkstemp(dir=str(env_path.parent), suffix='.tmp', prefix='.env_')
+        fd, tmp_path = tempfile.mkstemp(dir=str(env_path.parent), suffix=".tmp", prefix=".env_")
         # Preserve original permissions so Docker volume mounts aren't clobbered.
         original_mode = None
         try:
@@ -5837,7 +5840,7 @@ def remove_env_value(key: str) -> bool:
         except OSError:
             pass
         try:
-            with os.fdopen(fd, 'w', **write_kw) as f:
+            with os.fdopen(fd, "w", **write_kw) as f:
                 f.writelines(new_lines)
                 f.flush()
                 os.fsync(f.fileno())
@@ -5892,7 +5895,6 @@ def save_env_value_secure(key: str, value: str) -> dict[str, Any]:
         "stored_as": key,
         "validated": False,
     }
-
 
 
 def reload_env() -> int:
@@ -5985,7 +5987,7 @@ def show_config():
     print()
     print(color("◆ Model", Colors.CYAN, Colors.BOLD))
     print(f"  Model:        {config.get('model', 'not set')}")
-    _cfg_max_turns = config.get('agent', {}).get('max_turns', DEFAULT_CONFIG['agent']['max_turns'])
+    _cfg_max_turns = config.get("agent", {}).get("max_turns", DEFAULT_CONFIG["agent"]["max_turns"])
     print(f"  Max turns:    {_cfg_max_turns}")
     # Warn on stale HERMES_MAX_ITERATIONS ghost in .env that disagrees with
     # config.yaml (issue #17534). Read the .env FILE directly so we catch the
@@ -6004,45 +6006,45 @@ def show_config():
     # Display
     print()
     print(color("◆ Display", Colors.CYAN, Colors.BOLD))
-    display = config.get('display', {})
+    display = config.get("display", {})
     print(f"  Personality:  {display.get('personality') or 'none'}")
     print(f"  Reasoning:    {'on' if display.get('show_reasoning', False) else 'off'}")
     print(f"  Bell:         {'on' if display.get('bell_on_complete', False) else 'off'}")
-    ump = display.get('user_message_preview', {}) if isinstance(display.get('user_message_preview', {}), dict) else {}
-    ump_first = ump.get('first_lines', 2)
-    ump_last = ump.get('last_lines', 2)
+    ump = display.get("user_message_preview", {}) if isinstance(display.get("user_message_preview", {}), dict) else {}
+    ump_first = ump.get("first_lines", 2)
+    ump_last = ump.get("last_lines", 2)
     print(f"  User preview: first {ump_first} line(s), last {ump_last} line(s)")
 
     # Terminal
     print()
     print(color("◆ Terminal", Colors.CYAN, Colors.BOLD))
-    terminal = config.get('terminal', {})
+    terminal = config.get("terminal", {})
     print(f"  Backend:      {terminal.get('backend', 'local')}")
     print(f"  Working dir:  {terminal.get('cwd', '.')}")
     print(f"  Timeout:      {terminal.get('timeout', 60)}s")
     
-    if terminal.get('backend') == 'docker':
+    if terminal.get("backend") == "docker":
         print(f"  Docker image: {terminal.get('docker_image', 'nikolaik/python-nodejs:python3.11-nodejs20')}")
-    elif terminal.get('backend') == 'singularity':
+    elif terminal.get("backend") == "singularity":
         print(f"  Image:        {terminal.get('singularity_image', 'docker://nikolaik/python-nodejs:python3.11-nodejs20')}")
-    elif terminal.get('backend') == 'modal':
+    elif terminal.get("backend") == "modal":
         print(f"  Modal image:  {terminal.get('modal_image', 'nikolaik/python-nodejs:python3.11-nodejs20')}")
-        modal_token = get_env_value('MODAL_TOKEN_ID')
+        modal_token = get_env_value("MODAL_TOKEN_ID")
         print(f"  Modal token:  {'configured' if modal_token else '(not set)'}")
-    elif terminal.get('backend') == 'daytona':
+    elif terminal.get("backend") == "daytona":
         print(f"  Daytona image: {terminal.get('daytona_image', 'nikolaik/python-nodejs:python3.11-nodejs20')}")
-        daytona_key = get_env_value('DAYTONA_API_KEY')
+        daytona_key = get_env_value("DAYTONA_API_KEY")
         print(f"  API key:      {'configured' if daytona_key else '(not set)'}")
-    elif terminal.get('backend') == 'ssh':
-        ssh_host = get_env_value('TERMINAL_SSH_HOST')
-        ssh_user = get_env_value('TERMINAL_SSH_USER')
+    elif terminal.get("backend") == "ssh":
+        ssh_host = get_env_value("TERMINAL_SSH_HOST")
+        ssh_user = get_env_value("TERMINAL_SSH_USER")
         print(f"  SSH host:     {ssh_host or '(not set)'}")
         print(f"  SSH user:     {ssh_user or '(not set)'}")
     
     # Timezone
     print()
     print(color("◆ Timezone", Colors.CYAN, Colors.BOLD))
-    tz = config.get('timezone', '')
+    tz = config.get("timezone", "")
     if tz:
         print(f"  Timezone:     {tz}")
     else:
@@ -6051,38 +6053,38 @@ def show_config():
     # Compression
     print()
     print(color("◆ Context Compression", Colors.CYAN, Colors.BOLD))
-    compression = config.get('compression', {})
-    enabled = compression.get('enabled', True)
+    compression = config.get("compression", {})
+    enabled = compression.get("enabled", True)
     print(f"  Enabled:      {'yes' if enabled else 'no'}")
     if enabled:
         print(f"  Threshold:    {compression.get('threshold', 0.50) * 100:.0f}%")
         print(f"  Target ratio: {compression.get('target_ratio', 0.20) * 100:.0f}% of threshold preserved")
         print(f"  Protect last: {compression.get('protect_last_n', 20)} messages")
         print(f"  Protect first: {compression.get('protect_first_n', 3)} non-system head messages")
-        _aux_comp = config.get('auxiliary', {}).get('compression', {})
-        _sm = _aux_comp.get('model', '') or '(auto)'
+        _aux_comp = config.get("auxiliary", {}).get("compression", {})
+        _sm = _aux_comp.get("model", "") or "(auto)"
         print(f"  Model:        {_sm}")
-        comp_provider = _aux_comp.get('provider', 'auto')
-        if comp_provider and comp_provider != 'auto':
+        comp_provider = _aux_comp.get("provider", "auto")
+        if comp_provider and comp_provider != "auto":
             print(f"  Provider:     {comp_provider}")
     
     # Auxiliary models
-    auxiliary = config.get('auxiliary', {})
+    auxiliary = config.get("auxiliary", {})
     aux_tasks = {
-        "Vision":      auxiliary.get('vision', {}),
-        "Web extract": auxiliary.get('web_extract', {}),
+        "Vision":      auxiliary.get("vision", {}),
+        "Web extract": auxiliary.get("web_extract", {}),
     }
     has_overrides = any(
-        t.get('provider', 'auto') != 'auto' or t.get('model', '')
+        t.get("provider", "auto") != "auto" or t.get("model", "")
         for t in aux_tasks.values()
     )
     if has_overrides:
         print()
         print(color("◆ Auxiliary Models (overrides)", Colors.CYAN, Colors.BOLD))
         for label, task_cfg in aux_tasks.items():
-            prov = task_cfg.get('provider', 'auto')
-            mdl = task_cfg.get('model', '')
-            if prov != 'auto' or mdl:
+            prov = task_cfg.get("provider", "auto")
+            mdl = task_cfg.get("model", "")
+            if prov != "auto" or mdl:
                 parts = [f"provider={prov}"]
                 if mdl:
                     parts.append(f"model={mdl}")
@@ -6092,15 +6094,18 @@ def show_config():
     print()
     print(color("◆ Messaging Platforms", Colors.CYAN, Colors.BOLD))
     
-    telegram_token = get_env_value('TELEGRAM_BOT_TOKEN')
-    discord_token = get_env_value('DISCORD_BOT_TOKEN')
+    telegram_token = get_env_value("TELEGRAM_BOT_TOKEN")
+    discord_token = get_env_value("DISCORD_BOT_TOKEN")
     
     print(f"  Telegram:     {'configured' if telegram_token else color('not configured', Colors.DIM)}")
     print(f"  Discord:      {'configured' if discord_token else color('not configured', Colors.DIM)}")
     
     # Skill config
     try:
-        from agent.skill_utils import discover_all_skill_config_vars, resolve_skill_config_values
+        from agent.skill_utils import (
+            discover_all_skill_config_vars,
+            resolve_skill_config_values,
+        )
         skill_vars = discover_all_skill_config_vars()
         if skill_vars:
             resolved = resolve_skill_config_values(skill_vars)
@@ -6136,7 +6141,7 @@ def edit_config():
         print(f"Created {config_path}")
     
     # Find editor
-    editor = os.getenv('EDITOR') or os.getenv('VISUAL')
+    editor = os.getenv("EDITOR") or os.getenv("VISUAL")
 
     if not editor:
         # Try common editors — order is platform-aware so Windows users
@@ -6146,9 +6151,9 @@ def edit_config():
         import shutil
         import sys as _sys
         if _sys.platform == "win32":
-            candidates = ['notepad', 'code', 'vim', 'vi', 'nano']
+            candidates = ["notepad", "code", "vim", "vi", "nano"]
         else:
-            candidates = ['nano', 'vim', 'vi', 'code', 'notepad']
+            candidates = ["nano", "vim", "vi", "code", "notepad"]
         for cmd in candidates:
             if shutil.which(cmd):
                 editor = cmd
@@ -6170,18 +6175,18 @@ def set_config_value(key: str, value: str):
         return
     # Check if it's an API key (goes to .env)
     api_keys = [
-        'OPENROUTER_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'VOICE_TOOLS_OPENAI_KEY',
-        'EXA_API_KEY', 'PARALLEL_API_KEY', 'FIRECRAWL_API_KEY', 'FIRECRAWL_API_URL',
-        'FIRECRAWL_GATEWAY_URL', 'TOOL_GATEWAY_DOMAIN', 'TOOL_GATEWAY_SCHEME',
-        'TOOL_GATEWAY_USER_TOKEN', 'TAVILY_API_KEY',
-        'BROWSERBASE_API_KEY', 'BROWSERBASE_PROJECT_ID', 'BROWSER_USE_API_KEY',
-        'FAL_KEY', 'TELEGRAM_BOT_TOKEN', 'DISCORD_BOT_TOKEN',
-        'TERMINAL_SSH_HOST', 'TERMINAL_SSH_USER', 'TERMINAL_SSH_KEY',
-        'SUDO_PASSWORD', 'SLACK_BOT_TOKEN', 'SLACK_APP_TOKEN',
-        'GITHUB_TOKEN', 'HONCHO_API_KEY',
+        "OPENROUTER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "VOICE_TOOLS_OPENAI_KEY",
+        "EXA_API_KEY", "PARALLEL_API_KEY", "FIRECRAWL_API_KEY", "FIRECRAWL_API_URL",
+        "FIRECRAWL_GATEWAY_URL", "TOOL_GATEWAY_DOMAIN", "TOOL_GATEWAY_SCHEME",
+        "TOOL_GATEWAY_USER_TOKEN", "TAVILY_API_KEY",
+        "BROWSERBASE_API_KEY", "BROWSERBASE_PROJECT_ID", "BROWSER_USE_API_KEY",
+        "FAL_KEY", "TELEGRAM_BOT_TOKEN", "DISCORD_BOT_TOKEN",
+        "TERMINAL_SSH_HOST", "TERMINAL_SSH_USER", "TERMINAL_SSH_KEY",
+        "SUDO_PASSWORD", "SLACK_BOT_TOKEN", "SLACK_APP_TOKEN",
+        "GITHUB_TOKEN", "HONCHO_API_KEY",
     ]
     
-    if key.upper() in api_keys or key.upper().endswith(('_API_KEY', '_TOKEN')) or key.upper().startswith('TERMINAL_SSH'):
+    if key.upper() in api_keys or key.upper().endswith(("_API_KEY", "_TOKEN")) or key.upper().startswith("TERMINAL_SSH"):
         save_env_value(key.upper(), value)
         print(f"✓ Set {key} in {get_env_path()}")
         return
@@ -6204,13 +6209,13 @@ def set_config_value(key: str, value: str):
     # inline navigation here silently overwrote lists with dicts.
 
     # Convert value to appropriate type
-    if value.lower() in {'true', 'yes', 'on'}:
+    if value.lower() in {"true", "yes", "on"}:
         value = True
-    elif value.lower() in {'false', 'no', 'off'}:
+    elif value.lower() in {"false", "no", "off"}:
         value = False
     elif value.isdigit():
         value = int(value)
-    elif value.replace('.', '', 1).isdigit():
+    elif value.replace(".", "", 1).isdigit():
         value = float(value)
 
     _set_nested(user_config, key, value)
@@ -6235,7 +6240,7 @@ def set_config_value(key: str, value: str):
 
 def config_command(args):
     """Handle config subcommands."""
-    subcmd = getattr(args, 'config_command', None)
+    subcmd = getattr(args, "config_command", None)
     
     if subcmd is None or subcmd == "show":
         show_config()
@@ -6244,8 +6249,8 @@ def config_command(args):
         edit_config()
     
     elif subcmd == "set":
-        key = getattr(args, 'key', None)
-        value = getattr(args, 'value', None)
+        key = getattr(args, "key", None)
+        value = getattr(args, "value", None)
         if not key or value is None:
             print("Usage: hermes config set <key> <value>")
             print()

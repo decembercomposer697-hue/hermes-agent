@@ -19,8 +19,8 @@ import logging
 import platform
 
 from plugins.google_meet import process_manager as pm
-from plugins.google_meet.cli import register_cli as _register_meet_cli
 from plugins.google_meet.cli import meet_command as _meet_command
+from plugins.google_meet.cli import register_cli as _register_meet_cli
 from plugins.google_meet.tools import (
     MEET_JOIN_SCHEMA,
     MEET_LEAVE_SCHEMA,
@@ -39,11 +39,11 @@ logger = logging.getLogger(__name__)
 
 
 _TOOLS = (
-    ("meet_join",       MEET_JOIN_SCHEMA,       handle_meet_join,       "📞"),
-    ("meet_status",     MEET_STATUS_SCHEMA,     handle_meet_status,     "🟢"),
+    ("meet_join", MEET_JOIN_SCHEMA, handle_meet_join, "📞"),
+    ("meet_status", MEET_STATUS_SCHEMA, handle_meet_status, "🟢"),
     ("meet_transcript", MEET_TRANSCRIPT_SCHEMA, handle_meet_transcript, "📝"),
-    ("meet_leave",      MEET_LEAVE_SCHEMA,      handle_meet_leave,      "👋"),
-    ("meet_say",        MEET_SAY_SCHEMA,        handle_meet_say,        "🗣️"),
+    ("meet_leave", MEET_LEAVE_SCHEMA, handle_meet_leave, "👋"),
+    ("meet_say", MEET_SAY_SCHEMA, handle_meet_say, "🗣️"),
 )
 
 

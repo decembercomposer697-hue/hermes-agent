@@ -80,7 +80,8 @@ def _make_runner():
 @pytest.mark.asyncio
 async def test_gate_off_runs_execute_immediately(monkeypatch):
     """When approvals.destructive_slash_confirm is False, the destructive
-    action runs immediately without prompting."""
+    action runs immediately without prompting.
+    """
     runner = _make_runner()
     runner._read_user_config = lambda: {"approvals": {"destructive_slash_confirm": False}}
     runner._session_key_for_source = lambda src: build_session_key(src)
@@ -103,7 +104,8 @@ async def test_gate_off_runs_execute_immediately(monkeypatch):
 @pytest.mark.asyncio
 async def test_gate_on_text_fallback_returns_prompt_without_executing(monkeypatch):
     """When the gate is on and the adapter has no button UI, the user gets
-    a text prompt back and the destructive action is NOT yet run."""
+    a text prompt back and the destructive action is NOT yet run.
+    """
     runner = _make_runner()
     runner._read_user_config = lambda: {"approvals": {"destructive_slash_confirm": True}}
     runner._session_key_for_source = lambda src: build_session_key(src)
@@ -128,7 +130,8 @@ async def test_gate_on_text_fallback_returns_prompt_without_executing(monkeypatc
 @pytest.mark.asyncio
 async def test_gate_on_pending_confirm_registered(monkeypatch):
     """When the gate is on, a pending slash-confirm entry is registered for
-    the session — the user's /approve reply will resolve it."""
+    the session — the user's /approve reply will resolve it.
+    """
     from tools import slash_confirm as _slash_confirm_mod
     runner = _make_runner()
     runner._read_user_config = lambda: {"approvals": {"destructive_slash_confirm": True}}
@@ -155,7 +158,8 @@ async def test_gate_on_pending_confirm_registered(monkeypatch):
 @pytest.mark.asyncio
 async def test_resolve_once_runs_execute_and_returns_result():
     """Resolving the pending confirm with 'once' runs the destructive
-    action and returns its output."""
+    action and returns its output.
+    """
     from tools import slash_confirm as _slash_confirm_mod
     runner = _make_runner()
     runner._read_user_config = lambda: {"approvals": {"destructive_slash_confirm": True}}
@@ -221,7 +225,8 @@ async def test_resolve_cancel_does_not_run_execute():
 @pytest.mark.asyncio
 async def test_resolve_always_persists_opt_out_and_runs_execute(monkeypatch):
     """Resolving with 'always' must (a) flip the config gate to False,
-    (b) run execute, and (c) include a one-time opt-out note in the reply."""
+    (b) run execute, and (c) include a one-time opt-out note in the reply.
+    """
     from tools import slash_confirm as _slash_confirm_mod
     runner = _make_runner()
     runner._read_user_config = lambda: {"approvals": {"destructive_slash_confirm": True}}

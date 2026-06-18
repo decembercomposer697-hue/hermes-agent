@@ -18,16 +18,16 @@ class _DummyPool:
 
 @pytest.fixture
 def oauth_file(monkeypatch, tmp_path):
-    target = tmp_path / '.anthropic_oauth.json'
-    monkeypatch.setattr('agent.anthropic_adapter._HERMES_OAUTH_FILE', target)
-    monkeypatch.setattr('agent.credential_pool.load_pool', lambda _provider: _DummyPool())
+    target = tmp_path / ".anthropic_oauth.json"
+    monkeypatch.setattr("agent.anthropic_adapter._HERMES_OAUTH_FILE", target)
+    monkeypatch.setattr("agent.credential_pool.load_pool", lambda _provider: _DummyPool())
     return target
 
 
 def test_dashboard_oauth_write_uses_owner_only_permissions(oauth_file):
     old_umask = os.umask(0o022)
     try:
-        _save_anthropic_oauth_creds('access-token', 'refresh-token', 123456)
+        _save_anthropic_oauth_creds("access-token", "refresh-token", 123456)
     finally:
         os.umask(old_umask)
 
@@ -41,13 +41,13 @@ def test_dashboard_oauth_write_uses_atomic_replace_and_cleans_temp_files(oauth_f
 
     def flaky_replace(src, dst):
         replace_calls.append((src, dst))
-        raise OSError('simulated replace failure')
+        raise OSError("simulated replace failure")
 
-    monkeypatch.setattr('hermes_cli.web_server.os.replace', flaky_replace)
+    monkeypatch.setattr("hermes_cli.web_server.os.replace", flaky_replace)
 
-    with pytest.raises(OSError, match='simulated replace failure'):
-        _save_anthropic_oauth_creds('access-token', 'refresh-token', 123456)
+    with pytest.raises(OSError, match="simulated replace failure"):
+        _save_anthropic_oauth_creds("access-token", "refresh-token", 123456)
 
-    assert replace_calls, 'helper should attempt atomic os.replace()'
+    assert replace_calls, "helper should attempt atomic os.replace()"
     assert not oauth_file.exists()
-    assert not list(oauth_file.parent.glob(f'{oauth_file.name}.tmp*'))
+    assert not list(oauth_file.parent.glob(f"{oauth_file.name}.tmp*"))

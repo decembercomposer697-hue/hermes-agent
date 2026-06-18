@@ -104,7 +104,8 @@ class TestGetConnectedPlatforms:
     def test_dingtalk_recognised_via_env_vars(self, monkeypatch):
         """DingTalk configured via env vars (no extras) should still be
         recognised as connected — covers the case where _apply_env_overrides
-        hasn't populated extras yet."""
+        hasn't populated extras yet.
+        """
         monkeypatch.setenv("DINGTALK_CLIENT_ID", "env_cid")
         monkeypatch.setenv("DINGTALK_CLIENT_SECRET", "env_sec")
         config = GatewayConfig(
@@ -888,7 +889,8 @@ class TestLoadGatewayConfig:
 
 class TestHomeChannelEnvOverrides:
     """Home channel env vars should apply even when the platform was already
-    configured via config.yaml (not just when credential env vars create it)."""
+    configured via config.yaml (not just when credential env vars create it).
+    """
 
     def test_existing_platform_configs_accept_home_channel_env_overrides(self):
         cases = [

@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DASHBOARD_RUN = REPO_ROOT / "docker" / "s6-rc.d" / "dashboard" / "run"
 MAIN_WRAPPER = REPO_ROOT / "docker" / "main-wrapper.sh"
@@ -20,7 +19,7 @@ def test_main_wrapper_preserves_docker_workdir() -> None:
     assert "_hermes_orig_cwd" in text, (
         "main-wrapper.sh must save the original cwd before cd /opt/data"
     )
-    assert 'HERMES_ORIG_CWD:-$PWD' in text, (
+    assert "HERMES_ORIG_CWD:-$PWD" in text, (
         "main-wrapper.sh must capture PWD as the fallback original cwd"
     )
 
@@ -60,7 +59,7 @@ def test_dashboard_run_does_not_derive_insecure_from_bind_host() -> None:
     text = DASHBOARD_RUN.read_text(encoding="utf-8")
 
     # No legacy host-derived flip.
-    assert '127.0.0.1|localhost' not in text, (
+    assert "127.0.0.1|localhost" not in text, (
         "Run script still derives --insecure from the bind host. The gate "
         "is the authority now — opt in via HERMES_DASHBOARD_INSECURE instead."
     )

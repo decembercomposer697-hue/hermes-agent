@@ -22,7 +22,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 def test_redact_secrets_false_in_config_yaml_is_honored(tmp_path):
     """Setting `security.redact_secrets: false` in config.yaml must disable
-    redaction — even though it's set in YAML, not as an env var."""
+    redaction — even though it's set in YAML, not as an env var.
+    """
     hermes_home = tmp_path / ".hermes"
     hermes_home.mkdir()
 
@@ -114,7 +115,8 @@ def test_redact_secrets_default_true_when_unset(tmp_path):
 
 def test_redact_secrets_true_in_config_yaml_is_honored(tmp_path):
     """Setting `security.redact_secrets: true` in config.yaml must enable
-    redaction — even though it's set in YAML, not as an env var."""
+    redaction — even though it's set in YAML, not as an env var.
+    """
     hermes_home = tmp_path / ".hermes"
     hermes_home.mkdir()
     (hermes_home / "config.yaml").write_text(

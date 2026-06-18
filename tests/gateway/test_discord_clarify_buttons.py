@@ -25,16 +25,16 @@ if _repo not in sys.path:
 
 # Triggers the shared discord mock from tests/gateway/conftest.py before
 # importing the production module.
+from gateway.config import PlatformConfig
 from plugins.platforms.discord.adapter import (
     ClarifyChoiceView,
     DiscordAdapter,
 )
-from gateway.config import PlatformConfig
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_adapter(*, allowed_users=None, allowed_roles=None):
     config = PlatformConfig(enabled=True, token="test-token", extra={})
@@ -56,7 +56,8 @@ def _clear_clarify_state():
 def _make_interaction(*, user_id="42", display_name="Tester", roles=None,
                       include_message=True):
     """Build a mock discord.Interaction with response.edit_message /
-    send_message / defer all coroutine-callable."""
+    send_message / defer all coroutine-callable.
+    """
     user = SimpleNamespace(
         id=user_id,
         display_name=display_name,
@@ -168,7 +169,8 @@ class TestClarifyChoiceResolve:
     @pytest.mark.asyncio
     async def test_choice_falls_back_to_label_text_when_entry_missing(self):
         """If the gateway entry vanished (race / stale view), the button's
-        own choice text is used as the response."""
+        own choice text is used as the response.
+        """
         # Note: no cm.register() — entry intentionally absent
 
         view = ClarifyChoiceView(

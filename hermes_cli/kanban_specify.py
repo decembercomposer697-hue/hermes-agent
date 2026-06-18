@@ -39,7 +39,6 @@ from dataclasses import dataclass
 from typing import Optional
 
 from hermes_cli import kanban_db as kb
-
 from utils import env_int
 
 HERMES_KANBAN_SPECIFY_MAX_TOKENS = max(
@@ -110,7 +109,8 @@ _FENCE_RE = re.compile(r"^\s*```(?:json)?\s*|\s*```\s*$", re.IGNORECASE)
 
 def _extract_json_blob(raw: str) -> dict | None:
     """Lenient JSON extraction — tolerates fenced code blocks and
-    leading/trailing whitespace. Returns None if nothing parses."""
+    leading/trailing whitespace. Returns None if nothing parses.
+    """
     if not raw:
         return None
     stripped = _FENCE_RE.sub("", raw.strip())
@@ -131,7 +131,8 @@ def _extract_json_blob(raw: str) -> dict | None:
 
 def _profile_author() -> str:
     """Mirror of ``hermes_cli.kanban._profile_author``. Kept local to
-    avoid a circular import when kanban.py imports this module."""
+    avoid a circular import when kanban.py imports this module.
+    """
     return (
         os.environ.get("HERMES_PROFILE")
         or os.environ.get("USER")
@@ -162,7 +163,10 @@ def specify_task(
         )
 
     try:
-        from agent.auxiliary_client import get_auxiliary_extra_body, get_text_auxiliary_client
+        from agent.auxiliary_client import (
+            get_auxiliary_extra_body,
+            get_text_auxiliary_client,
+        )
     except Exception as exc:  # pragma: no cover — import smoke test
         logger.debug("specify: auxiliary client import failed: %s", exc)
         return SpecifyOutcome(task_id, False, "auxiliary client unavailable")

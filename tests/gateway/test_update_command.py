@@ -6,7 +6,7 @@ the _send_update_notification startup hook (sends results after restart).
 
 import json
 from pathlib import Path
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -167,6 +167,7 @@ class TestHandleUpdateCommand:
     async def test_resolve_hermes_bin_fallback(self):
         """_resolve_hermes_bin falls back to sys.executable argv when which fails."""
         import sys
+
         from gateway.run import _resolve_hermes_bin
 
         fake_spec = MagicMock()
@@ -385,7 +386,8 @@ class TestUpdateCommandPlatformGate:
     @pytest.mark.asyncio
     async def test_blocks_programmatic_interface(self, monkeypatch):
         """``Platform.WEBHOOK`` is not a messaging platform and must be
-        blocked by the allowlist gate before any side effects fire."""
+        blocked by the allowlist gate before any side effects fire.
+        """
         runner = _make_runner()
         event = _make_event(platform=Platform.WEBHOOK)
         # Stop _handle_update_command from progressing further if the gate
@@ -913,7 +915,8 @@ class TestUpdateInHelp:
         """The /update command is in the help text (proxy for _known_commands)."""
         # _known_commands is local to _handle_message, so we verify by
         # checking the help output includes it.
-        from gateway.run import GatewayRunner
         import inspect
+
+        from gateway.run import GatewayRunner
         source = inspect.getsource(GatewayRunner._handle_message)
         assert '"update"' in source

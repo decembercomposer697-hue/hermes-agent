@@ -28,7 +28,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Fixtures / helpers
 # ---------------------------------------------------------------------------
@@ -154,7 +153,8 @@ class TestCaptureResponseDefaultPath:
 
 class TestCaptureResponseRoutedToAuxVision:
     """When routing helper says 'aux', the PNG is pre-analysed and a text
-    response is returned with no image_url parts at all."""
+    response is returned with no image_url parts at all.
+    """
 
     def test_som_capture_returns_text_with_vision_analysis(
         self, tmp_cache_dir,

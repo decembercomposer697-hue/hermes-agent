@@ -32,7 +32,6 @@ import pytest
 import tools.approval as approval_module
 from cli import HermesCLI
 
-
 SESSION_KEY = "test-cli-yolo-session"
 
 
@@ -89,7 +88,8 @@ class TestToggleYoloIsSessionScoped:
     def test_toggle_yolo_does_not_mutate_env_var(self):
         """Toggling /yolo must not write ``HERMES_YOLO_MODE`` — that path is
         frozen at import time and would mislead anyone reading the env later
-        (subprocesses, status bars wired to the env, the relaunch flag list)."""
+        (subprocesses, status bars wired to the env, the relaunch flag list).
+        """
         stand_in = _make_stand_in()
         with patch("cli._cprint"):
             HermesCLI._toggle_yolo(stand_in)
@@ -100,7 +100,8 @@ class TestToggleYoloIsSessionScoped:
         """An edge case during CLI bootstrap: a ``/yolo`` triggered before the
         session id is set should not blow up, and should land under the
         ``default`` session key so the bypass still takes effect for any code
-        that resolves against the default key."""
+        that resolves against the default key.
+        """
         stand_in = _make_stand_in(session_id="")
         with patch("cli._cprint"):
             HermesCLI._toggle_yolo(stand_in)
@@ -109,7 +110,8 @@ class TestToggleYoloIsSessionScoped:
 
     def test_two_independent_sessions_are_isolated(self):
         """``/yolo`` toggled in one session must not bypass approvals in
-        another session — mirrors the gateway-side invariant."""
+        another session — mirrors the gateway-side invariant.
+        """
         cli_a = _make_stand_in(session_id="session-yolo-a")
         cli_b = _make_stand_in(session_id="session-yolo-b")
 
@@ -126,7 +128,8 @@ class TestToggleYoloIsSessionScoped:
 
 class TestIsSessionYoloActiveHelper:
     """The status-bar helper must read the live session-yolo state, not the
-    env var (which is the bug class this PR fixes)."""
+    env var (which is the bug class this PR fixes).
+    """
 
     def test_helper_reflects_toggle(self):
         stand_in = _make_stand_in()
@@ -146,7 +149,8 @@ class TestIsSessionYoloActiveHelper:
     def test_helper_honors_frozen_yolo_mode(self):
         """``hermes --yolo`` sets ``HERMES_YOLO_MODE`` before tool imports, so
         ``_YOLO_MODE_FROZEN`` ends up True. The status bar should still
-        reflect YOLO on in that case even when the session toggle is off."""
+        reflect YOLO on in that case even when the session toggle is off.
+        """
         stand_in = _make_stand_in()
 
         with patch.object(approval_module, "_YOLO_MODE_FROZEN", True):
@@ -155,7 +159,8 @@ class TestIsSessionYoloActiveHelper:
 
 class TestToggleYoloEndToEnd:
     """End-to-end: a dangerous command must auto-approve through the same
-    ``check_all_command_guards`` path the terminal tool uses."""
+    ``check_all_command_guards`` path the terminal tool uses.
+    """
 
     def test_toggle_yolo_bypasses_dangerous_command_check(self):
         stand_in = _make_stand_in()
@@ -181,7 +186,8 @@ class TestIsSessionYoloActiveAttrSafety:
     not raise ``AttributeError`` when ``session_id`` is absent — the
     status-bar builders swallow exceptions silently and lose every field
     after the failure, producing a regression that's hard to track back to
-    the helper."""
+    the helper.
+    """
 
     def test_helper_survives_missing_session_id_attr(self):
         # SimpleNamespace WITHOUT session_id mimics __new__-built fixtures.
@@ -196,7 +202,8 @@ class TestSessionRotationTransfersYolo:
     compression continuation), YOLO state keyed under the old id must move
     to the new id. Otherwise the user's ``/yolo ON`` silently reverts on
     the next turn — the same UX failure mode this PR set out to fix.
-    Mirrors ``tui_gateway/server.py`` ~line 1297-1305."""
+    Mirrors ``tui_gateway/server.py`` ~line 1297-1305.
+    """
 
     def test_transfer_moves_yolo_to_new_session(self):
         stand_in = _make_stand_in(session_id="old-id")

@@ -111,7 +111,8 @@ class TestExtractCwdFromOutput:
 
     def test_marker_in_command_output(self):
         """If the marker appears in command output AND as the real marker,
-        rfind grabs the last (real) one."""
+        rfind grabs the last (real) one.
+        """
         env = _TestableEnv()
         marker = env._cwd_marker
         result = {
@@ -169,6 +170,7 @@ class TestInitSessionFailure:
         env._snapshot_ready = False
 
         calls = []
+
         def mock_run_bash(cmd, *, login=False, timeout=120, stdin_data=None):
             calls.append({"login": login})
             # Return a mock process handle

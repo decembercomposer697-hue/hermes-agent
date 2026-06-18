@@ -1,5 +1,4 @@
-"""
-OpenAI-compatible API server platform adapter.
+"""OpenAI-compatible API server platform adapter.
 
 Exposes an HTTP server with endpoints:
 - POST /v1/chat/completions        — OpenAI Chat Completions format (stateless; opt-in session continuity via X-Hermes-Session-Id header; opt-in long-term memory scoping via X-Hermes-Session-Key header)
@@ -37,8 +36,8 @@ import hmac
 import json
 import logging
 import os
-import socket as _socket
 import re
+import socket as _socket
 import sqlite3
 import time
 import uuid
@@ -363,8 +362,7 @@ def check_api_server_requirements() -> bool:
 
 
 class ResponseStore:
-    """
-    SQLite-backed LRU store for Responses API state.
+    """SQLite-backed LRU store for Responses API state.
 
     Each stored response includes the full internal conversation history
     (with tool calls and results) so it can be reconstructed on subsequent
@@ -691,14 +689,28 @@ def _derive_chat_session_id(
 _CRON_AVAILABLE = False
 try:
     from cron.jobs import (
-        list_jobs as _cron_list,
-        get_job as _cron_get,
         create_job as _cron_create,
-        update_job as _cron_update,
-        remove_job as _cron_remove,
+    )
+    from cron.jobs import (
+        get_job as _cron_get,
+    )
+    from cron.jobs import (
+        list_jobs as _cron_list,
+    )
+    from cron.jobs import (
         pause_job as _cron_pause,
+    )
+    from cron.jobs import (
+        remove_job as _cron_remove,
+    )
+    from cron.jobs import (
         resume_job as _cron_resume,
+    )
+    from cron.jobs import (
         trigger_job as _cron_trigger,
+    )
+    from cron.jobs import (
+        update_job as _cron_update,
     )
     _CRON_AVAILABLE = True
 except ImportError:
@@ -726,8 +738,7 @@ except Exception:  # pragma: no cover - scanner is optional hardening
 
 
 class APIServerAdapter(BasePlatformAdapter):
-    """
-    OpenAI-compatible HTTP API server adapter.
+    """OpenAI-compatible HTTP API server adapter.
 
     Runs an aiohttp web server that accepts OpenAI-format requests
     and routes them through hermes-agent's AIAgent.
@@ -889,8 +900,7 @@ class APIServerAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     def _check_auth(self, request: "web.Request") -> Optional["web.Response"]:
-        """
-        Validate Bearer token from Authorization header.
+        """Validate Bearer token from Authorization header.
 
         Returns None if auth is OK, or a 401 web.Response on failure.
         connect() refuses to start the API server without API_SERVER_KEY, so
@@ -965,7 +975,7 @@ class APIServerAdapter(BasePlatformAdapter):
 
         # Reject control characters that could enable header injection on
         # the echo path.
-        if re.search(r'[\r\n\x00]', raw):
+        if re.search(r"[\r\n\x00]", raw):
             return None, web.json_response(
                 {"error": {"message": "Invalid session key", "type": "invalid_request_error"}},
                 status=400,
@@ -1011,8 +1021,7 @@ class APIServerAdapter(BasePlatformAdapter):
         tool_complete_callback=None,
         gateway_session_key: str | None = None,
     ) -> Any:
-        """
-        Create an AIAgent instance using the gateway's runtime config.
+        """Create an AIAgent instance using the gateway's runtime config.
 
         Uses _resolve_runtime_agent_kwargs() to pick up model, api_key,
         base_url, etc. from config.yaml / env vars.  Toolsets are resolved
@@ -1026,9 +1035,14 @@ class APIServerAdapter(BasePlatformAdapter):
         providers (e.g. Honcho) can scope their per-chat state correctly
         — matching the semantics of the native gateway's ``session_key``.
         """
-        from run_agent import AIAgent
-        from gateway.run import _resolve_runtime_agent_kwargs, _resolve_gateway_model, _load_gateway_config, GatewayRunner
+        from gateway.run import (
+            GatewayRunner,
+            _load_gateway_config,
+            _resolve_gateway_model,
+            _resolve_runtime_agent_kwargs,
+        )
         from hermes_cli.tools_config import _get_platform_tools
+        from run_agent import AIAgent
 
         runtime_kwargs = _resolve_runtime_agent_kwargs()
         reasoning_config = GatewayRunner._load_reasoning_config()
@@ -1397,7 +1411,7 @@ class APIServerAdapter(BasePlatformAdapter):
 
         raw_id = body.get("id") or body.get("session_id")
         session_id = str(raw_id).strip() if raw_id else f"api_{int(time.time())}_{uuid.uuid4().hex[:8]}"
-        if not session_id or re.search(r'[\r\n\x00]', session_id):
+        if not session_id or re.search(r"[\r\n\x00]", session_id):
             return web.json_response(_openai_error("Invalid session ID", code="invalid_session_id"), status=400)
         if len(session_id) > self._MAX_SESSION_HEADER_LEN:
             return web.json_response(_openai_error("Session ID too long", code="invalid_session_id"), status=400)
@@ -1502,7 +1516,7 @@ class APIServerAdapter(BasePlatformAdapter):
             return err
         db = self._ensure_session_db()
         fork_id = str(body.get("id") or body.get("session_id") or f"api_{int(time.time())}_{uuid.uuid4().hex[:8]}").strip()
-        if not fork_id or re.search(r'[\r\n\x00]', fork_id):
+        if not fork_id or re.search(r"[\r\n\x00]", fork_id):
             return web.json_response(_openai_error("Invalid session ID", code="invalid_session_id"), status=400)
         if db.get_session(fork_id):
             return web.json_response(_openai_error(f"Session already exists: {fork_id}", code="session_exists"), status=409)
@@ -1808,7 +1822,7 @@ class APIServerAdapter(BasePlatformAdapter):
                     status=403,
                 )
             # Sanitize: reject control characters that could enable header injection.
-            if re.search(r'[\r\n\x00]', provided_session_id):
+            if re.search(r"[\r\n\x00]", provided_session_id):
                 return web.json_response(
                     {"error": {"message": "Invalid session ID", "type": "invalid_request_error"}},
                     status=400,
@@ -2368,7 +2382,8 @@ class APIServerAdapter(BasePlatformAdapter):
 
             async def _open_message_item() -> None:
                 """Emit response.output_item.added for the assistant message
-                the first time any text delta arrives."""
+                the first time any text delta arrives.
+                """
                 nonlocal message_opened, message_output_index, output_index
                 if message_opened:
                     return
@@ -2448,7 +2463,8 @@ class APIServerAdapter(BasePlatformAdapter):
 
             async def _emit_tool_completed(payload: dict[str, Any]) -> None:
                 """Emit response.output_item.done (function_call) followed
-                by response.output_item.added (function_call_output)."""
+                by response.output_item.added (function_call_output).
+                """
                 nonlocal output_index
                 call_id = payload.get("tool_call_id")
                 result = payload.get("result", "")
@@ -3431,8 +3447,7 @@ class APIServerAdapter(BasePlatformAdapter):
 
     @staticmethod
     def _extract_output_items(result: dict[str, Any], start_index: int = 0) -> list[dict[str, Any]]:
-        """
-        Build the output item array from the agent's messages.
+        """Build the output item array from the agent's messages.
 
         Walks *result["messages"]* starting at *start_index* and emits:
         - ``function_call`` items for each tool_call on assistant messages
@@ -3496,8 +3511,7 @@ class APIServerAdapter(BasePlatformAdapter):
         agent_ref: list | None = None,
         gateway_session_key: str | None = None,
     ) -> tuple:
-        """
-        Create an agent and run a conversation in a thread executor.
+        """Create an agent and run a conversation in a thread executor.
 
         Returns ``(result_dict, usage_dict)`` where *usage_dict* contains
         ``input_tokens``, ``output_tokens`` and ``total_tokens``.
@@ -3766,7 +3780,10 @@ class APIServerAdapter(BasePlatformAdapter):
                         pass
 
                 def _run_sync():
-                    from gateway.session_context import clear_session_vars, set_session_vars
+                    from gateway.session_context import (
+                        clear_session_vars,
+                        set_session_vars,
+                    )
                     from tools.approval import (
                         register_gateway_notify,
                         reset_current_session_key,
@@ -3981,7 +3998,6 @@ class APIServerAdapter(BasePlatformAdapter):
             self._run_streams_created.pop(run_id, None)
 
         return response
-
 
     async def _handle_run_approval(self, request: "web.Request") -> "web.Response":
         """POST /v1/runs/{run_id}/approval — resolve a pending run approval."""
@@ -4243,8 +4259,8 @@ class APIServerAdapter(BasePlatformAdapter):
             try:
                 with _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM) as _s:
                     _s.settimeout(1)
-                    _s.connect(('127.0.0.1', self._port))
-                logger.error('[%s] Port %d already in use. Set a different port in config.yaml: platforms.api_server.port', self.name, self._port)
+                    _s.connect(("127.0.0.1", self._port))
+                logger.error("[%s] Port %d already in use. Set a different port in config.yaml: platforms.api_server.port", self.name, self._port)
                 return False
             except (ConnectionRefusedError, OSError):
                 pass  # port is free
@@ -4301,8 +4317,7 @@ class APIServerAdapter(BasePlatformAdapter):
         reply_to: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> SendResult:
-        """
-        Not used — HTTP request/response cycle handles delivery directly.
+        """Not used — HTTP request/response cycle handles delivery directly.
         """
         return SendResult(success=False, error="API server uses HTTP request/response, not send()")
 

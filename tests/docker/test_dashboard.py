@@ -22,7 +22,8 @@ from tests.docker.conftest import docker_exec, docker_exec_sh
 def _poll(container: str, probe: str, *, deadline_s: float = 30.0,
           interval_s: float = 0.5) -> tuple[bool, str]:
     """Repeatedly run ``probe`` inside the container until it exits 0 or
-    ``deadline_s`` elapses. Returns (success, last stdout)."""
+    ``deadline_s`` elapses. Returns (success, last stdout).
+    """
     end = time.monotonic() + deadline_s
     last = ""
     while time.monotonic() < end:

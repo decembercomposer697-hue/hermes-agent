@@ -5,7 +5,13 @@ import pytest
 from rich.console import Console
 
 from cli import ChatConsole
-from hermes_cli.skills_hub import do_check, do_install, do_list, do_update, handle_skills_slash
+from hermes_cli.skills_hub import (
+    do_check,
+    do_install,
+    do_list,
+    do_update,
+    handle_skills_slash,
+)
 
 
 class _DummyLockFile:
@@ -81,8 +87,8 @@ def _capture_check(monkeypatch, results, name=None) -> str:
 
 
 def _capture_update(monkeypatch, results) -> tuple[str, list[tuple[str, str, bool]]]:
-    import tools.skills_hub as hub
     import hermes_cli.skills_hub as cli_hub
+    import tools.skills_hub as hub
 
     sink = StringIO()
     console = Console(file=sink, force_terminal=False, color_system=None)
@@ -156,7 +162,8 @@ def test_do_list_filter_builtin(three_source_env):
 
 def test_do_list_renders_status_column(three_source_env, monkeypatch):
     """Every list row should carry an enabled/disabled status (new in PR that
-    answered Mr Mochizuki's 'I just want to see what's live' question)."""
+    answered Mr Mochizuki's 'I just want to see what's live' question).
+    """
     from agent import skill_utils
 
     monkeypatch.setattr(skill_utils, "get_disabled_skill_names", lambda platform=None: set())
@@ -207,7 +214,8 @@ def test_do_list_platform_env_is_ignored(three_source_env, monkeypatch):
     """`hermes skills list` reads the active profile's config via
     HERMES_HOME (swapped by -p), so it must NOT pass a platform arg to
     ``get_disabled_skill_names`` — otherwise per-platform overrides
-    would silently leak in from HERMES_PLATFORM env."""
+    would silently leak in from HERMES_PLATFORM env.
+    """
     from agent import skill_utils
 
     seen = {}
@@ -412,7 +420,8 @@ def test_do_install_preserves_nested_official_optional_path(
 
 def _make_url_bundle_fetcher(name="", awaiting_name=True, url="https://example.com/SKILL.md"):
     """Return a fake source that simulates ``UrlSource.fetch`` for a
-    URL-sourced skill whose name hasn't been auto-resolved."""
+    URL-sourced skill whose name hasn't been auto-resolved.
+    """
 
     class _UrlSource:
         def inspect(self, identifier):
@@ -438,8 +447,8 @@ def _make_url_bundle_fetcher(name="", awaiting_name=True, url="https://example.c
 
 def _install_mocks(monkeypatch, tmp_path, source_factory, category_hint=""):
     """Wire the minimum set of monkeypatches for a do_install dry run."""
-    import tools.skills_hub as hub
     import tools.skills_guard as guard
+    import tools.skills_hub as hub
 
     q_path = tmp_path / "skills" / ".hub" / "quarantine" / "pending"
     q_path.mkdir(parents=True)
@@ -624,8 +633,8 @@ def test_browse_skills_dedup_uses_identifier_not_name(monkeypatch):
     fix, both were keyed by name so only one survived deduplication. After the
     fix, each unique identifier produces a distinct result.
     """
-    from tools.skills_hub import SkillMeta
     from hermes_cli.skills_hub import browse_skills
+    from tools.skills_hub import SkillMeta
 
     airbnb = SkillMeta(
         name="search-listings", description="Airbnb search", source="browse-sh",
@@ -657,7 +666,8 @@ def test_do_browse_reports_live_per_source_progress():
     """do_browse must pass an on_source_done callback so the status line ticks
     off each source as it resolves, instead of showing a frozen spinner while
     a slow source blocks. The page is still rendered once, after the full
-    result set is merged and trust-sorted."""
+    result set is merged and trust-sorted.
+    """
     from hermes_cli.skills_hub import do_browse
     from tools.skills_hub import SkillMeta
 

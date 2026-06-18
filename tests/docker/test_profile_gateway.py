@@ -40,7 +40,8 @@ def _sh(
 def _svstat(container: str) -> str:
     """Returns the raw s6-svstat output for the test profile's slot.
     /command/s6-svstat is called by absolute path because /command/
-    isn't on PATH for docker-exec sessions."""
+    isn't on PATH for docker-exec sessions.
+    """
     r = _sh(container, f"/command/s6-svstat /run/service/gateway-{PROFILE}")
     return r.stdout if r.returncode == 0 else ""
 
@@ -113,7 +114,8 @@ def test_profile_delete_stops_gateway(
     built_image: str, container_name: str,
 ) -> None:
     """Deleting a profile should stop its gateway and remove the s6
-    service slot."""
+    service slot.
+    """
     subprocess.run(
         ["docker", "run", "-d", "--name", container_name, built_image,
          "sleep", "120"],

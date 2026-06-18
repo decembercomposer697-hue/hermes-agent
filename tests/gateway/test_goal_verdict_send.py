@@ -62,8 +62,9 @@ class _RecordingAdapter:
 
 
 def _make_runner_with_adapter(session_id: str = None):
-    from gateway.run import GatewayRunner
     import uuid
+
+    from gateway.run import GatewayRunner
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
@@ -99,7 +100,8 @@ def _make_runner_with_adapter(session_id: str = None):
 @pytest.mark.asyncio
 async def test_goal_verdict_done_sent_via_adapter_send(hermes_home):
     """When the judge says done, the '✓ Goal achieved' message must reach
-    the user through the adapter's ``send()`` method."""
+    the user through the adapter's ``send()`` method.
+    """
     runner, adapter, session_entry, src = _make_runner_with_adapter()
 
     from hermes_cli.goals import GoalManager
@@ -128,7 +130,8 @@ async def test_goal_verdict_continue_enqueues_continuation(hermes_home):
     """When the judge says continue, both the 'continuing' status and the
     continuation-prompt event must be delivered. The continuation prompt is
     routed through the adapter's pending-messages FIFO so the goal loop
-    proceeds on the next turn."""
+    proceeds on the next turn.
+    """
     runner, adapter, session_entry, src = _make_runner_with_adapter()
 
     from hermes_cli.goals import GoalManager
@@ -154,7 +157,8 @@ async def test_goal_verdict_continue_enqueues_continuation(hermes_home):
 @pytest.mark.asyncio
 async def test_goal_verdict_budget_exhausted_sends_pause(hermes_home):
     """When the budget is exhausted, a '⏸ Goal paused' message must be sent
-    and no further continuation enqueued."""
+    and no further continuation enqueued.
+    """
     runner, adapter, session_entry, src = _make_runner_with_adapter()
 
     from hermes_cli.goals import GoalManager, save_goal

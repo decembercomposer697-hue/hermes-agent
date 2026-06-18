@@ -48,7 +48,8 @@ def test_cleanup_forwards_session_messages(mock_invoke_hook):
 def test_cleanup_empty_list_still_forwarded(mock_invoke_hook):
     """An agent that initialised but ran no turns has an empty list.
     Forwarding it (rather than falling through) matches the gateway-side
-    behaviour and is explicit to providers."""
+    behaviour and is explicit to providers.
+    """
     import cli as cli_mod
 
     agent = MagicMock()
@@ -72,7 +73,8 @@ def test_cleanup_non_list_attribute_falls_back_to_no_arg(mock_invoke_hook):
     nested MagicMock. ``isinstance(mock, list)`` is False, so we fall
     back to the no-arg path rather than passing a garbage value to
     providers expecting ``List[Dict]``.  This keeps existing CLI test
-    suites that use bare ``MagicMock()`` agents green."""
+    suites that use bare ``MagicMock()`` agents green.
+    """
     import cli as cli_mod
 
     agent = MagicMock()

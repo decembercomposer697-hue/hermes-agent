@@ -64,7 +64,8 @@ class TestResetTerminalInputModes(unittest.TestCase):
 
     def test_noop_when_tui_never_ran(self):
         """Non-TUI one-shot CLI runs share _run_cleanup via atexit — they must
-        not emit terminal escape codes they never needed (review finding #1)."""
+        not emit terminal escape codes they never needed (review finding #1).
+        """
         cli_mod = _import_cli()
         fake = _FakeStream(isatty=True)
         with (
@@ -79,7 +80,7 @@ class TestResetTerminalInputModes(unittest.TestCase):
         m_open.assert_not_called()
 
     def test_noop_when_not_a_tty_and_no_dev_tty(self):
-        """stdout redirected and /dev/tty unavailable → nothing written, no raise."""
+        """Stdout redirected and /dev/tty unavailable → nothing written, no raise."""
         cli_mod = _import_cli()
         fake = _FakeStream(isatty=False)
         with (
@@ -93,7 +94,8 @@ class TestResetTerminalInputModes(unittest.TestCase):
 
     def test_falls_back_to_dev_tty_when_stdout_redirected(self):
         """When stdout isn't the terminal, reset via /dev/tty (issue's own
-        suggestion) so a TUI that drove /dev/tty still gets cleaned up."""
+        suggestion) so a TUI that drove /dev/tty still gets cleaned up.
+        """
         cli_mod = _import_cli()
         fake = _FakeStream(isatty=False)
         m_open = mock_open()
@@ -135,7 +137,8 @@ class TestResetTerminalInputModes(unittest.TestCase):
 
     def test_flag_cleared_after_reset(self):
         """Once the modes are disabled they are no longer active — the flag must
-        flip back so a re-armed cleanup doesn't re-emit the sequence."""
+        flip back so a re-armed cleanup doesn't re-emit the sequence.
+        """
         cli_mod = _import_cli()
         fake = _FakeStream(isatty=True)
         original = cli_mod._tui_input_modes_active
@@ -153,11 +156,13 @@ class TestResetTerminalInputModes(unittest.TestCase):
 
 class TestRunCleanupWiring(unittest.TestCase):
     """_run_cleanup must call the reset, as its first step, on every invocation
-    — even if a later cleanup step raises."""
+    — even if a later cleanup step raises.
+    """
 
     def _run_cleanup_isolated(self, cli_mod, **extra_patches):
         """Invoke _run_cleanup with heavy/real teardown steps stubbed out so the
-        test is hermetic (review finding #5)."""
+        test is hermetic (review finding #5).
+        """
         original_done = cli_mod._cleanup_done
         cli_mod._cleanup_done = False
         patches = {
@@ -202,7 +207,8 @@ class TestRunCleanupWiring(unittest.TestCase):
 
     def test_reset_runs_even_when_a_cleanup_step_raises(self):
         """The reset is the first step, so a failing teardown step can't skip
-        it — covering the Ctrl+C / crash paths the issue is about."""
+        it — covering the Ctrl+C / crash paths the issue is about.
+        """
         cli_mod = _import_cli()
         mock_reset = self._run_cleanup_isolated(cli_mod, terminals_raise=True)
         mock_reset.assert_called_once()

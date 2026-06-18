@@ -10,11 +10,10 @@ Covers: #5223, #6492
 import os
 from unittest.mock import patch
 
-
 from hermes_cli.model_switch import list_authenticated_providers
 
-
 # -- Copilot slug resolution (env var path) ----------------------------------
+
 
 @patch.dict(os.environ, {"COPILOT_GITHUB_TOKEN": "fake-ghu"}, clear=False)
 def test_copilot_uses_hermes_slug():
@@ -70,7 +69,7 @@ def test_kimi_for_coding_overlay_uses_hermes_slug():
 
 @patch.dict(os.environ, {"KILOCODE_API_KEY": "fake-key"}, clear=False)
 def test_kilo_overlay_uses_hermes_slug():
-    """kilo overlay should resolve to slug='kilocode'."""
+    """Kilo overlay should resolve to slug='kilocode'."""
     providers = list_authenticated_providers(current_provider="kilocode")
 
     kilo = next((p for p in providers if p["slug"] == "kilocode"), None)
@@ -79,7 +78,6 @@ def test_kilo_overlay_uses_hermes_slug():
 
     kilo_mdev = next((p for p in providers if p["slug"] == "kilo"), None)
     assert kilo_mdev is None, "kilo slug should not appear (resolved to kilocode)"
-
 
 
 def test_mapped_provider_credential_pool_visibility(monkeypatch):

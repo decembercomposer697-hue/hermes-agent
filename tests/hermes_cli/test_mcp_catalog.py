@@ -13,7 +13,6 @@ from unittest.mock import patch
 import pytest
 import yaml
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -99,7 +98,6 @@ def _entry(name: str):
     e = get_entry(name)
     assert e is not None, f"catalog entry {name!r} missing"
     return e
-
 
 
 # ---------------------------------------------------------------------------
@@ -206,8 +204,8 @@ class TestManifestParsing:
 class TestInstall:
     def test_install_simple_stdio_writes_config(self, catalog_dir):
         _write_manifest(catalog_dir, "demo", _basic_manifest())
-        from hermes_cli.mcp_catalog import install_entry
         from hermes_cli.config import load_config
+        from hermes_cli.mcp_catalog import install_entry
 
         install_entry(_entry("demo"), enable=True)
 
@@ -239,8 +237,8 @@ class TestInstall:
         fake_clone.mkdir()
 
         from hermes_cli import mcp_catalog
-        from hermes_cli.mcp_catalog import install_entry
         from hermes_cli.config import load_config
+        from hermes_cli.mcp_catalog import install_entry
 
         with patch.object(mcp_catalog, "_do_git_install", return_value=fake_clone):
             install_entry(_entry("demo"), enable=True)
@@ -262,8 +260,8 @@ class TestInstall:
 
         monkeypatch.setattr(mcp_catalog, "_prompt_input", lambda *a, **kw: "secret-val")
 
-        from hermes_cli.mcp_catalog import install_entry
         from hermes_cli.config import get_env_value, load_config
+        from hermes_cli.mcp_catalog import install_entry
 
         install_entry(_entry("demo"), enable=True)
 
@@ -277,8 +275,8 @@ class TestInstall:
         )
         _write_manifest(catalog_dir, "demo", body)
 
-        from hermes_cli.mcp_catalog import install_entry
         from hermes_cli.config import load_config
+        from hermes_cli.mcp_catalog import install_entry
 
         install_entry(_entry("demo"), enable=True)
 
@@ -296,7 +294,7 @@ class TestInstall:
         _write_manifest(catalog_dir, "demo", body)
 
         from hermes_cli import mcp_catalog
-        from hermes_cli.mcp_catalog import install_entry, CatalogError
+        from hermes_cli.mcp_catalog import CatalogError, install_entry
 
         # User hits enter — empty input, no default
         monkeypatch.setattr(mcp_catalog, "_prompt_input", lambda *a, **kw: "")
@@ -313,8 +311,8 @@ class TestInstall:
 class TestUninstall:
     def test_uninstall_removes_server_block(self, catalog_dir):
         _write_manifest(catalog_dir, "demo", _basic_manifest())
-        from hermes_cli.mcp_catalog import install_entry, uninstall_entry
         from hermes_cli.config import load_config
+        from hermes_cli.mcp_catalog import install_entry, uninstall_entry
 
         install_entry(_entry("demo"), enable=True)
         assert "demo" in load_config().get("mcp_servers", {})
@@ -359,8 +357,8 @@ class TestPicker:
 
     def test_install_by_name_success(self, catalog_dir):
         _write_manifest(catalog_dir, "demo", _basic_manifest())
-        from hermes_cli.mcp_picker import install_by_name
         from hermes_cli.config import load_config
+        from hermes_cli.mcp_picker import install_by_name
 
         rc = install_by_name("demo")
         assert rc == 0
@@ -391,8 +389,8 @@ class TestToolSelection:
     def test_probe_fail_no_default_writes_no_filter(self, catalog_dir):
         body = _basic_manifest()
         _write_manifest(catalog_dir, "demo", body)
-        from hermes_cli.mcp_catalog import install_entry
         from hermes_cli.config import load_config
+        from hermes_cli.mcp_catalog import install_entry
 
         install_entry(_entry("demo"), enable=True)
         server = load_config()["mcp_servers"]["demo"]
@@ -404,8 +402,8 @@ class TestToolSelection:
             tools={"default_enabled": ["a", "b", "c"]},
         )
         _write_manifest(catalog_dir, "demo", body)
-        from hermes_cli.mcp_catalog import install_entry
         from hermes_cli.config import load_config
+        from hermes_cli.mcp_catalog import install_entry
 
         install_entry(_entry("demo"), enable=True)
         server = load_config()["mcp_servers"]["demo"]
@@ -425,8 +423,8 @@ class TestToolSelection:
         import sys as _sys
         monkeypatch.setattr(_sys.stdin, "isatty", lambda: False)
 
-        from hermes_cli.mcp_catalog import install_entry
         from hermes_cli.config import load_config
+        from hermes_cli.mcp_catalog import install_entry
 
         install_entry(_entry("demo"), enable=True)
         server = load_config()["mcp_servers"]["demo"]
@@ -444,8 +442,8 @@ class TestToolSelection:
         import sys as _sys
         monkeypatch.setattr(_sys.stdin, "isatty", lambda: False)
 
-        from hermes_cli.mcp_catalog import install_entry
         from hermes_cli.config import load_config
+        from hermes_cli.mcp_catalog import install_entry
 
         install_entry(_entry("demo"), enable=True)
         server = load_config()["mcp_servers"]["demo"]
@@ -455,7 +453,8 @@ class TestToolSelection:
         self, catalog_dir, monkeypatch,
     ):
         """If manifest names a tool the server doesn\'t actually expose, it
-        silently drops out — never written into tools.include."""
+        silently drops out — never written into tools.include.
+        """
         body = _basic_manifest(
             tools={"default_enabled": ["real", "ghost"]},
         )
@@ -467,8 +466,8 @@ class TestToolSelection:
         import sys as _sys
         monkeypatch.setattr(_sys.stdin, "isatty", lambda: False)
 
-        from hermes_cli.mcp_catalog import install_entry
         from hermes_cli.config import load_config
+        from hermes_cli.mcp_catalog import install_entry
 
         install_entry(_entry("demo"), enable=True)
         server = load_config()["mcp_servers"]["demo"]
@@ -478,7 +477,8 @@ class TestToolSelection:
         self, catalog_dir, monkeypatch,
     ):
         """Second install of the same entry uses the user\'s prior
-        tools.include as the pre-check, NOT the manifest default."""
+        tools.include as the pre-check, NOT the manifest default.
+        """
         body = _basic_manifest(
             tools={"default_enabled": ["alpha"]},
         )
@@ -490,8 +490,8 @@ class TestToolSelection:
         import sys as _sys
         monkeypatch.setattr(_sys.stdin, "isatty", lambda: False)
 
-        from hermes_cli.mcp_catalog import install_entry
         from hermes_cli.config import load_config, save_config
+        from hermes_cli.mcp_catalog import install_entry
 
         # First install
         install_entry(_entry("demo"), enable=True)
@@ -515,8 +515,6 @@ class TestToolSelection:
         assert list_catalog() == []
 
 
-
-
 # ---------------------------------------------------------------------------
 # Forward-compat / diagnostics
 # ---------------------------------------------------------------------------
@@ -525,14 +523,15 @@ class TestToolSelection:
 class TestCatalogDiagnostics:
     def test_future_manifest_version_skipped_with_diagnostic(self, catalog_dir):
         """A manifest with a newer manifest_version is skipped, but the skip
-        is reported via catalog_diagnostics so the UI can tell the user."""
+        is reported via catalog_diagnostics so the UI can tell the user.
+        """
         body = _basic_manifest()
         body["manifest_version"] = 999  # Future version
         _write_manifest(catalog_dir, "futuristic", body)
         # Plus one valid entry
         _write_manifest(catalog_dir, "demo", _basic_manifest())
 
-        from hermes_cli.mcp_catalog import list_catalog, catalog_diagnostics
+        from hermes_cli.mcp_catalog import catalog_diagnostics, list_catalog
 
         entries = list_catalog()
         assert [e.name for e in entries] == ["demo"]
@@ -548,7 +547,7 @@ class TestCatalogDiagnostics:
         body["transport"] = {"type": "unsupported"}
         _write_manifest(catalog_dir, "broken", body)
 
-        from hermes_cli.mcp_catalog import list_catalog, catalog_diagnostics
+        from hermes_cli.mcp_catalog import catalog_diagnostics, list_catalog
 
         entries = list_catalog()
         assert entries == []
@@ -558,7 +557,8 @@ class TestCatalogDiagnostics:
 
     def test_picker_surfaces_future_manifest_warning(self, catalog_dir, capsys, monkeypatch):
         """The text-dump path should print a warning line for future-manifest
-        entries so users running headless or after `hermes setup` know to update."""
+        entries so users running headless or after `hermes setup` know to update.
+        """
         body = _basic_manifest()
         body["manifest_version"] = 999
         _write_manifest(catalog_dir, "futuristic", body)
@@ -582,7 +582,8 @@ class TestCatalogDiagnostics:
 class TestCustomMcpRows:
     def test_custom_mcp_shown_alongside_catalog(self, catalog_dir, capsys):
         """Servers in mcp_servers that aren't in the catalog show up in the
-        picker text dump with a 'custom' status."""
+        picker text dump with a 'custom' status.
+        """
         _write_manifest(catalog_dir, "demo", _basic_manifest())
 
         from hermes_cli.config import load_config, save_config
@@ -603,7 +604,8 @@ class TestCustomMcpRows:
 
     def test_custom_mcp_only_no_catalog(self, catalog_dir, capsys):
         """If the catalog is empty but the user has custom MCPs, they\'re
-        still visible — the picker is the unified surface."""
+        still visible — the picker is the unified surface.
+        """
         from hermes_cli.config import load_config, save_config
         cfg = load_config()
         cfg.setdefault("mcp_servers", {})["my-custom"] = {
@@ -627,7 +629,8 @@ class TestGitInstallShaRef:
     def test_sha_ref_skips_branch_attempt(self, catalog_dir, monkeypatch, tmp_path):
         """When install.ref is a SHA-shaped hex string, _do_git_install
         skips the `git clone --branch <ref>` attempt (which would always fail
-        noisily for SHAs) and goes straight to clone + checkout."""
+        noisily for SHAs) and goes straight to clone + checkout.
+        """
         body = _basic_manifest(
             install={
                 "type": "git",
@@ -679,7 +682,8 @@ class TestGitInstallShaRef:
 
     def test_branch_ref_uses_branch_clone(self, catalog_dir, monkeypatch):
         """When install.ref is a branch/tag (not SHA-shaped), the fast
-        `git clone --depth 1 --branch <ref>` path is used."""
+        `git clone --depth 1 --branch <ref>` path is used.
+        """
         body = _basic_manifest(
             install={
                 "type": "git",
@@ -726,7 +730,8 @@ class TestToolsConfigIncludeMode:
         """`_configure_mcp_tools_interactive` in tools_config.py must write
         `tools.include` (whitelist), matching the rest of the codebase. The
         old behavior wrote `tools.exclude`, which produced inconsistent
-        on-disk shapes depending on which UI the user used last."""
+        on-disk shapes depending on which UI the user used last.
+        """
         # Build a minimal mcp_servers config + mock probe + checklist
         cfg = {
             "_config_version": 23,

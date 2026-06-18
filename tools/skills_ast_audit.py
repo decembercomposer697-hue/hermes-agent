@@ -1,5 +1,4 @@
-"""
-AST-level deep audit for skill Python files — opt-in diagnostic, not a security gate.
+"""AST-level deep audit for skill Python files — opt-in diagnostic, not a security gate.
 
 Per SECURITY.md §2.4, Skills Guard is in-process heuristics ("useful — not
 boundaries"). This module is a separate opt-in diagnostic that flags dynamic

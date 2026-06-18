@@ -18,10 +18,8 @@ import hashlib
 import json
 from unittest.mock import MagicMock
 
-
 from plugins.memory.honcho.client import HonchoClientConfig
 from plugins.memory.honcho.session import HonchoSessionManager
-
 
 # ---------------------------------------------------------------------------
 # Config parsing
@@ -222,7 +220,8 @@ class TestPeerResolutionOrder:
 
     def test_runtime_wins_when_pin_is_false(self):
         """Regression guard: default behaviour must stay unchanged.
-        Multi-user bots rely on the platform-native ID winning."""
+        Multi-user bots rely on the platform-native ID winning.
+        """
         mgr = HonchoSessionManager(
             honcho=MagicMock(),
             config=self._config(peer_name="Igor", pin_peer_name=False),
@@ -382,7 +381,7 @@ class TestPeerResolutionOrder:
         assert session.user_peer_id == "raw-match"
 
     def test_session_peer_prefix_is_orthogonal_to_runtime_peer_prefix(self):
-        """sessionPeerPrefix scopes session IDs; runtimePeerPrefix scopes user peers."""
+        """SessionPeerPrefix scopes session IDs; runtimePeerPrefix scopes user peers."""
         mgr = HonchoSessionManager(
             honcho=MagicMock(),
             config=self._config(
@@ -423,7 +422,8 @@ class TestPeerResolutionOrder:
     def test_pin_noop_when_peer_name_missing(self):
         """Safety: pinPeerName alone (no peer_name) must not silently drop
         the runtime identity.  Without a configured peer_name there's
-        nothing to pin to — fall through to runtime mapping."""
+        nothing to pin to — fall through to runtime mapping.
+        """
         mgr = HonchoSessionManager(
             honcho=MagicMock(),
             config=self._config(
@@ -487,7 +487,8 @@ class TestPeerResolutionOrder:
 
     def test_runtime_missing_falls_back_to_peer_name(self):
         """CLI-mode (no gateway runtime identity) uses config peer_name —
-        this path was already correct but the refactor shouldn't break it."""
+        this path was already correct but the refactor shouldn't break it.
+        """
         mgr = HonchoSessionManager(
             honcho=MagicMock(),
             config=self._config(peer_name="Igor", pin_peer_name=False),
@@ -500,7 +501,8 @@ class TestPeerResolutionOrder:
 
     def test_everything_missing_falls_back_to_session_key(self):
         """Deepest fallback: no runtime identity, no peer_name, no pin.
-        Must still produce a deterministic peer_id from the session key."""
+        Must still produce a deterministic peer_id from the session key.
+        """
         # Config with no peer_name and default pin_peer_name=False
         mgr = HonchoSessionManager(
             honcho=MagicMock(),
@@ -514,7 +516,8 @@ class TestPeerResolutionOrder:
 
     def test_pin_does_not_affect_assistant_peer(self):
         """The flag only pins the USER peer — the assistant peer continues
-        to come from ``ai_peer`` and must not be touched."""
+        to come from ``ai_peer`` and must not be touched.
+        """
         cfg = HonchoClientConfig(
             api_key="k",
             peer_name="Igor",
@@ -551,7 +554,8 @@ class TestCrossPlatformMemoryUnification:
 
     def test_telegram_and_discord_collapse_to_one_peer_when_pinned(self):
         """Single-user deployment: Telegram UID and Discord snowflake
-        both resolve to the same configured peer_name."""
+        both resolve to the same configured peer_name.
+        """
         # Telegram turn
         mgr_telegram = HonchoSessionManager(
             honcho=MagicMock(),
@@ -581,7 +585,8 @@ class TestCrossPlatformMemoryUnification:
     def test_multiuser_default_keeps_platforms_separate(self):
         """Negative control: with pinPeerName=false (the default), two
         different platform IDs must produce two different peers so
-        multi-user bots don't merge users."""
+        multi-user bots don't merge users.
+        """
         cfg = HonchoClientConfig(
             api_key="k",
             peer_name="Igor",
@@ -616,8 +621,9 @@ class TestPinUserPeerAlias:
     """
 
     def test_root_pinUserPeer_true_pins(self, tmp_path):
-        from plugins.memory.honcho.client import HonchoClientConfig
         import json
+
+        from plugins.memory.honcho.client import HonchoClientConfig
         config_file = tmp_path / "honcho.json"
         config_file.write_text(json.dumps({
             "apiKey": "***",
@@ -628,8 +634,9 @@ class TestPinUserPeerAlias:
         assert config.pin_peer_name is True
 
     def test_host_pinUserPeer_wins_over_root_pinPeerName(self, tmp_path):
-        from plugins.memory.honcho.client import HonchoClientConfig
         import json
+
+        from plugins.memory.honcho.client import HonchoClientConfig
         config_file = tmp_path / "honcho.json"
         config_file.write_text(json.dumps({
             "apiKey": "***",
@@ -641,8 +648,9 @@ class TestPinUserPeerAlias:
         assert config.pin_peer_name is True
 
     def test_host_pinUserPeer_false_disables_root_pinPeerName(self, tmp_path):
-        from plugins.memory.honcho.client import HonchoClientConfig
         import json
+
+        from plugins.memory.honcho.client import HonchoClientConfig
         config_file = tmp_path / "honcho.json"
         config_file.write_text(json.dumps({
             "apiKey": "***",
@@ -657,8 +665,9 @@ class TestPinUserPeerAlias:
         )
 
     def test_pinPeerName_still_works_unchanged(self, tmp_path):
-        from plugins.memory.honcho.client import HonchoClientConfig
         import json
+
+        from plugins.memory.honcho.client import HonchoClientConfig
         config_file = tmp_path / "honcho.json"
         config_file.write_text(json.dumps({
             "apiKey": "***",

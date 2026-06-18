@@ -13,8 +13,8 @@ from dataclasses import dataclass, field
 from difflib import unified_diff
 from pathlib import Path
 
-from utils import safe_json_loads
 from agent.tool_result_classification import file_mutation_result_landed
+from utils import safe_json_loads
 
 # ANSI escape codes for coloring tool failure indicators
 _RED = "\033[31m"
@@ -560,15 +560,15 @@ class KawaiiSpinner:
     """Animated spinner with kawaii faces for CLI feedback during tool execution."""
 
     SPINNERS = {
-        'dots': ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'],
-        'bounce': ['⠁', '⠂', '⠄', '⡀', '⢀', '⠠', '⠐', '⠈'],
-        'grow': ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█', '▇', '▆', '▅', '▄', '▃', '▂'],
-        'arrows': ['←', '↖', '↑', '↗', '→', '↘', '↓', '↙'],
-        'star': ['✶', '✷', '✸', '✹', '✺', '✹', '✸', '✷'],
-        'moon': ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'],
-        'pulse': ['◜', '◠', '◝', '◞', '◡', '◟'],
-        'brain': ['🧠', '💭', '💡', '✨', '💫', '🌟', '💡', '💭'],
-        'sparkle': ['⁺', '˚', '*', '✧', '✦', '✧', '*', '˚'],
+        "dots": ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
+        "bounce": ["⠁", "⠂", "⠄", "⡀", "⢀", "⠠", "⠐", "⠈"],
+        "grow": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█", "▇", "▆", "▅", "▄", "▃", "▂"],
+        "arrows": ["←", "↖", "↑", "↗", "→", "↘", "↓", "↙"],
+        "star": ["✶", "✷", "✸", "✹", "✺", "✹", "✸", "✷"],
+        "moon": ["🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘"],
+        "pulse": ["◜", "◠", "◝", "◞", "◡", "◟"],
+        "brain": ["🧠", "💭", "💡", "✨", "💫", "🌟", "💡", "💭"],
+        "sparkle": ["⁺", "˚", "*", "✧", "✦", "✧", "*", "˚"],
     }
 
     KAWAII_WAITING = [
@@ -627,9 +627,9 @@ class KawaiiSpinner:
             pass
         return cls.THINKING_VERBS
 
-    def __init__(self, message: str = "", spinner_type: str = 'dots', print_fn=None):
+    def __init__(self, message: str = "", spinner_type: str = "dots", print_fn=None):
         self.message = message
-        self.spinner_frames = self.SPINNERS.get(spinner_type, self.SPINNERS['dots'])
+        self.spinner_frames = self.SPINNERS.get(spinner_type, self.SPINNERS["dots"])
         self.running = False
         self.thread = None
         self.frame_idx = 0
@@ -643,7 +643,7 @@ class KawaiiSpinner:
         # child agents can replace sys.stdout with a black hole.
         self._out = sys.stdout
 
-    def _write(self, text: str, end: str = '\n', flush: bool = False):
+    def _write(self, text: str, end: str = "\n", flush: bool = False):
         """Write to the stdout captured at spinner creation time.
 
         If a print_fn was supplied at construction, all output is routed through
@@ -666,7 +666,7 @@ class KawaiiSpinner:
     def _is_tty(self) -> bool:
         """Check if output is a real terminal, safe against closed streams."""
         try:
-            return hasattr(self._out, 'isatty') and self._out.isatty()
+            return hasattr(self._out, "isatty") and self._out.isatty()
         except (ValueError, OSError):
             return False
 
@@ -722,7 +722,7 @@ class KawaiiSpinner:
             else:
                 line = f"  {frame} {self.message} ({elapsed:.1f}s)"
             pad = max(self.last_line_len - len(line), 0)
-            self._write(f"\r{line}{' ' * pad}", end='', flush=True)
+            self._write(f"\r{line}{' ' * pad}", end="", flush=True)
             self.last_line_len = len(line)
             self.frame_idx += 1
             time.sleep(0.12)
@@ -753,7 +753,7 @@ class KawaiiSpinner:
         # Clear spinner line with spaces (not \033[K) to avoid garbled escape
         # codes when prompt_toolkit's patch_stdout is active — same approach
         # as stop(). Then print text; spinner redraws on next tick.
-        blanks = ' ' * max(self.last_line_len + 5, 40)
+        blanks = " " * max(self.last_line_len + 5, 40)
         self._write(f"\r{blanks}\r  {text}", flush=True)
 
     def stop(self, final_message: str = None):
@@ -765,8 +765,8 @@ class KawaiiSpinner:
         if is_tty:
             # Clear the spinner line with spaces instead of \033[K to avoid
             # garbled escape codes when prompt_toolkit's patch_stdout is active.
-            blanks = ' ' * max(self.last_line_len + 5, 40)
-            self._write(f"\r{blanks}\r", end='', flush=True)
+            blanks = " " * max(self.last_line_len + 5, 40)
+            self._write(f"\r{blanks}\r", end="", flush=True)
         if final_message:
             elapsed = f" ({time.time() - self.start_time:.1f}s)" if self.start_time else ""
             if is_tty:

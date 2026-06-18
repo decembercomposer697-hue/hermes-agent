@@ -232,7 +232,8 @@ class TestDumpSubagentTimeoutDiagnostic:
 
 class TestRunSingleChildTimeoutDump:
     """The timeout branch in _run_single_child must emit the diagnostic
-    dump when api_calls == 0, and must NOT emit it when api_calls > 0."""
+    dump when api_calls == 0, and must NOT emit it when api_calls > 0.
+    """
 
     def _invoke_with_short_timeout(self, child, monkeypatch):
         """Run _run_single_child with a tiny timeout to force the timeout branch."""

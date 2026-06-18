@@ -35,7 +35,8 @@ class TestDestructiveSlashConfirmDefault:
 class TestUserConfigMerge:
     """If a user has a pre-existing config without this key, load_config
     should fill it in from DEFAULT_CONFIG (deep merge preserves keys the
-    user didn't override)."""
+    user didn't override).
+    """
 
     def test_existing_user_config_without_key_gets_default(self, tmp_path, monkeypatch):
         import yaml
@@ -50,6 +51,7 @@ class TestUserConfigMerge:
 
         monkeypatch.setenv("HERMES_HOME", str(home))
         import importlib
+
         import hermes_cli.config as cfg_mod
         importlib.reload(cfg_mod)
 
@@ -79,6 +81,7 @@ class TestUserConfigMerge:
 
         monkeypatch.setenv("HERMES_HOME", str(home))
         import importlib
+
         import hermes_cli.config as cfg_mod
         importlib.reload(cfg_mod)
 

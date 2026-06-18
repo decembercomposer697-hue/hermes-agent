@@ -84,7 +84,8 @@ class AnthropicTransport(ProviderTransport):
         to OpenAI finish_reason, and collects reasoning_details in provider_data.
         """
         import json
-        from agent.anthropic_adapter import _to_plain_data, _sanitize_replay_block
+
+        from agent.anthropic_adapter import _sanitize_replay_block, _to_plain_data
         from agent.transports.types import ToolCall
 
         strip_tool_prefix = kwargs.get("strip_tool_prefix", False)

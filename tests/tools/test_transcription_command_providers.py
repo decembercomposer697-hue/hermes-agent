@@ -1,5 +1,4 @@
-"""
-Tests for the STT command-provider registry (``stt.providers.<name>``).
+"""Tests for the STT command-provider registry (``stt.providers.<name>``).
 
 Mirrors ``tests/tools/test_tts_command_providers.py`` — same shape, same
 invariants, adapted for the input=audio → output=transcript flow.
@@ -24,7 +23,6 @@ import wave
 from pathlib import Path
 from unittest.mock import patch
 
-
 from tools.transcription_tools import (
     BUILTIN_STT_PROVIDERS,
     COMMAND_STT_OUTPUT_FORMATS,
@@ -41,7 +39,6 @@ from tools.transcription_tools import (
     _transcribe_command_stt,
     transcribe_audio,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -289,7 +286,7 @@ class TestRenderCommandSTTTemplate:
         )
         # Doubled braces collapse to single braces — JSON snippets survive.
         assert rendered.startswith('echo {"foo":')
-        assert rendered.endswith('}')
+        assert rendered.endswith("}")
         assert "audio.wav" in rendered
 
     def test_shell_quote_outside_quotes_uses_shlex(self):

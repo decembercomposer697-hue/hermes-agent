@@ -1,5 +1,4 @@
-"""
-Regression tests for the shared-container task_id mapping.
+"""Regression tests for the shared-container task_id mapping.
 
 The top-level agent and all delegate_task subagents share a single
 terminal sandbox keyed by ``"default"``.  ``_resolve_container_task_id``
@@ -80,7 +79,8 @@ def test_cleared_override_collapses_again():
 def test_get_active_env_reads_shared_container_from_subagent_id():
     """``get_active_env`` must see the shared ``"default"`` sandbox when
     called with a subagent's task_id, so the agent loop's turn-budget
-    enforcement reads the real env (not None) during delegation."""
+    enforcement reads the real env (not None) during delegation.
+    """
     sentinel = object()
     terminal_tool._active_environments["default"] = sentinel
     try:
@@ -111,7 +111,8 @@ def test_cwd_only_override_collapses_to_default():
     """CWD-only overrides (ACP adapter workspace tracking) must NOT trigger
     container isolation — they should collapse to the shared 'default'
     container so all surfaces (TUI, gateway, dashboard) share one sandbox.
-    Regression for #37361."""
+    Regression for #37361.
+    """
     terminal_tool.register_task_env_overrides(
         "acp-session-abc", {"cwd": "/home/user/project"},
     )
@@ -126,7 +127,8 @@ def test_cwd_only_override_collapses_to_default():
 
 def test_cwd_plus_docker_image_keeps_own_id():
     """When overrides include both cwd AND docker_image, isolation must
-    still be honoured (RL/benchmark pattern with explicit cwd)."""
+    still be honoured (RL/benchmark pattern with explicit cwd).
+    """
     terminal_tool.register_task_env_overrides(
         "rl-with-cwd", {"docker_image": "myimg:latest", "cwd": "/workspace"},
     )

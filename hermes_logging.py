@@ -32,10 +32,10 @@ import logging
 import os
 import sys
 import threading
+from collections.abc import Sequence
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional
-from collections.abc import Sequence
 
 from hermes_constants import get_config_path, get_hermes_home
 
@@ -242,6 +242,7 @@ def setup_logging(
     -------
     Path
         The ``logs/`` directory where files are written.
+
     """
     global _logging_initialized
     home = hermes_home or get_hermes_home()
@@ -493,6 +494,7 @@ def _add_rotating_handler(
     log_filter
         Optional filter to attach to the handler (e.g. ``_ComponentFilter``
         for gateway.log).
+
     """
     resolved = path.resolve()
     for existing in logger.handlers:

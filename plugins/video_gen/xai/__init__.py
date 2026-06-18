@@ -195,7 +195,8 @@ async def _submit(
     base_url: str,
 ) -> str:
     """POST to /videos/generations — xAI's only public endpoint for our
-    text-to-video and image-to-video surface."""
+    text-to-video and image-to-video surface.
+    """
     response = await client.post(
         f"{base_url}/videos/generations",
         headers={**_xai_headers(api_key), "x-idempotency-key": str(uuid.uuid4())},

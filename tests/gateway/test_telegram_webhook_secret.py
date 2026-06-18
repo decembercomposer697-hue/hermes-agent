@@ -13,7 +13,6 @@ import re
 import sys
 from pathlib import Path
 
-
 _repo = str(Path(__file__).resolve().parents[2])
 if _repo not in sys.path:
     sys.path.insert(0, _repo)
@@ -36,11 +35,12 @@ class TestTelegramWebhookSecretRequired:
 
     def test_webhook_branch_checks_secret(self):
         """The webhook-mode branch of connect() must read
-        TELEGRAM_WEBHOOK_SECRET and refuse when empty."""
+        TELEGRAM_WEBHOOK_SECRET and refuse when empty.
+        """
         src = self._get_source()
         # The guard must appear after TELEGRAM_WEBHOOK_URL is set
         assert re.search(
-            r'TELEGRAM_WEBHOOK_SECRET.*?\.strip\(\)\s*\n\s*if not webhook_secret:',
+            r"TELEGRAM_WEBHOOK_SECRET.*?\.strip\(\)\s*\n\s*if not webhook_secret:",
             src, re.DOTALL,
         ), (
             "TelegramAdapter.connect() must strip TELEGRAM_WEBHOOK_SECRET "
@@ -49,12 +49,13 @@ class TestTelegramWebhookSecretRequired:
 
     def test_guard_raises_runtime_error(self):
         """The guard raises RuntimeError (not a silent log) so operators
-        see the failure at startup."""
+        see the failure at startup.
+        """
         src = self._get_source()
         # Between the "if not webhook_secret:" line and the next blank
         # line block, we should see a RuntimeError being raised
         guard_match = re.search(
-            r'if not webhook_secret:\s*\n\s*raise\s+RuntimeError\(',
+            r"if not webhook_secret:\s*\n\s*raise\s+RuntimeError\(",
             src,
         )
         assert guard_match, (
@@ -64,7 +65,8 @@ class TestTelegramWebhookSecretRequired:
 
     def test_guard_message_includes_advisory_link(self):
         """The RuntimeError message should reference the advisory so
-        operators can read the full context."""
+        operators can read the full context.
+        """
         src = self._get_source()
         assert "GHSA-3vpc-7q5r-276h" in src, (
             "Guard error message must cite the advisory for operator context"
@@ -81,7 +83,8 @@ class TestTelegramWebhookSecretRequired:
 
     def test_polling_branch_has_no_secret_guard(self):
         """Polling mode (else-branch) must NOT require the webhook secret —
-        polling authenticates via the bot token, not a webhook secret."""
+        polling authenticates via the bot token, not a webhook secret.
+        """
         src = self._get_source()
         # The guard should appear inside the `if webhook_url:` branch,
         # not the `else:` polling branch. Rough check: the raise is
@@ -89,7 +92,7 @@ class TestTelegramWebhookSecretRequired:
         # polling branch, and there's no secret-check in that polling
         # branch.
         webhook_block = re.search(
-            r'if webhook_url:\s*\n(.*?)\n            else:\s*\n(.*?)\n',
+            r"if webhook_url:\s*\n(.*?)\n            else:\s*\n(.*?)\n",
             src, re.DOTALL,
         )
         if webhook_block:

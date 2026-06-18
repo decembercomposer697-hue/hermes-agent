@@ -84,7 +84,8 @@ def test_status_reports_auth_disabled_in_loopback_mode(loopback_client):
 def test_status_preserves_existing_fields(loopback_client):
     """Defence-in-depth: adding auth_required/auth_providers must not
     have dropped any previous field (the dashboard's React StatusPage
-    relies on the full payload shape)."""
+    relies on the full payload shape).
+    """
     r = loopback_client.get("/api/status")
     body = r.json()
     expected_keys = {

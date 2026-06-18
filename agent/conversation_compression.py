@@ -300,6 +300,7 @@ def compress_context(
         returns the original messages unchanged and the existing system
         prompt — the session is NOT rotated.  Callers should detect the
         no-op via ``len(returned) == len(input)`` and stop the retry loop.
+
     """
     # Lazy feasibility check — run the auxiliary-provider probe + context
     # length lookup just-in-time on the first compression attempt instead of
@@ -693,8 +694,9 @@ def try_shrink_image_parts_in_messages(api_messages: list) -> bool:
                 if not data_d:
                     return None
                 raw_d = _b64_dim.b64decode(data_d)
-                from PIL import Image as _PILImage
                 import io as _io_dim
+
+                from PIL import Image as _PILImage
                 with _PILImage.open(_io_dim.BytesIO(raw_d)) as _img:
                     if max(_img.size) <= max_dimension:
                         return None  # both bytes and pixels are fine

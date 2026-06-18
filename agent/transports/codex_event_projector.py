@@ -40,7 +40,8 @@ def _deterministic_call_id(item_type: str, item_id: str) -> str:
     Uses the codex item id directly when present (already a uuid); falls back
     to a content hash so replay produces the same id across sessions and
     prefix caches stay valid. See AGENTS.md Pitfall #16 (deterministic IDs in
-    tool call history)."""
+    tool call history).
+    """
     if item_id:
         return f"codex_{item_type}_{item_id}"
     digest = hashlib.sha256(f"{item_type}".encode()).hexdigest()[:16]
@@ -59,7 +60,8 @@ class ProjectionResult:
     `messages` is a list because some Codex items produce two messages
     (assistant tool_call + tool result). Empty list = item ignored (e.g. a
     streaming `outputDelta` that doesn't materialize into messages until the
-    `item/completed` event)."""
+    `item/completed` event).
+    """
 
     messages: list[dict] = field(default_factory=list)
     is_tool_iteration: bool = False
@@ -70,14 +72,16 @@ class CodexEventProjector:
     """Stateful projector consuming Codex notifications in arrival order.
 
     Owns the in-progress reasoning content (codex emits reasoning as separate
-    items but Hermes stashes it on the next assistant message)."""
+    items but Hermes stashes it on the next assistant message).
+    """
 
     def __init__(self) -> None:
         self._pending_reasoning: list[str] = []
 
     def project(self, notification: dict) -> ProjectionResult:
         """Project a single notification. Idempotent for non-completion events;
-        only `item/completed` and `turn/completed` materialize messages."""
+        only `item/completed` and `turn/completed` materialize messages.
+        """
         method = notification.get("method", "")
         params = notification.get("params", {}) or {}
 

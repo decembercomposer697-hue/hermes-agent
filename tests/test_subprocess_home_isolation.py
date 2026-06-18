@@ -11,11 +11,10 @@ import os
 import threading
 from pathlib import Path
 
-
-
 # ---------------------------------------------------------------------------
 # get_subprocess_home()
 # ---------------------------------------------------------------------------
+
 
 class TestGetSubprocessHome:
     """Unit tests for hermes_constants.get_subprocess_home()."""
@@ -165,7 +164,10 @@ class TestMakeRunEnvHomeInjection:
         monkeypatch.setenv("HOME", "/root")
         monkeypatch.setenv("PATH", "/usr/bin:/bin")
 
-        from hermes_constants import reset_hermes_home_override, set_hermes_home_override
+        from hermes_constants import (
+            reset_hermes_home_override,
+            set_hermes_home_override,
+        )
         from tools.environments.local import _make_run_env
 
         token = set_hermes_home_override(profile)
@@ -217,7 +219,10 @@ class TestSanitizeSubprocessEnvHomeInjection:
         monkeypatch.setenv("HERMES_HOME", str(root))
 
         base_env = {"HOME": "/root", "PATH": "/usr/bin"}
-        from hermes_constants import reset_hermes_home_override, set_hermes_home_override
+        from hermes_constants import (
+            reset_hermes_home_override,
+            set_hermes_home_override,
+        )
         from tools.environments.local import _sanitize_subprocess_env
 
         token = set_hermes_home_override(profile)

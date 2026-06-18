@@ -61,7 +61,8 @@ class TestCleanupAgentResourcesPassesMessages:
 
     def test_populated_messages_forwarded(self):
         """Real-world path: an agent that ran a turn has a populated
-        ``_session_messages`` list and the cleanup call forwards it."""
+        ``_session_messages`` list and the cleanup call forwards it.
+        """
         runner = _make_runner()
         transcript = [
             {"role": "user", "content": "remember my dog is named Biscuit"},
@@ -80,7 +81,8 @@ class TestCleanupAgentResourcesPassesMessages:
         on ``_session_messages``. Forwarding it (rather than falling
         through to the no-arg path) makes the absence of content
         explicit to providers and matches the pre-fix observable
-        behaviour (``on_session_end([])``)."""
+        behaviour (``on_session_end([])``).
+        """
         runner = _make_runner()
         agent = _FakeAgent(session_messages=[])
 
@@ -92,7 +94,8 @@ class TestCleanupAgentResourcesPassesMessages:
         """Test stubs built via ``object.__new__(AIAgent)`` skip
         ``__init__`` and therefore have no ``_session_messages``
         attribute. The fix must not explode — it falls back to the
-        legacy no-arg call so existing suites keep passing."""
+        legacy no-arg call so existing suites keep passing.
+        """
         runner = _make_runner()
         agent = _FakeAgent(session_messages=None)  # attribute not set
 
@@ -104,7 +107,8 @@ class TestCleanupAgentResourcesPassesMessages:
         """A MagicMock-based agent auto-synthesises ``_session_messages``
         as a nested MagicMock. ``isinstance(mock, list)`` is False, so
         we fall back to the no-arg path rather than passing a garbage
-        value to providers that expect ``List[Dict]``."""
+        value to providers that expect ``List[Dict]``.
+        """
         runner = _make_runner()
         agent = MagicMock()
         # No explicit _session_messages assignment — MagicMock will
@@ -118,7 +122,8 @@ class TestCleanupAgentResourcesPassesMessages:
         """Provider teardown must be best-effort — a raising
         ``shutdown_memory_provider`` must not prevent ``close()`` from
         running (tool resource leak is worse than a missed memory
-        flush)."""
+        flush).
+        """
         runner = _make_runner()
         agent = _FakeAgent(session_messages=[{"role": "user", "content": "x"}])
         agent.shutdown_memory_provider.side_effect = RuntimeError("boom")
@@ -131,14 +136,16 @@ class TestCleanupAgentResourcesPassesMessages:
 
     def test_none_agent_is_noop(self):
         """Defensive: None agent short-circuits (idle sweeps may
-        observe a None entry in the cache during eviction races)."""
+        observe a None entry in the cache during eviction races).
+        """
         runner = _make_runner()
         # Must not raise.
         runner._cleanup_agent_resources(None)
 
     def test_agent_without_shutdown_method_is_tolerated(self):
         """An agent without ``shutdown_memory_provider`` (old test
-        stub, partial mock) must still have ``close()`` called."""
+        stub, partial mock) must still have ``close()`` called.
+        """
         runner = _make_runner()
         agent = _FakeAgent(has_shutdown=False)
         # No _session_messages either, to exercise the hasattr guard.

@@ -74,8 +74,9 @@ def test_manager_remove_evicts_cache(tmp_path, monkeypatch):
 
 def test_hermes_provider_subclass_exists():
     """HermesMCPOAuthProvider is defined and subclasses OAuthClientProvider."""
-    from tools.mcp_oauth_manager import _HERMES_PROVIDER_CLS
     from mcp.client.auth.oauth2 import OAuthClientProvider
+
+    from tools.mcp_oauth_manager import _HERMES_PROVIDER_CLS
 
     assert _HERMES_PROVIDER_CLS is not None
     assert issubclass(_HERMES_PROVIDER_CLS, OAuthClientProvider)
@@ -127,7 +128,9 @@ async def test_disk_watch_invalidates_on_mtime_change(tmp_path, monkeypatch):
 def test_manager_builds_hermes_provider_subclass(tmp_path, monkeypatch):
     """get_or_build_provider returns HermesMCPOAuthProvider, not plain OAuthClientProvider."""
     from tools.mcp_oauth_manager import (
-        MCPOAuthManager, _HERMES_PROVIDER_CLS, reset_manager_for_tests,
+        _HERMES_PROVIDER_CLS,
+        MCPOAuthManager,
+        reset_manager_for_tests,
     )
     reset_manager_for_tests()
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))

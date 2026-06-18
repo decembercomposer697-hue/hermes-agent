@@ -15,7 +15,6 @@ import pytest
 
 from agent import shell_hooks
 
-
 # ── helpers ───────────────────────────────────────────────────────────────
 
 
@@ -214,7 +213,8 @@ class TestMatcher:
 
     def test_matcher_leading_whitespace_stripped(self):
         """YAML quirks can introduce leading/trailing whitespace — must
-        not silently break the matcher."""
+        not silently break the matcher.
+        """
         spec = shell_hooks.ShellHookSpec(
             event="pre_tool_call", command="echo", matcher=" terminal ",
         )
@@ -267,7 +267,8 @@ class TestCallbackSubprocess:
     def test_non_zero_exit_with_block_stdout_still_blocks(self, tmp_path):
         """A script that signals failure via exit code AND prints a block
         directive must still block — scripts should be free to mix exit
-        codes with parseable output."""
+        codes with parseable output.
+        """
         script = _write_script(
             tmp_path, "exit1_block.sh",
             "#!/usr/bin/env bash\n"
@@ -304,7 +305,8 @@ class TestCallbackSubprocess:
     def test_block_aggregation_through_plugin_manager(self, tmp_path, monkeypatch):
         """Registering via register_from_config makes
         get_pre_tool_call_block_message surface the block — the real
-        end-to-end control flow used by run_agent._invoke_tool."""
+        end-to-end control flow used by run_agent._invoke_tool.
+        """
         from hermes_cli import plugins
 
         script = _write_script(
@@ -493,7 +495,8 @@ class TestParseHooksBlock:
 
     def test_non_tool_event_matcher_warns_and_drops(self, caplog):
         """matcher: is only honored for pre/post_tool_call; must warn
-        and drop on other events so the spec reflects runtime."""
+        and drop on other events so the spec reflects runtime.
+        """
         import logging
         cfg = {"pre_llm_call": [{"matcher": "terminal", "command": "/bin/echo"}]}
         with caplog.at_level(logging.WARNING, logger=shell_hooks.logger.name):
@@ -534,7 +537,8 @@ class TestIdempotentRegistration:
         self, tmp_path, monkeypatch,
     ):
         """Same script used for different matchers under one event must
-        register both callbacks — dedupe keys on (event, matcher, command)."""
+        register both callbacks — dedupe keys on (event, matcher, command).
+        """
         from hermes_cli import plugins
 
         script = _write_script(tmp_path, "h.sh",
@@ -565,7 +569,8 @@ class TestIdempotentRegistration:
 class TestAllowlistConcurrency:
     """Regression tests for the Codex#1 finding: simultaneous
     _record_approval() calls used to collide on a fixed tmp path and
-    silently lose entries under read-modify-write races."""
+    silently lose entries under read-modify-write races.
+    """
 
     def test_parallel_record_approval_does_not_lose_entries(
         self, tmp_path, monkeypatch,
@@ -607,7 +612,8 @@ class TestAllowlistConcurrency:
         """Regression: on platforms without fcntl, the fallback lock must
         be separate from _registered_lock.  register_from_config holds
         _registered_lock while calling _record_approval (via the consent
-        prompt path), so a shared non-reentrant lock would self-deadlock."""
+        prompt path), so a shared non-reentrant lock would self-deadlock.
+        """
         import threading
 
         monkeypatch.setattr(shell_hooks, "fcntl", None)
@@ -644,7 +650,8 @@ class TestAllowlistConcurrency:
         self, tmp_path, monkeypatch, caplog,
     ):
         """Persistence failures must log the path, errno, and
-        re-prompt consequence so "hermes keeps asking" is debuggable."""
+        re-prompt consequence so "hermes keeps asking" is debuggable.
+        """
         import logging
         monkeypatch.setenv("HERMES_HOME", str(tmp_path / "home"))
         monkeypatch.setattr(
@@ -664,7 +671,8 @@ class TestAllowlistConcurrency:
     def test_script_is_executable_handles_interpreter_prefix(self, tmp_path):
         """For ``python3 hook.py`` and similar the interpreter reads
         the script, so X_OK on the script itself is not required —
-        only R_OK.  Bare invocations still require X_OK."""
+        only R_OK.  Bare invocations still require X_OK.
+        """
         script = tmp_path / "hook.py"
         script.write_text("print()\n")  # readable, NOT executable
 
@@ -685,7 +693,8 @@ class TestAllowlistConcurrency:
         ``/usr/bin/env``) instead of the actual script for any
         interpreter-prefixed command.  That broke
         ``hermes hooks doctor``'s executability check and silently
-        disabled mtime drift detection for such hooks."""
+        disabled mtime drift detection for such hooks.
+        """
         cases = [
             # bare path
             ("/path/hook.sh", "/path/hook.sh"),
@@ -715,7 +724,8 @@ class TestAllowlistConcurrency:
 
     def test_save_allowlist_uses_unique_tmp_paths(self, tmp_path, monkeypatch):
         """Two save_allowlist calls in flight must use distinct tmp files
-        so the loser's os.replace does not ENOENT on the winner's sweep."""
+        so the loser's os.replace does not ENOENT on the winner's sweep.
+        """
         monkeypatch.setenv("HERMES_HOME", str(tmp_path / "home"))
         p = shell_hooks.allowlist_path()
         p.parent.mkdir(parents=True, exist_ok=True)

@@ -23,7 +23,6 @@ import pytest
 
 from hermes_cli.main import _cmd_update_check, cmd_update
 
-
 # ---------- cmd_update (apply path) ----------
 
 

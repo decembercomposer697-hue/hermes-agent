@@ -45,7 +45,7 @@ from __future__ import annotations
 import json
 import logging
 import time
-from datetime import date, datetime, timezone, UTC
+from datetime import UTC, date, datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 import requests

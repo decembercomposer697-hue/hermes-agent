@@ -105,6 +105,7 @@ def atomic_json_write(
             TOCTOU exposure for secret-bearing files.
         **dump_kwargs: Additional keyword args forwarded to json.dump(), such
             as default=str for non-native types.
+
     """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -172,6 +173,7 @@ def atomic_yaml_write(
         sort_keys: Whether to sort dict keys (default False).
         extra_content: Optional string to append after the YAML dump
             (e.g. commented-out sections for user reference).
+
     """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)

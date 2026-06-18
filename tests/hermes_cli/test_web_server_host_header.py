@@ -21,7 +21,8 @@ if _repo not in sys.path:
 
 class TestHostHeaderValidator:
     """Unit test the _is_accepted_host helper directly — cheaper and
-    more thorough than spinning up the full FastAPI app."""
+    more thorough than spinning up the full FastAPI app.
+    """
 
     def test_loopback_bind_accepts_loopback_names(self):
         from hermes_cli.web_server import _is_accepted_host
@@ -38,7 +39,8 @@ class TestHostHeaderValidator:
 
     def test_loopback_bind_rejects_attacker_hostnames(self):
         """The core rebinding defence: attacker-controlled hosts that
-        TTL-flip to 127.0.0.1 must be rejected."""
+        TTL-flip to 127.0.0.1 must be rejected.
+        """
         from hermes_cli.web_server import _is_accepted_host
 
         for bound in ("127.0.0.1", "localhost"):
@@ -57,7 +59,8 @@ class TestHostHeaderValidator:
     def test_zero_zero_bind_accepts_anything(self):
         """0.0.0.0 means operator explicitly opted into all-interfaces
         (requires --insecure). No Host-layer defence is possible — rely
-        on operator network controls."""
+        on operator network controls.
+        """
         from hermes_cli.web_server import _is_accepted_host
 
         for host in ("10.0.0.5", "evil.example", "my-server.corp.net"):
@@ -66,7 +69,8 @@ class TestHostHeaderValidator:
 
     def test_explicit_non_loopback_bind_requires_exact_match(self):
         """If the operator bound to a specific non-loopback hostname,
-        the Host header must match exactly."""
+        the Host header must match exactly.
+        """
         from hermes_cli.web_server import _is_accepted_host
 
         assert _is_accepted_host("my-server.corp.net", "my-server.corp.net")
@@ -86,10 +90,12 @@ class TestHostHeaderValidator:
 
 class TestHostHeaderMiddleware:
     """End-to-end test via the FastAPI app — verify the middleware
-    rejects bad Host headers with 400."""
+    rejects bad Host headers with 400.
+    """
 
     def test_rebinding_request_rejected(self):
         from fastapi.testclient import TestClient
+
         from hermes_cli.web_server import app
 
         # Simulate start_server having set the bound_host
@@ -111,6 +117,7 @@ class TestHostHeaderMiddleware:
 
     def test_legit_loopback_request_accepted(self):
         from fastapi.testclient import TestClient
+
         from hermes_cli.web_server import app
 
         app.state.bound_host = "127.0.0.1"
@@ -134,8 +141,10 @@ class TestHostHeaderMiddleware:
     def test_no_bound_host_skips_validation(self):
         """If app.state.bound_host isn't set (e.g. running under test
         infra without calling start_server), middleware must pass through
-        rather than crash."""
+        rather than crash.
+        """
         from fastapi.testclient import TestClient
+
         from hermes_cli.web_server import app
 
         # Make sure bound_host isn't set

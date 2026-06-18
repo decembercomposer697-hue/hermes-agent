@@ -10,10 +10,10 @@ from unittest.mock import patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_hermes_tree(root: Path) -> None:
     """Create a realistic ~/.hermes directory structure for testing."""
@@ -100,7 +100,8 @@ class TestShouldExclude:
 
     def test_excludes_checkpoints(self):
         """checkpoints/ is session-local trajectory cache — hash-keyed,
-        regenerated per-session, won't port to another machine anyway."""
+        regenerated per-session, won't port to another machine anyway.
+        """
         from hermes_cli.backup import _should_exclude
         assert _should_exclude(Path("checkpoints/abc123/trajectory.json"))
         assert _should_exclude(Path("checkpoints/deadbeef/step_0001.json"))
@@ -113,7 +114,8 @@ class TestShouldExclude:
     def test_excludes_sqlite_sidecars(self):
         """SQLite WAL/SHM/journal sidecars must not ship alongside the
         safe-copied .db — pairing a fresh snapshot with stale sidecar state
-        produces a torn restore."""
+        produces a torn restore.
+        """
         from hermes_cli.backup import _should_exclude
         assert _should_exclude(Path("state.db-wal"))
         assert _should_exclude(Path("state.db-shm"))
@@ -148,7 +150,8 @@ class TestShouldExclude:
 
     def test_includes_nested_hermes_agent_in_skills(self):
         """skills/autonomous-ai-agents/hermes-agent/ must NOT be excluded —
-        only the root-level hermes-agent/ repo is skipped."""
+        only the root-level hermes-agent/ repo is skipped.
+        """
         from hermes_cli.backup import _should_exclude
         assert not _should_exclude(Path("skills/autonomous-ai-agents/hermes-agent/SKILL.md"))
         assert not _should_exclude(Path("skills/autonomous-ai-agents/hermes-agent/sub/item.txt"))
@@ -156,6 +159,7 @@ class TestShouldExclude:
 # ---------------------------------------------------------------------------
 # Backup tests
 # ---------------------------------------------------------------------------
+
 
 class TestBackup:
     def test_creates_zip(self, tmp_path, monkeypatch):
@@ -195,7 +199,8 @@ class TestBackup:
     def test_db_snapshots_staged_beside_output_zip(self, tmp_path, monkeypatch):
         """SQLite staging temp files must be created on the output zip's
         filesystem (dir=out_path.parent), NOT the system /tmp default — a
-        small tmpfs there silently drops large DBs from the backup (#35376)."""
+        small tmpfs there silently drops large DBs from the backup (#35376).
+        """
         hermes_home = tmp_path / ".hermes"
         hermes_home.mkdir()
         _make_hermes_tree(hermes_home)
@@ -226,7 +231,8 @@ class TestBackup:
 
     def test_pre_update_db_snapshots_staged_beside_output_zip(self, tmp_path, monkeypatch):
         """The pre-update/pre-migration zip path (_write_full_zip_backup) must
-        also stage SQLite snapshots beside its output zip, not in /tmp."""
+        also stage SQLite snapshots beside its output zip, not in /tmp.
+        """
         hermes_home = tmp_path / ".hermes"
         hermes_home.mkdir()
         _make_hermes_tree(hermes_home)
@@ -701,6 +707,7 @@ class TestValidation:
     def test_validate_with_config(self):
         """Zip with config.yaml passes validation."""
         import io
+
         from hermes_cli.backup import _validate_backup_zip
 
         buf = io.BytesIO()
@@ -714,6 +721,7 @@ class TestValidation:
     def test_validate_with_env(self):
         """Zip with .env passes validation."""
         import io
+
         from hermes_cli.backup import _validate_backup_zip
 
         buf = io.BytesIO()
@@ -727,6 +735,7 @@ class TestValidation:
     def test_validate_rejects_random(self):
         """Zip without hermes markers fails validation."""
         import io
+
         from hermes_cli.backup import _validate_backup_zip
 
         buf = io.BytesIO()
@@ -740,6 +749,7 @@ class TestValidation:
     def test_detect_prefix_hermes(self):
         """Detects .hermes/ prefix wrapping all entries."""
         import io
+
         from hermes_cli.backup import _detect_prefix
 
         buf = io.BytesIO()
@@ -753,6 +763,7 @@ class TestValidation:
     def test_detect_prefix_none(self):
         """No prefix when entries are at root."""
         import io
+
         from hermes_cli.backup import _detect_prefix
 
         buf = io.BytesIO()
@@ -766,6 +777,7 @@ class TestValidation:
     def test_detect_prefix_only_dirs(self):
         """Prefix detection returns empty for zip with only directory entries."""
         import io
+
         from hermes_cli.backup import _detect_prefix
 
         buf = io.BytesIO()
@@ -1126,7 +1138,7 @@ class TestProfileRestoration:
         args = Namespace(zipfile=str(zip_path), force=True)
 
         # Simulate profiles module not being available
-        original_import = __builtins__.__import__ if hasattr(__builtins__, '__import__') else __import__
+        original_import = __builtins__.__import__ if hasattr(__builtins__, "__import__") else __import__
 
         def fake_import(name, *a, **kw):
             if name == "hermes_cli.profiles":
@@ -1304,14 +1316,22 @@ class TestQuickSnapshot:
         assert restore_quick_snapshot("nonexistent", hermes_home=hermes_home) is False
 
     def test_auto_prune(self, hermes_home):
-        from hermes_cli.backup import create_quick_snapshot, list_quick_snapshots, _QUICK_DEFAULT_KEEP
+        from hermes_cli.backup import (
+            _QUICK_DEFAULT_KEEP,
+            create_quick_snapshot,
+            list_quick_snapshots,
+        )
         for i in range(_QUICK_DEFAULT_KEEP + 5):
             create_quick_snapshot(label=f"snap-{i:03d}", hermes_home=hermes_home)
         snaps = list_quick_snapshots(limit=100, hermes_home=hermes_home)
         assert len(snaps) <= _QUICK_DEFAULT_KEEP
 
     def test_manual_prune(self, hermes_home):
-        from hermes_cli.backup import create_quick_snapshot, prune_quick_snapshots, list_quick_snapshots
+        from hermes_cli.backup import (
+            create_quick_snapshot,
+            list_quick_snapshots,
+            prune_quick_snapshots,
+        )
         for i in range(10):
             create_quick_snapshot(label=f"s{i}", hermes_home=hermes_home)
         deleted = prune_quick_snapshots(keep=3, hermes_home=hermes_home)
@@ -1321,7 +1341,8 @@ class TestQuickSnapshot:
     def test_snapshot_includes_pairing_directories(self, hermes_home):
         """Pairing JSONs live outside state.db — snapshot must capture them
         recursively (generic + per-platform) so approved-user lists survive
-        disasters like #15733."""
+        disasters like #15733.
+        """
         from hermes_cli.backup import create_quick_snapshot
 
         # Generic pairing store (new location)
@@ -1399,9 +1420,11 @@ class TestQuickSnapshot:
 # Pre-update backup (hermes update safety net)
 # ---------------------------------------------------------------------------
 
+
 class TestPreUpdateBackup:
     """Tests for create_pre_update_backup — the auto-backup ``hermes update``
-    runs before touching anything."""
+    runs before touching anything.
+    """
 
     @pytest.fixture
     def hermes_home(self, tmp_path):
@@ -1421,7 +1444,8 @@ class TestPreUpdateBackup:
 
     def test_backup_contents_match_full_backup(self, hermes_home):
         """Pre-update backup should include the same user data that
-        ``hermes backup`` would, and should exclude the same directories."""
+        ``hermes backup`` would, and should exclude the same directories.
+        """
         from hermes_cli.backup import create_pre_update_backup
         out = create_pre_update_backup(hermes_home=hermes_home)
         assert out is not None
@@ -1442,7 +1466,8 @@ class TestPreUpdateBackup:
 
     def test_does_not_recurse_into_prior_backups(self, hermes_home):
         """The ``backups/`` directory must be excluded so that each backup
-        doesn't grow exponentially by including all prior backups."""
+        doesn't grow exponentially by including all prior backups.
+        """
         from hermes_cli.backup import create_pre_update_backup
         # First backup
         out1 = create_pre_update_backup(hermes_home=hermes_home)
@@ -1459,8 +1484,10 @@ class TestPreUpdateBackup:
 
     def test_rotation_keeps_only_n(self, hermes_home):
         """After more than ``keep`` backups are created, older ones are
-        pruned automatically."""
+        pruned automatically.
+        """
         import time as _t
+
         from hermes_cli.backup import create_pre_update_backup
 
         created = []
@@ -1482,8 +1509,10 @@ class TestPreUpdateBackup:
 
     def test_rotation_preserves_manual_files(self, hermes_home):
         """Hand-dropped zips in ``backups/`` must not be touched by
-        rotation — it only prunes files matching ``pre-update-*.zip``."""
+        rotation — it only prunes files matching ``pre-update-*.zip``.
+        """
         import time as _t
+
         from hermes_cli.backup import create_pre_update_backup
 
         (hermes_home / "backups").mkdir(exist_ok=True)
@@ -1517,7 +1546,8 @@ class TestPreUpdateBackup:
 
     def test_keep_negative_does_not_delete_freshly_created_backup(self, hermes_home):
         """Mirror coverage: any value <1 should be floored, not literally
-        applied as a slice index."""
+        applied as a slice index.
+        """
         from hermes_cli.backup import create_pre_update_backup
         out = create_pre_update_backup(hermes_home=hermes_home, keep=-3)
         assert out is not None
@@ -1529,6 +1559,7 @@ class TestPreUpdateBackup:
         still remove pre-existing backups beyond the (floored) limit of 1.
         """
         import time as _t
+
         from hermes_cli.backup import create_pre_update_backup
 
         first = create_pre_update_backup(hermes_home=hermes_home, keep=5)
@@ -1565,7 +1596,8 @@ class TestPreUpdateBackup:
 
 class TestRunPreUpdateBackup:
     """Tests for the ``_run_pre_update_backup`` wrapper in main.py —
-    covers config gate, ``--no-backup`` flag, and user-facing output."""
+    covers config gate, ``--no-backup`` flag, and user-facing output.
+    """
 
     @pytest.fixture
     def hermes_home(self, tmp_path, monkeypatch):
@@ -1598,7 +1630,8 @@ class TestRunPreUpdateBackup:
 
     def test_default_disabled_is_silent(self, hermes_home, capsys):
         """With the default-off config and no --backup flag, the hook is silent
-        and creates no backup.  This is the common case for every update."""
+        and creates no backup.  This is the common case for every update.
+        """
         from hermes_cli.main import _run_pre_update_backup
         _run_pre_update_backup(Namespace(no_backup=False, backup=False))
         out = capsys.readouterr().out
@@ -1620,7 +1653,8 @@ class TestRunPreUpdateBackup:
 
     def test_config_enabled_creates_backup(self, hermes_home, capsys):
         """Users who explicitly set updates.pre_update_backup: true still get
-        a backup on every update — this is the opt-in legacy behavior."""
+        a backup on every update — this is the opt-in legacy behavior.
+        """
         import yaml
         (hermes_home / "config.yaml").write_text(yaml.safe_dump({
             "_config_version": 22,
@@ -1641,7 +1675,8 @@ class TestRunPreUpdateBackup:
 
     def test_config_disabled_is_silent(self, hermes_home, capsys):
         """Explicit pre_update_backup: false behaves the same as the default —
-        silent no-op, no message spam."""
+        silent no-op, no message spam.
+        """
         import yaml
         (hermes_home / "config.yaml").write_text(yaml.safe_dump({
             "_config_version": 22,
@@ -1684,7 +1719,8 @@ class TestRunPreUpdateBackup:
 
 class TestPreMigrationBackup:
     """Tests for create_pre_migration_backup — the auto-backup
-    ``hermes claw migrate`` runs before mutating ~/.hermes/."""
+    ``hermes claw migrate`` runs before mutating ~/.hermes/.
+    """
 
     @pytest.fixture
     def hermes_home(self, tmp_path):
@@ -1706,7 +1742,8 @@ class TestPreMigrationBackup:
 
     def test_backup_uses_shared_exclusion_rules(self, hermes_home):
         """Pre-migration backup reuses the same exclusion rules as
-        ``hermes backup`` / ``create_pre_update_backup`` — no drift."""
+        ``hermes backup`` / ``create_pre_update_backup`` — no drift.
+        """
         from hermes_cli.backup import create_pre_migration_backup
         out = create_pre_migration_backup(hermes_home=hermes_home)
         assert out is not None
@@ -1723,8 +1760,9 @@ class TestPreMigrationBackup:
 
     def test_restorable_with_hermes_import(self, hermes_home, tmp_path):
         """The zip produced by pre-migration backup must be a valid Hermes
-        backup — `hermes import` should accept it."""
-        from hermes_cli.backup import create_pre_migration_backup, _validate_backup_zip
+        backup — `hermes import` should accept it.
+        """
+        from hermes_cli.backup import _validate_backup_zip, create_pre_migration_backup
         out = create_pre_migration_backup(hermes_home=hermes_home)
         assert out is not None
         with zipfile.ZipFile(out) as zf:
@@ -1743,6 +1781,7 @@ class TestPreMigrationBackup:
 
     def test_rotation_keeps_only_n(self, hermes_home):
         import time as _t
+
         from hermes_cli.backup import create_pre_migration_backup
 
         created = []
@@ -1764,8 +1803,12 @@ class TestPreMigrationBackup:
 
     def test_does_not_touch_pre_update_backups(self, hermes_home):
         """Pre-migration rotation must only prune pre-migration-*.zip files,
-        leaving pre-update-*.zip backups untouched."""
-        from hermes_cli.backup import create_pre_update_backup, create_pre_migration_backup
+        leaving pre-update-*.zip backups untouched.
+        """
+        from hermes_cli.backup import (
+            create_pre_migration_backup,
+            create_pre_update_backup,
+        )
         update_backup = create_pre_update_backup(hermes_home=hermes_home, keep=5)
         assert update_backup is not None and update_backup.exists()
         # Spin up a lot of migration backups with keep=1
@@ -1785,7 +1828,8 @@ class TestPreMigrationBackup:
 class TestRestoreCronJobsIfEmptied:
     """`hermes update` config migration can leave cron/jobs.json valid-but-empty,
     silently dropping every scheduled job. `restore_cron_jobs_if_emptied` is the
-    post-migration safety net that restores from the pre-update snapshot."""
+    post-migration safety net that restores from the pre-update snapshot.
+    """
 
     @staticmethod
     def _seed_jobs(path: Path, jobs):
@@ -1843,7 +1887,8 @@ class TestRestoreCronJobsIfEmptied:
 
     def test_noop_when_live_file_unreadable(self, tmp_path):
         """An unparseable live file is left alone — that's a different failure
-        mode the user should see, not silently overwrite."""
+        mode the user should see, not silently overwrite.
+        """
         from hermes_cli.backup import restore_cron_jobs_if_emptied
         hermes_home = tmp_path / ".hermes"
         jobs_path = hermes_home / "cron" / "jobs.json"
@@ -1866,7 +1911,8 @@ class TestRestoreCronJobsIfEmptied:
 
     def test_restores_legacy_bare_list_snapshot_shape(self, tmp_path):
         """A legacy snapshot storing a bare JSON list (not {"jobs": [...]}) is
-        still counted and restored."""
+        still counted and restored.
+        """
         from hermes_cli.backup import restore_cron_jobs_if_emptied
         hermes_home = tmp_path / ".hermes"
         jobs_path = hermes_home / "cron" / "jobs.json"

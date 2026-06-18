@@ -74,7 +74,8 @@ async def _hold_typing(_chat_id, interval=2.0, metadata=None, stop_event=None):
 
 def _strip_everything(adapter, monkeypatch):
     """Force the extract pipeline to reduce text_content to "" with no
-    attachments — the exact failure mode that made the drop invisible."""
+    attachments — the exact failure mode that made the drop invisible.
+    """
     monkeypatch.setattr(
         type(adapter), "extract_media", staticmethod(lambda content: ([], content)),
     )
@@ -89,7 +90,8 @@ def _strip_everything(adapter, monkeypatch):
 @pytest.mark.parametrize("platform", [Platform.DISCORD, Platform.TELEGRAM])
 class TestExtractStripRecoveryAllPlatforms:
     """A non-empty response stripped to empty must be recovered on EVERY
-    platform (the fix de-scopes the recovery from Discord-only)."""
+    platform (the fix de-scopes the recovery from Discord-only).
+    """
 
     @pytest.mark.asyncio
     async def test_response_reduced_to_empty_is_recovered_and_sent(
@@ -155,7 +157,8 @@ class TestExtractStripRecoveryAllPlatforms:
     async def test_no_fallback_when_attachment_produced(self, platform, monkeypatch):
         """When an image attachment IS extracted, the empty text_content is
         intentional — recovery must NOT re-send the original markdown and
-        duplicate the attachment's content."""
+        duplicate the attachment's content.
+        """
         adapter = _DummyAdapter(platform)
         adapter._keep_typing = _hold_typing
 
@@ -231,7 +234,8 @@ class TestRecoveryDoesNotLeakMediaFragments:
 class TestUnrecoverableDropIsLoud:
     """A non-empty response that produces NOTHING deliverable (sanitizes to
     empty, no attachment) must log a response_delivery_dropped ERROR rather
-    than vanishing silently."""
+    than vanishing silently.
+    """
 
     @pytest.mark.asyncio
     async def test_directive_only_response_logs_dropped(self, monkeypatch, caplog):

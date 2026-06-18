@@ -11,11 +11,11 @@ This validates the IPC + lifecycle story that mocks can't:
 """
 
 import os
-from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import time
+from pathlib import Path
 
 WT = str(Path(__file__).resolve().parents[2])
 FAKE_WORKER = str(Path(__file__).parent / "_fake_worker.py")
@@ -24,7 +24,8 @@ PY = sys.executable
 
 def make_spawn_fn(home: str):
     """Return a spawn_fn the dispatcher can call. Launches the fake
-    worker as a detached subprocess."""
+    worker as a detached subprocess.
+    """
 
     def _spawn(task, workspace):
         log_path = os.path.join(home, f"worker_{task.id}.log")

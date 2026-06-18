@@ -17,7 +17,8 @@ class TestDetectProviderEntra:
     def test_callable_api_key_is_a_valid_credential(self):
         """A runtime returning a callable ``api_key`` (Entra bearer token
         provider) must be detected as a configured provider, not
-        ``None``."""
+        ``None``.
+        """
         from acp_adapter import auth as _acp_auth
 
         def _fake_runtime(**_kwargs):
@@ -65,7 +66,8 @@ class TestDetectProviderEntra:
 
     def test_missing_provider_returns_none(self):
         """A callable api_key without a provider is still ``None`` —
-        we don't synthesize a provider name from the credential shape."""
+        we don't synthesize a provider name from the credential shape.
+        """
         from acp_adapter import auth as _acp_auth
 
         def _fake_runtime(**_kwargs):

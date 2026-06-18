@@ -1,5 +1,4 @@
-"""
-Image Generation Provider ABC
+"""Image Generation Provider ABC
 =============================
 
 Defines the pluggable-backend interface for image generation. Providers register

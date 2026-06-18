@@ -5,9 +5,9 @@ persistent lines to scrollback on tool.completed, restoring the stacked
 tool history that was lost when the TUI switched to a single-line spinner.
 """
 
+import importlib
 import os
 import sys
-import importlib
 from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -127,7 +127,8 @@ class TestToolProgressScrollback:
     def test_error_suffix_on_failed_tool(self):
         """When a failed tool's result is forwarded, the stacked line surfaces
         the specific error (e.g. ``[exit 1]`` or ``[File not found: x]``)
-        instead of the legacy generic ``[error]`` suffix."""
+        instead of the legacy generic ``[error]`` suffix.
+        """
         import json
         cli = _make_cli(tool_progress="all")
         cli._on_tool_progress("tool.started", "terminal", "false", {"command": "false"})
@@ -194,7 +195,8 @@ class TestToolProgressScrollback:
 
     def test_explicit_verbose_argument_wins_over_config(self):
         """Explicit verbose=True from the CLI flag still enables DEBUG logging
-        regardless of tool_progress_mode."""
+        regardless of tool_progress_mode.
+        """
         cli = _make_cli(tool_progress="off", verbose=True)
 
         assert cli.tool_progress_mode == "off"

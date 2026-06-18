@@ -33,7 +33,6 @@ Usage:
 
 import contextvars
 
-
 _write_origin: contextvars.ContextVar[str] = contextvars.ContextVar(
     "skill_write_origin",
     default="foreground",
@@ -74,5 +73,6 @@ def get_current_write_origin() -> str:
 
 def is_background_review() -> bool:
     """Convenience: True iff the current write origin is the background
-    review fork."""
+    review fork.
+    """
     return get_current_write_origin() == BACKGROUND_REVIEW

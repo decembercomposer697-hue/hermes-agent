@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Skills Hub — Source adapters and hub state management for the Hermes Skills Hub.
+"""Skills Hub — Source adapters and hub state management for the Hermes Skills Hub.
 
 This is a library module (not an agent tool). It provides:
   - GitHubAuth: Shared GitHub API authentication (PAT, gh CLI, GitHub App)
@@ -23,18 +22,20 @@ import subprocess
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path, PurePosixPath
-from hermes_constants import get_hermes_home
-from agent.skill_utils import is_excluded_skill_path
 from typing import Any, Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin, urlparse, urlunparse
 
 import httpx
 import yaml
 
+from agent.skill_utils import is_excluded_skill_path
+from hermes_constants import get_hermes_home
 from tools.skills_guard import (
-    ScanResult, content_hash, TRUSTED_REPOS,
+    TRUSTED_REPOS,
+    ScanResult,
+    content_hash,
 )
 from tools.url_safety import is_safe_url
 from tools.website_policy import check_website_access
@@ -235,8 +236,7 @@ def _validate_bundle_rel_path(rel_path: str) -> str:
 # ---------------------------------------------------------------------------
 
 class GitHubAuth:
-    """
-    GitHub API authentication. Tries methods in priority order:
+    """GitHub API authentication. Tries methods in priority order:
       1. GITHUB_TOKEN / GH_TOKEN env var (PAT — the default)
       2. `gh auth token` subprocess (if gh CLI is installed)
       3. GitHub App JWT + installation token (if app credentials configured)
@@ -476,8 +476,7 @@ class GitHubSource(SkillSource):
         return results[:limit]
 
     def fetch(self, identifier: str) -> SkillBundle | None:
-        """
-        Download a skill from GitHub.
+        """Download a skill from GitHub.
         identifier format: "owner/repo/path/to/skill-dir"
         """
         parts = identifier.split("/", 2)
@@ -728,7 +727,6 @@ class GitHubSource(SkillSource):
 
         return last_resp
 
-
     def _download_directory(self, repo: str, path: str) -> dict[str, str]:
         """Recursively download all text files from a GitHub directory.
 
@@ -751,6 +749,7 @@ class GitHubSource(SkillSource):
             empty dict ``{}`` if the tree is cached but the path doesn't exist
             (prevents unnecessary Contents API fallback),
             ``None`` if the tree couldn't be fetched (triggers Contents API fallback).
+
         """
         path = path.rstrip("/")
 
@@ -953,7 +952,7 @@ class GitHubSource(SkillSource):
         """Parse YAML frontmatter from SKILL.md content."""
         if not content.startswith("---"):
             return {}
-        match = re.search(r'\n---\s*\n', content[3:])
+        match = re.search(r"\n---\s*\n", content[3:])
         if not match:
             return {}
         yaml_text = content[3:match.start() + 3]
@@ -1378,11 +1377,11 @@ class SkillsShSource(SkillSource):
     )
     _SKILL_LINK_RE = re.compile(r'href=["\']/(?P<id>(?!agents/|_next/|api/)[^"\'/]+/[^"\'/]+/[^"\'/]+)["\']')
     _INSTALL_CMD_RE = re.compile(
-        r'npx\s+skills\s+add\s+(?P<repo>https?://github\.com/[^\s<]+|[^\s<]+)'
-        r'(?:\s+--skill\s+(?P<skill>[^\s<]+))?',
+        r"npx\s+skills\s+add\s+(?P<repo>https?://github\.com/[^\s<]+|[^\s<]+)"
+        r"(?:\s+--skill\s+(?P<skill>[^\s<]+))?",
         re.IGNORECASE,
     )
-    _PAGE_H1_RE = re.compile(r'<h1[^>]*>(?P<title>.*?)</h1>', re.IGNORECASE | re.DOTALL)
+    _PAGE_H1_RE = re.compile(r"<h1[^>]*>(?P<title>.*?)</h1>", re.IGNORECASE | re.DOTALL)
     _PROSE_H1_RE = re.compile(
         r'<div[^>]*class=["\'][^"\']*prose[^"\']*["\'][^>]*>.*?<h1[^>]*>(?P<title>.*?)</h1>',
         re.IGNORECASE | re.DOTALL,
@@ -1811,11 +1810,11 @@ class SkillsShSource(SkillSource):
             return set()
 
         base = plain.split("/")[-1]
-        sanitized = re.sub(r'[^a-z0-9/_-]+', '-', plain).strip('-')
+        sanitized = re.sub(r"[^a-z0-9/_-]+", "-", plain).strip("-")
         sanitized_base = sanitized.split("/")[-1] if sanitized else ""
         slash_tail = plain.split("/")[-1]
-        slash_tail_clean = slash_tail.lstrip('@')
-        slash_tail_clean = slash_tail_clean.split('/')[-1]
+        slash_tail_clean = slash_tail.lstrip("@")
+        slash_tail_clean = slash_tail_clean.split("/")[-1]
 
         variants = {
             plain,
@@ -1883,14 +1882,14 @@ class SkillsShSource(SkillSource):
             if idx == -1:
                 continue
             window = html[idx:idx + 500]
-            match = re.search(r'(Pass|Warn|Fail)', window, re.IGNORECASE)
+            match = re.search(r"(Pass|Warn|Fail)", window, re.IGNORECASE)
             if match:
                 audits[audit] = match.group(1).title()
         return audits
 
     @staticmethod
     def _strip_html(value: str) -> str:
-        return re.sub(r'<[^>]+>', '', value)
+        return re.sub(r"<[^>]+>", "", value)
 
     @staticmethod
     def _normalize_identifier(identifier: str) -> str:
@@ -1938,8 +1937,7 @@ class SkillsShSource(SkillSource):
 # ---------------------------------------------------------------------------
 
 class ClawHubSource(SkillSource):
-    """
-    Fetch skills from ClawHub (clawhub.ai) via their HTTP API.
+    """Fetch skills from ClawHub (clawhub.ai) via their HTTP API.
     All skills are treated as community trust — ClawHavoc incident showed
     their vetting is insufficient (341 malicious skills found Feb 2026).
     """
@@ -2476,8 +2474,7 @@ class ClawHubSource(SkillSource):
 # ---------------------------------------------------------------------------
 
 class ClaudeMarketplaceSource(SkillSource):
-    """
-    Discover skills from Claude Code marketplace repos.
+    """Discover skills from Claude Code marketplace repos.
     Marketplace repos contain .claude-plugin/marketplace.json with plugin listings.
     """
 
@@ -2580,8 +2577,7 @@ class ClaudeMarketplaceSource(SkillSource):
 # ---------------------------------------------------------------------------
 
 class LobeHubSource(SkillSource):
-    """
-    Fetch skills from LobeHub's agent marketplace (14,500+ agents).
+    """Fetch skills from LobeHub's agent marketplace (14,500+ agents).
     LobeHub agents are system prompt templates — we convert them to SKILL.md on fetch.
     Data lives in GitHub: lobehub/lobe-chat-agents.
     """
@@ -2914,8 +2910,7 @@ class BrowseShSource(SkillSource):
 # ---------------------------------------------------------------------------
 
 class OptionalSkillSource(SkillSource):
-    """
-    Fetch skills from the optional-skills/ directory shipped with the repo.
+    """Fetch skills from the optional-skills/ directory shipped with the repo.
 
     These skills are official (maintained by Nous Research) but not activated
     by default — they don't appear in the system prompt and aren't copied to
@@ -3072,7 +3067,7 @@ class OptionalSkillSource(SkillSource):
         """Parse YAML frontmatter from SKILL.md content."""
         if not content.startswith("---"):
             return {}
-        match = re.search(r'\n---\s*\n', content[3:])
+        match = re.search(r"\n---\s*\n", content[3:])
         if not match:
             return {}
         yaml_text = content[3:match.start() + 3]
@@ -3726,8 +3721,7 @@ class HermesIndexSource(SkillSource):
 
 
 def create_source_router(auth: GitHubAuth | None = None) -> list[SkillSource]:
-    """
-    Create all configured source adapters.
+    """Create all configured source adapters.
     Returns a list of active sources for search/fetch operations.
     """
     if auth is None:

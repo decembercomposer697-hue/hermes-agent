@@ -22,10 +22,10 @@ from __future__ import annotations
 import json
 import logging
 import os
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
-from collections.abc import Sequence
 
 log = logging.getLogger(__name__)
 
@@ -90,6 +90,7 @@ def reconcile_profile_gateways(
     Returns:
         One :class:`ReconcileAction` per profile, in this order:
         ``default`` first, then named profiles in directory order.
+
     """
     actions: list[ReconcileAction] = []
 
@@ -221,7 +222,8 @@ def _is_legacy_gateway_run_request(argv: Sequence[str]) -> bool:
 def _read_prior_state(profile_dir: Path) -> str | None:
     """Read gateway_state.json's ``gateway_state`` field, or None if
     missing or unparseable. Unparseable counts as "no prior state" so
-    we don't bork the whole reconciliation on a corrupt file."""
+    we don't bork the whole reconciliation on a corrupt file.
+    """
     state_file = profile_dir / "gateway_state.json"
     if not state_file.exists():
         return None
@@ -237,7 +239,8 @@ def _read_prior_state(profile_dir: Path) -> str | None:
 def _cleanup_stale_runtime_files(profile_dir: Path) -> None:
     """Remove gateway.pid and processes.json — they reference PIDs in
     the dead container's process namespace and would otherwise confuse
-    the newly-started gateway's process-mismatch checks."""
+    the newly-started gateway's process-mismatch checks.
+    """
     for name in _STALE_RUNTIME_FILES:
         (profile_dir / name).unlink(missing_ok=True)
 

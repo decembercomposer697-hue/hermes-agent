@@ -29,15 +29,15 @@ from aiohttp.test_utils import TestClient, TestServer
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import SendResult
 from gateway.platforms.webhook import (
-    WebhookAdapter,
     _INSECURE_NO_AUTH,
+    WebhookAdapter,
     check_webhook_requirements,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_config(
     routes=None,
@@ -160,7 +160,8 @@ class TestValidateSignature:
     def test_validate_no_secret_allows_all(self):
         """When the secret is empty/falsy, the validator is never even called
         by the handler (secret check is 'if secret and secret != _INSECURE...').
-        Verify that an empty secret isn't accidentally passed to the validator."""
+        Verify that an empty secret isn't accidentally passed to the validator.
+        """
         # This tests the semantics: empty secret means skip validation entirely.
         # The handler code does: if secret and secret != _INSECURE_NO_AUTH: validate
         # So with an empty secret, _validate_signature is never reached.
@@ -960,7 +961,8 @@ class TestDeliverCrossPlatformThreadId:
 class TestInsecureNoAuthSafetyRail:
     """connect() refuses to start when INSECURE_NO_AUTH is combined with a
     non-loopback bind. Guards against accidentally exposing an unauthenticated
-    webhook endpoint on a public interface."""
+    webhook endpoint on a public interface.
+    """
 
     @pytest.mark.asyncio
     async def test_connect_rejects_insecure_no_auth_on_public_bind(self):

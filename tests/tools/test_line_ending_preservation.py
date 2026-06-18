@@ -32,7 +32,11 @@ def hermes_home(monkeypatch, tmp_path):
     # returns the stale cwd from this test's ops and breaks tests like
     # test_resolve_path that rely on TERMINAL_CWD env var.
     try:
-        from tools.file_tools import clear_file_ops_cache, _read_tracker_lock, _read_tracker
+        from tools.file_tools import (
+            _read_tracker,
+            _read_tracker_lock,
+            clear_file_ops_cache,
+        )
         clear_file_ops_cache()
         with _read_tracker_lock:
             _read_tracker.clear()
@@ -57,7 +61,8 @@ def _bare_lf_count(b: bytes) -> int:
 class TestPatchCRLFPreservation:
     def test_patch_on_crlf_file_stays_pure_crlf(self, hermes_home, tmp_path):
         """LLM sends LF old/new; file has CRLF.  Result must be all CRLF,
-        no mixed endings."""
+        no mixed endings.
+        """
         from tools.file_tools import _handle_patch
 
         target = tmp_path / "config.ini"
@@ -109,7 +114,8 @@ class TestPatchCRLFPreservation:
 
     def test_patch_multiline_replacement_on_crlf(self, hermes_home, tmp_path):
         """Multi-line new_string with bare LFs should be CRLF-converted
-        before write."""
+        before write.
+        """
         from tools.file_tools import _handle_patch
 
         target = tmp_path / "f.py"
@@ -140,7 +146,8 @@ class TestWriteFileCRLFPreservation:
     ):
         """The agent typically sends bare-LF content; if the file existed
         with CRLF, the write should convert to CRLF rather than silently
-        flipping the endings."""
+        flipping the endings.
+        """
         from tools.file_tools import _handle_write_file
 
         target = tmp_path / "config.bat"
@@ -197,7 +204,8 @@ class TestWriteFileCRLFPreservation:
 
 class TestLineEndingHelpers:
     """Direct unit tests for the pure helpers — easier to debug than the
-    integration tests above."""
+    integration tests above.
+    """
 
     def test_detect_crlf(self):
         from tools.file_operations import _detect_line_ending
@@ -218,7 +226,8 @@ class TestLineEndingHelpers:
     def test_detect_mixed_picks_crlf(self):
         """Mixed-ending content (any CRLF in the head) returns CRLF —
         we prefer to normalize TO CRLF rather than away from it, since
-        a single CRLF in the file is usually a Windows-origin marker."""
+        a single CRLF in the file is usually a Windows-origin marker.
+        """
         from tools.file_operations import _detect_line_ending
 
         assert _detect_line_ending("a\nb\r\nc\n") == "\r\n"

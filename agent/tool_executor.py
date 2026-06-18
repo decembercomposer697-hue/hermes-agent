@@ -23,26 +23,32 @@ from typing import Any, Optional
 
 from agent.display import (
     KawaiiSpinner,
-    build_tool_preview as _build_tool_preview,
-    get_cute_tool_message as _get_cute_tool_message_impl,
-    get_tool_emoji as _get_tool_emoji,
     _detect_tool_failure,
 )
-from agent.tool_guardrails import ToolGuardrailDecision
+from agent.display import (
+    build_tool_preview as _build_tool_preview,
+)
+from agent.display import (
+    get_cute_tool_message as _get_cute_tool_message_impl,
+)
+from agent.display import (
+    get_tool_emoji as _get_tool_emoji,
+)
 from agent.tool_dispatch_helpers import (
+    _append_subdir_hint_to_multimodal,
     _is_destructive_command,
     _is_multimodal_tool_result,
     _multimodal_text_summary,
-    _append_subdir_hint_to_multimodal,
     make_tool_result_message,
 )
+from agent.tool_guardrails import ToolGuardrailDecision
 from tools.terminal_tool import (
     get_active_env,
 )
 from tools.thread_context import propagate_context_to_thread
 from tools.tool_result_storage import (
-    maybe_persist_tool_result,
     enforce_turn_budget,
+    maybe_persist_tool_result,
 )
 
 logger = logging.getLogger(__name__)
@@ -547,7 +553,7 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
     spinner = None
     if agent._should_emit_quiet_tool_messages() and agent._should_start_quiet_spinner():
         face = random.choice(KawaiiSpinner.get_waiting_faces())
-        spinner = KawaiiSpinner(f"{face} ⚡ running {num_tools} tools concurrently", spinner_type='dots', print_fn=agent._print_fn)
+        spinner = KawaiiSpinner(f"{face} ⚡ running {num_tools} tools concurrently", spinner_type="dots", print_fn=agent._print_fn)
         spinner.start()
 
     try:
@@ -764,7 +770,6 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
     # so the steer marker is never truncated. See steer() for details.
     if num_tools > 0:
         agent._apply_pending_steer_to_tool_results(messages, num_tools)
-
 
 
 def execute_tool_calls_sequential(agent, assistant_message, messages: list, effective_task_id: str, api_call_count: int = 0) -> None:
@@ -1067,7 +1072,9 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
                 agent._vprint(f"  {_get_cute_tool_message_impl('clarify', function_args, tool_duration, result=function_result)}")
         elif function_name == "read_terminal":
             def _execute(next_args: dict) -> Any:
-                from tools.read_terminal_tool import read_terminal_tool as _read_terminal_tool
+                from tools.read_terminal_tool import (
+                    read_terminal_tool as _read_terminal_tool,
+                )
                 return _read_terminal_tool(
                     start_line=next_args.get("start_line"),
                     count=next_args.get("count"),
@@ -1098,7 +1105,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
             spinner = None
             if agent._should_emit_quiet_tool_messages() and agent._should_start_quiet_spinner():
                 face = random.choice(KawaiiSpinner.get_waiting_faces())
-                spinner = KawaiiSpinner(f"{face} {spinner_label}", spinner_type='dots', print_fn=agent._print_fn)
+                spinner = KawaiiSpinner(f"{face} {spinner_label}", spinner_type="dots", print_fn=agent._print_fn)
                 spinner.start()
             agent._delegate_spinner = spinner
             _delegate_result = None
@@ -1117,7 +1124,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
             finally:
                 agent._delegate_spinner = None
                 tool_duration = time.time() - tool_start_time
-                cute_msg = _get_cute_tool_message_impl('delegate_task', function_args, tool_duration, result=_delegate_result)
+                cute_msg = _get_cute_tool_message_impl("delegate_task", function_args, tool_duration, result=_delegate_result)
                 if spinner:
                     spinner.stop(cute_msg)
                 elif agent._should_emit_quiet_tool_messages():
@@ -1129,7 +1136,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
                 face = random.choice(KawaiiSpinner.get_waiting_faces())
                 emoji = _get_tool_emoji(function_name)
                 preview = _build_tool_preview(function_name, function_args) or function_name
-                spinner = KawaiiSpinner(f"{face} {emoji} {preview}", spinner_type='dots', print_fn=agent._print_fn)
+                spinner = KawaiiSpinner(f"{face} {emoji} {preview}", spinner_type="dots", print_fn=agent._print_fn)
                 spinner.start()
             _ce_result = None
             try:
@@ -1162,7 +1169,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
                 face = random.choice(KawaiiSpinner.get_waiting_faces())
                 emoji = _get_tool_emoji(function_name)
                 preview = _build_tool_preview(function_name, function_args) or function_name
-                spinner = KawaiiSpinner(f"{face} {emoji} {preview}", spinner_type='dots', print_fn=agent._print_fn)
+                spinner = KawaiiSpinner(f"{face} {emoji} {preview}", spinner_type="dots", print_fn=agent._print_fn)
                 spinner.start()
             _mem_result = None
             try:
@@ -1193,7 +1200,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
                 face = random.choice(KawaiiSpinner.get_waiting_faces())
                 emoji = _get_tool_emoji(function_name)
                 preview = _build_tool_preview(function_name, function_args) or function_name
-                spinner = KawaiiSpinner(f"{face} {emoji} {preview}", spinner_type='dots', print_fn=agent._print_fn)
+                spinner = KawaiiSpinner(f"{face} {emoji} {preview}", spinner_type="dots", print_fn=agent._print_fn)
                 spinner.start()
             _spinner_result = None
             try:
@@ -1418,8 +1425,6 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
     # applied to sequential execution as well.
     if num_tools_seq > 0:
         agent._apply_pending_steer_to_tool_results(messages, num_tools_seq)
-
-
 
 
 __all__ = [

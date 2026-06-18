@@ -36,7 +36,8 @@ def test_latest_message_wins_on_conflict():
 
 def test_reverse_signals_called_out():
     """Reverse signals (stop/undo/never mind/topic change) must be named so
-    the model recognizes them as cancellation triggers, not just background."""
+    the model recognizes them as cancellation triggers, not just background.
+    """
     lower = SUMMARY_PREFIX.lower()
     # At least a few of the canonical reverse-signal verbs should appear.
     reverse_terms = ["stop", "undo", "roll back", "never mind", "just verify"]

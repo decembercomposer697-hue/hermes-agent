@@ -133,7 +133,8 @@ class TestGateRedirectsCarryPrefix:
     def test_no_prefix_header_keeps_unprefixed_paths(self, gated_app_direct):
         """When no X-Forwarded-Prefix is sent, the Location header must
         NOT gain a phantom prefix — the Fly-direct deploy shape has no
-        proxy at all."""
+        proxy at all.
+        """
         r = gated_app_direct.get("/sessions", follow_redirects=False)
         assert r.status_code == 302
         assert r.headers["location"] == "/login?next=%2Fsessions"
@@ -141,7 +142,8 @@ class TestGateRedirectsCarryPrefix:
     def test_malformed_prefix_header_is_ignored(self, gated_app_proxied):
         """A hostile proxy injects ``X-Forwarded-Prefix: <script>``;
         the normaliser rejects it and the gate falls back to unprefixed
-        URLs. Defence against header-injection HTML inside Location."""
+        URLs. Defence against header-injection HTML inside Location.
+        """
         r = gated_app_proxied.get(
             "/sessions",
             headers={"x-forwarded-prefix": "<script>alert(1)</script>"},
@@ -166,7 +168,8 @@ class TestOAuthRedirectUriRespectsPrefix:
         ``https://mission-control.tilos.com/auth/callback`` instead of
         ``https://mission-control.tilos.com/hermes/auth/callback`` — the
         former routes to the MC frontend, not the dashboard, so the
-        user gets 404."""
+        user gets 404.
+        """
         r = gated_app_proxied.get(
             "/auth/login?provider=stub",
             headers={"x-forwarded-prefix": "/hermes"},
@@ -236,7 +239,8 @@ class TestPublicUrlOverride:
     def patch_config(self, monkeypatch):
         """Replace ``hermes_cli.config.load_config`` with a stub
         returning the given ``public_url``. Pass ``None`` to set no
-        config-side value."""
+        config-side value.
+        """
 
         def _set(public_url) -> None:
             cfg = {}
@@ -265,7 +269,8 @@ class TestPublicUrlOverride:
     ):
         """``HERMES_DASHBOARD_PUBLIC_URL`` wins over the URL the
         request would otherwise reconstruct to. Critical for deploys
-        whose proxy headers don't match the public URL."""
+        whose proxy headers don't match the public URL.
+        """
         patch_config(None)
         monkeypatch.setenv(
             "HERMES_DASHBOARD_PUBLIC_URL", "https://custom.example",
@@ -288,7 +293,8 @@ class TestPublicUrlOverride:
         self, gated_app_direct, patch_config, monkeypatch,
     ):
         """Precedence pin — env wins over config.yaml. Fly.io / CI
-        secret injection depends on this ordering."""
+        secret injection depends on this ordering.
+        """
         monkeypatch.setenv(
             "HERMES_DASHBOARD_PUBLIC_URL", "https://from-env.example",
         )
@@ -305,7 +311,8 @@ class TestPublicUrlOverride:
         """When public_url already carries a path prefix
         (``https://example.com/hermes``), the OAuth callback URL is
         the path appended verbatim. The operator is declaring the
-        whole authority; we trust them."""
+        whole authority; we trust them.
+        """
         patch_config(None)
         monkeypatch.setenv(
             "HERMES_DASHBOARD_PUBLIC_URL", "https://example.com/hermes",
@@ -319,7 +326,8 @@ class TestPublicUrlOverride:
         """X-Forwarded-Prefix is the auto-reconstruction signal; when
         public_url is set we no longer need to guess, and stacking the
         prefix on top would double-prefix in the common case where
-        the operator already baked their prefix into public_url."""
+        the operator already baked their prefix into public_url.
+        """
         patch_config(None)
         monkeypatch.setenv(
             "HERMES_DASHBOARD_PUBLIC_URL", "https://example.com/already-prefixed",
@@ -339,7 +347,8 @@ class TestPublicUrlOverride:
         self, gated_app_direct, patch_config, monkeypatch,
     ):
         """``https://example.com/`` and ``https://example.com`` must
-        produce identical results — no ``//auth/callback`` double slash."""
+        produce identical results — no ``//auth/callback`` double slash.
+        """
         patch_config(None)
         monkeypatch.setenv(
             "HERMES_DASHBOARD_PUBLIC_URL", "https://example.com/",
@@ -353,7 +362,8 @@ class TestPublicUrlOverride:
         """Defence against header injection: a public_url that doesn't
         parse as ``http(s)://host[/path]`` is dropped and we fall back
         to request reconstruction. The login flow continues to work
-        rather than dispatching the user to a hostile URL."""
+        rather than dispatching the user to a hostile URL.
+        """
         from urllib.parse import urlparse
 
         patch_config(None)
@@ -381,7 +391,8 @@ class TestPublicUrlOverride:
     ):
         """Same defensive behaviour as the other env vars in this
         plugin — an empty env var doesn't shadow a valid config.yaml
-        entry."""
+        entry.
+        """
         monkeypatch.setenv("HERMES_DASHBOARD_PUBLIC_URL", "")
         patch_config("https://from-config.example")
         redirect_uri = self._redirect_uri(gated_app_direct)
@@ -393,7 +404,8 @@ class TestPublicUrlOverride:
         """A non-empty env var that's missing its scheme (the #1 cause
         of "I set HERMES_DASHBOARD_PUBLIC_URL but the callback is still
         http://") must emit an operator-facing WARNING rather than being
-        silently discarded. Regression for #42780."""
+        silently discarded. Regression for #42780.
+        """
         import logging
 
         from hermes_cli.dashboard_auth import prefix as prefix_mod
@@ -425,7 +437,8 @@ class TestPublicUrlOverride:
     ):
         """resolve_public_url runs per-request; the malformed-value
         warning must fire at most once per distinct value so a
-        misconfigured deploy doesn't flood the logs."""
+        misconfigured deploy doesn't flood the logs.
+        """
         import logging
 
         from hermes_cli.dashboard_auth import prefix as prefix_mod
@@ -535,7 +548,8 @@ class TestCookiePathRespectsPrefix:
         """Fly-direct deploy: Path=/ is available, so we can use the
         stricter ``__Host-`` prefix. This binds the cookie to the
         exact origin (no Domain attribute) — best practice for
-        single-host single-app deploys."""
+        single-host single-app deploys.
+        """
         r = gated_app_direct.get(
             "/auth/login?provider=stub", follow_redirects=False,
         )
@@ -557,9 +571,11 @@ class TestCookiePathRespectsPrefix:
     def test_loopback_cookies_unprefixed(self):
         """Loopback HTTP dev: no Secure, no __Host- / __Secure-.
         The bare cookie name is the right choice — neither prefix is
-        spec-compatible without Secure."""
+        spec-compatible without Secure.
+        """
         from fastapi import FastAPI
         from fastapi.responses import Response
+
         from hermes_cli.dashboard_auth.cookies import set_pkce_cookie
 
         app = FastAPI()

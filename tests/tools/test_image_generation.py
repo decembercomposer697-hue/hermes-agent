@@ -13,15 +13,16 @@ from unittest.mock import patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def image_tool():
     """Fresh import of tools.image_generation_tool per test."""
     import importlib
+
     import tools.image_generation_tool as mod
     return importlib.reload(mod)
 
@@ -72,7 +73,8 @@ class TestFalCatalog:
     def test_only_flux2_pro_upscales_by_default(self, image_tool):
         """Upscaling should default to False for all new models to preserve
         the <1s / fast-render value prop. Only flux-2-pro stays True for
-        backward-compat with the previous default."""
+        backward-compat with the previous default.
+        """
         for mid, meta in image_tool.FAL_MODELS.items():
             if mid == "fal-ai/flux-2-pro":
                 assert meta["upscale"] is True, \
@@ -139,7 +141,8 @@ class TestGptLiteralFamily:
 class TestGptImage2Presets:
     """GPT Image 2 uses preset enum sizes (not literal strings like 1.5).
     Mapped to 4:3 variants so we stay above the 655,360 min-pixel floor
-    (16:9 presets at 1024x576 = 589,824 would be rejected)."""
+    (16:9 presets at 1024x576 = 589,824 would be rejected).
+    """
 
     def test_gpt2_landscape_uses_4_3_preset(self, image_tool):
         p = image_tool._build_fal_payload("fal-ai/gpt-image-2", "hello", "landscape")
@@ -160,7 +163,8 @@ class TestGptImage2Presets:
     def test_gpt2_strips_byok_and_unsupported_overrides(self, image_tool):
         """openai_api_key (BYOK) is deliberately not in supports — all users
         route through shared FAL billing. guidance_scale/num_inference_steps
-        aren't in the model's API surface either."""
+        aren't in the model's API surface either.
+        """
         p = image_tool._build_fal_payload(
             "fal-ai/gpt-image-2", "hi", "square",
             overrides={
@@ -259,7 +263,8 @@ class TestDefaults:
 class TestGptQualityPinnedToMedium:
     """GPT-Image quality is baked into the FAL_MODELS defaults at 'medium'
     and cannot be overridden via config. Pinning keeps Nous Portal billing
-    predictable across all users."""
+    predictable across all users.
+    """
 
     def test_gpt_payload_always_has_medium_quality(self, image_tool):
         p = image_tool._build_fal_payload("fal-ai/gpt-image-1.5", "hi", "square")
@@ -267,15 +272,17 @@ class TestGptQualityPinnedToMedium:
 
     def test_config_quality_setting_is_ignored(self, image_tool):
         """Even if a user manually edits config.yaml and adds quality_setting,
-        the payload must still use medium. No code path reads that field."""
+        the payload must still use medium. No code path reads that field.
+        """
         with patch("hermes_cli.config.load_config",
                    return_value={"image_gen": {"quality_setting": "high"}}):
             p = image_tool._build_fal_payload("fal-ai/gpt-image-1.5", "hi", "square")
         assert p["quality"] == "medium"
 
     def test_non_gpt_model_never_gets_quality(self, image_tool):
-        """quality is only meaningful for GPT-Image models (1.5, 2) — other
-        models should never have it in their payload."""
+        """Quality is only meaningful for GPT-Image models (1.5, 2) — other
+        models should never have it in their payload.
+        """
         gpt_models = {"fal-ai/gpt-image-1.5", "fal-ai/gpt-image-2"}
         for mid in image_tool.FAL_MODELS:
             if mid in gpt_models:
@@ -285,7 +292,8 @@ class TestGptQualityPinnedToMedium:
 
     def test_honors_quality_setting_flag_is_removed(self, image_tool):
         """The honors_quality_setting flag was the old override trigger.
-        It must not be present on any model entry anymore."""
+        It must not be present on any model entry anymore.
+        """
         for mid, meta in image_tool.FAL_MODELS.items():
             assert "honors_quality_setting" not in meta, (
                 f"{mid} still has honors_quality_setting; "
@@ -294,7 +302,8 @@ class TestGptQualityPinnedToMedium:
 
     def test_resolve_gpt_quality_function_is_gone(self, image_tool):
         """The _resolve_gpt_quality() helper was removed — quality is now
-        a static default, not a runtime lookup."""
+        a static default, not a runtime lookup.
+        """
         assert not hasattr(image_tool, "_resolve_gpt_quality"), (
             "_resolve_gpt_quality should not exist — quality is pinned"
         )
@@ -365,7 +374,8 @@ class TestRegistryIntegration:
 
     def test_schema_exposes_only_prompt_and_aspect_ratio_to_agent(self, image_tool):
         """The agent-facing schema must stay tight — model selection is a
-        user-level config choice, not an agent-level arg."""
+        user-level config choice, not an agent-level arg.
+        """
         props = image_tool.IMAGE_GENERATE_SCHEMA["parameters"]["properties"]
         assert set(props.keys()) == {"prompt", "aspect_ratio"}
 
@@ -465,7 +475,8 @@ class TestManagedGatewayErrorTranslation:
     def test_direct_fal_errors_are_not_translated(self, image_tool, monkeypatch):
         """When user has direct FAL_KEY (managed gateway returns None), raw
         errors from fal_client bubble up unchanged — fal_client already
-        provides reasonable error messages for direct usage."""
+        provides reasonable error messages for direct usage.
+        """
         from unittest.mock import MagicMock
 
         monkeypatch.setattr(image_tool, "_resolve_managed_fal_gateway",
@@ -481,7 +492,8 @@ class TestManagedGatewayErrorTranslation:
 
     def test_non_http_exception_from_managed_bubbles_up(self, image_tool, monkeypatch):
         """Connection errors, timeouts, etc. from managed mode aren't 4xx —
-        they should bubble up unchanged so callers can retry or diagnose."""
+        they should bubble up unchanged so callers can retry or diagnose.
+        """
         from unittest.mock import MagicMock
 
         managed_gateway = MagicMock()

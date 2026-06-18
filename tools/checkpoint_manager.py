@@ -1,5 +1,4 @@
-"""
-Checkpoint Manager — Transparent filesystem snapshots via a single shared
+"""Checkpoint Manager — Transparent filesystem snapshots via a single shared
 shadow git store.
 
 Creates automatic snapshots of working directories before file-mutating
@@ -57,9 +56,9 @@ import shutil
 import subprocess
 import time
 from pathlib import Path
-from hermes_constants import get_hermes_home
 from typing import Dict, List, Optional, Set, Tuple
 
+from hermes_constants import get_hermes_home
 from utils import env_int
 
 logger = logging.getLogger(__name__)
@@ -147,7 +146,7 @@ _GIT_TIMEOUT: int = max(10, min(60, env_int("HERMES_CHECKPOINT_TIMEOUT", 30)))
 _MAX_FILES = 50_000
 
 # Valid git commit hash pattern: 4–40 hex chars (short or full SHA-1/SHA-256).
-_COMMIT_HASH_RE = re.compile(r'^[0-9a-fA-F]{4,64}$')
+_COMMIT_HASH_RE = re.compile(r"^[0-9a-fA-F]{4,64}$")
 
 
 # ---------------------------------------------------------------------------
@@ -596,6 +595,7 @@ class CheckpointManager:
     max_file_size_mb : int
         Skip adding any single file larger than this to a checkpoint.
         (Implemented via ``.gitignore`` excludes + a post-stage size check.)
+
     """
 
     def __init__(
@@ -702,13 +702,13 @@ class CheckpointManager:
     @staticmethod
     def _parse_shortstat(stat_line: str, entry: dict) -> None:
         """Parse git --shortstat output into entry dict."""
-        m = re.search(r'(\d+) file', stat_line)
+        m = re.search(r"(\d+) file", stat_line)
         if m:
             entry["files_changed"] = int(m.group(1))
-        m = re.search(r'(\d+) insertion', stat_line)
+        m = re.search(r"(\d+) insertion", stat_line)
         if m:
             entry["insertions"] = int(m.group(1))
-        m = re.search(r'(\d+) deletion', stat_line)
+        m = re.search(r"(\d+) deletion", stat_line)
         if m:
             entry["deletions"] = int(m.group(1))
 

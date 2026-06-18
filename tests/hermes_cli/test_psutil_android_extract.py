@@ -12,8 +12,8 @@ import pytest
 
 from hermes_cli.psutil_android import (
     MARKER,
-    REPLACEMENT,
     PSUTIL_URL,
+    REPLACEMENT,
     PsutilAndroidInstallError,
     prepare_patched_psutil_sdist,
 )

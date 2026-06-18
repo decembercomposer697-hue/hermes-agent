@@ -147,7 +147,8 @@ class TestPreNavigationSsrf:
         self, monkeypatch, _common_patches,
     ):
         """Hybrid routing still works for ordinary private URLs — floor
-        must be narrow enough to not break the PR #16136 feature."""
+        must be narrow enough to not break the PR #16136 feature.
+        """
         monkeypatch.setattr(browser_tool, "_is_local_backend", lambda: False)
         monkeypatch.setattr(browser_tool, "_allow_private_urls", lambda: False)
         monkeypatch.setattr(browser_tool, "_is_local_sidecar_key", lambda key: True)
@@ -299,7 +300,8 @@ class TestPostRedirectSsrf:
     ):
         """Redirect to a cloud metadata endpoint is blocked regardless of
         routing — even the hybrid local sidecar path can't return IMDS
-        content to the agent."""
+        content to the agent.
+        """
         imds_final = "http://169.254.169.254/latest/meta-data/"
         monkeypatch.setattr(browser_tool, "_is_local_backend", lambda: False)
         monkeypatch.setattr(browser_tool, "_allow_private_urls", lambda: False)

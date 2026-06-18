@@ -6,7 +6,6 @@ import base64
 from pathlib import Path
 from unittest.mock import patch
 
-
 from agent.image_routing import (
     _coerce_capability_bool,
     _coerce_mode,
@@ -17,7 +16,6 @@ from agent.image_routing import (
     decide_image_input_mode,
     extract_image_refs,
 )
-
 
 # ─── _coerce_mode ────────────────────────────────────────────────────────────
 
@@ -456,7 +454,8 @@ class TestLargeImageHandling:
 
 class TestExtractImageRefs:
     """Scan task body / inbound text for image paths and URLs (kanban worker
-    enrichment, issue raised May 2026)."""
+    enrichment, issue raised May 2026).
+    """
 
     def test_empty_or_none_returns_empty(self):
         assert extract_image_refs("") == ([], [])
@@ -578,7 +577,8 @@ class TestExtractImageRefs:
 
 class TestBuildNativeContentPartsURLs:
     """URL pass-through support added so kanban task bodies (and other
-    inbound surfaces) can route remote image URLs straight to the model."""
+    inbound surfaces) can route remote image URLs straight to the model.
+    """
 
     def test_url_only_no_local_paths(self):
         parts, skipped = build_native_content_parts(

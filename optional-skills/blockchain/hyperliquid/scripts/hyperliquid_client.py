@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Hyperliquid CLI Tool for Hermes Agent
+"""Hyperliquid CLI Tool for Hermes Agent
 -------------------------------------
 Queries the Hyperliquid info endpoint for market and account data.
 Uses only Python standard library - no external packages required.
@@ -36,10 +35,9 @@ import time
 import urllib.error
 import urllib.request
 from collections import Counter
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from collections.abc import Iterable
-
 
 USER_AGENT = "HermesAgent/1.0"
 DEFAULT_USER_ENV = "HYPERLIQUID_USER_ADDRESS"
@@ -79,7 +77,7 @@ def _load_dotenv_values() -> dict[str, str]:
             key = key.strip()
             value = value.strip()
             if value.startswith('"') and value.endswith('"') and len(value) >= 2:
-                value = value[1:-1].replace('\\"', '"').replace('\\\\', '\\')
+                value = value[1:-1].replace('\\"', '"').replace("\\\\", "\\")
             values[key] = value
     return values
 

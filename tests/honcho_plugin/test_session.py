@@ -1,17 +1,15 @@
 """Tests for plugins/memory/honcho/session.py — HonchoSession and helpers."""
 
 import time
-
 from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
+from plugins.memory.honcho import HonchoMemoryProvider
 from plugins.memory.honcho.session import (
     HonchoSession,
     HonchoSessionManager,
 )
-from plugins.memory.honcho import HonchoMemoryProvider
-
 
 # ---------------------------------------------------------------------------
 # HonchoSession dataclass
@@ -623,7 +621,7 @@ class TestToolsModeInitBehavior:
         provider = HonchoMemoryProvider()
 
         # Patch the config loading and session init to avoid real Honcho calls
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
 
         mock_manager = MagicMock()
         mock_session = MagicMock()
@@ -645,7 +643,7 @@ class TestToolsModeInitBehavior:
         return provider, cfg, mock_manager_cls
 
     def test_tools_lazy_default(self):
-        """tools + initOnSessionStart=false → session NOT initialized after initialize()."""
+        """Tools + initOnSessionStart=false → session NOT initialized after initialize()."""
         provider, _, _ = self._make_provider_with_config(
             recall_mode="tools", init_on_session_start=False,
         )
@@ -654,7 +652,7 @@ class TestToolsModeInitBehavior:
         assert provider._lazy_init_kwargs is not None
 
     def test_tools_eager_init(self):
-        """tools + initOnSessionStart=true → session IS initialized after initialize()."""
+        """Tools + initOnSessionStart=true → session IS initialized after initialize()."""
         provider, _, _ = self._make_provider_with_config(
             recall_mode="tools", init_on_session_start=True,
         )
@@ -662,14 +660,14 @@ class TestToolsModeInitBehavior:
         assert provider._manager is not None
 
     def test_tools_eager_prefetch_still_empty(self):
-        """tools mode with eager init still returns empty from prefetch() (no auto-injection)."""
+        """Tools mode with eager init still returns empty from prefetch() (no auto-injection)."""
         provider, _, _ = self._make_provider_with_config(
             recall_mode="tools", init_on_session_start=True,
         )
         assert provider.prefetch("test query") == ""
 
     def test_tools_lazy_prefetch_empty(self):
-        """tools mode with lazy init also returns empty from prefetch()."""
+        """Tools mode with lazy init also returns empty from prefetch()."""
         provider, _, _ = self._make_provider_with_config(
             recall_mode="tools", init_on_session_start=False,
         )
@@ -713,8 +711,9 @@ class TestPerSessionMigrateGuard:
 
     def _make_provider_with_strategy(self, strategy, init_on_session_start=True):
         """Create a HonchoMemoryProvider and track migrate_memory_files calls."""
+        from unittest.mock import MagicMock, patch
+
         from plugins.memory.honcho.client import HonchoClientConfig
-        from unittest.mock import patch, MagicMock
 
         cfg = HonchoClientConfig(
             api_key="test-key",
@@ -898,7 +897,8 @@ class TestDialecticInputGuard:
 def _settle_prewarm(provider):
     """Wait for the session-start prewarm dialectic thread, then return the
     provider to a clean 'nothing fired yet' state so cadence/first-turn/
-    trivial-prompt tests can assert from a known baseline."""
+    trivial-prompt tests can assert from a known baseline.
+    """
     if provider._prefetch_thread:
         provider._prefetch_thread.join(timeout=3.0)
     with provider._prefetch_lock:
@@ -922,7 +922,8 @@ class TestDialecticCadenceDefaults:
     @staticmethod
     def _make_provider(cfg_extra=None):
         """Create a HonchoMemoryProvider with mocked dependencies."""
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from plugins.memory.honcho.client import HonchoClientConfig
 
         defaults = dict(api_key="test-key", enabled=True, recall_mode="hybrid")
@@ -947,12 +948,13 @@ class TestDialecticCadenceDefaults:
     def test_unset_falls_back_to_1(self):
         """Unset dialecticCadence falls back to 1 (every turn) for backwards
         compatibility with existing configs that predate the setting. The
-        setup wizard writes 2 explicitly on new configs."""
+        setup wizard writes 2 explicitly on new configs.
+        """
         provider = self._make_provider()
         assert provider._dialectic_cadence == 1
 
     def test_config_override(self):
-        """dialecticCadence from config overrides the default."""
+        """DialecticCadence from config overrides the default."""
         provider = self._make_provider(cfg_extra={"raw": {"dialecticCadence": 5}})
         assert provider._dialectic_cadence == 5
 
@@ -993,7 +995,8 @@ class TestDialecticDepth:
 
     @staticmethod
     def _make_provider(cfg_extra=None):
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from plugins.memory.honcho.client import HonchoClientConfig
 
         defaults = dict(api_key="test-key", enabled=True, recall_mode="hybrid")
@@ -1021,22 +1024,22 @@ class TestDialecticDepth:
         assert provider._dialectic_depth == 1
 
     def test_depth_from_config(self):
-        """dialecticDepth from config sets the depth."""
+        """DialecticDepth from config sets the depth."""
         provider = self._make_provider(cfg_extra={"dialectic_depth": 2})
         assert provider._dialectic_depth == 2
 
     def test_depth_clamped_to_3(self):
-        """dialecticDepth > 3 gets clamped to 3."""
+        """DialecticDepth > 3 gets clamped to 3."""
         provider = self._make_provider(cfg_extra={"dialectic_depth": 7})
         assert provider._dialectic_depth == 3
 
     def test_depth_clamped_to_1(self):
-        """dialecticDepth < 1 gets clamped to 1."""
+        """DialecticDepth < 1 gets clamped to 1."""
         provider = self._make_provider(cfg_extra={"dialectic_depth": 0})
         assert provider._dialectic_depth == 1
 
     def test_depth_levels_from_config(self):
-        """dialecticDepthLevels array is read from config."""
+        """DialecticDepthLevels array is read from config."""
         provider = self._make_provider(cfg_extra={
             "dialectic_depth": 2,
             "dialectic_depth_levels": ["minimal", "high"],
@@ -1158,7 +1161,8 @@ class TestTrivialPromptHeuristic:
 
     @staticmethod
     def _make_provider():
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from plugins.memory.honcho.client import HonchoClientConfig
 
         cfg = HonchoClientConfig(api_key="test-key", enabled=True, recall_mode="hybrid")
@@ -1214,11 +1218,13 @@ class TestTrivialPromptHeuristic:
 class TestDialecticCadenceAdvancesOnSuccess:
     """Cadence tracker advances only when the dialectic call returns a
     non-empty result. Empty results (transient API error, sparse representation)
-    must retry on the next eligible turn instead of waiting the full cadence."""
+    must retry on the next eligible turn instead of waiting the full cadence.
+    """
 
     @staticmethod
     def _make_provider():
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from plugins.memory.honcho.client import HonchoClientConfig
 
         cfg = HonchoClientConfig(
@@ -1296,11 +1302,13 @@ class TestDialecticCadenceAdvancesOnSuccess:
 
 class TestSessionStartDialecticPrewarm:
     """Session-start prewarm fires a depth-aware dialectic whose result is
-    consumed by turn 1 — no duplicate .chat() and no dead-cache orphaning."""
+    consumed by turn 1 — no duplicate .chat() and no dead-cache orphaning.
+    """
 
     @staticmethod
     def _make_provider(cfg_extra=None, dialectic_result="prewarm synthesis"):
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from plugins.memory.honcho.client import HonchoClientConfig
 
         defaults = dict(api_key="test-key", enabled=True, recall_mode="hybrid")
@@ -1332,7 +1340,8 @@ class TestSessionStartDialecticPrewarm:
 
     def test_turn1_consumes_prewarm_without_duplicate_dialectic(self):
         """With prewarm result already in _prefetch_result, turn 1 prefetch
-        should NOT fire another dialectic."""
+        should NOT fire another dialectic.
+        """
         p = self._make_provider()
         if p._prefetch_thread:
             p._prefetch_thread.join(timeout=3.0)
@@ -1348,7 +1357,8 @@ class TestSessionStartDialecticPrewarm:
 
     def test_turn1_falls_back_to_sync_when_prewarm_missing(self):
         """If the prewarm produced nothing (empty graph, API blip), turn 1
-        still fires its own sync dialectic."""
+        still fires its own sync dialectic.
+        """
         p = self._make_provider(dialectic_result="")  # prewarm returns empty
         if p._prefetch_thread:
             p._prefetch_thread.join(timeout=3.0)
@@ -1368,11 +1378,13 @@ class TestSessionStartDialecticPrewarm:
 
 class TestDialecticLiveness:
     """Liveness + observability: stale-thread recovery, stale-result discard,
-    empty-streak backoff, and the snapshot method used for diagnostics."""
+    empty-streak backoff, and the snapshot method used for diagnostics.
+    """
 
     @staticmethod
     def _make_provider(cfg_extra=None):
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from plugins.memory.honcho.client import HonchoClientConfig
 
         defaults = dict(api_key="test-key", enabled=True, recall_mode="hybrid", timeout=2.0)
@@ -1422,7 +1434,8 @@ class TestDialecticLiveness:
 
     def test_stale_pending_result_is_discarded_on_read(self):
         """A pending dialectic result from many turns ago is discarded
-        instead of injected against a fresh conversational pivot."""
+        instead of injected against a fresh conversational pivot.
+        """
         p = self._make_provider(cfg_extra={"raw": {"dialecticCadence": 2}})
         p._session_key = "test"
         p._base_context_cache = "base ctx"
@@ -1470,7 +1483,8 @@ class TestDialecticLiveness:
 
     def test_success_resets_empty_streak(self):
         """A non-empty result zeroes the streak so healthy operation restores
-        the base cadence immediately."""
+        the base cadence immediately.
+        """
         p = self._make_provider(cfg_extra={"raw": {"dialecticCadence": 1}})
         p._session_key = "test"
         p._dialectic_empty_streak = 5
@@ -1510,11 +1524,13 @@ class TestDialecticLiveness:
 class TestDialecticLifecycleSmoke:
     """End-to-end smoke walking a multi-turn session through prewarm,
     turn 1 consume, trivial skip, cadence fire, empty-result retry,
-    heuristic bump, and session-end flush."""
+    heuristic bump, and session-end flush.
+    """
 
     @staticmethod
     def _make_provider(cfg_extra=None):
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from plugins.memory.honcho.client import HonchoClientConfig
 
         defaults = dict(
@@ -1570,7 +1586,7 @@ class TestDialecticLifecycleSmoke:
         and the silent-failure retry path without their gates tripping each
         other. Trivial + slash skips apply independent of cadence.
         """
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
         provider, mgr, cfg = self._make_provider(
             cfg_extra={"raw": {"dialecticCadence": 3}},
         )
@@ -1668,11 +1684,13 @@ class TestDialecticLifecycleSmoke:
 
 class TestReasoningHeuristic:
     """Char-count heuristic that scales the auto-injected reasoning level by
-    query length, clamped at reasoning_level_cap."""
+    query length, clamped at reasoning_level_cap.
+    """
 
     @staticmethod
     def _make_provider(cfg_extra=None):
-        from unittest.mock import patch, MagicMock
+        from unittest.mock import MagicMock, patch
+
         from plugins.memory.honcho.client import HonchoClientConfig
 
         defaults = dict(
@@ -1730,7 +1748,7 @@ class TestReasoningHeuristic:
         assert p._resolve_pass_level(0, query=q) == "medium"
 
     def test_resolve_pass_level_does_not_touch_explicit_per_pass(self):
-        """dialecticDepthLevels wins absolutely — no heuristic scaling."""
+        """DialecticDepthLevels wins absolutely — no heuristic scaling."""
         p = self._make_provider(cfg_extra={"dialectic_depth_levels": ["minimal"]})
         q = "x" * 500  # heuristic would otherwise bump to 'high'
         assert p._resolve_pass_level(0, query=q) == "minimal"

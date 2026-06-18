@@ -15,13 +15,11 @@ from unittest.mock import MagicMock, patch
 class TestBedrockContext1MBeta:
     """``context-1m-2025-08-07`` must reach Bedrock Claude requests."""
 
-
-
     def test_common_betas_strips_1m_for_minimax(self):
         """MiniMax bearer-auth endpoints host their own models — strip 1M beta."""
         from agent.anthropic_adapter import (
-            _common_betas_for_base_url,
             _CONTEXT_1M_BETA,
+            _common_betas_for_base_url,
         )
 
         for url in (

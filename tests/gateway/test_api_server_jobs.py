@@ -1,5 +1,4 @@
-"""
-Tests for the Cron Jobs API endpoints on the API server adapter.
+"""Tests for the Cron Jobs API endpoints on the API server adapter.
 
 Covers:
 - CRUD operations for cron jobs (list, create, get, update, delete)
@@ -718,7 +717,8 @@ class TestCronPromptScanParity:
     @pytest.mark.asyncio
     async def test_create_job_rejects_malicious_prompt(self, adapter):
         """POST /api/jobs with an exfiltration prompt returns 400 and never
-        reaches create_job."""
+        reaches create_job.
+        """
         app = _create_app(adapter)
         mock_create = MagicMock(return_value=SAMPLE_JOB)
         async with TestClient(TestServer(app)) as cli:
@@ -756,7 +756,8 @@ class TestCronPromptScanParity:
     @pytest.mark.asyncio
     async def test_update_job_rejects_malicious_prompt(self, adapter):
         """PATCH /api/jobs/{id} with an exfiltration prompt returns 400 and
-        never reaches update_job."""
+        never reaches update_job.
+        """
         app = _create_app(adapter)
         mock_update = MagicMock(return_value=SAMPLE_JOB)
         async with TestClient(TestServer(app)) as cli:

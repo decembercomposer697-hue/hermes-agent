@@ -13,7 +13,6 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 
-
 def _clear_clarify_state():
     """Reset module-level state between tests."""
     from tools import clarify_gateway as cm
@@ -185,7 +184,8 @@ class TestGatewayTextIntercept:
 
     def test_get_pending_for_session_returns_oldest_text_awaiting(self):
         """When two clarifies are pending, get_pending_for_session returns the
-        first that is awaiting_text (the older one if both)."""
+        first that is awaiting_text (the older one if both).
+        """
         from tools import clarify_gateway as cm
 
         # Older multi-choice (not awaiting text)
@@ -206,7 +206,8 @@ class TestGatewayTextIntercept:
         assert pending2.clarify_id == "first"
     def test_text_fallback_enables_awaiting_text_for_multi_choice(self):
         """When base send_clarify renders choices as text, mark_awaiting_text
-        is called so the gateway text-intercept can capture the reply."""
+        is called so the gateway text-intercept can capture the reply.
+        """
         from tools import clarify_gateway as cm
 
         entry = cm.register("id-tf", "sk-tf", "Pick one", ["A", "B", "C"])

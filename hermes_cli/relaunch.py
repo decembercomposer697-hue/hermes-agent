@@ -1,5 +1,4 @@
-"""
-Unified self-relaunch for Hermes CLI.
+"""Unified self-relaunch for Hermes CLI.
 
 Preserves critical flags (--tui, --dev, --profile, --model, etc.) across
 process replacement so that ``hermes sessions browse`` or post-setup relaunch
@@ -11,8 +10,8 @@ Also works when ``hermes`` is not on PATH (e.g. ``nix run`` or ``python -m``).
 import os
 import shutil
 import sys
-from typing import Optional
 from collections.abc import Sequence
+from typing import Optional
 
 from hermes_cli._parser import (
     PRE_ARGPARSE_INHERITED_FLAGS,
@@ -136,6 +135,7 @@ def build_relaunch_argv(
             tagged with ``inherit_on_relaunch`` in the parser.
         original_argv: The original argv to scan for flags (defaults to
             ``sys.argv[1:]``).
+
     """
     bin_path = resolve_hermes_bin()
 

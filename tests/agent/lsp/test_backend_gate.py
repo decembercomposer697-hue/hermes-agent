@@ -43,7 +43,8 @@ def test_local_only_helper_returns_false_for_non_local_env():
 
 def test_snapshot_baseline_skipped_for_non_local(monkeypatch):
     """Verify the LSP service's snapshot_baseline is NOT called when
-    the backend isn't local."""
+    the backend isn't local.
+    """
     from tools.file_operations import ShellFileOperations
 
     fake_env = MagicMock()
@@ -77,6 +78,7 @@ def test_maybe_lsp_diagnostics_returns_empty_for_non_local(monkeypatch):
         def enabled_for(self, path):
             called.append(("enabled_for", path))
             return True
+
         def get_diagnostics_sync(self, path, **kw):
             called.append(("get_diagnostics_sync", path))
             return [{"severity": 1, "message": "should not see this"}]

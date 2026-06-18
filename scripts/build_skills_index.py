@@ -22,7 +22,7 @@ import sys
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 
 # Allow importing from repo root
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,19 +31,20 @@ sys.path.insert(0, REPO_ROOT)
 # Ensure HERMES_HOME is set (needed by tools/skills_hub.py imports)
 os.environ.setdefault("HERMES_HOME", os.path.join(os.path.expanduser("~"), ".hermes"))
 
+import httpx
+
 from tools.skills_hub import (
+    BrowseShSource,
+    ClaudeMarketplaceSource,
+    ClawHubSource,
     GitHubAuth,
     GitHubSource,
-    SkillsShSource,
-    OptionalSkillSource,
-    WellKnownSkillSource,
-    ClawHubSource,
-    ClaudeMarketplaceSource,
     LobeHubSource,
-    BrowseShSource,
+    OptionalSkillSource,
     SkillMeta,
+    SkillsShSource,
+    WellKnownSkillSource,
 )
-import httpx
 
 OUTPUT_PATH = os.path.join(REPO_ROOT, "website", "static", "api", "skills-index.json")
 INDEX_VERSION = 1

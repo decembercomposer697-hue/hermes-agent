@@ -440,11 +440,11 @@ class TestLoadShowReasoningCoercion:
     def test_bare_true_is_true(self, tmp_path, monkeypatch):
         assert self._load_with_config(
             tmp_path, monkeypatch,
-            'display:\n  show_reasoning: true\n',
+            "display:\n  show_reasoning: true\n",
         ) is True
 
     def test_missing_is_false(self, tmp_path, monkeypatch):
         assert self._load_with_config(
             tmp_path, monkeypatch,
-            'display: {}\n',
+            "display: {}\n",
         ) is False

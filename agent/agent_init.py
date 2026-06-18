@@ -28,7 +28,7 @@ import time
 import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-from urllib.parse import urlparse, parse_qs, urlunparse
+from urllib.parse import parse_qs, urlparse, urlunparse
 
 from agent.context_compressor import ContextCompressor
 from agent.iteration_budget import IterationBudget
@@ -223,8 +223,7 @@ def init_agent(
     checkpoint_max_file_size_mb: int = 10,
     pass_session_id: bool = False,
 ):
-    """
-    Initialize the AI Agent.
+    """Initialize the AI Agent.
 
     Args:
         base_url (str): Base URL for the model API (optional)
@@ -270,6 +269,7 @@ def init_agent(
         load_soul_identity (bool): If True, still use ~/.hermes/SOUL.md as the primary
             identity even when skip_context_files=True. Project context files from the cwd
             remain skipped.
+
     """
     _install_safe_stdio()
 
@@ -427,7 +427,6 @@ def init_agent(
     agent.notice_clear_callback = notice_clear_callback
     agent.tool_gen_callback = tool_gen_callback
 
-    
     # Tool execution state — allows _vprint during tool execution
     # even when stream consumers are registered (no tokens streaming then)
     agent._executing_tools = False
@@ -617,7 +616,10 @@ def init_agent(
     _provider_timeout = get_provider_request_timeout(agent.provider, agent.model)
 
     if agent.api_mode == "anthropic_messages":
-        from agent.anthropic_adapter import build_anthropic_client, resolve_anthropic_token
+        from agent.anthropic_adapter import (
+            build_anthropic_client,
+            resolve_anthropic_token,
+        )
         # Bedrock + Claude → use AnthropicBedrock SDK for full feature parity
         # (prompt caching, thinking budgets, adaptive thinking).
         _is_bedrock_anthropic = agent.provider == "bedrock"
@@ -1126,8 +1128,6 @@ def init_agent(
         except Exception:
             pass  # Memory is optional -- don't break agent init
     
-
-
     # Memory provider plugin (external — one at a time, alongside built-in)
     # Reads memory.provider from config to select which plugin to activate.
     agent._memory_manager = None
@@ -1283,6 +1283,8 @@ def init_agent(
     try:
         from agent.auxiliary_client import (
             _compression_threshold_for_model as _cthresh_fn,
+        )
+        from agent.auxiliary_client import (
             _is_codex_gpt55 as _is_codex_gpt55_fn,
         )
         _model_cthresh = _cthresh_fn(
@@ -1461,8 +1463,6 @@ def init_agent(
     agent._config_context_length = _config_context_length
 
     agent._ensure_lmstudio_runtime_loaded(_config_context_length)
-
-
 
     # Select context engine: config-driven (like memory providers).
     # 1. Check config.yaml context.engine setting
@@ -1737,7 +1737,6 @@ def init_agent(
             "anthropic_base_url": agent._anthropic_base_url,
             "is_anthropic_oauth": agent._is_anthropic_oauth,
         })
-
 
 
 __all__ = ["init_agent"]

@@ -29,11 +29,10 @@ import base64
 import json
 from unittest.mock import MagicMock, patch
 
-
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 def _make_codex_jwt(account_id: str = "acct-test-123") -> str:
     """Build a syntactically valid Codex-style JWT with the account_id claim."""
@@ -100,8 +99,10 @@ class TestCodexCloudflareHeaders:
 
     def test_jwt_without_chatgpt_account_id_claim(self):
         """A valid JWT that lacks the account_id claim should still return headers."""
+        import base64 as _b64
+        import json as _json
+
         from agent.auxiliary_client import _codex_cloudflare_headers
-        import base64 as _b64, json as _json
 
         def b64url(data: bytes) -> str:
             return _b64.urlsafe_b64encode(data).rstrip(b"=").decode()
@@ -209,7 +210,8 @@ class TestAuxiliaryClientWiring:
     def test_build_codex_client_passes_codex_headers(self, monkeypatch):
         """_build_codex_client builds the OpenAI client used for compression /
         vision / title generation when routed through Codex. Must emit codex
-        headers."""
+        headers.
+        """
         from agent import auxiliary_client
         token = _make_codex_jwt("acct-aux-try-codex")
 
@@ -234,7 +236,8 @@ class TestAuxiliaryClientWiring:
 
     def test_resolve_provider_client_raw_codex_passes_codex_headers(self, monkeypatch):
         """The ``raw_codex=True`` branch (used by the main agent loop for direct
-        responses.stream() access) must also emit codex headers."""
+        responses.stream() access) must also emit codex headers.
+        """
         from agent import auxiliary_client
         token = _make_codex_jwt("acct-aux-raw-codex")
         monkeypatch.setattr(

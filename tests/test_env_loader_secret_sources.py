@@ -12,7 +12,6 @@ from pathlib import Path
 
 import pytest
 
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -65,7 +64,8 @@ def test_format_secret_source_suffix_generic_label_for_future_sources():
 
 def test_apply_external_secret_sources_records_bitwarden_origin(tmp_path, monkeypatch):
     """End-to-end: when ``apply_bitwarden_secrets`` returns applied keys,
-    they end up in ``_SECRET_SOURCES`` so the UI can label them."""
+    they end up in ``_SECRET_SOURCES`` so the UI can label them.
+    """
 
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     config_path = tmp_path / "config.yaml"

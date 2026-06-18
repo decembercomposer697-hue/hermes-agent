@@ -437,7 +437,8 @@ class TestBuildAssistantMessagePadsStrictProviders:
 
     def test_text_only_turn_not_padded_by_tool_call_branch(self) -> None:
         """Plain-text turns rely on _copy_reasoning_content_for_api at replay
-        time, not on this builder's tool-call pad."""
+        time, not on this builder's tool-call pad.
+        """
         agent = _make_agent(provider="deepseek", model="deepseek-v4-pro")
         msg_in = SimpleNamespace(content="hello", tool_calls=None)
         msg = agent._build_assistant_message(msg_in, finish_reason="stop")
@@ -446,7 +447,8 @@ class TestBuildAssistantMessagePadsStrictProviders:
 
     def test_streamed_reasoning_text_promoted_over_pad(self) -> None:
         """When ``.reasoning`` carries streamed thinking, it must be promoted
-        to reasoning_content rather than overwritten with the empty pad."""
+        to reasoning_content rather than overwritten with the empty pad.
+        """
         agent = _make_agent(provider="deepseek", model="deepseek-v4-pro")
         msg_in = _build_sdk_message(
             reasoning="streamed thoughts",
@@ -500,7 +502,8 @@ class TestReapplyReasoningEchoForProviderSwitch:
     @staticmethod
     def _codex_built_history() -> list[dict]:
         """Assistant turns as built under a Codex primary: some carry a
-        reasoning summary (stored as reasoning_content), some are bare."""
+        reasoning summary (stored as reasoning_content), some are bare.
+        """
         return [
             {"role": "system", "content": "sys"},
             {"role": "user", "content": "do the thing"},

@@ -41,7 +41,7 @@ def test_metadata_as_string_does_not_crash():
 
 
 def test_metadata_as_none():
-    """metadata key is present but set to null/None."""
+    """Metadata key is present but set to null/None."""
     frontmatter = {"metadata": None}
     result = extract_skill_conditions(frontmatter)
     assert result == {
@@ -53,7 +53,7 @@ def test_metadata_as_none():
 
 
 def test_metadata_missing_entirely():
-    """metadata key is absent from frontmatter."""
+    """Metadata key is absent from frontmatter."""
     frontmatter = {"name": "my-skill", "description": "Does stuff."}
     result = extract_skill_conditions(frontmatter)
     assert result == {

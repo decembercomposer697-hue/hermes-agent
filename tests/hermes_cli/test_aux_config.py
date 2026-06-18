@@ -22,7 +22,6 @@ from hermes_cli.main import (
     _save_aux_choice,
 )
 
-
 # ── Default config ──────────────────────────────────────────────────────────
 
 

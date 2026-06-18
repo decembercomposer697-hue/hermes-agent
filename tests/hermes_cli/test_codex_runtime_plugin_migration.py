@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-
 import pytest
 
 from hermes_cli.codex_runtime_plugin_migration import (
-    MIGRATION_MARKER,
     MIGRATION_END_MARKER,
+    MIGRATION_MARKER,
     _build_hermes_tools_mcp_entry,
     _format_toml_value,
     _looks_like_test_tempdir,
@@ -18,8 +17,8 @@ from hermes_cli.codex_runtime_plugin_migration import (
     render_codex_toml_section,
 )
 
-
 # ---- per-server translation ----
+
 
 class TestTranslateOneServer:
     def test_stdio_basic(self):
@@ -155,7 +154,8 @@ class TestTomlValueFormatter:
     def test_string_with_newline_escaped(self):
         """TOML basic strings don't allow literal newlines — a path or
         env var containing a newline must use \\n. Otherwise codex would
-        refuse to load the config."""
+        refuse to load the config.
+        """
         out = _format_toml_value("line one\nline two")
         assert "\n" not in out  # no raw newline in output
         assert "\\n" in out
@@ -182,7 +182,8 @@ class TestTomlValueFormatter:
 
     def test_atomic_write_no_temp_leak_on_success(self, tmp_path):
         """The atomic-write path uses tempfile.mkstemp + rename. On
-        success the temp file should not be left behind."""
+        success the temp file should not be left behind.
+        """
         migrate({"mcp_servers": {"x": {"command": "y"}}},
                 codex_home=tmp_path,
                 discover_plugins=False,
@@ -198,7 +199,8 @@ class TestTomlValueFormatter:
     def test_atomic_write_cleanup_on_rename_failure(self, tmp_path, monkeypatch):
         """If rename fails partway through (out of disk, permissions,
         crash), the temp file must be cleaned up. Otherwise repeated
-        failed migrations would pile up .config.toml.* files."""
+        failed migrations would pile up .config.toml.* files.
+        """
         from pathlib import Path as _Path
         original_replace = _Path.replace
 
@@ -321,7 +323,8 @@ class TestMigrate:
     def test_no_servers_still_writes_permissions_default(self, tmp_path):
         """Even with zero MCP servers, enabling the runtime should write the
         default permissions profile so users don't get prompted on every
-        write attempt. This is the fix for quirk #2."""
+        write attempt. This is the fix for quirk #2.
+        """
         report = migrate({}, codex_home=tmp_path, discover_plugins=False, expose_hermes_tools=False)
         assert report.written
         text = (tmp_path / "config.toml").read_text()
@@ -343,7 +346,8 @@ class TestMigrate:
 
     def test_plugin_discovery_writes_plugin_blocks(self, tmp_path, monkeypatch):
         """Discovered curated plugins land as [plugins."<name>@<marketplace>"]
-        blocks. This is what OpenClaw calls 'migrate native codex plugins.'"""
+        blocks. This is what OpenClaw calls 'migrate native codex plugins.'
+        """
         from hermes_cli import codex_runtime_plugin_migration as crpm
 
         def fake_query(codex_home=None, timeout=8.0):
@@ -367,9 +371,11 @@ class TestMigrate:
         """Plugins where codex reports availability != AVAILABLE should
         be skipped — they're broken/uninstallable on codex's side, so
         migrating them would write config that fails at activation
-        time. Cf. openclaw#80815."""
-        from hermes_cli.codex_runtime_plugin_migration import _query_codex_plugins
+        time. Cf. openclaw#80815.
+        """
         from unittest.mock import patch
+
+        from hermes_cli.codex_runtime_plugin_migration import _query_codex_plugins
 
         # Fake a plugin/list response where one plugin is unavailable
         fake_response = {
@@ -394,8 +400,10 @@ class TestMigrate:
         class FakeClient:
             def __init__(self, **kw): pass
             def initialize(self, **kw): pass
+
             def request(self, method, params, timeout=None):
                 return fake_response
+
             def close(self): pass
             def __enter__(self): return self
             def __exit__(self, *a): pass
@@ -413,7 +421,8 @@ class TestMigrate:
 
     def test_plugin_discovery_failure_non_fatal(self, tmp_path, monkeypatch):
         """If codex isn't installed or RPC fails, MCP migration still
-        completes. The error surfaces in the report but doesn't abort."""
+        completes. The error surfaces in the report but doesn't abort.
+        """
         from hermes_cli import codex_runtime_plugin_migration as crpm
 
         def fake_query_fails(codex_home=None, timeout=8.0):
@@ -429,10 +438,12 @@ class TestMigrate:
 
     def test_discover_plugins_false_skips_query(self, tmp_path, monkeypatch):
         """Tests and restricted environments can opt out of the subprocess
-        spawn entirely."""
+        spawn entirely.
+        """
         from hermes_cli import codex_runtime_plugin_migration as crpm
 
         called = {"yes": False}
+
         def boom(*a, **kw):
             called["yes"] = True
             return [], None
@@ -444,10 +455,12 @@ class TestMigrate:
 
     def test_dry_run_skips_plugin_query(self, tmp_path, monkeypatch):
         """Dry run should never spawn codex. Even with discover_plugins=True
-        the query is skipped because dry_run takes precedence."""
+        the query is skipped because dry_run takes precedence.
+        """
         from hermes_cli import codex_runtime_plugin_migration as crpm
 
         called = {"yes": False}
+
         def boom(*a, **kw):
             called["yes"] = True
             return [], None
@@ -459,7 +472,8 @@ class TestMigrate:
 
     def test_re_run_replaces_plugin_block(self, tmp_path, monkeypatch):
         """Plugin blocks are managed and re-runs should replace them
-        cleanly — same idempotency contract as MCP servers."""
+        cleanly — same idempotency contract as MCP servers.
+        """
         from hermes_cli import codex_runtime_plugin_migration as crpm
 
         # First run: only github
@@ -491,7 +505,8 @@ class TestMigrate:
         into Hermes for browser/web/delegate_task/vision/memory tools.
 
         This is the fix for 'all other tools that codex doesn't provide
-        should be useable by hermes' — quirk #7."""
+        should be useable by hermes' — quirk #7.
+        """
         report = migrate({}, codex_home=tmp_path,
                          discover_plugins=False,
                          default_permission_profile=None,
@@ -577,7 +592,8 @@ class TestMigrate:
         """TOML has no explicit 'leave current table' syntax. If Hermes appends
         root keys like default_permissions after a user table such as [features],
         Codex parses them as features.default_permissions and rejects the config.
-        The managed block must therefore be inserted before the first table."""
+        The managed block must therefore be inserted before the first table.
+        """
         import tomllib
 
         target = tmp_path / "config.toml"
@@ -598,7 +614,8 @@ class TestMigrate:
         """Quirk #6: when a user adds their own MCP server entry directly
         to ~/.codex/config.toml outside Hermes' managed block, re-running
         migration must preserve it. Tested both above and below the
-        managed block."""
+        managed block.
+        """
         target = tmp_path / "config.toml"
         target.write_text(
             "[mcp_servers.user-above]\n"
@@ -734,7 +751,8 @@ class TestStripUnmanagedPluginTables:
 
     def test_migrate_dedups_codex_owned_plugin_tables(self, tmp_path, monkeypatch):
         """End-to-end: codex's pre-existing [plugins.X] tables get replaced by
-        the managed block's re-emission rather than duplicated."""
+        the managed block's re-emission rather than duplicated.
+        """
         target = tmp_path / "config.toml"
         target.write_text(
             "[mcp_servers.user-server]\n"
@@ -772,7 +790,8 @@ class TestStripUnmanagedPluginTables:
     def test_migrate_preserves_plugin_tables_when_plugin_list_fails(self, tmp_path, monkeypatch):
         """If plugin/list RPC fails, we can't re-emit plugins authoritatively,
         so we must NOT strip the user's existing [plugins.X] tables — that
-        would silently lose them."""
+        would silently lose them.
+        """
         target = tmp_path / "config.toml"
         target.write_text(
             '[plugins."tasks@openai-curated"]\n'
@@ -823,7 +842,8 @@ class TestHermesHomeLeakGuard:
 
     def test_pytest_tempdir_not_burned_into_mcp_env(self, monkeypatch):
         """The headline regression: even when HERMES_HOME points at a pytest
-        tempdir, _build_hermes_tools_mcp_entry() must NOT propagate it."""
+        tempdir, _build_hermes_tools_mcp_entry() must NOT propagate it.
+        """
         monkeypatch.setenv(
             "HERMES_HOME",
             "/private/var/folders/xx/pytest-of-user/pytest-99/test_x/hermes_test",
@@ -837,7 +857,8 @@ class TestHermesHomeLeakGuard:
 
     def test_real_hermes_home_propagates(self, monkeypatch, tmp_path):
         """A legitimate HERMES_HOME (not a tempdir path) DOES propagate so the
-        MCP subprocess sees the same config as the parent CLI."""
+        MCP subprocess sees the same config as the parent CLI.
+        """
         # Use a path that looks real — under /Users or /home, not /var/folders.
         # We can't easily create one in the test, so just use a stable path
         # outside any tempdir-detector needle. The detector checks for tempdir
@@ -853,7 +874,8 @@ class TestHermesHomeLeakGuard:
         NOT bake in a resolved-default path. The codex subprocess should
         inherit whatever HERMES_HOME its launcher (systemd, gateway, shell)
         sets at runtime, rather than being pinned to migrate-time defaults.
-        Regression guard for issue #26250 follow-up review."""
+        Regression guard for issue #26250 follow-up review.
+        """
         monkeypatch.delenv("HERMES_HOME", raising=False)
         entry = _build_hermes_tools_mcp_entry()
         env = entry.get("env", {})

@@ -1,5 +1,4 @@
-"""
-Video Generation Provider Registry
+"""Video Generation Provider Registry
 ==================================
 
 Central map of registered providers. Populated by plugins at import-time via

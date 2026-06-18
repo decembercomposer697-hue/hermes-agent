@@ -5,7 +5,6 @@ import json
 import sys
 from pathlib import Path
 
-
 SCRIPT_PATH = (
     Path(__file__).resolve().parents[2]
     / "optional-skills"
@@ -282,7 +281,8 @@ def test_migrator_records_preset_in_report(tmp_path: Path):
 
 def test_source_candidate_finds_files_in_custom_workspace(tmp_path: Path):
     """When agents.defaults.workspace points outside ~/.openclaw, files should
-    be discovered there as a fallback."""
+    be discovered there as a fallback.
+    """
     mod = load_module()
     source = tmp_path / ".openclaw"
     target = tmp_path / ".hermes"
@@ -340,7 +340,8 @@ def test_source_candidate_finds_files_in_custom_workspace(tmp_path: Path):
 
 def test_source_candidate_prefers_standard_workspace_over_custom(tmp_path: Path):
     """When files exist in both ~/.openclaw/workspace/ and the custom workspace,
-    the standard location should win (custom is a fallback only)."""
+    the standard location should win (custom is a fallback only).
+    """
     mod = load_module()
     source = tmp_path / ".openclaw"
     target = tmp_path / ".hermes"
@@ -976,7 +977,8 @@ def test_migrate_soul_rebrands_content(tmp_path):
 
 def _run_model_migration(tmp_path: Path, openclaw_json: dict) -> dict:
     """Helper: run just migrate_model_config on an openclaw.json and return
-    the parsed destination config.yaml."""
+    the parsed destination config.yaml.
+    """
     import yaml
 
     mod = load_module()
@@ -1013,7 +1015,8 @@ def _extract_model(parsed: dict) -> str | None:
 def test_migrate_model_config_resolves_alias_against_real_openclaw_schema(tmp_path: Path):
     """Regression for #16745 — OpenClaw's catalog is keyed by the full
     provider/model API ID with an "alias" field on the value.  The migration
-    must reverse-lookup the alias to find the API ID."""
+    must reverse-lookup the alias to find the API ID.
+    """
     parsed = _run_model_migration(
         tmp_path,
         {
@@ -1048,7 +1051,8 @@ def test_migrate_model_config_resolves_alias_with_bare_string_model(tmp_path: Pa
 
 def test_migrate_model_config_passes_through_existing_api_id(tmp_path: Path):
     """If the model value is already a provider/model API ID that appears as
-    a key in the catalog, it should be written verbatim — not double-rewritten."""
+    a key in the catalog, it should be written verbatim — not double-rewritten.
+    """
     parsed = _run_model_migration(
         tmp_path,
         {
@@ -1067,7 +1071,8 @@ def test_migrate_model_config_passes_through_existing_api_id(tmp_path: Path):
 
 def test_migrate_model_config_passes_through_unknown_alias(tmp_path: Path):
     """If the model value matches no catalog entry, leave it alone and let
-    downstream surface the mismatch."""
+    downstream surface the mismatch.
+    """
     parsed = _run_model_migration(
         tmp_path,
         {
@@ -1086,7 +1091,8 @@ def test_migrate_model_config_passes_through_unknown_alias(tmp_path: Path):
 
 def test_migrate_model_config_handles_string_valued_catalog_entries(tmp_path: Path):
     """Belt-and-suspenders: some catalogs store the alias as a plain string
-    value instead of a dict with an "alias" field."""
+    value instead of a dict with an "alias" field.
+    """
     parsed = _run_model_migration(
         tmp_path,
         {

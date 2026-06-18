@@ -66,12 +66,11 @@ import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from agent.skill_utils import is_excluded_skill_path
-
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -490,12 +489,12 @@ def plan_install(
     override_name: str | None = None,
 ) -> InstallPlan:
     """Stage *source* and produce a plan describing what install would do."""
+    from hermes_cli import __version__ as hermes_version
     from hermes_cli.profiles import (
         get_profile_dir,
         normalize_profile_name,
         validate_profile_name,
     )
-    from hermes_cli import __version__ as hermes_version
 
     staged, provenance = _stage_source(source, workdir)
     _reject_distribution_symlinks(staged)

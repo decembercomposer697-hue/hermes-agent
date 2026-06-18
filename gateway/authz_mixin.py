@@ -24,6 +24,8 @@ from gateway.config import Platform
 from gateway.session import SessionSource
 from gateway.whatsapp_identity import (
     expand_whatsapp_aliases as _expand_whatsapp_auth_aliases,
+)
+from gateway.whatsapp_identity import (
     normalize_whatsapp_identifier as _normalize_whatsapp_identifier,
 )
 
@@ -88,8 +90,7 @@ class GatewayAuthorizationMixin:
         return str(policy or "").strip().lower()
 
     def _is_user_authorized(self, source: SessionSource) -> bool:
-        """
-        Check if a user is authorized to use the bot.
+        """Check if a user is authorized to use the bot.
         
         Checks in order:
         1. Per-platform allow-all flag (e.g., DISCORD_ALLOW_ALL_USERS=true)

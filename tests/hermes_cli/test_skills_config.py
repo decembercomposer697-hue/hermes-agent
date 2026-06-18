@@ -1,10 +1,10 @@
 """Tests for hermes_cli/skills_config.py and skills_tool disabled filtering."""
 from unittest.mock import patch
 
-
 # ---------------------------------------------------------------------------
 # get_disabled_skills
 # ---------------------------------------------------------------------------
+
 
 class TestGetDisabledSkills:
     def test_empty_config(self):
@@ -257,8 +257,8 @@ class TestFindAllSkillsFiltering:
         skill_md.write_text("---\nname: my-skill\ndescription: A test skill\n---\nContent")
         # Point SKILLS_DIR at the real tempdir so iter_skill_index_files
         # (which uses os.walk) can actually find the file.
-        import tools.skills_tool as _st
         import agent.skill_utils as _su
+        import tools.skills_tool as _st
         monkeypatch.setattr(_st, "SKILLS_DIR", tmp_path)
         monkeypatch.setattr(_su, "get_external_skills_dirs", lambda: [])
         from tools.skills_tool import _find_all_skills
@@ -272,8 +272,8 @@ class TestFindAllSkillsFiltering:
         skill_dir.mkdir()
         skill_md = skill_dir / "SKILL.md"
         skill_md.write_text("---\nname: my-skill\ndescription: A test skill\n---\nContent")
-        import tools.skills_tool as _st
         import agent.skill_utils as _su
+        import tools.skills_tool as _st
         monkeypatch.setattr(_st, "SKILLS_DIR", tmp_path)
         monkeypatch.setattr(_su, "get_external_skills_dirs", lambda: [])
         from tools.skills_tool import _find_all_skills
@@ -288,8 +288,8 @@ class TestFindAllSkillsFiltering:
         skill_dir.mkdir()
         skill_md = skill_dir / "SKILL.md"
         skill_md.write_text("---\nname: my-skill\ndescription: A test skill\n---\nContent")
-        import tools.skills_tool as _st
         import agent.skill_utils as _su
+        import tools.skills_tool as _st
         monkeypatch.setattr(_st, "SKILLS_DIR", tmp_path)
         monkeypatch.setattr(_su, "get_external_skills_dirs", lambda: [])
         from tools.skills_tool import _find_all_skills

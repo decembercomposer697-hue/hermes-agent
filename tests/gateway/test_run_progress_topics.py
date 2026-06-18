@@ -11,7 +11,12 @@ import pytest
 
 import gateway.platforms.base as base_platform
 from gateway.config import Platform, PlatformConfig, StreamingConfig
-from gateway.platforms.base import BasePlatformAdapter, MessageEvent, MessageType, SendResult
+from gateway.platforms.base import (
+    BasePlatformAdapter,
+    MessageEvent,
+    MessageType,
+    SendResult,
+)
 from gateway.session import SessionSource
 
 
@@ -479,6 +484,7 @@ def _run_long_preview_helper(monkeypatch, tmp_path, preview_length=0):
     that _run_agent reads — so the gateway picks it up the same way production does.
     """
     import asyncio
+
     import yaml
 
     monkeypatch.setenv("HERMES_TOOL_PROGRESS_MODE", "all")
@@ -1181,8 +1187,8 @@ async def test_run_agent_drops_tool_progress_after_generation_invalidation(monke
     all_progress_text = " ".join(call["content"] for call in adapter.sent)
     all_progress_text += " ".join(call["content"] for call in adapter.edits)
     assert result["final_response"] == "done"
-    assert 'first command' in all_progress_text
-    assert 'second command' not in all_progress_text
+    assert "first command" in all_progress_text
+    assert "second command" not in all_progress_text
 
 
 @pytest.mark.asyncio
@@ -1347,7 +1353,8 @@ async def test_terminal_progress_renders_fenced_code_block(monkeypatch, tmp_path
     renders a bare fenced code block — no language tag (Slack mrkdwn would print
     'bash' as a literal first code line).  In non-verbose ("all"/"new") mode the
     command is collapsed to a single line capped at tool_preview_length so a long
-    or multi-line command doesn't render as a huge block (#42634)."""
+    or multi-line command doesn't render as a huge block (#42634).
+    """
     monkeypatch.setenv("HERMES_TOOL_PROGRESS_MODE", "all")
 
     fake_dotenv = types.ModuleType("dotenv")
@@ -1399,7 +1406,8 @@ async def test_terminal_progress_renders_fenced_code_block(monkeypatch, tmp_path
 async def test_terminal_progress_verbose_shows_full_command(monkeypatch, tmp_path):
     """Verbose mode on a markdown-capable gateway renders the FULL multi-line
     command in a bare fenced block (no truncation, no 'bash' tag).  This is the
-    parity guarantee for #42634: verbose keeps full detail, non-verbose caps."""
+    parity guarantee for #42634: verbose keeps full detail, non-verbose caps.
+    """
     monkeypatch.setenv("HERMES_TOOL_PROGRESS_MODE", "verbose")
 
     fake_dotenv = types.ModuleType("dotenv")
@@ -1446,7 +1454,8 @@ async def test_terminal_progress_verbose_shows_full_command(monkeypatch, tmp_pat
 async def test_terminal_progress_no_bash_block_in_verbose_mode(monkeypatch, tmp_path):
     """#41215 also rendered the bash block in verbose mode. The revert removed it
     from both branches, so verbose progress must not emit a fenced ```bash block
-    either (verbose still shows args by opt-in, just not as a code block)."""
+    either (verbose still shows args by opt-in, just not as a code block).
+    """
     monkeypatch.setenv("HERMES_TOOL_PROGRESS_MODE", "verbose")
 
     fake_dotenv = types.ModuleType("dotenv")
@@ -1484,9 +1493,11 @@ async def test_terminal_progress_no_bash_block_in_verbose_mode(monkeypatch, tmp_
     all_content += " ".join(call["content"] for call in adapter.edits)
     assert "```bash" not in all_content
 
+
 class MultiTerminalCommandAgent:
     """Emits several consecutive terminal tool.started events, then a
-    different tool, then terminal again — to exercise header collapsing."""
+    different tool, then terminal again — to exercise header collapsing.
+    """
 
     def __init__(self, **kwargs):
         self.tool_progress_callback = kwargs.get("tool_progress_callback")
@@ -1507,7 +1518,8 @@ class MultiTerminalCommandAgent:
 async def test_consecutive_terminal_progress_collapses_headers(monkeypatch, tmp_path):
     """Back-to-back terminal calls render ONE "terminal" header followed by
     adjacent code blocks; a different tool in between resets the header so the
-    next terminal call gets a fresh one."""
+    next terminal call gets a fresh one.
+    """
     monkeypatch.setenv("HERMES_TOOL_PROGRESS_MODE", "all")
 
     fake_dotenv = types.ModuleType("dotenv")

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Hermes CLI - Main entry point.
+"""Hermes CLI - Main entry point.
 
 Usage:
     hermes                     # Interactive chat (default)
@@ -115,7 +114,8 @@ _EARLY_INTERFACE_CACHE: "list | None" = None
 
 def _config_default_interface_early() -> str:
     """Return the configured default interface ("cli"/"tui") via a minimal
-    YAML read. Best-effort: any error falls back to "cli" (legacy behavior)."""
+    YAML read. Best-effort: any error falls back to "cli" (legacy behavior).
+    """
     global _EARLY_INTERFACE_CACHE
     if _EARLY_INTERFACE_CACHE is not None:
         return _EARLY_INTERFACE_CACHE[0]
@@ -261,45 +261,46 @@ import subprocess
 from pathlib import Path
 from typing import Optional
 
-
-from hermes_cli.subcommands._shared import add_accept_hooks_flag as _add_accept_hooks_flag
+from hermes_cli.subcommands._shared import (
+    add_accept_hooks_flag as _add_accept_hooks_flag,
+)
+from hermes_cli.subcommands.acp import build_acp_parser
+from hermes_cli.subcommands.auth import build_auth_parser
+from hermes_cli.subcommands.backup import build_backup_parser
+from hermes_cli.subcommands.claw import build_claw_parser
+from hermes_cli.subcommands.config import build_config_parser
 from hermes_cli.subcommands.cron import build_cron_parser
+from hermes_cli.subcommands.dashboard import build_dashboard_parser
+from hermes_cli.subcommands.debug import build_debug_parser
+from hermes_cli.subcommands.doctor import build_doctor_parser
+from hermes_cli.subcommands.dump import build_dump_parser
 from hermes_cli.subcommands.gateway import build_gateway_parser
-from hermes_cli.subcommands.profile import build_profile_parser
-from hermes_cli.subcommands.model import build_model_parser
-from hermes_cli.subcommands.setup import build_setup_parser
-from hermes_cli.subcommands.postinstall import build_postinstall_parser
-from hermes_cli.subcommands.whatsapp import build_whatsapp_parser
-from hermes_cli.subcommands.slack import build_slack_parser
+from hermes_cli.subcommands.gui import build_gui_parser
+from hermes_cli.subcommands.hooks import build_hooks_parser
+from hermes_cli.subcommands.import_cmd import build_import_cmd_parser
+from hermes_cli.subcommands.insights import build_insights_parser
 from hermes_cli.subcommands.login import build_login_parser
 from hermes_cli.subcommands.logout import build_logout_parser
-from hermes_cli.subcommands.auth import build_auth_parser
-from hermes_cli.subcommands.status import build_status_parser
-from hermes_cli.subcommands.webhook import build_webhook_parser
-from hermes_cli.subcommands.hooks import build_hooks_parser
-from hermes_cli.subcommands.doctor import build_doctor_parser
-from hermes_cli.subcommands.security import build_security_parser
-from hermes_cli.subcommands.dump import build_dump_parser
-from hermes_cli.subcommands.debug import build_debug_parser
-from hermes_cli.subcommands.backup import build_backup_parser
-from hermes_cli.subcommands.import_cmd import build_import_cmd_parser
-from hermes_cli.subcommands.config import build_config_parser
-from hermes_cli.subcommands.version import build_version_parser
-from hermes_cli.subcommands.update import build_update_parser
-from hermes_cli.subcommands.uninstall import build_uninstall_parser
-from hermes_cli.subcommands.dashboard import build_dashboard_parser
-from hermes_cli.subcommands.gui import build_gui_parser
 from hermes_cli.subcommands.logs import build_logs_parser
-from hermes_cli.subcommands.prompt_size import build_prompt_size_parser
+from hermes_cli.subcommands.mcp import build_mcp_parser
 from hermes_cli.subcommands.memory import build_memory_parser
-from hermes_cli.subcommands.acp import build_acp_parser
-from hermes_cli.subcommands.tools import build_tools_parser
-from hermes_cli.subcommands.insights import build_insights_parser
-from hermes_cli.subcommands.skills import build_skills_parser
+from hermes_cli.subcommands.model import build_model_parser
 from hermes_cli.subcommands.pairing import build_pairing_parser
 from hermes_cli.subcommands.plugins import build_plugins_parser
-from hermes_cli.subcommands.mcp import build_mcp_parser
-from hermes_cli.subcommands.claw import build_claw_parser
+from hermes_cli.subcommands.postinstall import build_postinstall_parser
+from hermes_cli.subcommands.profile import build_profile_parser
+from hermes_cli.subcommands.prompt_size import build_prompt_size_parser
+from hermes_cli.subcommands.security import build_security_parser
+from hermes_cli.subcommands.setup import build_setup_parser
+from hermes_cli.subcommands.skills import build_skills_parser
+from hermes_cli.subcommands.slack import build_slack_parser
+from hermes_cli.subcommands.status import build_status_parser
+from hermes_cli.subcommands.tools import build_tools_parser
+from hermes_cli.subcommands.uninstall import build_uninstall_parser
+from hermes_cli.subcommands.update import build_update_parser
+from hermes_cli.subcommands.version import build_version_parser
+from hermes_cli.subcommands.webhook import build_webhook_parser
+from hermes_cli.subcommands.whatsapp import build_whatsapp_parser
 
 
 def _require_tty(command_name: str) -> None:
@@ -491,34 +492,35 @@ if _FORCE_IPV4_EARLY:
 import logging
 import threading
 import time as _time
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
-from hermes_cli import __version__, __release_date__
+from hermes_cli import __release_date__, __version__
 
 # Provider model-selection wizard flows extracted to hermes_cli/model_setup_flows.py
 # (god-file decomposition Phase 2). Re-imported here so select_provider_and_model and
 # existing test monkeypatches (hermes_cli.main._model_flow_*) keep resolving unchanged.
 from hermes_cli.model_setup_flows import (
-    _prompt_auth_credentials_choice,
-    _model_flow_openrouter,
-    _model_flow_nous,
-    _model_flow_openai_codex,
-    _model_flow_xai_oauth,
-    _model_flow_qwen_oauth,
-    _model_flow_minimax_oauth,
-    _model_flow_google_gemini_cli,
-    _model_flow_custom,
+    _model_flow_anthropic,
+    _model_flow_api_key_provider,
     _model_flow_azure_foundry,
-    _model_flow_named_custom,
+    _model_flow_bedrock,
+    _model_flow_bedrock_api_key,
     _model_flow_copilot,
     _model_flow_copilot_acp,
+    _model_flow_custom,
+    _model_flow_google_gemini_cli,
     _model_flow_kimi,
+    _model_flow_minimax_oauth,
+    _model_flow_named_custom,
+    _model_flow_nous,
+    _model_flow_openai_codex,
+    _model_flow_openrouter,
+    _model_flow_qwen_oauth,
     _model_flow_stepfun,
-    _model_flow_bedrock_api_key,
-    _model_flow_bedrock,
-    _model_flow_api_key_provider,
-    _model_flow_anthropic,
+    _model_flow_xai_oauth,
+    _prompt_auth_credentials_choice,
 )
+
 logger = logging.getLogger(__name__)
 
 
@@ -680,14 +682,18 @@ def _relative_time(ts) -> str:
 
 def _has_any_provider_configured() -> bool:
     """Check if at least one inference provider is usable."""
-    from hermes_cli.config import get_env_path, get_hermes_home, load_config
     from hermes_cli.auth import get_auth_status
 
     # Determine whether Hermes itself has been explicitly configured (model
     # in config that isn't the hardcoded default). Used below to gate external
     # tool credentials (Claude Code, Codex CLI) that shouldn't silently skip
     # the setup wizard on a fresh install.
-    from hermes_cli.config import DEFAULT_CONFIG
+    from hermes_cli.config import (
+        DEFAULT_CONFIG,
+        get_env_path,
+        get_hermes_home,
+        load_config,
+    )
 
     _DEFAULT_MODEL = DEFAULT_CONFIG.get("model", "")
     cfg = load_config()
@@ -777,8 +783,8 @@ def _has_any_provider_configured() -> bool:
     if _has_hermes_config:
         try:
             from agent.anthropic_adapter import (
-                read_claude_code_credentials,
                 is_claude_code_token_valid,
+                read_claude_code_credentials,
             )
 
             creds = read_claude_code_credentials()
@@ -1082,6 +1088,7 @@ def _exec_in_container(container_info: dict, cli_args: list):
     Args:
         container_info: dict with backend, container_name, exec_user, hermes_bin
         cli_args: the original CLI arguments (everything after 'hermes')
+
     """
 
     backend = container_info["backend"]
@@ -2078,13 +2085,13 @@ def cmd_chat(args):
 
     # xAI retirement warning — one-shot, non-blocking, never fails startup
     try:
+        from hermes_cli.config import load_config as _load_config_for_xai_check
         from hermes_cli.xai_retirement import (
             MIGRATION_GUIDE_URL,
             RETIREMENT_DATE,
             find_retired_xai_refs,
             format_issue,
         )
-        from hermes_cli.config import load_config as _load_config_for_xai_check
 
         _retired_xai_refs = find_retired_xai_refs(_load_config_for_xai_check())
         if _retired_xai_refs:
@@ -2530,14 +2537,14 @@ def select_provider_and_model(args=None):
     persistence.
     """
     from hermes_cli.auth import (
-        resolve_provider,
         AuthError,
         format_auth_error,
+        resolve_provider,
     )
     from hermes_cli.config import (
         get_compatible_custom_providers,
-        load_config,
         get_env_value,
+        load_config,
     )
     from hermes_cli.providers import resolve_provider_full
 
@@ -2558,6 +2565,7 @@ def select_provider_and_model(args=None):
         config_provider or os.getenv("HERMES_INFERENCE_PROVIDER") or "auto"
     )
     compatible_custom_providers = get_compatible_custom_providers(config)
+
     def _named_custom_provider_map(cfg) -> dict[str, dict[str, str]]:
         from hermes_cli.config import read_raw_config
 
@@ -2736,8 +2744,8 @@ def select_provider_and_model(args=None):
         active = "custom"
 
     from hermes_cli.models import (
-        CANONICAL_PROVIDERS,
         _PROVIDER_LABELS,
+        CANONICAL_PROVIDERS,
         group_providers,
         provider_group_for_slug,
     )
@@ -2941,7 +2949,7 @@ def _clear_stale_openai_base_url():
     requests to the old custom endpoint instead of the newly selected
     provider.  See issue #5161.
     """
-    from hermes_cli.config import get_env_value, save_env_value, load_config
+    from hermes_cli.config import get_env_value, load_config, save_env_value
 
     cfg = load_config()
     model_cfg = cfg.get("model", {})
@@ -3382,26 +3390,10 @@ def _prompt_provider_choice(choices, *, default=0, title="Select provider:"):
             return None
 
 
-
-
-
-
-
-
-
-
 _DEFAULT_QWEN_PORTAL_MODELS = [
     "qwen3-coder-plus",
     "qwen3-coder",
 ]
-
-
-
-
-
-
-
-
 
 
 def _prompt_custom_api_mode_selection(base_url: str, current_api_mode: str = "") -> str | None:
@@ -3580,8 +3572,6 @@ def _save_custom_provider(
     print(f'  💾 Saved to custom providers as "{name}" (edit in config.yaml)')
 
 
-
-
 def _remove_custom_provider(config):
     """Let the user remove a saved custom provider from config.yaml."""
     from hermes_cli.config import load_config, save_config
@@ -3638,8 +3628,6 @@ def _remove_custom_provider(config):
         removed.get("name", "unnamed") if isinstance(removed, dict) else str(removed)
     )
     print(f'✅ Removed "{removed_name}" from custom providers.')
-
-
 
 
 # Lazy-export the model catalog at module level. Tests and a handful of
@@ -3760,10 +3748,6 @@ def _prompt_reasoning_effort_selection(efforts, current_effort=""):
             return None
 
 
-
-
-
-
 def _prompt_api_key(pconfig, existing_key: str, provider_id: str = "") -> tuple:
     """Shared API-key entry point for ``hermes setup`` / ``hermes model``.
 
@@ -3847,8 +3831,6 @@ def _prompt_api_key(pconfig, existing_key: str, provider_id: str = "") -> tuple:
     return existing_key, False
 
 
-
-
 def _infer_stepfun_region(base_url: str) -> str:
     """Infer the current StepFun region from the configured endpoint."""
     normalized = (base_url or "").strip().lower()
@@ -3870,20 +3852,12 @@ def _stepfun_base_url_for_region(region: str) -> str:
     )
 
 
-
-
-
-
-
-
-
-
 def _run_anthropic_oauth_flow(save_env_value):
     """Run the Claude OAuth setup-token flow. Returns True if credentials were saved."""
     from agent.anthropic_adapter import (
-        run_oauth_setup_token,
-        read_claude_code_credentials,
         is_claude_code_token_valid,
+        read_claude_code_credentials,
+        run_oauth_setup_token,
     )
     from hermes_cli.config import (
         save_anthropic_oauth_token,
@@ -3969,8 +3943,6 @@ def _run_anthropic_oauth_flow(save_env_value):
             return True
         print("  Cancelled — install Claude Code and try again.")
         return False
-
-
 
 
 def cmd_login(args):
@@ -4133,7 +4105,8 @@ def _print_version_info(*, check_updates: bool = True) -> None:
     # ``import openai`` — the SDK drags in ~800ms of pydantic-backed type
     # modules just to expose ``__version__``.  Metadata lookup is ~2ms.
     try:
-        from importlib.metadata import version as _pkg_version, PackageNotFoundError
+        from importlib.metadata import PackageNotFoundError
+        from importlib.metadata import version as _pkg_version
 
         try:
             print(f"OpenAI SDK: {_pkg_version('openai')}")
@@ -4311,6 +4284,7 @@ def _gateway_prompt(prompt_text: str, default: str = "", timeout: float = 300.0)
     """
     import json as _json
     import uuid as _uuid
+
     from hermes_constants import get_hermes_home
 
     home = get_hermes_home()
@@ -4543,6 +4517,8 @@ def _nixos_build_env() -> dict[str, str] | None:
         pass  # nix-shell not available — caller will get None
 
     return None
+
+
 def _run_npm_install_deterministic(
     npm: str,
     cwd: Path,
@@ -4599,6 +4575,7 @@ def _build_web_ui(web_dir: Path, *, fatal: bool = False) -> bool:
                instead of a soft warning (used by ``hermes web``).
 
     Returns True if the build succeeded or was skipped (no package.json).
+
     """
     if not (web_dir / "package.json").exists():
         return True
@@ -4761,7 +4738,6 @@ def _compute_desktop_content_hash(project_root: Path) -> str:
         except OSError:
             pass
         h.update(b"\0")
-
 
     from pathspec import PathSpec
 
@@ -7348,6 +7324,7 @@ def _install_psutil_android_compat(
     """
     import tempfile
     import urllib.request
+
     from hermes_cli.psutil_android import PSUTIL_URL, prepare_patched_psutil_sdist
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -7651,8 +7628,8 @@ def _cmd_update_check(branch: str = "main", *, branch_explicit: bool = False):
         print(format_docker_update_message())
         sys.exit(1)
     if method == "pip":
-        from hermes_cli.config import recommended_update_command
         from hermes_cli.banner import check_via_pypi
+        from hermes_cli.config import recommended_update_command
         if branch_explicit and branch != "main":
             print(f"⚠ --branch is ignored for PyPI installs (would have checked '{branch}').")
         result = check_via_pypi()
@@ -7928,7 +7905,7 @@ def _run_pre_update_backup(args) -> None:
 
     # Render path using display_hermes_home so the user sees ~/.hermes/...
     try:
-        from hermes_constants import get_hermes_home, display_hermes_home
+        from hermes_constants import display_hermes_home, get_hermes_home
 
         home = get_hermes_home()
         try:
@@ -8095,7 +8072,8 @@ def _cmd_update_pip(args):
 
 def _cmd_update_impl(args, gateway_mode: bool):
     """Body of ``cmd_update`` — kept separate so the wrapper can always
-    restore stdio even on ``sys.exit``."""
+    restore stdio even on ``sys.exit``.
+    """
     # In gateway mode, use file-based IPC for prompts instead of stdin
     gw_input_fn = (
         (lambda prompt, default="": _gateway_prompt(prompt, default))
@@ -8609,6 +8587,7 @@ def _cmd_update_impl(args, gateway_mode: bool):
         # attributes like display_hermes_home() added since the last release.
         try:
             import importlib
+
             import hermes_constants as _hc
 
             importlib.reload(_hc)
@@ -8692,9 +8671,9 @@ def _cmd_update_impl(args, gateway_mode: bool):
         print("→ Checking configuration for new options...")
 
         from hermes_cli.config import (
-            get_missing_env_vars,
-            get_missing_config_fields,
             check_config_version,
+            get_missing_config_fields,
+            get_missing_env_vars,
             migrate_config,
         )
 
@@ -8728,6 +8707,7 @@ def _cmd_update_impl(args, gateway_mode: bool):
             print()
             # Show WHAT changed, not just a count, so the user can make an
             # informed yes/no decision (previously the prompt named nothing).
+
             def _print_items(items, label, key, fallback_key=None):
                 if not items:
                     return
@@ -8899,18 +8879,19 @@ def _cmd_update_impl(args, gateway_mode: bool):
         # The code update (git pull) is shared across all profiles, so every
         # running gateway needs restarting to pick up the new code.
         try:
+            import signal as _signal
+
             from hermes_cli.gateway import (
-                is_macos,
-                supports_systemd_services,
                 _ensure_user_systemd_env,
-                find_gateway_pids,
-                find_profile_gateway_processes,
-                launch_detached_profile_gateway_restart,
                 _get_service_pids,
                 _graceful_restart_via_sigusr1,
                 _wait_for_gateway_exit,
+                find_gateway_pids,
+                find_profile_gateway_processes,
+                is_macos,
+                launch_detached_profile_gateway_restart,
+                supports_systemd_services,
             )
-            import signal as _signal
 
             def _wait_for_service_active(
                 scope_cmd_: list,
@@ -9273,9 +9254,9 @@ def _cmd_update_impl(args, gateway_mode: bool):
             if is_macos():
                 try:
                     from hermes_cli.gateway import (
-                        launchd_restart,
                         get_launchd_label,
                         get_launchd_plist_path,
+                        launchd_restart,
                     )
 
                     plist_path = get_launchd_plist_path()
@@ -9425,8 +9406,8 @@ def _cmd_update_impl(args, gateway_mode: bool):
         # every `hermes update` surfaces the issue until the user migrates.
         try:
             from hermes_cli.gateway import (
-                has_legacy_hermes_units,
                 _find_legacy_hermes_units,
+                has_legacy_hermes_units,
                 supports_systemd_services,
             )
 
@@ -9549,17 +9530,17 @@ def _coalesce_session_name_args(argv: list) -> list:
 def cmd_profile(args):
     """Profile management — create, delete, list, switch, alias."""
     from hermes_cli.profiles import (
-        list_profiles,
+        _get_wrapper_dir,
+        _is_wrapper_dir_in_path,
+        check_alias_collision,
         create_profile,
+        create_wrapper_script,
         delete_profile,
+        get_active_profile_name,
+        list_profiles,
+        remove_wrapper_script,
         seed_profile_skills,
         set_active_profile,
-        get_active_profile_name,
-        check_alias_collision,
-        create_wrapper_script,
-        remove_wrapper_script,
-        _is_wrapper_dir_in_path,
-        _get_wrapper_dir,
     )
     from hermes_constants import display_hermes_home
 
@@ -9860,14 +9841,14 @@ def cmd_profile(args):
     elif action == "show":
         name = args.profile_name
         from hermes_cli.profiles import (
-            get_profile_dir,
-            profile_exists,
-            _read_config_model,
             _check_gateway_running,
             _count_skills,
-            _read_distribution_meta,
             _get_wrapper_dir,
+            _read_config_model,
+            _read_distribution_meta,
             find_alias_for_profile,
+            get_profile_dir,
+            profile_exists,
         )
 
         if not profile_exists(name):
@@ -9980,10 +9961,11 @@ def cmd_profile(args):
 
     elif action == "install":
         import tempfile
+
         from hermes_cli.profile_distribution import (
-            plan_install,
-            install_distribution,
             DistributionError,
+            install_distribution,
+            plan_install,
         )
 
         try:
@@ -10032,9 +10014,9 @@ def cmd_profile(args):
 
     elif action == "update":
         from hermes_cli.profile_distribution import (
-            update_distribution,
-            read_manifest,
             DistributionError,
+            read_manifest,
+            update_distribution,
         )
         from hermes_cli.profiles import get_profile_dir, normalize_profile_name
 
@@ -10078,7 +10060,10 @@ def cmd_profile(args):
             sys.exit(1)
 
     elif action == "info":
-        from hermes_cli.profile_distribution import describe_distribution, DistributionError
+        from hermes_cli.profile_distribution import (
+            DistributionError,
+            describe_distribution,
+        )
 
         try:
             data = describe_distribution(args.profile_name)
@@ -10323,7 +10308,7 @@ def cmd_dashboard_register(args):
 
 def cmd_completion(args, parser=None):
     """Print shell completion script."""
-    from hermes_cli.completion import generate_bash, generate_zsh, generate_fish
+    from hermes_cli.completion import generate_bash, generate_fish, generate_zsh
 
     shell = getattr(args, "shell", "bash")
     if shell == "zsh":
@@ -10343,7 +10328,7 @@ def cmd_prompt_size(args):
 
 def cmd_logs(args):
     """View and filter Hermes log files."""
-    from hermes_cli.logs import tail_log, list_logs
+    from hermes_cli.logs import list_logs, tail_log
 
     log_name = getattr(args, "log_name", "agent") or "agent"
 
@@ -10554,8 +10539,8 @@ def _prepare_agent_startup(args) -> None:
                 exc_info=True,
             )
     try:
-        from hermes_cli.config import load_config
         from agent.shell_hooks import register_from_config
+        from hermes_cli.config import load_config
 
         register_from_config(load_config(), accept_hooks=_accept_hooks)
     except Exception:
@@ -10707,7 +10692,7 @@ def cmd_memory(args):
         print("\n  ✓ Memory provider: built-in only")
         print("  Saved to config.yaml\n")
     elif sub == "reset":
-        from hermes_constants import get_hermes_home, display_hermes_home
+        from hermes_constants import display_hermes_home, get_hermes_home
 
         mem_dir = get_hermes_home() / "memories"
         target = getattr(args, "target", "all")
@@ -10799,8 +10784,8 @@ def cmd_tools(args):
 
 def cmd_insights(args):
     try:
-        from hermes_state import SessionDB
         from agent.insights import InsightsEngine
+        from hermes_state import SessionDB
 
         db = SessionDB()
         engine = InsightsEngine(db)
@@ -11176,7 +11161,8 @@ def main():
             "referenced skill at once."
         ),
     )
-    from hermes_cli.bundles import register_cli as _bundles_register, bundles_command
+    from hermes_cli.bundles import bundles_command
+    from hermes_cli.bundles import register_cli as _bundles_register
     _bundles_register(bundles_parser)
     bundles_parser.set_defaults(func=bundles_command)
 
@@ -11198,8 +11184,8 @@ def main():
     # =========================================================================
     if _plugin_cli_discovery_needed():
         try:
-            from plugins.memory import discover_plugin_cli_commands
             from hermes_cli.plugins import discover_plugins, get_plugin_manager
+            from plugins.memory import discover_plugin_cli_commands
 
             seen_plugin_commands = set()
             for cmd_info in discover_plugin_cli_commands():
@@ -11733,7 +11719,6 @@ def main():
         cmd_dashboard=cmd_dashboard,
         cmd_dashboard_register=cmd_dashboard_register,
     )
-
 
     # =========================================================================
     # desktop (a.k.a. gui) command

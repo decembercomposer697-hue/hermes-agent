@@ -14,11 +14,11 @@ Covers:
 
 import os
 import unittest
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
 from email import encoders
-from unittest.mock import patch, MagicMock, AsyncMock
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from gateway.platforms.base import SendResult
 
@@ -61,6 +61,7 @@ class TestConfigEnvOverrides(unittest.TestCase):
         config = GatewayConfig()
         _apply_env_overrides(config)
         self.assertNotIn(Platform.EMAIL, config.platforms)
+
 
 class TestCheckRequirements(unittest.TestCase):
     """Verify check_email_requirements function."""
@@ -367,6 +368,7 @@ class TestDispatchMessage(unittest.TestCase):
     def test_image_attachment_sets_photo_type(self):
         """Email with image attachment should set message type to PHOTO."""
         import asyncio
+
         from gateway.platforms.base import MessageType
         adapter = self._make_adapter()
         captured_events = []
@@ -959,6 +961,7 @@ class TestSendEmailStandalone(unittest.TestCase):
         """_send_email should use verified STARTTLS when sending."""
         import asyncio
         import ssl
+
         from tools.send_message_tool import _send_email
 
         with patch("smtplib.SMTP") as mock_smtp:
@@ -987,6 +990,7 @@ class TestSendEmailStandalone(unittest.TestCase):
     def test_send_email_tool_failure(self):
         """SMTP failure should return error dict."""
         import asyncio
+
         from tools.send_message_tool import _send_email
 
         with patch("smtplib.SMTP", side_effect=Exception("SMTP error")):
@@ -1001,6 +1005,7 @@ class TestSendEmailStandalone(unittest.TestCase):
     def test_send_email_tool_not_configured(self):
         """Missing config should return error."""
         import asyncio
+
         from tools.send_message_tool import _send_email
 
         result = asyncio.run(

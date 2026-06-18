@@ -5,11 +5,11 @@ Covers:
 - ``_check_lint()`` robustness against file paths containing curly braces
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
 
-from tools.file_operations import ShellFileOperations, _parse_search_context_line
+import pytest
 
+from tools.file_operations import ShellFileOperations, _parse_search_context_line
 
 # =========================================================================
 # _is_likely_binary edge cases
@@ -245,8 +245,8 @@ class TestCheckLintDelta:
 
     def test_introduces_new_error_filters_pre(self, ops):
         """Delta filter drops pre-existing errors, surfaces only new ones."""
-        pre = 'def a(:\n    pass\n'  # line 1 broken
-        post = 'def a():\n    pass\n\ndef b(:\n    pass\n'  # line 1 fixed, line 4 broken
+        pre = "def a(:\n    pass\n"  # line 1 broken
+        post = "def a():\n    pass\n\ndef b(:\n    pass\n"  # line 1 fixed, line 4 broken
         r = ops._check_lint_delta("/tmp/d.py", pre_content=pre, post_content=post)
         assert r.success is False
         assert "New lint errors" in r.output or "line 4" in r.output
@@ -254,8 +254,8 @@ class TestCheckLintDelta:
     def test_pre_existing_remains_flagged_but_not_new(self, ops):
         """Single-error parsers (ast) may miss that post is OK — be cautious."""
         # Pre has line-1 error, post keeps it (and doesn't add anything new)
-        pre = 'def a(:\n    pass\n'
-        post = 'def a(:\n    pass\n\nprint(42)\n'  # still line 1 broken
+        pre = "def a(:\n    pass\n"
+        post = "def a(:\n    pass\n\nprint(42)\n"  # still line 1 broken
         r = ops._check_lint_delta("/tmp/d.py", pre_content=pre, post_content=post)
         # File is still broken — don't lie and claim success — but flag it as pre-existing
         assert r.success is False

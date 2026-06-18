@@ -53,7 +53,8 @@ def test_stage2_hook_resolves_puid_pgid_aliases(stage2_text: str) -> None:
 
 def _resolve(stage2_text: str, env: dict[str, str]) -> str:
     """Run the stage2 hook's alias-resolution lines in isolation and report the
-    resolved ``HERMES_UID:HERMES_GID`` pair."""
+    resolved ``HERMES_UID:HERMES_GID`` pair.
+    """
     bash = shutil.which("bash")
     if bash is None:
         pytest.skip("bash not available")

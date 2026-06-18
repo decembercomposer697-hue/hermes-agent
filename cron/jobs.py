@@ -1,5 +1,4 @@
-"""
-Cron job storage and management.
+"""Cron job storage and management.
 
 Jobs are stored in ~/.hermes/cron/jobs.json
 Output is saved to ~/.hermes/cron/output/{job_id}/{timestamp}.md
@@ -8,16 +7,17 @@ Output is saved to ~/.hermes/cron/output/{job_id}/{timestamp}.md
 import copy
 import json
 import logging
+import os
+import re
 import shutil
 import tempfile
 import threading
-import os
-import re
 import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
 from hermes_constants import get_hermes_home
-from typing import Optional, Dict, List, Any, Union
 
 logger = logging.getLogger(__name__)
 
@@ -183,29 +183,28 @@ def ensure_dirs():
 # =============================================================================
 
 def parse_duration(s: str) -> int:
-    """
-    Parse duration string into minutes.
+    """Parse duration string into minutes.
     
     Examples:
         "30m" → 30
         "2h" → 120
         "1d" → 1440
+
     """
     s = s.strip().lower()
-    match = re.match(r'^(\d+)\s*(m|min|mins|minute|minutes|h|hr|hrs|hour|hours|d|day|days)$', s)
+    match = re.match(r"^(\d+)\s*(m|min|mins|minute|minutes|h|hr|hrs|hour|hours|d|day|days)$", s)
     if not match:
         raise ValueError(f"Invalid duration: '{s}'. Use format like '30m', '2h', or '1d'")
     
     value = int(match.group(1))
     unit = match.group(2)[0]  # First char: m, h, or d
     
-    multipliers = {'m': 1, 'h': 60, 'd': 1440}
+    multipliers = {"m": 1, "h": 60, "d": 1440}
     return value * multipliers[unit]
 
 
 def parse_schedule(schedule: str) -> dict[str, Any]:
-    """
-    Parse schedule string into structured format.
+    """Parse schedule string into structured format.
     
     Returns dict with:
         - kind: "once" | "interval" | "cron"
@@ -220,6 +219,7 @@ def parse_schedule(schedule: str) -> dict[str, Any]:
         "every 2h"         → recurring every 2 hours
         "0 9 * * *"        → cron expression
         "2026-02-03T14:00" → once at timestamp
+
     """
     schedule = schedule.strip()
     original = schedule
@@ -239,7 +239,7 @@ def parse_schedule(schedule: str) -> dict[str, Any]:
     # Cron fields: minute hour day month weekday [year]
     parts = schedule.split()
     if len(parts) >= 5 and all(
-        re.match(r'^[\d\*\-,/]+$', p) for p in parts[:5]
+        re.match(r"^[\d\*\-,/]+$", p) for p in parts[:5]
     ):
         if not HAS_CRONITER:
             raise ValueError("Cron expressions require 'croniter' package. Install with: pip install croniter")
@@ -255,10 +255,10 @@ def parse_schedule(schedule: str) -> dict[str, Any]:
         }
     
     # ISO timestamp (contains T or looks like date)
-    if 'T' in schedule or re.match(r'^\d{4}-\d{2}-\d{2}', schedule):
+    if "T" in schedule or re.match(r"^\d{4}-\d{2}-\d{2}", schedule):
         try:
             # Parse and validate
-            dt = datetime.fromisoformat(schedule.replace('Z', '+00:00'))
+            dt = datetime.fromisoformat(schedule.replace("Z", "+00:00"))
             # Make naive timestamps timezone-aware at parse time so the stored
             # value doesn't depend on the system timezone matching at check time.
             if dt.tzinfo is None:
@@ -371,8 +371,7 @@ def _compute_grace_seconds(schedule: dict) -> int:
 
 
 def compute_next_run(schedule: dict[str, Any], last_run_at: str | None = None) -> str | None:
-    """
-    Compute the next run time for a schedule.
+    """Compute the next run time for a schedule.
 
     Returns ISO timestamp string, or None if no more runs.
     """
@@ -429,13 +428,13 @@ def load_jobs() -> list[dict[str, Any]]:
     _strict_retry = False  # track whether we used the strict=False fallback
 
     try:
-        with open(JOBS_FILE, encoding='utf-8') as f:
+        with open(JOBS_FILE, encoding="utf-8") as f:
             data = json.load(f)
     except json.JSONDecodeError:
         # Retry with strict=False to handle bare control chars in string values
         _strict_retry = True
         try:
-            with open(JOBS_FILE, encoding='utf-8') as f:
+            with open(JOBS_FILE, encoding="utf-8") as f:
                 data = json.loads(f.read(), strict=False)
         except Exception as e:
             logger.error("Failed to auto-repair jobs.json: %s", e)
@@ -471,9 +470,9 @@ def load_jobs() -> list[dict[str, Any]]:
 def save_jobs(jobs: list[dict[str, Any]]):
     """Save all jobs to storage."""
     ensure_dirs()
-    fd, tmp_path = tempfile.mkstemp(dir=str(JOBS_FILE.parent), suffix='.tmp', prefix='.jobs_')
+    fd, tmp_path = tempfile.mkstemp(dir=str(JOBS_FILE.parent), suffix=".tmp", prefix=".jobs_")
     try:
-        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump({"jobs": jobs, "updated_at": _hermes_now().isoformat()}, f, indent=2)
             f.flush()
             os.fsync(f.fileno())
@@ -538,8 +537,7 @@ def create_job(
     workdir: str | None = None,
     no_agent: bool = False,
 ) -> dict[str, Any]:
-    """
-    Create a new cron job.
+    """Create a new cron job.
 
     Args:
         prompt: The prompt to run (must be self-contained, or a task instruction when skill is set).
@@ -584,6 +582,7 @@ def create_job(
 
     Returns:
         The created job dict
+
     """
     parsed_schedule = parse_schedule(schedule)
 
@@ -865,8 +864,7 @@ def remove_job(job_id: str) -> bool:
 
 def mark_job_run(job_id: str, success: bool, error: str | None = None,
                  delivery_error: str | None = None):
-    """
-    Mark a job as having been run.
+    """Mark a job as having been run.
     
     Updates last_run_at, last_status, increments completed count,
     computes next_run_at, and auto-deletes if repeat limit reached.
@@ -1077,9 +1075,9 @@ def save_job_output(job_id: str, output: str):
     timestamp = _hermes_now().strftime("%Y-%m-%d_%H-%M-%S")
     output_file = job_output_dir / f"{timestamp}.md"
     
-    fd, tmp_path = tempfile.mkstemp(dir=str(job_output_dir), suffix='.tmp', prefix='.output_')
+    fd, tmp_path = tempfile.mkstemp(dir=str(job_output_dir), suffix=".tmp", prefix=".output_")
     try:
-        with os.fdopen(fd, 'w', encoding='utf-8') as f:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(output)
             f.flush()
             os.fsync(f.fileno())
@@ -1148,6 +1146,7 @@ def rewrite_skill_refs(
     Best-effort: exceptions from loading/saving propagate to the caller so
     tests can assert behaviour; the curator invocation site wraps this
     call in a try/except so a failure here never breaks the curator.
+
     """
     consolidated = dict(consolidated or {})
     pruned_set = set(pruned or [])

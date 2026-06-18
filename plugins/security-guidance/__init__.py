@@ -190,7 +190,8 @@ def _format_warning_block(findings: list[tuple[str, str]]) -> str:
 
 def _scan_args(tool_name: str, args: Any) -> list[tuple[str, str]]:
     """Common scan path used by both pre_tool_call (block mode) and
-    transform_tool_result (warn mode)."""
+    transform_tool_result (warn mode).
+    """
     if _plugin_disabled():
         return []
     findings: list[tuple[str, str]] = []

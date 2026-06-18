@@ -208,7 +208,7 @@ class TestSSHBulkUpload:
             mock_env._ssh_bulk_upload(files)
 
     def test_mkdir_failure_raises(self, mock_env, tmp_path):
-        """mkdir failure should raise RuntimeError before tar pipe."""
+        """Mkdir failure should raise RuntimeError before tar pipe."""
         f1 = tmp_path / "y.txt"
         f1.write_text("y")
         files = [(str(f1), "/home/testuser/.hermes/skills/y.txt")]
@@ -219,7 +219,7 @@ class TestSSHBulkUpload:
                 mock_env._ssh_bulk_upload(files)
 
     def test_tar_create_failure_raises(self, mock_env, tmp_path):
-        """tar create failure should raise RuntimeError."""
+        """Tar create failure should raise RuntimeError."""
         f1 = tmp_path / "z.txt"
         f1.write_text("z")
         files = [(str(f1), "/home/testuser/.hermes/skills/z.txt")]

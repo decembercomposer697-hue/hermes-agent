@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-body_calc.py — All-in-one fitness calculator.
+"""body_calc.py — All-in-one fitness calculator.
 
 Subcommands:
   bmi      <weight_kg> <height_cm>
@@ -11,8 +10,8 @@ Subcommands:
 
 No external dependencies — stdlib only.
 """
-import sys
 import math
+import sys
 
 
 def bmi(weight_kg, height_cm):

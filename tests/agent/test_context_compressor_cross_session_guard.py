@@ -111,7 +111,8 @@ def test_stale_previous_summary_cleared_when_no_handoff():
 
 def test_previous_summary_preserved_when_handoff_found():
     """When a handoff IS found, _previous_summary should be preserved for
-    iterative update within the same session."""
+    iterative update within the same session.
+    """
     c = _make_compressor()
     c._previous_summary = "Summary from earlier compaction in same session"
 
@@ -131,7 +132,8 @@ def test_previous_summary_preserved_when_handoff_found():
 
 def test_no_false_positive_when_previous_summary_already_none():
     """When _previous_summary is already None and no handoff found, nothing
-    should break (the guard is a no-op in this case)."""
+    should break (the guard is a no-op in this case).
+    """
     c = _make_compressor()
     c._previous_summary = None
 

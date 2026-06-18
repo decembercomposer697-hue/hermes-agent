@@ -19,25 +19,24 @@ import re
 
 import pytest
 
-
 # Reconstruct the exact _TOOL_MEDIA_RE pattern from gateway/run.py
 # The pattern is built by concatenating raw string parts:
 #   r'MEDIA:((?:[A-Za-z]:[/\\]|/|~\/)\S+\.(?:png|...))'
 _TOOL_MEDIA_RE = re.compile(
-    r'MEDIA:((?:[A-Za-z]:[/\\]|/|~\/)\S+\.(?:png|jpe?g|gif|webp|'
-    r'mp4|mov|avi|mkv|webm|ogg|opus|mp3|wav|m4a|'
-    r'flac|epub|pdf|zip|rar|7z|docx?|xlsx?|pptx?|'
-    r'txt|csv|apk|ipa))',
+    r"MEDIA:((?:[A-Za-z]:[/\\]|/|~\/)\S+\.(?:png|jpe?g|gif|webp|"
+    r"mp4|mov|avi|mkv|webm|ogg|opus|mp3|wav|m4a|"
+    r"flac|epub|pdf|zip|rar|7z|docx?|xlsx?|pptx?|"
+    r"txt|csv|apk|ipa))",
     re.IGNORECASE,
 )
 
 
 # Reconstruct the pre-fix pattern (without Windows anchor) for regression proof
 _TOOL_MEDIA_RE_PRE_FIX = re.compile(
-    r'MEDIA:((?:/|~\/)\S+\.(?:png|jpe?g|gif|webp|'
-    r'mp4|mov|avi|mkv|webm|ogg|opus|mp3|wav|m4a|'
-    r'flac|epub|pdf|zip|rar|7z|docx?|xlsx?|pptx?|'
-    r'txt|csv|apk|ipa))',
+    r"MEDIA:((?:/|~\/)\S+\.(?:png|jpe?g|gif|webp|"
+    r"mp4|mov|avi|mkv|webm|ogg|opus|mp3|wav|m4a|"
+    r"flac|epub|pdf|zip|rar|7z|docx?|xlsx?|pptx?|"
+    r"txt|csv|apk|ipa))",
     re.IGNORECASE,
 )
 
@@ -110,7 +109,8 @@ class TestToolMediaReWindowsPaths:
     ])
     def test_pre_fix_pattern_rejects_windows(self, media_tag):
         """The pre-fix pattern (without Windows anchor) does NOT match Windows paths.
-        This proves the fix is necessary — without it, these paths are silently ignored."""
+        This proves the fix is necessary — without it, these paths are silently ignored.
+        """
         match = _TOOL_MEDIA_RE_PRE_FIX.search(media_tag)
         assert match is None, f"Pre-fix pattern should NOT match: {media_tag}"
 

@@ -236,7 +236,8 @@ def test_native_client_accepts_injected_http_client():
 
 def test_native_client_rejects_empty_api_key_with_actionable_message():
     """Empty/whitespace api_key must raise at construction, not produce a cryptic
-    Google GFE 'Error 400 (Bad Request)!!1' HTML page on the first request."""
+    Google GFE 'Error 400 (Bad Request)!!1' HTML page on the first request.
+    """
     from agent.gemini_native_adapter import GeminiNativeClient
 
     for bad in ("", "   ", None):
@@ -337,8 +338,8 @@ def test_max_tokens_none_defaults_to_gemini_output_ceiling():
     published 65,535 ceiling rather than leaving the field unset.
     """
     from agent.gemini_native_adapter import (
-        build_gemini_request,
         GEMINI_DEFAULT_MAX_OUTPUT_TOKENS,
+        build_gemini_request,
     )
 
     req = build_gemini_request(messages=[{"role": "user", "content": "hi"}], max_tokens=None)

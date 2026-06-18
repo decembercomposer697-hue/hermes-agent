@@ -1,5 +1,4 @@
-"""
-Microsoft Teams platform adapter for Hermes Agent.
+"""Microsoft Teams platform adapter for Hermes Agent.
 
 Uses the microsoft-teams-apps SDK for authentication and activity processing.
 Runs an aiohttp webhook server to receive messages from Teams.
@@ -48,16 +47,20 @@ except ImportError:
     web = None  # type: ignore[assignment]
 
 try:
-    from microsoft_teams.apps import App, ActivityContext
-    from microsoft_teams.common.http.client import ClientOptions
-    from microsoft_teams.api import MessageActivity, ConversationReference
+    from microsoft_teams.api import ConversationReference, MessageActivity
+    from microsoft_teams.api.activities.invoke.adaptive_card import (
+        AdaptiveCardInvokeActivity,
+    )
     from microsoft_teams.api.activities.typing import TypingActivityInput
-    from microsoft_teams.api.activities.invoke.adaptive_card import AdaptiveCardInvokeActivity
     from microsoft_teams.api.models.adaptive_card import (
         AdaptiveCardActionCardResponse,
         AdaptiveCardActionMessageResponse,
     )
-    from microsoft_teams.api.models.invoke_response import InvokeResponse, AdaptiveCardInvokeResponse
+    from microsoft_teams.api.models.invoke_response import (
+        AdaptiveCardInvokeResponse,
+        InvokeResponse,
+    )
+    from microsoft_teams.apps import ActivityContext, App
     from microsoft_teams.apps.http.adapter import (
         HttpMethod,
         HttpRequest,
@@ -65,6 +68,7 @@ try:
         HttpRouteHandler,
     )
     from microsoft_teams.cards import AdaptiveCard, ExecuteAction, TextBlock
+    from microsoft_teams.common.http.client import ClientOptions
 
     TEAMS_SDK_AVAILABLE = True
 except ImportError:
@@ -89,7 +93,6 @@ except ImportError:
     TextBlock = None  # type: ignore[assignment,misc]
 
 from gateway.config import Platform, PlatformConfig
-from gateway.platforms.helpers import MessageDeduplicator
 from gateway.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
@@ -97,6 +100,7 @@ from gateway.platforms.base import (
     SendResult,
     cache_image_from_url,
 )
+from gateway.platforms.helpers import MessageDeduplicator
 
 logger = logging.getLogger(__name__)
 
@@ -467,6 +471,7 @@ _ALLOWED_TEAMS_SERVICE_HOSTS = frozenset({
 # ``thread.tacv2`` suffixes; reject anything outside this set so a hostile
 # value cannot path-traverse out of ``/v3/conversations/<id>/activities``.
 import re as _re_teams
+
 _TEAMS_CONV_ID_RE = _re_teams.compile(r"^[A-Za-z0-9:@\-_.]+$")
 
 
@@ -822,7 +827,7 @@ class TeamsAdapter(BasePlatformAdapter):
         self, ctx: ActivityContext[AdaptiveCardInvokeActivity],
     ) -> InvokeResponse[AdaptiveCardActionMessageResponse]:
         """Handle an Adaptive Card Action.Execute button click."""
-        from tools.approval import resolve_gateway_approval, has_blocking_approval
+        from tools.approval import has_blocking_approval, resolve_gateway_approval
 
         action = ctx.activity.value.action
         data = action.data or {}
@@ -1033,6 +1038,7 @@ class TeamsAdapter(BasePlatformAdapter):
         try:
             import base64
             import mimetypes
+
             from microsoft_teams.api import Attachment, MessageActivityInput
 
             if image_url.startswith("http://") or image_url.startswith("https://"):
@@ -1084,16 +1090,16 @@ class TeamsAdapter(BasePlatformAdapter):
 
 def interactive_setup() -> None:
     """Guide the user through Teams setup using the Teams CLI."""
-    from hermes_cli.config import (
-        get_env_value,
-        save_env_value,
-    )
     from hermes_cli.cli_output import (
-        prompt,
-        prompt_yes_no,
         print_info,
         print_success,
         print_warning,
+        prompt,
+        prompt_yes_no,
+    )
+    from hermes_cli.config import (
+        get_env_value,
+        save_env_value,
     )
 
     existing_id = get_env_value("TEAMS_CLIENT_ID")

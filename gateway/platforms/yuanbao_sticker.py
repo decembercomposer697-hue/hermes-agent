@@ -1,5 +1,4 @@
-"""
-Yuanbao sticker (TIMFaceElem) support.
+"""Yuanbao sticker (TIMFaceElem) support.
 
 Ported from yuanbao-openclaw-plugin/src/sticker/.
 
@@ -329,8 +328,7 @@ STICKER_MAP: dict[str, dict] = {
 
 
 def get_sticker_by_name(name: str) -> dict | None:
-    """
-    按名称查找贴纸，支持模糊匹配。
+    """按名称查找贴纸，支持模糊匹配。
 
     匹配优先级：
       1. 完全相等（name）
@@ -362,8 +360,7 @@ def get_sticker_by_name(name: str) -> dict | None:
 
 
 def get_random_sticker(category: str = None) -> dict:
-    """
-    随机返回一个贴纸。
+    """随机返回一个贴纸。
 
     若指定 category，则在 description 中含有该关键词的贴纸里随机选取；
     category 为 None 时从全表随机。
@@ -466,8 +463,7 @@ def _score_field(haystack: str, query: str) -> float:
 
 
 def search_stickers(query: str, limit: int = 10) -> list[dict]:
-    """
-    在内置贴纸表中按模糊匹配排序返回前 N 条结果。
+    """在内置贴纸表中按模糊匹配排序返回前 N 条结果。
 
     评分综合 name/description 字段的子串、字符多重集覆盖、bigram Jaccard、子序列比例。
     name 权重略高于 description（×0.88）。空 query 时按字典顺序返回前 N 条。
@@ -513,8 +509,7 @@ def build_face_msg_body(
     face_type: int = 1,
     data: str | None = None,
 ) -> list:
-    """
-    构造 TIMFaceElem 消息体。
+    """构造 TIMFaceElem 消息体。
 
     Yuanbao 约定：
       - index 固定传 0（服务端通过 data 字段识别具体表情）
@@ -530,6 +525,7 @@ def build_face_msg_body(
         符合 Yuanbao TIM 协议的 msg_body list，如::
 
             [{"msg_type": "TIMFaceElem", "msg_content": {"index": 0, "data": "..."}}]
+
     """
     msg_content: dict = {"index": face_index}
     if data is not None:
@@ -538,8 +534,7 @@ def build_face_msg_body(
 
 
 def build_sticker_msg_body(sticker: dict) -> list:
-    """
-    从 STICKER_MAP 中的 sticker dict 直接构造 TIMFaceElem 消息体。
+    """从 STICKER_MAP 中的 sticker dict 直接构造 TIMFaceElem 消息体。
 
     这是 send_sticker() 的内部辅助，确保 data 字段与原始 JS 插件一致。
     """

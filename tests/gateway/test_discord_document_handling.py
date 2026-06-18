@@ -7,7 +7,7 @@ to download, cache, and optionally inject text from non-image/audio files.
 
 import os
 import sys
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from types import SimpleNamespace
 from typing import Optional
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -17,10 +17,10 @@ import pytest
 from gateway.config import PlatformConfig
 from gateway.platforms.base import MessageType
 
-
 # ---------------------------------------------------------------------------
 # Discord mock setup (copied from test_discord_free_response.py)
 # ---------------------------------------------------------------------------
+
 
 def _ensure_discord_mock():
     """Install a mock discord module when discord.py isn't available."""
@@ -60,10 +60,10 @@ _ensure_discord_mock()
 import plugins.platforms.discord.adapter as discord_platform
 from plugins.platforms.discord.adapter import DiscordAdapter
 
-
 # ---------------------------------------------------------------------------
 # Fake channel / thread types
 # ---------------------------------------------------------------------------
+
 
 class FakeDMChannel:
     def __init__(self, channel_id: int = 1):

@@ -1,5 +1,4 @@
-"""
-Tests for Slack mention gating (require_mention / free_response_channels).
+"""Tests for Slack mention gating (require_mention / free_response_channels).
 
 Follows the same pattern as test_whatsapp_group_gating.py.
 """
@@ -9,10 +8,10 @@ from unittest.mock import MagicMock
 
 from gateway.config import Platform, PlatformConfig
 
-
 # ---------------------------------------------------------------------------
 # Mock slack-bolt if not installed (same as test_slack.py)
 # ---------------------------------------------------------------------------
+
 
 def _ensure_slack_mock():
     if "slack_bolt" in sys.modules and hasattr(sys.modules["slack_bolt"], "__file__"):
@@ -41,10 +40,10 @@ def _ensure_slack_mock():
 _ensure_slack_mock()
 
 import gateway.platforms.slack as _slack_mod
+
 _slack_mod.SLACK_AVAILABLE = True
 
 from gateway.platforms.slack import SlackAdapter
-
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -1,16 +1,17 @@
 """Tests for the ContextEngine ABC and plugin slot."""
 
 import json
-import pytest
 from typing import Any, Dict, List
 
-from agent.context_engine import ContextEngine
-from agent.context_compressor import ContextCompressor
+import pytest
 
+from agent.context_compressor import ContextCompressor
+from agent.context_engine import ContextEngine
 
 # ---------------------------------------------------------------------------
 # A minimal concrete engine for testing the ABC
 # ---------------------------------------------------------------------------
+
 
 class StubEngine(ContextEngine):
     """Minimal engine that satisfies the ABC without doing real work."""
@@ -198,7 +199,7 @@ class TestPluginContextEngineSlot:
     """Test register_context_engine on PluginContext."""
 
     def test_register_engine(self):
-        from hermes_cli.plugins import PluginManager, PluginContext, PluginManifest
+        from hermes_cli.plugins import PluginContext, PluginManager, PluginManifest
         mgr = PluginManager()
         manifest = PluginManifest(name="test-lcm")
         ctx = PluginContext(manifest, mgr)
@@ -210,7 +211,7 @@ class TestPluginContextEngineSlot:
         assert mgr._context_engine.name == "stub"
 
     def test_reject_second_engine(self):
-        from hermes_cli.plugins import PluginManager, PluginContext, PluginManifest
+        from hermes_cli.plugins import PluginContext, PluginManager, PluginManifest
         mgr = PluginManager()
         manifest = PluginManifest(name="test-lcm")
         ctx = PluginContext(manifest, mgr)
@@ -223,7 +224,7 @@ class TestPluginContextEngineSlot:
         assert mgr._context_engine is engine1
 
     def test_reject_non_engine(self):
-        from hermes_cli.plugins import PluginManager, PluginContext, PluginManifest
+        from hermes_cli.plugins import PluginContext, PluginManager, PluginManifest
         mgr = PluginManager()
         manifest = PluginManifest(name="test-bad")
         ctx = PluginContext(manifest, mgr)
@@ -232,8 +233,8 @@ class TestPluginContextEngineSlot:
         assert mgr._context_engine is None
 
     def test_get_plugin_context_engine(self):
-        from hermes_cli.plugins import PluginManager, get_plugin_context_engine
         import hermes_cli.plugins as plugins_mod
+        from hermes_cli.plugins import PluginManager, get_plugin_context_engine
 
         # Inject a test manager
         old_mgr = plugins_mod._plugin_manager

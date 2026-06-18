@@ -17,8 +17,9 @@ import logging
 import os
 import tempfile
 import time
-from typing import Any, Optional
 from collections.abc import Mapping
+from typing import Any, Optional
+
 from utils import atomic_replace
 
 logger = logging.getLogger(__name__)
@@ -85,6 +86,7 @@ def record_nous_rate_limit(
         headers: HTTP response headers from the 429 error.
         error_context: Structured error context from _extract_api_error_context().
         default_cooldown: Fallback cooldown in seconds when no header data.
+
     """
     now = time.time()
     reset_at = None
@@ -142,6 +144,7 @@ def nous_rate_limit_remaining() -> float | None:
 
     Returns:
         Seconds remaining until reset, or None if not rate-limited.
+
     """
     path = _state_path()
     try:

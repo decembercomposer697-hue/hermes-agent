@@ -19,7 +19,6 @@ These tests pin the new caps + prune hooks.
 """
 
 
-
 class TestReadTrackerCaps:
     def setup_method(self):
         from tools import file_tools
@@ -44,7 +43,7 @@ class TestReadTrackerCaps:
         assert len(task_data["read_history"]) == 10
 
     def test_dedup_capped_oldest_first(self, monkeypatch):
-        """dedup dict is bounded; oldest entries evicted first."""
+        """Dedup dict is bounded; oldest entries evicted first."""
         from tools import file_tools as ft
 
         monkeypatch.setattr(ft, "_DEDUP_CAP", 5)
@@ -136,12 +135,15 @@ class TestReadTrackerCaps:
 class TestCompletionConsumedPrune:
     def test_prune_drops_completion_entry_with_expired_session(self):
         """When a finished session is pruned, _completion_consumed is
-        cleared for the same session_id."""
-        from tools.process_registry import ProcessRegistry, FINISHED_TTL_SECONDS
+        cleared for the same session_id.
+        """
         import time
+
+        from tools.process_registry import FINISHED_TTL_SECONDS, ProcessRegistry
 
         reg = ProcessRegistry()
         # Fake a finished session whose started_at is older than the TTL.
+
         class _FakeSess:
             def __init__(self, sid):
                 self.id = sid
@@ -159,8 +161,9 @@ class TestCompletionConsumedPrune:
 
     def test_prune_drops_completion_entry_for_lru_evicted(self):
         """Same contract for the LRU path (over MAX_PROCESSES)."""
-        from tools import process_registry as pr
         import time
+
+        from tools import process_registry as pr
 
         reg = pr.ProcessRegistry()
 
@@ -189,7 +192,8 @@ class TestCompletionConsumedPrune:
 
     def test_prune_clears_dangling_completion_entries(self):
         """Stale entries in _completion_consumed without a backing session
-        record are cleared out (belt-and-suspenders invariant)."""
+        record are cleared out (belt-and-suspenders invariant).
+        """
         from tools.process_registry import ProcessRegistry
 
         reg = ProcessRegistry()

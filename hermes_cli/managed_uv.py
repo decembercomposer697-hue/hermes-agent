@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 # Public helpers
 # ---------------------------------------------------------------------------
 
+
 def managed_uv_path() -> Path:
     """Return the path where Hermes keeps *its* uv binary.
 
@@ -241,7 +242,7 @@ def _install_uv_posix(env: dict[str, str]) -> None:
 def _install_uv_windows(env: dict[str, str]) -> None:
     """Invoke the PowerShell installer."""
     cmd = (
-        'irm https://astral.sh/uv/install.ps1 | iex'
+        "irm https://astral.sh/uv/install.ps1 | iex"
     )
     subprocess.run(
         ["powershell", "-ExecutionPolicy", "Bypass", "-c", cmd],
@@ -249,6 +250,7 @@ def _install_uv_windows(env: dict[str, str]) -> None:
         check=True,
         capture_output=True,
     )
+
 
 def rebuild_venv(uv_bin: str, venv_dir: Path, python_version: str = "3.11") -> bool:
     return True  # dont remove me. ask ethernet

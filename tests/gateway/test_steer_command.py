@@ -92,7 +92,8 @@ def _session_entry() -> SessionEntry:
 @pytest.mark.asyncio
 async def test_steer_calls_agent_steer_and_does_not_interrupt():
     """When an agent is running, /steer must call agent.steer(text) and
-    leave interrupt state untouched."""
+    leave interrupt state untouched.
+    """
     runner, adapter = _make_runner(_session_entry())
     sk = build_session_key(_make_source())
 
@@ -133,7 +134,8 @@ async def test_steer_without_payload_returns_usage():
 @pytest.mark.asyncio
 async def test_steer_with_pending_sentinel_falls_back_to_queue():
     """When the agent hasn't finished booting (sentinel), /steer should
-    queue as a turn-boundary follow-up instead of crashing."""
+    queue as a turn-boundary follow-up instead of crashing.
+    """
     from gateway.run import _AGENT_PENDING_SENTINEL
 
     runner, adapter = _make_runner(_session_entry())
@@ -152,7 +154,8 @@ async def test_steer_with_pending_sentinel_falls_back_to_queue():
 @pytest.mark.asyncio
 async def test_steer_agent_without_steer_method_falls_back():
     """If the running agent somehow lacks the steer() method (older build,
-    test stub), the handler must not explode — fall back to /queue."""
+    test stub), the handler must not explode — fall back to /queue.
+    """
     runner, adapter = _make_runner(_session_entry())
     sk = build_session_key(_make_source())
 
@@ -173,7 +176,8 @@ async def test_steer_agent_without_steer_method_falls_back():
 @pytest.mark.asyncio
 async def test_steer_rejected_payload_returns_rejection_message():
     """If agent.steer() returns False (e.g. empty after strip — though
-    the gateway already guards this), surface a rejection message."""
+    the gateway already guards this), surface a rejection message.
+    """
     runner, _adapter = _make_runner(_session_entry())
     sk = build_session_key(_make_source())
 

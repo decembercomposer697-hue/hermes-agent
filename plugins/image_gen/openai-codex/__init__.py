@@ -245,6 +245,7 @@ def _iter_sse_json(response: Any):
 def _collect_image_b64(token: str, *, prompt: str, size: str, quality: str) -> str | None:
     """Stream a Codex Responses image_generation call and return the b64 image."""
     import httpx
+
     from agent.auxiliary_client import _codex_cloudflare_headers
 
     headers = _codex_cloudflare_headers(token)

@@ -73,7 +73,7 @@ _DESTRUCTIVE_PATTERNS = re.compile(
     re.VERBOSE,
 )
 # Output redirects that overwrite files (> but not >>)
-_REDIRECT_OVERWRITE = re.compile(r'[^>]>[^>]|^>[^>]')
+_REDIRECT_OVERWRITE = re.compile(r"[^>]>[^>]|^>[^>]")
 
 
 def _is_destructive_command(cmd: str) -> bool:
@@ -258,7 +258,7 @@ def _extract_file_mutation_targets(tool_name: str, args: dict[str, Any]) -> list
             return []
         paths: list[str] = []
         for _m in re.finditer(
-            r'^\*\*\*\s+(?:Update|Add|Delete)\s+File:\s*(.+)$',
+            r"^\*\*\*\s+(?:Update|Add|Delete)\s+File:\s*(.+)$",
             body,
             re.MULTILINE,
         ):

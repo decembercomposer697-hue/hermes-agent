@@ -1,23 +1,27 @@
 """Tests for the hermes_cli models module."""
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from hermes_cli.nous_account import NousPortalAccountInfo
+import hermes_cli.models as _models_mod
 from hermes_cli.models import (
-    OPENROUTER_MODELS, fetch_openrouter_models, model_ids, detect_provider_for_model,
-    is_nous_free_tier, partition_nous_models_by_tier,
-    check_nous_free_tier, _FREE_TIER_CACHE_TTL,
+    _FREE_TIER_CACHE_TTL,
+    OPENROUTER_MODELS,
+    check_nous_free_tier,
+    detect_provider_for_model,
+    fetch_openrouter_models,
+    is_nous_free_tier,
+    model_ids,
+    partition_nous_models_by_tier,
     union_with_portal_free_recommendations,
     union_with_portal_paid_recommendations,
 )
-import hermes_cli.models as _models_mod
+from hermes_cli.nous_account import NousPortalAccountInfo
 
 LIVE_OPENROUTER_MODELS = [
     ("anthropic/claude-opus-4.6", "recommended"),
     ("qwen/qwen3.7-max", ""),
     ("nvidia/nemotron-3-super-120b-a12b:free", "free"),
 ]
-
 
 
 class TestModelIds:
@@ -43,9 +47,6 @@ class TestModelIds:
         with patch("hermes_cli.models.fetch_openrouter_models", return_value=LIVE_OPENROUTER_MODELS):
             ids = model_ids()
         assert len(ids) == len(set(ids)), "Duplicate model IDs found"
-
-
-
 
 
 class TestOpenRouterModels:

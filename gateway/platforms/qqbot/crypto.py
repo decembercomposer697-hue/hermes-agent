@@ -31,6 +31,7 @@ def decrypt_secret(encrypted_base64: str, key_base64: str) -> str:
 
     Returns:
         The decrypted *client_secret* as a UTF-8 string.
+
     """
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 

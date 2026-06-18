@@ -103,7 +103,8 @@ class TestMissingTypeFilled:
 
     def test_ref_node_is_not_given_synthetic_type(self):
         """$ref nodes should NOT get a synthetic type — the referenced
-        definition supplies it, and Moonshot would reject the conflict."""
+        definition supplies it, and Moonshot would reject the conflict.
+        """
         params = {
             "type": "object",
             "properties": {"payload": {"$ref": "#/$defs/Payload"}},
@@ -123,7 +124,7 @@ class TestAnyOfParentType:
     """
 
     def test_anyof_null_branch_collapsed_to_single_type(self):
-        """anyOf [string, null] → plain string (anyOf removed)."""
+        """AnyOf [string, null] → plain string (anyOf removed)."""
         params = {
             "type": "object",
             "properties": {
@@ -143,7 +144,7 @@ class TestAnyOfParentType:
         assert from_format["type"] == "string"
 
     def test_anyof_multiple_non_null_preserved(self):
-        """anyOf [string, integer] (no null) → kept as-is with parent type stripped."""
+        """AnyOf [string, integer] (no null) → kept as-is with parent type stripped."""
         params = {
             "type": "object",
             "properties": {
@@ -161,7 +162,7 @@ class TestAnyOfParentType:
         assert "type" not in mode  # parent type stripped
 
     def test_anyof_enum_with_null_collapsed(self):
-        """anyOf [{enum: [...], type: string}, {type: null}] → enum + type only."""
+        """AnyOf [{enum: [...], type: string}, {type: null}] → enum + type only."""
         params = {
             "type": "object",
             "properties": {
@@ -286,7 +287,7 @@ class TestEnumNullStripping:
     """Rule 3: Moonshot rejects null/empty-string inside enum arrays."""
 
     def test_enum_null_value_stripped(self):
-        """enum containing Python None must have it removed for Moonshot."""
+        """Enum containing Python None must have it removed for Moonshot."""
         params = {
             "type": "object",
             "properties": {
@@ -303,7 +304,7 @@ class TestEnumNullStripping:
         assert "postgresql" in db_type["enum"]
 
     def test_enum_empty_string_stripped(self):
-        """enum containing empty string '' must have it removed for Moonshot."""
+        """Enum containing empty string '' must have it removed for Moonshot."""
         params = {
             "type": "object",
             "properties": {
@@ -319,7 +320,7 @@ class TestEnumNullStripping:
         assert db_type["enum"] == ["mysql", "postgresql"]
 
     def test_enum_all_null_becomes_no_enum(self):
-        """enum that only had null/empty values is dropped entirely."""
+        """Enum that only had null/empty values is dropped entirely."""
         params = {
             "type": "object",
             "properties": {
@@ -358,7 +359,7 @@ class TestEnumNullStripping:
         assert db_type["type"] == "string"
 
     def test_enum_on_object_type_not_stripped(self):
-        """enum on non-scalar types (object) should NOT be touched."""
+        """Enum on non-scalar types (object) should NOT be touched."""
         params = {
             "type": "object",
             "properties": {

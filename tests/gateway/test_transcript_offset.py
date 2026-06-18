@@ -15,10 +15,10 @@ to ``_run_agent``'s return dict and uses it for the slice.
 
 from gateway.run import _preserve_queued_followup_history_offset
 
-
 # ---------------------------------------------------------------------------
 # Helpers - replicate the filtering logic from _run_agent
 # ---------------------------------------------------------------------------
+
 
 def _filter_history(history: list) -> list:
     """Replicate the agent_history filtering from GatewayRunner._run_agent.
@@ -166,7 +166,7 @@ class TestTranscriptHistoryOffset:
         assert fixed_new[1]["content"] == "reply3"
 
     def test_system_messages_also_filtered(self):
-        """system messages in history are also stripped from agent_history."""
+        """System messages in history are also stripped from agent_history."""
         history = [
             {"role": "session_meta", "tools": [], "timestamp": "t0"},
             {"role": "system", "content": "You are a helpful assistant."},

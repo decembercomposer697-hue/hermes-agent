@@ -8,13 +8,12 @@ import warnings
 from concurrent.futures import Future
 from unittest.mock import patch
 
-
 from agent.async_utils import safe_schedule_threadsafe
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _no_unawaited_warnings(caught, *, coro_name: str = "") -> bool:
     """Return True if no "X was never awaited" warning slipped through.
@@ -86,7 +85,7 @@ class TestSafeScheduleThreadsafe:
             gc.collect()
 
         assert result is None
-        assert _no_unawaited_warnings(caught, coro_name='_sample')
+        assert _no_unawaited_warnings(caught, coro_name="_sample")
 
     def test_none_loop_returns_none_and_closes_coroutine(self):
         async def _sample():
@@ -100,7 +99,7 @@ class TestSafeScheduleThreadsafe:
             gc.collect()
 
         assert result is None
-        assert _no_unawaited_warnings(caught, coro_name='_sample')
+        assert _no_unawaited_warnings(caught, coro_name="_sample")
 
     def test_scheduling_exception_closes_coroutine(self):
         """If run_coroutine_threadsafe raises, close the coroutine and return None."""
@@ -122,7 +121,7 @@ class TestSafeScheduleThreadsafe:
                 gc.collect()
 
             assert result is None
-            assert _no_unawaited_warnings(caught, coro_name='_sample')
+            assert _no_unawaited_warnings(caught, coro_name="_sample")
         finally:
             loop.close()
 

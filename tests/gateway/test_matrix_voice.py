@@ -6,9 +6,9 @@ import os
 import tempfile
 import types
 from types import SimpleNamespace
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 # Try importing mautrix; skip entire file if not available.
 try:
@@ -20,15 +20,15 @@ except ImportError:
 
 from gateway.platforms.base import MessageType
 
-
 # ---------------------------------------------------------------------------
 # Adapter helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_adapter():
     """Create a MatrixAdapter with mocked config."""
-    from gateway.platforms.matrix import MatrixAdapter
     from gateway.config import PlatformConfig
+    from gateway.platforms.matrix import MatrixAdapter
 
     config = PlatformConfig(
         enabled=True,
@@ -52,8 +52,7 @@ def _make_audio_event(
     mimetype: str = "audio/ogg",
     timestamp: int = 9999999999000,  # ms
 ):
-    """
-    Create a mock mautrix room message event.
+    """Create a mock mautrix room message event.
 
     In mautrix, the handler receives a single event object with attributes
     ``room_id``, ``sender``, ``event_id``, ``timestamp``, and ``content``
@@ -61,6 +60,7 @@ def _make_audio_event(
 
     Args:
         is_voice: If True, adds org.matrix.msc3245.voice field to content.
+
     """
     content = {
         "msgtype": "m.audio",

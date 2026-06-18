@@ -29,12 +29,12 @@ import logging
 import os
 import tempfile
 from contextlib import contextmanager
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from hermes_constants import get_hermes_home
 from agent.skill_utils import is_excluded_skill_path
+from hermes_constants import get_hermes_home
 
 logger = logging.getLogger(__name__)
 
@@ -632,10 +632,12 @@ def mark_agent_created(skill_name: str) -> None:
 
 def set_state(skill_name: str, state: str) -> None:
     """Set lifecycle state. No-op if *state* is invalid or the skill isn't
-    curator-manageable (hub skills, or built-ins with pruning disabled)."""
+    curator-manageable (hub skills, or built-ins with pruning disabled).
+    """
     if state not in _VALID_STATES:
         logger.debug("set_state: invalid state %r for %s", state, skill_name)
         return
+
     def _apply(rec: dict[str, Any]) -> None:
         rec["state"] = state
         if state == STATE_ARCHIVED:

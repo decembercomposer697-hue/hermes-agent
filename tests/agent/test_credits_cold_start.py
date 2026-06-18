@@ -13,7 +13,8 @@ from agent.credits_tracker import CreditsState, evaluate_credits_notices
 
 def _cold_start_notices(state: CreditsState):
     """Mirror the conversation_loop seed: prime seen_below_90 when used_fraction is
-    computable (the snapshot IS the first observation), then evaluate once."""
+    computable (the snapshot IS the first observation), then evaluate once.
+    """
     latch = {"active": set(), "seen_below_90": False}
     if state.used_fraction is not None:
         latch["seen_below_90"] = True
@@ -39,7 +40,8 @@ def test_cold_start_healthy_no_notice():
 
 def test_cold_start_opens_already_at_90pct_warns():
     """A session that OPENS already ≥90% must warn immediately — the seed primes
-    seen_below_90 so warn90 fires without a prior live crossing."""
+    seen_below_90 so warn90 fires without a prior live crossing.
+    """
     s = _state(
         remaining_micros=2_000_000, subscription_micros=2_000_000,
         subscription_limit_micros=20_000_000, subscription_limit_usd="20.00",
@@ -86,7 +88,8 @@ def test_cold_start_debt_warns_and_depleted():
 
 def test_cold_start_no_cap_degrades_to_depletion_only():
     """Without monthly_credits (older portals) the seed sets no limit → used_fraction
-    None → only depletion can fire, never warn90."""
+    None → only depletion can fire, never warn90.
+    """
     healthy_no_cap = _state(
         remaining_micros=30_000_000, subscription_micros=18_000_000,
         subscription_limit_micros=None, denominator_kind="none", paid_access=True,
@@ -124,7 +127,8 @@ def test_dev_fixtures_drive_cold_start():
 class _FakeAgent:
     """Minimal agent surface for the seed helper: state slots + an emit that runs
     the real policy against the latch (mirroring run_agent._emit_credits_notices,
-    including the free-model suppression flag)."""
+    including the free-model suppression flag).
+    """
 
     def __init__(self, provider="nous", model=""):
         from agent.credits_tracker import evaluate_credits_notices, is_free_tier_model
@@ -178,7 +182,8 @@ def test_seed_fires_depleted_at_session_open():
 
 def test_seed_depleted_suppressed_on_free_model():
     """A session that opens depleted but on a Nous ``:free`` model must NOT show
-    the depleted banner — inference works fine on the free tier."""
+    the depleted banner — inference works fine on the free tier.
+    """
     a = _FakeAgent(model="nvidia/nemotron-3-ultra:free")
     assert _seed(a, "depleted") is True
     assert a.emitted == [([], [])]

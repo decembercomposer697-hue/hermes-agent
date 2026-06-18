@@ -12,7 +12,13 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
-from agent.codex_responses_adapter import _chat_content_to_responses_parts, _chat_messages_to_responses_input, _normalize_codex_response, _preflight_codex_input_items
+
+from agent.codex_responses_adapter import (
+    _chat_content_to_responses_parts,
+    _chat_messages_to_responses_input,
+    _normalize_codex_response,
+    _preflight_codex_input_items,
+)
 
 sys.modules.setdefault("fire", types.SimpleNamespace(Fire=lambda *a, **k: None))
 sys.modules.setdefault("firecrawl", types.SimpleNamespace(Firecrawl=object))
@@ -20,8 +26,8 @@ sys.modules.setdefault("fal_client", types.SimpleNamespace())
 
 from run_agent import AIAgent
 
-
 # ── Helpers ──────────────────────────────────────────────────────────────────
+
 
 def _tool_defs(*names):
     return [
@@ -866,7 +872,7 @@ class TestNormalizeCodexResponse:
         response = SimpleNamespace(
             output=[
                 SimpleNamespace(type="function_call", status="completed",
-                    call_id="call_1", name="web_search", arguments='{}', id="fc_1"),
+                    call_id="call_1", name="web_search", arguments="{}", id="fc_1"),
             ],
             status="completed",
         )
@@ -951,7 +957,8 @@ class TestBuildAssistantMessage:
 
     def test_openrouter_reasoning_details_preserved_unmodified(self, monkeypatch):
         """reasoning_details must be passed back exactly as received for
-        multi-turn continuity (OpenRouter, Anthropic, OpenAI all need this)."""
+        multi-turn continuity (OpenRouter, Anthropic, OpenAI all need this).
+        """
         agent = _make_agent(monkeypatch, "openrouter")
         original_detail = {
             "type": "thinking",

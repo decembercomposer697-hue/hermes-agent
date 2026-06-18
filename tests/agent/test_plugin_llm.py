@@ -32,7 +32,6 @@ from agent.plugin_llm import (
     make_plugin_llm_for_test,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -122,7 +121,8 @@ class TestTrustGate:
 
     def test_overrides_independent(self):
         """Each override is gated independently — turning on
-        ``allow_model_override`` does NOT also grant provider override."""
+        ``allow_model_override`` does NOT also grant provider override.
+        """
         policy = _TrustPolicy(
             plugin_id="model-only",
             allow_model_override=True,
@@ -778,7 +778,7 @@ plugins:
 
 class TestPluginContextIntegration:
     def test_ctx_llm_is_lazy_singleton(self):
-        from hermes_cli.plugins import PluginContext, PluginManifest, PluginManager
+        from hermes_cli.plugins import PluginContext, PluginManager, PluginManifest
 
         manifest = PluginManifest(name="test-plugin", source="test", key="test-plugin")
         manager = PluginManager()
@@ -790,7 +790,7 @@ class TestPluginContextIntegration:
         assert first._plugin_id == "test-plugin"  # type: ignore[attr-defined]
 
     def test_ctx_llm_uses_manifest_key_for_policy(self):
-        from hermes_cli.plugins import PluginContext, PluginManifest, PluginManager
+        from hermes_cli.plugins import PluginContext, PluginManager, PluginManifest
 
         manifest = PluginManifest(
             name="bare-name", source="test", key="image_gen/openai",
@@ -808,7 +808,8 @@ class TestPluginContextIntegration:
 class TestAttribution:
     """Verifies that the result object and the audit log carry the real
     provider/model that ``call_llm`` ended up using, NOT the placeholder
-    fallbacks ('auto', 'default') from earlier drafts."""
+    fallbacks ('auto', 'default') from earlier drafts.
+    """
 
     def test_explicit_overrides_recorded_when_no_response_model(self):
         from agent.plugin_llm import _resolve_attribution
@@ -826,7 +827,8 @@ class TestAttribution:
     def test_response_model_wins_over_model_override(self):
         """Providers often canonicalise the model name (e.g. ``gpt-4o``
         → ``gpt-4o-2024-08-06``). Whatever they actually returned wins
-        for the recorded model so the audit log reflects reality."""
+        for the recorded model so the audit log reflects reality.
+        """
         from agent.plugin_llm import _resolve_attribution
 
         response = SimpleNamespace(model="gpt-4o-2024-08-06", choices=[])
@@ -842,9 +844,10 @@ class TestAttribution:
     def test_falls_back_to_main_provider_and_model_when_no_overrides(self, monkeypatch):
         """When the plugin doesn't override anything, attribution
         reflects the user's active main provider/model rather than
-        misleading placeholders."""
-        from agent import plugin_llm
+        misleading placeholders.
+        """
         import agent.auxiliary_client as ac
+        from agent import plugin_llm
 
         monkeypatch.setattr(ac, "_read_main_provider", lambda: "openrouter")
         monkeypatch.setattr(ac, "_read_main_model", lambda: "anthropic/claude-3-5-sonnet")
@@ -860,9 +863,10 @@ class TestAttribution:
 
     def test_response_model_used_even_when_no_overrides(self, monkeypatch):
         """The provider's canonical model name should still flow through
-        when no overrides are set."""
-        from agent import plugin_llm
+        when no overrides are set.
+        """
         import agent.auxiliary_client as ac
+        from agent import plugin_llm
 
         monkeypatch.setattr(ac, "_read_main_provider", lambda: "openrouter")
         monkeypatch.setattr(ac, "_read_main_model", lambda: "openai/gpt-4o")
@@ -879,9 +883,10 @@ class TestAttribution:
     def test_placeholder_fallback_only_when_everything_is_empty(self, monkeypatch):
         """If main_provider/main_model are unset AND there's no override
         AND the response has no .model, fall through to the safety
-        placeholders so the result object never has empty strings."""
-        from agent import plugin_llm
+        placeholders so the result object never has empty strings.
+        """
         import agent.auxiliary_client as ac
+        from agent import plugin_llm
 
         monkeypatch.setattr(ac, "_read_main_provider", lambda: "")
         monkeypatch.setattr(ac, "_read_main_model", lambda: "")
@@ -905,10 +910,11 @@ class TestHookMode:
     """The docs page promises ``ctx.llm`` works from inside lifecycle
     hooks. This exercises that path: register a ``post_tool_call``
     callback that calls ``ctx.llm.complete``, fire the hook through
-    the real ``invoke_hook`` machinery, and check the call landed."""
+    the real ``invoke_hook`` machinery, and check the call landed.
+    """
 
     def test_complete_works_from_post_tool_call_hook(self):
-        from hermes_cli.plugins import PluginContext, PluginManifest, PluginManager
+        from hermes_cli.plugins import PluginContext, PluginManager, PluginManifest
 
         manifest = PluginManifest(name="hook-plugin", source="test", key="hook-plugin")
         manager = PluginManager()
@@ -963,8 +969,9 @@ class TestHookMode:
 
     def test_complete_works_from_post_tool_call_hook_when_async_caller_set(self):
         """Hooks fired synchronously should still work with sync
-        ctx.llm.complete even if other callsites use async."""
-        from hermes_cli.plugins import PluginContext, PluginManifest, PluginManager
+        ctx.llm.complete even if other callsites use async.
+        """
+        from hermes_cli.plugins import PluginContext, PluginManager, PluginManifest
 
         manifest = PluginManifest(name="hook-async", source="test", key="hook-async")
         manager = PluginManager()

@@ -21,7 +21,7 @@ the unified index existed).
 import json
 import os
 from collections import Counter
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 
 import yaml
 

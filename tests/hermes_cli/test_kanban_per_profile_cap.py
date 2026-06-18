@@ -49,7 +49,8 @@ def test_no_cap_all_tasks_dispatched(isolated_kanban_home_with_profiles):
 
 def test_cap_2_balances_two_profiles(isolated_kanban_home_with_profiles):
     """With cap=2: 2 alpha + 2 beta dispatched; remaining 3 alpha + 1 beta
-    deferred to skipped_per_profile_capped."""
+    deferred to skipped_per_profile_capped.
+    """
     kb = isolated_kanban_home_with_profiles
     with kb.connect_closing() as conn:
         kb.create_board(slug="default", name="Test")
@@ -73,7 +74,8 @@ def test_cap_2_balances_two_profiles(isolated_kanban_home_with_profiles):
 def test_pre_existing_running_counts_against_cap(isolated_kanban_home_with_profiles):
     """A task already in 'running' status when dispatch_once starts counts
     toward the per-profile cap. With 1 alpha pre-running and cap=1, NO new
-    alpha tasks should spawn; beta is independent so 1 beta spawns."""
+    alpha tasks should spawn; beta is independent so 1 beta spawns.
+    """
     kb = isolated_kanban_home_with_profiles
     with kb.connect_closing() as conn:
         kb.create_board(slug="default", name="Test")
@@ -103,7 +105,8 @@ def test_pre_existing_running_counts_against_cap(isolated_kanban_home_with_profi
 @pytest.mark.parametrize("cap", [0, -1, "abc", None])
 def test_invalid_cap_treated_as_no_cap(isolated_kanban_home_with_profiles, cap):
     """Cap values that don't represent a positive int should be treated as
-    'no cap' — silently falling through rather than crashing the dispatcher."""
+    'no cap' — silently falling through rather than crashing the dispatcher.
+    """
     kb = isolated_kanban_home_with_profiles
     with kb.connect_closing() as conn:
         kb.create_board(slug="default", name="Test")
@@ -121,7 +124,8 @@ def test_invalid_cap_treated_as_no_cap(isolated_kanban_home_with_profiles, cap):
 def test_capped_tasks_dispatched_on_subsequent_tick(isolated_kanban_home_with_profiles):
     """A task deferred this tick because its profile was at cap should be
     eligible for dispatch on the next tick (after running tasks complete).
-    This verifies the cap is per-tick state, not a permanent block."""
+    This verifies the cap is per-tick state, not a permanent block.
+    """
     kb = isolated_kanban_home_with_profiles
     with kb.connect_closing() as conn:
         kb.create_board(slug="default", name="Test")
@@ -160,7 +164,8 @@ def test_capped_tasks_dispatched_on_subsequent_tick(isolated_kanban_home_with_pr
 def test_dispatch_result_has_skipped_per_profile_capped_field():
     """Schema-level invariant: DispatchResult exposes the
     skipped_per_profile_capped field as a list of
-    (task_id, assignee, current_running) tuples."""
+    (task_id, assignee, current_running) tuples.
+    """
     from hermes_cli.kanban_db import DispatchResult
     r = DispatchResult()
     assert hasattr(r, "skipped_per_profile_capped")

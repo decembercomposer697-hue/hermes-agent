@@ -44,7 +44,17 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Optional
 
-from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile, WebSocket, WebSocketDisconnect, status as http_status
+from fastapi import (
+    APIRouter,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    WebSocket,
+    WebSocketDisconnect,
+)
+from fastapi import status as http_status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
@@ -199,7 +209,8 @@ def _comment_dict(c: kanban_db.Comment) -> dict[str, Any]:
 
 def _attachment_dict(a: kanban_db.Attachment) -> dict[str, Any]:
     """Serialise an Attachment for the drawer. ``stored_path`` is the
-    absolute on-disk path workers read; the UI uses ``id`` for download."""
+    absolute on-disk path workers read; the UI uses ``id`` for download.
+    """
     return {
         "id": a.id,
         "task_id": a.task_id,
@@ -661,7 +672,7 @@ def _safe_attachment_name(raw: str) -> str:
     name = (raw or "").replace("\\", "/").split("/")[-1].strip()
     # Drop control chars and leading dots so we never write a dotfile or
     # a name with embedded NULs/newlines.
-    name = "".join(ch for ch in name if ch.isprintable() and ch not in '\x00').strip()
+    name = "".join(ch for ch in name if ch.isprintable() and ch not in "\x00").strip()
     name = name.lstrip(".").strip()
     if not name:
         raise HTTPException(status_code=400, detail="invalid attachment filename")
@@ -1322,6 +1333,7 @@ def list_diagnostics(
         # Sort: highest severity first, then most recent.
         from hermes_cli.kanban_diagnostics import SEVERITY_ORDER
         sev_idx = {s: i for i, s in enumerate(SEVERITY_ORDER)}
+
         def _sort_key(row):
             top = row["diagnostics"][0]
             return (
@@ -1336,7 +1348,6 @@ def list_diagnostics(
         }
     finally:
         conn.close()
-
 
 
 # ---------------------------------------------------------------------------
@@ -1593,7 +1604,8 @@ def reclaim_task_endpoint(
 class SpecifyBody(BaseModel):
     """Optional author override. Nothing else is configurable from the
     dashboard — model + prompt come from ``auxiliary.triage_specifier``
-    in config.yaml, same as the CLI."""
+    in config.yaml, same as the CLI.
+    """
 
     author: str | None = None
 
@@ -2155,8 +2167,9 @@ def update_profile_description(profile_name: str, payload: DescribeBody):
         from hermes_cli import profiles as profiles_mod
         canon = profiles_mod.normalize_profile_name(profile_name)
         if canon == "default":
-            from hermes_constants import get_hermes_home  # type: ignore
             from pathlib import Path as _Path
+
+            from hermes_constants import get_hermes_home  # type: ignore
             profile_dir = _Path(get_hermes_home())
         else:
             profile_dir = profiles_mod.get_profile_dir(canon)
@@ -2265,7 +2278,8 @@ class OrchestrationSettingsBody(BaseModel):
 @router.get("/orchestration")
 def get_orchestration_settings():
     """Return the current kanban orchestration knobs from config.yaml
-    plus the resolved effective values (filling in fallbacks)."""
+    plus the resolved effective values (filling in fallbacks).
+    """
     try:
         from hermes_cli.config import load_config
         cfg = load_config() or {}

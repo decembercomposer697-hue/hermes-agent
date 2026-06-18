@@ -1,5 +1,4 @@
-"""
-Delivery routing for cron job outputs and agent responses.
+"""Delivery routing for cron job outputs and agent responses.
 
 Routes messages to the appropriate destination based on:
 - Explicit targets (e.g., "telegram:123456789")
@@ -11,10 +10,10 @@ Routes messages to the appropriate destination based on:
 import logging
 import os
 import re
-from pathlib import Path
-from datetime import datetime
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from hermes_cli.config import get_hermes_home
 
@@ -29,8 +28,8 @@ TRUNCATED_VISIBLE = 3800
 # wild. Anchored to start/end so substantive messages that merely *contain* the
 # word "silent" are never matched.
 _SILENCE_NARRATION = re.compile(
-    r'^[\s*_~`]*\(?\s*(silent|silence|no\s+response|no\s+reply)\s*\.?\)?[\s*_~`]*$'
-    r'|^[\s*_~`]*[\U0001F507\.\u2026]+[\s*_~`]*$',
+    r"^[\s*_~`]*\(?\s*(silent|silence|no\s+response|no\s+reply)\s*\.?\)?[\s*_~`]*$"
+    r"|^[\s*_~`]*[\U0001F507\.\u2026]+[\s*_~`]*$",
     re.IGNORECASE,
 )
 
@@ -49,7 +48,7 @@ def _is_silence_narration(content: str | None) -> bool:
         return False
     return bool(_SILENCE_NARRATION.match(stripped))
 
-from .config import Platform, GatewayConfig
+from .config import GatewayConfig, Platform
 from .session import SessionSource
 
 
@@ -93,8 +92,7 @@ def _is_thread_not_found_delivery_error(result: Any) -> bool:
 
 @dataclass
 class DeliveryTarget:
-    """
-    A single delivery target.
+    """A single delivery target.
     
     Represents where a message should be sent:
     - "origin" → back to source
@@ -110,8 +108,7 @@ class DeliveryTarget:
     
     @classmethod
     def parse(cls, target: str, origin: SessionSource | None = None) -> "DeliveryTarget":
-        """
-        Parse a delivery target string.
+        """Parse a delivery target string.
         
         Formats:
         - "origin" → back to source
@@ -173,20 +170,19 @@ class DeliveryTarget:
 
 
 class DeliveryRouter:
-    """
-    Routes messages to appropriate destinations.
+    """Routes messages to appropriate destinations.
     
     Handles the logic of resolving delivery targets and dispatching
     messages to the right platform adapters.
     """
     
     def __init__(self, config: GatewayConfig, adapters: dict[Platform, Any] = None):
-        """
-        Initialize the delivery router.
+        """Initialize the delivery router.
         
         Args:
             config: Gateway configuration
             adapters: Dict mapping platforms to their adapter instances
+
         """
         self.config = config
         self.adapters = adapters or {}
@@ -200,8 +196,7 @@ class DeliveryRouter:
         job_name: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """
-        Deliver content to all specified targets.
+        """Deliver content to all specified targets.
         
         Args:
             content: The message/output to deliver
@@ -212,6 +207,7 @@ class DeliveryRouter:
         
         Returns:
             Dict with delivery results per target
+
         """
         results = {}
         

@@ -13,7 +13,6 @@ from agent.file_safety import (
     get_read_block_error,
 )
 
-
 # ---------------------------------------------------------------------------
 # Project-local .env file blocking (issue #20734)
 # ---------------------------------------------------------------------------
@@ -68,7 +67,8 @@ class TestEnvFileReadBlocking:
 
     def test_allowed_hermes_env(self):
         """Hermes' own .env inside HERMES_HOME is NOT blocked by this rule
-        (it's handled by other mechanisms). Only project-local .env is blocked."""
+        (it's handled by other mechanisms). Only project-local .env is blocked.
+        """
         # Note: hermes internal .env is in ~/.hermes/.env which is NOT a project-local
         # path, but the basename check applies to ANY .env. This is intentional —
         # even ~/.hermes/.env should not be readable via read_file.

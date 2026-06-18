@@ -24,10 +24,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Coroutine
 from concurrent.futures import Future
 from typing import Any, Optional
-from collections.abc import Coroutine
-
 
 _DEFAULT_LOGGER = logging.getLogger(__name__)
 

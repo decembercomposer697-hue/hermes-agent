@@ -26,7 +26,8 @@ def _make_agent_stub(prompt_tokens, completion_tokens, threshold_tokens):
 class TestCompressionTriggerExcludesReasoning:
     def test_high_reasoning_tokens_should_not_trigger_compression(self):
         """With the old bug, 40k prompt + 80k reasoning = 120k > 100k threshold.
-        After the fix, only 40k prompt is compared — no compression."""
+        After the fix, only 40k prompt is compared — no compression.
+        """
         real_tokens, comp = _make_agent_stub(
             prompt_tokens=40_000,
             completion_tokens=80_000,  # reasoning-heavy model

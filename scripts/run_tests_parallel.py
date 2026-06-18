@@ -44,10 +44,9 @@ import subprocess
 import sys
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor, Future
+from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
 from typing import Dict, List, Tuple
-
 
 # Default test discovery roots.
 _DEFAULT_ROOTS = ["tests"]

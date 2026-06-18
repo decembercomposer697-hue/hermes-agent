@@ -115,7 +115,8 @@ class TestStripImagesPreservesAlternation:
 
     def test_image_only_user_message_dropped(self):
         """Synthetic image-only user messages (gateway injection pattern) are
-        safe to drop — no tool_call_id linkage to preserve."""
+        safe to drop — no tool_call_id linkage to preserve.
+        """
         msgs = [
             {"role": "user", "content": "what's in this?"},
             {"role": "assistant", "content": "I'll check."},

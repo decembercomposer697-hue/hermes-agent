@@ -1,5 +1,4 @@
-"""
-QQBot scan-to-configure (QR code onboard) module.
+"""QQBot scan-to-configure (QR code onboard) module.
 
 Mirrors the Feishu onboarding pattern: synchronous HTTP + a single public
 entry-point ``qr_register()`` that handles the full flow (create task →
@@ -86,6 +85,7 @@ def _create_bind_task(timeout: float = ONBOARD_API_TIMEOUT) -> tuple[str, str]:
 
     Raises:
         RuntimeError: If the API returns a non-zero ``retcode``.
+
     """
     import httpx
 
@@ -119,6 +119,7 @@ def _poll_bind_result(
 
     Raises:
         RuntimeError: If the API returns a non-zero ``retcode``.
+
     """
     import httpx
 

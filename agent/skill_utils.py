@@ -93,6 +93,7 @@ def parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
 
     Returns:
         (frontmatter_dict, remaining_body)
+
     """
     frontmatter: dict[str, Any] = {}
     body = content
@@ -283,6 +284,7 @@ def get_disabled_skill_names(platform: str | None = None) -> set[str]:
 
     Reads the config file directly (no CLI config imports) to stay
     lightweight.
+
     """
     config_path = get_config_path()
     if not config_path.exists():

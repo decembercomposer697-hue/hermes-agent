@@ -1,5 +1,4 @@
-"""
-Skills configuration for Hermes Agent.
+"""Skills configuration for Hermes Agent.
 `hermes skills` enters this module.
 
 Toggle individual skills or categories on/off, globally or per-platform.
@@ -13,8 +12,8 @@ Config stored in ~/.hermes/config.yaml under:
 """
 from typing import List, Optional, Set
 
-from hermes_cli.config import cfg_get, load_config, save_config
 from hermes_cli.colors import Colors, color
+from hermes_cli.config import cfg_get, load_config, save_config
 from hermes_cli.platforms import PLATFORMS as _PLATFORMS
 
 # Backward-compatible view: {key: label_string} so existing code that
@@ -23,6 +22,7 @@ from hermes_cli.platforms import PLATFORMS as _PLATFORMS
 PLATFORMS = {k: info.label for k, info in _PLATFORMS.items() if k != "api_server"}
 
 # ─── Config Helpers ───────────────────────────────────────────────────────────
+
 
 def get_disabled_skills(config: dict, platform: str | None = None) -> set[str]:
     """Return disabled skill names. Platform-specific list falls back to global."""

@@ -6,7 +6,6 @@ from unittest.mock import MagicMock
 import hermes_cli.plugins as plugins_mod
 import tools.terminal_tool as terminal_tool_module
 
-
 _UNSET = object()
 
 

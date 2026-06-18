@@ -164,7 +164,8 @@ def test_log_lines_use_lsp_prefix(caplog_lsp):
 
 def test_thousand_clean_writes_emit_one_info(caplog_lsp):
     """A long session writes lots of files cleanly; agent.log should
-    show ONE 'active for' INFO and zero other INFO lines."""
+    show ONE 'active for' INFO and zero other INFO lines.
+    """
     eventlog.log_active("pyright", "/proj")
     for _ in range(1000):
         eventlog.log_clean("pyright", "/proj/x.py")

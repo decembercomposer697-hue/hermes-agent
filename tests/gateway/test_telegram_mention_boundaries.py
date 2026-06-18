@@ -97,7 +97,7 @@ class TestSubstringFalsePositivesAreRejected:
     """
 
     def test_email_like_substring(self):
-        """bug #12545 exact repro: 'foo@hermes_bot.example'."""
+        """Bug #12545 exact repro: 'foo@hermes_bot.example'."""
         adapter = _make_adapter()
         msg = _message(text="email me at foo@hermes_bot.example")
         assert adapter._message_mentions_bot(msg) is False
@@ -109,7 +109,8 @@ class TestSubstringFalsePositivesAreRejected:
 
     def test_superstring_username(self):
         """`@hermes_botx` is a different username; Telegram would emit a mention
-        entity for `@hermes_botx`, not `@hermes_bot`."""
+        entity for `@hermes_botx`, not `@hermes_bot`.
+        """
         adapter = _make_adapter()
         msg = _message(text="@hermes_botx hello")
         assert adapter._message_mentions_bot(msg) is False

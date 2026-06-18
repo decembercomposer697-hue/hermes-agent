@@ -96,6 +96,7 @@ class TextBatchAggregator:
         if msg_type == MessageType.TEXT and self._text_batcher.is_enabled():
             self._text_batcher.enqueue(event, session_key)
             return
+
     """
 
     def __init__(

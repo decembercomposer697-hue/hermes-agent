@@ -144,7 +144,8 @@ def _cleanup(proc: subprocess.Popen) -> None:
 )
 def test_sigterm_with_kanban_task_env_terminates_quickly():
     """With HERMES_KANBAN_TASK set, SIGTERM should kill the process in <2s
-    even when a non-daemon thread is still alive."""
+    even when a non-daemon thread is still alive.
+    """
     proc = _spawn_synthetic({"HERMES_KANBAN_TASK": "t_test_28181"})
     try:
         t0 = time.time()

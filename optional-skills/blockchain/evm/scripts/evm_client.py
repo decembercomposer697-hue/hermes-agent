@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-evm_client.py — EVM blockchain CLI tool for the Hermes Agent project.
+"""evm_client.py — EVM blockchain CLI tool for the Hermes Agent project.
 Zero external dependencies. Uses stdlib only: urllib, json, argparse, time, os, sys, typing.
 """
 
@@ -233,6 +232,7 @@ COINGECKO_IDS: dict[str, str] = {
 # Helper utilities
 # ---------------------------------------------------------------------------
 
+
 def hex_to_int(h: str) -> int:
     if not h or h == "0x":
         return 0
@@ -308,10 +308,12 @@ def wei_to_native(wei: int, decimals: int = 18) -> float:
 def gwei_from_wei(wei: int) -> float:
     return wei / 1e9
 
+
 def _short_addr(addr: str) -> str:
     if addr and len(addr) >= 10:
         return addr[:6] + "..." + addr[-4:]
     return addr or ""
+
 
 def print_json(data: Any) -> None:
     print(json.dumps(data, indent=2, default=str))
@@ -319,6 +321,7 @@ def print_json(data: Any) -> None:
 # ---------------------------------------------------------------------------
 # HTTP / JSON-RPC layer
 # ---------------------------------------------------------------------------
+
 
 def _http_post(url: str, payload: Any, retries: int = 5, timeout: int = 20) -> Any:
     body = json.dumps(payload).encode()
@@ -353,6 +356,7 @@ def _http_post(url: str, payload: Any, retries: int = 5, timeout: int = 20) -> A
                 delay = min(delay * 2, 30)
     raise RuntimeError(f"Request failed after {retries} retries: {last_err}") from last_err
 
+
 def _http_get(url: str, retries: int = 5, timeout: int = 20) -> Any:
     headers = {"Accept": "application/json", "User-Agent": "evm_client/1.0"}
     req = urllib.request.Request(url, headers=headers, method="GET")
@@ -385,6 +389,7 @@ def _http_get(url: str, retries: int = 5, timeout: int = 20) -> Any:
 # RPC helpers
 # ---------------------------------------------------------------------------
 
+
 def get_rpc_url(chain: str) -> str:
     env = os.environ.get("EVM_RPC_URL", "")
     if env:
@@ -394,6 +399,7 @@ def get_rpc_url(chain: str) -> str:
         raise ValueError(f"Unknown chain '{chain}'. Available: {', '.join(CHAINS)}")
     return cfg["rpc"]
 
+
 def rpc_call(chain: str, method: str, params: list[Any], req_id: int = 1) -> Any:
     url = get_rpc_url(chain)
     payload = {"jsonrpc": "2.0", "id": req_id, "method": method, "params": params}
@@ -401,6 +407,7 @@ def rpc_call(chain: str, method: str, params: list[Any], req_id: int = 1) -> Any
     if "error" in resp:
         raise RuntimeError(f"RPC error: {resp['error']}")
     return resp.get("result")
+
 
 def rpc_batch(chain: str, calls: list[tuple[str, list[Any]]], batch_limit: int = 10) -> list[Any]:
     """Send a batch of JSON-RPC calls; returns list of results in same order.
@@ -437,9 +444,11 @@ def rpc_batch(chain: str, calls: list[tuple[str, list[Any]]], batch_limit: int =
 # ABI encoding helpers (minimal, for ERC-20 calls)
 # ---------------------------------------------------------------------------
 
+
 def _encode_address(addr: str) -> str:
     """Pad address to 32 bytes."""
     return addr.lower().replace("0x", "").zfill(64)
+
 
 def _keccak256(data: bytes) -> bytes:
     """Pure Python Keccak-256 (Ethereum's hash, NOT SHA3-256)."""
@@ -456,6 +465,7 @@ def _keccak256(data: bytes) -> bytes:
         [0, 36, 3, 41, 18], [1, 44, 10, 45, 2], [62, 6, 43, 15, 61],
         [28, 55, 25, 21, 56], [27, 20, 39, 8, 14],
     ]
+
     def rot64(x, n): return ((x << n) | (x >> (64 - n))) & 0xFFFFFFFFFFFFFFFF
     rate = 136  # 1088 bits for keccak-256
     # Padding
@@ -503,6 +513,7 @@ ERC20_SELECTORS: dict[str, str] = {
     "balanceOf(address)":      "0x70a08231",
 }
 
+
 def eth_call_erc20(chain: str, contract: str, fn: str, arg_addr: str | None = None) -> str:
     selector = ERC20_SELECTORS[fn]
     data = selector
@@ -510,6 +521,7 @@ def eth_call_erc20(chain: str, contract: str, fn: str, arg_addr: str | None = No
         data += _encode_address(arg_addr)
     params = [{"to": contract, "data": data}, "latest"]
     return rpc_call(chain, "eth_call", params) or "0x"
+
 
 def decode_string(hex_data: str) -> str:
     """Decode ABI-encoded string from eth_call result."""
@@ -526,6 +538,7 @@ def decode_string(hex_data: str) -> str:
     except Exception:
         return ""
 
+
 def decode_uint256(hex_data: str) -> int:
     try:
         raw = hex_data[2:] if hex_data.startswith("0x") else hex_data
@@ -534,6 +547,7 @@ def decode_uint256(hex_data: str) -> int:
         return int(raw, 16)
     except Exception:
         return 0
+
 
 def decode_uint8(hex_data: str) -> int:
     return decode_uint256(hex_data)
@@ -544,6 +558,7 @@ def decode_uint8(hex_data: str) -> int:
 
 COINGECKO_BASE = "https://api.coingecko.com/api/v3"
 
+
 def cg_price_by_id(cg_id: str) -> float | None:
     try:
         url = f"{COINGECKO_BASE}/simple/price?ids={cg_id}&vs_currencies=usd"
@@ -551,6 +566,7 @@ def cg_price_by_id(cg_id: str) -> float | None:
         return data.get(cg_id, {}).get("usd")
     except Exception:
         return None
+
 
 def cg_price_by_ids(cg_ids: list[str]) -> dict[str, float]:
     """Fetch multiple prices in one request."""
@@ -563,6 +579,7 @@ def cg_price_by_ids(cg_ids: list[str]) -> dict[str, float]:
         return {k: v.get("usd", 0.0) for k, v in data.items() if "usd" in v}
     except Exception:
         return {}
+
 
 def cg_price_by_contract(chain: str, contract: str) -> float | None:
     cg_platform_map = {
@@ -592,6 +609,7 @@ def cg_price_by_contract(chain: str, contract: str) -> float | None:
     except Exception:
         return None
 
+
 def get_native_price(chain: str) -> float | None:
     cg_id = CHAINS[chain]["coingecko"]
     return cg_price_by_id(cg_id)
@@ -600,6 +618,7 @@ def get_native_price(chain: str) -> float | None:
 # Command implementations
 # ---------------------------------------------------------------------------
 
+
 def cmd_stats(args: argparse.Namespace) -> None:
     chain = args.chain
     cfg = CHAINS[chain]
@@ -607,7 +626,7 @@ def cmd_stats(args: argparse.Namespace) -> None:
     # Batch: blockNumber + gasPrice
     results = rpc_batch(chain, [
         ("eth_blockNumber", []),
-        ("eth_gasPrice",    []),
+        ("eth_gasPrice", []),
     ])
     block_num = hex_to_int(results[0] or "0x0")
     gas_price_wei = hex_to_int(results[1] or "0x0")
@@ -725,8 +744,8 @@ def cmd_tx(args: argparse.Namespace) -> None:
     cfg     = CHAINS[chain]
 
     results = rpc_batch(chain, [
-        ("eth_getTransactionByHash",       [tx_hash]),
-        ("eth_getTransactionReceipt",      [tx_hash]),
+        ("eth_getTransactionByHash", [tx_hash]),
+        ("eth_getTransactionReceipt", [tx_hash]),
     ])
     tx      = results[0]
     receipt = results[1]
@@ -794,10 +813,10 @@ def cmd_token(args: argparse.Namespace) -> None:
 
     # Batch all ERC-20 metadata calls
     calls = [
-        ("eth_call", [{"to": contract, "data": ERC20_SELECTORS["name()"]},        "latest"]),
-        ("eth_call", [{"to": contract, "data": ERC20_SELECTORS["symbol()"]},       "latest"]),
-        ("eth_call", [{"to": contract, "data": ERC20_SELECTORS["decimals()"]},     "latest"]),
-        ("eth_call", [{"to": contract, "data": ERC20_SELECTORS["totalSupply()"]},  "latest"]),
+        ("eth_call", [{"to": contract, "data": ERC20_SELECTORS["name()"]}, "latest"]),
+        ("eth_call", [{"to": contract, "data": ERC20_SELECTORS["symbol()"]}, "latest"]),
+        ("eth_call", [{"to": contract, "data": ERC20_SELECTORS["decimals()"]}, "latest"]),
+        ("eth_call", [{"to": contract, "data": ERC20_SELECTORS["totalSupply()"]}, "latest"]),
     ]
     results  = rpc_batch(chain, calls)
     name     = decode_string(results[0] or "0x")
@@ -1393,7 +1412,7 @@ def build_parser() -> argparse.ArgumentParser:
     # -- wallet --
     p_wallet = sub.add_parser("wallet", help="Wallet balance + ERC-20 portfolio")
     p_wallet.add_argument("address", help="Wallet address (0x...)")
-    p_wallet.add_argument("--limit",     type=int, default=20, metavar="N",
+    p_wallet.add_argument("--limit", type=int, default=20, metavar="N",
                           help="Max number of known tokens to check (default: 20)")
     p_wallet.add_argument("--no-prices", action="store_true",
                           help="Skip USD price lookups (faster)")
@@ -1430,7 +1449,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     # -- whale --
     p_whale = sub.add_parser("whale", help="Scan for large value transfers in recent blocks")
-    p_whale.add_argument("--blocks",  type=int, default=20, metavar="N",
+    p_whale.add_argument("--blocks", type=int, default=20, metavar="N",
                          help="Number of recent blocks to scan (default: 20)")
     p_whale.add_argument("--min-usd", type=float, default=10_000.0, metavar="N",
                          help="Minimum USD value to report (default: 10000)")

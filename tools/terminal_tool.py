@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Terminal Tool Module
+"""Terminal Tool Module
 
 A terminal tool that executes commands in local, Docker, Modal, SSH,
 Singularity, and Daytona environments. Supports local execution,
@@ -31,19 +30,19 @@ Usage:
     result = terminal_tool("python server.py", background=True)
 """
 
+import atexit
 import importlib.util
 import json
 import logging
 import os
 import platform
 import re
-import time
-import threading
-import atexit
 import shutil
 import subprocess
+import threading
+import time
 from pathlib import Path
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
 
 from utils import env_var_enabled
 
@@ -55,18 +54,13 @@ logger = logging.getLogger(__name__)
 # The terminal tool polls this during command execution so it can kill
 # long-running subprocesses immediately instead of blocking until timeout.
 # ---------------------------------------------------------------------------
-from tools.interrupt import is_interrupted, _interrupt_event
 # display_hermes_home imported lazily at call site (stale-module safety during hermes update)
-
-
-
-
 # =============================================================================
 # Custom Singularity Environment with more space
 # =============================================================================
-
 # Singularity helpers (scratch dir, SIF cache) now live in tools/environments/singularity.py
 from tools.environments.singularity import _get_scratch_dir
+from tools.interrupt import _interrupt_event, is_interrupted
 from tools.tool_backend_helpers import (
     coerce_modal_mode,
     has_direct_modal_credentials,
@@ -129,7 +123,7 @@ def _check_disk_usage_warning():
         total_bytes = 0
         import glob
         for path in glob.glob(str(scratch_dir / "hermes-*")):
-            for f in Path(path).rglob('*'):
+            for f in Path(path).rglob("*"):
                 if f.is_file():
                     try:
                         total_bytes += f.stat().st_size
@@ -267,7 +261,7 @@ def _check_all_guards(command: str, env_type: str) -> dict:
 # Covers alphanumeric, path separators, Windows drive/UNC separators, tilde,
 # dot, hyphen, underscore, space, plus, at, equals, and comma.  Everything
 # else is rejected.
-_WORKDIR_SAFE_RE = re.compile(r'^[A-Za-z0-9/\\:_\-.~ +@=,]+$')
+_WORKDIR_SAFE_RE = re.compile(r"^[A-Za-z0-9/\\:_\-.~ +@=,]+$")
 
 
 def _validate_workdir(workdir: str) -> str | None:
@@ -293,8 +287,7 @@ def _validate_workdir(workdir: str) -> str | None:
 
 
 def _handle_sudo_failure(output: str, env_type: str) -> str:
-    """
-    Check for sudo failure and add helpful message for messaging contexts.
+    """Check for sudo failure and add helpful message for messaging contexts.
     
     Returns enhanced output if sudo failed in messaging context, else original.
     """
@@ -319,8 +312,7 @@ def _handle_sudo_failure(output: str, env_type: str) -> str:
 
 
 def _prompt_for_sudo_password(timeout_seconds: int = 45) -> str:
-    """
-    Prompt user for sudo password with timeout.
+    """Prompt user for sudo password with timeout.
     
     Returns the password if entered, or empty string if:
     - User presses Enter without input (skip)
@@ -442,6 +434,7 @@ def _prompt_for_sudo_password(timeout_seconds: int = 45) -> str:
         if "HERMES_SPINNER_PAUSE" in os.environ:
             del os.environ["HERMES_SPINNER_PAUSE"]
 
+
 def _safe_command_preview(command: Any, limit: int = 200) -> str:
     """Return a log-safe preview for possibly-invalid command values."""
     if command is None:
@@ -452,6 +445,7 @@ def _safe_command_preview(command: Any, limit: int = 200) -> str:
         return repr(command)[:limit]
     except Exception:
         return f"<{type(command).__name__}>"
+
 
 def _looks_like_env_assignment(token: str) -> bool:
     """Return True when *token* is a leading shell environment assignment."""
@@ -750,8 +744,7 @@ def _rewrite_compound_background(command: str) -> str:
 
 
 def _transform_sudo_command(command: str | None) -> tuple[str | None, str | None]:
-    """
-    Transform sudo commands to use -S flag if SUDO_PASSWORD is available.
+    """Transform sudo commands to use -S flag if SUDO_PASSWORD is available.
 
     This is a shared helper used by all execution environments to provide
     consistent sudo handling across local, SSH, and container environments.
@@ -783,6 +776,7 @@ def _transform_sudo_command(command: str | None) -> tuple[str | None, str | None
 
     If SUDO_PASSWORD is not set and NOT interactive:
       Command runs as-is (fails gracefully with "sudo: a password is required").
+
     """
     if command is None:
         return None, None
@@ -823,15 +817,19 @@ def _transform_sudo_command(command: str | None) -> tuple[str | None, str | None
 
 
 # Environment classes now live in tools/environments/
-from tools.environments.local import LocalEnvironment as _LocalEnvironment
-from tools.environments.singularity import SingularityEnvironment as _SingularityEnvironment
-from tools.environments.ssh import SSHEnvironment as _SSHEnvironment
-from tools.environments.docker import DockerEnvironment as _DockerEnvironment
-from tools.environments.modal import ModalEnvironment as _ModalEnvironment
-from tools.environments.managed_modal import ManagedModalEnvironment as _ManagedModalEnvironment
-from tools.managed_tool_gateway import is_managed_tool_gateway_ready
 import sys
 
+from tools.environments.docker import DockerEnvironment as _DockerEnvironment
+from tools.environments.local import LocalEnvironment as _LocalEnvironment
+from tools.environments.managed_modal import (
+    ManagedModalEnvironment as _ManagedModalEnvironment,
+)
+from tools.environments.modal import ModalEnvironment as _ModalEnvironment
+from tools.environments.singularity import (
+    SingularityEnvironment as _SingularityEnvironment,
+)
+from tools.environments.ssh import SSHEnvironment as _SSHEnvironment
+from tools.managed_tool_gateway import is_managed_tool_gateway_ready
 
 # Tool description for LLM
 TERMINAL_TOOL_DESCRIPTION = """Execute shell commands on a Linux environment. Filesystem usually persists between calls.
@@ -918,7 +916,8 @@ def _maybe_reap_docker_orphans(container_config: dict[str, Any]) -> None:
 
     try:
         from tools.environments.docker import (
-            reap_orphan_containers, _get_active_profile_name,
+            _get_active_profile_name,
+            reap_orphan_containers,
         )
     except ImportError:
         return
@@ -949,8 +948,7 @@ _task_env_overrides: dict[str, dict[str, Any]] = {}
 
 
 def register_task_env_overrides(task_id: str, overrides: dict[str, Any]):
-    """
-    Register environment overrides for a specific task/rollout.
+    """Register environment overrides for a specific task/rollout.
 
     Called by Atropos environments before the agent loop to configure
     per-task sandbox settings (e.g., a custom Dockerfile for the Modal image).
@@ -963,6 +961,7 @@ def register_task_env_overrides(task_id: str, overrides: dict[str, Any]):
     Args:
         task_id: The rollout's unique task identifier
         overrides: Dict of config keys to override
+
     """
     _task_env_overrides[task_id] = overrides
 
@@ -990,8 +989,7 @@ def register_task_env_overrides(task_id: str, overrides: dict[str, Any]):
 
 
 def clear_task_env_overrides(task_id: str):
-    """
-    Clear environment overrides for a task after rollout completes.
+    """Clear environment overrides for a task after rollout completes.
 
     Called during cleanup to avoid stale entries accumulating.
     """
@@ -999,8 +997,7 @@ def clear_task_env_overrides(task_id: str):
 
 
 def _resolve_container_task_id(task_id: str | None) -> str:
-    """
-    Map a tool-call ``task_id`` to the container/sandbox key used by
+    """Map a tool-call ``task_id`` to the container/sandbox key used by
     ``_active_environments``.
 
     The top-level agent passes ``task_id=None`` and lands on ``"default"``.
@@ -1206,8 +1203,7 @@ def _create_environment(env_type: str, image: str, cwd: str, timeout: int,
                         local_config: dict = None,
                         task_id: str = "default",
                         host_cwd: str = None):
-    """
-    Create an execution environment for sandboxed command execution.
+    """Create an execution environment for sandboxed command execution.
     
     Args:
         env_type: One of "local", "docker", "singularity", "modal",
@@ -1222,6 +1218,7 @@ def _create_environment(env_type: str, image: str, cwd: str, timeout: int,
         
     Returns:
         Environment instance with execute() method
+
     """
     cc = container_config or {}
     cpu = cc.get("container_cpu", 1)
@@ -1273,7 +1270,9 @@ def _create_environment(env_type: str, image: str, cwd: str, timeout: int,
             sandbox_kwargs["memory"] = memory
         if disk > 0:
             try:
-                import inspect, modal
+                import inspect
+
+                import modal
                 if "ephemeral_disk" in inspect.signature(modal.Sandbox.create).parameters:
                     sandbox_kwargs["ephemeral_disk"] = disk
             except Exception:
@@ -1396,11 +1395,11 @@ def _cleanup_inactive_envs(lifetime_seconds: int = 300):
             pass
 
         try:
-            if hasattr(env, 'cleanup'):
+            if hasattr(env, "cleanup"):
                 env.cleanup()
-            elif hasattr(env, 'stop'):
+            elif hasattr(env, "stop"):
                 env.stop()
-            elif hasattr(env, 'terminate'):
+            elif hasattr(env, "terminate"):
                 env.terminate()
 
             logger.info("Cleaned up inactive environment for task: %s", task_id)
@@ -1474,8 +1473,6 @@ def is_persistent_env(task_id: str) -> bool:
     return bool(getattr(env, "_persistent", False))
 
 
-
-
 def cleanup_all_environments():
     """Clean up ALL active environments. Use with caution."""
     task_ids = list(_active_environments.keys())
@@ -1547,7 +1544,7 @@ def cleanup_vm(task_id: str, *, force_remove: bool = False):
         return
 
     try:
-        if hasattr(env, 'cleanup'):
+        if hasattr(env, "cleanup"):
             # Pass force_remove only if the env's cleanup() accepts it
             # (DockerEnvironment after issue #20561; other backends don't).
             import inspect
@@ -1556,9 +1553,9 @@ def cleanup_vm(task_id: str, *, force_remove: bool = False):
                 env.cleanup(force_remove=force_remove)
             else:
                 env.cleanup()
-        elif hasattr(env, 'stop'):
+        elif hasattr(env, "stop"):
             env.stop()
-        elif hasattr(env, 'terminate'):
+        elif hasattr(env, "terminate"):
             env.terminate()
 
         logger.info("Manually cleaned up environment for task: %s", task_id)
@@ -1619,7 +1616,7 @@ def _interpret_exit_code(command: str, exit_code: int) -> str | None:
     # Extract the last command in a pipeline/chain — that determines the
     # exit code.  Handles  `cmd1 && cmd2`, `cmd1 | cmd2`, `cmd1; cmd2`.
     # Deliberately simple: split on shell operators and take the last piece.
-    segments = re.split(r'\s*(?:\|\||&&|[|;])\s*', command)
+    segments = re.split(r"\s*(?:\|\||&&|[|;])\s*", command)
     last_segment = (segments[-1] if segments else command).strip()
 
     # Get base command name (first word), stripping env var assignments
@@ -1785,6 +1782,7 @@ def _resolve_notification_flag_conflict(
     Returns:
         (watch_patterns_to_use, conflict_note). conflict_note is "" when there
         is no conflict.
+
     """
     if background and notify_on_complete and watch_patterns:
         note = (
@@ -1830,8 +1828,7 @@ def terminal_tool(
     notify_on_complete: bool = False,
     watch_patterns: list[str] | None = None,
 ) -> str:
-    """
-    Execute a command in the configured terminal environment.
+    """Execute a command in the configured terminal environment.
 
     Args:
         command: The command to execute
@@ -1859,6 +1856,7 @@ def terminal_tool(
         
         # Force run after user confirmation
         # Note: force parameter is internal only, not exposed to model API
+
     """
     try:
         if not isinstance(command, str):
@@ -2128,7 +2126,7 @@ def terminal_tool(
                         cwd=effective_cwd,
                         task_id=effective_task_id,
                         session_key=session_key,
-                        env_vars=env.env if hasattr(env, 'env') else None,
+                        env_vars=env.env if hasattr(env, "env") else None,
                         use_pty=effective_pty,
                     )
                 else:

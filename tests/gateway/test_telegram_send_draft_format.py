@@ -67,7 +67,8 @@ async def test_send_draft_passes_markdownv2_parse_mode():
 @pytest.mark.asyncio
 async def test_send_draft_falls_back_to_plain_text_on_markdownv2_error():
     """A MarkdownV2 BadRequest retries once as plain text (no parse_mode),
-    instead of aborting draft streaming for the whole response."""
+    instead of aborting draft streaming for the whole response.
+    """
     adapter = _make_adapter()
     adapter.format_message = lambda content: f"FMT::{content}"
 
@@ -96,7 +97,8 @@ async def test_send_draft_falls_back_to_plain_text_on_markdownv2_error():
 @pytest.mark.asyncio
 async def test_send_draft_non_badrequest_propagates_without_retry():
     """A non-BadRequest failure (e.g. drafts not allowed) returns failure
-    immediately so the caller falls back to the edit transport."""
+    immediately so the caller falls back to the edit transport.
+    """
     adapter = _make_adapter()
     adapter.format_message = lambda c: f"FMT::{c}"
 

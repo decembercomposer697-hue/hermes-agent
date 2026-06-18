@@ -17,7 +17,6 @@ UpdatePromptView, ModelPickerView, ClarifyChoiceView.
 import importlib
 from unittest.mock import patch
 
-
 _VIEW_NAMES = [
     "ExecApprovalView",
     "SlashConfirmView",
@@ -51,7 +50,8 @@ class TestDefineDiscordViewClasses:
 
     def test_check_discord_requirements_calls_define_on_lazy_install(self, monkeypatch):
         """check_discord_requirements() must call _define_discord_view_classes() on
-        a successful lazy install so view classes exist when DISCORD_AVAILABLE=True."""
+        a successful lazy install so view classes exist when DISCORD_AVAILABLE=True.
+        """
         dp = importlib.import_module("plugins.platforms.discord.adapter")
 
         # Simulate discord not yet available at module load.

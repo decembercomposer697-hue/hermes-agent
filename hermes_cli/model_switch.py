@@ -25,22 +25,22 @@ import re
 from dataclasses import dataclass
 from typing import List, NamedTuple, Optional
 
-from hermes_cli.providers import (
-    custom_provider_slug,
-    determine_api_mode,
-    get_label,
-    is_aggregator,
-    resolve_provider_full,
-)
-from hermes_cli.model_normalize import (
-    normalize_model_for_provider,
-)
 from agent.models_dev import (
     ModelCapabilities,
     ModelInfo,
     get_model_capabilities,
     get_model_info,
     list_provider_models,
+)
+from hermes_cli.model_normalize import (
+    normalize_model_for_provider,
+)
+from hermes_cli.providers import (
+    custom_provider_slug,
+    determine_api_mode,
+    get_label,
+    is_aggregator,
+    resolve_provider_full,
 )
 
 logger = logging.getLogger(__name__)
@@ -281,6 +281,7 @@ class ModelSwitchResult:
 # Flag parsing
 # ---------------------------------------------------------------------------
 
+
 def parse_model_flags(raw_args: str) -> tuple[str, str, bool, bool]:
     """Parse --provider, --global, and --refresh flags from /model command args.
 
@@ -302,7 +303,7 @@ def parse_model_flags(raw_args: str) -> tuple[str, str, bool, bool]:
     # Normalize Unicode dashes (Telegram/iOS auto-converts -- to em/en dash)
     # A single Unicode dash before a flag keyword becomes "--"
     import re as _re
-    raw_args = _re.sub(r'[\u2012\u2013\u2014\u2015](provider|global|refresh)', r'--\1', raw_args)
+    raw_args = _re.sub(r"[\u2012\u2013\u2014\u2015](provider|global|refresh)", r"--\1", raw_args)
 
     # Extract --global
     if "--global" in raw_args:
@@ -456,6 +457,7 @@ def resolve_alias(
         ``(provider, resolved_model_id, alias_name)`` if a match is
         found on the current provider, or ``None`` if the alias doesn't
         exist or no matching model is available.
+
     """
     key = raw_input.strip().lower()
 
@@ -653,12 +655,13 @@ def switch_model(
 
     Returns:
         ModelSwitchResult with all information the caller needs.
+
     """
     from hermes_cli.models import (
         copilot_model_api_mode,
         detect_provider_for_model,
-        validate_requested_model,
         opencode_model_api_mode,
+        validate_requested_model,
     )
     from hermes_cli.runtime_provider import resolve_runtime_provider
 
@@ -1204,15 +1207,21 @@ def list_authenticated_providers(
     not block on fresh Portal/account checks every time.
     """
     import os
+
     from agent.models_dev import (
         PROVIDER_TO_MODELS_DEV,
         fetch_models_dev,
+    )
+    from agent.models_dev import (
         get_provider_info as _mdev_pinfo,
     )
     from hermes_cli.auth import PROVIDER_REGISTRY
     from hermes_cli.models import (
-        OPENROUTER_MODELS, _PROVIDER_MODELS,
-        _MODELS_DEV_PREFERRED, _merge_with_models_dev, cached_provider_model_ids,
+        _MODELS_DEV_PREFERRED,
+        _PROVIDER_MODELS,
+        OPENROUTER_MODELS,
+        _merge_with_models_dev,
+        cached_provider_model_ids,
         get_curated_nous_model_ids,
     )
 
@@ -1234,7 +1243,8 @@ def list_authenticated_providers(
 
         Prefers the live env-override (e.g. DASHSCOPE_BASE_URL) over the
         static inference_base_url so the dedup matches what a user typing
-        that URL into custom_providers would actually hit."""
+        that URL into custom_providers would actually hit.
+        """
         try:
             from hermes_cli.auth import PROVIDER_REGISTRY as _reg
         except Exception:
@@ -1314,8 +1324,8 @@ def list_authenticated_providers(
     if "lmstudio" not in curated and (
         os.environ.get("LM_API_KEY") or os.environ.get("LM_BASE_URL") or current_provider.strip().lower() == "lmstudio"
     ):
-        from hermes_cli.models import fetch_lmstudio_models
         from hermes_cli.auth import AuthError
+        from hermes_cli.models import fetch_lmstudio_models
         is_current_lmstudio = current_provider.strip().lower() == "lmstudio"
         lm_base = (
             os.environ.get("LM_BASE_URL")
@@ -1420,8 +1430,8 @@ def list_authenticated_providers(
         _record_builtin_endpoint(slug)
 
     # --- 2. Check Hermes-only providers (nous, openai-codex, copilot, opencode-go) ---
-    from hermes_cli.providers import HERMES_OVERLAYS
     from hermes_cli.auth import PROVIDER_REGISTRY as _auth_registry
+    from hermes_cli.providers import HERMES_OVERLAYS
 
     # Build reverse mapping: models.dev ID → Hermes provider ID.
     # HERMES_OVERLAYS keys may be models.dev IDs (e.g. "github-copilot")
@@ -1529,13 +1539,19 @@ def list_authenticated_providers(
             # recommendations (e.g. stepfun/step-3.7-flash:free).
             model_ids = curated.get("nous", [])
             try:
+                from hermes_cli.auth import get_provider_auth_state as _nous_state
+                from hermes_cli.models import (
+                    check_nous_free_tier as _nous_free,
+                )
                 from hermes_cli.models import (
                     get_pricing_for_provider as _nous_pricing,
-                    check_nous_free_tier as _nous_free,
+                )
+                from hermes_cli.models import (
                     union_with_portal_free_recommendations as _union_free,
+                )
+                from hermes_cli.models import (
                     union_with_portal_paid_recommendations as _union_paid,
                 )
-                from hermes_cli.auth import get_provider_auth_state as _nous_state
 
                 _pricing = _nous_pricing("nous") or {}
                 _portal = ""

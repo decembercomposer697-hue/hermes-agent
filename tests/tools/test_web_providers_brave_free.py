@@ -19,7 +19,6 @@ import pytest
 
 from tests.tools.conftest import register_all_web_providers
 
-
 # ---------------------------------------------------------------------------
 # BraveFreeWebSearchProvider unit tests
 # ---------------------------------------------------------------------------
@@ -254,11 +253,13 @@ class TestBraveFreeSearchOnlyErrors:
 
     def test_web_extract_returns_search_only_error(self, monkeypatch):
         import asyncio
+
         from tools import web_tools
 
         monkeypatch.setattr(web_tools, "_load_web_config", lambda: {"backend": "brave-free"})
         monkeypatch.setenv("BRAVE_SEARCH_API_KEY", "BSAkey123")
         monkeypatch.setattr(web_tools, "_is_tool_gateway_ready", lambda: False)
+
         async def _allow_ssrf(_url: str) -> bool:
             return True
 

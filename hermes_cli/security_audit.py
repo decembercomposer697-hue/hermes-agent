@@ -26,10 +26,10 @@ import re
 import sys
 import urllib.error
 import urllib.request
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
-from collections.abc import Iterable
 
 from hermes_constants import get_hermes_home
 

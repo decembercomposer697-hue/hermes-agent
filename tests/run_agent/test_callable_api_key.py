@@ -31,7 +31,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # OpenAI SDK construction preserves the callable
 # ---------------------------------------------------------------------------
@@ -39,11 +38,13 @@ import pytest
 
 class TestCreateOpenAIClientCallable:
     """``AIAgent._create_openai_client`` must pass the callable through
-    to ``openai.OpenAI(...)`` without coercion."""
+    to ``openai.OpenAI(...)`` without coercion.
+    """
 
     def test_callable_api_key_passed_to_openai_constructor(self, monkeypatch):
         """Construct the smallest possible AIAgent surface and verify
-        the OpenAI client receives the callable unchanged."""
+        the OpenAI client receives the callable unchanged.
+        """
         captured = {}
 
         def fake_openai(**kwargs):
@@ -91,7 +92,8 @@ class TestCreateOpenAIClientCallable:
 class TestNormalizeMainRuntimePreservesCallable:
     """The aux client orchestrator must keep the callable on the
     runtime dict so compression / vision / embedding / title-gen clients
-    inherit Entra ID auth from the main agent."""
+    inherit Entra ID auth from the main agent.
+    """
 
     def test_callable_api_key_survives_normalization(self):
         from agent.auxiliary_client import _normalize_main_runtime
@@ -136,7 +138,7 @@ class TestNormalizeMainRuntimePreservesCallable:
         assert "model" not in normalized
 
     def test_unknown_field_dropped(self):
-        from agent.auxiliary_client import _normalize_main_runtime, _MAIN_RUNTIME_FIELDS
+        from agent.auxiliary_client import _MAIN_RUNTIME_FIELDS, _normalize_main_runtime
         normalized = _normalize_main_runtime({
             "provider": "azure-foundry",
             "api_key": "k",
@@ -155,7 +157,8 @@ class TestNormalizeMainRuntimePreservesCallable:
 class TestTruncateTokenCallable:
     def test_callable_returns_placeholder(self):
         """Dashboard preview must render the Entra placeholder, NOT
-        ``"<function ...>"``."""
+        ``"<function ...>"``.
+        """
         from hermes_cli.web_server import _truncate_token
 
         invoked = {"count": 0}
@@ -194,7 +197,8 @@ class TestRuntimeDictSerializationGuard:
         sanitized BEFORE serialization. This test pins the loud-fail
         behaviour so future changes that introduce
         ``json.dumps(..., default=str)`` over a runtime dict are caught
-        by a regression here."""
+        by a regression here.
+        """
 
         def provider():
             return "jwt"
@@ -219,7 +223,8 @@ class TestBatchRunnerCallableHandling:
     def test_callable_api_key_stripped_from_worker_config(self, capsys, monkeypatch, tmp_path):
         """``BatchRunner._run_batches`` (or the equivalent code path)
         must replace a callable api_key with None before pickling the
-        worker config dict — otherwise multiprocessing.Pool fails."""
+        worker config dict — otherwise multiprocessing.Pool fails.
+        """
         # We can't easily run BatchRunner end-to-end in a unit test
         # (it spawns subprocesses), but we CAN inline the same logic:
         # the production code uses ``callable(self.api_key) and not
@@ -244,7 +249,8 @@ class TestBatchRunnerCallableHandling:
     def test_batch_runner_source_uses_the_correct_predicate(self):
         """Pin the predicate string in batch_runner so refactors that
         change it are caught here. Reading the source rather than
-        importing avoids spinning up the full BatchRunner."""
+        importing avoids spinning up the full BatchRunner.
+        """
         from pathlib import Path
         src = (Path(__file__).resolve().parent.parent.parent
                / "batch_runner.py").read_text()
@@ -271,7 +277,8 @@ class TestCliEnsureRuntimeCredentialsCallable:
 
     We verify the source pattern (rather than spinning up a real
     ``HermesCLI`` instance) — the predicate change is the load-bearing
-    fix and is invariant under the surrounding orchestration code."""
+    fix and is invariant under the surrounding orchestration code.
+    """
 
     def test_callable_predicate_present_in_cli_runtime_validation(self):
         from pathlib import Path
@@ -296,7 +303,8 @@ class TestInlinedDisplayMasks:
     ``"Microsoft Entra ID"`` label, then falls through to its own
     context-appropriate string mask. This replaces a unified helper
     that would have forced one mask shape across sites with legitimately
-    different display needs (banner vs diagnostic vs UI vs preview)."""
+    different display needs (banner vs diagnostic vs UI vs preview).
+    """
 
     def test_run_agent_banner_uses_is_token_provider_guard(self):
         """The masked-banner sites live in ``agent/agent_init.py``
@@ -304,7 +312,8 @@ class TestInlinedDisplayMasks:
         this feature was first written). Both the OpenAI and Anthropic
         client init paths must guard their banner prints with
         ``is_token_provider`` so a callable Entra ID provider doesn't
-        crash ``len(api_key)``."""
+        crash ``len(api_key)``.
+        """
         from pathlib import Path
         src = (Path(__file__).resolve().parent.parent.parent
                / "agent" / "agent_init.py").read_text()
@@ -324,7 +333,8 @@ class TestInlinedDisplayMasks:
         ``self.api_key[-4:]`` / ``len(self.api_key)`` which crashes on
         callable Entra ID providers. The inlined version uses
         ``is_token_provider`` and prints the same static label as the
-        run_agent banners."""
+        run_agent banners.
+        """
         from pathlib import Path
         src = (Path(__file__).resolve().parent.parent.parent
                / "cli.py").read_text()
@@ -345,7 +355,8 @@ class TestInlinedDisplayMasks:
         is the SDK's empty string (callable stashed privately) — but
         defensively the helper must also accept a callable directly
         and return the placeholder rather than crashing on
-        ``len(callable)``."""
+        ``len(callable)``.
+        """
         from pathlib import Path
         src = (Path(__file__).resolve().parent.parent.parent
                / "run_agent.py").read_text()
@@ -364,7 +375,8 @@ class TestInlinedDisplayMasks:
         ``agent/conversation_loop.py`` (the ``run_conversation`` body
         was extracted after this feature was first written). It used
         to do ``key[:12]`` on ``self._anthropic_api_key``. For Entra ID +
-        Anthropic-style mode that's a callable; slicing crashes."""
+        Anthropic-style mode that's a callable; slicing crashes.
+        """
         from pathlib import Path
         src = (Path(__file__).resolve().parent.parent.parent
                / "agent" / "conversation_loop.py").read_text()

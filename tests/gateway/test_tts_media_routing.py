@@ -1,5 +1,4 @@
-"""
-Tests for cross-platform audio/voice media routing.
+"""Tests for cross-platform audio/voice media routing.
 
 These tests pin the expected delivery path for audio media files across
 Telegram (where Bot-API sendAudio only accepts MP3/M4A and .ogg/.opus
@@ -13,7 +12,12 @@ from unittest.mock import AsyncMock
 import pytest
 
 from gateway.config import Platform, PlatformConfig
-from gateway.platforms.base import BasePlatformAdapter, MessageEvent, MessageType, SendResult
+from gateway.platforms.base import (
+    BasePlatformAdapter,
+    MessageEvent,
+    MessageType,
+    SendResult,
+)
 from gateway.run import GatewayRunner
 from gateway.session import SessionSource, build_session_key
 
@@ -123,7 +127,8 @@ async def test_base_adapter_routes_voice_tagged_telegram_ogg_media_tag_to_voice_
 
 def _fake_runner(thread_meta):
     """Build a fake GatewayRunner-like object with the helper methods needed by
-    _deliver_media_from_response."""
+    _deliver_media_from_response.
+    """
     runner = SimpleNamespace(
         _thread_metadata_for_source=lambda source, anchor=None: thread_meta,
         _reply_anchor_for_event=lambda event: None,
@@ -194,7 +199,8 @@ async def test_streaming_delivery_routes_non_voice_telegram_ogg_media_tag_to_doc
 @pytest.mark.asyncio
 async def test_streaming_delivery_routes_telegram_mp3_media_tag_to_voice_sender(tmp_path, monkeypatch):
     """MP3 audio on Telegram must go through send_voice (which routes to
-    sendAudio internally); Telegram accepts MP3 for the audio player."""
+    sendAudio internally); Telegram accepts MP3 for the audio player.
+    """
     event = _event(thread_id="topic-1")
     media_file = _allowed_media_path(tmp_path, monkeypatch, "speech.mp3")
     adapter = SimpleNamespace(

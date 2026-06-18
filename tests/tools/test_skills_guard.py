@@ -20,22 +20,21 @@ def _can_symlink():
 
 
 from tools.skills_guard import (
+    MAX_FILE_COUNT,
+    MAX_SINGLE_FILE_KB,
     Finding,
     ScanResult,
+    _check_structure,
+    _determine_verdict,
+    _load_skill_ignore,
+    _resolve_trust_level,
+    _unicode_char_name,
+    content_hash,
+    format_scan_report,
     scan_file,
     scan_skill,
     should_allow_install,
-    format_scan_report,
-    content_hash,
-    _determine_verdict,
-    _resolve_trust_level,
-    _check_structure,
-    _unicode_char_name,
-    _load_skill_ignore,
-    MAX_FILE_COUNT,
-    MAX_SINGLE_FILE_KB,
 )
-
 
 # ---------------------------------------------------------------------------
 # _resolve_trust_level
@@ -217,7 +216,8 @@ class TestShouldAllowInstall:
         when the scan runs. The caller (_security_scan_skill) surfaces this as an error
         to the agent, who can retry without the flagged content.
 
-        This gate only runs when skills.guard_agent_created is enabled (off by default)."""
+        This gate only runs when skills.guard_agent_created is enabled (off by default).
+        """
         f = [Finding("env_exfil_curl", "critical", "exfiltration", "SKILL.md", 1, "curl $TOKEN", "exfiltration")]
         allowed, reason = should_allow_install(self._result("agent-created", "dangerous", f))
         assert allowed is None
@@ -363,7 +363,6 @@ class TestScanSkill:
 
         result = scan_skill(f, source="community")
         assert result.verdict != "safe"
-
 
 
 # ---------------------------------------------------------------------------

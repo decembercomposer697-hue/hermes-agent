@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test Modal Terminal Tool
+"""Test Modal Terminal Tool
 
 This script tests that the Modal terminal backend is correctly configured
 and can execute commands in Modal sandboxes.
@@ -14,11 +13,12 @@ Usage:
 """
 
 import pytest
+
 pytestmark = pytest.mark.integration
 
+import json
 import os
 import sys
-import json
 from pathlib import Path
 
 # Try to load .env file if python-dotenv is available
@@ -32,8 +32,8 @@ except ImportError:
         with open(env_file) as f:
             for line in f:
                 line = line.strip()
-                if line and not line.startswith('#') and '=' in line:
-                    key, value = line.split('=', 1)
+                if line and not line.startswith("#") and "=" in line:
+                    key, value = line.split("=", 1)
                     # Remove quotes if present
                     value = value.strip().strip('"').strip("'")
                     os.environ.setdefault(key.strip(), value)
@@ -44,6 +44,7 @@ sys.path.insert(0, str(parent_dir))
 
 # Import terminal_tool module directly using importlib to avoid tools/__init__.py
 import importlib.util
+
 terminal_tool_path = parent_dir / "tools" / "terminal_tool.py"
 spec = importlib.util.spec_from_file_location("terminal_tool", terminal_tool_path)
 terminal_module = importlib.util.module_from_spec(spec)
@@ -73,7 +74,7 @@ def test_modal_requirements():
     print(f"  MODAL_TOKEN_ID env var: {'✅ Set' if modal_token else '❌ Not set'}")
     print(f"  ~/.modal.toml file: {'✅ Exists' if modal_toml.exists() else '❌ Not found'}")
     
-    if config['env_type'] != 'modal':
+    if config["env_type"] != "modal":
         print(f"\n⚠️  TERMINAL_ENV is '{config['env_type']}', not 'modal'")
         print("   Set TERMINAL_ENV=modal in .env or export it to test Modal backend")
         return False
@@ -101,7 +102,7 @@ def test_simple_command():
     print(f"  Exit code: {result_json.get('exit_code')}")
     print(f"  Error: {result_json.get('error')}")
     
-    success = result_json.get('exit_code') == 0 and 'Hello from Modal!' in result_json.get('output', '')
+    success = result_json.get("exit_code") == 0 and "Hello from Modal!" in result_json.get("output", "")
     print(f"\nTest: {'✅ Passed' if success else '❌ Failed'}")
     
     # Cleanup
@@ -129,7 +130,7 @@ def test_python_execution():
     print(f"  Exit code: {result_json.get('exit_code')}")
     print(f"  Error: {result_json.get('error')}")
     
-    success = result_json.get('exit_code') == 0 and 'Python' in result_json.get('output', '')
+    success = result_json.get("exit_code") == 0 and "Python" in result_json.get("output", "")
     print(f"\nTest: {'✅ Passed' if success else '❌ Failed'}")
     
     # Cleanup
@@ -157,12 +158,12 @@ def test_pip_install():
     result_json = json.loads(result)
     
     print("\nResult:")
-    output = result_json.get('output', '')
+    output = result_json.get("output", "")
     print(f"  Output (last 500 chars): ...{output[-500:] if len(output) > 500 else output}")
     print(f"  Exit code: {result_json.get('exit_code')}")
     print(f"  Error: {result_json.get('error')}")
     
-    success = result_json.get('exit_code') == 0 and 'Modal works!' in result_json.get('output', '')
+    success = result_json.get("exit_code") == 0 and "Modal works!" in result_json.get("output", "")
     print(f"\nTest: {'✅ Passed' if success else '❌ Failed'}")
     
     # Cleanup
@@ -193,9 +194,9 @@ def test_filesystem_persistence():
     print(f"  Exit code: {result2_json.get('exit_code')}")
     
     success = (
-        result1_json.get('exit_code') == 0 and
-        result2_json.get('exit_code') == 0 and
-        'persistence test' in result2_json.get('output', '')
+        result1_json.get("exit_code") == 0 and
+        result2_json.get("exit_code") == 0 and
+        "persistence test" in result2_json.get("output", "")
     )
     print(f"\nTest: {'✅ Passed' if success else '❌ Failed'}")
     
@@ -224,8 +225,8 @@ def test_environment_isolation():
     result2_json = json.loads(result2)
     
     # The file should either not exist or be empty in task2
-    output = result2_json.get('output', '')
-    isolated = 'task1 data' not in output or 'FILE_NOT_FOUND' in output or 'No such file' in output
+    output = result2_json.get("output", "")
+    isolated = "task1 data" not in output or "FILE_NOT_FOUND" in output or "No such file" in output
     
     print(f"  Task2 output: {output[:200]}")
     print(f"\nTest: {'✅ Passed (environments isolated)' if isolated else '❌ Failed (environments NOT isolated)'}")
@@ -249,28 +250,28 @@ def main():
     print(f"  TERMINAL_MODAL_IMAGE: {config['modal_image']}")
     print(f"  TERMINAL_TIMEOUT: {config['timeout']}s")
     
-    if config['env_type'] != 'modal':
+    if config["env_type"] != "modal":
         print(f"\n⚠️  WARNING: TERMINAL_ENV is set to '{config['env_type']}', not 'modal'")
         print("   To test Modal specifically, set TERMINAL_ENV=modal")
         response = input("\n   Continue testing with current backend? (y/n): ")
-        if response.lower() != 'y':
+        if response.lower() != "y":
             print("Aborting.")
             return
     
     results = {}
     
     # Run tests
-    results['requirements'] = test_modal_requirements()
+    results["requirements"] = test_modal_requirements()
     
-    if not results['requirements']:
+    if not results["requirements"]:
         print("\n❌ Requirements not met. Cannot continue with other tests.")
         return
     
-    results['simple_command'] = test_simple_command()
-    results['python_execution'] = test_python_execution()
-    results['pip_install'] = test_pip_install()
-    results['filesystem_persistence'] = test_filesystem_persistence()
-    results['environment_isolation'] = test_environment_isolation()
+    results["simple_command"] = test_simple_command()
+    results["python_execution"] = test_python_execution()
+    results["pip_install"] = test_pip_install()
+    results["filesystem_persistence"] = test_filesystem_persistence()
+    results["environment_isolation"] = test_environment_isolation()
     
     # Summary
     print("\n" + "=" * 60)

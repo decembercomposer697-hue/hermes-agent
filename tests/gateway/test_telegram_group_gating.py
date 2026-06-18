@@ -314,7 +314,12 @@ def test_observed_group_context_replays_normally_without_telegram_prompt():
 
 
 def test_observed_group_context_preserves_slash_command_text_for_dispatch():
-    from gateway.platforms.base import MessageEvent, MessageType, Platform, SessionSource
+    from gateway.platforms.base import (
+        MessageEvent,
+        MessageType,
+        Platform,
+        SessionSource,
+    )
 
     adapter = _make_adapter(
         require_mention=True,

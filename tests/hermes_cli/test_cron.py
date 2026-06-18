@@ -108,7 +108,8 @@ class TestCronCommandLifecycle:
 
     def test_list_does_not_crash_when_repeat_is_null(self, tmp_cron_dir, capsys):
         """A one-shot job can be persisted with ``"repeat": null``. `cron
-        list` must render it as ∞ rather than crashing on .get(...)\\.get."""
+        list` must render it as ∞ rather than crashing on .get(...)\\.get.
+        """
         from cron.jobs import load_jobs, save_jobs
 
         create_job(prompt="One shot", schedule="every 1h")

@@ -139,6 +139,7 @@ def run_oneshot(
         toolsets: Optional comma-separated string or iterable of toolsets.
 
     Returns the exit code.  Caller should sys.exit() with the return.
+
     """
     # Silence every stdlib logger for the duration.  AIAgent, tools, and
     # provider adapters all log to stderr through the root logger; file
@@ -250,7 +251,8 @@ def _run_agent(
     use_config_toolsets: bool = True,
 ) -> str:
     """Build an AIAgent exactly like a normal CLI chat turn would, then
-    run a single conversation.  Returns the final response string."""
+    run a single conversation.  Returns the final response string.
+    """
     # Imports are local so they don't run when hermes is invoked for
     # other commands (keeps top-level CLI startup cheap).
     from hermes_cli.config import load_config
@@ -369,7 +371,8 @@ def _run_agent(
 
 def _oneshot_clarify_callback(question: str, choices=None) -> str:
     """Clarify is disabled in oneshot mode — tell the agent to pick a
-    default and proceed instead of stalling or erroring."""
+    default and proceed instead of stalling or erroring.
+    """
     if choices:
         return (
             f"[oneshot mode: no user available. Pick the best option from "

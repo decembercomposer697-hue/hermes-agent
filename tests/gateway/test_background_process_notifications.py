@@ -16,10 +16,10 @@ import pytest
 from gateway.config import GatewayConfig, Platform
 from gateway.run import GatewayRunner, _parse_session_key
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 class _FakeRegistry:
     """Return pre-canned sessions, then None once exhausted."""
@@ -289,7 +289,8 @@ async def test_agent_notification_carries_message_id_reply_anchor(monkeypatch, t
     synthetic event can be reply-anchored back into a Telegram DM topic.
 
     Without an anchor, Telegram private-chat topic sends fall back to the main
-    chat (see _thread_kwargs_for_send / telegram_dm_topic_reply_fallback)."""
+    chat (see _thread_kwargs_for_send / telegram_dm_topic_reply_fallback).
+    """
     import tools.process_registry as pr_module
 
     sessions = [SimpleNamespace(
@@ -326,7 +327,8 @@ async def test_agent_notification_carries_message_id_reply_anchor(monkeypatch, t
 @pytest.mark.asyncio
 async def test_agent_notification_no_message_id_is_tolerated(monkeypatch, tmp_path):
     """A watcher dict without message_id (CLI spawn, pre-upgrade checkpoint)
-    still injects — message_id is simply None."""
+    still injects — message_id is simply None.
+    """
     import tools.process_registry as pr_module
 
     sessions = [SimpleNamespace(

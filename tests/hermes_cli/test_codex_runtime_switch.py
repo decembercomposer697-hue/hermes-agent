@@ -2,7 +2,8 @@
 
 These cover the pure-Python state machine; CLI and gateway handlers are
 tested separately because they involve config persistence and prompt
-formatting that's surface-specific."""
+formatting that's surface-specific.
+"""
 
 from __future__ import annotations
 
@@ -157,7 +158,8 @@ class TestApply:
 
     def test_enable_triggers_mcp_migration(self):
         """Enabling codex_app_server should auto-migrate Hermes mcp_servers
-        to ~/.codex/config.toml so the spawned subprocess sees them."""
+        to ~/.codex/config.toml so the spawned subprocess sees them.
+        """
         cfg = {
             "mcp_servers": {
                 "filesystem": {"command": "npx", "args": ["-y", "fs-server"]},
@@ -197,7 +199,8 @@ class TestApply:
 
     def test_migration_failure_does_not_block_enable(self):
         """If MCP migration raises, the runtime change still proceeds —
-        users can manually re-run migration later."""
+        users can manually re-run migration later.
+        """
         cfg = {"mcp_servers": {"x": {"command": "y"}}}
         with patch.object(crs, "check_codex_binary_ok",
                           return_value=(True, "0.130.0")), \
@@ -230,7 +233,8 @@ class TestApply:
 
     def test_binary_check_cached_on_read_only_call(self):
         """Read-only call (new_value=None) calls the binary check exactly
-        once and reuses the result for the message."""
+        once and reuses the result for the message.
+        """
         cfg = {"model": {"openai_runtime": "codex_app_server"}}
         with patch.object(crs, "check_codex_binary_ok",
                           return_value=(True, "0.130.0")) as bin_check:

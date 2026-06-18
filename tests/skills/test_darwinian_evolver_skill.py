@@ -1,5 +1,4 @@
-"""
-Smoke tests for the darwinian-evolver optional skill.
+"""Smoke tests for the darwinian-evolver optional skill.
 
 We can't actually run the evolution loop in CI (it needs network + a paid LLM),
 so these tests verify:
@@ -89,7 +88,8 @@ def test_parrot_script_has_error_swallowing() -> None:
 
 def test_skill_calls_out_agpl(frontmatter) -> None:
     """The upstream tool is AGPL-3.0. The skill MUST flag this so users don't
-    import it into MIT-licensed code by accident."""
+    import it into MIT-licensed code by accident.
+    """
     src = (SKILL_DIR / "SKILL.md").read_text()
     assert "AGPL" in src, "SKILL.md must mention upstream AGPL license"
 

@@ -1,5 +1,4 @@
-"""
-Contextual first-touch onboarding hints.
+"""Contextual first-touch onboarding hints.
 
 Instead of blocking first-run questionnaires, show a one-time hint the *first*
 time a user hits a behavior fork — message-while-running, first long-running
@@ -13,9 +12,9 @@ it without pulling in heavy modules.
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, Optional
-from collections.abc import Mapping
 
 logger = logging.getLogger(__name__)
 
@@ -210,6 +209,7 @@ def mark_seen(config_path: Path, flag: str) -> bool:
     """
     try:
         import yaml
+
         from utils import atomic_yaml_write
     except Exception as e:  # pragma: no cover — dependency issue
         logger.debug("onboarding: failed to import yaml/utils: %s", e)

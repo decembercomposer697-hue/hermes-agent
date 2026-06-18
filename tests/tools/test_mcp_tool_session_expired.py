@@ -16,7 +16,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # _is_session_expired_error — unit coverage
 # ---------------------------------------------------------------------------
@@ -31,7 +30,8 @@ def test_is_session_expired_detects_invalid_or_expired_session():
 
 def test_is_session_expired_detects_expired_session_variant():
     """Generic ``session expired`` / ``expired session`` phrasings used
-    by other SDK servers."""
+    by other SDK servers.
+    """
     from tools.mcp_tool import _is_session_expired_error
     assert _is_session_expired_error(RuntimeError("Session expired")) is True
     assert _is_session_expired_error(RuntimeError("expired session: abc")) is True
@@ -39,7 +39,8 @@ def test_is_session_expired_detects_expired_session_variant():
 
 def test_is_session_expired_detects_session_not_found():
     """Server-side GC produces ``session not found`` / ``unknown session``
-    on some implementations."""
+    on some implementations.
+    """
     from tools.mcp_tool import _is_session_expired_error
     assert _is_session_expired_error(RuntimeError("session not found")) is True
     assert _is_session_expired_error(RuntimeError("Unknown session: abc123")) is True
@@ -54,7 +55,8 @@ def test_is_session_expired_detects_session_terminated():
 
 def test_is_session_expired_detects_stale_pipe_and_closed_transport_variants():
     """Stdio/AnyIO stale-pipe failures usually surface as closed-resource
-    or broken-pipe text, not an HTTP session-expired JSON-RPC error."""
+    or broken-pipe text, not an HTTP session-expired JSON-RPC error.
+    """
     from tools.mcp_tool import _is_session_expired_error
     assert _is_session_expired_error(RuntimeError("ClosedResourceError")) is True
     assert _is_session_expired_error(RuntimeError("closed resource in MCP child")) is True
@@ -65,7 +67,8 @@ def test_is_session_expired_detects_stale_pipe_and_closed_transport_variants():
 
 def test_is_session_expired_is_case_insensitive():
     """Match uses lower-cased comparison so servers that emit the
-    message in different cases (SDK formatter quirks) still trigger."""
+    message in different cases (SDK formatter quirks) still trigger.
+    """
     from tools.mcp_tool import _is_session_expired_error
     assert _is_session_expired_error(RuntimeError("INVALID OR EXPIRED SESSION")) is True
     assert _is_session_expired_error(RuntimeError("Session Expired")) is True
@@ -73,7 +76,8 @@ def test_is_session_expired_is_case_insensitive():
 
 def test_is_session_expired_rejects_unrelated_errors():
     """Narrow scope: only the specific session-expired markers trigger.
-    A regular RuntimeError / ValueError does not."""
+    A regular RuntimeError / ValueError does not.
+    """
     from tools.mcp_tool import _is_session_expired_error
     assert _is_session_expired_error(RuntimeError("Tool failed to execute")) is False
     assert _is_session_expired_error(ValueError("Missing parameter")) is False
@@ -84,7 +88,8 @@ def test_is_session_expired_rejects_unrelated_errors():
 
 def test_is_session_expired_rejects_interrupted_error():
     """InterruptedError is the user-cancel signal — must never route
-    through the session-reconnect path."""
+    through the session-reconnect path.
+    """
     from tools.mcp_tool import _is_session_expired_error
     assert _is_session_expired_error(InterruptedError()) is False
     assert _is_session_expired_error(InterruptedError("Invalid or expired session")) is False
@@ -105,7 +110,8 @@ def test_is_session_expired_rejects_empty_message():
 def _install_stub_server(name: str = "wpcom"):
     """Register a minimal server stub that _handle_session_expired_and_retry
     can signal via _reconnect_event, and that reports ready+session after
-    the event fires."""
+    the event fires.
+    """
     from tools import mcp_tool
 
     mcp_tool._ensure_mcp_loop()
@@ -139,7 +145,8 @@ def _install_stub_server(name: str = "wpcom"):
 def test_call_tool_handler_reconnects_on_session_expired(monkeypatch, tmp_path):
     """Reporter's exact repro: call_tool raises "Invalid or expired
     session", handler triggers reconnect, retries once, and returns
-    the retry's successful JSON (not the generic error)."""
+    the retry's successful JSON (not the generic error).
+    """
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
     from tools import mcp_tool
@@ -193,7 +200,8 @@ def test_call_tool_handler_non_session_expired_error_falls_through(
 ):
     """Preserved-behaviour canary: a non-session-expired exception must
     NOT trigger reconnect — it must fall through to the generic error
-    path so the caller sees the real failure."""
+    path so the caller sees the real failure.
+    """
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
     from tools import mcp_tool
@@ -228,7 +236,8 @@ def test_call_tool_handler_non_session_expired_error_falls_through(
 def test_session_expired_handler_returns_none_without_loop(monkeypatch):
     """Defensive: if the MCP loop isn't running (cold start / shutdown
     race), the handler must fall through cleanly instead of hanging
-    or raising."""
+    or raising.
+    """
     from tools import mcp_tool
     from tools.mcp_tool import _handle_session_expired_and_retry
 
@@ -259,7 +268,8 @@ def test_session_expired_handler_returns_none_without_loop(monkeypatch):
 
 def test_session_expired_handler_returns_none_without_server_record():
     """If the server has been torn down / isn't in _servers, fall
-    through cleanly — nothing to reconnect to."""
+    through cleanly — nothing to reconnect to.
+    """
     from tools.mcp_tool import _handle_session_expired_and_retry
     out = _handle_session_expired_and_retry(
         "does-not-exist",
@@ -275,7 +285,8 @@ def test_session_expired_handler_returns_none_when_retry_also_fails(
 ):
     """If the retry after reconnect also raises, fall through to the
     generic error path (don't loop forever, don't mask the second
-    failure)."""
+    failure).
+    """
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
     from tools import mcp_tool
@@ -321,7 +332,8 @@ def test_non_tool_handlers_also_reconnect_on_session_expired(
     monkeypatch, tmp_path, handler_factory, handler_kwargs, session_method, op_label,
 ):
     """All four non-``tools/call`` MCP handlers share the recovery
-    pattern and must reconnect the same way on session-expired."""
+    pattern and must reconnect the same way on session-expired.
+    """
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
     from tools import mcp_tool

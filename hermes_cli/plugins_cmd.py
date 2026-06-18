@@ -19,9 +19,9 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-from hermes_constants import get_hermes_home
 from hermes_cli.config import cfg_get
 from hermes_cli.secret_prompt import masked_secret_prompt
+from hermes_constants import get_hermes_home
 
 logger = logging.getLogger(__name__)
 
@@ -1272,7 +1272,6 @@ def _run_composite_ui(curses, plugin_names, plugin_labels, plugin_selected,
             # Determine which items are visible based on scroll
             # We need to map logical cursor positions to screen rows
             # accounting for non-navigable separator/headers
-
 
             # --- General Plugins section ---
             if n_plugins > 0:

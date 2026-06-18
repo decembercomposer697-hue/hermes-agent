@@ -1,32 +1,33 @@
 """Tests for cron/jobs.py — schedule parsing, job CRUD, and due-job detection."""
 
 import threading
+from datetime import UTC, datetime, timedelta, timezone
+
 import pytest
-from datetime import datetime, timedelta, timezone, UTC
 
 from cron.jobs import (
-    parse_duration,
-    parse_schedule,
+    advance_next_run,
     compute_next_run,
     create_job,
-    load_jobs,
-    save_jobs,
+    get_due_jobs,
     get_job,
     list_jobs,
-    update_job,
-    pause_job,
-    resume_job,
-    remove_job,
+    load_jobs,
     mark_job_run,
-    advance_next_run,
-    get_due_jobs,
+    parse_duration,
+    parse_schedule,
+    pause_job,
+    remove_job,
+    resume_job,
     save_job_output,
+    save_jobs,
+    update_job,
 )
-
 
 # =========================================================================
 # parse_duration
 # =========================================================================
+
 
 class TestParseDuration:
     def test_minutes(self):
@@ -231,7 +232,8 @@ class TestJobCRUD:
 
     def test_remove_job_rejects_unsafe_legacy_id_before_output_cleanup(self, tmp_cron_dir):
         """Legacy unsafe IDs left over from before the create-time guard
-        must fail closed without half-applying the removal."""
+        must fail closed without half-applying the removal.
+        """
         job = create_job(prompt="Legacy unsafe", schedule="every 1h")
         job["id"] = "../escape"
         save_jobs([job])

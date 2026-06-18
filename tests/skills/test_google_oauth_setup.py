@@ -12,7 +12,6 @@ from pathlib import Path
 
 import pytest
 
-
 SCRIPT_PATH = (
     Path(__file__).resolve().parents[2]
     / "skills/productivity/google-workspace/scripts/setup.py"
@@ -337,7 +336,8 @@ def _load_setup_module(monkeypatch):
 
 def _force_deps_missing(monkeypatch):
     """Make `import googleapiclient` / `import google_auth_oauthlib` fail so
-    install_deps() proceeds past its early-return short-circuit."""
+    install_deps() proceeds past its early-return short-circuit.
+    """
     for name in ("googleapiclient", "google_auth_oauthlib"):
         monkeypatch.setitem(sys.modules, name, None)
 
@@ -362,8 +362,8 @@ class TestInstallDeps:
         # google_auth_oauthlib may not be installed in the test env; only run
         # this assertion when the early-return path is actually reachable.
         try:
-            import googleapiclient
             import google_auth_oauthlib
+            import googleapiclient
         except ImportError:
             pytest.skip("Google libs not installed in test env")
         assert module.install_deps() is True
@@ -432,7 +432,7 @@ class TestInstallDeps:
         assert "hermes-agent[google]" in out
 
     def test_returns_false_when_uv_fallback_also_fails(self, monkeypatch, capsys):
-        """uv present but its install fails → failure surfaced (not swallowed)."""
+        """Uv present but its install fails → failure surfaced (not swallowed)."""
         module = _load_setup_module(monkeypatch)
         _force_deps_missing(monkeypatch)
 

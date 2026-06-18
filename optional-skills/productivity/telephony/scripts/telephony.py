@@ -26,7 +26,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from email.utils import parsedate_to_datetime
 from html import escape as xml_escape
 from pathlib import Path
@@ -127,7 +127,7 @@ def _load_dotenv_values(path: Path | None = None) -> dict[str, str]:
         key = key.strip()
         value = value.strip()
         if value.startswith('"') and value.endswith('"') and len(value) >= 2:
-            value = value[1:-1].replace('\\"', '"').replace('\\\\', '\\')
+            value = value[1:-1].replace('\\"', '"').replace("\\\\", "\\")
         values[key] = value
     return values
 

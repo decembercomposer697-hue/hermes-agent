@@ -1,5 +1,4 @@
-"""
-Profile management for multiple isolated Hermes instances.
+"""Profile management for multiple isolated Hermes instances.
 
 Each profile is a fully independent HERMES_HOME directory with its own
 config.yaml, .env, memory, sessions, skills, gateway, cron, and logs.
@@ -752,6 +751,7 @@ def create_profile(
     -------
     Path
         The newly created profile directory.
+
     """
     if no_skills and (clone_config or clone_all):
         raise ValueError(
@@ -1165,7 +1165,7 @@ def _cleanup_gateway_service(name: str, profile_dir: Path) -> None:
     old_home = os.environ.get("HERMES_HOME")
     try:
         os.environ["HERMES_HOME"] = str(profile_dir)
-        from hermes_cli.gateway import get_service_name, get_launchd_plist_path
+        from hermes_cli.gateway import get_launchd_plist_path, get_service_name
 
         if _platform.system() == "Linux":
             svc_name = get_service_name()
@@ -1221,8 +1221,8 @@ def _stop_gateway_process(profile_dir: Path) -> None:
         # _signal.SIGKILL raises AttributeError at import time on Windows,
         # and raw os.kill with SIGTERM doesn't cascade to child processes
         # the same way taskkill /T does.
-        from gateway.status import terminate_pid as _terminate_pid
         from gateway.status import _pid_exists
+        from gateway.status import terminate_pid as _terminate_pid
         _terminate_pid(pid)  # graceful first
         # Wait up to 10s for graceful shutdown. On Windows, os.kill(pid, 0)
         # is NOT a no-op — use the handle-based existence check.

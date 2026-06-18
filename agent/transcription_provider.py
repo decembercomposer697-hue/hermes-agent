@@ -1,5 +1,4 @@
-"""
-Transcription Provider ABC
+"""Transcription Provider ABC
 ==========================
 
 Defines the pluggable-backend interface for speech-to-text. Providers
@@ -190,4 +189,5 @@ class TranscriptionProvider(abc.ABC):
                 ignore this argument.
             **extra: Forward-compat parameters future schema versions
                 may expose. Implementations should ignore unknown keys.
+
         """

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-maps_client.py - CLI tool for maps, geocoding, routing, POI search, and more.
+"""maps_client.py - CLI tool for maps, geocoding, routing, POI search, and more.
 Uses only Python stdlib. Data from OpenStreetMap/Nominatim, Overpass API, OSRM,
 and TimeAPI.io.
 
@@ -60,7 +59,7 @@ CATEGORY_TAGS = {
     # bakery is tagged as shop=bakery in the OSM wiki, but some mappers use
     # amenity=bakery. Search both so small indie bakeries aren't missed.
     "bakery":            [("shop", "bakery"), ("amenity", "bakery")],
-    "convenience_store": ("shop",    "convenience"),
+    "convenience_store": ("shop", "convenience"),
     # Health
     "hospital":          ("amenity", "hospital"),
     "pharmacy":          ("amenity", "pharmacy"),
@@ -72,9 +71,9 @@ CATEGORY_TAGS = {
     "guest_house":       ("tourism", "guest_house"),
     "camp_site":         ("tourism", "camp_site"),
     # Shopping & Services
-    "supermarket":       ("shop",    "supermarket"),
-    "bookshop":          ("shop",    "books"),
-    "laundry":           ("shop",    "laundry"),
+    "supermarket":       ("shop", "supermarket"),
+    "bookshop":          ("shop", "books"),
+    "laundry":           ("shop", "laundry"),
     # Finance
     "atm":               ("amenity", "atm"),
     "bank":              ("amenity", "bank"),
@@ -146,6 +145,7 @@ OSRM_PROFILES = {
 # Output helpers
 # ---------------------------------------------------------------------------
 
+
 def print_json(data):
     """Print data as pretty-printed JSON to stdout."""
     print(json.dumps(data, indent=2, ensure_ascii=False))
@@ -162,8 +162,7 @@ def error_exit(message, code=1):
 # ---------------------------------------------------------------------------
 
 def http_get(url, params=None, retries=MAX_RETRIES, silent=False):
-    """
-    Perform an HTTP GET request, returning parsed JSON.
+    """Perform an HTTP GET request, returning parsed JSON.
     Adds the required User-Agent header. Retries on transient errors.
     If silent=True, raises RuntimeError instead of calling error_exit.
     """
@@ -200,8 +199,7 @@ def http_get(url, params=None, retries=MAX_RETRIES, silent=False):
 
 
 def http_get_text(url, params=None, retries=MAX_RETRIES, silent=False):
-    """
-    Like http_get but returns raw text instead of parsed JSON.
+    """Like http_get but returns raw text instead of parsed JSON.
     Useful for APIs that may return non-JSON responses.
     """
     if params:
@@ -233,8 +231,7 @@ def http_get_text(url, params=None, retries=MAX_RETRIES, silent=False):
 
 
 def http_post(url, data_str, retries=MAX_RETRIES):
-    """
-    Perform an HTTP POST with a plain-text body (for Overpass QL).
+    """Perform an HTTP POST with a plain-text body (for Overpass QL).
     Returns parsed JSON.
     """
     encoded = data_str.encode("utf-8")
@@ -338,8 +335,7 @@ def nominatim_reverse(lat, lon):
 
 
 def geocode_single(query):
-    """
-    Geocode a query and return (lat, lon, display_name).
+    """Geocode a query and return (lat, lon, display_name).
     Exits with error if nothing found.
     """
     results = nominatim_search(query, limit=1)
@@ -378,11 +374,11 @@ def build_overpass_nearby(tag_key, tag_val, lat, lon, radius, limit,
         )
     body = "\n".join(body_lines)
     return (
-        f'[out:json][timeout:25];\n'
-        f'(\n'
-        f'{body}\n'
-        f');\n'
-        f'out center {limit};\n'
+        f"[out:json][timeout:25];\n"
+        f"(\n"
+        f"{body}\n"
+        f");\n"
+        f"out center {limit};\n"
     )
 
 
@@ -408,17 +404,16 @@ def build_overpass_bbox(tag_key, tag_val, south, west, north, east, limit,
         )
     body = "\n".join(body_lines)
     return (
-        f'[out:json][timeout:25];\n'
-        f'(\n'
-        f'{body}\n'
-        f');\n'
-        f'out center {limit};\n'
+        f"[out:json][timeout:25];\n"
+        f"(\n"
+        f"{body}\n"
+        f");\n"
+        f"out center {limit};\n"
     )
 
 
 def parse_overpass_elements(elements, ref_lat=None, ref_lon=None):
-    """
-    Parse Overpass elements into a clean list of POI dicts.
+    """Parse Overpass elements into a clean list of POI dicts.
     If ref_lat/ref_lon are provided, computes distance and sorts by it.
     """
     places = []
@@ -466,10 +461,10 @@ def parse_overpass_elements(elements, ref_lat=None, ref_lon=None):
         # Promote commonly-useful tags to top-level fields so agents can
         # reference them without digging into the raw ``tags`` dict.
         for src_key, dst_key in (
-            ("cuisine",        "cuisine"),
-            ("opening_hours",  "hours"),
-            ("phone",          "phone"),
-            ("website",        "website"),
+            ("cuisine", "cuisine"),
+            ("opening_hours", "hours"),
+            ("phone", "phone"),
+            ("website", "website"),
         ):
             val = tags.get(src_key)
             if val:
@@ -887,8 +882,7 @@ def cmd_directions(args):
 # ---------------------------------------------------------------------------
 
 def cmd_timezone(args):
-    """
-    Get timezone information for a lat/lon coordinate.
+    """Get timezone information for a lat/lon coordinate.
 
     Strategy:
       1. Try TimeAPI.io (free, no key, supports coordinate-based lookup).

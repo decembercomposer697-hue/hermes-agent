@@ -10,7 +10,6 @@ run silently.
 
 from __future__ import annotations
 
-
 from hermes_cli.config import DEFAULT_CONFIG
 
 
@@ -54,6 +53,7 @@ class TestUserConfigMerge:
         monkeypatch.setenv("HERMES_HOME", str(home))
         # Force a fresh reimport of config.py so the HERMES_HOME is honored.
         import importlib
+
         import hermes_cli.config as cfg_mod
         importlib.reload(cfg_mod)
 
@@ -83,6 +83,7 @@ class TestUserConfigMerge:
 
         monkeypatch.setenv("HERMES_HOME", str(home))
         import importlib
+
         import hermes_cli.config as cfg_mod
         importlib.reload(cfg_mod)
 

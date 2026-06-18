@@ -2,6 +2,7 @@
 
 import sqlite3
 import time
+
 import pytest
 
 from hermes_state import SCHEMA_SQL, SessionDB
@@ -78,7 +79,6 @@ class TestSessionLifecycle:
         assert session["model"] == "test-model"
         assert session["ended_at"] is None
 
-
     def test_get_nonexistent_session(self, db):
         assert db.get_session("nonexistent") is None
 
@@ -148,7 +148,7 @@ class TestSessionLifecycle:
         assert session["api_call_count"] == 3
 
     def test_update_token_counts_api_call_count_absolute(self, db):
-        """absolute mode sets api_call_count directly."""
+        """Absolute mode sets api_call_count directly."""
         db.create_session(session_id="s1", source="cli")
         db.update_token_counts("s1", input_tokens=100, output_tokens=50, api_call_count=1)
         db.update_token_counts("s1", input_tokens=300, output_tokens=150,
@@ -485,7 +485,8 @@ class TestMessageStorage:
 
     def test_replace_messages_persists_tool_name(self, db):
         """`replace_messages` (used by /retry, /undo, /compress) must write
-        tool_name to the DB for messages built by make_tool_result_message."""
+        tool_name to the DB for messages built by make_tool_result_message.
+        """
         from agent.tool_dispatch_helpers import make_tool_result_message
         db.create_session(session_id="s1", source="cli")
         db.replace_messages(
@@ -502,7 +503,8 @@ class TestMessageStorage:
 
     def test_replace_messages_handles_multimodal_content(self, db):
         """`replace_messages` (used by /retry, /undo, /compress) must also
-        handle list content without crashing."""
+        handle list content without crashing.
+        """
         db.create_session(session_id="s1", source="cli")
         content = [
             {"type": "text", "text": "look at this"},
@@ -535,7 +537,8 @@ class TestMessageStorage:
     def test_platform_message_id_round_trips(self, db):
         """Platform-side message ids (yuanbao msg_id, telegram update_id, …)
         survive append → get_messages_as_conversation under the
-        ``message_id`` key so platform recall flows can match by exact id."""
+        ``message_id`` key so platform recall flows can match by exact id.
+        """
         db.create_session(session_id="s_pmi", source="yuanbao")
         db.append_message(
             "s_pmi",
@@ -555,7 +558,8 @@ class TestMessageStorage:
     def test_replace_messages_preserves_platform_message_id(self, db):
         """``rewrite_transcript`` (which goes through replace_messages) must
         keep the platform_message_id round-trip working for /retry, /undo,
-        /compress and yuanbao's recall rewrite path."""
+        /compress and yuanbao's recall rewrite path.
+        """
         db.create_session(session_id="s_rep", source="yuanbao")
         db.replace_messages(
             "s_rep",
@@ -625,7 +629,8 @@ class TestMessageStorage:
     def test_reasoning_persisted_and_restored(self, db):
         """Reasoning text is stored for assistant messages and restored by
         get_messages_as_conversation() so providers receive coherent multi-turn
-        reasoning context."""
+        reasoning context.
+        """
         db.create_session(session_id="s1", source="telegram")
         db.append_message("s1", role="user", content="create a cron job")
         db.append_message(
@@ -649,7 +654,8 @@ class TestMessageStorage:
 
     def test_reasoning_details_persisted_and_restored(self, db):
         """reasoning_details (structured array) is round-tripped through JSON
-        serialization in the DB."""
+        serialization in the DB.
+        """
         db.create_session(session_id="s1", source="telegram")
         details = [
             {"type": "reasoning.summary", "summary": "Thinking about tools"},
@@ -750,7 +756,7 @@ class TestMessageStorage:
         assert conv[0].get("codex_message_items") == items
 
     def test_reasoning_not_set_for_non_assistant(self, db):
-        """reasoning is never leaked onto user or tool messages."""
+        """Reasoning is never leaked onto user or tool messages."""
         db.create_session(session_id="s1", source="telegram")
         db.append_message("s1", role="user", content="hi")
         db.append_message("s1", role="assistant", content="hello", reasoning=None)
@@ -769,7 +775,8 @@ class TestMessageStorage:
 
     def test_codex_reasoning_items_persisted_and_restored(self, db):
         """codex_reasoning_items (encrypted blobs for Codex Responses API) are
-        round-tripped through JSON serialization in the DB."""
+        round-tripped through JSON serialization in the DB.
+        """
         db.create_session(session_id="s1", source="cli")
         codex_items = [
             {"type": "reasoning", "id": "rs_abc", "encrypted_content": "enc_blob_123"},
@@ -885,14 +892,14 @@ class TestFTS5Search:
 
         # Each of these previously caused sqlite3.OperationalError
         dangerous_queries = [
-            'C++',              # + is FTS5 column filter
+            "C++",              # + is FTS5 column filter
             '"unterminated',    # unbalanced double-quote
-            '(problem',         # unbalanced parenthesis
-            'hello AND',        # dangling boolean operator
-            '***',              # repeated wildcard
-            '{test}',           # curly braces (column reference)
-            'OR hello',         # leading boolean operator
-            'a AND OR b',       # adjacent operators
+            "(problem",         # unbalanced parenthesis
+            "hello AND",        # dangling boolean operator
+            "***",              # repeated wildcard
+            "{test}",           # curly braces (column reference)
+            "OR hello",         # leading boolean operator
+            "a AND OR b",       # adjacent operators
         ]
         for query in dangerous_queries:
             # Must not raise — should return list (possibly empty)
@@ -972,22 +979,22 @@ class TestFTS5Search:
         """Unit test for _sanitize_fts5_query static method."""
         from hermes_state import SessionDB
         s = SessionDB._sanitize_fts5_query
-        assert s('hello world') == 'hello world'
-        assert '+' not in s('C++')
+        assert s("hello world") == "hello world"
+        assert "+" not in s("C++")
         assert '"' not in s('"unterminated')
-        assert '(' not in s('(problem')
-        assert '{' not in s('{test}')
+        assert "(" not in s("(problem")
+        assert "{" not in s("{test}")
         # Dangling operators removed
-        assert s('hello AND') == 'hello'
-        assert s('OR world') == 'world'
+        assert s("hello AND") == "hello"
+        assert s("OR world") == "world"
         # Leading bare * removed
-        assert s('***') == ''
+        assert s("***") == ""
         # Valid prefix kept
-        assert s('deploy*') == 'deploy*'
+        assert s("deploy*") == "deploy*"
         # Colon (FTS5 column-filter operator) stripped, both terms preserved
-        assert ':' not in s('TODO: fix')
-        assert s('TODO: fix').split() == ['TODO', 'fix']
-        assert ':' not in s('error:timeout')
+        assert ":" not in s("TODO: fix")
+        assert s("TODO: fix").split() == ["TODO", "fix"]
+        assert ":" not in s("error:timeout")
 
     def test_sanitize_fts5_preserves_quoted_phrases(self):
         """Properly paired double-quoted phrases should be preserved."""
@@ -1009,16 +1016,16 @@ class TestFTS5Search:
         from hermes_state import SessionDB
         s = SessionDB._sanitize_fts5_query
         # Simple hyphenated term
-        assert s('chat-send') == '"chat-send"'
+        assert s("chat-send") == '"chat-send"'
         # Multiple hyphens
-        assert s('docker-compose-up') == '"docker-compose-up"'
+        assert s("docker-compose-up") == '"docker-compose-up"'
         # Hyphenated term with other words
-        result = s('fix chat-send bug')
+        result = s("fix chat-send bug")
         assert '"chat-send"' in result
-        assert 'fix' in result
-        assert 'bug' in result
+        assert "fix" in result
+        assert "bug" in result
         # Multiple hyphenated terms with OR
-        result = s('chat-send OR deploy-prod')
+        result = s("chat-send OR deploy-prod")
         assert '"chat-send"' in result
         assert '"deploy-prod"' in result
         # Already-quoted hyphenated term — no double quoting
@@ -1031,21 +1038,21 @@ class TestFTS5Search:
         from hermes_state import SessionDB
         s = SessionDB._sanitize_fts5_query
 
-        assert s('P2.2') == '"P2.2"'
-        assert s('simulate.p2') == '"simulate.p2"'
-        assert s('simulate.p2.test.ts') == '"simulate.p2.test.ts"'
+        assert s("P2.2") == '"P2.2"'
+        assert s("simulate.p2") == '"simulate.p2"'
+        assert s("simulate.p2.test.ts") == '"simulate.p2.test.ts"'
 
         # Already quoted — no double quoting
         assert s('"P2.2"') == '"P2.2"'
 
         # Works with boolean syntax
-        result = s('P2.2 OR simulate.p2')
+        result = s("P2.2 OR simulate.p2")
         assert '"P2.2"' in result
         assert '"simulate.p2"' in result
 
         # Mixed dots and hyphens — single pass avoids double-quoting
-        assert s('my-app.config') == '"my-app.config"'
-        assert s('my-app.config.ts') == '"my-app.config.ts"'
+        assert s("my-app.config") == '"my-app.config"'
+        assert s("my-app.config.ts") == '"my-app.config.ts"'
 
     def test_sanitize_fts5_quotes_underscored_terms(self):
         """Underscored terms should be wrapped in quotes for exact matching.
@@ -1057,19 +1064,19 @@ class TestFTS5Search:
         from hermes_state import SessionDB
         s = SessionDB._sanitize_fts5_query
         # Simple underscored term
-        assert s('sp_new') == '"sp_new"'
+        assert s("sp_new") == '"sp_new"'
         # Multiple underscores
-        assert s('a_b_c') == '"a_b_c"'
+        assert s("a_b_c") == '"a_b_c"'
         # Mixed underscores and hyphens/dots — single pass avoids double-quoting
-        assert s('sp_new1') == '"sp_new1"'
-        assert s('docker-compose_up') == '"docker-compose_up"'
-        assert s('my.app_config.ts') == '"my.app_config.ts"'
+        assert s("sp_new1") == '"sp_new1"'
+        assert s("docker-compose_up") == '"docker-compose_up"'
+        assert s("my.app_config.ts") == '"my.app_config.ts"'
         # Already-quoted — no double quoting
         assert s('"sp_new"') == '"sp_new"'
         # Mixed with other words
-        result = s('sp_new and 血管瘤')
+        result = s("sp_new and 血管瘤")
         assert '"sp_new"' in result
-        assert '血管瘤' in result
+        assert "血管瘤" in result
 
 
 # =========================================================================
@@ -1135,7 +1142,8 @@ class TestCJKSearchFallback:
 
     def test_cjk_fallback_preserves_source_filter(self, db):
         """Guards against the SQL-builder bug where filter clauses land
-        after LIMIT/OFFSET (seen in one of the duplicate PRs)."""
+        after LIMIT/OFFSET (seen in one of the duplicate PRs).
+        """
         db.create_session(session_id="s1", source="cli")
         db.create_session(session_id="s2", source="telegram")
         db.append_message("s1", role="user", content="记忆断裂在CLI")
@@ -1587,7 +1595,8 @@ class TestBulkDeleteSessions:
     def test_returns_real_count_skipping_unknown_ids(self, db):
         """Unknown IDs are silently skipped — the return value reflects
         what was *actually* deleted, so the UI can show an accurate
-        toast even if the selection raced against another tab."""
+        toast even if the selection raced against another tab.
+        """
         db.create_session(session_id="real", source="cli")
 
         deleted = db.delete_sessions(["real", "ghost1", "ghost2"])
@@ -1598,7 +1607,8 @@ class TestBulkDeleteSessions:
         """``[]`` returns 0 without touching the DB. Guards against a
         bulk endpoint with an empty payload triggering an
         unconditional 'wipe everything' if the caller forgets the
-        WHERE clause."""
+        WHERE clause.
+        """
         db.create_session(session_id="keep", source="cli")
         assert db.delete_sessions([]) == 0
         assert db.get_session("keep") is not None
@@ -1607,7 +1617,8 @@ class TestBulkDeleteSessions:
         """Stray ``None`` / empty strings in the input list are
         filtered out before hitting SQL. Callers may pull selection IDs
         from a Set-like that occasionally contains noise; we don't want
-        a SQL parameter-type error to fail the whole batch."""
+        a SQL parameter-type error to fail the whole batch.
+        """
         db.create_session(session_id="real", source="cli")
         # noinspection PyTypeChecker
         deleted = db.delete_sessions(["real", None, "", "ghost"])  # type: ignore[list-item]
@@ -1617,7 +1628,8 @@ class TestBulkDeleteSessions:
     def test_dedupes_duplicate_ids(self, db):
         """The same ID listed twice counts as one deletion. Defends
         against a hand-crafted POST body or a UI bug that double-adds
-        the same selection."""
+        the same selection.
+        """
         db.create_session(session_id="real", source="cli")
         deleted = db.delete_sessions(["real", "real"])
         assert deleted == 1
@@ -1625,7 +1637,8 @@ class TestBulkDeleteSessions:
     def test_orphans_children_of_deleted_parents(self, db):
         """Bulk-deleting a parent leaves its children alive but
         re-parented to NULL. Same contract as the single-session
-        :meth:`delete_session` path."""
+        :meth:`delete_session` path.
+        """
         db.create_session(session_id="parent", source="cli")
         db.create_session(
             session_id="child", source="cli", parent_session_id="parent",
@@ -1642,7 +1655,8 @@ class TestBulkDeleteSessions:
         explicit bulk-select trusts the user — archived sessions and
         un-ended live sessions are both deleted when in the list.
         Otherwise the selection UI would silently 'leak' rows the user
-        thought they'd removed."""
+        thought they'd removed.
+        """
         db.create_session(session_id="archived", source="cli")
         db.end_session("archived", end_reason="done")
         db.set_session_archived("archived", True)
@@ -1657,7 +1671,8 @@ class TestBulkDeleteSessions:
         """When ``sessions_dir`` is provided, on-disk transcripts are
         swept as part of the bulk operation — mirrors the per-row
         :meth:`delete_session(sessions_dir=...)` behaviour so the
-        bulk-delete CLI / web flows don't leak files."""
+        bulk-delete CLI / web flows don't leak files.
+        """
         db.create_session(session_id="s1", source="cli")
         db.create_session(session_id="s2", source="cli")
         (tmp_path / "s1.jsonl").write_text("")
@@ -1713,7 +1728,8 @@ class TestDeleteEmptySessions:
         """A live (un-ended) empty session is what you get during the
         race between session-create and the first message landing. The
         sweep must not delete it — that would yank a session out from
-        under the agent before its first reply persists."""
+        under the agent before its first reply persists.
+        """
         db.create_session(session_id="live", source="cli")
         # Deliberately no end_session() — session is "active".
 
@@ -1725,7 +1741,8 @@ class TestDeleteEmptySessions:
         """Archived = soft-hidden by the user. They explicitly chose to
         keep the row around (even though it's empty), so the bulk sweep
         must not surprise them by deleting it. Restoring an archived
-        session is one click; resurrecting one we deleted is impossible."""
+        session is one click; resurrecting one we deleted is impossible.
+        """
         db.create_session(session_id="archived_empty", source="cli")
         db.end_session("archived_empty", end_reason="done")
         db.set_session_archived("archived_empty", True)
@@ -1748,7 +1765,8 @@ class TestDeleteEmptySessions:
         """Even an empty parent can have a child (e.g. a branch session
         spawned before the parent received any messages). The sweep
         must orphan that child, not cascade-delete it — same contract
-        as ``delete_session`` and ``prune_sessions``."""
+        as ``delete_session`` and ``prune_sessions``.
+        """
         db.create_session(session_id="empty_parent", source="cli")
         db.end_session("empty_parent", end_reason="done")
         db.create_session(
@@ -1770,7 +1788,8 @@ class TestDeleteEmptySessions:
         too. Empty sessions rarely have ``{id}.json`` / ``.jsonl``
         transcripts, but the request-dump path is real — the gateway
         writes one before the first reply lands, so a crash mid-reply
-        produces an empty session with a non-empty dump file."""
+        produces an empty session with a non-empty dump file.
+        """
         db.create_session(session_id="empty_with_dump", source="cli")
         db.end_session("empty_with_dump", end_reason="done")
 
@@ -3154,6 +3173,7 @@ class TestConcurrentWriteSafety:
         # Access the underlying connection timeout via sqlite3 introspection.
         # There is no public API, so we check the kwarg via the module default.
         import inspect
+
         from hermes_state import SessionDB as _SessionDB
         src = inspect.getsource(_SessionDB.__init__)
         assert "30" in src, (
@@ -3220,7 +3240,8 @@ class TestOptimizeFts:
 
     def test_optimize_skips_missing_trigram_table(self, db):
         """When the trigram index is absent, optimize handles only the porter
-        index and does not raise."""
+        index and does not raise.
+        """
         db.create_session(session_id="s1", source="cli")
         db.append_message(session_id="s1", role="user", content="hello")
         # Drop the trigram table + triggers to simulate a disabled/absent index.
@@ -3464,6 +3485,7 @@ class TestFTS5ToolCallIndexing:
         )
         # end_session + end-time prune path would exercise DELETE; hit the
         # row directly through the write helper to keep the regression focused.
+
         def _delete(conn):
             conn.execute("DELETE FROM messages WHERE session_id = ?", ("s1",))
         db._execute_write(_delete)  # must not raise
@@ -3493,12 +3515,14 @@ class TestFTS5ToolCallIndexing:
 
 class TestFTS5ToolCallMigration:
     """v11 migration: pre-existing state.db with old external-content FTS tables
-    must be re-indexed so tool_name / tool_calls become searchable after upgrade."""
+    must be re-indexed so tool_name / tool_calls become searchable after upgrade.
+    """
 
     def test_v10_to_v11_upgrade_backfills_tool_fields(self, tmp_path):
         """Simulate an existing user: build a v10-shaped DB by hand, insert a
         row with tool_calls, then open via SessionDB (which runs migrations).
-        After upgrade, the tool_calls token must be searchable."""
+        After upgrade, the tool_calls token must be searchable.
+        """
         import sqlite3
 
         db_path = tmp_path / "legacy.db"
@@ -3601,6 +3625,7 @@ class TestApplyWalProbe:
     def test_skips_set_pragma_when_already_wal(self, tmp_path):
         """Already-WAL connection must not trigger the set-pragma."""
         import sqlite3
+
         from hermes_state import apply_wal_with_fallback
 
         class _TracingConn(sqlite3.Connection):
@@ -3635,6 +3660,7 @@ class TestApplyWalProbe:
     def test_sets_wal_on_fresh_connection(self, tmp_path):
         """Probe sees 'delete', then set-pragma runs and returns 'wal'."""
         import sqlite3
+
         from hermes_state import apply_wal_with_fallback
 
         class _TracingConn(sqlite3.Connection):
@@ -3660,9 +3686,10 @@ class TestApplyWalProbe:
 
     def test_apply_wal_concurrent_connects_no_eio(self, tmp_path):
         """20 threads calling connect() on the same DB must not see disk I/O error."""
+        import sqlite3
         import sys
         import threading
-        import sqlite3
+
         from hermes_state import apply_wal_with_fallback
 
         db_path = tmp_path / "concurrent.db"
@@ -3706,6 +3733,7 @@ class TestApplyWalProbe:
     def test_fallback_to_delete_still_works(self, tmp_path):
         """When set-pragma raises a WAL-incompat error, falls back to DELETE."""
         import sqlite3
+
         from hermes_state import apply_wal_with_fallback
 
         class _IncompatConn(sqlite3.Connection):
@@ -3733,6 +3761,7 @@ class TestApplyWalProbe:
     def test_probe_failure_falls_through_to_set_pragma(self, tmp_path):
         """When the read probe raises OperationalError, fall through to set-pragma."""
         import sqlite3
+
         from hermes_state import apply_wal_with_fallback
 
         class _ProbeFails(sqlite3.Connection):
@@ -3759,7 +3788,9 @@ class TestApplyWalProbe:
     def test_no_downgrade_from_wal_to_delete_on_eio(self, tmp_path):
         """OperationalError NOT in _WAL_INCOMPAT_MARKERS must propagate, not downgrade."""
         import sqlite3
+
         import pytest
+
         from hermes_state import apply_wal_with_fallback
 
         class _EIOConn(sqlite3.Connection):
@@ -3786,6 +3817,7 @@ class TestApplyWalProbe:
     def test_returns_wal_not_delete_from_probe(self, tmp_path):
         """Early-return only on 'wal'; 'delete' or 'memory' must fall through to set-pragma."""
         import sqlite3
+
         from hermes_state import apply_wal_with_fallback
 
         class _TracingConn(sqlite3.Connection):
@@ -3849,7 +3881,6 @@ class TestSessionArchive:
         both = {s["id"] for s in db.list_sessions_rich(include_archived=True)}
         assert both == {"live", "hidden"}
         assert db.session_count(include_archived=True) == 2
-
 
 
 class TestSessionIdSearch:

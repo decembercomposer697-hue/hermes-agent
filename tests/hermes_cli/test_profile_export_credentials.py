@@ -7,7 +7,7 @@ profiles; leaking credentials in the archive is a security issue.
 
 import tarfile
 
-from hermes_cli.profiles import export_profile, _DEFAULT_EXPORT_EXCLUDE_ROOT
+from hermes_cli.profiles import _DEFAULT_EXPORT_EXCLUDE_ROOT, export_profile
 
 
 class TestCredentialExclusion:

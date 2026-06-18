@@ -334,7 +334,6 @@ class TestScanSkillCommands:
                 get_skill_commands()
             assert scan_spy.call_count == 0
 
-
     def test_special_chars_stripped_from_cmd_key(self, tmp_path):
         """Skill names with +, /, or other special chars produce clean cmd keys."""
         with patch("tools.skills_tool.SKILLS_DIR", tmp_path):
@@ -620,7 +619,8 @@ Generate some audio.
 class TestSkillDirectoryHeader:
     """The activation message must expose the absolute skill directory and
     explain how to resolve relative paths, so skills with bundled scripts
-    don't force the agent into a second ``skill_view()`` round-trip."""
+    don't force the agent into a second ``skill_view()`` round-trip.
+    """
 
     def test_header_contains_absolute_skill_dir(self, tmp_path):
         with patch("tools.skills_tool.SKILLS_DIR", tmp_path):
@@ -651,7 +651,8 @@ class TestSkillDirectoryHeader:
 
 class TestTemplateVarSubstitution:
     """``${HERMES_SKILL_DIR}`` and ``${HERMES_SESSION_ID}`` in SKILL.md body
-    are replaced before the agent sees the content."""
+    are replaced before the agent sees the content.
+    """
 
     def test_substitutes_skill_dir(self, tmp_path):
         with patch("tools.skills_tool.SKILLS_DIR", tmp_path):
@@ -720,7 +721,8 @@ class TestTemplateVarSubstitution:
 
 class TestInlineShellExpansion:
     """Inline ``!`cmd`` snippets in SKILL.md run before the agent sees the
-    content — but only when the user has opted in via config."""
+    content — but only when the user has opted in via config.
+    """
 
     def test_inline_shell_is_off_by_default(self, tmp_path):
         with patch("tools.skills_tool.SKILLS_DIR", tmp_path):

@@ -229,11 +229,13 @@ class TestFallbackChainDedup:
     """A fallback chain entry that resolves to the current provider/model
     (or the same custom-provider base_url) must be skipped, not retried.
     Otherwise a misconfigured chain or two custom_providers entries pointing
-    at the same shim loop the same failure. See issue #22548."""
+    at the same shim loop the same failure. See issue #22548.
+    """
 
     def test_skips_entry_matching_current_provider_and_model(self):
         """Chain has [same-as-current, real-fallback]; activate must skip
-        the first and use the second."""
+        the first and use the second.
+        """
         fbs = [
             # First entry == current state. Should be skipped.
             {"provider": "openrouter", "model": "z-ai/glm-4.7"},
@@ -248,6 +250,7 @@ class TestFallbackChainDedup:
         # Stub out resolve_provider_client so we can assert which entry was
         # actually used — return a MagicMock client tagged with the provider.
         called = []
+
         def _resolve(provider, model=None, raw_codex=False, **kwargs):
             called.append((provider, model))
             return _mock_client(), model
@@ -263,7 +266,8 @@ class TestFallbackChainDedup:
 
     def test_skips_entry_matching_current_base_url_and_model(self):
         """Two custom_providers entries pointing at the same shim URL
-        with the same model should dedup even if their provider names differ."""
+        with the same model should dedup even if their provider names differ.
+        """
         fbs = [
             # Different provider name but same shim URL + model — same backend.
             {"provider": "claude-cli-alt", "model": "claude-opus-4.7",
@@ -277,6 +281,7 @@ class TestFallbackChainDedup:
         agent.base_url = "http://127.0.0.1:7891/v1"
 
         called = []
+
         def _resolve(provider, model=None, raw_codex=False, **kwargs):
             called.append((provider, model))
             return _mock_client(), model

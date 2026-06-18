@@ -11,8 +11,9 @@ Covers:
 import json
 import os
 import time
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 from tools.process_registry import (
     ProcessRegistry,
@@ -374,10 +375,12 @@ def _silent_bg_base_config(tmp_path):
 
 def _silent_bg_harness(monkeypatch, tmp_path):
     """Common test fixture: patch enough of terminal_tool to spawn a fake
-    background process and capture the JSON result the agent sees."""
+    background process and capture the JSON result the agent sees.
+    """
+    from types import SimpleNamespace
+
     import tools.terminal_tool as terminal_tool_module
     from tools import process_registry as process_registry_module
-    from types import SimpleNamespace
 
     config = _silent_bg_base_config(tmp_path)
     dummy_env = SimpleNamespace(env={})
@@ -407,7 +410,8 @@ def _silent_bg_harness(monkeypatch, tmp_path):
 
 def test_background_without_notify_emits_silent_process_hint(monkeypatch, tmp_path):
     """The footgun case (May 2026 PR #31231): bg=True alone runs silently
-    and the agent has no signal it finished. Tool must nudge."""
+    and the agent has no signal it finished. Tool must nudge.
+    """
     tt = _silent_bg_harness(monkeypatch, tmp_path)
     try:
         result = json.loads(
@@ -474,7 +478,8 @@ def test_background_with_watch_patterns_does_not_emit_hint(monkeypatch, tmp_path
 
 def test_foreground_command_does_not_emit_hint(monkeypatch, tmp_path):
     """Hint only applies to background processes — foreground returns its
-    result synchronously and the agent always sees the outcome."""
+    result synchronously and the agent always sees the outcome.
+    """
     tt = _silent_bg_harness(monkeypatch, tmp_path)
 
     # Foreground path doesn't go through spawn_local. Patch the local-env
@@ -519,7 +524,8 @@ def test_foreground_command_does_not_emit_hint(monkeypatch, tmp_path):
 
 def test_homebrew_ci_poller_via_statusCheckRollup_emits_hint(monkeypatch, tmp_path):
     """The canonical anti-pattern: jq pipeline parsing statusCheckRollup
-    JSON. Tool must point the agent at the green-ci-policy skill snippet."""
+    JSON. Tool must point the agent at the green-ci-policy skill snippet.
+    """
     tt = _silent_bg_harness(monkeypatch, tmp_path)
     try:
         result = json.loads(
@@ -553,7 +559,8 @@ def test_homebrew_ci_poller_via_statusCheckRollup_emits_hint(monkeypatch, tmp_pa
 def test_homebrew_ci_poller_via_gh_pr_checks_piped_to_jq_emits_hint(monkeypatch, tmp_path):
     """`gh pr checks` doesn't emit JSON, so piping it to jq is a confused-
     intent anti-pattern that produces silent failures (jq fails, loop
-    keeps spinning with empty data)."""
+    keeps spinning with empty data).
+    """
     tt = _silent_bg_harness(monkeypatch, tmp_path)
     try:
         result = json.loads(
@@ -580,7 +587,8 @@ def test_canonical_column2_awk_poller_does_not_emit_homebrew_hint(monkeypatch, t
     """The blessed column-2 awk-on-tabs poller from green-ci-policy is the
     PREFERRED pattern for sharded matrices. Must not be flagged as
     homebrew — the gating signal is statusCheckRollup or `gh pr checks
-    | jq`, NOT awk on tabs."""
+    | jq`, NOT awk on tabs.
+    """
     tt = _silent_bg_harness(monkeypatch, tmp_path)
     try:
         result = json.loads(
@@ -611,7 +619,8 @@ def test_canonical_column2_awk_poller_does_not_emit_homebrew_hint(monkeypatch, t
 def test_canonical_gh_pr_checks_exit_code_loop_does_not_emit_hint(monkeypatch, tmp_path):
     """The blessed exit-code-driven snippet from green-ci-policy is exactly
     what we want — no jq, no awk-on-stdout, gates the loop on exit code.
-    Must not be flagged as a homebrew anti-pattern."""
+    Must not be flagged as a homebrew anti-pattern.
+    """
     tt = _silent_bg_harness(monkeypatch, tmp_path)
     try:
         result = json.loads(
@@ -640,7 +649,8 @@ def test_canonical_gh_pr_checks_exit_code_loop_does_not_emit_hint(monkeypatch, t
 def test_non_ci_background_command_does_not_emit_homebrew_hint(monkeypatch, tmp_path):
     """A long-running task that happens to use awk for unrelated reasons
     must not be mistaken for a CI poller — the gating signal is the
-    combination of `gh pr ...` AND a stdout parser."""
+    combination of `gh pr ...` AND a stdout parser.
+    """
     tt = _silent_bg_harness(monkeypatch, tmp_path)
     try:
         result = json.loads(

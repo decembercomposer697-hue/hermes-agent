@@ -107,7 +107,8 @@ def test_codex_picker_uses_live_codex_catalog(hermes_auth_only_env, tmp_path, mo
 def claude_code_only_env(tmp_path, monkeypatch):
     """Set up an environment where Anthropic credentials only exist in
     ~/.claude/.credentials.json (Claude Code) — not in env vars or Hermes
-    auth store."""
+    auth store.
+    """
     hermes_home = tmp_path / ".hermes"
     hermes_home.mkdir()
 
@@ -144,7 +145,7 @@ def claude_code_only_env(tmp_path, monkeypatch):
 
 
 def test_claude_code_file_detected_by_model_picker(claude_code_only_env):
-    """anthropic should appear when credentials only exist in ~/.claude/.credentials.json."""
+    """Anthropic should appear when credentials only exist in ~/.claude/.credentials.json."""
     from hermes_cli.model_switch import list_authenticated_providers
 
     providers = list_authenticated_providers(

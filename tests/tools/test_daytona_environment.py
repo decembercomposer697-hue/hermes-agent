@@ -6,10 +6,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Helpers to build mock Daytona SDK objects
 # ---------------------------------------------------------------------------
+
 
 def _make_exec_response(result="", exit_code=0):
     return SimpleNamespace(result=result, exit_code=exit_code)
@@ -25,9 +25,8 @@ def _make_sandbox(sandbox_id="sb-123", state="started"):
 
 def _patch_daytona_imports(monkeypatch):
     """Patch the daytona SDK so DaytonaEnvironment can be imported without it."""
-    import types as _types
-
     import enum
+    import types as _types
 
     class _SandboxState(str, enum.Enum):
         STARTED = "started"
@@ -298,7 +297,6 @@ class TestExecute:
         assert "HERMES_STDIN_" in cmd
         assert "print" in cmd
         assert "hi" in cmd
-
 
     def test_daytona_error_triggers_retry(self, make_env, daytona_sdk):
         sb = _make_sandbox()

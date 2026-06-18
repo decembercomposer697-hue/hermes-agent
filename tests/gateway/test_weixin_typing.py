@@ -9,7 +9,7 @@ import pytest
 @pytest.fixture
 def weixin_adapter():
     """Create a minimal WeixinAdapter with mocked internals for typing tests."""
-    from gateway.platforms.weixin import WeixinAdapter, TypingTicketCache
+    from gateway.platforms.weixin import TypingTicketCache, WeixinAdapter
 
     config = MagicMock()
     config.extra = {"account_id": "test-account"}

@@ -203,7 +203,8 @@ class TestSegmentBreakDoesNotMarkFinalSent:
         age gate, not a monkeypatch): a preamble ages past the threshold, then a
         tool boundary finalizes it via fresh-final.  The genuine final answer is
         produced on a later API call and is NOT streamed through this consumer
-        (the #29346 repro), so the consumer must NOT believe the final was sent."""
+        (the #29346 repro), so the consumer must NOT believe the final was sent.
+        """
         adapter = _make_adapter()
         consumer = GatewayStreamConsumer(
             adapter=adapter,
@@ -232,7 +233,8 @@ class TestSegmentBreakDoesNotMarkFinalSent:
         """P0 user-visible contract: when the real final answer DOES stream in
         after the preamble + tool boundary, the user gets it exactly once AND
         the consumer marks it delivered (so the gateway correctly suppresses a
-        redundant send)."""
+        redundant send).
+        """
         adapter = _make_adapter()
         consumer = GatewayStreamConsumer(
             adapter=adapter,
@@ -265,7 +267,8 @@ class TestSegmentBreakDoesNotMarkFinalSent:
     async def test_genuine_final_answer_without_tools_marks_delivered(self):
         """P1 happy path: a single answer streamed straight to completion (no
         tool boundary) still sets final_response_sent so the gateway suppresses
-        the redundant final send."""
+        the redundant final send.
+        """
         adapter = _make_adapter()
         consumer = GatewayStreamConsumer(
             adapter=adapter,
@@ -287,7 +290,8 @@ class TestSegmentBreakDoesNotMarkFinalSent:
     async def test_no_edit_adapter_delivers_final_after_preamble(self):
         """No-edit adapters (Signal/SMS/webhook → __no_edit__) accumulate and
         deliver rather than fresh-final. A preamble before a tool call must not
-        swallow the genuine final answer — it must reach the user."""
+        swallow the genuine final answer — it must reach the user.
+        """
         adapter = _make_adapter()
         adapter.send.return_value = SimpleNamespace(success=True, message_id=None)
         consumer = GatewayStreamConsumer(
@@ -316,7 +320,8 @@ class TestSegmentBreakDoesNotMarkFinalSent:
     async def test_multi_tool_call_turn_delivers_final_once(self):
         """Two tool boundaries before the final answer: flags stay clear across
         both boundaries and the genuine final is delivered exactly once and
-        marked sent."""
+        marked sent.
+        """
         adapter = _make_adapter()
         consumer = GatewayStreamConsumer(
             adapter=adapter,
@@ -436,7 +441,8 @@ class TestCancelledBestEffortDeliveryFinalizes:
         finalized cancel-path delivery is eligible for fresh-final
         (delete + fresh send). is_turn_final=False keeps _try_fresh_final
         from setting the flags itself; the cancel handler sets them after
-        the successful delivery."""
+        the successful delivery.
+        """
         adapter = _make_adapter()
         adapter.REQUIRES_EDIT_FINALIZE = True
         adapter.send.side_effect = [
@@ -520,7 +526,8 @@ class TestGotDoneOverflowSplitNotRefinalized:
     async def test_non_split_finalize_edit_still_gets_explicit_refinalize(self):
         """The narrow fix must not regress the requires-finalize contract:
         a normal (non-split) got_done edit is still followed by the
-        explicit finalize edit (#25010 semantics unchanged)."""
+        explicit finalize edit (#25010 semantics unchanged).
+        """
         adapter = _make_adapter()
         adapter.REQUIRES_EDIT_FINALIZE = True
         adapter.edit_message = AsyncMock(return_value=SimpleNamespace(
@@ -598,7 +605,8 @@ class TestTelegramAdapterDeleteMessage:
 
     def test_base_adapter_default_returns_false(self):
         """BasePlatformAdapter.delete_message default = no-op returning False."""
-        from gateway.platforms.base import BasePlatformAdapter
         import inspect
+
+        from gateway.platforms.base import BasePlatformAdapter
         sig = inspect.signature(BasePlatformAdapter.delete_message)
         assert list(sig.parameters)[:3] == ["self", "chat_id", "message_id"]

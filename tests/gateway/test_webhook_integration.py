@@ -23,12 +23,12 @@ from gateway.config import (
     PlatformConfig,
 )
 from gateway.platforms.base import MessageEvent, SendResult
-from gateway.platforms.webhook import WebhookAdapter, _INSECURE_NO_AUTH
-
+from gateway.platforms.webhook import _INSECURE_NO_AUTH, WebhookAdapter
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_adapter(routes, **extra_kw) -> WebhookAdapter:
     """Create a WebhookAdapter with the given routes."""
@@ -153,7 +153,8 @@ class TestSkillsInjection:
     async def test_skills_injected_into_prompt(self):
         """When a route has skills: [code-review], the adapter should
         call build_skill_invocation_message() and use its output as the
-        prompt instead of the raw template render."""
+        prompt instead of the raw template render.
+        """
         routes = {
             "pr-review": {
                 "secret": _INSECURE_NO_AUTH,
@@ -214,7 +215,8 @@ class TestCrossPlatformDelivery:
     @pytest.mark.asyncio
     async def test_cross_platform_delivery(self):
         """When deliver='telegram', the response is routed to the
-        Telegram adapter via gateway_runner.adapters."""
+        Telegram adapter via gateway_runner.adapters.
+        """
         routes = {
             "alerts": {
                 "secret": _INSECURE_NO_AUTH,
@@ -272,7 +274,8 @@ class TestGitHubCommentDelivery:
     @pytest.mark.asyncio
     async def test_github_comment_delivery(self):
         """When deliver='github_comment', the adapter invokes
-        ``gh pr comment`` via subprocess.run (mocked)."""
+        ``gh pr comment`` via subprocess.run (mocked).
+        """
         routes = {
             "pr-bot": {
                 "secret": _INSECURE_NO_AUTH,

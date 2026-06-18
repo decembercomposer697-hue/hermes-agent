@@ -1,5 +1,4 @@
-"""
-Cron job scheduler - executes due jobs.
+"""Cron job scheduler - executes due jobs.
 
 Provides tick() which checks for due jobs and runs them. The gateway
 calls this every 60 seconds from a background thread.
@@ -37,9 +36,9 @@ from typing import List, Optional
 # the module) fail with ModuleNotFoundError for hermes_time et al.
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from hermes_constants import get_hermes_home
 from hermes_cli._subprocess_compat import windows_hide_flags
-from hermes_cli.config import load_config, _expand_env_vars
+from hermes_cli.config import _expand_env_vars, load_config
+from hermes_constants import get_hermes_home
 from hermes_time import now as _hermes_now
 
 logger = logging.getLogger(__name__)
@@ -102,7 +101,9 @@ def _resolve_cron_enabled_toolsets(job: dict, cfg: dict) -> list[str] | None:
     if per_job:
         return per_job
     try:
-        from hermes_cli.tools_config import _get_platform_tools  # lazy: avoid heavy import at cron module load
+        from hermes_cli.tools_config import (
+            _get_platform_tools,  # lazy: avoid heavy import at cron module load
+        )
         return sorted(_get_platform_tools(cfg or {}, "cron"))
     except Exception as exc:
         logger.warning(
@@ -148,7 +149,7 @@ _LEGACY_HOME_TARGET_ENV_VARS = {
     "QQBOT_HOME_CHANNEL": "QQ_HOME_CHANNEL",
 }
 
-from cron.jobs import get_due_jobs, mark_job_run, save_job_output, advance_next_run
+from cron.jobs import advance_next_run, get_due_jobs, mark_job_run, save_job_output
 
 # Sentinel: when a cron agent has nothing new to report, it can start its
 # response with this marker to suppress delivery.  Output is still saved
@@ -595,8 +596,8 @@ def _resolve_delivery_target(job: dict) -> dict | None:
 
 # Media extension sets — audio routing is centralized in gateway.platforms.base
 # via should_send_media_as_audio() so Telegram-specific rules stay in one place.
-_VIDEO_EXTS = frozenset({'.mp4', '.mov', '.avi', '.mkv', '.webm', '.3gp'})
-_IMAGE_EXTS = frozenset({'.jpg', '.jpeg', '.png', '.webp', '.gif'})
+_VIDEO_EXTS = frozenset({".mp4", ".mov", ".avi", ".mkv", ".webm", ".3gp"})
+_IMAGE_EXTS = frozenset({".jpg", ".jpeg", ".png", ".webp", ".gif"})
 
 
 def _send_media_via_adapter(
@@ -656,8 +657,7 @@ def _send_media_via_adapter(
 
 
 def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> str | None:
-    """
-    Deliver job output to the configured target(s) (origin chat, specific platform, etc.).
+    """Deliver job output to the configured target(s) (origin chat, specific platform, etc.).
 
     When ``adapters`` and ``loop`` are provided (gateway is running), tries to
     use the live adapter first — this supports E2EE rooms (e.g. Matrix) where
@@ -674,8 +674,8 @@ def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> str | 
             return msg
         return None  # local-only jobs don't deliver — not a failure
 
+    from gateway.config import Platform, load_gateway_config
     from tools.send_message_tool import _send_to_platform
-    from gateway.config import load_gateway_config, Platform
 
     # Optionally wrap the content with a header/footer so the user knows this
     # is a cron delivery.  Wrapping is on by default; set cron.wrap_response: false
@@ -914,6 +914,7 @@ def _run_job_script(script_path: str) -> tuple[bool, str]:
     Returns:
         (success, output) — on failure *output* contains the error message so the
         LLM can report the problem to the user.
+
     """
     scripts_dir = _get_hermes_home() / "scripts"
     scripts_dir.mkdir(parents=True, exist_ok=True)
@@ -1039,6 +1040,7 @@ def _build_job_prompt(job: dict, prerun_script: tuple | None = None) -> str:
             When provided, the script is not re-executed and the cached
             result is used for prompt injection. When omitted, the script
             (if any) runs inline as before.
+
     """
     user_prompt = str(job.get("prompt") or "")
     prompt = user_prompt
@@ -1157,9 +1159,12 @@ def _build_job_prompt(job: dict, prerun_script: tuple | None = None) -> str:
             user_prompt=user_prompt,
         )
 
-    from tools.skills_tool import skill_view
+    from agent.skill_bundles import (
+        build_bundle_invocation_message,
+        resolve_bundle_command_key,
+    )
     from tools.skill_usage import bump_use
-    from agent.skill_bundles import build_bundle_invocation_message, resolve_bundle_command_key
+    from tools.skills_tool import skill_view
 
     parts = []
     skipped: list[str] = []
@@ -1303,11 +1308,11 @@ def _scan_assembled_cron_prompt(
 
 
 def run_job(job: dict) -> tuple[bool, str, str, str | None]:
-    """
-    Execute a single cron job.
+    """Execute a single cron job.
     
     Returns:
         Tuple of (success, full_output_doc, final_response, error_message)
+
     """
     job_id = job["id"]
     job_name = str(job.get("name") or job.get("prompt") or job_id or "cron job")
@@ -1497,7 +1502,7 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
 
     # Use ContextVars for per-job session/delivery state so parallel jobs
     # don't clobber each other's targets (os.environ is process-global).
-    from gateway.session_context import set_session_vars, clear_session_vars, _VAR_MAP
+    from gateway.session_context import _VAR_MAP, clear_session_vars, set_session_vars
 
     # Cron execution is an internal scheduler context, not a live inbound
     # gateway message. Do not seed HERMES_SESSION_* contextvars from the
@@ -1640,11 +1645,11 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
         # Provider routing
         pr = _cfg.get("provider_routing", {})
 
-        from hermes_cli.runtime_provider import (
-            resolve_runtime_provider,
-            format_runtime_provider_error,
-        )
         from hermes_cli.auth import AuthError
+        from hermes_cli.runtime_provider import (
+            format_runtime_provider_error,
+            resolve_runtime_provider,
+        )
         try:
             # Do not inject HERMES_INFERENCE_PROVIDER here. resolve_runtime_provider()
             # already prefers persisted config over stale shell/env overrides when
@@ -1967,8 +1972,7 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
 
 
 def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> int:
-    """
-    Check and run all due jobs.
+    """Check and run all due jobs.
     
     Uses a file lock so only one tick runs at a time, even if the gateway's
     in-process ticker and a standalone daemon or manual tick overlap.
@@ -1980,6 +1984,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
     
     Returns:
         Number of jobs executed (0 if another tick is already running)
+
     """
     lock_dir, lock_file = _get_lock_paths()
     lock_dir.mkdir(parents=True, exist_ok=True)
@@ -2002,11 +2007,11 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
         due_jobs = get_due_jobs()
 
         if verbose and not due_jobs:
-            logger.info("%s - No jobs due", _hermes_now().strftime('%H:%M:%S'))
+            logger.info("%s - No jobs due", _hermes_now().strftime("%H:%M:%S"))
             return 0
 
         if verbose:
-            logger.info("%s - %s job(s) due", _hermes_now().strftime('%H:%M:%S'), len(due_jobs))
+            logger.info("%s - %s job(s) due", _hermes_now().strftime("%H:%M:%S"), len(due_jobs))
 
         # Advance next_run_at for all recurring jobs FIRST, under the file lock,
         # before any execution begins.  This preserves at-most-once semantics.
@@ -2083,7 +2088,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
                 return True
 
             except Exception as e:
-                logger.error("Error processing job %s: %s", job['id'], e)
+                logger.error("Error processing job %s: %s", job["id"], e)
                 mark_job_run(job["id"], False, str(e))
                 return False
 

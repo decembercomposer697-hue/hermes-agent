@@ -521,7 +521,8 @@ def test_custom_endpoint_uses_saved_config_base_url_when_env_missing(monkeypatch
     """Persisted custom endpoints in config.yaml must still resolve when
     OPENAI_BASE_URL is absent from the current environment.
     OPENAI_API_KEY / OPENROUTER_API_KEY must NOT leak to a non-OpenAI host
-    (issue #28660) — local LLM servers get no-key-required instead."""
+    (issue #28660) — local LLM servers get no-key-required instead.
+    """
     monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "openrouter")
     monkeypatch.setattr(
         rp,
@@ -756,7 +757,8 @@ def test_bare_custom_resolves_providers_dict_entry_named_custom(monkeypatch):
 
 def test_bare_custom_without_named_entry_still_falls_through(monkeypatch):
     """No literal providers.custom entry → bare custom keeps the legacy
-    model.base_url trust-path behavior, unchanged by the fix."""
+    model.base_url trust-path behavior, unchanged by the fix.
+    """
     monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "openrouter")
     monkeypatch.setattr(
         rp,
@@ -784,7 +786,8 @@ def test_bare_custom_without_named_entry_still_falls_through(monkeypatch):
 
 def test_named_custom_provider_uses_providers_dict_when_list_missing(monkeypatch):
     """After v11→v12 migration deletes custom_providers, resolution should
-    still find entries in the providers dict via get_compatible_custom_providers."""
+    still find entries in the providers dict via get_compatible_custom_providers.
+    """
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     monkeypatch.setattr(
@@ -824,7 +827,7 @@ def test_named_custom_provider_uses_providers_dict_when_list_missing(monkeypatch
 
 
 def test_named_custom_provider_uses_key_env_from_providers_dict(monkeypatch):
-    """providers dict entries with key_env should resolve API key from env var."""
+    """Providers dict entries with key_env should resolve API key from env var."""
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     monkeypatch.setenv("MYCORP_API_KEY", "env-secret")
@@ -1032,7 +1035,8 @@ def test_named_custom_provider_skipped_for_canonical_built_in(monkeypatch):
 def test_explicit_openrouter_skips_openai_base_url(monkeypatch):
     """When the user explicitly requests openrouter, OPENAI_BASE_URL
     (which may point to a custom endpoint) must not override the
-    OpenRouter base URL.  Regression test for #874."""
+    OpenRouter base URL.  Regression test for #874.
+    """
     monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "openrouter")
     monkeypatch.setattr(rp, "_get_model_config", lambda: {})
     monkeypatch.setenv("OPENAI_BASE_URL", "https://my-custom-llm.example.com/v1")
@@ -1606,8 +1610,9 @@ def test_auto_detected_codex_auth_failure_falls_through_to_openrouter(monkeypatc
 
 def test_explicit_nous_auth_failure_still_raises(monkeypatch):
     """When user explicitly requests Nous and auth fails, the error should propagate."""
-    from hermes_cli.auth import AuthError
     import pytest
+
+    from hermes_cli.auth import AuthError
 
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-or-key")
     monkeypatch.setattr(rp, "load_config", lambda: {})
@@ -1829,7 +1834,8 @@ class TestOllamaUrlSubstringLeak:
 
     def test_ollama_key_not_leaked_to_path_injection(self, monkeypatch):
         """http://127.0.0.1:9000/ollama.com/v1 — attacker endpoint with
-        ollama.com in PATH. Must resolve to OPENAI_API_KEY, not OLLAMA_API_KEY."""
+        ollama.com in PATH. Must resolve to OPENAI_API_KEY, not OLLAMA_API_KEY.
+        """
         monkeypatch.setenv("OPENAI_API_KEY", "oa-secret")
         monkeypatch.setenv("OPENROUTER_API_KEY", "or-secret")
         monkeypatch.setenv("OLLAMA_API_KEY", "ol-SECRET-should-not-leak")
@@ -1851,7 +1857,8 @@ class TestOllamaUrlSubstringLeak:
 
     def test_ollama_key_not_leaked_to_lookalike_host(self, monkeypatch):
         """ollama.com.attacker.test — look-alike host. OLLAMA_API_KEY
-        must not be sent."""
+        must not be sent.
+        """
         monkeypatch.setenv("OPENAI_API_KEY", "oa-secret")
         monkeypatch.setenv("OLLAMA_API_KEY", "ol-SECRET-should-not-leak")
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "custom")
@@ -1869,7 +1876,8 @@ class TestOllamaUrlSubstringLeak:
 
     def test_ollama_key_sent_to_genuine_ollama_com(self, monkeypatch):
         """https://ollama.com/v1 — legit Ollama Cloud. OLLAMA_API_KEY
-        should be used."""
+        should be used.
+        """
         monkeypatch.setenv("OPENAI_API_KEY", "oa-secret")
         monkeypatch.setenv("OLLAMA_API_KEY", "ol-legit-key")
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "custom")
@@ -1936,7 +1944,8 @@ class TestAzureFoundryResolution:
 
     def test_azure_foundry_anthropic_style_strips_v1_suffix(self, monkeypatch):
         """Anthropic-style Azure Foundry → anthropic_messages, /v1 stripped
-        because the Anthropic SDK appends /v1/messages itself."""
+        because the Anthropic SDK appends /v1/messages itself.
+        """
         monkeypatch.setenv("AZURE_FOUNDRY_API_KEY", "az-key-ant")
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "azure-foundry")
         monkeypatch.setattr(rp, "_get_model_config", lambda: self._make_cfg(
@@ -2178,7 +2187,8 @@ class TestAzureAnthropicEnvVarHint:
 
     def test_key_env_points_at_unset_var_falls_through(self, monkeypatch):
         """If key_env names an env var that isn't set, fall through to the
-        historical fixed names rather than failing outright."""
+        historical fixed names rather than failing outright.
+        """
         monkeypatch.setenv("AZURE_ANTHROPIC_KEY", "fallback-works")
         monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
         monkeypatch.delenv("UNSET_VAR", raising=False)
@@ -2190,7 +2200,6 @@ class TestAzureAnthropicEnvVarHint:
         resolved = rp.resolve_runtime_provider(requested="anthropic")
 
         assert resolved["api_key"] == "fallback-works"
-
 
     def test_no_key_anywhere_raises_helpful_error(self, monkeypatch):
         """When nothing resolves, the error message mentions key_env as an option."""
@@ -2205,7 +2214,8 @@ class TestAzureAnthropicEnvVarHint:
 
     def test_non_azure_anthropic_path_ignores_key_env(self, monkeypatch):
         """key_env is only consulted on Azure endpoints — non-Azure Anthropic
-        still goes through the regular resolve_anthropic_token chain."""
+        still goes through the regular resolve_anthropic_token chain.
+        """
         monkeypatch.setenv("MY_KEY", "custom-key-value")
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "anthropic")
         monkeypatch.setattr(rp, "_get_model_config", lambda: {
@@ -2215,6 +2225,7 @@ class TestAzureAnthropicEnvVarHint:
         })
         monkeypatch.setattr(rp, "load_pool", lambda provider: None)
         called = {"resolve_anthropic_token": False}
+
         def _fake_resolve():
             called["resolve_anthropic_token"] = True
             return "token-from-resolver"
@@ -2239,7 +2250,8 @@ class TestProviderEntryApiKeyEnvAlias:
     """The `providers.<name>` and `custom_providers[i]` normalizer must accept
     `api_key_env` as an alias for `key_env` so configs written against the
     documented Azure Foundry YAML shape (or imported from other tools that
-    use `api_key_env`) resolve correctly."""
+    use `api_key_env`) resolve correctly.
+    """
 
     def test_snake_case_api_key_env_normalizes_to_key_env(self):
         from hermes_cli.config import _normalize_custom_provider_entry
@@ -2278,7 +2290,8 @@ class TestProviderEntryApiKeyEnvAlias:
 
     def test_valid_fields_set_lists_key_env(self):
         """The _VALID_CUSTOM_PROVIDER_FIELDS documentation set must include
-        key_env so the set stays in sync with what the runtime actually reads."""
+        key_env so the set stays in sync with what the runtime actually reads.
+        """
         from hermes_cli.config import _VALID_CUSTOM_PROVIDER_FIELDS
         assert "key_env" in _VALID_CUSTOM_PROVIDER_FIELDS
 
@@ -2303,9 +2316,11 @@ class TestProviderEntryApiKeyEnvAlias:
 # Tencent TokenHub — API-key provider runtime resolution
 # =============================================================================
 
+
 class TestTencentTokenhubRuntimeResolution:
     """Verify Tencent TokenHub resolves correctly through the generic
-    API-key provider path in resolve_runtime_provider."""
+    API-key provider path in resolve_runtime_provider.
+    """
 
     def test_resolves_with_env_key(self, monkeypatch):
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "tencent-tokenhub")
@@ -2335,7 +2350,8 @@ class TestTencentTokenhubRuntimeResolution:
 
     def test_config_base_url_honoured_when_provider_matches(self, monkeypatch):
         """model.base_url in config.yaml should override the hardcoded default
-        when model.provider == tencent-tokenhub."""
+        when model.provider == tencent-tokenhub.
+        """
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "tencent-tokenhub")
         monkeypatch.setattr(rp, "_get_model_config", lambda: {
             "provider": "tencent-tokenhub",
@@ -2383,6 +2399,7 @@ class TestTencentTokenhubRuntimeResolution:
 # ---------------------------------------------------------------------------
 # minimax-oauth runtime resolution tests (added by feat/minimax-oauth-provider)
 # ---------------------------------------------------------------------------
+
 
 def test_minimax_oauth_runtime_returns_anthropic_messages_mode(monkeypatch):
     """resolve_runtime_provider for minimax-oauth must return api_mode='anthropic_messages'."""
@@ -2555,7 +2572,8 @@ def test_trustworthy_check_accepts_custom_aliases():
 
 def test_openai_key_only_sent_to_openai_host(monkeypatch):
     """OPENAI_API_KEY must only be forwarded to api.openai.com, not to
-    arbitrary custom endpoints (issue #28660)."""
+    arbitrary custom endpoints (issue #28660).
+    """
     monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "openrouter")
     monkeypatch.setattr(
         rp,
@@ -2668,7 +2686,8 @@ def test_host_derived_key_does_not_leak_to_lookalike_host(monkeypatch):
     """DEEPSEEK_API_KEY must NOT be sent to an attacker-controlled lookalike
     host (e.g. api.deepseek.com.attacker.test). The host-derive helper uses
     proper hostname parsing so it picks the *attacker's* vendor label, not
-    DEEPSEEK — and any real DEEPSEEK_API_KEY stays put."""
+    DEEPSEEK — and any real DEEPSEEK_API_KEY stays put.
+    """
     monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "openrouter")
     monkeypatch.setattr(
         rp,
@@ -2690,7 +2709,8 @@ def test_host_derived_key_does_not_leak_to_lookalike_host(monkeypatch):
 
 def test_host_derived_key_ignored_for_loopback(monkeypatch):
     """Local LLM endpoints (127.0.0.1, localhost) must not derive any host
-    env var — there's no meaningful vendor label."""
+    env var — there's no meaningful vendor label.
+    """
     monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "openrouter")
     monkeypatch.setattr(
         rp,
@@ -2715,7 +2735,8 @@ def test_host_derived_key_skips_already_handled_vendors(monkeypatch):
     """The host-derive helper must not double-resolve OPENAI / OPENROUTER /
     OLLAMA env vars — those are owned by their explicit host-gated paths.
     Specifically, OPENAI_API_KEY must not leak to a non-openai host via the
-    `openai` label in a path or subdomain."""
+    `openai` label in a path or subdomain.
+    """
     monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "openrouter")
     monkeypatch.setattr(
         rp,

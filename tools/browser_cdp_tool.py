@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Raw Chrome DevTools Protocol (CDP) passthrough tool.
+"""Raw Chrome DevTools Protocol (CDP) passthrough tool.
 
 Exposes a single tool, ``browser_cdp``, that sends arbitrary CDP commands to
 the browser's DevTools WebSocket endpoint.  Works when a CDP URL is
@@ -78,7 +77,9 @@ def _resolve_cdp_endpoint() -> str:
     2. ``browser.cdp_url`` in ``config.yaml``
     """
     try:
-        from tools.browser_tool import _get_cdp_override  # type: ignore[import-not-found]
+        from tools.browser_tool import (
+            _get_cdp_override,  # type: ignore[import-not-found]
+        )
 
         return (_get_cdp_override() or "").strip()
     except Exception as exc:  # pragma: no cover — defensive
@@ -202,7 +203,9 @@ def _browser_cdp_via_supervisor(
     ``asyncio.run_coroutine_threadsafe`` onto the supervisor loop).
     """
     try:
-        from tools.browser_supervisor import SUPERVISOR_REGISTRY  # type: ignore[import-not-found]
+        from tools.browser_supervisor import (
+            SUPERVISOR_REGISTRY,  # type: ignore[import-not-found]
+        )
     except Exception as exc:  # pragma: no cover — defensive
         return tool_error(
             f"CDP supervisor is not available: {exc}. frame_id routing requires "
@@ -329,6 +332,7 @@ def browser_cdp(
     Returns:
         JSON string ``{"success": True, "method": ..., "result": {...}}`` on
         success, or ``{"error": "..."}`` on failure.
+
     """
     # --- Route iframe-scoped calls through the supervisor ---------------
     if frame_id:

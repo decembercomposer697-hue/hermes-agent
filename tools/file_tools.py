@@ -9,14 +9,14 @@ import threading
 from pathlib import Path
 
 from agent.file_safety import get_read_block_error
+from agent.redact import redact_sensitive_text
+from tools import file_state
 from tools.binary_extensions import has_binary_extension
 from tools.file_operations import (
     ShellFileOperations,
     normalize_read_pagination,
     normalize_search_pagination,
 )
-from tools import file_state
-from agent.redact import redact_sensitive_text
 
 logger = logging.getLogger(__name__)
 
@@ -616,14 +616,19 @@ def _get_file_ops(task_id: str = "default") -> ShellFileOperations:
     parent's container and its cached file_ops. RL/benchmark task_ids with
     a registered env override keep their isolation.
     """
+    import time
+
     from tools.terminal_tool import (
-        _active_environments, _env_lock, _create_environment,
-        _get_env_config, _last_activity, _start_cleanup_thread,
+        _active_environments,
+        _create_environment,
         _creation_locks,
         _creation_locks_lock,
+        _env_lock,
+        _get_env_config,
+        _last_activity,
         _resolve_container_task_id,
+        _start_cleanup_thread,
     )
-    import time
 
     task_id = _resolve_container_task_id(task_id)
 
@@ -959,8 +964,6 @@ def read_file_tool(path: str, offset: int = 1, limit: int = 500, task_id: str = 
         return tool_error(str(e))
 
 
-
-
 def reset_file_dedup(task_id: str = None):
     """Clear the deduplication cache for file reads.
 
@@ -1186,8 +1189,9 @@ def patch_tool(mode: str = "replace", path: str = None, old_string: str = None,
         _paths_to_check.append(path)
     if mode == "patch" and patch:
         import re as _re
+
         from tools.path_security import has_traversal_component
-        for _m in _re.finditer(r'^\*\*\*\s+(?:Update|Add|Delete)\s+File:\s*(.+)$', patch, _re.MULTILINE):
+        for _m in _re.finditer(r"^\*\*\*\s+(?:Update|Add|Delete)\s+File:\s*(.+)$", patch, _re.MULTILINE):
             v4a_path = _m.group(1).strip()
             # V4A path headers come from patch CONTENT, not the explicit
             # ``path=`` arg — so they're more attacker-influenceable (skill
@@ -1389,9 +1393,9 @@ def search_tool(pattern: str, target: str = "content", path: str = ".",
             pattern=pattern, path=path, target=target, file_glob=file_glob,
             limit=limit, offset=offset, output_mode=output_mode, context=context,
         )
-        if hasattr(result, 'matches'):
+        if hasattr(result, "matches"):
             for m in result.matches:
-                if hasattr(m, 'content') and m.content:
+                if hasattr(m, "content") and m.content:
                     m.content = redact_sensitive_text(m.content, code_file=True)
         result_dict = result.to_dict()
 
@@ -1410,8 +1414,6 @@ def search_tool(pattern: str, target: str = "content", path: str = ".",
         return result_json
     except Exception as e:
         return tool_error(str(e))
-
-
 
 
 # ---------------------------------------------------------------------------

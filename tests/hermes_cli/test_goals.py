@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import json
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
-
 
 # ──────────────────────────────────────────────────────────────────────
 # Fixtures
@@ -325,7 +324,8 @@ class TestGoalManager:
     def test_continuation_prompt_shape(self, hermes_home):
         """The continuation prompt must include the goal text verbatim —
         and must be safe to inject as a user-role message (prompt-cache
-        invariants: no system-prompt mutation)."""
+        invariants: no system-prompt mutation).
+        """
         from hermes_cli.goals import GoalManager
 
         mgr = GoalManager(session_id="cont-sid")
@@ -350,7 +350,7 @@ def test_goal_command_in_registry():
 
 
 def test_goal_command_dispatches_in_cli_registry_helpers():
-    """goal shows up in autocomplete / help categories alongside other Session cmds."""
+    """Goal shows up in autocomplete / help categories alongside other Session cmds."""
     from hermes_cli.commands import COMMANDS, COMMANDS_BY_CATEGORY
 
     assert "/goal" in COMMANDS
@@ -366,7 +366,8 @@ def test_goal_command_dispatches_in_cli_registry_helpers():
 class TestJudgeParseFailureAutoPause:
     """Regression: weak judge models (e.g. deepseek-v4-flash) that return
     empty strings or non-JSON prose must auto-pause the loop after N turns
-    instead of burning the whole turn budget."""
+    instead of burning the whole turn budget.
+    """
 
     def test_parse_response_flags_empty_as_parse_failure(self):
         from hermes_cli.goals import _parse_judge_response
@@ -428,7 +429,7 @@ class TestJudgeParseFailureAutoPause:
     def test_auto_pause_after_three_consecutive_parse_failures(self, hermes_home):
         """N=3 consecutive parse failures → auto-pause with config pointer."""
         from hermes_cli import goals
-        from hermes_cli.goals import GoalManager, DEFAULT_MAX_CONSECUTIVE_PARSE_FAILURES
+        from hermes_cli.goals import DEFAULT_MAX_CONSECUTIVE_PARSE_FAILURES, GoalManager
 
         assert DEFAULT_MAX_CONSECUTIVE_PARSE_FAILURES == 3
         mgr = GoalManager(session_id="parse-fail-sid-1", default_max_turns=20)
@@ -524,7 +525,8 @@ class TestJudgeParseFailureAutoPause:
 class TestGoalStateSubgoalsBackcompat:
     def test_old_state_meta_row_loads_without_subgoals(self):
         """A goal serialized BEFORE the subgoals field existed must
-        round-trip with an empty list, not crash."""
+        round-trip with an empty list, not crash.
+        """
         from hermes_cli.goals import GoalState
 
         legacy = json.dumps({
@@ -558,6 +560,7 @@ class TestGoalManagerSubgoals:
 
     def test_add_subgoal_requires_active_goal(self, hermes_home):
         import pytest
+
         from hermes_cli.goals import GoalManager
         mgr = GoalManager(session_id="sub-noactive")
         with pytest.raises(RuntimeError):
@@ -565,6 +568,7 @@ class TestGoalManagerSubgoals:
 
     def test_add_empty_subgoal_rejected(self, hermes_home):
         import pytest
+
         from hermes_cli.goals import GoalManager
         mgr = GoalManager(session_id="sub-empty")
         mgr.set("g")
@@ -584,6 +588,7 @@ class TestGoalManagerSubgoals:
 
     def test_remove_subgoal_out_of_range(self, hermes_home):
         import pytest
+
         from hermes_cli.goals import GoalManager
         mgr = GoalManager(session_id="sub-oob")
         mgr.set("g")
@@ -647,16 +652,20 @@ class TestJudgeGoalWithSubgoals:
         capture the prompt that would be sent.
         """
         from unittest.mock import patch
+
         from hermes_cli import goals
 
         captured = {}
 
         class _FakeMsg:
             content = '{"done": true, "reason": "all done"}'
+
         class _FakeChoice:
             message = _FakeMsg()
+
         class _FakeResp:
             choices = [_FakeChoice()]
+
         class _FakeClient:
             class chat:
                 class completions:
@@ -690,16 +699,20 @@ class TestJudgeGoalWithSubgoals:
 
     def test_judge_uses_original_template_when_no_subgoals(self, hermes_home):
         from unittest.mock import patch
+
         from hermes_cli import goals
 
         captured = {}
 
         class _FakeMsg:
             content = '{"done": true, "reason": "ok"}'
+
         class _FakeChoice:
             message = _FakeMsg()
+
         class _FakeResp:
             choices = [_FakeChoice()]
+
         class _FakeClient:
             class chat:
                 class completions:

@@ -1,5 +1,4 @@
-"""
-DingTalk platform adapter using Stream Mode.
+"""DingTalk platform adapter using Stream Mode.
 
 Uses dingtalk-stream SDK (>=0.20) for real-time message reception without webhooks.
 Responses are sent via DingTalk's session webhook (markdown format).
@@ -33,13 +32,13 @@ import os
 import re
 import traceback
 import uuid
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from typing import Any, Dict, List, Optional, Set
 
 try:
     import dingtalk_stream
     from dingtalk_stream import ChatbotMessage
-    from dingtalk_stream.frames import CallbackMessage, AckMessage
+    from dingtalk_stream.frames import AckMessage, CallbackMessage
 
     DINGTALK_STREAM_AVAILABLE = True
 except ImportError:
@@ -68,10 +67,14 @@ except ImportError:
 try:
     from alibabacloud_dingtalk.card_1_0 import (
         client as dingtalk_card_client,
+    )
+    from alibabacloud_dingtalk.card_1_0 import (
         models as dingtalk_card_models,
     )
     from alibabacloud_dingtalk.robot_1_0 import (
         client as dingtalk_robot_client,
+    )
+    from alibabacloud_dingtalk.robot_1_0 import (
         models as dingtalk_robot_models,
     )
     from alibabacloud_tea_openapi import models as open_api_models
@@ -88,20 +91,20 @@ except ImportError:
     tea_util_models = None
 
 from gateway.config import Platform, PlatformConfig
-from gateway.platforms.helpers import MessageDeduplicator
 from gateway.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     SendResult,
 )
+from gateway.platforms.helpers import MessageDeduplicator
 
 logger = logging.getLogger(__name__)
 
 MAX_MESSAGE_LENGTH = 20000
 RECONNECT_BACKOFF = [2, 5, 10, 30, 60]
 _SESSION_WEBHOOKS_MAX = 500
-_DINGTALK_WEBHOOK_RE = re.compile(r'^https://(?:api|oapi)\.dingtalk\.com/')
+_DINGTALK_WEBHOOK_RE = re.compile(r"^https://(?:api|oapi)\.dingtalk\.com/")
 
 # DingTalk message type → runtime content type
 DINGTALK_TYPE_MAPPING = {
@@ -126,9 +129,10 @@ def check_dingtalk_requirements() -> bool:
             return False
         try:
             import dingtalk_stream as _ds
-            from dingtalk_stream import ChatbotMessage as _CM
-            from dingtalk_stream.frames import CallbackMessage as _CBM, AckMessage as _AM
             import httpx as _httpx
+            from dingtalk_stream import ChatbotMessage as _CM
+            from dingtalk_stream.frames import AckMessage as _AM
+            from dingtalk_stream.frames import CallbackMessage as _CBM
         except ImportError:
             return False
         dingtalk_stream = _ds

@@ -12,7 +12,7 @@ import os
 import sys
 import tempfile
 import uuid
-from datetime import datetime, timedelta, timezone, UTC
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
 _HERMES_HOME = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))

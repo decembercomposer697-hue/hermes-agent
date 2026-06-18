@@ -20,12 +20,9 @@ from contextlib import contextmanager
 from types import ModuleType
 from unittest.mock import MagicMock, patch
 
-
-
 # ---------------------------------------------------------------------------
 # Shared helpers / fixtures
 # ---------------------------------------------------------------------------
-
 
 
 @contextmanager
@@ -41,13 +38,13 @@ def _mock_botocore_session(*, return_value=None):
 
 _EU_MODELS = [
     {"id": "eu.anthropic.claude-sonnet-4-6-20250514-v1:0", "name": "Claude Sonnet 4.6 (EU)", "provider": "inference-profile"},
-    {"id": "eu.anthropic.claude-haiku-4-5-20251015-v1:0",  "name": "Claude Haiku 4.5 (EU)",  "provider": "inference-profile"},
-    {"id": "eu.amazon.nova-pro-v1:0",                       "name": "Nova Pro (EU)",           "provider": "inference-profile"},
+    {"id": "eu.anthropic.claude-haiku-4-5-20251015-v1:0", "name": "Claude Haiku 4.5 (EU)", "provider": "inference-profile"},
+    {"id": "eu.amazon.nova-pro-v1:0", "name": "Nova Pro (EU)", "provider": "inference-profile"},
 ]
 
 _US_MODELS = [
     {"id": "us.anthropic.claude-sonnet-4-6-20250514-v1:0", "name": "Claude Sonnet 4.6 (US)", "provider": "inference-profile"},
-    {"id": "us.amazon.nova-pro-v1:0",                       "name": "Nova Pro (US)",           "provider": "inference-profile"},
+    {"id": "us.amazon.nova-pro-v1:0", "name": "Nova Pro (US)", "provider": "inference-profile"},
 ]
 
 
@@ -278,7 +275,8 @@ class TestListAuthenticatedProvidersBedrock:
 
 class TestBedrockRegionRouting:
     """End-to-end: region from botocore profile is used for discovery, so EU/AP
-    users get eu.*/ap.* model IDs rather than the hardcoded us-east-1 list."""
+    users get eu.*/ap.* model IDs rather than the hardcoded us-east-1 list.
+    """
 
     def test_eu_region_from_botocore_profile_yields_eu_models(self):
         """When botocore resolves eu-central-1, picker shows eu.* model IDs."""

@@ -6,13 +6,14 @@ are exposed in the model picker.
 """
 
 import pytest
-from hermes_cli.model_switch import list_authenticated_providers, switch_model
-from hermes_cli import runtime_provider as rp
 
+from hermes_cli import runtime_provider as rp
+from hermes_cli.model_switch import list_authenticated_providers, switch_model
 
 # =============================================================================
 # Tests for list_authenticated_providers including full models list
 # =============================================================================
+
 
 def test_list_authenticated_providers_includes_full_models_list_from_user_providers(monkeypatch):
     """User-defined providers should expose both default_model and full models list.
@@ -182,7 +183,8 @@ def test_list_authenticated_providers_uses_live_models_for_user_provider(monkeyp
 
 def test_list_authenticated_providers_dict_models_without_default_model(monkeypatch):
     """Dict-format ``models:`` without a ``default_model`` must still expose
-    every dict key, not collapse to an empty list."""
+    every dict key, not collapse to an empty list.
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr("hermes_cli.providers.HERMES_OVERLAYS", {})
 
@@ -214,7 +216,8 @@ def test_list_authenticated_providers_dict_models_without_default_model(monkeypa
 
 def test_list_authenticated_providers_dict_models_dedupe_with_default(monkeypatch):
     """When ``default_model`` is also a key in the ``models:`` dict, it must
-    appear exactly once (list already had this for list-format models)."""
+    appear exactly once (list already had this for list-format models).
+    """
     monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
     monkeypatch.setattr("hermes_cli.providers.HERMES_OVERLAYS", {})
 
@@ -260,7 +263,8 @@ def test_list_authenticated_providers_openai_alias_not_emitted_as_phantom(monkey
     such a row resolves via resolve_provider_full() to OpenRouter, silently
     switching the user onto an endpoint they may have no key for (HTTP 401).
     Real OpenAI access comes via 'openai-api' (direct) or a providers.openai
-    config entry — both of which carry api.openai.com. See model-picker bug."""
+    config entry — both of which carry api.openai.com. See model-picker bug.
+    """
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
     monkeypatch.setattr(
         "agent.models_dev.fetch_models_dev",
@@ -286,7 +290,8 @@ def test_resolve_provider_full_user_config_openai_beats_alias():
     """A providers.openai config entry must win over the built-in
     'openai' → 'openrouter' alias. Regression for the model-picker bug
     where users with provider=openai-api + a providers.openai config block
-    had their OpenAI selection silently routed to OpenRouter (HTTP 401)."""
+    had their OpenAI selection silently routed to OpenRouter (HTTP 401).
+    """
     from hermes_cli.providers import resolve_provider_full
 
     user_providers = {
@@ -308,7 +313,8 @@ def test_resolve_provider_full_user_config_openai_beats_alias():
 
 def test_switch_model_user_config_openai_does_not_hop_to_openrouter(monkeypatch):
     """End-to-end: selecting a providers.openai config row in the picker must
-    resolve to api.openai.com, never silently switch to OpenRouter."""
+    resolve to api.openai.com, never silently switch to OpenRouter.
+    """
     monkeypatch.setenv("CUSTOM_OPENAI_API_KEY", "sk-resolved")
     user_providers = {
         "openai": {
@@ -568,7 +574,8 @@ def test_list_authenticated_providers_hides_custom_shadowing_builtin_endpoint(mo
 def test_list_authenticated_providers_keeps_custom_with_distinct_endpoint(monkeypatch):
     """Dedup must only apply when the endpoint matches a built-in. A custom
     provider on a genuinely distinct endpoint stays visible even if a
-    built-in is also authenticated."""
+    built-in is also authenticated.
+    """
     monkeypatch.setenv("DASHSCOPE_API_KEY", "sk-test")
     monkeypatch.setattr(
         "agent.models_dev.fetch_models_dev",
@@ -608,7 +615,8 @@ def test_list_authenticated_providers_dedup_honors_base_url_env_override(monkeyp
     """The dedup must track the EFFECTIVE endpoint — if DASHSCOPE_BASE_URL
     overrides the static inference_base_url, a custom provider pointing at
     the overridden URL (not the static one) should still be recognized as
-    a duplicate."""
+    a duplicate.
+    """
     monkeypatch.setenv("DASHSCOPE_API_KEY", "sk-test")
     monkeypatch.setenv(
         "DASHSCOPE_BASE_URL",
@@ -856,7 +864,8 @@ def test_get_named_custom_provider_legacy_api_mode_field_still_works(monkeypatch
     """Hand-edited configs that used ``api_mode:`` (legacy spelling) inside
     the v12+ providers: dict shape must keep working — the migration writer
     produces ``transport:`` but human-edited configs may carry the older
-    spelling forward."""
+    spelling forward.
+    """
     config = {
         "_config_version": 12,
         "providers": {
@@ -880,7 +889,8 @@ def test_get_named_custom_provider_legacy_api_mode_field_still_works(monkeypatch
 def test_get_named_custom_provider_transport_resolves_via_display_name(monkeypatch):
     """When the requested name matches the entry's ``name:`` field rather
     than its dict key, the same transport-vs-api_mode logic must apply
-    (second branch in ``_get_named_custom_provider``)."""
+    (second branch in ``_get_named_custom_provider``).
+    """
     config = {
         "_config_version": 12,
         "providers": {

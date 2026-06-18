@@ -1,5 +1,4 @@
-"""
-Tests for media download retry logic added in PR #2982.
+"""Tests for media download retry logic added in PR #2982.
 
 Covers:
 - gateway/platforms/base.py:       cache_image_from_url
@@ -15,12 +14,13 @@ import asyncio
 import sys
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 import httpx
+import pytest
 
 # ---------------------------------------------------------------------------
 # Helpers for building httpx exceptions
 # ---------------------------------------------------------------------------
+
 
 def _make_http_status_error(status_code: int) -> httpx.HTTPStatusError:
     request = httpx.Request("GET", "http://example.com/img.jpg")
@@ -383,7 +383,8 @@ class TestCacheAudioFromUrl:
 
 class TestSSRFRedirectGuard:
     """cache_image_from_url / cache_audio_from_url must reject redirects
-    that land on private/internal hosts (e.g. cloud metadata endpoint)."""
+    that land on private/internal hosts (e.g. cloud metadata endpoint).
+    """
 
     def _make_redirect_response(self, target_url: str):
         """Build a mock httpx response that looks like a redirect."""
@@ -394,7 +395,8 @@ class TestSSRFRedirectGuard:
 
     def _make_client_capturing_hooks(self):
         """Return (mock_client, captured_kwargs dict) where captured_kwargs
-        will contain the kwargs passed to httpx.AsyncClient()."""
+        will contain the kwargs passed to httpx.AsyncClient().
+        """
         captured = {}
         mock_client = AsyncMock()
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
@@ -533,10 +535,11 @@ def _ensure_slack_mock():
 _ensure_slack_mock()
 
 import gateway.platforms.slack as _slack_mod
+
 _slack_mod.SLACK_AVAILABLE = True
 
-from gateway.platforms.slack import SlackAdapter
 from gateway.config import PlatformConfig
+from gateway.platforms.slack import SlackAdapter
 
 
 def _make_slack_adapter():

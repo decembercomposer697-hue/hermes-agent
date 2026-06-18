@@ -5,17 +5,16 @@ import os
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from tools.send_message_tool import (
-    _send_dingtalk,
-    _send_matrix,
-)
-
 # ``_send_mattermost`` moved into the mattermost plugin
 # (``plugins/platforms/mattermost/adapter.py::_standalone_send``).  Keep a
 # thin ``(token, extra, chat_id, message)``-shaped wrapper so existing test
 # bodies continue to work without rewriting every signature.
 from plugins.platforms.mattermost.adapter import (
     _standalone_send as _mattermost_standalone_send,
+)
+from tools.send_message_tool import (
+    _send_dingtalk,
+    _send_matrix,
 )
 
 

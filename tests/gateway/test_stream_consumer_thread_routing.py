@@ -6,8 +6,8 @@ the main group chat.
 
 Covers: #6969, #9916, #7355
 """
-from unittest.mock import AsyncMock, MagicMock
 from types import SimpleNamespace
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -34,7 +34,8 @@ class TestInitialReplyToId:
     @pytest.mark.asyncio
     async def test_first_send_uses_initial_reply_to_id(self):
         """When initial_reply_to_id is set, first adapter.send() should
-        include reply_to=initial_reply_to_id."""
+        include reply_to=initial_reply_to_id.
+        """
         adapter = _make_adapter()
         consumer = GatewayStreamConsumer(
             adapter,
@@ -54,7 +55,8 @@ class TestInitialReplyToId:
     @pytest.mark.asyncio
     async def test_first_send_without_initial_reply_to_id(self):
         """When initial_reply_to_id is None, first send should have
-        reply_to=None (backward compatible)."""
+        reply_to=None (backward compatible).
+        """
         adapter = _make_adapter()
         consumer = GatewayStreamConsumer(
             adapter,
@@ -112,7 +114,8 @@ class TestOverflowFirstMessage:
     @pytest.mark.asyncio
     async def test_overflow_first_send_uses_initial_reply_to_id(self):
         """When first message exceeds platform limit and is split into chunks,
-        each chunk should be threaded to initial_reply_to_id, not None."""
+        each chunk should be threaded to initial_reply_to_id, not None.
+        """
         adapter = _make_adapter(max_length=10)
         adapter.truncate_message = MagicMock(
             return_value=["chunk_1", "chunk_2"],
@@ -142,7 +145,8 @@ class TestFeishuFallbackThreadRouting:
     @pytest.mark.asyncio
     async def test_create_uses_thread_id_when_available(self):
         """When reply_to=None and metadata has thread_id, message.create
-        should use receive_id_type='thread_id'."""
+        should use receive_id_type='thread_id'.
+        """
         from gateway.platforms.feishu import FeishuAdapter
 
         # We test the _send_raw_message method directly by mocking the client
@@ -199,7 +203,8 @@ class TestFeishuFallbackThreadRouting:
     @pytest.mark.asyncio
     async def test_create_uses_chat_id_when_no_thread(self):
         """When reply_to=None and metadata has no thread_id, message.create
-        should use receive_id_type='chat_id' (original behavior)."""
+        should use receive_id_type='chat_id' (original behavior).
+        """
         from gateway.platforms.feishu import FeishuAdapter
 
         mock_client = MagicMock()

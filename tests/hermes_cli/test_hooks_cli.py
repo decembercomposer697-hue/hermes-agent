@@ -85,7 +85,8 @@ class TestHooksTest:
         shape invoke_hook() would at runtime.  Prior to this fix,
         run_once bypassed _serialize_payload and the two paths diverged —
         scripts tested with `hermes hooks test` saw different top-level
-        keys than at runtime, silently breaking in production."""
+        keys than at runtime, silently breaking in production.
+        """
         capture = tmp_path / "captured.json"
         script = _hook_script(
             tmp_path,
@@ -248,7 +249,8 @@ class TestHooksDoctor:
         listed script against a synthetic payload as part of its JSON
         smoke test, which contradicted the documented workflow of
         "spot newly-added hooks *before they register*".  An un-allowlisted
-        script must not be executed during `doctor`."""
+        script must not be executed during `doctor`.
+        """
         sentinel = tmp_path / "executed"
         # Script would touch the sentinel if executed; we assert it wasn't.
         script = _hook_script(

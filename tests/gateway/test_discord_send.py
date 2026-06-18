@@ -1,7 +1,7 @@
 import asyncio
+import sys
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
-import sys
 
 import pytest
 
@@ -277,7 +277,6 @@ async def test_send_to_forum_create_thread_failure():
 
     assert result.success is False
     assert "rate limited" in result.error
-
 
 
 # ---------------------------------------------------------------------------

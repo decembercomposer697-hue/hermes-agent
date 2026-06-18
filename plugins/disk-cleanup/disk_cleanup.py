@@ -24,7 +24,7 @@ from __future__ import annotations
 import json
 import logging
 import shutil
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 

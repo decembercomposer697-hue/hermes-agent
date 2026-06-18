@@ -82,7 +82,8 @@ def _make_runner():
 @pytest.mark.asyncio
 async def test_unknown_slash_command_returns_guidance(monkeypatch):
     """A genuinely unknown /foobar should return user-facing guidance, not
-    silently drop through to the LLM."""
+    silently drop through to the LLM.
+    """
     import gateway.run as gateway_run
 
     runner = _make_runner()
@@ -110,7 +111,8 @@ async def test_unknown_slash_command_returns_guidance(monkeypatch):
 @pytest.mark.asyncio
 async def test_unknown_slash_command_underscored_form_also_guarded(monkeypatch):
     """Telegram may send /foo_bar — same guard must trigger for underscored
-    commands that normalize to unknown hyphenated names."""
+    commands that normalize to unknown hyphenated names.
+    """
     import gateway.run as gateway_run
 
     runner = _make_runner()
@@ -149,11 +151,13 @@ async def test_known_slash_command_not_flagged_as_unknown(monkeypatch):
 @pytest.mark.asyncio
 async def test_underscored_alias_for_hyphenated_builtin_not_flagged(monkeypatch):
     """Telegram autocomplete sends /reload_mcp for the /reload-mcp built-in.
-    That must NOT be flagged as unknown."""
+    That must NOT be flagged as unknown.
+    """
     import gateway.run as gateway_run
 
     runner = _make_runner()
     # Prevent real MCP work; we only care that the unknown guard doesn't fire.
+
     async def _noop_reload(*_a, **_kw):
         return "mcp reloaded"
 

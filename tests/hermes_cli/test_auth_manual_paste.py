@@ -24,13 +24,12 @@ locks in four things:
 from __future__ import annotations
 
 import builtins
-import io
 import contextlib
+import io
 
 import pytest
 
 from hermes_cli import auth as auth_mod
-
 
 # ---------------------------------------------------------------------------
 # _is_remote_session — broadened detection (#26923)
@@ -671,7 +670,8 @@ def test_xai_loopback_login_timeout_noninteractive_reraises(monkeypatch):
 def test_ssh_hint_mentions_manual_paste_for_non_ssh_remotes(monkeypatch):
     """Users on Cloud Shell / Codespaces have no real SSH client; the
     hint must point them at the new ``--manual-paste`` flag instead
-    of leaving them stuck on the ``ssh -L`` recipe."""
+    of leaving them stuck on the ``ssh -L`` recipe.
+    """
     monkeypatch.setattr(auth_mod, "_is_remote_session", lambda: True)
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):

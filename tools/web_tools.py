@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Standalone Web Tools Module
+"""Standalone Web Tools Module
 
 This module provides generic web tools that work with multiple backend providers.
 Backend is selected during ``hermes tools`` setup (web.backend in config.yaml).
@@ -36,13 +35,15 @@ Usage:
     content = web_extract_tool(["https://example.com"], format="markdown")
 """
 
+import asyncio
 import json
 import logging
 import os
 import re
-import asyncio
-from typing import List, Dict, Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
 import httpx
+
 # After the web-provider plugin migration (PR #25182), the Firecrawl SDK
 # proxy, client construction, and response-shape normalizers all live in
 # plugins.web.firecrawl.provider. We re-export the names that external
@@ -50,6 +51,7 @@ import httpx
 # surface stays stable.
 if TYPE_CHECKING:
     from firecrawl import Firecrawl
+from plugins.web.exa.provider import _get_exa_client
 from plugins.web.firecrawl.provider import (
     Firecrawl,  # re-exported for tests that mock.patch("tools.web_tools.Firecrawl")
     _firecrawl_backend_help_suffix,
@@ -58,13 +60,7 @@ from plugins.web.firecrawl.provider import (
     _is_tool_gateway_ready,
     check_firecrawl_api_key,
 )
-# Tavily helpers re-exported for backward-compat with existing unit tests
-# (tests/tools/test_web_tools_tavily.py imports these names directly).
-from plugins.web.tavily.provider import (
-    _normalize_tavily_documents,
-    _normalize_tavily_search_results,
-    _tavily_request,
-)
+
 # Parallel + Exa clients re-exported for backward-compat with existing
 # unit tests (tests/tools/test_web_tools_config.py imports _get_parallel_client
 # / _get_async_parallel_client / _get_exa_client directly).
@@ -72,7 +68,14 @@ from plugins.web.parallel.provider import (
     _get_async_parallel_client,
     _get_parallel_client,
 )
-from plugins.web.exa.provider import _get_exa_client
+
+# Tavily helpers re-exported for backward-compat with existing unit tests
+# (tests/tools/test_web_tools_tavily.py imports these names directly).
+from plugins.web.tavily.provider import (
+    _normalize_tavily_documents,
+    _normalize_tavily_search_results,
+    _tavily_request,
+)
 
 # Module-level cache slots for the per-vendor clients. The plugins read/write
 # these via tools.web_tools so unit tests that reset
@@ -83,19 +86,26 @@ _parallel_client: Any | None = None
 _async_parallel_client: Any | None = None
 _exa_client: Any | None = None
 
+import sys
+
 from agent.auxiliary_client import (
     async_call_llm,
     extract_content_or_reasoning,
     get_async_text_auxiliary_client,
 )
 from tools.debug_helpers import DebugSession
+
 # Imported solely so unit tests can monkeypatch these names on
 # tools.web_tools (the firecrawl plugin reads them via its own import chain).
 from tools.managed_tool_gateway import (
     build_vendor_gateway_url,
-    peek_nous_access_token as _peek_nous_access_token,
-    read_nous_access_token as _read_nous_access_token,
     resolve_managed_tool_gateway,
+)
+from tools.managed_tool_gateway import (
+    peek_nous_access_token as _peek_nous_access_token,
+)
+from tools.managed_tool_gateway import (
+    read_nous_access_token as _read_nous_access_token,
 )
 from tools.tool_backend_helpers import (
     managed_nous_tools_enabled,
@@ -103,7 +113,6 @@ from tools.tool_backend_helpers import (
     prefers_gateway,
 )
 from tools.url_safety import async_is_safe_url, normalize_url_for_request
-import sys
 
 logger = logging.getLogger(__name__)
 
@@ -132,6 +141,7 @@ def _env_value(name: str) -> str:
 
 def _has_env(name: str) -> bool:
     return bool(_env_value(name))
+
 
 def _load_web_config() -> dict:
     """Load the ``web:`` section from ~/.hermes/config.yaml."""
@@ -346,6 +356,7 @@ def _web_requires_env() -> list[str]:
 
 DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION = 5000
 
+
 def _is_nous_auxiliary_client(client: Any) -> bool:
     """Return True when the resolved auxiliary backend is Nous Portal."""
     from urllib.parse import urlparse
@@ -385,8 +396,7 @@ async def process_content_with_llm(
     model: str | None = None,
     min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION,
 ) -> str | None:
-    """
-    Process web content using LLM to create intelligent summaries with key excerpts.
+    """Process web content using LLM to create intelligent summaries with key excerpts.
     
     This function uses Gemini 3 Flash Preview (or specified model) via OpenRouter API 
     to intelligently extract key information and create markdown summaries,
@@ -404,6 +414,7 @@ async def process_content_with_llm(
         
     Returns:
         Optional[str]: Processed markdown content, or None if content too short or processing fails
+
     """
     # Size thresholds
     MAX_CONTENT_SIZE = 2_000_000  # 2M chars - refuse entirely above this
@@ -486,8 +497,7 @@ async def _call_summarizer_llm(
     is_chunk: bool = False,
     chunk_info: str = "",
 ) -> str | None:
-    """
-    Make a single LLM call to summarize content.
+    """Make a single LLM call to summarize content.
     
     Args:
         content: The content to summarize
@@ -499,6 +509,7 @@ async def _call_summarizer_llm(
         
     Returns:
         Summarized content or None on failure
+
     """
     if is_chunk:
         # Chunk-specific prompt - aware that this is partial content
@@ -603,8 +614,7 @@ async def _process_large_content_chunked(
     chunk_size: int,
     max_output_size: int,
 ) -> str | None:
-    """
-    Process large content by chunking, summarizing each chunk in parallel,
+    """Process large content by chunking, summarizing each chunk in parallel,
     then synthesizing the summaries.
     
     Args:
@@ -616,6 +626,7 @@ async def _process_large_content_chunked(
         
     Returns:
         Synthesized summary or None on failure
+
     """
     # Split content into chunks
     chunks = []
@@ -753,8 +764,7 @@ Create a single, unified markdown summary."""
 
 
 def clean_base64_images(text: str) -> str:
-    """
-    Remove base64 encoded images from text to reduce token count and clutter.
+    """Remove base64 encoded images from text to reduce token count and clutter.
     
     This function finds and removes base64 encoded images in various formats:
     - (data:image/png;base64,...)
@@ -767,20 +777,21 @@ def clean_base64_images(text: str) -> str:
         
     Returns:
         Cleaned text with base64 images replaced with placeholders
+
     """
     # Pattern to match base64 encoded images wrapped in parentheses
     # Matches: (data:image/[type];base64,[base64-string])
-    base64_with_parens_pattern = r'\(data:image/[^;]+;base64,[A-Za-z0-9+/=]+\)'
+    base64_with_parens_pattern = r"\(data:image/[^;]+;base64,[A-Za-z0-9+/=]+\)"
     
     # Pattern to match base64 encoded images without parentheses
     # Matches: data:image/[type];base64,[base64-string]
-    base64_pattern = r'data:image/[^;]+;base64,[A-Za-z0-9+/=]+'
+    base64_pattern = r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+"
     
     # Replace parentheses-wrapped images first
-    cleaned_text = re.sub(base64_with_parens_pattern, '[BASE64_IMAGE_REMOVED]', text)
+    cleaned_text = re.sub(base64_with_parens_pattern, "[BASE64_IMAGE_REMOVED]", text)
     
     # Then replace any remaining non-parentheses images
-    cleaned_text = re.sub(base64_pattern, '[BASE64_IMAGE_REMOVED]', cleaned_text)
+    cleaned_text = re.sub(base64_pattern, "[BASE64_IMAGE_REMOVED]", cleaned_text)
     
     return cleaned_text
 
@@ -824,8 +835,7 @@ def _ensure_web_plugins_loaded() -> None:
 
 
 def web_search_tool(query: str, limit: int = 5) -> str:
-    """
-    Search the web for information using available search API backend.
+    """Search the web for information using available search API backend.
 
     This function provides a generic interface for web search that can work
     with multiple backends (Parallel or Firecrawl).
@@ -856,6 +866,7 @@ def web_search_tool(query: str, limit: int = 5) -> str:
     
     Raises:
         Exception: If search fails or API key is not set
+
     """
     try:
         limit = int(limit)
@@ -886,6 +897,8 @@ def web_search_tool(query: str, limit: int = 5) -> str:
         _ensure_web_plugins_loaded()
         from agent.web_search_registry import (
             get_active_search_provider,
+        )
+        from agent.web_search_registry import (
             get_provider as _wsp_get_provider,
         )
 
@@ -937,8 +950,7 @@ async def web_extract_tool(
     model: str | None = None,
     min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION,
 ) -> str:
-    """
-    Extract content from specific web pages using available extraction API backend.
+    """Extract content from specific web pages using available extraction API backend.
 
     This function provides a generic interface for web content extraction that
     can work with multiple backends. Currently uses Firecrawl.
@@ -958,11 +970,13 @@ async def web_extract_tool(
     
     Raises:
         Exception: If extraction fails or API key is not set
+
     """
     # Block URLs containing embedded secrets (exfiltration prevention).
     # URL-decode first so percent-encoded secrets (%73k- = sk-) are caught.
-    from agent.redact import _PREFIX_RE
     from urllib.parse import unquote
+
+    from agent.redact import _PREFIX_RE
     normalized_urls: list[str] = []
     for _url in urls:
         normalized_url = normalize_url_for_request(_url)
@@ -1035,6 +1049,8 @@ async def web_extract_tool(
             _ensure_web_plugins_loaded()
             from agent.web_search_registry import (
                 get_active_extract_provider,
+            )
+            from agent.web_search_registry import (
                 get_provider as _wsp_get_provider,
             )
 
@@ -1095,7 +1111,7 @@ async def web_extract_tool(
 
         response = {"results": results}
         
-        pages_extracted = len(response.get('results', []))
+        pages_extracted = len(response.get("results", []))
         logger.info("Extracted content from %d pages", pages_extracted)
         
         debug_call_data["pages_extracted"] = pages_extracted
@@ -1111,9 +1127,9 @@ async def web_extract_tool(
             # Prepare tasks for parallel processing
             async def process_single_result(result):
                 """Process a single result with LLM and return updated result with metrics."""
-                url = result.get('url', 'Unknown URL')
-                title = result.get('title', '')
-                raw_content = result.get('raw_content', '') or result.get('content', '')
+                url = result.get("url", "Unknown URL")
+                title = result.get("title", "")
+                raw_content = result.get("raw_content", "") or result.get("content", "")
                 
                 if not raw_content:
                     return result, None, "no_content"
@@ -1130,8 +1146,8 @@ async def web_extract_tool(
                     compression_ratio = processed_size / original_size if original_size > 0 else 1.0
                     
                     # Update result with processed content
-                    result['content'] = processed
-                    result['raw_content'] = raw_content
+                    result["content"] = processed
+                    result["raw_content"] = raw_content
                     
                     metrics = {
                         "url": url,
@@ -1153,7 +1169,7 @@ async def web_extract_tool(
                     return result, metrics, "too_short"
             
             # Run all LLM processing in parallel
-            results_list = response.get('results', [])
+            results_list = response.get("results", [])
             tasks = [process_single_result(result) for result in results_list]
             # Use return_exceptions=True so a single task failure does not
             # discard all other successfully processed results.
@@ -1165,7 +1181,7 @@ async def web_extract_tool(
                     logger.warning("Web result processing task failed: %s", result_item)
                     continue
                 result, metrics, status = result_item
-                url = result.get('url', 'Unknown URL')
+                url = result.get("url", "Unknown URL")
                 if status == "processed":
                     debug_call_data["compression_metrics"].append(metrics)
                     debug_call_data["pages_processed_with_llm"] += 1
@@ -1180,9 +1196,9 @@ async def web_extract_tool(
                 logger.warning("LLM processing requested but no auxiliary model available, returning raw content")
                 debug_call_data["processing_applied"].append("llm_processing_unavailable")
             # Print summary of extracted pages for debugging (original behavior)
-            for result in response.get('results', []):
-                url = result.get('url', 'Unknown URL')
-                content_length = len(result.get('raw_content', ''))
+            for result in response.get("results", []):
+                url = result.get("url", "Unknown URL")
+                content_length = len(result.get("raw_content", ""))
                 logger.info("%s (%d characters)", url, content_length)
         
         # Trim output to minimal fields per entry: title, content, error
@@ -1297,8 +1313,6 @@ def check_auxiliary_model() -> bool:
     """Check if an auxiliary text model is available for LLM content processing."""
     client, _, _ = _resolve_web_extract_auxiliary()
     return client is not None
-
-
 
 
 if __name__ == "__main__":

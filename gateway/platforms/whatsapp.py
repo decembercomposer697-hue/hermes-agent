@@ -1,5 +1,4 @@
-"""
-WhatsApp platform adapter.
+"""WhatsApp platform adapter.
 
 WhatsApp integration is more complex than Telegram/Discord because:
 - No official bot API for personal accounts
@@ -27,7 +26,7 @@ import subprocess
 
 _IS_WINDOWS = platform.system() == "Windows"
 from pathlib import Path
-from typing import Dict, Optional, Any
+from typing import Any, Dict, Optional
 
 from hermes_constants import get_hermes_dir
 
@@ -177,23 +176,23 @@ def _terminate_bridge_process(proc, *, force: bool = False) -> None:
         return
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import (
+    SUPPORTED_DOCUMENT_TYPES,
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     SendResult,
-    SUPPORTED_DOCUMENT_TYPES,
-    cache_image_from_url,
     cache_audio_from_url,
+    cache_image_from_url,
 )
 
 
 def check_whatsapp_requirements() -> bool:
-    """
-    Check if WhatsApp dependencies are available.
+    """Check if WhatsApp dependencies are available.
     
     WhatsApp requires a Node.js bridge for most implementations.
     """
@@ -216,8 +215,7 @@ def check_whatsapp_requirements() -> bool:
 
 
 class WhatsAppAdapter(BasePlatformAdapter):
-    """
-    WhatsApp adapter.
+    """WhatsApp adapter.
     
     This implementation uses a simple HTTP bridge pattern where:
     1. A Node.js process runs the WhatsApp Web client
@@ -529,8 +527,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
         return self._message_matches_mention_patterns(data)
     
     async def connect(self) -> bool:
-        """
-        Start the WhatsApp bridge.
+        """Start the WhatsApp bridge.
         
         This launches the Node.js bridge process and waits for it to be ready.
         """
@@ -580,7 +577,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
         # Acquire scoped lock to prevent duplicate sessions
         lock_acquired = False
         try:
-            if not self._acquire_platform_lock('whatsapp-session', str(self._session_path), 'WhatsApp session'):
+            if not self._acquire_platform_lock("whatsapp-session", str(self._session_path), "WhatsApp session"):
                 return False
             lock_acquired = True
         except Exception as e:

@@ -223,7 +223,8 @@ class TestInternalCredential:
 
     def test_independent_of_ticket_store(self):
         """The internal credential is not a ticket — minting tickets doesn't
-        touch it, and consuming the credential doesn't consume tickets."""
+        touch it, and consuming the credential doesn't consume tickets.
+        """
         cred = ws_tickets.internal_ws_credential()
         ticket = mint_ticket(user_id="u1", provider="nous")
         # Consuming the internal credential leaves the ticket intact.

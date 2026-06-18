@@ -264,7 +264,8 @@ class TestTransformToolResultHook:
 
     def test_block_mode_makes_transform_hook_quiet(self, monkeypatch):
         """In block mode, pre_tool_call handles the warning; the transform
-        hook stays silent so we don't double-emit."""
+        hook stays silent so we don't double-emit.
+        """
         mod = _load_plugin_init()
         monkeypatch.setenv("SECURITY_GUIDANCE_BLOCK", "1")
         args = {"path": "/tmp/foo.py", "content": "pickle.load(f)\n"}
@@ -312,7 +313,8 @@ class TestPreToolCallHook:
 class TestPluginDiscovery:
     def test_loads_via_plugin_manager(self, _isolate_env, monkeypatch):
         """End-to-end: enable in config.yaml and verify the PluginManager
-        picks it up via the standard discovery path."""
+        picks it up via the standard discovery path.
+        """
         import yaml
 
         config = {"plugins": {"enabled": ["security-guidance"]}}

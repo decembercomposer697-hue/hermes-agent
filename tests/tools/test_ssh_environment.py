@@ -7,8 +7,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from tools.environments.ssh import SSHEnvironment
 from tools.environments import ssh as ssh_env
+from tools.environments.ssh import SSHEnvironment
 
 _SSH_HOST = os.getenv("TERMINAL_SSH_HOST", "")
 _SSH_USER = os.getenv("TERMINAL_SSH_USER", "")
@@ -96,7 +96,8 @@ class TestControlSocketPath:
     def test_fits_under_macos_socket_limit_with_ipv6_host(self, monkeypatch):
         """A realistic macOS $TMPDIR + IPv6 host must still produce a
         control socket path that fits once SSH appends its ControlMaster
-        suffix (see issue #11840)."""
+        suffix (see issue #11840).
+        """
         # Simulate the macOS $TMPDIR shape from the issue traceback —
         # 48 bytes, the typical length of ``/var/folders/XX/YYYYYYYYY/T``.
         fake_tmp = "/var/folders/2t/wbkw5yb158jc3zhswgl7tz9c0000gn/T"
@@ -122,7 +123,8 @@ class TestControlSocketPath:
 
     def test_path_is_deterministic_across_instances(self):
         """Same (user, host, port) must yield the same control socket so
-        ControlMaster reuse works across reconnects."""
+        ControlMaster reuse works across reconnects.
+        """
         first = SSHEnvironment(host="example.com", user="alice", port=2222)
         second = SSHEnvironment(host="example.com", user="alice", port=2222)
         assert first.control_socket == second.control_socket

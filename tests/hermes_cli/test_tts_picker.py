@@ -77,7 +77,8 @@ class TestPluginTTSProviders:
         """Even if a plugin slipped past the registry's built-in check
         (e.g. via direct ``agent.tts_registry.register_provider`` rather
         than the ``ctx.register_tts_provider`` hook), the picker layer
-        filters it out so the picker invariant holds."""
+        filters it out so the picker invariant holds.
+        """
         # Use lower-level call to bypass the warning + skip in
         # register_provider (the registry's built-in guard).
         # Note: this is intentionally pathological — production code
@@ -95,10 +96,12 @@ class TestPluginTTSProviders:
 
     def test_skips_providers_with_no_name(self):
         """Defense in depth: a provider with no .name attribute is skipped
-        rather than crashing the picker."""
+        rather than crashing the picker.
+        """
 
         class _NoName:
             display_name = "Bogus"
+
             def get_setup_schema(self):
                 return {"name": "Bogus"}
 
@@ -122,7 +125,8 @@ class TestPluginTTSProviders:
 
     def test_minimal_schema_uses_display_name(self):
         """A provider with no setup_schema override gets a row built from
-        ``display_name`` and ``name`` only."""
+        ``display_name`` and ``name`` only.
+        """
         tts_registry.register_provider(_FakeTTSProvider(name="minimal"))
         rows = tools_config._plugin_tts_providers()
         assert len(rows) == 1
@@ -147,7 +151,8 @@ class TestPluginTTSProviders:
 
 class TestVisibleProvidersInjectsTTSPlugins:
     """``_visible_providers()`` injects plugin rows into the Text-to-Speech
-    category alongside the hardcoded built-in rows."""
+    category alongside the hardcoded built-in rows.
+    """
 
     def test_tts_category_includes_plugin_rows(self):
         tts_registry.register_provider(_FakeTTSProvider(name="cartesia"))
@@ -168,7 +173,8 @@ class TestVisibleProvidersInjectsTTSPlugins:
 
     def test_other_categories_unaffected_by_tts_plugins(self):
         """Registering a TTS plugin must not leak into the Image Generation
-        or Browser pickers."""
+        or Browser pickers.
+        """
         tts_registry.register_provider(_FakeTTSProvider(name="cartesia"))
 
         img_cat = tools_config.TOOL_CATEGORIES["image_gen"]

@@ -20,8 +20,9 @@ Both ``code_execution_tool.py`` and ``tools/environments/local.py`` consult
 from __future__ import annotations
 
 import logging
-from contextvars import ContextVar
 from collections.abc import Iterable
+from contextvars import ContextVar
+
 from hermes_cli.config import cfg_get
 
 logger = logging.getLogger(__name__)

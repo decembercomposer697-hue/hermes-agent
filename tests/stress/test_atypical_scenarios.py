@@ -161,7 +161,8 @@ def _(home, kb):
 @scenario("sql_injection_attempts")
 def _(home, kb):
     """SQLite parameterized queries should neutralize all of these, but
-    verify empirically across every string field."""
+    verify empirically across every string field.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -195,7 +196,8 @@ def _(home, kb):
     """Summaries with newlines, tabs, and shell metachars.
 
     The notifier truncates to first line — verify that's right, not
-    that the kernel loses data."""
+    that the kernel loses data.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -260,7 +262,8 @@ def _(home, kb):
 @scenario("dependency_cycle")
 def _(home, kb):
     """A → B → A should be refused. If it's allowed, recompute_ready
-    could infinite-loop or never promote."""
+    could infinite-loop or never promote.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -274,6 +277,7 @@ def _(home, kb):
             import threading
             done = threading.Event()
             result = []
+
             def run():
                 try:
                     result.append(kb.recompute_ready(conn))
@@ -314,7 +318,8 @@ def _(home, kb):
 @scenario("diamond_dependency")
 def _(home, kb):
     """Root → (A, B) → leaf. Leaf should promote to ready only when
-    BOTH A and B are done."""
+    BOTH A and B are done.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -413,7 +418,8 @@ def _(home, kb):
 @scenario("workspace_path_traversal")
 def _(home, kb):
     """`workspace_path='../../../etc/passwd'` or absolute-outside-home
-    should not be silently accepted and then executed in the wrong place."""
+    should not be silently accepted and then executed in the wrong place.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -451,7 +457,8 @@ def _(home, kb):
 @scenario("workspace_nonexistent_path")
 def _(home, kb):
     """Dispatching a task whose workspace can't be resolved should go
-    through the spawn-failure circuit breaker, not crash."""
+    through the spawn-failure circuit breaker, not crash.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -491,7 +498,8 @@ def _(home, kb):
 def _(home, kb):
     """NTP jumps backward. Run.started_at gets written as 1234 but by
     the time complete_task runs, time.time() returned 1230. A human
-    reading run history sees negative elapsed."""
+    reading run history sees negative elapsed.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -530,7 +538,8 @@ def _(home, kb):
 @scenario("hermes_home_with_spaces")
 def _(home, kb):
     """HERMES_HOME at a path with spaces — should work but catches
-    anyone doing string interpolation without quoting."""
+    anyone doing string interpolation without quoting.
+    """
     # Note: home was already created with a safe prefix. We need to
     # reset to a weird one for this test.
     weird = tempfile.mkdtemp(prefix="hermes with spaces ")
@@ -580,7 +589,8 @@ def _(home, kb):
 def _(home, kb):
     """HERMES_HOME is a symlink to the real dir. _INITIALIZED_PATHS
     uses Path.resolve() — two different symlink names pointing at the
-    same dir should NOT double-init."""
+    same dir should NOT double-init.
+    """
     real = tempfile.mkdtemp(prefix="hermes_real_")
     link1 = real + "_link1"
     link2 = real + "_link2"
@@ -622,7 +632,8 @@ def _(home, kb):
 @scenario("huge_run_count_on_one_task")
 def _(home, kb):
     """1000 reclaim cycles on a single task → 1000 run rows. Verify
-    list_runs still performs, and build_worker_context isn't quadratic."""
+    list_runs still performs, and build_worker_context isn't quadratic.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -658,7 +669,8 @@ def _(home, kb):
 @scenario("hundred_tenants")
 def _(home, kb):
     """100 distinct tenants with 50 tasks each. board_stats + list_tasks
-    should still return quickly."""
+    should still return quickly.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -713,7 +725,8 @@ def _idempotency_race_worker(hermes_home: str, key: str, result_file: str,
 def _(home, kb):
     """Two processes concurrently call create_task with the same
     idempotency_key — should both get back the SAME task id, not two
-    different ones."""
+    different ones.
+    """
     kb.init_db()
     # Spawn workers, then drop the barrier so they fire ~simultaneously.
     key = "race-key-12345"
@@ -754,7 +767,6 @@ def _(home, kb):
     print(f"  idempotency race: both workers got {tids[0]}")
 
 
-
 # =============================================================================
 # MORE EDGE CASES
 # =============================================================================
@@ -762,7 +774,8 @@ def _(home, kb):
 @scenario("assignee_with_special_chars")
 def _(home, kb):
     """Profile names can contain @-signs, dots, hyphens. Some users
-    might try nonsense. Kernel shouldn't break on any of them."""
+    might try nonsense. Kernel shouldn't break on any of them.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -789,7 +802,8 @@ def _(home, kb):
 @scenario("completed_task_reclaim_attempt")
 def _(home, kb):
     """A task in 'done' should NOT be reclaimable — reclaim/claim paths
-    must refuse."""
+    must refuse.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -842,7 +856,8 @@ def _(home, kb):
 @scenario("unassigned_task_never_claims")
 def _(home, kb):
     """Task without an assignee should never be claimed by dispatch_once,
-    even though its status might be 'ready' if it has no parents."""
+    even though its status might be 'ready' if it has no parents.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -861,7 +876,8 @@ def _(home, kb):
 @scenario("comment_storm")
 def _(home, kb):
     """1000 comments on a single task — build_worker_context should still
-    be reasonable."""
+    be reasonable.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -883,7 +899,8 @@ def _(home, kb):
 @scenario("empty_string_fields")
 def _(home, kb):
     """Empty title should be rejected (we already do this). Empty body,
-    empty summary, etc. should be accepted."""
+    empty summary, etc. should be accepted.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -916,7 +933,8 @@ def _(home, kb):
 def _(home, kb):
     """Someone pastes a multi-line string into --tenant. Kernel should
     store what it gets — but queries filtering by tenant should still
-    work against the raw value."""
+    work against the raw value.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -934,7 +952,8 @@ def _(home, kb):
 @scenario("parent_in_different_status_states")
 def _(home, kb):
     """recompute_ready promotes a todo child only if ALL parents are
-    in 'done'. Verify against parents in every non-done state."""
+    in 'done'. Verify against parents in every non-done state.
+    """
     kb.init_db()
     conn = kb.connect()
     try:
@@ -986,6 +1005,7 @@ def _(home, kb):
 
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
+
     from plugins.kanban.dashboard.plugin_api import router as kanban_router
     app = FastAPI()
     app.include_router(kanban_router, prefix="/api/plugins/kanban")
@@ -1033,6 +1053,7 @@ def _(home, kb):
 # =============================================================================
 # RUN ALL
 # =============================================================================
+
 
 def main():
     print(f"Running {len(_REGISTERED)} atypical-scenario tests...")

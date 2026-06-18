@@ -4,7 +4,7 @@ import csv
 import json
 import sys
 import uuid
-from datetime import datetime, timedelta, timezone, UTC
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
 

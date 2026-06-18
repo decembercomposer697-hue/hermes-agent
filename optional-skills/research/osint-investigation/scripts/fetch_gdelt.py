@@ -124,7 +124,7 @@ def fetch(
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--query", required=True, help='Search query (supports GDELT operators: quoted phrases, AND/OR/NOT, sourcecountry:, theme:)')
+    p.add_argument("--query", required=True, help="Search query (supports GDELT operators: quoted phrases, AND/OR/NOT, sourcecountry:, theme:)")
     p.add_argument(
         "--mode",
         default="ArtList",

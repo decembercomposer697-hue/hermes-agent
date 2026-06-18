@@ -66,7 +66,8 @@ def test_guard_present_and_mentions_remediation(path: Path) -> None:
 
 def _run_guard(text: str, *, cur_uid: int, hermes_uid: int = 10000) -> subprocess.CompletedProcess:
     """Run the extracted guard with `id` stubbed. Returns the completed process
-    (rc 1 + stderr message when rejected, rc 0 when allowed through)."""
+    (rc 1 + stderr message when rejected, rc 0 when allowed through).
+    """
     bash = shutil.which("bash")
     if bash is None:
         pytest.skip("bash not available")
@@ -103,7 +104,8 @@ def test_root_start_passes() -> None:
 
 def test_user_pinned_to_hermes_uid_passes() -> None:
     """`--user 10000:10000` (the hermes UID itself) is the supported non-root
-    start from #34648 / #34837 and must NOT be blocked."""
+    start from #34648 / #34837 and must NOT be blocked.
+    """
     for text in (_read(STAGE2_HOOK), _read(MAIN_WRAPPER)):
         proc = _run_guard(text, cur_uid=10000, hermes_uid=10000)
         assert proc.returncode == 0, proc.stderr
@@ -112,7 +114,8 @@ def test_user_pinned_to_hermes_uid_passes() -> None:
 
 def test_user_pinned_to_remapped_hermes_uid_passes() -> None:
     """After a HERMES_UID remap the hermes UID is e.g. 4242; a container pinned
-    to that same UID must still pass (cur_uid == hermes_uid)."""
+    to that same UID must still pass (cur_uid == hermes_uid).
+    """
     for text in (_read(STAGE2_HOOK), _read(MAIN_WRAPPER)):
         proc = _run_guard(text, cur_uid=4242, hermes_uid=4242)
         assert proc.returncode == 0, proc.stderr

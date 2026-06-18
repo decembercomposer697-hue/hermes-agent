@@ -126,7 +126,9 @@ def _browser_dialog_check() -> bool:
     CDP URL is enough to commit to showing the tool.
     """
     try:
-        from tools.browser_cdp_tool import _browser_cdp_check  # type: ignore[import-not-found]
+        from tools.browser_cdp_tool import (
+            _browser_cdp_check,  # type: ignore[import-not-found]
+        )
     except Exception as exc:  # pragma: no cover — defensive
         logger.debug("browser_dialog check: browser_cdp_tool import failed: %s", exc)
         return False

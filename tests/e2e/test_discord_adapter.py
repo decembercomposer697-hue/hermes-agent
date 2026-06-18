@@ -51,7 +51,8 @@ class TestMentionStrippedCommandDispatch:
 
     async def test_text_before_command_not_detected(self, discord_adapter, bot_user):
         """'<@BOT> something else /help' → mention stripped, but 'something else /help'
-        doesn't start with / so it's treated as text, not a command."""
+        doesn't start with / so it's treated as text, not a command.
+        """
         msg = make_discord_message(
             content=f"<@{BOT_USER_ID}> something else /help",
             mentions=[bot_user],

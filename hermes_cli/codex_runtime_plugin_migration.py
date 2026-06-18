@@ -131,7 +131,8 @@ def _translate_one_server(
     representation. Returns (codex_entry, skipped_keys).
 
     codex_entry is a dict ready for TOML serialization, or None when the
-    server can't be translated (e.g. neither command nor url present)."""
+    server can't be translated (e.g. neither command nor url present).
+    """
     if not isinstance(hermes_cfg, dict):
         return None, []
 
@@ -200,7 +201,8 @@ def _format_toml_value(value: Any) -> str:
     """Minimal TOML value formatter for the value types we emit.
 
     We only emit strings, numbers, booleans, and tables of those — no nested
-    arrays of tables. This covers everything codex's MCP schema accepts."""
+    arrays of tables. This covers everything codex's MCP schema accepts.
+    """
     if isinstance(value, bool):
         return "true" if value else "false"
     if isinstance(value, (int, float)):
@@ -230,7 +232,7 @@ def _format_toml_value(value: Any) -> str:
         return f"[{items}]"
     if isinstance(value, dict):
         items = ", ".join(
-            f'{_quote_key(k)} = {_format_toml_value(v)}' for k, v in value.items()
+            f"{_quote_key(k)} = {_format_toml_value(v)}" for k, v in value.items()
         )
         return "{ " + items + " }" if items else "{}"
     raise ValueError(f"Unsupported TOML value type: {type(value).__name__}")
@@ -242,6 +244,7 @@ def _quote_key(key: str) -> str:
         return key
     escaped = key.replace("\\", "\\\\").replace('"', '\\"')
     return f'"{escaped}"'
+
 
 def render_codex_toml_section(
     servers: dict[str, dict],
@@ -260,6 +263,7 @@ def render_codex_toml_section(
             so the user doesn't get an approval prompt on every write
             attempt. Common values: "workspace-write", "read-only",
             "full-access".
+
     """
     out = [MIGRATION_MARKER]
     if not servers and not plugins and not default_permission_profile:
@@ -296,7 +300,7 @@ def render_codex_toml_section(
             enabled = bool(plugin.get("enabled", True))
             qualified = f"{name}@{marketplace}"
             out.append("")
-            out.append(f'[plugins.{_quote_key(qualified)}]')
+            out.append(f"[plugins.{_quote_key(qualified)}]")
             out.append(f"enabled = {_format_toml_value(enabled)}")
 
     out.append("")
@@ -413,7 +417,8 @@ def _strip_existing_managed_block(toml_text: str) -> str:
     hit a section that's not [mcp_servers.*]/[plugins.*]/[permissions]/
     a `default_permissions =` key. This matches what older versions of
     this code wrote so re-runs don't break configs from prior Hermes
-    versions."""
+    versions.
+    """
     lines = toml_text.splitlines(keepends=True)
     out: list[str] = []
     in_managed = False
@@ -562,7 +567,8 @@ def _build_hermes_tools_mcp_entry() -> dict:
     The command runs the worktree's Python via the current sys.executable
     so a hermes installed under /opt/, /usr/local/, or a venv all work.
     HERMES_HOME and PYTHONPATH are passed through so the spawned process
-    sees the same config + module layout the user is running."""
+    sees the same config + module layout the user is running.
+    """
     import sys
 
     env: dict[str, str] = {}
@@ -640,6 +646,7 @@ def migrate(
             memory, skills, etc.) as an MCP server in ~/.codex/config.toml
             so the codex subprocess can call back into Hermes for tools
             codex doesn't have built in. Set False to opt out.
+
     """
     report = MigrationReport(dry_run=dry_run)
     codex_home = codex_home or Path.home() / ".codex"

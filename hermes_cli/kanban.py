@@ -26,8 +26,11 @@ from typing import Any, Optional
 
 from hermes_cli import kanban_db as kb
 from hermes_cli import kanban_swarm as ks
-from hermes_cli.profiles import get_active_profile_name, get_profile_dir, seed_profile_skills
-
+from hermes_cli.profiles import (
+    get_active_profile_name,
+    get_profile_dir,
+    seed_profile_skills,
+)
 
 # ---------------------------------------------------------------------------
 # Small formatting helpers
@@ -2532,7 +2535,8 @@ def _cmd_context(args: argparse.Namespace) -> int:
 
 def _cmd_specify(args: argparse.Namespace) -> int:
     """Flesh out a triage task (or all of them) via auxiliary LLM,
-    then promote to todo. Thin wrapper over ``kanban_specify``."""
+    then promote to todo. Thin wrapper over ``kanban_specify``.
+    """
     from hermes_cli import kanban_specify as spec
 
     all_flag = bool(getattr(args, "all_triage", False))
@@ -2606,7 +2610,8 @@ def _cmd_specify(args: argparse.Namespace) -> int:
 def _cmd_decompose(args: argparse.Namespace) -> int:
     """Fan a triage task (or all of them) out into a graph of child
     tasks via the auxiliary LLM, routed to specialist profiles by
-    description. Thin wrapper over ``kanban_decompose``."""
+    description. Thin wrapper over ``kanban_decompose``.
+    """
     from hermes_cli import kanban_decompose as decomp
 
     all_flag = bool(getattr(args, "all_triage", False))
@@ -2686,7 +2691,8 @@ def _cmd_decompose(args: argparse.Namespace) -> int:
 
 def _cmd_gc(args: argparse.Namespace) -> int:
     """Remove scratch workspaces of archived tasks, prune old events, and
-    delete old worker logs."""
+    delete old worker logs.
+    """
     import shutil
     scratch_root = kb.workspaces_root()
     removed_ws = 0
@@ -2759,8 +2765,8 @@ def run_slash(rest: str) -> str:
     both the interactive CLI (``self._handle_kanban_command``) and the
     gateway (``_handle_kanban_command``) so formatting is identical.
     """
-    import io
     import contextlib
+    import io
 
     tokens = shlex.split(rest) if rest and rest.strip() else []
 

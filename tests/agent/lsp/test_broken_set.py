@@ -42,7 +42,8 @@ def _make_git_workspace(tmp_path: Path) -> Path:
 def test_mark_broken_for_file_adds_correct_key(tmp_path, monkeypatch):
     """``_mark_broken_for_file`` keys the broken-set on
     (server_id, per_server_root) so subsequent ``enabled_for`` calls
-    for files in the same project skip immediately."""
+    for files in the same project skip immediately.
+    """
     repo = _make_git_workspace(tmp_path)
     monkeypatch.chdir(str(repo))
     src = repo / "x.py"
@@ -65,7 +66,8 @@ def test_mark_broken_for_file_adds_correct_key(tmp_path, monkeypatch):
 def test_enabled_for_returns_false_after_broken(tmp_path, monkeypatch):
     """Once a (server_id, root) pair is in the broken-set,
     ``enabled_for`` returns False so the file_operations layer skips
-    the LSP path entirely."""
+    the LSP path entirely.
+    """
     repo = _make_git_workspace(tmp_path)
     monkeypatch.chdir(str(repo))
     src = repo / "x.py"
@@ -91,7 +93,8 @@ def test_enabled_for_returns_false_after_broken(tmp_path, monkeypatch):
 def test_enabled_for_other_file_in_same_project_also_skipped(tmp_path, monkeypatch):
     """The broken key is (server_id, root), so ALL files routed through
     the same server in the same project are skipped — not just the one
-    that triggered the failure."""
+    that triggered the failure.
+    """
     repo = _make_git_workspace(tmp_path)
     monkeypatch.chdir(str(repo))
     a = repo / "a.py"
@@ -146,7 +149,8 @@ def test_unrelated_project_not_affected_by_broken(tmp_path, monkeypatch):
 
 def test_mark_broken_handles_missing_server_silently(tmp_path):
     """If the file extension doesn't match any registered server,
-    ``_mark_broken_for_file`` no-ops — nothing to mark."""
+    ``_mark_broken_for_file`` no-ops — nothing to mark.
+    """
     svc = LSPService(
         enabled=True,
         wait_mode="document",
@@ -181,7 +185,8 @@ def test_mark_broken_handles_no_workspace_silently(tmp_path):
 def test_snapshot_failure_marks_broken_via_outer_timeout(tmp_path, monkeypatch):
     """End-to-end: ``snapshot_baseline``'s outer ``_loop.run`` timeout
     triggers ``_mark_broken_for_file``, so a second call to
-    ``enabled_for`` returns False."""
+    ``enabled_for`` returns False.
+    """
     repo = _make_git_workspace(tmp_path)
     monkeypatch.chdir(str(repo))
     src = repo / "x.py"

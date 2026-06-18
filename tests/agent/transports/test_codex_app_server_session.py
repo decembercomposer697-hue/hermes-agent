@@ -8,23 +8,24 @@ deadline timeouts. These tests pin all of that without spawning real codex.
 from __future__ import annotations
 
 import time
-from unittest.mock import patch
 from typing import Any, Optional
+from unittest.mock import patch
 
 import pytest
 
 import agent.transports.codex_app_server_session as session_mod
 from agent.transports.codex_app_server_session import (
     CodexAppServerSession,
-    _ServerRequestRouting,
     _approval_choice_to_codex_decision,
     _coerce_turn_input_text,
+    _ServerRequestRouting,
 )
 
 
 class FakeClient:
     """Stand-in for CodexAppServerClient that records calls and lets the test
-    drive the notification / server-request streams synchronously."""
+    drive the notification / server-request streams synchronously.
+    """
 
     def __init__(self, *, codex_bin: str = "codex", codex_home=None) -> None:
         self.codex_bin = codex_bin
@@ -153,7 +154,8 @@ class TestLifecycle:
         """thread/start carries cwd. We intentionally do NOT pass `permissions`
         on this codex version (experimentalApi-gated + requires matching
         config.toml [permissions] table). Letting codex use its default
-        (read-only unless user configures otherwise) is the documented path."""
+        (read-only unless user configures otherwise) is the documented path.
+        """
         client = FakeClient()
         s = make_session(client, permission_profile="workspace-write")
         s.ensure_started()
@@ -309,7 +311,8 @@ class TestRunTurn:
         to the user-facing error so config/provider problems are debuggable
         instead of just 'Internal error'. Credential-shaped values in stderr
         are redacted via agent.redact(force=True); web-URL query params pass
-        through (see fix(redact): pass web URLs through unchanged)."""
+        through (see fix(redact): pass web URLs through unchanged).
+        """
         client = FakeClient()
         client.set_stderr_tail([
             "ERROR: provider auth failed",
@@ -339,7 +342,8 @@ class TestRunTurn:
 
     def test_turn_start_timeout_attaches_redacted_stderr_tail(self):
         """A non-OAuth TimeoutError on turn/start surfaces with codex stderr
-        context attached and marks the session for retirement."""
+        context attached and marks the session for retirement.
+        """
         client = FakeClient()
         client.set_stderr_tail([
             "WARN: provider request stalled",
@@ -363,7 +367,8 @@ class TestRunTurn:
     def test_startup_failure_returns_error_with_stderr(self):
         """Codex thread/start failures during ensure_started() used to bubble
         up as uncaught exceptions. Now they return a TurnResult.error so
-        AIAgent surfaces a clean diagnostic instead of crashing the turn."""
+        AIAgent surfaces a clean diagnostic instead of crashing the turn.
+        """
         client = FakeClient()
         client.set_stderr_tail([
             "FATAL: model_provider 'azure_foundry' not configured",
@@ -524,7 +529,8 @@ class TestServerRequestRouting:
     def test_mcp_elicitation_for_hermes_tools_auto_accepts(self):
         """When codex elicits on behalf of hermes-tools (our own callback),
         accept automatically — the user already opted in by enabling the
-        runtime."""
+        runtime.
+        """
         client = FakeClient()
         client.queue_server_request(
             "mcpServer/elicitation/request", request_id="elic-1",
@@ -544,7 +550,8 @@ class TestServerRequestRouting:
 
     def test_mcp_elicitation_for_other_servers_declines(self):
         """For third-party MCP servers we decline by default so users
-        explicitly opt in through codex's own UI."""
+        explicitly opt in through codex's own UI.
+        """
         client = FakeClient()
         client.queue_server_request(
             "mcpServer/elicitation/request", request_id="elic-2",
@@ -598,11 +605,13 @@ class TestServerRequestRouting:
 
 class TestApprovalPromptEnrichment:
     """Quirk #4: apply_patch prompt should show what's changing.
-    Quirk #10: exec prompt should never show empty cwd."""
+    Quirk #10: exec prompt should never show empty cwd.
+    """
 
     def test_exec_falls_back_to_session_cwd(self):
         """When codex omits cwd from the approval params, the prompt shows
-        the session cwd, not an empty string."""
+        the session cwd, not an empty string.
+        """
         client = FakeClient()
         client.queue_server_request(
             "item/commandExecution/requestApproval", request_id="r1",
@@ -613,6 +622,7 @@ class TestApprovalPromptEnrichment:
             turn={"id": "tu1", "status": "completed", "error": None},
         )
         captured = {}
+
         def cb(command, description, *, allow_permanent=True):
             captured["description"] = description
             return "once"
@@ -624,7 +634,8 @@ class TestApprovalPromptEnrichment:
 
     def test_apply_patch_prompt_summarizes_pending_changes(self):
         """When the projector has cached the fileChange item from item/started,
-        the approval prompt surfaces the change summary."""
+        the approval prompt surfaces the change summary.
+        """
         client = FakeClient()
         # item/started fires first (carries the changes), then approval request
         client.queue_notification(
@@ -647,6 +658,7 @@ class TestApprovalPromptEnrichment:
             turn={"id": "tu1", "status": "completed", "error": None},
         )
         captured = {}
+
         def cb(command, description, *, allow_permanent=True):
             captured["command"] = command
             captured["description"] = description
@@ -662,7 +674,8 @@ class TestApprovalPromptEnrichment:
 
     def test_apply_patch_prompt_works_without_cached_summary(self):
         """When approval arrives before item/started (or without changes
-        info), prompt falls back to whatever codex provided."""
+        info), prompt falls back to whatever codex provided.
+        """
         client = FakeClient()
         client.queue_server_request(
             "item/fileChange/requestApproval", request_id="req-2",
@@ -675,6 +688,7 @@ class TestApprovalPromptEnrichment:
             turn={"id": "tu1", "status": "completed", "error": None},
         )
         captured = {}
+
         def cb(command, description, *, allow_permanent=True):
             captured["command"] = command
             return "once"
@@ -787,7 +801,8 @@ class TestSessionRetirement:
 
     def test_post_tool_watchdog_resets_on_further_activity(self):
         """A tool completion followed by an agent message should NOT trip
-        the watchdog — further activity = codex still alive."""
+        the watchdog — further activity = codex still alive.
+        """
         client = FakeClient()
         client.queue_notification(
             "item/completed",
@@ -825,7 +840,8 @@ class TestSessionRetirement:
     def test_turn_aborted_marker_in_text_is_terminal(self):
         """If codex emits `<turn_aborted>` in agent text and never sends
         turn/completed, we still exit promptly instead of burning the
-        deadline."""
+        deadline.
+        """
         client = FakeClient()
         client.queue_notification(
             "item/completed",
@@ -885,7 +901,8 @@ class TestSessionRetirement:
 
     def test_oauth_failure_from_stderr_on_turn_start_failure(self):
         """If the RPC error itself is opaque but stderr shows an auth
-        problem, we still classify it as a refresh failure."""
+        problem, we still classify it as a refresh failure.
+        """
         from agent.transports.codex_app_server import CodexAppServerError
 
         client = FakeClient()
@@ -909,7 +926,8 @@ class TestSessionRetirement:
 
     def test_oauth_failure_in_turn_completed_error(self):
         """A failed turn/completed whose error mentions auth/refresh
-        triggers the re-auth hint + retirement."""
+        triggers the re-auth hint + retirement.
+        """
         client = FakeClient()
         client.queue_notification(
             "turn/completed", threadId="t",
@@ -927,7 +945,8 @@ class TestSessionRetirement:
 
     def test_generic_turn_failure_does_not_trigger_oauth_hint(self):
         """A boring model error must NOT rewrite the message into a fake
-        re-auth hint. Conservative classifier."""
+        re-auth hint. Conservative classifier.
+        """
         client = FakeClient()
         client.queue_notification(
             "turn/completed", threadId="t",
@@ -948,7 +967,8 @@ class TestSessionRetirement:
     def test_dead_subprocess_detected_between_iterations(self):
         """If codex dies (segfault, OOM, killed by its auth refresh
         thread), the inter-iteration is_alive check breaks the loop
-        instead of waiting on a queue that will never fill."""
+        instead of waiting on a queue that will never fill.
+        """
         client = FakeClient()
         s = make_session(client)
         s.ensure_started()

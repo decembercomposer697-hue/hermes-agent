@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-extract_schema.py — Analyze a ComfyUI API-format workflow and extract
+"""extract_schema.py — Analyze a ComfyUI API-format workflow and extract
 controllable parameters.
 
 Improvements over v1:
@@ -32,10 +31,15 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _common import (
-    OUTPUT_NODES, PARAM_PATTERNS, PROMPT_FIELDS,
-    is_link, iter_embedding_refs, iter_model_deps, iter_nodes, unwrap_workflow,
+    OUTPUT_NODES,
+    PARAM_PATTERNS,
+    PROMPT_FIELDS,
+    is_link,
+    iter_embedding_refs,
+    iter_model_deps,
+    iter_nodes,
+    unwrap_workflow,
 )
-
 
 # Sampler nodes whose `positive` / `negative` connections we trace
 SAMPLER_NODE_FAMILY = {
@@ -137,6 +141,7 @@ def extract_schema(workflow: dict) -> dict:
           "embedding_dependencies": [{node_id, embedding_name, found_in_field, value_excerpt}],
           "summary": {...}
         }
+
     """
     output_nodes: list[str] = []
 

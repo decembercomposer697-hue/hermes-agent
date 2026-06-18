@@ -8,7 +8,6 @@ from typing import Any, Dict
 
 from utils import is_truthy_value
 
-
 _DEFAULT_BROWSER_PROVIDER = "local"
 _DEFAULT_MODAL_MODE = "auto"
 _VALID_MODAL_MODES = {"auto", "direct", "managed"}

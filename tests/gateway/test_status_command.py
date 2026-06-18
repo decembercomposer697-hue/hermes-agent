@@ -1,7 +1,7 @@
 """Tests for gateway /status behavior and token persistence."""
 
-from datetime import datetime
 import time
+from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
@@ -128,7 +128,8 @@ async def test_status_command_includes_session_title_when_present():
 async def test_status_command_reads_token_totals_from_session_db():
     """Regression test for #17158: /status must source token totals from the
     SQLite SessionDB (where run_agent.py persists them) and sum all component
-    counts, not from SessionEntry (which the agent never writes)."""
+    counts, not from SessionEntry (which the agent never writes).
+    """
     session_entry = SessionEntry(
         session_key=build_session_key(_make_source()),
         session_id="sess-1",
@@ -156,7 +157,8 @@ async def test_status_command_reads_token_totals_from_session_db():
 @pytest.mark.asyncio
 async def test_status_command_tokens_zero_when_session_db_row_missing():
     """When the SessionDB has no row for the current session yet (fresh
-    session, no agent calls), /status reports 0 without raising."""
+    session, no agent calls), /status reports 0 without raising.
+    """
     session_entry = SessionEntry(
         session_key=build_session_key(_make_source()),
         session_id="sess-1",
@@ -487,15 +489,16 @@ async def test_handle_message_stale_result_keeps_newer_generation_callback(monke
     assert adapter._post_delivery_callbacks[session_key][0] == 2
 
 
-
 @pytest.mark.asyncio
 async def test_status_command_bypasses_active_session_guard():
     """When an agent is running, /status must be dispatched immediately via
-    base.handle_message — not queued or treated as an interrupt (#5046)."""
+    base.handle_message — not queued or treated as an interrupt (#5046).
+    """
     import asyncio
+
+    from gateway.config import Platform, PlatformConfig
     from gateway.platforms.base import BasePlatformAdapter, MessageEvent, MessageType
     from gateway.session import build_session_key
-    from gateway.config import Platform, PlatformConfig
 
     source = _make_source()
     session_key = build_session_key(source)
@@ -582,6 +585,7 @@ async def test_post_delivery_callback_generation_snapshot_happens_after_bind():
     fire a fresher run's callbacks.
     """
     import asyncio
+
     from gateway.platforms.base import BasePlatformAdapter
 
     source = _make_source()

@@ -16,7 +16,6 @@ from hermes_cli.proxy.adapters.base import UpstreamAdapter, UpstreamCredential
 from hermes_cli.proxy.adapters.nous_portal import NousPortalAdapter
 from hermes_cli.proxy.adapters.xai import XAIGrokAdapter
 
-
 # ---------------------------------------------------------------------------
 # Adapter registry
 # ---------------------------------------------------------------------------
@@ -226,8 +225,8 @@ def test_nous_adapter_get_credential_raises_on_refresh_failure(tmp_path, monkeyp
 
 
 def test_nous_adapter_quarantines_terminal_refresh_failure(tmp_path, monkeypatch):
-    from hermes_cli.auth import AuthError
     from agent.credential_pool import load_pool
+    from hermes_cli.auth import AuthError
 
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     _write_auth_store(tmp_path, {
@@ -519,7 +518,8 @@ def test_xai_adapter_retry_rotates_pool_entry_on_429(tmp_path, monkeypatch):
 def test_xai_adapter_retry_returns_none_on_429_when_pool_exhausted(tmp_path, monkeypatch):
     """Single-entry pool: 429 has nowhere to rotate to → return None
     so the 429 flows back to the client unchanged (existing behavior
-    preserved)."""
+    preserved).
+    """
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     _write_xai_pool_entry(tmp_path)  # single entry
 
@@ -543,7 +543,8 @@ def test_xai_adapter_retry_returns_none_on_429_when_pool_exhausted(tmp_path, mon
 
 def test_xai_adapter_retry_returns_none_for_unrelated_status(tmp_path, monkeypatch):
     """Non-{401, 429} statuses must NOT trigger any retry — pool
-    untouched, no refresh attempted, return None immediately."""
+    untouched, no refresh attempted, return None immediately.
+    """
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     _write_xai_pool_entry(tmp_path)
 

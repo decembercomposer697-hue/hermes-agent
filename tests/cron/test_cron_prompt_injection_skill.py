@@ -230,7 +230,8 @@ class TestBuildJobPromptScansSkillContent:
         """A stray zero-width space in a vetted skill body is stripped, not
         blocked. The job builds normally with the invisible char removed.
         Regression: the free-surgeon-gpt55 cron was permanently dead because
-        a single U+200B in loaded skill content tripped a hard block."""
+        a single U+200B in loaded skill content tripped a hard block.
+        """
         hermes_home, scheduler = cron_env
         # Zero-width space smuggled into the skill body.
         _plant_skill(hermes_home, "zwsp-skill", "clean looking\u200bskill content")
@@ -358,7 +359,8 @@ class TestScriptOutputNotStrictScanned:
 
     def test_command_shapes_in_script_output_not_blocked(self, cron_env):
         """The triage scenario: bug-report bodies quoting dangerous commands
-        arrive via script stdout. The job must run, not block."""
+        arrive via script stdout. The job must run, not block.
+        """
         _, scheduler = cron_env
         feed = (
             "issue #101: running `" + self.RM_ROOT + "` wipes the host\n"
@@ -385,7 +387,8 @@ class TestScriptOutputNotStrictScanned:
     def test_injection_directive_in_script_output_still_blocked(self, cron_env):
         """The looser tier keeps the unambiguous injection directives — a
         compromised feed smuggling 'ignore all previous instructions'
-        through script stdout must still block."""
+        through script stdout must still block.
+        """
         _, scheduler = cron_env
         with pytest.raises(scheduler.CronPromptInjectionBlocked) as exc_info:
             scheduler._build_job_prompt(
@@ -397,7 +400,8 @@ class TestScriptOutputNotStrictScanned:
     def test_user_prompt_still_strict_scanned_when_script_present(self, cron_env):
         """The user-authored prompt keeps the STRICT guarantee even when the
         looser tier was selected for the script-output blob (defense-in-depth
-        for legacy jobs that predate the create-time scanner)."""
+        for legacy jobs that predate the create-time scanner).
+        """
         _, scheduler = cron_env
         with pytest.raises(scheduler.CronPromptInjectionBlocked) as exc_info:
             scheduler._build_job_prompt(
@@ -441,7 +445,8 @@ class TestScriptOutputNotStrictScanned:
 
     def test_no_script_no_skills_keeps_strict_scan(self, cron_env):
         """Tier selection must not loosen the plain-prompt path: a bare
-        command-shape string in a no-script, no-skills job still blocks."""
+        command-shape string in a no-script, no-skills job still blocks.
+        """
         _, scheduler = cron_env
         job = {
             "id": "job-plain",

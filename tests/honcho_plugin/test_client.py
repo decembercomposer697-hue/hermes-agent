@@ -4,12 +4,11 @@ import importlib.util
 import json
 import os
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-
-from hermes_cli.profiles import _get_default_hermes_home
+from unittest.mock import MagicMock, patch
 
 import pytest
 
+from hermes_cli.profiles import _get_default_hermes_home
 from plugins.memory.honcho.client import (
     HonchoClientConfig,
     get_honcho_client,
@@ -202,7 +201,7 @@ class TestFromGlobalConfig:
         assert config.context_tokens == 2000
 
     def test_recall_mode_from_config(self, tmp_path):
-        """recallMode is read from config, host block wins."""
+        """RecallMode is read from config, host block wins."""
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
             "apiKey": "key",
@@ -245,7 +244,7 @@ class TestFromGlobalConfig:
         assert config.enabled is True
 
     def test_base_url_from_config_root(self, tmp_path):
-        """baseUrl in config root is read and takes precedence over env var."""
+        """BaseUrl in config root is read and takes precedence over env var."""
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({"baseUrl": "http://config-host:9000"}))
 
@@ -254,7 +253,7 @@ class TestFromGlobalConfig:
         assert config.base_url == "http://config-host:9000"
 
     def test_base_url_not_read_from_host_block(self, tmp_path):
-        """baseUrl is a root-level connection setting, not overridable per-host (consistent with apiKey)."""
+        """BaseUrl is a root-level connection setting, not overridable per-host (consistent with apiKey)."""
         config_file = tmp_path / "config.json"
         config_file.write_text(json.dumps({
             "baseUrl": "http://root:9000",
@@ -920,7 +919,8 @@ class TestDialecticDepthParsing:
 
 class TestGetHonchoClientBaseUrlDoublePrefixFix:
     """Regression tests for #20688 — Honcho SDK double-prefixing of /v3 for
-    self-hosted instances where base_url already contains a version path."""
+    self-hosted instances where base_url already contains a version path.
+    """
 
     def teardown_method(self):
         reset_honcho_client()
@@ -931,7 +931,8 @@ class TestGetHonchoClientBaseUrlDoublePrefixFix:
     )
     def test_local_base_url_with_v3_suffix_stripped(self):
         """base_url 'http://localhost:38000/v3' must become 'http://localhost:38000'
-        before passing to the Honcho SDK to avoid double '/v3/v3' prefixing."""
+        before passing to the Honcho SDK to avoid double '/v3/v3' prefixing.
+        """
         fake_honcho = MagicMock(name="Honcho")
         cfg = HonchoClientConfig(
             api_key=None,
@@ -1004,7 +1005,8 @@ class TestGetHonchoClientBaseUrlDoublePrefixFix:
     )
     def test_cloud_base_url_with_version_stripped(self):
         """A version segment double-prefixes regardless of host, so a cloud
-        base_url that ends in '/v3' must also be stripped (the SDK re-adds it)."""
+        base_url that ends in '/v3' must also be stripped (the SDK re-adds it).
+        """
         fake_honcho = MagicMock(name="Honcho")
         cfg = HonchoClientConfig(
             api_key="cloud-key",
@@ -1047,7 +1049,8 @@ class TestGetHonchoClientBaseUrlDoublePrefixFix:
     def test_self_hosted_base_url_version_stripped(self, raw_url, expected):
         """Non-loopback self-hosted instances (LAN IPs, Tailscale, custom
         domains) must get the same version-segment stripping as localhost.
-        Regression for #20688 recurring on any non-loopback self-host."""
+        Regression for #20688 recurring on any non-loopback self-host.
+        """
         fake_honcho = MagicMock(name="Honcho")
         cfg = HonchoClientConfig(
             api_key="self-host-key",

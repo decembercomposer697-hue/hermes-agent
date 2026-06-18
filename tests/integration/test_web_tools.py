@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Comprehensive Test Suite for Web Tools Module
+"""Comprehensive Test Suite for Web Tools Module
 
 This script tests all web tools functionality to ensure they work correctly.
 Run this after any updates to the web_tools.py module or backend libraries.
@@ -16,38 +15,39 @@ Requirements:
 """
 
 import pytest
+
 pytestmark = pytest.mark.integration
 
-import json
-import asyncio
-import sys
-import os
 import argparse
+import asyncio
+import json
+import os
+import sys
 from datetime import datetime
 from typing import List
 
 # Import the web tools to test (updated path after moving tools/)
 from tools.web_tools import (
-    web_search_tool,
-    web_extract_tool,
+    _get_backend,
+    check_auxiliary_model,
     check_firecrawl_api_key,
     check_web_api_key,
-    check_auxiliary_model,
-    _get_backend,
+    web_extract_tool,
+    web_search_tool,
 )
 
 
 class Colors:
     """ANSI color codes for terminal output"""
-    HEADER = '\033[95m'
-    BLUE = '\033[94m'
-    CYAN = '\033[96m'
-    GREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+    HEADER = "\033[95m"
+    BLUE = "\033[94m"
+    CYAN = "\033[96m"
+    GREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
 
 
 def print_header(text: str):
@@ -471,7 +471,7 @@ class WebToolsTester:
         }
         
         try:
-            with open(filename, 'w') as f:
+            with open(filename, "w") as f:
                 json.dump(results, f, indent=2, ensure_ascii=False)
             print_info(f"Test results saved to: {filename}")
         except Exception as e:

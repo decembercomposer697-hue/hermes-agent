@@ -1,5 +1,4 @@
-"""
-Tests for subagent progress relay (issue #169).
+"""Tests for subagent progress relay (issue #169).
 
 Verifies that:
 - KawaiiSpinner.print_above() works with and without active spinner
@@ -10,16 +9,17 @@ Verifies that:
 
 import io
 import sys
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
 
 from agent.display import KawaiiSpinner
 from tools.delegate_tool import _build_child_progress_callback
 
-
 # =========================================================================
 # KawaiiSpinner.print_above tests
 # =========================================================================
+
 
 class TestPrintAbove:
     """Tests for KawaiiSpinner.print_above method."""
@@ -48,7 +48,8 @@ class TestPrintAbove:
 
     def test_print_above_uses_captured_stdout(self):
         """print_above should use self._out, not sys.stdout.
-        This ensures it works inside redirect_stdout(devnull)."""
+        This ensures it works inside redirect_stdout(devnull).
+        """
         buf = io.StringIO()
         spinner = KawaiiSpinner("test")
         spinner._out = buf
@@ -120,7 +121,8 @@ class TestBuildChildProgressCallback:
 
     def test_gateway_batched_progress(self):
         """Gateway path: each tool.started relays a subagent.tool event, and a
-        subagent.progress summary fires once BATCH_SIZE tools accumulate."""
+        subagent.progress summary fires once BATCH_SIZE tools accumulate.
+        """
         parent = MagicMock()
         parent._delegate_spinner = None
         parent_cb = MagicMock()
@@ -238,9 +240,9 @@ class TestThinkingCallback:
         if (content and callback and delegate_depth > 0):
             _think_text = content.strip()
             _think_text = re.sub(
-                r'</?(?:REASONING_SCRATCHPAD|think|reasoning)>', '', _think_text,
+                r"</?(?:REASONING_SCRATCHPAD|think|reasoning)>", "", _think_text,
             ).strip()
-            first_line = _think_text.split('\n')[0][:80] if _think_text else ""
+            first_line = _think_text.split("\n")[0][:80] if _think_text else ""
             if first_line:
                 try:
                     callback("_thinking", first_line)
@@ -249,7 +251,8 @@ class TestThinkingCallback:
 
     def test_thinking_callback_fires_on_content(self):
         """tool_progress_callback should receive _thinking event
-        when assistant message has content."""
+        when assistant message has content.
+        """
         calls = []
         self._simulate_thinking_callback(
             "I'll research quantum computing first, then summarize.",
@@ -280,7 +283,8 @@ class TestThinkingCallback:
 
     def test_thinking_callback_skipped_for_main_agent(self):
         """Main agent (delegate_depth=0) should NOT fire thinking events.
-        This prevents gateway spam on Telegram/Discord."""
+        This prevents gateway spam on Telegram/Discord.
+        """
         calls = []
         self._simulate_thinking_callback(
             "I'll help you with that request.",
@@ -330,7 +334,8 @@ class TestBatchFlush:
 
     def test_flush_sends_remaining_batch(self):
         """_flush should send a final subagent.progress summary of any unsent
-        tool names in the batch (less than BATCH_SIZE)."""
+        tool names in the batch (less than BATCH_SIZE).
+        """
         parent = MagicMock()
         parent._delegate_spinner = None
         parent_cb = MagicMock()

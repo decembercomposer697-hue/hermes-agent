@@ -39,8 +39,8 @@ import logging
 import os
 import threading
 import time
-from typing import Any, Dict, List, Optional, Tuple
 from collections.abc import Callable
+from typing import Any, Dict, List, Optional, Tuple
 
 from agent.lsp import eventlog
 from agent.lsp.client import (

@@ -65,7 +65,7 @@ def test_no_install_when_only_optional_peer_package_missing_from_hidden_lock(tmp
 
 
 def test_no_install_when_only_peer_annotation_differs(tmp_path: Path, main_mod) -> None:
-    """npm 9 drops the ``peer`` flag from the hidden lock on dev-deps that are
+    """Npm 9 drops the ``peer`` flag from the hidden lock on dev-deps that are
     *also* declared as peers.  That's a cosmetic difference — the package is
     installed at the requested version — so it must not trigger a reinstall.
     Regression for the TUI-in-Docker failure where 16 such mismatches caused
@@ -425,6 +425,7 @@ def test_tui_launch_install_uses_workspace_scope(
     install_cmd = npm_calls[0]
     assert "--workspace" in install_cmd
     assert "ui-tui" in install_cmd
+
 
 def test_make_tui_argv_omits_workspace_when_tui_has_own_lockfile(
     tmp_path: Path, main_mod, monkeypatch,

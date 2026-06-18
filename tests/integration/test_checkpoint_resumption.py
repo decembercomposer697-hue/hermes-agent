@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test script to verify checkpoint behavior in batch_runner.py
+"""Test script to verify checkpoint behavior in batch_runner.py
 
 This script simulates batch processing with intentional failures to test:
 1. Whether checkpoints are saved incrementally during processing
@@ -19,15 +18,16 @@ Usage:
 """
 
 import pytest
+
 pytestmark = pytest.mark.integration
 
 import json
 import shutil
 import sys
 import time
-from pathlib import Path
-from typing import List, Dict, Any
 import traceback
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Add project root to path to import batch_runner
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -40,7 +40,7 @@ def create_test_dataset(num_prompts: int = 20) -> Path:
     
     dataset_file = test_data_dir / "checkpoint_test_dataset.jsonl"
     
-    with open(dataset_file, 'w', encoding='utf-8') as f:
+    with open(dataset_file, "w", encoding="utf-8") as f:
         for i in range(num_prompts):
             entry = {
                 "prompt": f"Test prompt {i}: What is 2+2? Just answer briefly.",
@@ -53,8 +53,7 @@ def create_test_dataset(num_prompts: int = 20) -> Path:
 
 
 def monitor_checkpoint_during_run(checkpoint_file: Path, duration: int = 30) -> list[dict[str, Any]]:
-    """
-    Monitor checkpoint file during a batch run to see when it gets updated.
+    """Monitor checkpoint file during a batch run to see when it gets updated.
     
     Args:
         checkpoint_file: Path to checkpoint file to monitor
@@ -62,6 +61,7 @@ def monitor_checkpoint_during_run(checkpoint_file: Path, duration: int = 30) -> 
     
     Returns:
         List of checkpoint snapshots with timestamps
+
     """
     snapshots = []
     start_time = time.time()
@@ -239,7 +239,7 @@ def test_interruption_and_resume():
         # Create a modified dataset with only first 5 prompts for initial run
         with open(dataset_file) as f:
             lines = f.readlines()[:5]
-        with open(temp_dataset, 'w') as f:
+        with open(temp_dataset, "w") as f:
             f.writelines(lines)
         
         runner = BatchRunner(
@@ -393,8 +393,7 @@ def main(
     compare: bool = False,
     show_plan: bool = False,
 ):
-    """
-    Run checkpoint behavior tests.
+    """Run checkpoint behavior tests.
     
     Args:
         test_current: Test current implementation checkpoint timing
@@ -402,6 +401,7 @@ def main(
         test_crash: Test simulated crash scenario (manual)
         compare: Run all tests and compare
         show_plan: Show detailed fix plan
+
     """
     if show_plan or (not any([test_current, test_resume, test_crash, compare])):
         print_test_plan()
@@ -410,13 +410,13 @@ def main(
     results = {}
     
     if test_current or compare:
-        results['current'] = test_current_implementation()
+        results["current"] = test_current_implementation()
     
     if test_resume or compare:
-        results['resume'] = test_interruption_and_resume()
+        results["resume"] = test_interruption_and_resume()
     
     if test_crash or compare:
-        results['crash'] = test_simulated_crash()
+        results["crash"] = test_simulated_crash()
     
     # Summary
     if results:

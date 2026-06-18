@@ -37,6 +37,7 @@ def jittered_backoff(
 
     The jitter decorrelates concurrent retries so multiple sessions
     hitting the same provider don't all retry at the same instant.
+
     """
     global _jitter_counter
     with _jitter_lock:

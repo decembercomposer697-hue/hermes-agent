@@ -19,10 +19,10 @@ import secrets
 import stat
 import subprocess
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from hermes_constants import get_hermes_home
-from typing import Any, Dict, List, Optional, Tuple
 from utils import base_url_host_matches, normalize_proxy_env_vars
 
 # NOTE: `import anthropic` is deliberately NOT at module top — the SDK pulls
@@ -657,6 +657,7 @@ def _build_anthropic_client_with_bearer_hook(
     normalize_proxy_env_vars()
 
     from httpx import Timeout
+
     from agent.azure_identity_adapter import build_bearer_http_client
 
     _read_timeout = timeout if (isinstance(timeout, (int, float)) and timeout > 0) else 900.0

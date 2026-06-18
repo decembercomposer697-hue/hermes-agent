@@ -8,7 +8,6 @@ from __future__ import annotations
 import argparse
 
 
-
 class TestCmdSetupNonTtyGuard:
     """cmd_setup should fail early with a clear error in non-TTY environments."""
 

@@ -281,7 +281,8 @@ async def test_drain_active_agents_throttles_status_updates():
 async def test_gateway_stop_kills_tool_subprocesses_before_adapter_disconnect_on_timeout(monkeypatch):
     """On drain timeout, tool subprocesses must be killed BEFORE adapter
     disconnect so systemd's TimeoutStopSec doesn't SIGKILL the cgroup with
-    bash/sleep children still attached (#8202)."""
+    bash/sleep children still attached (#8202).
+    """
     runner, adapter = make_restart_runner()
     runner._restart_drain_timeout = 0.01  # force timeout path
 
@@ -301,9 +302,9 @@ async def test_gateway_stop_kills_tool_subprocesses_before_adapter_disconnect_on
         call_order.append("disconnect")
 
     # Patch the module-level names the stop() helper imports lazily.
+    import tools.browser_tool as _bt
     import tools.process_registry as _pr
     import tools.terminal_tool as _tt
-    import tools.browser_tool as _bt
     monkeypatch.setattr(_pr.process_registry, "kill_all", _fake_kill_all)
     monkeypatch.setattr(_tt, "cleanup_all_environments", _fake_cleanup_envs)
     monkeypatch.setattr(_bt, "cleanup_all_browsers", _fake_cleanup_browsers)
@@ -334,7 +335,8 @@ async def test_gateway_stop_kills_tool_subprocesses_before_adapter_disconnect_on
 async def test_gateway_stop_kills_tool_subprocesses_on_graceful_path(monkeypatch):
     """Graceful shutdown (no drain timeout) must still kill tool subprocesses
     exactly once via the final catch-all — regression guard against
-    accidentally removing that call when refactoring."""
+    accidentally removing that call when refactoring.
+    """
     runner, adapter = make_restart_runner()
     adapter.disconnect = AsyncMock()
 
@@ -345,9 +347,9 @@ async def test_gateway_stop_kills_tool_subprocesses_on_graceful_path(monkeypatch
         kill_count += 1
         return 0
 
+    import tools.browser_tool as _bt
     import tools.process_registry as _pr
     import tools.terminal_tool as _tt
-    import tools.browser_tool as _bt
     monkeypatch.setattr(_pr.process_registry, "kill_all", _fake_kill_all)
     monkeypatch.setattr(_tt, "cleanup_all_environments", lambda: None)
     monkeypatch.setattr(_bt, "cleanup_all_browsers", lambda: None)
@@ -392,7 +394,8 @@ def _stopped_state_persisted(runner) -> bool:
 async def test_signal_initiated_shutdown_persists_running_not_stopped(tmp_path, monkeypatch):
     """Unexpected SIGTERM (container restart / OOM / kill) must persist
     gateway_state=running — NOT stopped, and NOT leave the mid-shutdown
-    'draining' marker — so container_boot auto-starts on next boot (#42675)."""
+    'draining' marker — so container_boot auto-starts on next boot (#42675).
+    """
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
     runner, adapter = make_restart_runner()
     adapter.disconnect = AsyncMock()
@@ -414,7 +417,8 @@ async def test_signal_initiated_shutdown_persists_running_not_stopped(tmp_path, 
 @pytest.mark.asyncio
 async def test_operator_initiated_stop_persists_stopped(tmp_path, monkeypatch):
     """A planned stop (marker written → not signal-initiated) must persist
-    gateway_state=stopped so an explicit `hermes gateway stop` stays down."""
+    gateway_state=stopped so an explicit `hermes gateway stop` stays down.
+    """
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
     runner, adapter = make_restart_runner()
     adapter.disconnect = AsyncMock()
@@ -432,7 +436,8 @@ async def test_operator_initiated_stop_persists_stopped(tmp_path, monkeypatch):
 async def test_signal_initiated_restart_still_persists_stopped(tmp_path, monkeypatch):
     """A restart is not a 'stay down' — it persists normally (the new
     process/container brings the gateway back up itself). The suppression
-    only applies to a terminal signal-initiated stop, not a restart."""
+    only applies to a terminal signal-initiated stop, not a restart.
+    """
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
     runner, adapter = make_restart_runner()
     adapter.disconnect = AsyncMock()

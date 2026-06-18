@@ -23,10 +23,11 @@ import re
 from typing import Any, Dict, List
 
 from agent.memory_provider import MemoryProvider
-from tools.registry import tool_error
-from .store import MemoryStore
-from .retrieval import FactRetriever
 from hermes_cli.config import cfg_get
+from tools.registry import tool_error
+
+from .retrieval import FactRetriever
+from .store import MemoryStore
 
 logger = logging.getLogger(__name__)
 
@@ -358,13 +359,13 @@ class HolographicMemoryProvider(MemoryProvider):
 
     def _auto_extract_facts(self, messages: list) -> None:
         _PREF_PATTERNS = [
-            re.compile(r'\bI\s+(?:prefer|like|love|use|want|need)\s+(.+)', re.IGNORECASE),
-            re.compile(r'\bmy\s+(?:favorite|preferred|default)\s+\w+\s+is\s+(.+)', re.IGNORECASE),
-            re.compile(r'\bI\s+(?:always|never|usually)\s+(.+)', re.IGNORECASE),
+            re.compile(r"\bI\s+(?:prefer|like|love|use|want|need)\s+(.+)", re.IGNORECASE),
+            re.compile(r"\bmy\s+(?:favorite|preferred|default)\s+\w+\s+is\s+(.+)", re.IGNORECASE),
+            re.compile(r"\bI\s+(?:always|never|usually)\s+(.+)", re.IGNORECASE),
         ]
         _DECISION_PATTERNS = [
-            re.compile(r'\bwe\s+(?:decided|agreed|chose)\s+(?:to\s+)?(.+)', re.IGNORECASE),
-            re.compile(r'\bthe\s+project\s+(?:uses|needs|requires)\s+(.+)', re.IGNORECASE),
+            re.compile(r"\bwe\s+(?:decided|agreed|chose)\s+(?:to\s+)?(.+)", re.IGNORECASE),
+            re.compile(r"\bthe\s+project\s+(?:uses|needs|requires)\s+(.+)", re.IGNORECASE),
         ]
 
         extracted = 0

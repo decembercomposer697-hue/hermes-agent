@@ -19,10 +19,9 @@ _needs_tiktoken = pytest.mark.skipif(not _has_tiktoken, reason="tiktoken not ins
 @_needs_tiktoken
 def test_estimate_tool_tokens_returns_positive_counts():
     """_estimate_tool_tokens should return a non-empty dict with positive values."""
-    from hermes_cli.tools_config import _estimate_tool_tokens
-
     # Clear cache to force fresh computation
     import hermes_cli.tools_config as tc
+    from hermes_cli.tools_config import _estimate_tool_tokens
     tc._tool_token_cache = None
 
     tokens = _estimate_tool_tokens()

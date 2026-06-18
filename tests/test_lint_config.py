@@ -56,7 +56,8 @@ class TestRuffConfig:
 
     def test_preview_mode_enabled(self):
         """PLW1514 is a preview rule in ruff 0.15.x — preview=true is
-        required for it to actually run."""
+        required for it to actually run.
+        """
         cfg = _load_pyproject()
         ruff_cfg = cfg.get("tool", {}).get("ruff", {})
         assert ruff_cfg.get("preview") is True, (
@@ -77,7 +78,8 @@ class TestLintWorkflow:
 
     def test_workflow_has_blocking_ruff_step(self):
         """The workflow must run a blocking ``ruff check .`` step
-        (one without --exit-zero) so violations fail the job."""
+        (one without --exit-zero) so violations fail the job.
+        """
         content = self.WORKFLOW_PATH.read_text(encoding="utf-8")
         # Look for the blocking step's named line + its command.  We want
         # at least one ``ruff check .`` that does NOT have ``--exit-zero``
@@ -103,7 +105,8 @@ class TestLintWorkflow:
 
     def test_workflow_yaml_is_valid(self):
         """Workflow file must parse as valid YAML (can't ship a broken
-        CI config to main)."""
+        CI config to main).
+        """
         import yaml
         content = self.WORKFLOW_PATH.read_text(encoding="utf-8")
         try:

@@ -21,8 +21,8 @@ callbacks it replaces.
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
 from collections.abc import Callable
+from typing import Any, Optional
 
 from gateway.stream_events import (
     Commentary,
@@ -63,6 +63,7 @@ class GatewayEventDispatcher:
     on_long_tool / on_notice:
         Optional hooks for LongToolHint / GatewayNotice events, letting the
         gateway own the "should I surface this here?" decision.
+
     """
 
     def __init__(

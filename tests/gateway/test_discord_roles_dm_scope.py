@@ -18,7 +18,6 @@ opts into a single trusted guild.
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-
 from plugins.platforms.discord.adapter import DiscordAdapter
 
 
@@ -272,7 +271,8 @@ def test_empty_allowlists_allow_everyone():
 
 def test_slash_authorization_rejects_cross_guild_role_dm(monkeypatch):
     """Slash interaction in a DM must not be authorized by a role held in
-    any mutual guild (parallel to the on_message cross-guild bypass)."""
+    any mutual guild (parallel to the on_message cross-guild bypass).
+    """
     import discord as _discord  # type: ignore
     _set_dm_role_auth_guild(monkeypatch)
 

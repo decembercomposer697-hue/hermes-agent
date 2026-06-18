@@ -34,9 +34,9 @@ from __future__ import annotations
 import logging
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
-from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 

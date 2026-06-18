@@ -22,7 +22,7 @@ from unittest.mock import patch
 
 import httpx
 
-from run_agent import AIAgent, _get_proxy_from_env, _get_proxy_for_base_url
+from run_agent import AIAgent, _get_proxy_for_base_url, _get_proxy_from_env
 
 
 def _make_agent():
@@ -118,7 +118,8 @@ def test_create_openai_client_routes_via_proxy_when_env_set(mock_openai, monkeyp
 @patch("run_agent.OpenAI")
 def test_create_openai_client_no_proxy_when_env_unset(mock_openai, monkeypatch):
     """Without proxy env vars, the keepalive transport must still be installed
-    and no HTTPProxy mount should exist."""
+    and no HTTPProxy mount should exist.
+    """
     for key in ("HTTPS_PROXY", "HTTP_PROXY", "ALL_PROXY",
                 "https_proxy", "http_proxy", "all_proxy"):
         monkeypatch.delenv(key, raising=False)
@@ -191,7 +192,8 @@ def test_get_proxy_for_base_url_returns_none_when_proxy_unset(monkeypatch):
 @patch("run_agent.OpenAI")
 def test_create_openai_client_bypasses_proxy_for_no_proxy_host(mock_openai, monkeypatch):
     """E2E: with HTTPS_PROXY + NO_PROXY=localhost, a local base_url gets a
-    keepalive client with NO HTTPProxy mount."""
+    keepalive client with NO HTTPProxy mount.
+    """
     for key in ("HTTPS_PROXY", "HTTP_PROXY", "ALL_PROXY",
                 "https_proxy", "http_proxy", "all_proxy",
                 "NO_PROXY", "no_proxy"):

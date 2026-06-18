@@ -39,7 +39,8 @@ def _reset_credential_cache():
 @pytest.fixture
 def fake_azure_identity(monkeypatch):
     """Identical fake to test_azure_identity_adapter — keeps Azure SDK
-    out of these tests so they run in CI without the package installed."""
+    out of these tests so they run in CI without the package installed.
+    """
     from agent import azure_identity_adapter as _adapter
 
     last = {"scope": None, "kwargs": None, "credential_count": 0}
@@ -92,7 +93,8 @@ class TestResolveAzureFoundryRuntimeEntra:
         """GPT-5.x / o-series / codex models on Azure are Responses-API-only.
         The runtime auto-upgrades api_mode regardless of auth mode — this is
         the same behaviour as the static-key path (see
-        ``hermes_cli/models.py::azure_foundry_model_api_mode``)."""
+        ``hermes_cli/models.py::azure_foundry_model_api_mode``).
+        """
         from hermes_cli.runtime_provider import _resolve_azure_foundry_runtime
         runtime = _resolve_azure_foundry_runtime(
             requested_provider="azure-foundry",
@@ -115,7 +117,8 @@ class TestResolveAzureFoundryRuntimeEntra:
         service principal secret, federated token file) flows through
         standard ``AZURE_*`` env vars read by azure-identity directly.
         Legacy ``model.entra.client_id`` / ``tenant_id`` / ``authority``
-        keys in config.yaml are silently ignored."""
+        keys in config.yaml are silently ignored.
+        """
         from hermes_cli.runtime_provider import _resolve_azure_foundry_runtime
         _resolve_azure_foundry_runtime(
             requested_provider="azure-foundry",
@@ -148,9 +151,10 @@ class TestResolveAzureFoundryRuntimeEntra:
         endpoint is ``*.openai.azure.com`` or ``*.services.ai.azure.com``.
         Both shapes use the SAME scope per Microsoft's docs; the
         ``cognitiveservices.azure.com`` scope is the control-plane
-        audience and is rejected for inference by newer resources."""
-        from hermes_cli.runtime_provider import _resolve_azure_foundry_runtime
+        audience and is rejected for inference by newer resources.
+        """
         from agent.azure_identity_adapter import SCOPE_AI_AZURE_DEFAULT
+        from hermes_cli.runtime_provider import _resolve_azure_foundry_runtime
         _resolve_azure_foundry_runtime(
             requested_provider="azure-foundry",
             model_cfg={
@@ -164,7 +168,8 @@ class TestResolveAzureFoundryRuntimeEntra:
 
     def test_entra_scope_override_wins(self, fake_azure_identity):
         """Users on sovereign clouds / unusual tenants can set
-        ``model.entra.scope`` to override the default."""
+        ``model.entra.scope`` to override the default.
+        """
         from hermes_cli.runtime_provider import _resolve_azure_foundry_runtime
         _resolve_azure_foundry_runtime(
             requested_provider="azure-foundry",
@@ -190,7 +195,8 @@ class TestResolveAzureFoundryRuntimeEntra:
         :func:`agent.anthropic_adapter.build_anthropic_client` detects
         the callable and installs an httpx event hook that mints a
         fresh bearer JWT per request (the Anthropic SDK does not
-        accept callable auth_token natively)."""
+        accept callable auth_token natively).
+        """
         from hermes_cli.runtime_provider import _resolve_azure_foundry_runtime
         runtime = _resolve_azure_foundry_runtime(
             requested_provider="azure-foundry",
@@ -213,7 +219,8 @@ class TestResolveAzureFoundryRuntimeEntra:
     def test_entra_with_explicit_api_key_uses_string_escape_hatch(self, fake_azure_identity):
         """Passing --api-key on the CLI overrides the entra path so a
         user can debug a single request with a static key without
-        editing config.yaml."""
+        editing config.yaml.
+        """
         from hermes_cli.runtime_provider import _resolve_azure_foundry_runtime
         runtime = _resolve_azure_foundry_runtime(
             requested_provider="azure-foundry",
@@ -323,7 +330,8 @@ class TestResolveAzureFoundryRuntimeApiKey:
 class TestAzureFoundryAuthStatus:
     def test_entra_status_does_not_mint_token(self, monkeypatch, tmp_path):
         """Structural check — must return logged_in=True based on
-        importable + config, never call get_bearer_token_provider."""
+        importable + config, never call get_bearer_token_provider.
+        """
         from hermes_cli import auth as _auth
         # Force load_config to return our entra config.
         monkeypatch.setattr(

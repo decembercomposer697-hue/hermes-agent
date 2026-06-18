@@ -111,7 +111,8 @@ class TestDraftTransportSelection:
 
     def test_magicmock_adapter_falls_back_to_edit(self):
         """MagicMock adapters (used in many existing tests) must default to
-        edit-based since their auto-attributes aren't real callables."""
+        edit-based since their auto-attributes aren't real callables.
+        """
         adapter = MagicMock()
         cfg = StreamConsumerConfig(transport="auto", chat_type="dm")
         consumer = GatewayStreamConsumer(adapter, "12345", cfg)
@@ -120,7 +121,8 @@ class TestDraftTransportSelection:
 
 class TestDraftStreamingHappyPath:
     """End-to-end: stream a few deltas in a DM, verify drafts animated and
-    the final message was delivered as a real sendMessage."""
+    the final message was delivered as a real sendMessage.
+    """
 
     @pytest.mark.asyncio
     async def test_dm_stream_animates_draft_then_finalizes_with_send(self):
@@ -183,7 +185,8 @@ class TestDraftStreamingHappyPath:
 
 class TestDraftFallbackOnFailure:
     """When a draft frame fails, the consumer disables drafts for the rest
-    of the response and continues via the edit-based path."""
+    of the response and continues via the edit-based path.
+    """
 
     @pytest.mark.asyncio
     async def test_first_draft_failure_disables_drafts_for_run(self):
@@ -211,7 +214,8 @@ class TestDraftFallbackOnFailure:
 
 class TestDraftIdLifecycle:
     """Each response gets its own draft_id (no animation collision across
-    consecutive responses to the same chat)."""
+    consecutive responses to the same chat).
+    """
 
     @pytest.mark.asyncio
     async def test_consecutive_responses_use_distinct_draft_ids(self):
@@ -250,7 +254,8 @@ class TestDraftIdLifecycle:
     async def test_tool_boundary_bumps_draft_id(self):
         """After a segment break (tool boundary), the next text segment
         animates via a new draft_id so it appears below the tool-progress
-        bubble rather than overwriting the prior segment's preview."""
+        bubble rather than overwriting the prior segment's preview.
+        """
         adapter = _make_draft_capable_adapter()
         cfg = StreamConsumerConfig(
             transport="auto", chat_type="dm",
@@ -291,7 +296,8 @@ class TestDraftIdLifecycle:
 class TestAlreadySentInDraftMode:
     """Drafts must NOT mark _already_sent — that flag gates the gateway's
     fallback final-send path, which we still need to fire so the user gets
-    a real message in their history (drafts have no message_id)."""
+    a real message in their history (drafts have no message_id).
+    """
 
     @pytest.mark.asyncio
     async def test_drafts_do_not_set_already_sent_until_real_message(self):

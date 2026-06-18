@@ -1,5 +1,4 @@
-"""
-Cron job management tools for Hermes Agent.
+"""Cron job management tools for Hermes Agent.
 
 Expose a single compressed action-oriented tool to avoid schema/context bloat.
 Compatibility wrappers remain for direct Python callers and legacy tests.
@@ -31,7 +30,6 @@ from cron.jobs import (
     trigger_job,
     update_job,
 )
-
 
 # ---------------------------------------------------------------------------
 # Cron prompt scanning
@@ -65,14 +63,14 @@ from cron.jobs import (
 
 # Strict patterns — applied to the user prompt only.
 _CRON_THREAT_PATTERNS = [
-    (r'ignore\s+(?:\w+\s+)*(?:previous|all|above|prior)\s+(?:\w+\s+)*instructions', "prompt_injection"),
-    (r'do\s+not\s+tell\s+the\s+user', "deception_hide"),
-    (r'system\s+prompt\s+override', "sys_prompt_override"),
-    (r'disregard\s+(your|all|any)\s+(instructions|rules|guidelines)', "disregard_rules"),
-    (r'cat\s+[^\n]*(\.env|credentials|\.netrc|\.pgpass)', "read_secrets"),
-    (r'authorized_keys', "ssh_backdoor"),
-    (r'/etc/sudoers|visudo', "sudoers_mod"),
-    (r'rm\s+-rf\s+/', "destructive_root_rm"),
+    (r"ignore\s+(?:\w+\s+)*(?:previous|all|above|prior)\s+(?:\w+\s+)*instructions", "prompt_injection"),
+    (r"do\s+not\s+tell\s+the\s+user", "deception_hide"),
+    (r"system\s+prompt\s+override", "sys_prompt_override"),
+    (r"disregard\s+(your|all|any)\s+(instructions|rules|guidelines)", "disregard_rules"),
+    (r"cat\s+[^\n]*(\.env|credentials|\.netrc|\.pgpass)", "read_secrets"),
+    (r"authorized_keys", "ssh_backdoor"),
+    (r"/etc/sudoers|visudo", "sudoers_mod"),
+    (r"rm\s+-rf\s+/", "destructive_root_rm"),
 ]
 
 # Looser pattern set — applied to the assembled prompt when skills are
@@ -83,13 +81,13 @@ _CRON_THREAT_PATTERNS = [
 # obvious injection directives surviving a malicious skill that slipped
 # through install.
 _CRON_SKILL_ASSEMBLED_PATTERNS = [
-    (r'ignore\s+(?:\w+\s+)*(?:previous|all|above|prior)\s+(?:\w+\s+)*instructions', "prompt_injection"),
-    (r'do\s+not\s+tell\s+the\s+user', "deception_hide"),
-    (r'system\s+prompt\s+override', "sys_prompt_override"),
-    (r'disregard\s+(your|all|any)\s+(instructions|rules|guidelines)', "disregard_rules"),
+    (r"ignore\s+(?:\w+\s+)*(?:previous|all|above|prior)\s+(?:\w+\s+)*instructions", "prompt_injection"),
+    (r"do\s+not\s+tell\s+the\s+user", "deception_hide"),
+    (r"system\s+prompt\s+override", "sys_prompt_override"),
+    (r"disregard\s+(your|all|any)\s+(instructions|rules|guidelines)", "disregard_rules"),
 ]
 
-_CRON_SECRET_VAR_RE = r'\$\{?\w*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL|API)\w*\}?'
+_CRON_SECRET_VAR_RE = r"\$\{?\w*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL|API)\w*\}?"
 _CRON_EXFIL_COMMAND_PATTERNS = [
     # Tighten exfil detection to obvious leak paths: embedding a secret
     # directly in the destination URL, sending it in POST/FORM payloads,
@@ -98,14 +96,14 @@ _CRON_EXFIL_COMMAND_PATTERNS = [
     # pattern that talks to api.github.com.
     (rf'curl\s+[^\n]*https?://[^\s"\'`]*{_CRON_SECRET_VAR_RE}', "exfil_curl_url"),
     (rf'wget\s+[^\n]*https?://[^\s"\'`]*{_CRON_SECRET_VAR_RE}', "exfil_wget_url"),
-    (rf'curl\s+[^\n]*(?:--data(?:-raw|-binary|-urlencode)?|-d|--form|-F)\s+[^\n]*{_CRON_SECRET_VAR_RE}', "exfil_curl_data"),
-    (rf'wget\s+[^\n]*--post-(?:data|file)=[^\n]*{_CRON_SECRET_VAR_RE}', "exfil_wget_post"),
+    (rf"curl\s+[^\n]*(?:--data(?:-raw|-binary|-urlencode)?|-d|--form|-F)\s+[^\n]*{_CRON_SECRET_VAR_RE}", "exfil_curl_data"),
+    (rf"wget\s+[^\n]*--post-(?:data|file)=[^\n]*{_CRON_SECRET_VAR_RE}", "exfil_wget_post"),
     (rf'curl\s+[^\n]*(?:-H|--header)\s+["\']Authorization:\s*(?:Bearer|token)\s+{_CRON_SECRET_VAR_RE}["\']', "exfil_curl_auth_header"),
 ]
 
 _CRON_INVISIBLE_CHARS = {
-    '\u200b', '\u200c', '\u200d', '\u2060', '\ufeff',
-    '\u202a', '\u202b', '\u202c', '\u202d', '\u202e',
+    "\u200b", "\u200c", "\u200d", "\u2060", "\ufeff",
+    "\u202a", "\u202b", "\u202c", "\u202d", "\u202e",
 }
 
 # U+200D Zero-Width Joiner is also a legitimate, required part of many
@@ -142,14 +140,14 @@ def _zwj_has_emoji_neighbour(text: str, idx: int) -> bool:
 
 
 def _strip_legitimate_emoji_zwj(prompt: str) -> str:
-    if '\u200d' not in prompt:
+    if "\u200d" not in prompt:
         return prompt
     cleaned: list[str] = []
     for idx, ch in enumerate(prompt):
-        if ch == '\u200d' and _zwj_has_emoji_neighbour(prompt, idx):
+        if ch == "\u200d" and _zwj_has_emoji_neighbour(prompt, idx):
             continue
         cleaned.append(ch)
-    return ''.join(cleaned)
+    return "".join(cleaned)
 
 
 def _strip_cron_safe_constructs(prompt: str) -> str:
@@ -201,13 +199,13 @@ def _strip_invisible_unicode(prompt: str) -> tuple[str, list[str]]:
     cleaned: list[str] = []
     for idx, ch in enumerate(prompt):
         if ch in _CRON_INVISIBLE_CHARS:
-            if ch == '\u200d' and _zwj_has_emoji_neighbour(prompt, idx):
+            if ch == "\u200d" and _zwj_has_emoji_neighbour(prompt, idx):
                 cleaned.append(ch)  # legitimate emoji joiner — keep
                 continue
             removed.add(f"U+{ord(ch):04X}")
             continue
         cleaned.append(ch)
-    return ''.join(cleaned), sorted(removed)
+    return "".join(cleaned), sorted(removed)
 
 
 def _scan_cron_prompt(prompt: str) -> str:
@@ -310,8 +308,6 @@ def _canonical_skills(skill: str | None = None, skills: Any | None = None) -> li
         if text and text not in normalized:
             normalized.append(text)
     return normalized
-
-
 
 
 def _resolve_model_override(model_obj: dict[str, Any] | None) -> tuple:
@@ -719,7 +715,6 @@ def cronjob(
         return tool_error(str(e), success=False)
 
 
-
 CRONJOB_SCHEMA = {
     "name": "cronjob",
     "description": """Manage scheduled cron jobs with a single compressed tool.
@@ -841,8 +836,7 @@ Important safety rule: cron-run sessions should not recursively schedule more cr
 
 
 def check_cronjob_requirements() -> bool:
-    """
-    Check if cronjob tools can be used.
+    """Check if cronjob tools can be used.
 
     Available in interactive CLI mode and gateway/messaging platforms.
     The cron system is internal (JSON file-based scheduler ticked by the gateway),

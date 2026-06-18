@@ -10,8 +10,8 @@ an OAuth2 access token has expired.  These tests verify the three fixes:
 
 import pytest
 
-
 # ── _is_auth_error ──────────────────────────────────────────────────────────
+
 
 def _import_is_auth_error():
     from agent.auxiliary_client import _is_auth_error
@@ -112,7 +112,7 @@ class TestRecoverablePoolProviderXaiOAuth:
         assert result == "xai-oauth"
 
     def test_auto_with_unknown_host_returns_none(self):
-        """auto provider with unknown host returns None."""
+        """Auto provider with unknown host returns None."""
         class MockClient:
             base_url = "https://unknown.example.com/v1/"
 

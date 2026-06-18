@@ -36,8 +36,8 @@ from __future__ import annotations
 
 # Re-export the public surface so `from tools.computer_use import ...` works.
 from tools.computer_use.tool import (
-    handle_computer_use,
-    set_approval_callback,
     check_computer_use_requirements,
     get_computer_use_schema,
+    handle_computer_use,
+    set_approval_callback,
 )

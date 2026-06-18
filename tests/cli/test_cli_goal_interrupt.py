@@ -18,7 +18,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ──────────────────────────────────────────────────────────────────────
 # Fixtures
 # ──────────────────────────────────────────────────────────────────────
@@ -207,8 +206,9 @@ class TestInterruptFlagLifecycle:
         # We can't run chat() end-to-end here, but we can assert the reset
         # is the first thing after the secret-capture registration by
         # inspecting the source shape.
-        from cli import HermesCLI
         import inspect
+
+        from cli import HermesCLI
 
         src = inspect.getsource(HermesCLI.chat)
         # Look for an explicit reset near the top of chat().

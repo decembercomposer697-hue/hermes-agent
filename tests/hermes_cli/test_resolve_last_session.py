@@ -51,9 +51,9 @@ def test_search_sessions_exposes_last_active_column(tmp_path, monkeypatch):
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
 
-    import hermes_state
-
     from pathlib import Path
+
+    import hermes_state
 
     db = hermes_state.SessionDB(db_path=Path(tmp_path / "state.db"))
     try:
@@ -124,9 +124,9 @@ def test_resolve_last_session_not_limited_to_newest_started_20(tmp_path, monkeyp
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
 
-    import hermes_state
-
     from pathlib import Path
+
+    import hermes_state
 
     state_db = Path(tmp_path / "state.db")
     real_session_db = hermes_state.SessionDB

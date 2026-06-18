@@ -1,13 +1,14 @@
 """Tests for batch_runner checkpoint behavior — incremental writes, resume, atomicity."""
 
 import json
+
+# batch_runner uses relative imports, ensure project root is on path
+import sys
 from pathlib import Path
 from threading import Lock
 
 import pytest
 
-# batch_runner uses relative imports, ensure project root is on path
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from batch_runner import BatchRunner, _process_batch_worker
@@ -216,7 +217,8 @@ class TestFinalCheckpointNoDuplicates:
 
     def test_persisted_checkpoint_has_unique_prompts(self, runner):
         """Write what run()'s fixed aggregation produces to disk; the file
-        must load back with no duplicate indices."""
+        must load back with no duplicate indices.
+        """
         batch_results = [
             {"completed_prompts": [0, 1]},
             {"completed_prompts": [2, 3]},
@@ -235,7 +237,8 @@ class TestFinalCheckpointNoDuplicates:
     def test_old_buggy_pattern_would_have_duplicates(self):
         """Document the bug this PR fixes: the old code shape produced
         duplicates.  Kept as a sanity anchor so a future refactor that
-        re-introduces the pattern is immediately visible."""
+        re-introduces the pattern is immediately visible.
+        """
         completed_prompts_set = set()
         results = []
         for batch in ({"completed_prompts": [0, 1, 2]},

@@ -40,7 +40,8 @@ async def test_safe_disconnect_calls_adapter_disconnect(bare_runner):
 @pytest.mark.asyncio
 async def test_safe_disconnect_swallows_exceptions(bare_runner):
     """An exception in adapter.disconnect() must not propagate — the
-    caller is already on an error path."""
+    caller is already on an error path.
+    """
     adapter = MagicMock()
     adapter.disconnect = AsyncMock(side_effect=RuntimeError("partial init"))
 

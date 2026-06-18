@@ -1,15 +1,16 @@
 """Tests for _detect_file_drop — file path detection that prevents
-dragged/pasted absolute paths from being mistaken for slash commands."""
+dragged/pasted absolute paths from being mistaken for slash commands.
+"""
 
 
 import pytest
 
 from cli import _detect_file_drop
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def tmp_image(tmp_path):
@@ -129,15 +130,15 @@ class TestNonImageFileDrop:
 
 class TestEscapedSpaces:
     def test_escaped_spaces_in_path(self, tmp_image_with_spaces):
-        r"""macOS drags produce paths like /path/to/my\ file.png"""
-        escaped = str(tmp_image_with_spaces).replace(' ', '\\ ')
+        r"""MacOS drags produce paths like /path/to/my\ file.png"""
+        escaped = str(tmp_image_with_spaces).replace(" ", "\\ ")
         result = _detect_file_drop(escaped)
         assert result is not None
         assert result["path"] == tmp_image_with_spaces
         assert result["is_image"] is True
 
     def test_escaped_spaces_with_trailing_text(self, tmp_image_with_spaces):
-        escaped = str(tmp_image_with_spaces).replace(' ', '\\ ')
+        escaped = str(tmp_image_with_spaces).replace(" ", "\\ ")
         user_input = f"{escaped} what is this?"
         result = _detect_file_drop(user_input)
         assert result is not None

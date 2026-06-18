@@ -30,7 +30,6 @@ from __future__ import annotations
 
 import pytest
 
-
 pytest.importorskip("mcp.client.auth.oauth2", reason="MCP SDK 1.26.0+ required")
 
 
@@ -126,7 +125,11 @@ async def test_hermes_provider_forwards_401_triggers_refresh(tmp_path, monkeypat
     branch which begins discovery (yielding a metadata-discovery request).
     """
     import httpx
-    from mcp.shared.auth import OAuthClientInformationFull, OAuthClientMetadata, OAuthToken
+    from mcp.shared.auth import (
+        OAuthClientInformationFull,
+        OAuthClientMetadata,
+        OAuthToken,
+    )
     from pydantic import AnyUrl
 
     from tools.mcp_oauth import HermesTokenStorage

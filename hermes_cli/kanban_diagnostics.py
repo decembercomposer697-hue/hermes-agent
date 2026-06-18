@@ -29,12 +29,11 @@ Design goals:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Optional
-from collections.abc import Callable, Iterable
 import json
 import time
-
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass, field
+from typing import Any, Optional
 
 # Severity rungs, ordered least → most urgent. The UI colors them
 # amber (warning), orange (error), red (critical). Sorted outputs put
@@ -192,6 +191,8 @@ def _active_hallucination_events(
         elif k == kind:
             active.append(ev)
     return active
+
+
 # Standard always-available actions. Every diagnostic can offer these as
 # fallbacks regardless of kind — they're the two baseline recovery
 # primitives the kernel supports.

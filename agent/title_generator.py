@@ -6,8 +6,8 @@ adds latency to the user-facing reply.
 
 import logging
 import threading
-from typing import Optional
 from collections.abc import Callable
+from typing import Optional
 
 from agent.auxiliary_client import call_llm
 

@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-
 # One consolidated tool with an `action` discriminator. Keeps the schema
 # compact and the per-turn token cost low.
 COMPUTER_USE_SCHEMA: dict[str, Any] = {

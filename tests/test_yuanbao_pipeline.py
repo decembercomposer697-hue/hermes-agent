@@ -1,5 +1,4 @@
-"""
-test_yuanbao_pipeline.py - Unit tests for the inbound middleware pipeline.
+"""test_yuanbao_pipeline.py - Unit tests for the inbound middleware pipeline.
 
 Tests cover:
   1. InboundPipeline engine (use, use_before, use_after, remove, execute)
@@ -10,47 +9,48 @@ Tests cover:
   6. OOP middleware ABC and class tests
 """
 
-import sys
-import os
 import json
+import os
+import sys
 
 # Ensure project root is on the path
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
+from gateway.config import PlatformConfig
 from gateway.platforms.yuanbao import (
+    AccessGuardMiddleware,
+    AccessPolicy,
+    BuildSourceMiddleware,
+    ChatRoutingMiddleware,
+    DecodeMiddleware,
+    DedupMiddleware,
+    DispatchMiddleware,
+    ExtractContentMiddleware,
+    ExtractFieldsMiddleware,
+    GroupAtGuardMiddleware,
     InboundContext,
     InboundMiddleware,
     InboundPipeline,
-    DecodeMiddleware,
-    ExtractFieldsMiddleware,
-    DedupMiddleware,
-    SkipSelfMiddleware,
-    ChatRoutingMiddleware,
-    AccessPolicy,
-    AccessGuardMiddleware,
-    ExtractContentMiddleware,
-    PlaceholderFilterMiddleware,
-    OwnerCommandMiddleware,
-    BuildSourceMiddleware,
-    GroupAtGuardMiddleware,
-    QuoteContextMiddleware,
-    MediaResolveMiddleware,
-    PatchAnchorsMiddleware,
-    DispatchMiddleware,
     InboundPipelineBuilder,
+    MediaResolveMiddleware,
+    OwnerCommandMiddleware,
+    PatchAnchorsMiddleware,
+    PlaceholderFilterMiddleware,
+    QuoteContextMiddleware,
+    SkipSelfMiddleware,
     YuanbaoAdapter,
 )
-from gateway.config import PlatformConfig
-
 
 # ============================================================
 # Helpers
 # ============================================================
+
 
 def make_config(**kwargs):
     extra = kwargs.pop("extra", {})
@@ -251,7 +251,7 @@ class TestInboundPipeline:
         assert pipeline.middleware_names == ["a", "b"]
 
     def test_remove(self):
-        """remove deletes middleware by name."""
+        """Remove deletes middleware by name."""
         async def noop(ctx, next_fn):
             await next_fn()
 
@@ -260,7 +260,7 @@ class TestInboundPipeline:
         assert pipeline.middleware_names == ["a", "c"]
 
     def test_remove_nonexistent_is_noop(self):
-        """remove with nonexistent name is a no-op."""
+        """Remove with nonexistent name is a no-op."""
         async def noop(ctx, next_fn):
             await next_fn()
 
@@ -815,7 +815,6 @@ class TestPipelineIntegration:
         assert isinstance(adapter._inbound_pipeline, InboundPipeline)
 
 
-
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
 
@@ -831,6 +830,7 @@ class TestInboundMiddlewareABC:
         """Subclass with handle() can be instantiated."""
         class GoodMiddleware(InboundMiddleware):
             name = "good"
+
             async def handle(self, ctx, next_fn):
                 await next_fn()
         mw = GoodMiddleware()
@@ -841,6 +841,7 @@ class TestInboundMiddlewareABC:
         """Middleware instances are callable via __call__."""
         class TestMW(InboundMiddleware):
             name = "test"
+
             async def handle(self, ctx, next_fn):
                 ctx.raw_text = "called"
                 await next_fn()
@@ -891,6 +892,7 @@ class TestPipelineOOPRegistration:
         """pipeline.use(SomeMiddleware()) auto-extracts name."""
         class TestMW(InboundMiddleware):
             name = "test-mw"
+
             async def handle(self, ctx, next_fn):
                 ctx.raw_text = "oop-works"
                 await next_fn()
@@ -909,6 +911,7 @@ class TestPipelineOOPRegistration:
 
         class OopMW(InboundMiddleware):
             name = "oop"
+
             async def handle(self, ctx, next_fn):
                 order.append("oop")
                 await next_fn()

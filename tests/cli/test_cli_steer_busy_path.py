@@ -78,7 +78,8 @@ class TestSteerInlineDetector:
 
     def test_ignores_steer_when_agent_idle(self):
         """Idle-path /steer should fall through to the normal process_loop
-        dispatch so the queue-style fallback message is emitted."""
+        dispatch so the queue-style fallback message is emitted.
+        """
         cli = _make_cli()
         cli._agent_running = False
         assert cli._should_handle_steer_command_inline("/steer do something") is False
@@ -105,11 +106,13 @@ class TestSteerInlineDetector:
 
 class TestSteerBusyPathDispatch:
     """When the detector fires, process_command('/steer ...') must call
-    agent.steer() directly rather than the idle-path fallback."""
+    agent.steer() directly rather than the idle-path fallback.
+    """
 
     def test_process_command_routes_to_agent_steer(self):
         """With _agent_running=True and agent.steer present, /steer reaches
-        agent.steer(payload), NOT _pending_input."""
+        agent.steer(payload), NOT _pending_input.
+        """
         cli = _make_cli()
         cli._agent_running = True
         cli.agent = MagicMock()
@@ -125,7 +128,8 @@ class TestSteerBusyPathDispatch:
     def test_idle_path_queues_as_next_turn(self):
         """Control — when the agent is NOT running, /steer correctly falls
         back to next-turn queue semantics.  Demonstrates why the fix was
-        needed: the queue path only works when you can actually drain it."""
+        needed: the queue path only works when you can actually drain it.
+        """
         cli = _make_cli()
         cli._agent_running = False
         cli.agent = MagicMock()

@@ -4,7 +4,8 @@ XML stripping added in openclaw/openclaw#67318 port.
 The CLI has its own copy of the stripper because it needs to run on the
 final displayed assistant text (after streaming) without depending on the
 AIAgent instance. It must stay in sync with run_agent.py::_strip_think_blocks
-for tool-call tag coverage."""
+for tool-call tag coverage.
+"""
 
 
 from cli import _strip_reasoning_tags
@@ -18,7 +19,7 @@ class TestToolCallStripping:
         assert "result" in result
 
     def test_function_calls_block_stripped(self):
-        text = '<function_calls>[{}]</function_calls>\nanswer'
+        text = "<function_calls>[{}]</function_calls>\nanswer"
         result = _strip_reasoning_tags(text)
         assert "<function_calls>" not in result
         assert "answer" in result

@@ -1,5 +1,4 @@
-"""
-Tests for timezone support (hermes_time module + integration points).
+"""Tests for timezone support (hermes_time module + integration points).
 
 Covers:
   - Valid timezone applies correctly
@@ -9,13 +8,14 @@ Covers:
   - Backward compatibility with naive timestamps
 """
 
-import os
 import logging
+import os
 import sys
-import pytest
-from datetime import datetime, timedelta, timezone, UTC
+from datetime import UTC, datetime, timedelta, timezone
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
+
+import pytest
 
 import hermes_time
 
@@ -128,7 +128,6 @@ class TestGetTimezone:
         os.environ["HERMES_TIMEZONE"] = "Not/A/Timezone"
         tz = hermes_time.get_timezone()
         assert tz is None
-
 
 
 # =========================================================================
@@ -246,7 +245,7 @@ class TestCronTimezone:
         _reset_hermes_time_cache()
 
         # Create a job with a NAIVE past timestamp (simulating pre-tz data)
-        from cron.jobs import create_job, load_jobs, save_jobs, get_due_jobs
+        from cron.jobs import create_job, get_due_jobs, load_jobs, save_jobs
         job = create_job(prompt="Test job", schedule="every 1h")
         jobs = load_jobs()
         # Force a naive (no timezone) past timestamp
@@ -320,7 +319,7 @@ class TestCronTimezone:
         os.environ["HERMES_TIMEZONE"] = "UTC"
         _reset_hermes_time_cache()
 
-        from cron.jobs import create_job, load_jobs, save_jobs, get_due_jobs
+        from cron.jobs import create_job, get_due_jobs, load_jobs, save_jobs
 
         job = create_job(prompt="Bug repro", schedule="every 1h")
         jobs = load_jobs()
@@ -339,7 +338,8 @@ class TestCronTimezone:
 
     def test_get_due_jobs_naive_cross_timezone(self, tmp_path, monkeypatch):
         """Naive past timestamps must be detected as due even when Hermes tz
-        is behind system local tz — the scenario that triggered #806."""
+        is behind system local tz — the scenario that triggered #806.
+        """
         import cron.jobs as jobs_module
         monkeypatch.setattr(jobs_module, "CRON_DIR", tmp_path / "cron")
         monkeypatch.setattr(jobs_module, "JOBS_FILE", tmp_path / "cron" / "jobs.json")
@@ -351,7 +351,7 @@ class TestCronTimezone:
         os.environ["HERMES_TIMEZONE"] = "Pacific/Midway"  # UTC-11
         _reset_hermes_time_cache()
 
-        from cron.jobs import create_job, load_jobs, save_jobs, get_due_jobs
+        from cron.jobs import create_job, get_due_jobs, load_jobs, save_jobs
         create_job(prompt="Cross-tz job", schedule="every 1h")
         jobs = load_jobs()
 

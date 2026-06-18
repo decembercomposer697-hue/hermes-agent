@@ -20,7 +20,6 @@ import threading
 from unittest.mock import MagicMock
 
 
-
 def _make_runner():
     """Bare GatewayRunner wired with just the state the helper touches."""
     from gateway.run import GatewayRunner
@@ -120,8 +119,8 @@ class TestNoMoreBareDeleteSites:
     """
 
     def test_no_bare_del_of_running_agents_in_gateway_run(self):
-        from pathlib import Path
         import re
+        from pathlib import Path
 
         gateway_run = (Path(__file__).parent.parent.parent / "gateway" / "run.py").read_text()
         # Match `del self._running_agents[...]` that is NOT inside a
@@ -165,7 +164,8 @@ class TestSessionDbCloseOnShutdown:
 
     def test_stop_impl_closes_both_session_dbs(self):
         """Run the exact shutdown block that closes SessionDBs and verify
-        .close() was called on both holders."""
+        .close() was called on both holders.
+        """
         from gateway.run import GatewayRunner
 
         runner = GatewayRunner.__new__(GatewayRunner)

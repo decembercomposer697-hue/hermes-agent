@@ -8,9 +8,8 @@ import threading
 import time
 import urllib.request
 from dataclasses import dataclass, field
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from typing import Any, Literal, Optional
-
 
 NousAccountInfoSource = Literal["jwt", "account_api", "inference_key", "none", "error"]
 
@@ -110,7 +109,8 @@ class NousPortalAccountInfo:
     def tool_gateway_entitled(self) -> bool:
         """Coarse "entitled to any managed tool" gate: paid access OR a live
         free tool pool. Use :meth:`tool_gateway_entitled_for` to gate a specific
-        tool category (the pool does not cover every category)."""
+        tool category (the pool does not cover every category).
+        """
         if self.paid_service_access is True:
             return True
         return self.tool_access is not None and self.tool_access.enabled
@@ -118,7 +118,8 @@ class NousPortalAccountInfo:
     def tool_gateway_entitled_for(self, category: str) -> bool:
         """Whether a specific tool category is entitled. Paid users are entitled
         everywhere; free tool-pool users only where ``coverage[category]`` is
-        true (e.g. image but not video)."""
+        true (e.g. image but not video).
+        """
         if self.paid_service_access is True:
             return True
         ta = self.tool_access
@@ -643,7 +644,8 @@ def _tool_access_from_value(value: Any) -> NousToolAccessInfo | None:
     """Parse a Portal ``tool_access`` object (from the JWT claim or the account
     API) into :class:`NousToolAccessInfo`. Fails closed: a non-object value
     yields ``None``, and only literal ``true`` counts for ``enabled`` and each
-    coverage entry."""
+    coverage entry.
+    """
     if not isinstance(value, dict):
         return None
     enabled = _coerce_bool(value.get("enabled")) is True

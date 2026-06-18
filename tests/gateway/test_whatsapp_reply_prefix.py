@@ -9,9 +9,7 @@ Covers:
 
 from unittest.mock import patch
 
-
 from gateway.config import Platform, PlatformConfig
-
 
 # ---------------------------------------------------------------------------
 # Config bridging from config.yaml
@@ -65,7 +63,7 @@ class TestConfigYamlBridging:
         assert "reply_prefix" not in wa_config.extra
 
     def test_whatsapp_section_without_reply_prefix(self, tmp_path):
-        """whatsapp section present but without reply_prefix key."""
+        """Whatsapp section present but without reply_prefix key."""
         config_yaml = tmp_path / "config.yaml"
         config_yaml.write_text("whatsapp:\n  other_setting: true\n")
 

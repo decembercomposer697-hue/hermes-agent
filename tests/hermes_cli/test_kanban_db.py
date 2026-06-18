@@ -307,8 +307,9 @@ def test_recompute_ready_cascades_through_chain(kanban_home):
 
 
 def test_recompute_ready_promotes_blocked_with_done_parents(kanban_home):
-    """blocked tasks with all parents done should be promoted to ready,
-    unless the circuit-breaker failure limit has been reached."""
+    """Blocked tasks with all parents done should be promoted to ready,
+    unless the circuit-breaker failure limit has been reached.
+    """
     with kb.connect() as conn:
         parent = kb.create_task(conn, title="parent", assignee="a")
         child = kb.create_task(
@@ -409,6 +410,7 @@ def test_unblock_scheduled_rechecks_parent_gate(kanban_home):
 
 def test_stale_claim_reclaimed(kanban_home, monkeypatch):
     import signal
+
     import hermes_cli.kanban_db as _kb
 
     with kb.connect() as conn:
@@ -442,7 +444,8 @@ def test_stale_claim_with_live_pid_extends_instead_of_reclaiming(
     extended, not reclaimed (#23025). Slow models can spend longer than
     ``DEFAULT_CLAIM_TTL_SECONDS`` inside a single tool-free LLM call;
     killing those healthy workers produces a respawn loop with zero
-    progress."""
+    progress.
+    """
     import hermes_cli.kanban_db as _kb
 
     with kb.connect() as conn:
@@ -511,8 +514,10 @@ def test_stale_claim_reclaim_event_records_diagnostic_payload(
     """``reclaimed`` events should carry claim_expires, last_heartbeat_at,
     and worker_pid so operators can diagnose why a claim went stale
     (#23025: previous payload only had ``stale_lock`` which gives no
-    timing context)."""
+    timing context).
+    """
     import json
+
     import hermes_cli.kanban_db as _kb
 
     with kb.connect() as conn:
@@ -712,7 +717,8 @@ def test_rate_limit_exit_requeues_without_counting_failure(
 ):
     """A rate-limit sentinel exit releases the task to ``ready`` and leaves
     ``consecutive_failures`` untouched — the breaker must never trip on a
-    transient throttle, even across many quota-wall hits."""
+    transient throttle, even across many quota-wall hits.
+    """
     import hermes_cli.kanban_db as _kb
 
     monkeypatch.setattr(_kb, "_pid_alive", lambda _pid: False)
@@ -772,7 +778,8 @@ def test_rate_limit_exit_requeues_without_counting_failure(
 def test_real_crash_still_counts_and_trips_breaker(kanban_home, monkeypatch):
     """Sanity: a genuine non-zero crash (not the sentinel) still increments
     the failure counter and trips the breaker — the rate-limit carve-out is
-    surgical, not a blanket "never count crashes"."""
+    surgical, not a blanket "never count crashes".
+    """
     import hermes_cli.kanban_db as _kb
 
     monkeypatch.setattr(_kb, "_pid_alive", lambda _pid: False)
@@ -803,7 +810,8 @@ def test_respawn_guard_defers_rate_limited_within_cooldown(
 ):
     """Within the cooldown after a rate-limit requeue, the guard defers the
     respawn; after the cooldown it allows a probe — and crucially does NOT
-    fall into ``blocker_auth`` (which would defer forever)."""
+    fall into ``blocker_auth`` (which would defer forever).
+    """
     import hermes_cli.kanban_db as _kb
 
     monkeypatch.setenv("HERMES_KANBAN_RATE_LIMIT_COOLDOWN_SECONDS", "300")
@@ -841,7 +849,8 @@ def test_respawn_guard_rate_limit_cooldown_zero_allows_immediately(
     kanban_home, monkeypatch,
 ):
     """Cooldown of 0 disables the wait — task is spawnable on the next tick,
-    and the stamped rate-limit text does not re-trap it via blocker_auth."""
+    and the stamped rate-limit text does not re-trap it via blocker_auth.
+    """
     import hermes_cli.kanban_db as _kb
 
     monkeypatch.setenv("HERMES_KANBAN_RATE_LIMIT_COOLDOWN_SECONDS", "0")
@@ -1065,7 +1074,8 @@ def test_recompute_ready_skips_tasks_at_failure_limit(kanban_home):
 
 def test_recompute_ready_recovers_below_limit(kanban_home):
     """recompute_ready auto-recovers blocked tasks that haven't hit the
-    failure limit yet — the counter is preserved across recovery."""
+    failure limit yet — the counter is preserved across recovery.
+    """
     with kb.connect() as conn:
         t = kb.create_task(conn, title="task", assignee="a")
         kb.claim_task(conn, t)
@@ -1142,7 +1152,8 @@ def test_recompute_ready_honours_dispatcher_failure_limit(kanban_home):
 
 def test_recompute_ready_per_task_max_retries_overrides_dispatcher(kanban_home):
     """A per-task ``max_retries`` wins over the dispatcher failure_limit,
-    matching ``_record_task_failure``'s resolution order."""
+    matching ``_record_task_failure``'s resolution order.
+    """
     with kb.connect() as conn:
         t = kb.create_task(conn, title="per-task", assignee="a")
         # Per-task allows 4 retries; dispatcher config says 2.
@@ -1379,6 +1390,7 @@ def test_list_tasks_order_by(kanban_home):
         except ValueError as e:
             assert "order_by must be one of" in str(e)
 
+
 def test_delete_task_removes_task_and_cascades(kanban_home):
     with kb.connect() as conn:
         t = kb.create_task(conn, title="to-delete", assignee="alice")
@@ -1483,7 +1495,8 @@ def test_dispatch_skips_nonspawnable_into_separate_bucket(kanban_home, monkeypat
     """Tasks whose assignee fails profile_exists() must NOT land in
     ``skipped_unassigned`` (which is operator-actionable) — they go in
     the dedicated ``skipped_nonspawnable`` bucket so health telemetry
-    can suppress false-positive "stuck" warnings."""
+    can suppress false-positive "stuck" warnings.
+    """
     from hermes_cli import profiles
     monkeypatch.setattr(profiles, "profile_exists", lambda name: False)
     with kb.connect() as conn:
@@ -1497,7 +1510,8 @@ def test_dispatch_skips_nonspawnable_into_separate_bucket(kanban_home, monkeypat
 def test_has_spawnable_ready_false_when_only_terminal_lanes(kanban_home, monkeypatch):
     """``has_spawnable_ready`` returns False when every ready task is
     assigned to a control-plane lane — used by gateway/CLI dispatchers
-    to silence the stuck-warn while terminals still have queued work."""
+    to silence the stuck-warn while terminals still have queued work.
+    """
     from hermes_cli import profiles
     monkeypatch.setattr(profiles, "profile_exists", lambda name: False)
     with kb.connect() as conn:
@@ -1509,7 +1523,8 @@ def test_has_spawnable_ready_false_when_only_terminal_lanes(kanban_home, monkeyp
 def test_has_spawnable_ready_true_when_real_profile_present(kanban_home, monkeypatch):
     """``has_spawnable_ready`` returns True as soon as ANY ready task
     has an assignee that maps to a real Hermes profile — preserves the
-    real "stuck" signal when a daily/agent task is queued."""
+    real "stuck" signal when a daily/agent task is queued.
+    """
     from hermes_cli import profiles
     monkeypatch.setattr(
         profiles, "profile_exists", lambda name: name == "daily",
@@ -2251,7 +2266,8 @@ def test_session_id_filters_listings(kanban_home):
 def test_session_id_index_exists(kanban_home):
     """The migration creates an index on session_id for cheap per-session
     list queries on busy boards. Without it, a chat-scoped poll would
-    full-scan the tasks table."""
+    full-scan the tasks table.
+    """
     with kb.connect() as conn:
         rows = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='index' "
@@ -2263,7 +2279,8 @@ def test_session_id_index_exists(kanban_home):
 
 def test_session_id_compose_with_tenant_filter(kanban_home):
     """A client may want both `tenant=scarf:foo` AND `session=acp-x` —
-    the filters must AND, not replace."""
+    the filters must AND, not replace.
+    """
     with kb.connect() as conn:
         kb.create_task(
             conn, title="match", tenant="scarf:foo", session_id="acp-x",
@@ -2293,7 +2310,8 @@ def test_session_id_compose_with_tenant_filter(kanban_home):
 
 class TestSharedBoardPaths:
     """`kanban_home`/`kanban_db_path`/`workspaces_root`/`worker_log_path`
-    must anchor at the **shared root**, not the active profile's HERMES_HOME."""
+    must anchor at the **shared root**, not the active profile's HERMES_HOME.
+    """
 
     def _set_home(self, monkeypatch, tmp_path, hermes_home):
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
@@ -2573,7 +2591,8 @@ def test_latest_summary_returns_none_when_no_runs(kanban_home):
 def test_latest_summary_returns_summary_after_complete(kanban_home):
     """``complete_task(summary=...)`` is the canonical kanban-worker
     handoff; ``latest_summary`` must surface it so dashboards/CLI can
-    render what the worker actually did."""
+    render what the worker actually did.
+    """
     handoff = "shipped 3 files, ran tests, opened PR #42"
     with kb.connect() as conn:
         t = kb.create_task(conn, title="work", assignee="alice")
@@ -2585,7 +2604,8 @@ def test_latest_summary_picks_newest_when_multiple_runs(kanban_home):
     """When a task has been re-run (block → unblock → complete), the
     newest run's summary wins. We unblock to take the task back to
     ``ready``, then complete a second time and verify the second
-    summary surfaces."""
+    summary surfaces.
+    """
     with kb.connect() as conn:
         t = kb.create_task(conn, title="retry", assignee="alice")
         kb.complete_task(conn, t, summary="first attempt")
@@ -2605,7 +2625,8 @@ def test_latest_summary_picks_newest_when_multiple_runs(kanban_home):
 
 def test_latest_summary_skips_empty_string(kanban_home):
     """A run with an empty-string summary should not mask an earlier
-    populated one — empty strings carry no information."""
+    populated one — empty strings carry no information.
+    """
     with kb.connect() as conn:
         t = kb.create_task(conn, title="t", assignee="alice")
         kb.complete_task(conn, t, summary="real handoff")
@@ -2623,7 +2644,8 @@ def test_latest_summary_skips_empty_string(kanban_home):
 def test_latest_summaries_batch_omits_tasks_without_summary(kanban_home):
     """``latest_summaries`` is the dashboard's N+1 escape hatch — it
     must return only entries for tasks that actually have a summary,
-    keep the per-task latest, and accept an empty input gracefully."""
+    keep the per-task latest, and accept an empty input gracefully.
+    """
     with kb.connect() as conn:
         t1 = kb.create_task(conn, title="a", assignee="alice")
         t2 = kb.create_task(conn, title="b", assignee="bob")
@@ -2634,7 +2656,6 @@ def test_latest_summaries_batch_omits_tasks_without_summary(kanban_home):
         assert out == {t1: "alpha", t3: "charlie"}
         # Empty input → empty dict, no SQL syntax error from "IN ()".
         assert kb.latest_summaries(conn, []) == {}
-
 
 
 # ---------------------------------------------------------------------------
@@ -2760,6 +2781,7 @@ def test_archive_task_triggers_recompute_ready_for_dependents(kanban_home):
 # _add_column_if_missing / _migrate_add_optional_columns idempotency (#21708)
 # ---------------------------------------------------------------------------
 
+
 def test_add_column_if_missing_is_idempotent_on_race(kanban_home):
     """``_add_column_if_missing`` must swallow 'duplicate column name' errors.
 
@@ -2796,7 +2818,8 @@ def test_add_column_if_missing_is_idempotent_on_race(kanban_home):
 
 def test_migrate_add_optional_columns_tolerates_concurrent_migration(kanban_home):
     """Full _migrate_add_optional_columns must not raise when columns already
-    exist (issue #21708 race window — two connections migrate concurrently)."""
+    exist (issue #21708 race window — two connections migrate concurrently).
+    """
     import sqlite3
 
     # Schema already in fully-migrated state (all optional columns present).
@@ -2859,6 +2882,7 @@ def test_migrate_add_optional_columns_tolerates_concurrent_migration(kanban_home
 def test_resolve_hermes_argv_prefers_path_shim(monkeypatch):
     """When `hermes` is on PATH, use the shim — preserves familiar ps output."""
     import shutil
+
     import hermes_cli.kanban_db as kb
 
     monkeypatch.delenv("HERMES_BIN", raising=False)
@@ -2881,6 +2905,7 @@ def test_resolve_hermes_argv_absolutizes_relative_exe_shim(monkeypatch, tmp_path
 def test_resolve_hermes_argv_avoids_implicit_windows_batch_shim(monkeypatch, tmp_path):
     """Implicit .cmd/.bat shims use the module fallback, not batch argv[0]."""
     import sys
+
     import hermes_cli.kanban_db as kb
 
     bin_dir = tmp_path / "bin"
@@ -2897,6 +2922,7 @@ def test_resolve_hermes_argv_avoids_implicit_windows_batch_shim(monkeypatch, tmp
 def test_resolve_hermes_argv_honors_hermes_bin_path_override(monkeypatch, tmp_path):
     """An explicit path-like HERMES_BIN lets service managers pin the executable."""
     import shutil
+
     import hermes_cli.kanban_db as kb
 
     shim = tmp_path / "bin" / "hermes"
@@ -2911,6 +2937,7 @@ def test_resolve_hermes_argv_honors_hermes_bin_path_override(monkeypatch, tmp_pa
 def test_resolve_hermes_argv_hermes_bin_bare_name_uses_path(monkeypatch, tmp_path):
     """Bare HERMES_BIN values keep PATH semantics instead of cwd shadowing."""
     import stat
+
     import hermes_cli.kanban_db as kb
 
     cwd_hermes = tmp_path / "hermes"
@@ -2930,6 +2957,7 @@ def test_resolve_hermes_argv_hermes_bin_bare_name_uses_path(monkeypatch, tmp_pat
 def test_resolve_hermes_argv_hermes_bin_bare_name_ignores_cwd(monkeypatch, tmp_path):
     """Bare HERMES_BIN does not accept current-directory shadow executables."""
     import sys
+
     import hermes_cli.kanban_db as kb
 
     (tmp_path / "hermes.exe").write_text("wrong\n", encoding="utf-8")
@@ -2944,6 +2972,7 @@ def test_resolve_hermes_argv_hermes_bin_bare_name_ignores_cwd(monkeypatch, tmp_p
 def test_resolve_hermes_argv_hermes_bin_bare_cmd_uses_module_fallback(monkeypatch, tmp_path):
     """A PATH-resolved HERMES_BIN batch shim is not used as worker argv[0]."""
     import sys
+
     import hermes_cli.kanban_db as kb
 
     bin_dir = tmp_path / "bin"
@@ -2960,6 +2989,7 @@ def test_resolve_hermes_argv_hermes_bin_bare_cmd_uses_module_fallback(monkeypatc
 def test_resolve_hermes_argv_hermes_bin_unresolved_bare_name_falls_back(monkeypatch):
     """Unresolved HERMES_BIN command names do not delegate cwd search to Popen."""
     import sys
+
     import hermes_cli.kanban_db as kb
 
     monkeypatch.setenv("PATH", "")
@@ -2978,6 +3008,7 @@ def test_resolve_hermes_argv_falls_back_to_module_form_when_no_path_shim(monkeyp
     """
     import shutil
     import sys
+
     import hermes_cli.kanban_db as kb
 
     monkeypatch.delenv("HERMES_BIN", raising=False)
@@ -2995,10 +3026,11 @@ def test_resolve_hermes_argv_module_actually_runs():
     would fail and so would every dispatcher spawn that hits the fallback.
     Run it as a real subprocess to catch that regression.
     """
-    import subprocess
-    import hermes_cli.kanban_db as kb
     import shutil
+    import subprocess
     import unittest.mock as mock
+
+    import hermes_cli.kanban_db as kb
 
     with mock.patch.dict(os.environ, {}, clear=False):
         os.environ.pop("HERMES_BIN", None)
@@ -3155,7 +3187,8 @@ def test_task_dict_survives_corrupt_created_at(tmp_path, monkeypatch):
 
 def test_create_task_scratch_without_workspace_ignores_board_default_workdir(kanban_home, monkeypatch):
     """Scratch tasks must NOT inherit board.default_workdir — would point auto-cleanup
-    at the user's source tree on completion (#28818)."""
+    at the user's source tree on completion (#28818).
+    """
     default_wd = "/home/user/project"
     kb.create_board("work-proj", default_workdir=default_wd)
 
@@ -3446,6 +3479,7 @@ def test_dispatch_review_does_not_claim_ready_tasks(
 
 # Stale detection — detect_stale_running
 # ---------------------------------------------------------------------------
+
 
 def test_detect_stale_returns_running_task_with_no_heartbeat(kanban_home, monkeypatch):
     """A task running > timeout with zero heartbeats gets reclaimed as stale."""
@@ -3786,7 +3820,8 @@ def test_repeated_corrupt_open_reuses_single_backup(tmp_path):
 def test_locked_healthy_db_does_not_classify_as_corrupt(tmp_path, monkeypatch):
     """A transient lock during the probe must not produce a .corrupt backup
     and must not be reported as :class:`KanbanDbCorruptError`. Raw sqlite
-    ``OperationalError`` (lock/busy) is acceptable and expected."""
+    ``OperationalError`` (lock/busy) is acceptable and expected.
+    """
     db_path = tmp_path / "kanban.db"
     kb.init_db(db_path=db_path)
     kb._INITIALIZED_PATHS.discard(str(db_path.resolve()))
@@ -3903,7 +3938,8 @@ def test_maybe_emit_scratch_tip_fires_once_per_install(kanban_home, caplog):
 
 def test_maybe_emit_scratch_tip_skips_non_scratch_workspaces(kanban_home, caplog):
     """worktree/dir workspaces are preserved on completion and must not
-    trigger the scratch-cleanup tip."""
+    trigger the scratch-cleanup tip.
+    """
     import logging
 
     with kb.connect() as conn:
@@ -3958,7 +3994,7 @@ def test_connect_sets_cell_size_check_on(tmp_path):
 
 
 def test_connect_sets_synchronous_full(tmp_path):
-    """synchronous must be FULL (=2), not NORMAL (=1)."""
+    """Synchronous must be FULL (=2), not NORMAL (=1)."""
     db_path = tmp_path / "kanban.db"
     kb._INITIALIZED_PATHS.discard(str(db_path.resolve()))
     with kb.connect(db_path=db_path) as conn:
@@ -3980,7 +4016,6 @@ def test_connect_pragmas_applied_on_reconnect(tmp_path):
         assert conn.execute("PRAGMA secure_delete").fetchone()[0] == 1
         assert conn.execute("PRAGMA cell_size_check").fetchone()[0] == 1
         assert conn.execute("PRAGMA synchronous").fetchone()[0] == 2
-
 
 
 def test_pragmas_not_accidentally_disabled_by_migrate_path(tmp_path):
@@ -4013,7 +4048,8 @@ def test_write_txn_preserves_original_exception_when_rollback_fails(kanban_home)
 
     class FailingConnWrapper:
         """Delegate to a real connection, simulating an EIO during an INSERT
-        that SQLite has already auto-rolled-back."""
+        that SQLite has already auto-rolled-back.
+        """
 
         def __init__(self, real):
             self._real = real
@@ -4054,6 +4090,8 @@ def test_write_txn_preserves_original_exception_when_rollback_fails(kanban_home)
         f"write_txn surfaced the rollback failure instead of the original "
         f"OperationalError; got {msg!r}"
     )
+
+
 def test_write_txn_healthy_commit_no_exception(tmp_path):
     """Normal commit does not trigger the torn-extend check."""
     from hermes_cli.kanban_db import connect, write_txn
@@ -4096,8 +4134,8 @@ def test_write_txn_raises_on_truncated_file(tmp_path):
 
 def test_write_txn_post_commit_check_fires_every_call(tmp_path):
     """The invariant check runs on every write_txn call."""
-    from hermes_cli.kanban_db import connect, write_txn
     import hermes_cli.kanban_db as kanban_db_module
+    from hermes_cli.kanban_db import connect, write_txn
     db = tmp_path / "test.db"
     conn = connect(db_path=db)
     call_count = 0
@@ -4132,7 +4170,8 @@ def test_connect_sets_wal_autocheckpoint_100(tmp_path):
 def test_write_txn_check_reads_correct_header_fields(tmp_path):
     """Synthetic DB file with mismatched header page_count triggers the check."""
     import struct
-    from hermes_cli.kanban_db import connect, _check_file_length_invariant
+
+    from hermes_cli.kanban_db import _check_file_length_invariant, connect
     db = tmp_path / "synthetic.db"
     conn = connect(db_path=db)
     page_size = conn.execute("PRAGMA page_size").fetchone()[0]
@@ -4309,7 +4348,6 @@ def test_dispatch_once_still_reaps_via_extracted_fn(kanban_home):
                 pids = kb.reap_worker_zombies()
 
     assert pids == [99999]
-
 
 
 # ---------------------------------------------------------------------------

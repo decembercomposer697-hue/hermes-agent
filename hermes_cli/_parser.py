@@ -1,5 +1,4 @@
-"""
-Top-level argparse construction for the hermes CLI.
+"""Top-level argparse construction for the hermes CLI.
 
 Lives in its own module so other modules (e.g. ``relaunch.py``) can
 introspect the parser to discover which flags exist without running the
@@ -11,7 +10,6 @@ because its dispatch is tightly coupled to module-level ``cmd_*`` functions.
 """
 
 import argparse
-
 
 # `--profile` / `-p` is consumed by ``main._apply_profile_override`` before
 # argparse runs (it sets ``HERMES_HOME`` and strips itself from ``sys.argv``),

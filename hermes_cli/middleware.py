@@ -8,10 +8,10 @@ contract helpers here so agent-loop call sites and plugins share one vocabulary.
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
-from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 

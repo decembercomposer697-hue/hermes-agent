@@ -19,9 +19,9 @@ from __future__ import annotations
 
 import logging
 import os
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Optional, Tuple
-from collections.abc import Iterable
 
 logger = logging.getLogger("agent.lsp.workspace")
 

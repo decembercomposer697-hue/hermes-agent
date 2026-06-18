@@ -232,6 +232,7 @@ def mask_secret(
         '(not set)'
         >>> mask_secret("long-token", head=6, tail=4, floor=18)
         '***'
+
     """
     if not value:
         return empty
@@ -488,7 +489,7 @@ def _has_http_method_substring(text: str) -> bool:
 class RedactingFormatter(logging.Formatter):
     """Log formatter that redacts secrets from all log messages."""
 
-    def __init__(self, fmt=None, datefmt=None, style='%', **kwargs):
+    def __init__(self, fmt=None, datefmt=None, style="%", **kwargs):
         super().__init__(fmt, datefmt, style, **kwargs)
 
     def format(self, record: logging.LogRecord) -> str:

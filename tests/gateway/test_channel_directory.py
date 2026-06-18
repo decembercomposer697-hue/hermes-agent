@@ -7,13 +7,13 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from gateway.channel_directory import (
-    build_channel_directory,
-    lookup_channel_type,
-    resolve_channel_name,
-    format_directory_for_display,
-    load_directory,
     _build_from_sessions,
     _build_slack,
+    build_channel_directory,
+    format_directory_for_display,
+    load_directory,
+    lookup_channel_type,
+    resolve_channel_name,
 )
 
 
@@ -146,7 +146,8 @@ class TestResolveChannelName:
     def test_id_match_takes_precedence_over_name(self, tmp_path):
         """A raw channel ID resolves to itself, even when a different
         channel happens to be named the same string. Case-sensitive: Slack
-        IDs are uppercase and must not be normalized away."""
+        IDs are uppercase and must not be normalized away.
+        """
         platforms = {
             "slack": [
                 {"id": "C0B0QV5434G", "name": "engineering", "type": "channel"},

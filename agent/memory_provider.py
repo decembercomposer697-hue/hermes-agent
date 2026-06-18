@@ -214,6 +214,7 @@ class MemoryProvider(ABC):
             invalidate.
 
         Default is no-op for backward compatibility.
+
         """
 
     def on_pre_compress(self, messages: list[dict[str, Any]]) -> str:

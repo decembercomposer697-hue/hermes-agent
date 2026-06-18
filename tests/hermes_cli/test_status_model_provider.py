@@ -128,8 +128,8 @@ def test_show_status_hides_nous_subscription_section_when_feature_flag_is_off(mo
 
 def test_show_status_reports_exhausted_nous_credits(monkeypatch, capsys, tmp_path):
     monkeypatch.setattr("hermes_cli.status.managed_nous_tools_enabled", lambda: False)
-    from hermes_cli import status as status_mod
     import hermes_cli.auth as auth_mod
+    from hermes_cli import status as status_mod
 
     _patch_common_status_deps(monkeypatch, status_mod, tmp_path)
     monkeypatch.setattr(

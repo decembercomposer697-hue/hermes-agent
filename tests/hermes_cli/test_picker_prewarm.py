@@ -20,7 +20,8 @@ def _reset_guard():
 
 def test_prewarm_runs_list_authenticated_providers_once():
     """First call spawns a thread that calls list_authenticated_providers;
-    the warm side effect is delegated there (which disk-caches per provider)."""
+    the warm side effect is delegated there (which disk-caches per provider).
+    """
     _reset_guard()
     with patch.object(ms, "list_authenticated_providers", return_value=[]) as mock_list:
         t = ms.prewarm_picker_cache_async()
@@ -33,7 +34,8 @@ def test_prewarm_runs_list_authenticated_providers_once():
 
 def test_prewarm_guard_is_once_per_process():
     """The process-level Event guard must make repeat calls no-ops so a
-    long-lived process never leaks one OS thread per call."""
+    long-lived process never leaks one OS thread per call.
+    """
     _reset_guard()
     with patch.object(ms, "list_authenticated_providers", return_value=[]):
         t1 = ms.prewarm_picker_cache_async()
@@ -47,7 +49,8 @@ def test_prewarm_guard_is_once_per_process():
 
 def test_prewarm_never_raises_on_failure():
     """A failing/offline provider path must be fully swallowed — the prewarm
-    is best-effort and must never surface errors into the session."""
+    is best-effort and must never surface errors into the session.
+    """
     _reset_guard()
     with patch.object(
         ms, "list_authenticated_providers", side_effect=RuntimeError("boom"),

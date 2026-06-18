@@ -1,5 +1,4 @@
-"""
-Yuanbao platform adapter.
+"""Yuanbao platform adapter.
 
 Connects to the Yuanbao WebSocket gateway, handles authentication (AUTH_BIND),
 heartbeat, reconnection, message receive (T05) and send (T06).
@@ -27,16 +26,15 @@ import logging
 import os
 import re
 import secrets
+import sys
 import time
 import urllib.parse
 import uuid
-from datetime import datetime, timezone, timedelta, UTC
-from pathlib import Path
 from abc import ABC, abstractmethod
-from typing import Any, ClassVar, Dict, List, Optional, Tuple
 from collections.abc import Callable
-
-import sys
+from datetime import UTC, datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any, ClassVar, Dict, List, Optional, Tuple
 
 import httpx
 
@@ -59,36 +57,38 @@ from gateway.platforms.base import (
 )
 from gateway.platforms.helpers import MessageDeduplicator
 from gateway.platforms.yuanbao_media import (
-    download_url as media_download_url,
-    get_cos_credentials,
-    upload_to_cos,
-    build_image_msg_body,
     build_file_msg_body,
+    build_image_msg_body,
+    get_cos_credentials,
     guess_mime_type,
     md5_hex,
+    upload_to_cos,
+)
+from gateway.platforms.yuanbao_media import (
+    download_url as media_download_url,
 )
 from gateway.platforms.yuanbao_proto import (
     CMD_TYPE,
+    HERMES_INSTANCE_ID,
+    WS_HEARTBEAT_FINISH,
+    WS_HEARTBEAT_RUNNING,
     _fields_to_dict,
     _get_string,
     _get_varint,
     _parse_fields,
-    WS_HEARTBEAT_RUNNING,
-    WS_HEARTBEAT_FINISH,
-    HERMES_INSTANCE_ID,
     decode_conn_msg,
+    decode_get_group_member_list_rsp,
     decode_inbound_push,
     decode_query_group_info_rsp,
-    decode_get_group_member_list_rsp,
     encode_auth_bind,
+    encode_get_group_member_list,
     encode_ping,
     encode_push_ack,
+    encode_query_group_info,
     encode_send_c2c_message,
+    encode_send_group_heartbeat,
     encode_send_group_message,
     encode_send_private_heartbeat,
-    encode_send_group_heartbeat,
-    encode_query_group_info,
-    encode_get_group_member_list,
     next_seq_no,
 )
 from gateway.session import build_session_key
@@ -168,12 +168,13 @@ _YB_LOCAL_MEDIA_RE = re.compile(r"\[(\w+):[^\]]*?(/[^\]]+?)\s*\]")
 _RESOLVABLE_MEDIA_KINDS = frozenset({"image", "file"})
 
 # Strip page indicators like (1/3) appended by BasePlatformAdapter
-_INDICATOR_RE = re.compile(r'\s*\(\d+/\d+\)$')
+_INDICATOR_RE = re.compile(r"\s*\(\d+/\d+\)$")
 
 # Observed-media backfill: how many recent transcript messages to scan
 OBSERVED_MEDIA_BACKFILL_LOOKBACK = 50
 # Max number of resource references to resolve per inbound turn
 OBSERVED_MEDIA_BACKFILL_MAX_RESOLVE_PER_TURN = 12
+
 
 class MarkdownProcessor:
     """Encapsulates all Markdown-related utilities for the Yuanbao platform.
@@ -191,8 +192,7 @@ class MarkdownProcessor:
 
     @staticmethod
     def has_unclosed_fence(text: str) -> bool:
-        """
-        Detect whether the text has unclosed code block fences.
+        """Detect whether the text has unclosed code block fences.
 
         Scan line by line, toggling in/out state when encountering a line starting with ```.
         An odd number of toggles indicates an unclosed fence.
@@ -202,10 +202,11 @@ class MarkdownProcessor:
 
         Returns:
             Returns True if the text ends with an unclosed fence, otherwise False
+
         """
         in_fence = False
-        for line in text.split('\n'):
-            if line.startswith('```'):
+        for line in text.split("\n"):
+            if line.startswith("```"):
                 in_fence = not in_fence
         return in_fence
 
@@ -213,20 +214,20 @@ class MarkdownProcessor:
 
     @staticmethod
     def ends_with_table_row(text: str) -> bool:
-        """
-        Detect whether the text ends with a table row (last non-empty line starts and ends with |).
+        """Detect whether the text ends with a table row (last non-empty line starts and ends with |).
 
         Args:
             text: Text to check
 
         Returns:
             Returns True if the last non-empty line is a table row
+
         """
         trimmed = text.rstrip()
         if not trimmed:
             return False
-        last_line = trimmed.split('\n')[-1].strip()
-        return last_line.startswith('|') and last_line.endswith('|')
+        last_line = trimmed.split("\n")[-1].strip()
+        return last_line.startswith("|") and last_line.endswith("|")
 
     # -- Paragraph boundary splitting --------------------------------------
 
@@ -236,8 +237,7 @@ class MarkdownProcessor:
         max_chars: int,
         len_fn: Callable[[str], int] | None = None,
     ) -> tuple[str, str]:
-        """
-        Find the nearest paragraph boundary split point within max_chars, return (head, tail).
+        """Find the nearest paragraph boundary split point within max_chars, return (head, tail).
 
         Split priority:
         1. Blank line (paragraph boundary)
@@ -252,10 +252,11 @@ class MarkdownProcessor:
 
         Returns:
             (head, tail) tuple, head is the front part, tail is the back part, satisfying head + tail == text
+
         """
         _len = len_fn or len
         if _len(text) <= max_chars:
-            return text, ''
+            return text, ""
 
         # Build a character-index window that fits within max_chars.
         # When len_fn != len we cannot simply slice [:max_chars], so we
@@ -273,12 +274,12 @@ class MarkdownProcessor:
             window = text[:lo]
 
         # 1. Prefer the last blank line (\n\n) as paragraph boundary
-        pos = window.rfind('\n\n')
+        pos = window.rfind("\n\n")
         if pos > 0:
             return text[:pos + 2], text[pos + 2:]
 
         # 2. Then find the last newline after a sentence-ending punctuation
-        sentence_end_re = re.compile(r'[。！？.!?]\n')
+        sentence_end_re = re.compile(r"[。！？.!?]\n")
         best_pos = -1
         for m in sentence_end_re.finditer(window):
             best_pos = m.end()
@@ -286,7 +287,7 @@ class MarkdownProcessor:
             return text[:best_pos], text[best_pos:]
 
         # 3. Fallback: find the last newline
-        pos = window.rfind('\n')
+        pos = window.rfind("\n")
         if pos > 0:
             return text[:pos + 1], text[pos + 1:]
 
@@ -299,18 +300,17 @@ class MarkdownProcessor:
     @staticmethod
     def is_fence_atom(text: str) -> bool:
         """Determine whether an atomic block is a code block (starts with ```)."""
-        return text.lstrip().startswith('```')
+        return text.lstrip().startswith("```")
 
     @staticmethod
     def is_table_atom(text: str) -> bool:
         """Determine whether an atomic block is a table (first line starts with |)."""
-        first_line = text.split('\n')[0].strip()
-        return first_line.startswith('|') and first_line.endswith('|')
+        first_line = text.split("\n")[0].strip()
+        return first_line.startswith("|") and first_line.endswith("|")
 
     @staticmethod
     def split_into_atoms(text: str) -> list[str]:
-        """
-        Split text into a list of "atomic blocks", each being an indivisible logical unit:
+        """Split text into a list of "atomic blocks", each being an indivisible logical unit:
 
         - Code block (fence): from opening ``` to closing ``` (including fence lines)
         - Table: consecutive |...| lines forming a whole segment
@@ -323,8 +323,9 @@ class MarkdownProcessor:
 
         Returns:
             List of atomic block strings (all non-empty)
+
         """
-        lines = text.split('\n')
+        lines = text.split("\n")
         atoms: list[str] = []
 
         current_lines: list[str] = []
@@ -332,11 +333,11 @@ class MarkdownProcessor:
 
         def _is_table_line(line: str) -> bool:
             stripped = line.strip()
-            return stripped.startswith('|') and stripped.endswith('|')
+            return stripped.startswith("|") and stripped.endswith("|")
 
         def _flush_current() -> None:
             if current_lines:
-                atom = '\n'.join(current_lines)
+                atom = "\n".join(current_lines)
                 if atom.strip():
                     atoms.append(atom)
                 current_lines.clear()
@@ -344,10 +345,10 @@ class MarkdownProcessor:
         for line in lines:
             if in_fence:
                 current_lines.append(line)
-                if line.startswith('```') and len(current_lines) > 1:
+                if line.startswith("```") and len(current_lines) > 1:
                     in_fence = False
                     _flush_current()
-            elif line.startswith('```'):
+            elif line.startswith("```"):
                 _flush_current()
                 in_fence = True
                 current_lines.append(line)
@@ -355,7 +356,7 @@ class MarkdownProcessor:
                 if current_lines and not _is_table_line(current_lines[-1]):
                     _flush_current()
                 current_lines.append(line)
-            elif line.strip() == '':
+            elif line.strip() == "":
                 _flush_current()
             else:
                 if current_lines and _is_table_line(current_lines[-1]):
@@ -375,8 +376,7 @@ class MarkdownProcessor:
         max_chars: int = 4000,
         len_fn: Callable[[str], int] | None = None,
     ) -> list[str]:
-        """
-        Split Markdown text into multiple chunks by max_chars.
+        """Split Markdown text into multiple chunks by max_chars.
 
         Guarantees:
         - Each chunk <= max_chars characters (unless a single code block/table itself exceeds the limit)
@@ -392,6 +392,7 @@ class MarkdownProcessor:
 
         Returns:
             List of text chunks after splitting (non-empty)
+
         """
         _len = len_fn or len
 
@@ -412,7 +413,7 @@ class MarkdownProcessor:
 
         def _flush_parts() -> None:
             if current_parts:
-                chunks.append('\n\n'.join(current_parts))
+                chunks.append("\n\n".join(current_parts))
 
         for atom in atoms:
             atom_len = _len(atom)
@@ -469,7 +470,7 @@ class MarkdownProcessor:
             merged: list[str] = [result[0]]
             for chunk in result[1:]:
                 prev = merged[-1]
-                combined = prev + '\n\n' + chunk
+                combined = prev + "\n\n" + chunk
                 if _len(combined) <= max_chars:
                     merged[-1] = combined
                 else:
@@ -482,8 +483,7 @@ class MarkdownProcessor:
 
     @classmethod
     def infer_block_separator(cls, prev_chunk: str, next_chunk: str) -> str:
-        """
-        Infer the separator to use between two split chunks.
+        """Infer the separator to use between two split chunks.
 
         Rules (aligned with TS markdown-stream.ts):
         - Previous chunk ends with code fence or next chunk starts with fence → single newline '\\n'
@@ -496,28 +496,28 @@ class MarkdownProcessor:
 
         Returns:
             '\\n' or '\\n\\n'
+
         """
         prev_trimmed = prev_chunk.rstrip()
         next_trimmed = next_chunk.lstrip()
 
         # Previous chunk ends with fence or next chunk starts with fence
-        if prev_trimmed.endswith('```') or next_trimmed.startswith('```'):
-            return '\n'
+        if prev_trimmed.endswith("```") or next_trimmed.startswith("```"):
+            return "\n"
 
         # Table continuation
         if cls.ends_with_table_row(prev_chunk):
-            first_line = next_trimmed.split('\n')[0].strip() if next_trimmed else ''
-            if first_line.startswith('|') and first_line.endswith('|'):
-                return '\n'
+            first_line = next_trimmed.split("\n")[0].strip() if next_trimmed else ""
+            if first_line.startswith("|") and first_line.endswith("|"):
+                return "\n"
 
-        return '\n\n'
+        return "\n\n"
 
     # -- Streaming fence merge ---------------------------------------------
 
     @classmethod
     def merge_block_streaming_fences(cls, chunks: list[str]) -> list[str]:
-        """
-        Stream-aware fence-conscious chunk merging.
+        """Stream-aware fence-conscious chunk merging.
 
         When streaming output produces multiple chunks truncated in the middle of a fence,
         attempt to merge adjacent chunks to complete the fence.
@@ -532,6 +532,7 @@ class MarkdownProcessor:
 
         Returns:
             Merged chunk list (length <= original length)
+
         """
         if not chunks:
             return []
@@ -554,8 +555,7 @@ class MarkdownProcessor:
 
     @staticmethod
     def strip_outer_markdown_fence(text: str) -> str:
-        """
-        Strip outer Markdown fence.
+        """Strip outer Markdown fence.
 
         When AI reply is entirely wrapped in ```markdown\\n...\\n```, remove the outer fence,
         keeping the content. Only strip when the first line is ```markdown (case-insensitive) and the last line is ```.
@@ -565,11 +565,12 @@ class MarkdownProcessor:
 
         Returns:
             Text with outer fence stripped (returns original if no match)
+
         """
         if not text:
             return text
 
-        lines = text.split('\n')
+        lines = text.split("\n")
         if len(lines) < 3:
             return text
 
@@ -577,23 +578,22 @@ class MarkdownProcessor:
         last_line = lines[-1].strip()
 
         # First line must be ```markdown (optional language tag md/markdown)
-        if not re.match(r'^```(?:markdown|md)?\s*$', first_line, re.IGNORECASE):
+        if not re.match(r"^```(?:markdown|md)?\s*$", first_line, re.IGNORECASE):
             return text
 
         # Last line must be plain ```
-        if last_line != '```':
+        if last_line != "```":
             return text
 
         # Strip first and last lines
-        inner = '\n'.join(lines[1:-1])
+        inner = "\n".join(lines[1:-1])
         return inner
 
     # -- Table sanitization ------------------------------------------------
 
     @staticmethod
     def sanitize_markdown_table(text: str) -> str:
-        """
-        Table output sanitization.
+        """Table output sanitization.
 
         Handle common formatting issues in AI-generated Markdown tables:
         1. Remove extra whitespace before/after table rows
@@ -605,27 +605,28 @@ class MarkdownProcessor:
 
         Returns:
             Sanitized text
+
         """
-        if '|' not in text:
+        if "|" not in text:
             return text
 
-        lines = text.split('\n')
+        lines = text.split("\n")
         result_lines: list[str] = []
 
         for line in lines:
             stripped = line.strip()
 
             # Table row processing
-            if stripped.startswith('|') and stripped.endswith('|'):
+            if stripped.startswith("|") and stripped.endswith("|"):
                 # Separator row normalization: | --- | --- | → |---|---|
-                if re.match(r'^\|[\s\-:]+(\|[\s\-:]+)+\|$', stripped):
-                    cells = stripped.split('|')
-                    normalized = '|'.join(
+                if re.match(r"^\|[\s\-:]+(\|[\s\-:]+)+\|$", stripped):
+                    cells = stripped.split("|")
+                    normalized = "|".join(
                         cell.strip() if cell.strip() else cell
                         for cell in cells
                     )
                     result_lines.append(normalized)
-                elif stripped == '||' or stripped.replace('|', '').strip() == '':
+                elif stripped == "||" or stripped.replace("|", "").strip() == "":
                     # Empty table row → skip
                     continue
                 else:
@@ -633,14 +634,13 @@ class MarkdownProcessor:
             else:
                 result_lines.append(line)
 
-        return '\n'.join(result_lines)
+        return "\n".join(result_lines)
 
     # -- Markdown hint prompt ----------------------------------------------
 
     @staticmethod
     def markdown_hint_system_prompt() -> str:
-        """
-        Markdown rendering hint (appended to system prompt).
+        """Markdown rendering hint (appended to system prompt).
 
         Tell AI that Yuanbao platform supports Markdown rendering, including:
         - Code blocks (```lang)
@@ -654,6 +654,7 @@ class MarkdownProcessor:
             "- Bold: **text** / Italic: *text*\n"
             "Please use Markdown formatting when appropriate to improve readability."
         )
+
 
 class SignManager:
     """Encapsulates all sign-token related logic for the Yuanbao platform.
@@ -898,7 +899,9 @@ class SignManager:
         return dict(cls._cache[app_key])
 
 
-from dataclasses import dataclass, field as dc_field
+from dataclasses import dataclass
+from dataclasses import field as dc_field
+
 
 @dataclass
 class InboundContext:
@@ -1083,6 +1086,8 @@ class InboundPipeline:
             # End of chain — nothing more to do
 
         await next_fn()
+
+
 class DecodeMiddleware(InboundMiddleware):
     """Decode raw inbound frames from JSON or Protobuf into ctx.push.
 
@@ -1609,9 +1614,10 @@ class AutoSetHomeMiddleware(InboundMiddleware):
                 adapter._auto_sethome_done = True  # DM seen — no further upgrades needed
             if _should_set:
                 try:
+                    import yaml
+
                     from hermes_constants import get_hermes_home
                     from utils import atomic_yaml_write
-                    import yaml
 
                     _home = get_hermes_home()
                     config_path = _home / "config.yaml"
@@ -1681,6 +1687,7 @@ class ExtractContentMiddleware(InboundMiddleware):
 
         Returns:
             Resource ID string, or empty string if not found
+
         """
         if not url:
             return ""
@@ -1791,8 +1798,8 @@ class ExtractContentMiddleware(InboundMiddleware):
         (Chinese input method) to ASCII slash so commands are recognized correctly.
         """
         text = text.strip()
-        if text.startswith('\uff0f'):  # Full-width slash
-            text = '/' + text[1:]
+        if text.startswith("\uff0f"):  # Full-width slash
+            text = "/" + text[1:]
         return text
 
     @staticmethod
@@ -1879,6 +1886,7 @@ class ExtractContentMiddleware(InboundMiddleware):
         ctx.link_urls = self._extract_link_urls(ctx.msg_body)
         await next_fn()
 
+
 class PlaceholderFilterMiddleware(InboundMiddleware):
     """Skip pure placeholder messages (e.g. '[image]' with no media)."""
 
@@ -1924,8 +1932,8 @@ class OwnerCommandMiddleware(InboundMiddleware):
     def _rewrite_slash_command(text: str) -> str:
         """Normalize full-width slash to ASCII slash and strip whitespace."""
         text = text.strip()
-        if text.startswith('\uff0f'):  # Full-width slash
-            text = '/' + text[1:]
+        if text.startswith("\uff0f"):  # Full-width slash
+            text = "/" + text[1:]
         return text
 
     @classmethod
@@ -2903,6 +2911,7 @@ class InboundPipelineBuilder:
             pipeline.use(mw_cls())
         return pipeline
 
+
 class ConnectionManager:
     """Manages the WebSocket connection lifecycle for YuanbaoAdapter.
 
@@ -2993,7 +3002,7 @@ class ConnectionManager:
 
         # Acquire platform-scoped lock to prevent duplicate connections
         if not adapter._acquire_platform_lock(
-            'yuanbao-app-key', adapter._app_key, 'Yuanbao app key',
+            "yuanbao-app-key", adapter._app_key, "Yuanbao app key",
         ):
             return False
 
@@ -3234,10 +3243,10 @@ class ConnectionManager:
         except asyncio.CancelledError:
             pass
         except websockets.exceptions.ConnectionClosed as close_exc:  # type: ignore[union-attr]
-            close_code = getattr(close_exc, 'code', None)
+            close_code = getattr(close_exc, "code", None)
             logger.warning(
                 "[%s] WebSocket connection closed: code=%s reason=%s",
-                adapter.name, close_code, getattr(close_exc, 'reason', ''),
+                adapter.name, close_code, getattr(close_exc, "reason", ""),
             )
             if close_code and close_code in NO_RECONNECT_CLOSE_CODES:
                 logger.error(
@@ -3554,7 +3563,8 @@ class ConnectionManager:
     async def _cleanup_ws(self) -> None:
         """Close and clear the WebSocket connection, bounded by
         ``WS_CLOSE_TIMEOUT_S`` so an unresponsive server can't stall teardown
-        (see the constant's definition for the full rationale)."""
+        (see the constant's definition for the full rationale).
+        """
         ws = self._ws
         self._ws = None
         if ws is not None:
@@ -3570,6 +3580,7 @@ class ConnectionManager:
                 )
             except Exception:
                 pass
+
 
 class MediaSendHandler(ABC):
     """Abstract base class for media send strategies.
@@ -3590,6 +3601,7 @@ class MediaSendHandler(ABC):
 
         Raises:
             ValueError: when file cannot be acquired (not found, empty, etc.)
+
         """
 
     @abstractmethod
@@ -3814,10 +3826,10 @@ class StickerHandler(MediaSendHandler):
 
     def build_msg_body(self, upload_result, **kwargs):
         from gateway.platforms.yuanbao_sticker import (
-            get_sticker_by_name,
-            get_random_sticker,
             build_face_msg_body,
             build_sticker_msg_body,
+            get_random_sticker,
+            get_sticker_by_name,
         )
         sticker_name = kwargs.get("sticker_name")
         face_index = kwargs.get("face_index")
@@ -3832,6 +3844,7 @@ class StickerHandler(MediaSendHandler):
         else:
             sticker = get_random_sticker()
             return build_sticker_msg_body(sticker)
+
 
 class GroupQueryService:
     """Encapsulates all group query operations (both low-level WS calls and
@@ -3855,6 +3868,7 @@ class GroupQueryService:
 
         Returns:
             Decoded dict or None on failure.
+
         """
         adapter = self._adapter
         if adapter._connection.ws is None:
@@ -3888,6 +3902,7 @@ class GroupQueryService:
 
         Returns:
             Decoded dict or None on failure.  Also populates adapter._member_cache.
+
         """
         adapter = self._adapter
         if adapter._connection.ws is None:
@@ -3951,6 +3966,7 @@ class GroupQueryService:
 
         Returns:
             {"members": [...], "total": int, "mentionHint": str}
+
         """
         if not chat_id.startswith("group:"):
             return {"error": "This command is only available in group chats"}
@@ -4402,7 +4418,7 @@ class MessageSender:
         return await self.send_group_msg_body(group_code, msg_body, reply_to)
 
     # @mention pattern: (whitespace or start) + @ + nickname + (whitespace or end)
-    _AT_USER_RE = re.compile(r'(?:(?<=\s)|(?<=^))@(\S+?)(?=\s|$)', re.MULTILINE)
+    _AT_USER_RE = re.compile(r"(?:(?<=\s)|(?<=^))@(\S+?)(?=\s|$)", re.MULTILINE)
 
     def _build_msg_body_with_mentions(self, text: str, group_code: str) -> list:
         """Parse @nickname patterns and build mixed TIMTextElem + TIMCustomElem msg_body."""
@@ -4512,6 +4528,7 @@ class MessageSender:
 
         Returns:
             Error description (str) if validation fails, otherwise None.
+
         """
         if file_bytes is None or len(file_bytes) == 0:
             return f"Empty file: {filename}"
@@ -4529,8 +4546,7 @@ class MessageSender:
         max_length: int = 4000,
         len_fn: Callable[[str], int] | None = None,
     ) -> list[str]:
-        """
-        Split a long message into chunks with table-awareness.
+        """Split a long message into chunks with table-awareness.
 
         Delegates core splitting to ``MarkdownProcessor.chunk_markdown_text``
         and strips page indicators like ``(1/3)`` from the output.
@@ -4548,7 +4564,7 @@ class MessageSender:
         )
 
         # Strip page indicators like (1/3) that BasePlatformAdapter may add
-        chunks = [_INDICATOR_RE.sub('', c) for c in chunks]
+        chunks = [_INDICATOR_RE.sub("", c) for c in chunks]
 
         return chunks if chunks else [content]
 
@@ -4915,8 +4931,7 @@ class YuanbaoAdapter(BasePlatformAdapter):
     DM_MAX_CHARS = 10000  # DM text limit
 
     async def send_dm(self, user_id: str, text: str, group_code: str = "") -> SendResult:
-        """
-        Actively send C2C private chat message.
+        """Actively send C2C private chat message.
 
         Args:
             user_id: Target user ID
@@ -4925,6 +4940,7 @@ class YuanbaoAdapter(BasePlatformAdapter):
 
         Returns:
             SendResult
+
         """
         if not self._access_policy.is_dm_allowed(user_id):
             return SendResult(success=False, error="DM access denied for this user")

@@ -1,5 +1,4 @@
-"""
-Feishu/Lark platform adapter.
+"""Feishu/Lark platform adapter.
 
 Supports:
 - WebSocket long connection and Webhook transport
@@ -61,12 +60,12 @@ import threading
 import time
 import uuid
 from collections import OrderedDict
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Dict, List, Literal, Optional
-from collections.abc import Sequence
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -130,16 +129,16 @@ FEISHU_WEBHOOK_AVAILABLE = aiohttp is not None
 
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import (
+    SUPPORTED_DOCUMENT_TYPES,
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     ProcessingOutcome,
     SendResult,
-    SUPPORTED_DOCUMENT_TYPES,
-    cache_document_from_bytes,
-    cache_image_from_url,
     cache_audio_from_bytes,
+    cache_document_from_bytes,
     cache_image_from_bytes,
+    cache_image_from_url,
 )
 from gateway.status import acquire_scoped_lock, release_scoped_lock
 from hermes_constants import get_hermes_home
@@ -1360,19 +1359,27 @@ def check_feishu_requirements() -> bool:
         import lark_oapi as lark
         from lark_oapi.api.application.v6 import GetApplicationRequest
         from lark_oapi.api.im.v1 import (
-            CreateFileRequest, CreateFileRequestBody,
-            CreateImageRequest, CreateImageRequestBody,
-            CreateMessageRequest, CreateMessageRequestBody,
-            GetChatRequest, GetMessageRequest, GetMessageResourceRequest,
+            CreateFileRequest,
+            CreateFileRequestBody,
+            CreateImageRequest,
+            CreateImageRequestBody,
+            CreateMessageRequest,
+            CreateMessageRequestBody,
+            GetChatRequest,
+            GetMessageRequest,
+            GetMessageResourceRequest,
             P2ImMessageMessageReadV1,
-            ReplyMessageRequest, ReplyMessageRequestBody,
-            UpdateMessageRequest, UpdateMessageRequestBody,
+            ReplyMessageRequest,
+            ReplyMessageRequestBody,
+            UpdateMessageRequest,
+            UpdateMessageRequestBody,
         )
         from lark_oapi.core import AccessTokenType, HttpMethod
         from lark_oapi.core.const import FEISHU_DOMAIN, LARK_DOMAIN
         from lark_oapi.core.model import BaseRequest
         from lark_oapi.event.callback.model.p2_card_action_trigger import (
-            CallBackCard, P2CardActionTriggerResponse,
+            CallBackCard,
+            P2CardActionTriggerResponse,
         )
         from lark_oapi.event.dispatcher_handler import EventDispatcherHandler
         from lark_oapi.ws import Client as FeishuWSClient

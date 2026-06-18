@@ -1,5 +1,4 @@
-"""
-Text-to-Speech Provider ABC
+"""Text-to-Speech Provider ABC
 ============================
 
 Defines the pluggable-backend interface for text-to-speech synthesis.
@@ -47,8 +46,8 @@ from __future__ import annotations
 
 import abc
 import logging
-from typing import Any, Dict, List, Optional
 from collections.abc import Iterator
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -215,6 +214,7 @@ class TTSProvider(abc.ABC):
                 ends with the correct extension.
             **extra: Forward-compat parameters future schema versions
                 may expose. Implementations should ignore unknown keys.
+
         """
 
     def stream(

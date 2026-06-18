@@ -1,6 +1,7 @@
 """Tests for tools.env_passthrough — skill and config env var passthrough."""
 
 import os
+
 import pytest
 import yaml
 
@@ -163,7 +164,10 @@ class TestTerminalIntegration:
     """Verify that the passthrough is checked in terminal's env sanitizers."""
 
     def test_blocklisted_var_blocked_by_default(self):
-        from tools.environments.local import _sanitize_subprocess_env, _HERMES_PROVIDER_ENV_BLOCKLIST
+        from tools.environments.local import (
+            _HERMES_PROVIDER_ENV_BLOCKLIST,
+            _sanitize_subprocess_env,
+        )
 
         # Pick a var we know is in the blocklist
         blocked_var = next(iter(_HERMES_PROVIDER_ENV_BLOCKLIST))
@@ -176,10 +180,11 @@ class TestTerminalIntegration:
         """GHSA-rhgp-j443-p4rf: register_env_passthrough must NOT accept
         Hermes provider credentials — that was the bypass where a skill
         could declare ANTHROPIC_TOKEN / OPENAI_API_KEY as passthrough and
-        defeat the execute_code sandbox scrubbing."""
+        defeat the execute_code sandbox scrubbing.
+        """
         from tools.environments.local import (
-            _sanitize_subprocess_env,
             _HERMES_PROVIDER_ENV_BLOCKLIST,
+            _sanitize_subprocess_env,
         )
 
         blocked_var = next(iter(_HERMES_PROVIDER_ENV_BLOCKLIST))
@@ -197,10 +202,11 @@ class TestTerminalIntegration:
 
     def test_make_run_env_blocklist_override_rejected(self):
         """_make_run_env must NOT expose a blocklisted var to subprocess env
-        even after a skill attempts to register it via passthrough."""
+        even after a skill attempts to register it via passthrough.
+        """
         from tools.environments.local import (
-            _make_run_env,
             _HERMES_PROVIDER_ENV_BLOCKLIST,
+            _make_run_env,
         )
 
         blocked_var = next(iter(_HERMES_PROVIDER_ENV_BLOCKLIST))
@@ -220,7 +226,8 @@ class TestTerminalIntegration:
     def test_non_hermes_api_key_still_registerable(self):
         """Third-party API keys (TENOR_API_KEY, NOTION_TOKEN, etc.) are NOT
         Hermes provider credentials and must still pass through — skills
-        that legitimately wrap third-party APIs must keep working."""
+        that legitimately wrap third-party APIs must keep working.
+        """
         # TENOR_API_KEY is a real example — used by the gif-search skill
         register_env_passthrough(["TENOR_API_KEY"])
         assert is_env_passthrough("TENOR_API_KEY")

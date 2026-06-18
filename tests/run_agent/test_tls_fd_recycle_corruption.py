@@ -28,8 +28,6 @@ import threading
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
-
-
 # ---------------------------------------------------------------------------
 # Prong 1: force_close_tcp_sockets must NOT release file descriptors.
 # ---------------------------------------------------------------------------
@@ -160,7 +158,8 @@ def _make_agent_mock():
 
 def _call_inside_owner_thread(callable_):
     """Run callable_ on a separate thread so its ``threading.get_ident()``
-    differs from the test thread."""
+    differs from the test thread.
+    """
     result = {"value": None, "exc": None}
 
     def runner():

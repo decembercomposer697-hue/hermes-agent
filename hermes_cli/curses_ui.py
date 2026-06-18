@@ -5,9 +5,9 @@ Provides a curses multi-select with keyboard navigation, plus a
 text-based numbered fallback for terminals without curses support.
 """
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import List, Optional, Set
-from collections.abc import Callable
 
 from hermes_cli.colors import Colors, color
 
@@ -547,6 +547,7 @@ def curses_checklist(
         status_fn: Optional callback ``f(chosen_indices) -> str`` whose return
             value is rendered on the bottom row of the terminal.  Use this for
             live aggregate info (e.g. estimated token counts).
+
     """
     if cancel_returns is None:
         cancel_returns = set(selected)
@@ -642,6 +643,7 @@ def curses_radiolist(
         searchable: When true, ``/`` opens a type-to-filter prompt. The
             returned value is always the original item index, not a filtered
             row position.
+
     """
     if cancel_returns is None:
         cancel_returns = selected

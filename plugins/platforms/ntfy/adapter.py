@@ -50,7 +50,7 @@ import logging
 import os
 import time
 import uuid
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from typing import Any, Dict, List, Optional
 
 try:
@@ -430,7 +430,7 @@ class NtfyAdapter(BasePlatformAdapter):
             return SendResult(success=False, error=str(e))
 
     async def send_typing(self, chat_id: str, metadata=None) -> None:
-        """ntfy does not support typing indicators."""
+        """Ntfy does not support typing indicators."""
         pass
 
     async def get_chat_info(self, chat_id: str) -> dict[str, Any]:

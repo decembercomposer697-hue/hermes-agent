@@ -3,15 +3,14 @@
 import asyncio
 import os
 import signal
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
-
-
 
 # ---------------------------------------------------------------------------
 # Fix 1: MCP event loop exception handler
 # ---------------------------------------------------------------------------
+
 
 class TestMCPLoopExceptionHandler:
     """_mcp_loop_exception_handler suppresses benign 'Event loop is closed'."""
@@ -74,7 +73,7 @@ class TestStdioPidTracking:
             assert isinstance(pid, int)
 
     def test_stdio_pids_starts_empty(self):
-        from tools.mcp_tool import _stdio_pids, _lock
+        from tools.mcp_tool import _lock, _stdio_pids
         with _lock:
             # Might have residual state from other tests, just check type
             assert isinstance(_stdio_pids, dict)
@@ -83,9 +82,9 @@ class TestStdioPidTracking:
         """_kill_orphaned_mcp_children does nothing when no PIDs tracked."""
         from tools.mcp_tool import (
             _kill_orphaned_mcp_children,
+            _lock,
             _orphan_stdio_pids,
             _stdio_pids,
-            _lock,
         )
 
         with _lock:
@@ -99,8 +98,8 @@ class TestStdioPidTracking:
         """_kill_orphaned_mcp_children gracefully handles already-dead PIDs."""
         from tools.mcp_tool import (
             _kill_orphaned_mcp_children,
-            _orphan_stdio_pids,
             _lock,
+            _orphan_stdio_pids,
         )
 
         # Use a PID that definitely doesn't exist
@@ -118,8 +117,8 @@ class TestStdioPidTracking:
         """SIGTERM-first then SIGKILL after 2s for orphan cleanup."""
         from tools.mcp_tool import (
             _kill_orphaned_mcp_children,
-            _orphan_stdio_pids,
             _lock,
+            _orphan_stdio_pids,
         )
 
         fake_pid = 424242
@@ -151,8 +150,8 @@ class TestStdioPidTracking:
         """Without SIGKILL, SIGTERM is used for both phases."""
         from tools.mcp_tool import (
             _kill_orphaned_mcp_children,
-            _orphan_stdio_pids,
             _lock,
+            _orphan_stdio_pids,
         )
 
         fake_pid = 434343
@@ -188,7 +187,7 @@ class TestStdioPgroupReaping:
     """_kill_orphaned_mcp_children reaps via killpg when a pgid is tracked."""
 
     def _reset_state(self):
-        from tools.mcp_tool import _stdio_pids, _orphan_stdio_pids, _stdio_pgids, _lock
+        from tools.mcp_tool import _lock, _orphan_stdio_pids, _stdio_pgids, _stdio_pids
         with _lock:
             _stdio_pids.clear()
             _orphan_stdio_pids.clear()
@@ -198,9 +197,9 @@ class TestStdioPgroupReaping:
         """SIGTERM and SIGKILL route through killpg when pgid is known."""
         from tools.mcp_tool import (
             _kill_orphaned_mcp_children,
+            _lock,
             _orphan_stdio_pids,
             _stdio_pgids,
-            _lock,
         )
 
         self._reset_state()
@@ -238,9 +237,9 @@ class TestStdioPgroupReaping:
         """If killpg raises ProcessLookupError (pgroup gone), try os.kill."""
         from tools.mcp_tool import (
             _kill_orphaned_mcp_children,
+            _lock,
             _orphan_stdio_pids,
             _stdio_pgids,
-            _lock,
         )
 
         self._reset_state()
@@ -275,8 +274,8 @@ class TestStdioPgroupReaping:
         """When no pgid is recorded (e.g. Windows), fall back to os.kill."""
         from tools.mcp_tool import (
             _kill_orphaned_mcp_children,
-            _orphan_stdio_pids,
             _lock,
+            _orphan_stdio_pids,
         )
 
         self._reset_state()
@@ -366,10 +365,10 @@ class TestStdioPgroupReaping:
         # Drive the reaper: register the parent pid + pgid as an orphan.
         from tools.mcp_tool import (
             _kill_orphaned_mcp_children,
+            _lock,
             _orphan_stdio_pids,
             _stdio_pgids,
             _stdio_pids,
-            _lock,
         )
         with _lock:
             _stdio_pids.clear()
@@ -426,6 +425,7 @@ class TestMCPReloadTimeout:
         # by checking that _check_config_mcp_changes doesn't call
         # _reload_mcp directly (it uses a thread now)
         import inspect
+
         from cli import HermesCLI
         source = inspect.getsource(HermesCLI._check_config_mcp_changes)
         # The fix adds threading.Thread for _reload_mcp
@@ -468,7 +468,7 @@ class TestMCPInitialConnectionRetry:
                 self_inner._ready.set()
                 await self_inner._shutdown_event.wait()
 
-            with patch.object(MCPServerTask, '_run_stdio', fake_run_stdio):
+            with patch.object(MCPServerTask, "_run_stdio", fake_run_stdio):
                 task = asyncio.ensure_future(server.run({"command": "fake"}))
                 await server._ready.wait()
 
@@ -484,7 +484,7 @@ class TestMCPInitialConnectionRetry:
 
     def test_initial_connect_gives_up_after_max_retries(self):
         """Server gives up after _MAX_INITIAL_CONNECT_RETRIES failures."""
-        from tools.mcp_tool import MCPServerTask, _MAX_INITIAL_CONNECT_RETRIES
+        from tools.mcp_tool import _MAX_INITIAL_CONNECT_RETRIES, MCPServerTask
 
         call_count = 0
 
@@ -497,7 +497,7 @@ class TestMCPInitialConnectionRetry:
                 call_count += 1
                 raise ConnectionError("DNS resolution failed")
 
-            with patch.object(MCPServerTask, '_run_stdio', fake_run_stdio):
+            with patch.object(MCPServerTask, "_run_stdio", fake_run_stdio):
                 task = asyncio.ensure_future(server.run({"command": "fake"}))
                 await server._ready.wait()
 
@@ -527,7 +527,7 @@ class TestMCPInitialConnectionRetry:
                 # Should not reach here because shutdown fires during sleep
                 raise AssertionError("Should not attempt after shutdown")
 
-            with patch.object(MCPServerTask, '_run_stdio', fake_run_stdio):
+            with patch.object(MCPServerTask, "_run_stdio", fake_run_stdio):
                 task = asyncio.ensure_future(server.run({"command": "fake"}))
 
                 # Give the first attempt time to fail, then set shutdown

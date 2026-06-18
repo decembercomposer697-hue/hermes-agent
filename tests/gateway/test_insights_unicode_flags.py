@@ -4,16 +4,16 @@ Telegram on iOS auto-converts -- to em/en dashes. The /insights handler
 normalizes these before parsing --days and --source flags.
 """
 import re
+
 import pytest
 
-
 # The regex from gateway/run.py insights handler
-_UNICODE_DASH_RE = re.compile(r'[\u2012\u2013\u2014\u2015](days|source)')
+_UNICODE_DASH_RE = re.compile(r"[\u2012\u2013\u2014\u2015](days|source)")
 
 
 def _normalize_insights_args(raw: str) -> str:
     """Apply the same normalization as the /insights handler."""
-    return _UNICODE_DASH_RE.sub(r'--\1', raw)
+    return _UNICODE_DASH_RE.sub(r"--\1", raw)
 
 
 class TestInsightsUnicodeDashFlags:

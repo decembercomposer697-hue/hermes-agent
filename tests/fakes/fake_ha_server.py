@@ -25,7 +25,6 @@ import aiohttp
 from aiohttp import web
 from aiohttp.test_utils import TestServer
 
-
 # -- Sample entity data -------------------------------------------------------
 
 ENTITY_STATES: list[dict[str, Any]] = [
@@ -81,6 +80,7 @@ class FakeHAServer:
     ----------
     token : str
         The expected Bearer token for authentication.
+
     """
 
     def __init__(self, token: str = "test-token-123"):

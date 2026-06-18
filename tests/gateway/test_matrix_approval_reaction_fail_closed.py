@@ -13,11 +13,10 @@ from collections import deque
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
-
-
 # ---------------------------------------------------------------------------
 # Stub mautrix so gateway.platforms.matrix can be imported without the SDK.
 # ---------------------------------------------------------------------------
+
 
 def _stub_mautrix():
     stub = types.ModuleType("mautrix")
@@ -40,10 +39,10 @@ _stub_mautrix()
 
 from gateway.platforms.matrix import MatrixAdapter, _MatrixApprovalPrompt
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_adapter(allowed_user_ids=None):
     """Construct a MatrixAdapter with only the state needed by _on_reaction."""

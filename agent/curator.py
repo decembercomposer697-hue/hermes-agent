@@ -26,10 +26,10 @@ import logging
 import os
 import re
 import threading
-from datetime import datetime, timedelta, timezone, UTC
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, NamedTuple, Optional, Set
-from collections.abc import Callable
 
 from hermes_constants import get_hermes_home
 from tools import skill_usage
@@ -626,7 +626,7 @@ def _classify_removed_skills(
                         matched = _needle_in_path_component(needle, hay)
                     else:
                         matched = bool(
-                            re.search(rf'\b{re.escape(needle)}\b', hay),
+                            re.search(rf"\b{re.escape(needle)}\b", hay),
                         )
                     if matched:
                         hit = True
@@ -1821,7 +1821,8 @@ def maybe_run_curator(
     on_summary: Callable[[str], None] | None = None,
 ) -> dict[str, Any] | None:
     """Best-effort: run a curator pass if all gates pass. Returns the result
-    dict if a pass was started, else None. Never raises."""
+    dict if a pass was started, else None. Never raises.
+    """
     try:
         if not should_run_now():
             return None

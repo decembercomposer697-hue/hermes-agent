@@ -16,9 +16,8 @@ from urllib.parse import urlparse
 import requests
 import yaml
 
-from utils import base_url_host_matches, base_url_hostname
-
 from hermes_constants import OPENROUTER_MODELS_URL
+from utils import base_url_host_matches, base_url_hostname
 
 logger = logging.getLogger(__name__)
 
@@ -907,11 +906,11 @@ def parse_context_limit_from_error(error_msg: str) -> int | None:
     error_lower = error_msg.lower()
     # Pattern: look for numbers near context-related keywords
     patterns = [
-        r'(?:max(?:imum)?|limit)\s*(?:context\s*)?(?:length|size|window)?\s*(?:is|of|:)?\s*(\d{4,})',
-        r'context\s*(?:length|size|window)\s*(?:is|of|:)?\s*(\d{4,})',
-        r'(\d{4,})\s*(?:token)?\s*(?:context|limit)',
-        r'>\s*(\d{4,})\s*(?:max|limit|token)',  # "250000 tokens > 200000 maximum"
-        r'(\d{4,})\s*(?:max(?:imum)?)\b',  # "200000 maximum"
+        r"(?:max(?:imum)?|limit)\s*(?:context\s*)?(?:length|size|window)?\s*(?:is|of|:)?\s*(\d{4,})",
+        r"context\s*(?:length|size|window)\s*(?:is|of|:)?\s*(\d{4,})",
+        r"(\d{4,})\s*(?:token)?\s*(?:context|limit)",
+        r">\s*(\d{4,})\s*(?:max|limit|token)",  # "250000 tokens > 200000 maximum"
+        r"(\d{4,})\s*(?:max(?:imum)?)\b",  # "200000 maximum"
     ]
     for pattern in patterns:
         match = re.search(pattern, error_lower)
@@ -987,10 +986,10 @@ def parse_available_output_tokens_from_error(error_msg: str) -> int | None:
     # Extract the available_tokens figure.
     # Anthropic format: "… = available_tokens: 10000"
     patterns = [
-        r'available_tokens[:\s]+(\d+)',
-        r'available\s+tokens[:\s]+(\d+)',
+        r"available_tokens[:\s]+(\d+)",
+        r"available\s+tokens[:\s]+(\d+)",
         # fallback: last number after "=" in expressions like "200000 - 190000 = 10000"
-        r'=\s*(\d+)\s*$',
+        r"=\s*(\d+)\s*$",
     ]
     for pattern in patterns:
         match = re.search(pattern, error_lower)
@@ -1001,9 +1000,9 @@ def parse_available_output_tokens_from_error(error_msg: str) -> int | None:
 
     # OpenRouter/Nous format: "maximum context length is N … (A of text input,
     # B of tool input, C in the output)". Available output = ctx - text - tool.
-    _m_ctx = re.search(r'maximum context length is (\d+)', error_lower)
+    _m_ctx = re.search(r"maximum context length is (\d+)", error_lower)
     _m_parts = re.search(
-        r'\((\d+)\s+of text input,\s*(\d+)\s+of tool input,\s*(\d+)\s+in the output\)',
+        r"\((\d+)\s+of text input,\s*(\d+)\s+of tool input,\s*(\d+)\s+in the output\)",
         error_lower,
     )
     if _m_ctx and _m_parts:
@@ -1018,8 +1017,8 @@ def parse_available_output_tokens_from_error(error_msg: str) -> int | None:
     # Estimate the input tokens conservatively (~3 chars/token, which
     # over-reserves the input so the retried output cap stays safely inside the
     # window) and leave the remainder of the window for output.
-    _m_ctx_tok = re.search(r'maximum context length is (\d+)\s*token', error_lower)
-    _m_chars = re.search(r'prompt contains (\d+)\s*character', error_lower)
+    _m_ctx_tok = re.search(r"maximum context length is (\d+)\s*token", error_lower)
+    _m_chars = re.search(r"prompt contains (\d+)\s*character", error_lower)
     if _m_ctx_tok and _m_chars:
         _ctx = int(_m_ctx_tok.group(1))
         _est_input = (int(_m_chars.group(1)) + 2) // 3
@@ -1557,7 +1556,8 @@ def get_model_context_length(
     6. OpenRouter live API metadata (Kimi-family 32k guard)
     7. Hardcoded defaults (broad family patterns, longest-key-first)
     8. Local server query (last resort)
-    9. Default fallback (256K)"""
+    9. Default fallback (256K)
+    """
     # 0. Explicit config override — user knows best
     if config_context_length is not None and isinstance(config_context_length, int) and config_context_length > 0:
         return config_context_length

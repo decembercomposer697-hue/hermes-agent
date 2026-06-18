@@ -359,7 +359,8 @@ class TestClawHubSource(unittest.TestCase):
         """A walk truncated by the wall-clock budget must stop early and must
         NOT write the (partial) result to the cache. Before the budget guard
         the walk ran up to 750 pages and cached unconditionally — a truncated
-        walk poisoned the cache with incomplete catalog data."""
+        walk poisoned the cache with incomplete catalog data.
+        """
         page_calls = {"n": 0}
 
         def side_effect(url, *args, **kwargs):
@@ -399,7 +400,8 @@ class TestClawHubSource(unittest.TestCase):
         self, mock_get, _mock_read_cache, mock_write_cache,
     ):
         """Happy path: a walk that exhausts the cursor within the budget DOES
-        write the cache."""
+        write the cache.
+        """
 
         def side_effect(url, *args, **kwargs):
             if url.endswith("/skills"):
@@ -426,7 +428,8 @@ class TestClawHubSource(unittest.TestCase):
 class TestClawHubCatalogWalkBounded(unittest.TestCase):
     """max_items bounds the walk so browse's cold-start fallback renders one
     page without walking the entire 50k+ catalog. The offline index builder
-    keeps max_items=0 (unbounded) and walks to exhaustion."""
+    keeps max_items=0 (unbounded) and walks to exhaustion.
+    """
 
     def setUp(self):
         self.src = ClawHubSource()
@@ -441,7 +444,8 @@ class TestClawHubCatalogWalkBounded(unittest.TestCase):
 
     def _infinite_pages(self, page_calls):
         """A side_effect that always advertises another cursor — the walk would
-        never stop on its own, so only max_items / budget can break it."""
+        never stop on its own, so only max_items / budget can break it.
+        """
 
         def side_effect(url, *args, **kwargs):
             if url.endswith("/skills"):
@@ -467,7 +471,8 @@ class TestClawHubCatalogWalkBounded(unittest.TestCase):
         self, mock_get, _mock_read_cache, mock_write_cache,
     ):
         """A bounded walk stops as soon as it has >= max_items skills and must
-        NOT poison the shared full-catalog cache with the partial slice."""
+        NOT poison the shared full-catalog cache with the partial slice.
+        """
         page_calls = {"n": 0}
         mock_get.side_effect = self._infinite_pages(page_calls)
 
@@ -487,7 +492,8 @@ class TestClawHubCatalogWalkBounded(unittest.TestCase):
         self, mock_get, _mock_read_cache, mock_write_cache,
     ):
         """max_items=0 (the index builder's path) walks to natural termination
-        and DOES cache the complete catalog."""
+        and DOES cache the complete catalog.
+        """
 
         def side_effect(url, *args, **kwargs):
             if url.endswith("/skills"):
@@ -518,7 +524,8 @@ class TestClawHubCatalogWalkBounded(unittest.TestCase):
         self, mock_get, _mock_read_cache, _mock_write_cache,
     ):
         """search("", limit=N) is the browse cold-start path — it must bound the
-        catalog walk to N rather than walking the whole 50k+ catalog."""
+        catalog walk to N rather than walking the whole 50k+ catalog.
+        """
         page_calls = {"n": 0}
         mock_get.side_effect = self._infinite_pages(page_calls)
 

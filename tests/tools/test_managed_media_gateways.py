@@ -7,7 +7,6 @@ import pytest
 
 from hermes_cli.nous_account import NousPortalAccountInfo
 
-
 TOOLS_DIR = Path(__file__).resolve().parents[2] / "tools"
 
 
@@ -49,7 +48,8 @@ def _restore_tool_and_agent_modules():
 @pytest.fixture(autouse=True)
 def _enable_managed_nous_tools(monkeypatch):
     """Patch the source modules so managed_nous_tools_enabled() returns True
-    even after tool modules are dynamically reloaded."""
+    even after tool modules are dynamically reloaded.
+    """
     monkeypatch.setattr(
         "hermes_cli.nous_account.get_nous_portal_account_info",
         lambda: NousPortalAccountInfo(
@@ -404,6 +404,7 @@ def test_video_gen_direct_mode_when_fal_key_set(monkeypatch):
         direct_captured["arguments"] = arguments
         direct_captured["headers"] = headers
         # Return a mock handle
+
         class FakeHandle:
             def get(self):
                 return {"video": {"url": "https://fal.media/result.mp4"}}

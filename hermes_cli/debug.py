@@ -549,6 +549,7 @@ def collect_debug_report(
         internally.
 
     Returns the report as a plain-text string ready for upload.
+
     """
     buf = io.StringIO()
 

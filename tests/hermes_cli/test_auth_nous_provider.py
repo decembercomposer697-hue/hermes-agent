@@ -4,14 +4,17 @@ import base64
 import json
 import logging
 import time
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 
 import httpx
 import pytest
 
-from hermes_cli.auth import AuthError, get_provider_auth_state, resolve_nous_runtime_credentials
-
+from hermes_cli.auth import (
+    AuthError,
+    get_provider_auth_state,
+    resolve_nous_runtime_credentials,
+)
 
 # =============================================================================
 # _resolve_verify: CA bundle path validation
@@ -24,7 +27,8 @@ class TestResolveVerifyFallback:
     @pytest.fixture(autouse=True)
     def _pin_platform_to_linux(self, monkeypatch):
         """Pin sys.platform so the macOS certifi fallback doesn't alter the
-        generic "default trust" return value asserted by these tests."""
+        generic "default trust" return value asserted by these tests.
+        """
         monkeypatch.setattr("sys.platform", "linux")
 
     def test_missing_ca_bundle_in_auth_state_falls_back(self):
@@ -37,6 +41,7 @@ class TestResolveVerifyFallback:
 
     def test_valid_ca_bundle_in_auth_state_is_returned(self, tmp_path, monkeypatch):
         import ssl
+
         from hermes_cli.auth import _resolve_verify
 
         ca_file = tmp_path / "ca-bundle.pem"
@@ -80,6 +85,7 @@ class TestResolveVerifyFallback:
 
     def test_string_false_in_auth_state_does_not_disable_tls_verify(self):
         import ssl
+
         from hermes_cli.auth import _resolve_verify
 
         result = _resolve_verify(auth_state={"tls": {"insecure": "false"}})
@@ -108,6 +114,7 @@ class TestResolveVerifyFallback:
 
     def test_explicit_ca_bundle_param_valid_is_returned(self, tmp_path, monkeypatch):
         import ssl
+
         from hermes_cli.auth import _resolve_verify
 
         ca_file = tmp_path / "explicit-ca.pem"
@@ -670,8 +677,8 @@ def test_get_nous_auth_status_auth_store_fallback(tmp_path, monkeypatch):
 
 
 def test_get_nous_auth_status_prefers_runtime_auth_store_over_stale_pool(tmp_path, monkeypatch):
-    from hermes_cli.auth import get_nous_auth_status
     from agent.credential_pool import PooledCredential, load_pool
+    from hermes_cli.auth import get_nous_auth_status
 
     hermes_home = tmp_path / "hermes"
     _setup_nous_auth(hermes_home, access_token="at-fresh")
@@ -1030,7 +1037,9 @@ class TestLoginNousSkipKeepsCurrent:
     def test_skip_keep_current_preserves_provider_and_model(self, tmp_path, monkeypatch):
         """User picks Skip → config.yaml untouched, Nous creds still saved."""
         import argparse
+
         import yaml
+
         from hermes_cli.auth import PROVIDER_REGISTRY, _login_nous
 
         hermes_home, config_path, auth_path = self._setup_home_with_openrouter(
@@ -1061,7 +1070,9 @@ class TestLoginNousSkipKeepsCurrent:
     def test_picking_model_switches_to_nous(self, tmp_path, monkeypatch):
         """User picks a Nous model → provider flips to nous with that model."""
         import argparse
+
         import yaml
+
         from hermes_cli.auth import PROVIDER_REGISTRY, _login_nous
 
         hermes_home, config_path, auth_path = self._setup_home_with_openrouter(
@@ -1087,9 +1098,12 @@ class TestLoginNousSkipKeepsCurrent:
 
     def test_skip_with_no_prior_active_provider_clears_it(self, tmp_path, monkeypatch):
         """Fresh install (no prior active_provider) → Skip clears active_provider
-        instead of leaving it as nous."""
+        instead of leaving it as nous.
+        """
         import argparse
+
         import yaml
+
         from hermes_cli.auth import PROVIDER_REGISTRY, _login_nous
 
         hermes_home = tmp_path / "hermes"
@@ -1123,7 +1137,8 @@ class TestLoginNousSkipKeepsCurrent:
 
 def _full_state_fixture() -> dict:
     """Shape of the dict returned by _nous_device_code_login /
-    refresh_nous_oauth_from_state. Used as helper input."""
+    refresh_nous_oauth_from_state. Used as helper input.
+    """
     token = _invoke_jwt(seconds=3600)
     expires_at = _future_iso(3600)
     return {
@@ -1157,7 +1172,7 @@ def test_persist_nous_credentials_writes_both_pool_and_providers(tmp_path, monke
     agent failed with "Non-retryable client error". Both stores must stay
     in sync at write time.
     """
-    from hermes_cli.auth import persist_nous_credentials, NOUS_DEVICE_CODE_SOURCE
+    from hermes_cli.auth import NOUS_DEVICE_CODE_SOURCE, persist_nous_credentials
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1244,7 +1259,7 @@ def test_persist_nous_credentials_idempotent_no_duplicate_pool_entries(tmp_path,
     materialise the pool entry under the canonical ``device_code`` source, so
     two persists still leave the pool with exactly one row.
     """
-    from hermes_cli.auth import persist_nous_credentials, NOUS_DEVICE_CODE_SOURCE
+    from hermes_cli.auth import NOUS_DEVICE_CODE_SOURCE, persist_nous_credentials
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1285,7 +1300,7 @@ def test_persist_nous_credentials_reloads_pool_after_singleton_write(tmp_path, m
     callers observe the canonical seeded state, including any legacy entries
     that ``_seed_from_singletons`` pruned or upserted.
     """
-    from hermes_cli.auth import persist_nous_credentials, NOUS_DEVICE_CODE_SOURCE
+    from hermes_cli.auth import NOUS_DEVICE_CODE_SOURCE, persist_nous_credentials
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1312,7 +1327,7 @@ def test_persist_nous_credentials_embeds_custom_label(tmp_path, monkeypatch):
     _seed_from_singletons always auto-derived via label_from_token().  The
     fix stashes the label inside providers.nous so seeding prefers it.
     """
-    from hermes_cli.auth import persist_nous_credentials, NOUS_DEVICE_CODE_SOURCE
+    from hermes_cli.auth import NOUS_DEVICE_CODE_SOURCE, persist_nous_credentials
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1336,8 +1351,8 @@ def test_persist_nous_credentials_custom_label_survives_reseed(tmp_path, monkeyp
     """Reopening the pool (which re-runs _seed_from_singletons) must keep the
     user-chosen label instead of clobbering it with label_from_token output.
     """
-    from hermes_cli.auth import persist_nous_credentials
     from agent.credential_pool import load_pool
+    from hermes_cli.auth import persist_nous_credentials
 
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
@@ -1568,7 +1583,7 @@ def test_shared_store_seat_belt_refuses_real_home_under_pytest(monkeypatch):
 
 def test_shared_store_honors_env_override(tmp_path, monkeypatch):
     """HERMES_SHARED_AUTH_DIR must redirect the path."""
-    from hermes_cli.auth import _nous_shared_store_path, NOUS_SHARED_STORE_FILENAME
+    from hermes_cli.auth import NOUS_SHARED_STORE_FILENAME, _nous_shared_store_path
 
     custom_dir = tmp_path / "custom_shared"
     monkeypatch.setenv("HERMES_SHARED_AUTH_DIR", str(custom_dir))

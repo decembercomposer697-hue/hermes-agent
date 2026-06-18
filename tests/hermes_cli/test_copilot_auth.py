@@ -1,7 +1,8 @@
 """Tests for hermes_cli.copilot_auth — Copilot token validation and resolution."""
 
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 
 class TestTokenValidation:
@@ -33,7 +34,6 @@ class TestTokenValidation:
         from hermes_cli.copilot_auth import validate_copilot_token
         valid, msg = validate_copilot_token("")
         assert valid is False
-
 
 
 class TestResolveToken:

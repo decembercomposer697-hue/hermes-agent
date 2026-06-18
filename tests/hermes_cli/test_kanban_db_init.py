@@ -104,7 +104,8 @@ def test_connect_initialization_is_thread_safe(tmp_path, monkeypatch):
 def test_legacy_text_pk_tables_rebuilt_to_integer_autoincrement(tmp_path, monkeypatch):
     """A pre-AUTOINCREMENT DB is migrated in place: id columns become INTEGER
     PKs, ``last_event_id`` becomes INTEGER, data is preserved, and indexes
-    are recreated (DROP TABLE would otherwise take them down)."""
+    are recreated (DROP TABLE would otherwise take them down).
+    """
     db_path = _setup_home(tmp_path, monkeypatch)
     _make_legacy_db(db_path)
 
@@ -137,7 +138,8 @@ def test_legacy_text_pk_tables_rebuilt_to_integer_autoincrement(tmp_path, monkey
 
 def test_rebuilt_schema_matches_fresh_db(tmp_path, monkeypatch):
     """The rebuilt tables must be structurally identical to a fresh DB, so the
-    hand-written DDL in ``_REBUILD_SPECS`` can't silently drift from SCHEMA_SQL."""
+    hand-written DDL in ``_REBUILD_SPECS`` can't silently drift from SCHEMA_SQL.
+    """
     legacy_path = _setup_home(tmp_path, monkeypatch)
     _make_legacy_db(legacy_path)
     fresh_path = kb.kanban_db_path(board="fresh")
@@ -165,7 +167,8 @@ def test_migration_is_idempotent(tmp_path, monkeypatch):
 
 def test_unseen_events_for_sub_survives_migrated_db(tmp_path, monkeypatch):
     """The crash that motivated #35096 — ``int(None)`` on a NULL cursor — is
-    gone after migration; the notifier query returns an integer cursor."""
+    gone after migration; the notifier query returns an integer cursor.
+    """
     db_path = _setup_home(tmp_path, monkeypatch)
     _make_legacy_db(db_path)
 

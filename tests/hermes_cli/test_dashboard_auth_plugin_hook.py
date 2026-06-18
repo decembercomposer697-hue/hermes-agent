@@ -9,7 +9,9 @@ import pytest
 
 from hermes_cli.dashboard_auth import clear_providers, get_provider
 from hermes_cli.dashboard_auth.base import (
-    DashboardAuthProvider, LoginStart, Session,
+    DashboardAuthProvider,
+    LoginStart,
+    Session,
 )
 from hermes_cli.plugins import PluginContext, PluginManifest
 

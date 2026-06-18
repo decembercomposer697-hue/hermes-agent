@@ -1,5 +1,4 @@
-"""
-Tests for the OpenAI-compatible API server gateway adapter.
+"""Tests for the OpenAI-compatible API server gateway adapter.
 
 Tests cover:
 - Chat Completions endpoint (request parsing, response format)
@@ -28,13 +27,12 @@ from gateway.config import GatewayConfig, Platform, PlatformConfig
 from gateway.platforms.api_server import (
     APIServerAdapter,
     ResponseStore,
-    _IdempotencyCache,
     _derive_chat_session_id,
+    _IdempotencyCache,
     check_api_server_requirements,
     cors_middleware,
     security_headers_middleware,
 )
-
 
 # ---------------------------------------------------------------------------
 # check_api_server_requirements
@@ -501,7 +499,8 @@ class TestHealthEndpoint:
     async def test_health_reports_version(self, adapter):
         """GET /health must expose a non-empty version so orchestrators (e.g.
         AgentOS) can read the gateway version without scraping. Regression
-        guard for the missing-version gap."""
+        guard for the missing-version gap.
+        """
         app = _create_app(adapter)
         async with TestClient(TestServer(app)) as cli:
             resp = await cli.get("/health")
@@ -993,6 +992,7 @@ class TestChatCompletionsEndpoint:
     async def test_stream_sends_keepalive_during_quiet_tool_gap(self, adapter):
         """Idle SSE streams should send keepalive comments while tools run silently."""
         import asyncio
+
         import gateway.platforms.api_server as api_server_mod
 
         app = _create_app(adapter)
@@ -1261,7 +1261,8 @@ class TestChatCompletionsEndpoint:
         """Internal tools (``_thinking``-style) and ``completed`` events
         without a prior matching ``running`` must produce no lifecycle
         events on the wire — otherwise clients would see orphaned
-        ``status: completed`` updates they cannot correlate."""
+        ``status: completed`` updates they cannot correlate.
+        """
         import asyncio
 
         app = _create_app(adapter)
@@ -2272,8 +2273,9 @@ class TestResponsesStreaming:
                 written_payloads.append(payload)
 
         # Patch web.StreamResponse for the duration of the writer call.
-        import gateway.platforms.api_server as api_mod
         import queue as _q
+
+        import gateway.platforms.api_server as api_mod
 
         stream_q: _q.Queue = _q.Queue()
 
@@ -2325,7 +2327,8 @@ class TestResponsesStreaming:
     async def test_stream_client_disconnect_persists_incomplete_snapshot(self, adapter):
         """Client disconnect (ConnectionResetError) during streaming must
         persist an ``incomplete`` snapshot in ResponseStore.  Regression
-        for PR #15171."""
+        for PR #15171.
+        """
         fake_request = MagicMock()
         fake_request.headers = {}
 
@@ -2343,8 +2346,9 @@ class TestResponsesStreaming:
                 if write_call_count["n"] >= 3:
                     raise ConnectionResetError("simulated client disconnect")
 
-        import gateway.platforms.api_server as api_mod
         import queue as _q
+
+        import gateway.platforms.api_server as api_mod
 
         stream_q: _q.Queue = _q.Queue()
         stream_q.put("some streamed text")
@@ -2837,12 +2841,14 @@ class TestChatCompletionsAgentIncomplete:
     """When the agent run yields a partial / failed result, the API server
     must NOT pretend it succeeded. Either signal truncation via
     finish_reason='length' (with the partial text), or 502 with an OpenAI
-    error envelope (no usable text). Issue #22496."""
+    error envelope (no usable text). Issue #22496.
+    """
 
     @pytest.mark.asyncio
     async def test_truncation_with_partial_text_uses_length_finish_reason(self, adapter):
         """Partial text + truncation marker → finish_reason='length', 200 OK,
-        plus hermes extras + headers."""
+        plus hermes extras + headers.
+        """
         mock_result = {
             "final_response": "Here is part one of the answer",
             "completed": False,
@@ -2906,7 +2912,8 @@ class TestChatCompletionsAgentIncomplete:
     @pytest.mark.asyncio
     async def test_normal_completion_unchanged(self, adapter):
         """Sanity: a completed-True result still returns finish_reason='stop'
-        and no hermes extras (preserves the existing happy-path contract)."""
+        and no hermes extras (preserves the existing happy-path contract).
+        """
         mock_result = {
             "final_response": "All good.",
             "completed": True,
@@ -3048,7 +3055,6 @@ class TestCORS:
             assert resp.status == 200
             assert resp.headers.get("Access-Control-Allow-Origin") == "http://localhost:3000"
             assert "Authorization" in resp.headers.get("Access-Control-Allow-Headers", "")
-
 
     @pytest.mark.asyncio
     async def test_cors_preflight_sets_max_age(self):

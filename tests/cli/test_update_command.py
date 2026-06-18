@@ -62,7 +62,8 @@ def _call(self_):
 
 def test_managed_install_refuses_and_does_not_set_pending_relaunch(capsys):
     """Under a managed install (brew/docker), /update prints a hint and
-    returns without setting ``_pending_relaunch``."""
+    returns without setting ``_pending_relaunch``.
+    """
     self_ = SimpleNamespace(
         _app=None,
         _pending_relaunch=None,
@@ -96,7 +97,8 @@ def test_managed_install_refuses_and_does_not_set_pending_relaunch(capsys):
 def test_affirmative_answer_sets_pending_relaunch_and_returns_true(answer, capsys):
     """Recognised affirmative answers ("y", "yes", "1", "ok") set
     ``_pending_relaunch = ["update"]`` and return ``True`` so the caller
-    (process_command) can trigger the main-thread app-exit path."""
+    (process_command) can trigger the main-thread app-exit path.
+    """
     self_ = _make_self(modal_response=answer)
     with patch("hermes_cli.config.is_managed", return_value=False):
         result = _call(self_)

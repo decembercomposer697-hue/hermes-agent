@@ -17,7 +17,7 @@ import logging
 import os
 import shlex
 from pathlib import Path
-from typing import Dict, Any, Optional, Set
+from typing import Any, Dict, Optional, Set
 
 from agent.prompt_builder import _scan_context_content
 
@@ -53,6 +53,7 @@ def _is_ancestor_or_same(a: Path, b: Path) -> bool:
         return True
     except ValueError:
         return False
+
 
 class SubdirectoryHintTracker:
     """Track which directories the agent visits and load hints on first access.

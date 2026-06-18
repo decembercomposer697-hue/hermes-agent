@@ -1,5 +1,4 @@
-"""
-hermes fallback — manage the fallback provider chain.
+"""hermes fallback — manage the fallback provider chain.
 
 Fallback providers are tried in order when the primary model fails with
 rate-limit, overload, or connection errors. See:
@@ -23,10 +22,10 @@ from typing import Any, Dict, List, Optional
 
 from hermes_cli.fallback_config import get_fallback_chain
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _read_chain(config: dict[str, Any]) -> list[dict[str, Any]]:
     """Return the normalized fallback chain as a list of dicts.
@@ -146,8 +145,8 @@ def _describe_primary(config: dict[str, Any]) -> str | None:
 
 def cmd_fallback_add(args) -> None:
     """Launch the same picker as `hermes model`, then append the selection to the chain."""
-    from hermes_cli.main import _require_tty, select_provider_and_model
     from hermes_cli.config import load_config, save_config
+    from hermes_cli.main import _require_tty, select_provider_and_model
 
     _require_tty("fallback add")
 

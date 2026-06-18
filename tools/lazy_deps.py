@@ -1,5 +1,4 @@
-"""
-Lazy dependency installer for opt-in Hermes Agent backends.
+"""Lazy dependency installer for opt-in Hermes Agent backends.
 
 Many Hermes features (Mistral TTS, ElevenLabs TTS, Honcho memory, Bedrock,
 Slack, Matrix, etc.) require Python packages that not every user needs. The
@@ -57,10 +56,10 @@ import re
 import shutil
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
-from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 

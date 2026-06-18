@@ -1,17 +1,18 @@
 """Tests for tools/tool_result_storage.py -- 3-layer tool result persistence."""
 
-import pytest
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from tools.budget_config import (
-    DEFAULT_RESULT_SIZE_CHARS,
     DEFAULT_PREVIEW_SIZE_CHARS,
+    DEFAULT_RESULT_SIZE_CHARS,
     BudgetConfig,
 )
 from tools.tool_result_storage import (
     HEREDOC_MARKER,
-    PERSISTED_OUTPUT_TAG,
     PERSISTED_OUTPUT_CLOSING_TAG,
+    PERSISTED_OUTPUT_TAG,
     STORAGE_DIR,
     _build_persisted_message,
     _heredoc_marker,
@@ -22,8 +23,8 @@ from tools.tool_result_storage import (
     maybe_persist_tool_result,
 )
 
-
 # ── generate_preview ──────────────────────────────────────────────────
+
 
 class TestGeneratePreview:
     def test_short_content_unchanged(self):
@@ -103,7 +104,8 @@ class TestWriteToSandbox:
 
     def test_large_content_via_stdin(self):
         """Regression: 200 KB content exceeds Linux MAX_ARG_STRLEN (128 KB).
-        It must travel via stdin, never inside the command string."""
+        It must travel via stdin, never inside the command string.
+        """
         env = MagicMock()
         env.execute.return_value = {"output": "", "returncode": 0}
         big = "x" * 200_000
@@ -461,7 +463,8 @@ class TestEnforceTurnBudget:
 
     def test_medium_result_regression(self):
         """6 results of 42K chars each (252K total) — each under 100K default
-        threshold but aggregate exceeds 200K budget. L3 should persist."""
+        threshold but aggregate exceeds 200K budget. L3 should persist.
+        """
         env = MagicMock()
         env.execute.return_value = {"output": "", "returncode": 0}
         msgs = [

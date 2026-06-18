@@ -8,10 +8,10 @@ from __future__ import annotations
 
 import logging
 import time
+
 import pytest
 
 from agent.credits_tracker import CreditsState, parse_credits_headers
-
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -829,7 +829,7 @@ class TestCreditsStateDefaults:
 
 class TestDepletedProperty:
     def test_depleted_equals_not_paid_access(self):
-        """depleted must be exactly `not paid_access`, never `remaining==0`."""
+        """Depleted must be exactly `not paid_access`, never `remaining==0`."""
         state = CreditsState(paid_access=False, remaining_micros=0, captured_at=time.time())
         assert state.depleted is True
 

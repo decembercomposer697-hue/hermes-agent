@@ -33,7 +33,8 @@ def _default_path() -> Path:
 
 class NodeRegistry:
     """Simple file-backed registry. Not concurrent-safe across processes
-    — single writer assumed (the gateway CLI)."""
+    — single writer assumed (the gateway CLI).
+    """
 
     def __init__(self, path: Path | None = None) -> None:
         self.path = Path(path) if path is not None else _default_path()

@@ -53,7 +53,8 @@ def test_diag_key_treats_shifted_diagnostics_as_distinct():
     """Two diagnostics with the same message but at different lines hash
     differently — they are genuinely different diagnostics.  The shift
     map is what makes them equal AFTER remapping; the key itself stays
-    strict."""
+    strict.
+    """
     a = _diag(line=100)
     b = _diag(line=200)
     assert _diag_key(a) != _diag_key(b)
@@ -63,7 +64,8 @@ def test_diag_key_matches_client_key_for_shifted_baseline():
     """When a baseline diagnostic is remapped through a shift, its
     _diag_key must match the corresponding post-edit diagnostic's key
     at the same coordinates.  This is the contract the delta filter
-    relies on."""
+    relies on.
+    """
     pre = _diag(line=200)
     # Edit deletes 14 lines above line 200, so the same error now
     # appears at line 186 post-edit.
@@ -95,7 +97,8 @@ def test_diag_key_distinguishes_source():
 def test_diag_key_matches_client_key_byte_for_byte():
     """The manager-side and client-side keys must agree on diagnostic
     identity — they're used by two layers that need to round-trip the
-    same diagnostics through dedup and delta filtering."""
+    same diagnostics through dedup and delta filtering.
+    """
     d = _diag(line=42)
     assert _diag_key(d) == _diagnostic_key(d)
 
@@ -138,7 +141,8 @@ def test_shift_pure_insertion_above_line():
 
 def test_shift_replacement_in_middle():
     """Replace 2 lines in the middle with 1 line.  Lines above
-    unchanged; lines below shift up by 1."""
+    unchanged; lines below shift up by 1.
+    """
     pre = "a\nb\nc\nd\ne\n"
     post = "a\nb\nX\ne\n"  # replaced lines 2,3 (c,d) with X
     shift = build_line_shift(pre, post)
@@ -151,7 +155,8 @@ def test_shift_replacement_in_middle():
 
 def test_shift_handles_empty_pre():
     """First write of a file: pre is empty, post has content.  Nothing
-    to shift, so the function should be well-defined for empty pre."""
+    to shift, so the function should be well-defined for empty pre.
+    """
     shift = build_line_shift("", "hello\nworld\n")
     # Any pre line falls past the end of an empty pre — anchor at end of post
     assert shift(0) == 1
@@ -220,7 +225,8 @@ def test_shift_baseline_drops_deleted_and_remaps_rest():
 def test_pipeline_filters_shifted_baseline_under_strict_key():
     """The exact scenario the bug fix is for: an edit deletes lines,
     every diagnostic below shifts, and the delta filter (strict key
-    + shifted baseline) correctly identifies them as pre-existing."""
+    + shifted baseline) correctly identifies them as pre-existing.
+    """
     pre = "line0\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\n"
     # Delete lines 2,3,4 — pre-existing errors at lines 7,8 should
     # appear at lines 4,5 post-edit and be filtered out.
@@ -241,7 +247,8 @@ def test_pipeline_filters_shifted_baseline_under_strict_key():
 def test_pipeline_preserves_new_instance_at_different_line():
     """The case content-only keys would miss: the model introduces a
     SECOND instance of the same error class at a new location.  The
-    new instance must surface."""
+    new instance must surface.
+    """
     pre = "good\ngood\ngood\n"
     post = "good\nbad\ngood\nbad\n"  # added 2 new error lines
     shift = build_line_shift(pre, post)

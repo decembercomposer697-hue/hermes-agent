@@ -65,7 +65,8 @@ async def test_reply_prefix_still_injected_when_text_in_history():
     """Regression test: the pointer must survive even when the quoted text
     already appears in history. Previously a `found_in_history` guard
     silently dropped the prefix, leaving the agent to guess which prior
-    message the user was referencing."""
+    message the user was referencing.
+    """
     runner = _make_runner()
     source = _source()
     quoted = "Japan is great for culture, food, and efficiency."
@@ -117,7 +118,8 @@ async def test_no_prefix_without_reply_context():
 @pytest.mark.asyncio
 async def test_no_prefix_when_reply_to_text_is_empty():
     """reply_to_message_id alone without text (e.g. a reply to a media-only
-    message) should not produce an empty `[Replying to: ""]` prefix."""
+    message) should not produce an empty `[Replying to: ""]` prefix.
+    """
     runner = _make_runner()
     source = _source()
     event = MessageEvent(

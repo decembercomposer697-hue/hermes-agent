@@ -274,6 +274,7 @@ class HonchoMemoryProvider(MemoryProvider):
     def post_setup(self, hermes_home: str, config: dict) -> None:
         """Run the full Honcho setup wizard after provider selection."""
         import types
+
         from plugins.memory.honcho.cli import cmd_setup
         cmd_setup(types.SimpleNamespace())
 
@@ -294,7 +295,10 @@ class HonchoMemoryProvider(MemoryProvider):
                 self._cron_skipped = True
                 return
 
-            from plugins.memory.honcho.client import HonchoClientConfig, get_honcho_client
+            from plugins.memory.honcho.client import (
+                HonchoClientConfig,
+                get_honcho_client,
+            )
             from plugins.memory.honcho.session import HonchoSessionManager
 
             cfg = HonchoClientConfig.from_global_config()
@@ -890,7 +894,8 @@ class HonchoMemoryProvider(MemoryProvider):
 
     def _thread_is_live(self) -> bool:
         """Thread-alive guard that treats threads older than the stale
-        threshold as dead, so a hung Honcho request can't block new fires."""
+        threshold as dead, so a hung Honcho request can't block new fires.
+        """
         if not self._prefetch_thread or not self._prefetch_thread.is_alive():
             return False
         timeout = (self._config.timeout if self._config and self._config.timeout else 8.0)
@@ -1073,8 +1078,8 @@ class HonchoMemoryProvider(MemoryProvider):
     # commands, empty input. Skipping injection here saves tokens and prevents
     # stale user-model context from derailing one-word replies.
     _TRIVIAL_PROMPT_RE = re.compile(
-        r'^(yes|no|ok|okay|sure|thanks|thank you|y|n|yep|nope|yeah|nah|'
-        r'continue|go ahead|do it|proceed|got it|cool|nice|great|done|next|lgtm|k)$',
+        r"^(yes|no|ok|okay|sure|thanks|thank you|y|n|yep|nope|yeah|nah|"
+        r"continue|go ahead|do it|proceed|got it|cool|nice|great|done|next|lgtm|k)$",
         re.IGNORECASE,
     )
 

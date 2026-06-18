@@ -86,7 +86,8 @@ class TestResolveContextCwd:
 
 class TestSessionCwdOverride:
     """The #29531 per-session arm: a contextvar cwd wins over TERMINAL_CWD so a
-    multi-session gateway can pin each session to its own folder."""
+    multi-session gateway can pin each session to its own folder.
+    """
 
     def test_session_cwd_overrides_terminal_cwd(self, monkeypatch, tmp_path):
         other = tmp_path / "other"

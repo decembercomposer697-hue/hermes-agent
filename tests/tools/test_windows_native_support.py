@@ -19,7 +19,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # configure_windows_stdio
 # ---------------------------------------------------------------------------
@@ -163,8 +162,9 @@ class TestConfigureWindowsStdio:
 
     def test_reconfigure_stream_handles_missing_method(self, monkeypatch):
         """StringIO-like objects without .reconfigure() must not blow up."""
-        from hermes_cli import stdio
         import io
+
+        from hermes_cli import stdio
 
         buf = io.StringIO()
         # Must not raise
@@ -665,7 +665,8 @@ class TestTuiGatewayEntrySignalGuards:
 
 class TestKanbanWaitpidWindowsGuard:
     """os.WNOHANG doesn't exist on Windows — the dispatcher tick reap loop
-    must be gated behind ``os.name != "nt"``."""
+    must be gated behind ``os.name != "nt"``.
+    """
 
     def test_source_gates_waitpid_loop(self):
         root = Path(__file__).resolve().parents[2]
@@ -729,7 +730,8 @@ class TestCodeExecutionTransportTcpFallback:
 
 class TestCronSchedulerBashResolution:
     """cron.scheduler must NOT hardcode /bin/bash — .sh scripts need a
-    dynamically-resolved bash so Windows (Git Bash) works."""
+    dynamically-resolved bash so Windows (Git Bash) works.
+    """
 
     def test_source_uses_shutil_which_for_bash(self):
         root = Path(__file__).resolve().parents[2]
@@ -758,7 +760,8 @@ class TestCronSchedulerBashResolution:
 class TestNpmBareSpawnsResolved:
     """Every spawn site that launches ``npm``/``npx`` must resolve via
     shutil.which / hermes_cli._subprocess_compat.resolve_node_command
-    so Windows can execute the .cmd batch shims."""
+    so Windows can execute the .cmd batch shims.
+    """
 
     @pytest.mark.parametrize(
         "relpath",
@@ -816,12 +819,14 @@ class TestNpmBareSpawnsResolved:
 
 class TestLocalEnvironmentWindowsTempDir:
     """LocalEnvironment.get_temp_dir must return a native Windows path on
-    Windows, NOT the POSIX ``/tmp`` literal (which Python can't open)."""
+    Windows, NOT the POSIX ``/tmp`` literal (which Python can't open).
+    """
 
     def test_posix_path_preserved_on_linux(self):
         """Linux/macOS behaviour MUST be unchanged — return / tmp or
         tempfile.gettempdir()-derived POSIX path.  This is the 'do no harm'
-        test — regressions here break every Unix user's terminal tool."""
+        test — regressions here break every Unix user's terminal tool.
+        """
         from tools.environments.local import LocalEnvironment
 
         env = LocalEnvironment(cwd="/tmp", timeout=10, env={})
@@ -858,7 +863,8 @@ class TestLocalEnvironmentPathInjectionGated:
 
 class TestGitBashPathNormalization:
     """_normalize_git_bash_path should turn /c/Users/... into C:\\Users\\...
-    on Windows and leave paths unchanged on POSIX."""
+    on Windows and leave paths unchanged on POSIX.
+    """
 
     def test_posix_noop(self):
         """Must NOT mutate paths on Linux/macOS."""
@@ -891,7 +897,8 @@ class TestGitBashPathNormalization:
 
 class TestWorktreeSymlinkFallback:
     """.worktreeinclude directory symlinks must fall back to copytree on
-    Windows (where symlink creation requires admin / Dev Mode)."""
+    Windows (where symlink creation requires admin / Dev Mode).
+    """
 
     def test_source_has_symlink_fallback(self):
         root = Path(__file__).resolve().parents[2]
@@ -912,7 +919,8 @@ class TestWorktreeSymlinkFallback:
 class TestGatewayDetachedWatcherWindowsFlags:
     """launch_detached_profile_gateway_restart and the in-gateway update
     launcher must use CREATE_NEW_PROCESS_GROUP | DETACHED_PROCESS on
-    Windows, not silent start_new_session=True."""
+    Windows, not silent start_new_session=True.
+    """
 
     def test_hermes_cli_gateway_uses_compat_kwargs(self):
         root = Path(__file__).resolve().parents[2]

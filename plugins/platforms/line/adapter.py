@@ -1,5 +1,4 @@
-"""
-LINE Messaging API platform adapter for Hermes Agent.
+"""LINE Messaging API platform adapter for Hermes Agent.
 
 A bundled platform plugin that runs an aiohttp webhook server, accepts LINE
 webhook events (signature-verified), and relays messages to/from the agent
@@ -87,6 +86,7 @@ logger = logging.getLogger(__name__)
 # already loaded.
 # ---------------------------------------------------------------------------
 
+from gateway.config import Platform
 from gateway.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
@@ -94,8 +94,6 @@ from gateway.platforms.base import (
     SendResult,
     cache_image_from_bytes,
 )
-from gateway.config import Platform
-
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -1462,7 +1460,8 @@ class LineAdapter(BasePlatformAdapter):
 
 def _is_relative_to(child: Path, parent: Path) -> bool:
     """Backport for Path.is_relative_to (Python 3.9+) — defensive against
-    cwd-resolution differences across CI runners."""
+    cwd-resolution differences across CI runners.
+    """
     try:
         return child.resolve().is_relative_to(parent.resolve())
     except (AttributeError, ValueError):

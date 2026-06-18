@@ -79,6 +79,7 @@ class UpstreamAdapter(ABC):
         Raises:
             RuntimeError: if the user isn't authenticated or the upstream
               refresh fails. The proxy will return 401 to the client.
+
         """
 
     def get_retry_credential(

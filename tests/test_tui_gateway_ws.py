@@ -6,7 +6,8 @@ from tui_gateway import ws as ws_mod
 
 def _run_disconnect(monkeypatch, seed):
     """Drive handle_ws to its disconnect `finally`, seeding sessions against the
-    live WSTransport the moment it exists. Returns nothing; inspect _sessions."""
+    live WSTransport the moment it exists. Returns nothing; inspect _sessions.
+    """
     # Disable the grace-reap Timer: detached sessions normally schedule a
     # threading.Timer via _schedule_ws_orphan_reap, which would outlive the test
     # and fire _reap during interpreter teardown — touching _sessions/DB and

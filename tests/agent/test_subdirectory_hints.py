@@ -1,8 +1,9 @@
 """Tests for progressive subdirectory hint discovery."""
 
-import pytest
 from pathlib import Path
 from unittest.mock import patch
+
+import pytest
 
 from agent.subdirectory_hints import SubdirectoryHintTracker
 
@@ -104,7 +105,7 @@ class TestSubdirectoryHintTracker:
         assert "Frontend rules" in result
 
     def test_terminal_cd_command(self, project):
-        """cd into a directory with hints."""
+        """Cd into a directory with hints."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
             "terminal", {"command": f"cd {project / 'backend'} && ls"},
@@ -266,6 +267,7 @@ class TestPermissionErrorHandling:
         restricted = tmp_path / "restricted"
         restricted.mkdir()
         original_is_file = Path.is_file
+
         def patched_is_file(self):
             if "restricted" in str(self):
                 raise PermissionError("Permission denied")
@@ -278,6 +280,7 @@ class TestPermissionErrorHandling:
         """Full check_tool_call should not crash when a path is inaccessible."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         original_is_dir = Path.is_dir
+
         def patched_is_dir(self):
             if "backend" in str(self) and "src" not in str(self):
                 raise PermissionError("Permission denied")

@@ -19,7 +19,7 @@ import os
 import random
 import time
 import uuid
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import quote, unquote
@@ -33,9 +33,9 @@ from gateway.platforms.base import (
     MessageType,
     ProcessingOutcome,
     SendResult,
-    cache_image_from_bytes,
     cache_audio_from_bytes,
     cache_document_from_bytes,
+    cache_image_from_bytes,
     cache_image_from_url,
 )
 from gateway.platforms.helpers import redact_phone
@@ -259,7 +259,7 @@ class SignalAdapter(BasePlatformAdapter):
         # Acquire scoped lock to prevent duplicate Signal listeners for the same phone
         lock_acquired = False
         try:
-            if not self._acquire_platform_lock('signal-phone', self.account, 'Signal account'):
+            if not self._acquire_platform_lock("signal-phone", self.account, "Signal account"):
                 return False
             lock_acquired = True
         except Exception as e:
@@ -1217,7 +1217,8 @@ class SignalAdapter(BasePlatformAdapter):
         wait_s: float,
     ) -> None:
         """Inform the user when an inter-batch pacing wait crosses the
-        notice threshold. Best-effort; logs and continues on failure."""
+        notice threshold. Best-effort; logs and continues on failure.
+        """
         try:
             await self.send(
                 chat_id,
@@ -1384,7 +1385,8 @@ class SignalAdapter(BasePlatformAdapter):
 
     async def stop_typing(self, chat_id: str) -> None:
         """Public interface for stopping typing — called by base adapter's
-        _keep_typing finally block to clean up platform-level typing tasks."""
+        _keep_typing finally block to clean up platform-level typing tasks.
+        """
         await self._stop_typing_indicator(chat_id)
 
     # ------------------------------------------------------------------
@@ -1405,6 +1407,7 @@ class SignalAdapter(BasePlatformAdapter):
             emoji: Reaction emoji string (e.g. "👀", "✅")
             target_author: Phone number / UUID of the message author
             target_timestamp: Signal timestamp (ms) of the message to react to
+
         """
         params: dict[str, Any] = {
             "account": self.account,

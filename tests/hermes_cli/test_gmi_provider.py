@@ -16,17 +16,17 @@ if "dotenv" not in sys.modules:
     fake_dotenv.load_dotenv = lambda *args, **kwargs: None
     sys.modules["dotenv"] = fake_dotenv
 
+from agent.auxiliary_client import resolve_provider_client
+from agent.model_metadata import get_model_context_length
 from hermes_cli.auth import resolve_provider
 from hermes_cli.config import load_config
 from hermes_cli.models import (
-    CANONICAL_PROVIDERS,
     _PROVIDER_LABELS,
     _PROVIDER_MODELS,
+    CANONICAL_PROVIDERS,
     normalize_provider,
     provider_model_ids,
 )
-from agent.auxiliary_client import resolve_provider_client
-from agent.model_metadata import get_model_context_length
 
 
 @pytest.fixture(autouse=True)
@@ -56,7 +56,9 @@ class TestGmiAliases:
         assert normalize_provider("gmicloud") == "gmi"
 
     def test_providers_normalize_provider(self):
-        from hermes_cli.providers import normalize_provider as normalize_provider_in_providers
+        from hermes_cli.providers import (
+            normalize_provider as normalize_provider_in_providers,
+        )
 
         assert normalize_provider_in_providers("gmi-cloud") == "gmi"
         assert normalize_provider_in_providers("gmicloud") == "gmi"
@@ -355,6 +357,7 @@ class TestGmiMainFlow:
             _model_flow_api_key_provider(load_config(), "gmi", "old-model")
 
         import yaml
+
         from hermes_constants import get_hermes_home
 
         config = yaml.safe_load((get_hermes_home() / "config.yaml").read_text()) or {}

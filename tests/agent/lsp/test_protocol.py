@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+
 import pytest
 
 from agent.lsp.protocol import (
@@ -28,7 +29,6 @@ from agent.lsp.protocol import (
     make_response,
     read_message,
 )
-
 
 # ---------------------------------------------------------------------------
 # encode_message
@@ -119,7 +119,8 @@ async def test_read_message_two_messages_back_to_back():
 async def test_read_message_rejects_runaway_header():
     """A pathological server that streams headers without ever emitting
     the CRLF-CRLF terminator must not loop forever — the 8 KiB cap kicks
-    in and surfaces a protocol error."""
+    in and surfaces a protocol error.
+    """
     flood = (b"X-Junk: " + b"A" * 200 + b"\r\n") * 60   # ~12 KiB worth
     reader = await _stream_from_bytes(flood)
     with pytest.raises(LSPProtocolError) as exc:

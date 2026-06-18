@@ -16,15 +16,15 @@ Both fixed together by:
 import threading
 
 
-
 class TestThreadLocalApprovalCallback:
     """GHSA-qg5c-hvr5-hjgr: set_approval_callback must be per-thread so
-    concurrent ACP sessions don't stomp on each other's handlers."""
+    concurrent ACP sessions don't stomp on each other's handlers.
+    """
 
     def test_set_and_get_in_same_thread(self):
         from tools.terminal_tool import (
-            set_approval_callback,
             _get_approval_callback,
+            set_approval_callback,
         )
 
         cb1 = lambda cmd, desc: "once"
@@ -34,8 +34,8 @@ class TestThreadLocalApprovalCallback:
     def test_callback_not_visible_in_different_thread(self):
         """Thread A's callback is NOT visible to Thread B."""
         from tools.terminal_tool import (
-            set_approval_callback,
             _get_approval_callback,
+            set_approval_callback,
         )
 
         cb_a = lambda cmd, desc: "thread_a"
@@ -70,10 +70,11 @@ class TestThreadLocalApprovalCallback:
 
     def test_main_thread_callback_not_leaked_to_worker(self):
         """A callback set in the main thread does NOT leak into a
-        freshly-spawned worker thread."""
+        freshly-spawned worker thread.
+        """
         from tools.terminal_tool import (
-            set_approval_callback,
             _get_approval_callback,
+            set_approval_callback,
         )
 
         cb_main = lambda cmd, desc: "main"
@@ -96,8 +97,8 @@ class TestThreadLocalApprovalCallback:
     def test_sudo_password_callback_also_thread_local(self):
         """Same protection applies to the sudo password callback."""
         from tools.terminal_tool import (
-            set_sudo_password_callback,
             _get_sudo_password_callback,
+            set_sudo_password_callback,
         )
 
         cb_main = lambda: "main-password"
@@ -200,11 +201,13 @@ class TestAcpExecAskGate:
 
     (HERMES_EXEC_ASK takes the gateway-queue path which requires a
     notify_cb registered in _gateway_notify_cbs — not applicable to ACP,
-    which uses a direct callback shape.)"""
+    which uses a direct callback shape.)
+    """
 
     def test_interactive_env_var_routes_to_callback(self, monkeypatch):
         """When HERMES_INTERACTIVE is set and an approval callback is
-        registered, a dangerous command must route through the callback."""
+        registered, a dangerous command must route through the callback.
+        """
         # Clean env
         monkeypatch.delenv("HERMES_INTERACTIVE", raising=False)
         monkeypatch.delenv("HERMES_GATEWAY_SESSION", raising=False)

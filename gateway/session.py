@@ -1,5 +1,4 @@
-"""
-Session management for the gateway.
+"""Session management for the gateway.
 
 Handles:
 - Session context tracking (where messages come from)
@@ -9,15 +8,15 @@ Handles:
 """
 
 import hashlib
+import json
 import logging
 import os
-import json
 import threading
 import uuid
-from pathlib import Path
-from datetime import datetime, timedelta
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -54,23 +53,23 @@ def _hash_chat_id(value: str) -> str:
     return _hash_id(value)
 
 
+from utils import atomic_replace
+
 from .config import (
-    Platform,
     GatewayConfig,
-    SessionResetPolicy,
     HomeChannel,
+    Platform,
+    SessionResetPolicy,
 )
 from .whatsapp_identity import (
     canonical_whatsapp_identifier,
     normalize_whatsapp_identifier,
 )
-from utils import atomic_replace
 
 
 @dataclass
 class SessionSource:
-    """
-    Describes where a message originated from.
+    """Describes where a message originated from.
     
     This information is used to:
     1. Route responses back to the right place
@@ -156,11 +155,9 @@ class SessionSource:
         )
     
 
-
 @dataclass
 class SessionContext:
-    """
-    Full context for a session, used for dynamic system prompt injection.
+    """Full context for a session, used for dynamic system prompt injection.
     
     The agent receives this information to understand:
     - Where messages are coming from
@@ -234,8 +231,7 @@ def build_session_context_prompt(
     *,
     redact_pii: bool = False,
 ) -> str:
-    """
-    Build the dynamic system prompt section that tells the agent about its context.
+    """Build the dynamic system prompt section that tells the agent about its context.
 
     This is injected into the system prompt so the agent knows:
     - Where messages are coming from
@@ -424,8 +420,7 @@ def build_session_context_prompt(
 
 @dataclass
 class SessionEntry:
-    """
-    Entry in the session store.
+    """Entry in the session store.
     
     Maps a session key to its current session ID and metadata.
     """
@@ -683,8 +678,7 @@ def build_session_key(
 
 
 class SessionStore:
-    """
-    Manages session storage and retrieval.
+    """Manages session storage and retrieval.
     
     Uses SQLite (via SessionDB) for session metadata and message transcripts.
     Falls back to legacy JSONL files if SQLite is unavailable.
@@ -805,8 +799,7 @@ class SessionStore:
         return False
 
     def _should_reset(self, entry: SessionEntry, source: SessionSource) -> str | None:
-        """
-        Check if a session should be reset based on policy.
+        """Check if a session should be reset based on policy.
         
         Returns the reset reason ("idle" or "daily") if a reset is needed,
         or None if the session is still valid.
@@ -875,8 +868,7 @@ class SessionStore:
         source: SessionSource,
         force_new: bool = False,
     ) -> SessionEntry:
-        """
-        Get an existing session or create a new one.
+        """Get an existing session or create a new one.
 
         Evaluates reset policy to determine if the existing session is stale.
         Creates a session record in SQLite when a new session starts.
@@ -1273,6 +1265,7 @@ class SessionStore:
                      already persisted messages to SQLite via its own
                      _flush_messages_to_session_db(), preventing the
                      duplicate-write bug (#860).
+
         """
         if self._db and not skip_db:
             try:
@@ -1384,8 +1377,7 @@ def build_session_context(
     config: GatewayConfig,
     session_entry: SessionEntry | None = None,
 ) -> SessionContext:
-    """
-    Build a full session context from a source and config.
+    """Build a full session context from a source and config.
     
     This is used to inject context into the agent's system prompt.
     """

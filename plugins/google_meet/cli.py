@@ -18,7 +18,6 @@ from pathlib import Path
 from typing import Optional
 
 from hermes_constants import get_hermes_home
-
 from plugins.google_meet import process_manager as pm
 from plugins.google_meet.meet_bot import _is_safe_meet_url
 
@@ -383,8 +382,8 @@ def _cmd_join(
     if node:
         # Remote: go through NodeClient.
         try:
-            from plugins.google_meet.node.registry import NodeRegistry
             from plugins.google_meet.node.client import NodeClient
+            from plugins.google_meet.node.registry import NodeRegistry
         except ImportError as e:
             print(f"node module unavailable: {e}")
             return 1
@@ -424,8 +423,8 @@ def _cmd_say(text: str, node: str | None = None) -> int:
         return 2
     if node:
         try:
-            from plugins.google_meet.node.registry import NodeRegistry
             from plugins.google_meet.node.client import NodeClient
+            from plugins.google_meet.node.registry import NodeRegistry
         except ImportError as e:
             print(f"node module unavailable: {e}")
             return 1

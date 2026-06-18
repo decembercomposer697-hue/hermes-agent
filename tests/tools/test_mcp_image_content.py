@@ -20,7 +20,6 @@ import base64
 from types import SimpleNamespace
 
 
-
 def _png_bytes():
     """Return a minimal valid PNG byte sequence.
 
@@ -55,7 +54,8 @@ class TestMimeExtension:
 class TestCacheMcpImageBlock:
     def test_returns_media_tag_for_valid_image_block(self, tmp_path, monkeypatch):
         """A well-formed ImageContent block with valid PNG bytes caches
-        to the image dir and the helper returns a ``MEDIA:<path>`` tag."""
+        to the image dir and the helper returns a ``MEDIA:<path>`` tag.
+        """
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         from tools.mcp_tool import _cache_mcp_image_block
 
@@ -97,7 +97,8 @@ class TestCacheMcpImageBlock:
 
     def test_returns_empty_on_malformed_base64(self, tmp_path, monkeypatch):
         """A server that sends garbage base64 shouldn't crash the handler —
-        we log and drop the block, letting any text blocks still come through."""
+        we log and drop the block, letting any text blocks still come through.
+        """
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         from tools.mcp_tool import _cache_mcp_image_block
 
@@ -110,7 +111,8 @@ class TestCacheMcpImageBlock:
     def test_returns_empty_when_bytes_dont_look_like_an_image(self, tmp_path, monkeypatch):
         """``cache_image_from_bytes`` has a format sniff; if the claimed
         ``image/png`` is actually an HTML error page, the cache raises and
-        we log + drop rather than propagate."""
+        we log + drop rather than propagate.
+        """
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         from tools.mcp_tool import _cache_mcp_image_block
 

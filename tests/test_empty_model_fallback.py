@@ -57,7 +57,8 @@ class TestGetDefaultModelForProvider:
 
     def test_override_falls_back_to_catalog_when_missing(self):
         """If an override model is no longer in the catalog, fall back to [0]
-        rather than returning a stale/absent id."""
+        rather than returning a stale/absent id.
+        """
         from unittest.mock import patch
 
         from hermes_cli import models as models_mod

@@ -324,6 +324,7 @@ def decide_image_input_mode(
       provider: active inference provider ID (e.g. ``"anthropic"``, ``"openrouter"``).
       model:    active model slug as it would be sent to the provider.
       cfg:      loaded config.yaml dict, or None. When None, behaves as auto.
+
     """
     mode_cfg = "auto"
     if isinstance(cfg, dict):

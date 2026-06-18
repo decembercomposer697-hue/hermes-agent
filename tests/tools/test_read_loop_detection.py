@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for the read-loop detection mechanism in file_tools.
+"""Tests for the read-loop detection mechanism in file_tools.
 
 Verifies that:
 1. Only *consecutive* identical reads trigger warnings/blocks
@@ -17,13 +16,13 @@ Run with:  python -m pytest tests/tools/test_read_loop_detection.py -v
 
 import json
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from tools.file_tools import (
+    _read_tracker,
+    notify_other_tool_call,
     read_file_tool,
     search_tool,
-    notify_other_tool_call,
-    _read_tracker,
 )
 
 
@@ -189,9 +188,6 @@ class TestNotifyOtherToolCall(unittest.TestCase):
     def test_notify_on_unknown_task_is_safe(self, _mock_ops):
         """notify_other_tool_call on a task that hasn't read anything is a no-op."""
         notify_other_tool_call("nonexistent_task")  # Should not raise
-
-
-
 
 
 class TestSearchLoopDetection(unittest.TestCase):

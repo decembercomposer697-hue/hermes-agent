@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-stocks_client.py - Stock market data CLI tool for the Hermes Agent project.
+"""stocks_client.py - Stock market data CLI tool for the Hermes Agent project.
 Zero external dependencies - Python stdlib only.
 """
 
@@ -12,7 +11,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from http.cookiejar import CookieJar
 
 # ---------------------------------------------------------------------------
@@ -145,8 +144,7 @@ def fetch_url(url: str, headers: dict | None = None, retries: int = MAX_RETRIES)
 
 
 def _fetch_crumb() -> str | None:
-    """
-    Yahoo Finance v8 requires a crumb + consent cookie.
+    """Yahoo Finance v8 requires a crumb + consent cookie.
     We hit the consent page once to grab cookies, then fetch the crumb.
     """
     global _crumb

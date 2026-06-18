@@ -18,7 +18,6 @@ import pytest
 
 from tests.tools.conftest import register_all_web_providers
 
-
 # ---------------------------------------------------------------------------
 # SearXNGWebSearchProvider unit tests
 # ---------------------------------------------------------------------------
@@ -90,9 +89,9 @@ class TestSearXNGSearchProviderSearch:
         from plugins.web.searxng.provider import SearXNGWebSearchProvider
         unordered = {
             "results": [
-                {"title": "Low",  "url": "https://low.example.com",  "content": "", "score": 0.1},
+                {"title": "Low", "url": "https://low.example.com", "content": "", "score": 0.1},
                 {"title": "High", "url": "https://high.example.com", "content": "", "score": 0.99},
-                {"title": "Mid",  "url": "https://mid.example.com",  "content": "", "score": 0.5},
+                {"title": "Mid", "url": "https://mid.example.com", "content": "", "score": 0.5},
             ],
         }
         mock_resp = self._make_mock_response(unordered)
@@ -198,6 +197,7 @@ class TestSearXNGSearchProviderSearch:
         mock_resp = self._make_mock_response({"results": []})
 
         calls = []
+
         def capture_get(url, **kwargs):
             calls.append(url)
             return mock_resp
@@ -269,7 +269,8 @@ class TestGetBackendSearXNG:
 
     def test_auto_detect_picks_searxng_when_url_only_in_hermes_config(self, monkeypatch):
         """#34290 follow-up: a config-only SEARXNG_URL (absent from process env)
-        must still drive auto-detect via the now config-aware ``_has_env``."""
+        must still drive auto-detect via the now config-aware ``_has_env``.
+        """
         from hermes_cli import config as hermes_config
         from tools import web_tools
         monkeypatch.setattr(web_tools, "_load_web_config", lambda: {})
@@ -315,7 +316,8 @@ class TestCheckWebApiKey:
 
     def test_no_credentials_usable_via_free_parallel(self, monkeypatch):
         """No credentials → check_web_api_key True: the keyless Parallel free MCP
-        services calls, so web is usable out of the box."""
+        services calls, so web is usable out of the box.
+        """
         from tools import web_tools
         monkeypatch.setattr(web_tools, "_load_web_config", lambda: {})
         monkeypatch.delenv("FIRECRAWL_API_KEY", raising=False)
@@ -349,11 +351,13 @@ class TestSearXNGOnlyExtractCrawlErrors:
 
     def test_web_extract_searxng_returns_clear_error(self, monkeypatch):
         import asyncio
+
         from tools import web_tools
 
         monkeypatch.setattr(web_tools, "_load_web_config", lambda: {"backend": "searxng"})
         monkeypatch.setenv("SEARXNG_URL", "http://localhost:8080")
         monkeypatch.setattr(web_tools, "_is_tool_gateway_ready", lambda: False)
+
         async def _allow_ssrf(_url: str) -> bool:
             return True
 

@@ -101,7 +101,8 @@ class TestBillingTriggersClientErrorAbort:
 
     def test_context_overflow_still_falls_through_to_compression(self):
         """Sanity check: context-overflow must NOT be classified as
-        client error — compression is the recovery path."""
+        client error — compression is the recovery path.
+        """
         from agent.error_classifier import FailoverReason
 
         assert not self._mirror_is_client_error(
@@ -119,6 +120,7 @@ class TestSourceStillHasBillingExclusionRemoved:
 
     def test_conversation_loop_omits_billing_from_client_error_exclusion(self):
         import inspect
+
         from agent import conversation_loop
 
         src = inspect.getsource(conversation_loop)

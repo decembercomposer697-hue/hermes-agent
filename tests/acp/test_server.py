@@ -3,11 +3,10 @@
 import asyncio
 import os
 from types import SimpleNamespace
-from unittest.mock import MagicMock, AsyncMock, patch
-
-import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import acp
+import pytest
 from acp.agent.router import build_agent_router
 from acp.schema import (
     AgentCapabilities,
@@ -22,21 +21,22 @@ from acp.schema import (
     NewSessionResponse,
     PromptResponse,
     ResumeSessionResponse,
+    SessionInfo,
+    SessionInfoUpdate,
     SessionModelState,
     SessionModeState,
     SetSessionConfigOptionResponse,
     SetSessionModelResponse,
     SetSessionModeResponse,
-    SessionInfo,
-    SessionInfoUpdate,
     TextContentBlock,
     ToolCallProgress,
     ToolCallStart,
     UsageUpdate,
     UserMessageChunk,
 )
+
 from acp_adapter.auth import TERMINAL_SETUP_AUTH_METHOD_ID
-from acp_adapter.server import HermesACPAgent, HERMES_VERSION
+from acp_adapter.server import HERMES_VERSION, HermesACPAgent
 from acp_adapter.session import SessionManager
 from hermes_state import SessionDB
 
@@ -1183,7 +1183,8 @@ class TestPrompt:
         with it (e.g. ``kanban_create``) can read the env var inside
         ``run_conversation``. The variable must be visible during the
         agent call AND restored afterwards so a re-used executor thread
-        doesn't leak one session's id into another."""
+        doesn't leak one session's id into another.
+        """
         # Pre-condition: env is clean.
         monkeypatch.delenv("HERMES_SESSION_ID", raising=False)
 
@@ -1225,7 +1226,8 @@ class TestPrompt:
     async def test_prompt_restores_prior_hermes_session_id(self, agent, monkeypatch):
         """If the env already had HERMES_SESSION_ID set (e.g. nested
         agent loops), the prior value must be restored after the inner
-        prompt completes — not popped, not left at the inner id."""
+        prompt completes — not popped, not left at the inner id.
+        """
         monkeypatch.setenv("HERMES_SESSION_ID", "outer-sess")
 
         new_resp = await agent.new_session(cwd=".")
@@ -1317,7 +1319,6 @@ class TestPrompt:
         assert any(
             text and "[plugin appended this]" in text for text in all_texts
         ), f"expected transformed final to be delivered, got: {all_texts!r}"
-
 
     @pytest.mark.asyncio
     async def test_prompt_auto_titles_session(self, agent):
@@ -1724,7 +1725,7 @@ class TestRegisterSessionMcpServers:
     @pytest.mark.asyncio
     async def test_registers_stdio_servers(self, agent, mock_manager):
         """McpServerStdio servers are converted and passed to register_mcp_servers."""
-        from acp.schema import McpServerStdio, EnvVariable
+        from acp.schema import EnvVariable, McpServerStdio
 
         state = mock_manager.create_session(cwd="/tmp")
         # Give the mock agent the attributes _register_session_mcp_servers reads
@@ -1741,6 +1742,7 @@ class TestRegisterSessionMcpServers:
         )
 
         registered_config = {}
+
         def capture_register(config_map):
             registered_config.update(config_map)
             return ["mcp_test_server_tool1"]
@@ -1758,7 +1760,7 @@ class TestRegisterSessionMcpServers:
     @pytest.mark.asyncio
     async def test_registers_http_servers(self, agent, mock_manager):
         """McpServerHttp servers are converted correctly."""
-        from acp.schema import McpServerHttp, HttpHeader
+        from acp.schema import HttpHeader, McpServerHttp
 
         state = mock_manager.create_session(cwd="/tmp")
         state.agent.enabled_toolsets = ["hermes-acp"]
@@ -1773,6 +1775,7 @@ class TestRegisterSessionMcpServers:
         )
 
         registered_config = {}
+
         def capture_register(config_map):
             registered_config.update(config_map)
             return []

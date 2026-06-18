@@ -7,10 +7,10 @@ Feishu adapter: credentials, connection mode, DM policy, and group policy.
 import os
 from unittest.mock import patch
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _run_setup_feishu(
     *,
@@ -84,7 +84,8 @@ class TestSetupFeishuQrPath:
 
     def test_qr_success_does_not_persist_bot_identity(self):
         """Bot identity is discovered at runtime by _hydrate_bot_identity — not persisted
-        in env, so it stays fresh if the user renames the bot later."""
+        in env, so it stays fresh if the user renames the bot later.
+        """
         env = _run_setup_feishu(
             qr_result={
                 "app_id": "cli_test",
@@ -182,7 +183,6 @@ class TestSetupFeishuDmPolicy:
         assert env["FEISHU_ALLOWED_USERS"] == "ou_owner"
 
 
-
 # ---------------------------------------------------------------------------
 # Group policy
 # ---------------------------------------------------------------------------
@@ -261,8 +261,8 @@ class TestSetupFeishuAdapterIntegration:
         env = self._make_env_from_setup(dm_idx=1)
 
         with patch.dict(os.environ, env, clear=True):
-            from gateway.platforms.feishu import FeishuAdapter
             from gateway.config import PlatformConfig
+            from gateway.platforms.feishu import FeishuAdapter
             # Verify adapter initializes without error and env var is correct.
             FeishuAdapter(PlatformConfig())
             assert os.getenv("FEISHU_ALLOW_ALL_USERS") == "true"

@@ -2,9 +2,8 @@
 import sys
 import types
 
-
-from hermes_cli.config import load_config, save_config
 from hermes_cli import setup as setup_mod
+from hermes_cli.config import load_config, save_config
 from hermes_cli.setup import setup_model_provider
 
 
@@ -75,7 +74,8 @@ def test_setup_delegates_to_select_provider_and_model(tmp_path, monkeypatch):
 
 def test_setup_syncs_openrouter_from_disk(tmp_path, monkeypatch):
     """When select_provider_and_model saves OpenRouter config to disk,
-    the wizard's config dict picks it up."""
+    the wizard's config dict picks it up.
+    """
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     _clear_provider_env(monkeypatch)
     _stub_tts(monkeypatch)

@@ -1,5 +1,4 @@
-"""
-TTS Provider Registry
+"""TTS Provider Registry
 =====================
 
 Central map of registered TTS providers. Populated by plugins at

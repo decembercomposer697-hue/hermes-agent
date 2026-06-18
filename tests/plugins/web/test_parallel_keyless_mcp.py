@@ -20,8 +20,8 @@ import pytest
 
 import plugins.web.parallel.provider as pp
 
-
 # ─── _mcp_headers ──────────────────────────────────────────────────────────
+
 
 class TestMcpHeaders:
     def test_anonymous_has_no_authorization(self):

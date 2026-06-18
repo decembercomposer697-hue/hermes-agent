@@ -9,15 +9,15 @@ import pytest
 
 import tools.skills_tool as skills_tool_module
 from tools.skills_tool import (
+    MAX_DESCRIPTION_LENGTH,
+    _find_all_skills,
+    _get_category_from_path,
     _get_required_environment_variables,
     _parse_frontmatter,
     _parse_tags,
-    _get_category_from_path,
-    _find_all_skills,
     skill_matches_platform,
-    skills_list,
     skill_view,
-    MAX_DESCRIPTION_LENGTH,
+    skills_list,
 )
 
 
@@ -1153,7 +1153,8 @@ class TestSkillViewCollisionDetection:
 
     def test_nested_local_collides_with_top_level_external(self, tmp_path):
         """The original bug scenario: nested local + top-level external,
-        same name. Now refuses with both paths surfaced."""
+        same name. Now refuses with both paths surfaced.
+        """
         local_dir = tmp_path / "local"
         external_dir = tmp_path / "external"
         local_dir.mkdir()
@@ -1183,7 +1184,8 @@ class TestSkillViewCollisionDetection:
 
     def test_top_level_local_collides_with_external(self, tmp_path):
         """Top-level local + top-level external with the same name also
-        refuses — same-name shadowing is ambiguous regardless of nesting."""
+        refuses — same-name shadowing is ambiguous regardless of nesting.
+        """
         local_dir = tmp_path / "local"
         external_dir = tmp_path / "external"
         local_dir.mkdir()
@@ -1203,7 +1205,8 @@ class TestSkillViewCollisionDetection:
 
     def test_collision_resolvable_via_categorized_path(self, tmp_path):
         """User can recover from a collision by passing the full
-        categorized path — the bare name is ambiguous, the path is not."""
+        categorized path — the bare name is ambiguous, the path is not.
+        """
         local_dir = tmp_path / "local"
         external_dir = tmp_path / "external"
         local_dir.mkdir()
@@ -1227,7 +1230,8 @@ class TestSkillViewCollisionDetection:
 
     def test_external_skill_resolves_when_no_collision(self, tmp_path):
         """External-only skills still resolve normally when there's no
-        local skill of the same name."""
+        local skill of the same name.
+        """
         local_dir = tmp_path / "local"
         external_dir = tmp_path / "external"
         local_dir.mkdir()
@@ -1245,7 +1249,8 @@ class TestSkillViewCollisionDetection:
 
     def test_two_externals_same_name_also_refuse(self, tmp_path):
         """Collision detection is symmetric — two external dirs with
-        same-name skills also trigger the refusal."""
+        same-name skills also trigger the refusal.
+        """
         local_dir = tmp_path / "local"
         ext_a = tmp_path / "ext_a"
         ext_b = tmp_path / "ext_b"
@@ -1267,7 +1272,8 @@ class TestSkillViewCollisionDetection:
 
     def test_local_only_skill_loads_normally(self, tmp_path):
         """Sanity: a single local skill (no external collision) loads
-        without any error."""
+        without any error.
+        """
         local_dir = tmp_path / "local"
         external_dir = tmp_path / "external"
         local_dir.mkdir()

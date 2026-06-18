@@ -27,7 +27,7 @@ import os
 import shutil
 import subprocess
 import sys
-from datetime import datetime, timedelta, timezone, UTC
+from datetime import UTC, datetime, timedelta, timezone
 from email.mime.text import MIMEText
 from pathlib import Path
 
@@ -182,8 +182,8 @@ def get_credentials():
     """Load and refresh credentials from token file."""
     _ensure_authenticated()
 
-    from google.oauth2.credentials import Credentials
     from google.auth.transport.requests import Request
+    from google.oauth2.credentials import Credentials
 
     creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), _stored_token_scopes())
     if creds.expired and creds.refresh_token:
@@ -274,7 +274,6 @@ def gmail_search(args):
     print(json.dumps(output, indent=2, ensure_ascii=False))
 
 
-
 def gmail_get(args):
     if _gws_binary():
         msg = _run_gws(
@@ -312,7 +311,6 @@ def gmail_get(args):
         "body": _extract_message_body(msg),
     }
     print(json.dumps(result, indent=2, ensure_ascii=False))
-
 
 
 def gmail_send(args):
@@ -355,7 +353,6 @@ def gmail_send(args):
 
     result = service.users().messages().send(userId="me", body=body).execute()
     print(json.dumps({"status": "sent", "id": result["id"], "threadId": result.get("threadId", "")}, indent=2))
-
 
 
 def gmail_reply(args):
@@ -420,7 +417,6 @@ def gmail_reply(args):
     print(json.dumps({"status": "sent", "id": result["id"], "threadId": result.get("threadId", "")}, indent=2))
 
 
-
 def gmail_labels(args):
     if _gws_binary():
         results = _run_gws(["gmail", "users", "labels", "list"], params={"userId": "me"})
@@ -432,7 +428,6 @@ def gmail_labels(args):
     results = service.users().labels().list(userId="me").execute()
     labels = [{"id": l["id"], "name": l["name"], "type": l.get("type", "")} for l in results.get("labels", [])]
     print(json.dumps(labels, indent=2))
-
 
 
 def gmail_modify(args):
@@ -514,7 +509,6 @@ def calendar_list(args):
     print(json.dumps(events, indent=2, ensure_ascii=False))
 
 
-
 def calendar_create(args):
     event = {
         "summary": args.summary,
@@ -550,7 +544,6 @@ def calendar_create(args):
         "summary": result.get("summary", ""),
         "htmlLink": result.get("htmlLink", ""),
     }, indent=2))
-
 
 
 def calendar_delete(args):
@@ -609,8 +602,10 @@ def drive_get(args):
 
 def drive_upload(args):
     """Upload a local file to Drive. Falls through to Python client even when gws
-    is installed, because gws doesn't do multipart uploads."""
+    is installed, because gws doesn't do multipart uploads.
+    """
     import mimetypes
+
     from googleapiclient.http import MediaFileUpload
 
     local_path = Path(args.path).expanduser()
@@ -641,8 +636,10 @@ def drive_upload(args):
 
 def drive_download(args):
     """Download a Drive file to a local path. Google-native files (Docs/Sheets/Slides)
-    must be exported; binary files are downloaded as-is."""
+    must be exported; binary files are downloaded as-is.
+    """
     import io
+
     from googleapiclient.http import MediaIoBaseDownload
 
     service = build_service("drive", "v3")
@@ -866,7 +863,6 @@ def sheets_get(args):
     print(json.dumps(result.get("values", []), indent=2, ensure_ascii=False))
 
 
-
 def sheets_update(args):
     values = json.loads(args.values)
     body = {"values": values}
@@ -890,7 +886,6 @@ def sheets_update(args):
         valueInputOption="USER_ENTERED", body=body,
     ).execute()
     print(json.dumps({"updatedCells": result.get("updatedCells", 0), "updatedRange": result.get("updatedRange", "")}, indent=2))
-
 
 
 def sheets_append(args):

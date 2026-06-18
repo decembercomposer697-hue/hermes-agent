@@ -4,7 +4,7 @@ import logging
 
 import pytest
 
-from agent.redact import redact_sensitive_text, RedactingFormatter
+from agent.redact import RedactingFormatter, redact_sensitive_text
 
 
 @pytest.fixture(autouse=True)
@@ -317,7 +317,7 @@ class TestJWTTokens:
         assert "abc123def456" not in result
 
     def test_short_eyj_not_matched(self):
-        """eyJ followed by fewer than 10 base64 chars should not match."""
+        """EyJ followed by fewer than 10 base64 chars should not match."""
         text = "eyJust a normal word"
         assert redact_sensitive_text(text) == text
 
@@ -344,7 +344,8 @@ class TestJWTTokens:
 class TestDiscordMentions:
     """Discord mention snowflakes (<@ID> / <@!ID>) are public syntax, not
     secrets — they must pass through the redactor unchanged so multi-bot
-    @-pings (DISCORD_ALLOW_BOTS=mentions) keep resolving. See issue #35611."""
+    @-pings (DISCORD_ALLOW_BOTS=mentions) keep resolving. See issue #35611.
+    """
 
     def test_normal_mention_passes_through(self):
         text = "Hello <@222589316709220353>"
@@ -413,7 +414,8 @@ class TestWebUrlsNotRedacted:
 
     def test_known_prefix_inside_url_still_redacted(self):
         """sk-/ghp_/JWT-shaped values inside a URL are still caught by
-        _PREFIX_RE / _JWT_RE — the carve-out is for opaque tokens only."""
+        _PREFIX_RE / _JWT_RE — the carve-out is for opaque tokens only.
+        """
         text = "https://evil.com/steal?key=sk-" + "a" * 30
         result = redact_sensitive_text(text)
         assert "sk-" + "a" * 30 not in result
@@ -421,7 +423,8 @@ class TestWebUrlsNotRedacted:
     def test_db_connstr_password_still_redacted(self):
         """DB schemes (postgres/mysql/mongodb/redis/amqp) keep their
         userinfo redaction via _DB_CONNSTR_RE — connection strings are
-        not web URLs the agent navigates to."""
+        not web URLs the agent navigates to.
+        """
         text = "postgres://admin:dbpass@db.internal:5432/app"
         result = redact_sensitive_text(text)
         assert "dbpass" not in result

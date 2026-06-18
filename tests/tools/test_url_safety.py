@@ -1,20 +1,20 @@
 """Tests for SSRF protection in url_safety module."""
 
+import ipaddress
 import socket
 from unittest.mock import patch
 
+import pytest
+
 from tools.url_safety import (
-    is_safe_url,
+    _global_allow_private_urls,
+    _is_blocked_ip,
+    _reset_allow_private_cache,
     async_is_safe_url,
     is_always_blocked_url,
+    is_safe_url,
     normalize_url_for_request,
-    _is_blocked_ip,
-    _global_allow_private_urls,
-    _reset_allow_private_cache,
 )
-
-import ipaddress
-import pytest
 
 
 class TestNormalizeUrlForRequest:
@@ -124,7 +124,8 @@ class TestIsSafeUrl:
 
     def test_cgnat_100_64_blocked(self):
         """100.64.0.0/10 (CGNAT/Shared Address Space) is NOT covered by
-        ipaddress.is_private — must be blocked explicitly."""
+        ipaddress.is_private — must be blocked explicitly.
+        """
         with patch("socket.getaddrinfo", return_value=[
             (2, 1, 6, "", ("100.64.0.1", 0)),
         ]):
@@ -329,7 +330,7 @@ class TestGlobalAllowPrivateUrls:
             assert _global_allow_private_urls() is False
 
     def test_config_security_takes_precedence_over_browser(self, monkeypatch):
-        """security section is checked before browser section."""
+        """Security section is checked before browser section."""
         monkeypatch.delenv("HERMES_ALLOW_PRIVATE_URLS", raising=False)
         cfg = {"security": {"allow_private_urls": True}, "browser": {"allow_private_urls": False}}
         with patch("hermes_cli.config.read_raw_config", return_value=cfg):

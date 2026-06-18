@@ -164,7 +164,8 @@ def test_passes_non_table_lines_through_around_a_table():
 def test_overflow_falls_back_to_vertical_when_table_wider_than_terminal():
     """A horizontal table that would exceed the available width must
     drop to vertical key-value rendering so the terminal does not
-    soft-wrap mid-cell (which destroys column alignment visually)."""
+    soft-wrap mid-cell (which destroys column alignment visually).
+    """
 
     src = dedent(
         """\
@@ -195,7 +196,8 @@ def test_overflow_falls_back_to_vertical_when_table_wider_than_terminal():
 def test_horizontal_kept_when_table_fits():
     """A table that fits the terminal must keep the horizontal
     pipe-bordered rendering — vertical fallback only kicks in when
-    soft-wrap is unavoidable."""
+    soft-wrap is unavoidable.
+    """
 
     src = dedent(
         """\
@@ -238,7 +240,8 @@ def test_vertical_fallback_wraps_long_cell_text_with_indent():
 
 def test_overflow_falls_back_to_vertical_for_cjk_too():
     """CJK content can also push a table over the terminal budget;
-    the vertical fallback should kick in regardless of script."""
+    the vertical fallback should kick in regardless of script.
+    """
 
     src = dedent(
         """\

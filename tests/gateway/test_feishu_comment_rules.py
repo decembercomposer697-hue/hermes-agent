@@ -9,8 +9,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from gateway.platforms.feishu_comment_rules import (
-    CommentsConfig,
     CommentDocumentRule,
+    CommentsConfig,
     ResolvedCommentRule,
     _MtimeCache,
     _parse_document_rule,

@@ -80,7 +80,7 @@ class TestBuildJobPromptContextFrom:
     """Test that _build_job_prompt() injects context from referenced jobs."""
 
     def test_injects_latest_output(self, cron_env):
-        from cron.jobs import create_job, OUTPUT_DIR
+        from cron.jobs import OUTPUT_DIR, create_job
         from cron.scheduler import _build_job_prompt
 
         job_a = create_job(prompt="Find news", schedule="every 1h")
@@ -103,9 +103,10 @@ class TestBuildJobPromptContextFrom:
         assert f"Output from job '{job_a['id']}'" in prompt
 
     def test_uses_most_recent_output(self, cron_env):
-        from cron.jobs import create_job, OUTPUT_DIR
-        from cron.scheduler import _build_job_prompt
         import time
+
+        from cron.jobs import OUTPUT_DIR, create_job
+        from cron.scheduler import _build_job_prompt
 
         job_a = create_job(prompt="Find news", schedule="every 1h")
         output_dir = OUTPUT_DIR / job_a["id"]
@@ -141,7 +142,7 @@ class TestBuildJobPromptContextFrom:
         assert "Summarize" in prompt
 
     def test_injects_multiple_context_jobs(self, cron_env):
-        from cron.jobs import create_job, OUTPUT_DIR
+        from cron.jobs import OUTPUT_DIR, create_job
         from cron.scheduler import _build_job_prompt
 
         job_a = create_job(prompt="Find news", schedule="every 1h")
@@ -163,7 +164,7 @@ class TestBuildJobPromptContextFrom:
 
     def test_context_injected_before_prompt(self, cron_env):
         """Context should appear before the job's own prompt."""
-        from cron.jobs import create_job, OUTPUT_DIR
+        from cron.jobs import OUTPUT_DIR, create_job
         from cron.scheduler import _build_job_prompt
 
         job_a = create_job(prompt="Find data", schedule="every 1h")
@@ -183,7 +184,7 @@ class TestBuildJobPromptContextFrom:
 
     def test_output_truncated_at_8k_chars(self, cron_env):
         """Output longer than 8000 chars should be truncated."""
-        from cron.jobs import create_job, OUTPUT_DIR
+        from cron.jobs import OUTPUT_DIR, create_job
         from cron.scheduler import _build_job_prompt
 
         job_a = create_job(prompt="Find data", schedule="every 1h")
@@ -201,9 +202,10 @@ class TestBuildJobPromptContextFrom:
 
     def test_graceful_when_file_deleted_between_listing_and_reading(self, cron_env):
         """Job should not crash if output file is deleted mid-read."""
-        from cron.jobs import create_job, OUTPUT_DIR
-        from cron.scheduler import _build_job_prompt
         from unittest.mock import patch
+
+        from cron.jobs import OUTPUT_DIR, create_job
+        from cron.scheduler import _build_job_prompt
 
         job_a = create_job(prompt="Find data", schedule="every 1h")
         out_dir = OUTPUT_DIR / job_a["id"]
@@ -216,6 +218,7 @@ class TestBuildJobPromptContextFrom:
 
         # Simulate file deleted between glob() and read_text()
         original_read = Path.read_text
+
         def mock_read_text(self, *args, **kwargs):
             if self.suffix == ".md":
                 raise FileNotFoundError("file deleted mid-read")
@@ -229,9 +232,10 @@ class TestBuildJobPromptContextFrom:
 
     def test_graceful_when_permission_error(self, cron_env):
         """Job should not crash if output directory is not readable."""
-        from cron.jobs import create_job, OUTPUT_DIR
-        from cron.scheduler import _build_job_prompt
         from unittest.mock import patch
+
+        from cron.jobs import OUTPUT_DIR, create_job
+        from cron.scheduler import _build_job_prompt
 
         job_a = create_job(prompt="Find data", schedule="every 1h")
         out_dir = OUTPUT_DIR / job_a["id"]
@@ -244,6 +248,7 @@ class TestBuildJobPromptContextFrom:
 
         # Simulate permission error on read
         original_read = Path.read_text
+
         def mock_read_text(self, *args, **kwargs):
             if self.suffix == ".md":
                 raise PermissionError("permission denied")
@@ -298,7 +303,6 @@ class TestBuildJobPromptContextFrom:
         assert "198.51.100.7" in message
 
 
-
 class TestUpdateContextFrom:
     """Verify the cronjob tool's `update` action wires context_from through.
 
@@ -307,9 +311,10 @@ class TestUpdateContextFrom:
     """
 
     def test_update_adds_context_from_to_existing_job(self, cron_env):
+        import json
+
         from cron.jobs import create_job, get_job
         from tools.cronjob_tools import cronjob
-        import json
 
         job_a = create_job(prompt="Find news", schedule="every 1h")
         job_b = create_job(prompt="Summarize", schedule="every 2h")
@@ -326,9 +331,10 @@ class TestUpdateContextFrom:
         assert reloaded["context_from"] == [job_a["id"]]
 
     def test_update_changes_context_from_reference(self, cron_env):
+        import json
+
         from cron.jobs import create_job, get_job
         from tools.cronjob_tools import cronjob
-        import json
 
         job_a = create_job(prompt="Find news", schedule="every 1h")
         job_a2 = create_job(prompt="Find weather", schedule="every 1h")
@@ -346,9 +352,10 @@ class TestUpdateContextFrom:
         assert get_job(job_b["id"])["context_from"] == [job_a2["id"]]
 
     def test_update_clears_context_from_with_empty_list(self, cron_env):
+        import json
+
         from cron.jobs import create_job, get_job
         from tools.cronjob_tools import cronjob
-        import json
 
         job_a = create_job(prompt="Find news", schedule="every 1h")
         job_b = create_job(
@@ -365,9 +372,10 @@ class TestUpdateContextFrom:
         assert get_job(job_b["id"])["context_from"] is None
 
     def test_update_clears_context_from_with_empty_string(self, cron_env):
+        import json
+
         from cron.jobs import create_job, get_job
         from tools.cronjob_tools import cronjob
-        import json
 
         job_a = create_job(prompt="Find news", schedule="every 1h")
         job_b = create_job(
@@ -383,9 +391,10 @@ class TestUpdateContextFrom:
         assert get_job(job_b["id"])["context_from"] is None
 
     def test_update_rejects_unknown_job_reference(self, cron_env):
+        import json
+
         from cron.jobs import create_job
         from tools.cronjob_tools import cronjob
-        import json
 
         job_b = create_job(prompt="Summarize", schedule="every 2h")
 
@@ -399,9 +408,10 @@ class TestUpdateContextFrom:
 
     def test_update_preserves_context_from_when_not_passed(self, cron_env):
         """Updating other fields must not clobber context_from."""
+        import json
+
         from cron.jobs import create_job, get_job
         from tools.cronjob_tools import cronjob
-        import json
 
         job_a = create_job(prompt="Find news", schedule="every 1h")
         job_b = create_job(

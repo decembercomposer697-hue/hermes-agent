@@ -35,7 +35,6 @@ from hermes_cli.dashboard_auth.ws_tickets import (
 )
 from tests.hermes_cli.conftest_dashboard_auth import StubAuthProvider
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -254,7 +253,8 @@ class TestWsAuthOkGated:
     def test_legacy_token_rejected_in_gated_mode(self, gated_app):
         """Critical: gated mode must NOT honour the legacy token path
         even when someone has access to the in-process value of
-        _SESSION_TOKEN (e.g. a leaked log line)."""
+        _SESSION_TOKEN (e.g. a leaked log line).
+        """
         ws = _fake_ws(query={"token": web_server._SESSION_TOKEN})
         assert web_server._ws_auth_ok(ws) is False
 
@@ -282,14 +282,16 @@ class TestWsAuthOkGated:
 
     def test_internal_credential_accepted(self, gated_app):
         """Server-spawned children present the process-lifetime internal
-        credential via ?internal= and are accepted in gated mode."""
+        credential via ?internal= and are accepted in gated mode.
+        """
         cred = internal_ws_credential()
         ws = _fake_ws(query={"internal": cred})
         assert web_server._ws_auth_ok(ws) is True
 
     def test_internal_credential_is_multi_use(self, gated_app):
         """Unlike single-use tickets, the internal credential survives
-        repeated use so the child can reconnect."""
+        repeated use so the child can reconnect.
+        """
         cred = internal_ws_credential()
         for _ in range(3):
             ws = _fake_ws(query={"internal": cred})
@@ -303,7 +305,8 @@ class TestWsAuthOkGated:
 
     def test_internal_credential_not_accepted_in_loopback(self, loopback_app):
         """Outside gated mode, ?internal= is meaningless — only ?token= works.
-        A naked internal credential must not authenticate."""
+        A naked internal credential must not authenticate.
+        """
         cred = internal_ws_credential()
         ws = _fake_ws(query={"internal": cred})
         assert web_server._ws_auth_ok(ws) is False
@@ -338,7 +341,8 @@ class TestWsRequestIsAllowedGated:
     def test_non_loopback_peer_rejected_in_loopback_mode(self, loopback_app):
         """Loopback mode still enforces the peer-IP guard — the legacy
         token path is the only auth and we don't want random LAN hosts
-        guessing it."""
+        guessing it.
+        """
         ws = _fake_ws(query={}, client_host="192.168.1.42")
         ws.headers = {"host": "127.0.0.1:8080"}
         assert web_server._ws_request_is_allowed(ws) is False
@@ -393,7 +397,8 @@ class TestWsRequestIsAllowedGated:
     def test_host_origin_guard_still_runs_in_gated_mode(self, gated_app):
         """Bypassing the peer-IP check must not bypass the DNS-rebinding
         Host header guard — that one still protects against attacker
-        sites resolving DNS to the public IP."""
+        sites resolving DNS to the public IP.
+        """
         ws = _fake_ws(query={}, client_host="203.0.113.7")
         ws.headers = {"host": "evil.example.com"}
         assert web_server._ws_request_is_allowed(ws) is False
@@ -553,7 +558,8 @@ class TestGatewayWsUrl:
 
     def test_gated_credential_matches_sidecar(self, gated_app):
         """Both server-internal builders share one process credential, so a
-        single value authenticates /api/ws and /api/pub alike."""
+        single value authenticates /api/ws and /api/pub alike.
+        """
         gw = web_server._build_gateway_ws_url()
         sc = web_server._build_sidecar_url("ch-1")
         assert gw is not None and sc is not None

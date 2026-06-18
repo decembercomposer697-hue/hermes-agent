@@ -37,10 +37,10 @@ import asyncio
 import functools
 import hashlib
 import logging
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from collections.abc import Awaitable, Callable
 
 from gateway.platforms.qqbot.constants import FILE_UPLOAD_TIMEOUT
 

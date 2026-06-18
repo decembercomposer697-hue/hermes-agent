@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Upload an .excalidraw file to excalidraw.com and print a shareable URL.
+"""Upload an .excalidraw file to excalidraw.com and print a shareable URL.
 
 No account required. The diagram is encrypted client-side (AES-GCM) before
 upload -- the encryption key is embedded in the URL fragment, so the server
@@ -15,15 +14,16 @@ Usage:
 Example:
     python upload.py ~/diagrams/architecture.excalidraw
     # prints: https://excalidraw.com/#json=abc123,encryptionKeyHere
+
 """
 
+import base64
 import json
 import os
 import struct
 import sys
-import zlib
-import base64
 import urllib.request
+import zlib
 
 try:
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -37,8 +37,7 @@ UPLOAD_URL = "https://json.excalidraw.com/api/v2/post/"
 
 
 def concat_buffers(*buffers: bytes) -> bytes:
-    """
-    Build the Excalidraw v2 concat-buffers binary format.
+    """Build the Excalidraw v2 concat-buffers binary format.
 
     Layout: [version=1 (4B big-endian)] then for each buffer:
             [length (4B big-endian)] [data bytes]
@@ -51,14 +50,14 @@ def concat_buffers(*buffers: bytes) -> bytes:
 
 
 def upload(excalidraw_json: str) -> str:
-    """
-    Encrypt and upload Excalidraw JSON to excalidraw.com.
+    """Encrypt and upload Excalidraw JSON to excalidraw.com.
 
     Args:
         excalidraw_json: The full .excalidraw file content as a string.
 
     Returns:
         Shareable URL string.
+
     """
     # 1. Inner payload: concat_buffers(file_metadata, data)
     file_metadata = json.dumps({}).encode("utf-8")

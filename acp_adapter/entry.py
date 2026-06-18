@@ -29,8 +29,8 @@ import asyncio
 import logging
 import sys
 from pathlib import Path
-from hermes_constants import get_hermes_home
 
+from hermes_constants import get_hermes_home
 
 # Methods clients send as periodic liveness probes. They are not part of the
 # ACP schema, so the acp router correctly returns JSON-RPC -32601 to the
@@ -149,6 +149,7 @@ def _print_version() -> None:
 
 def _run_check() -> None:
     import acp
+
     from acp_adapter.server import HermesACPAgent
 
     print("Hermes ACP check OK")
@@ -239,6 +240,7 @@ def main(argv: list[str] | None = None) -> None:
         sys.path.insert(0, project_root)
 
     import acp
+
     from .server import HermesACPAgent
 
     # MCP tool discovery from config.yaml — run before asyncio.run() so

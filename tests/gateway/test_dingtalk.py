@@ -1,6 +1,6 @@
 """Tests for DingTalk platform adapter."""
 import asyncio
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -410,6 +410,7 @@ class TestConnect:
     async def test_disconnect_finalizes_open_streaming_cards(self):
         """Streaming cards must be finalized before HTTP client closes."""
         from unittest.mock import AsyncMock, patch
+
         from gateway.platforms.dingtalk import DingTalkAdapter
         adapter = DingTalkAdapter(PlatformConfig(enabled=True))
         adapter._http_client = AsyncMock()
@@ -573,7 +574,8 @@ class TestExtractText:
 
 class TestExtractMedia:
     """_extract_media must split native voice rich-text items (auto-STT)
-    from generic audio file uploads (kept as attachments, no STT)."""
+    from generic audio file uploads (kept as attachments, no STT).
+    """
 
     def _msg_with_rich_text(self, items):
         msg = MagicMock()
@@ -585,9 +587,10 @@ class TestExtractMedia:
 
     def test_voice_rich_text_item_classified_as_voice(self):
         """Native DingTalk voice notes (type=voice) must enter the auto-STT
-        path via MessageType.VOICE — the gateway skips STT for AUDIO."""
-        from gateway.platforms.dingtalk import DingTalkAdapter
+        path via MessageType.VOICE — the gateway skips STT for AUDIO.
+        """
         from gateway.platforms.base import MessageType
+        from gateway.platforms.dingtalk import DingTalkAdapter
 
         msg = self._msg_with_rich_text(
             [{"type": "voice", "downloadCode": "dl_voice_abc"}],
@@ -601,9 +604,10 @@ class TestExtractMedia:
 
     def test_audio_rich_text_item_stays_audio(self):
         """Generic audio uploads (e.g. an mp3 the user attached) must NOT
-        be auto-transcribed — they stay MessageType.AUDIO."""
-        from gateway.platforms.dingtalk import DingTalkAdapter, DINGTALK_TYPE_MAPPING
+        be auto-transcribed — they stay MessageType.AUDIO.
+        """
         from gateway.platforms.base import MessageType
+        from gateway.platforms.dingtalk import DINGTALK_TYPE_MAPPING, DingTalkAdapter
 
         # Simulate a future/non-voice audio rich-text item by extending the
         # mapping so item_type != "voice" but still routes through the
@@ -785,12 +789,13 @@ class TestShouldProcessMessage:
 class TestIncomingHandlerProcess:
     """Verify that _IncomingHandler.process correctly converts callback data
     and dispatches message processing as a background task (fire-and-forget)
-    so the SDK ACK is returned immediately."""
+    so the SDK ACK is returned immediately.
+    """
 
     @pytest.mark.asyncio
     async def test_process_extracts_session_webhook(self):
         """session_webhook must be populated from callback data."""
-        from gateway.platforms.dingtalk import _IncomingHandler, DingTalkAdapter
+        from gateway.platforms.dingtalk import DingTalkAdapter, _IncomingHandler
 
         adapter = DingTalkAdapter(PlatformConfig(enabled=True))
         adapter._on_message = AsyncMock()
@@ -822,8 +827,9 @@ class TestIncomingHandlerProcess:
     async def test_process_fallback_session_webhook_when_from_dict_misses_it(self):
         """If ChatbotMessage.from_dict does not map sessionWebhook (e.g. SDK
         version mismatch), the handler should fall back to extracting it
-        directly from the raw data dict."""
-        from gateway.platforms.dingtalk import _IncomingHandler, DingTalkAdapter
+        directly from the raw data dict.
+        """
+        from gateway.platforms.dingtalk import DingTalkAdapter, _IncomingHandler
 
         adapter = DingTalkAdapter(PlatformConfig(enabled=True))
         adapter._on_message = AsyncMock()
@@ -850,8 +856,9 @@ class TestIncomingHandlerProcess:
     @pytest.mark.asyncio
     async def test_process_returns_ack_immediately(self):
         """process() must not block on _on_message — it should return
-        the ACK tuple before the message is fully processed."""
-        from gateway.platforms.dingtalk import _IncomingHandler, DingTalkAdapter
+        the ACK tuple before the message is fully processed.
+        """
+        from gateway.platforms.dingtalk import DingTalkAdapter, _IncomingHandler
 
         processing_started = asyncio.Event()
         processing_gate = asyncio.Event()
@@ -940,10 +947,6 @@ class TestMessageContextIsolation:
         assert adapter._message_contexts["chat-B"] is msg_b
 
 
-
-
-
-
 # ---------------------------------------------------------------------------
 # Card lifecycle: finalize via metadata["streaming"]
 # ---------------------------------------------------------------------------
@@ -992,7 +995,8 @@ class TestCardLifecycle:
     async def test_intermediate_send_stays_streaming(self, adapter_with_card):
         """send() without reply_to creates an OPEN card (tool progress /
         commentary / streaming first chunk).  No flicker closed→streaming
-        when edit_message follows."""
+        when edit_message follows.
+        """
         a = adapter_with_card
         result = await a.send("chat-1", "💻 terminal: ls")
         assert result.success
@@ -1004,7 +1008,8 @@ class TestCardLifecycle:
     @pytest.mark.asyncio
     async def test_done_fires_only_when_reply_to_is_set(self, adapter_with_card):
         """reply_to distinguishes final response (base.py) from tool-progress
-        sends (run.py).  Done must only fire for the former."""
+        sends (run.py).  Done must only fire for the former.
+        """
         a = adapter_with_card
         fired: list[str] = []
         a._fire_done_reaction = lambda cid: fired.append(cid)
@@ -1052,7 +1057,8 @@ class TestCardLifecycle:
         self, adapter_with_card,
     ):
         """Tool-progress card left open (send without reply_to + edits) must
-        be auto-closed when the final-reply send arrives."""
+        be auto-closed when the final-reply send arrives.
+        """
         a = adapter_with_card
         # First tool: intermediate send — card stays open.
         r1 = await a.send("chat-1", "💻 tool1")
@@ -1089,6 +1095,7 @@ class TestCardLifecycle:
     def test_fire_done_reaction_is_idempotent(self, adapter_with_card):
         a = adapter_with_card
         captured = []
+
         def _capture(coro):
             captured.append(coro)
         a._spawn_bg = _capture
@@ -1097,7 +1104,6 @@ class TestCardLifecycle:
         a._fire_done_reaction("chat-1")
         assert len(captured) == 1
         captured[0].close()
-
 
 
 # ---------------------------------------------------------------------------

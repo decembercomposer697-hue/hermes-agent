@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Transcription Tools Module
+"""Transcription Tools Module
 
 Provides speech-to-text transcription with six providers:
 
@@ -34,18 +33,19 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 from urllib.parse import urljoin
 
-from utils import is_truthy_value
 from tools.managed_tool_gateway import resolve_managed_tool_gateway
 from tools.tool_backend_helpers import (
     managed_nous_tools_enabled,
     nous_tool_gateway_unavailable_message,
     resolve_openai_audio_api_key,
 )
+from utils import is_truthy_value
 
 logger = logging.getLogger(__name__)
+
 
 def get_env_value(name, default=None):
     """Read env values through the live config module.
@@ -114,7 +114,6 @@ _local_model_name: str | None = None
 # ---------------------------------------------------------------------------
 # Config helpers
 # ---------------------------------------------------------------------------
-
 
 
 def _load_stt_config() -> dict:
@@ -1237,7 +1236,6 @@ def _transcribe_local_command(file_path: str, model_name: str) -> dict[str, Any]
             else:
                 subprocess.run(shlex.split(command), check=True, capture_output=True, text=True, timeout=300, stdin=subprocess.DEVNULL)
             
-
             txt_files = sorted(Path(output_dir).glob("*.txt"))
             if not txt_files:
                 return {
@@ -1289,7 +1287,7 @@ def _transcribe_groq(file_path: str, model_name: str) -> dict[str, Any]:
         model_name = DEFAULT_GROQ_STT_MODEL
 
     try:
-        from openai import OpenAI, APIError, APIConnectionError, APITimeoutError
+        from openai import APIConnectionError, APIError, APITimeoutError, OpenAI
         client = OpenAI(api_key=api_key, base_url=GROQ_BASE_URL, timeout=30, max_retries=0)
         try:
             with open(file_path, "rb") as audio_file:
@@ -1346,7 +1344,7 @@ def _transcribe_openai(file_path: str, model_name: str) -> dict[str, Any]:
         model_name = DEFAULT_STT_MODEL
 
     try:
-        from openai import OpenAI, APIError, APIConnectionError, APITimeoutError
+        from openai import APIConnectionError, APIError, APITimeoutError, OpenAI
         client = OpenAI(api_key=api_key, base_url=base_url, timeout=30, max_retries=0)
         try:
             with open(file_path, "rb") as audio_file:
@@ -1465,6 +1463,7 @@ def _transcribe_xai(file_path: str, model_name: str) -> dict[str, Any]:
 
     try:
         import requests
+
         from tools.xai_http import hermes_xai_user_agent
 
         data: dict[str, str] = {}
@@ -1621,8 +1620,7 @@ def _transcribe_elevenlabs(file_path: str, model_name: str) -> dict[str, Any]:
 
 
 def transcribe_audio(file_path: str, model: str | None = None) -> dict[str, Any]:
-    """
-    Transcribe an audio file using the configured STT provider.
+    """Transcribe an audio file using the configured STT provider.
 
     Provider priority:
       1. User config (``stt.provider`` in config.yaml)
@@ -1638,6 +1636,7 @@ def transcribe_audio(file_path: str, model: str | None = None) -> dict[str, Any]
           - "transcript" (str): The transcribed text (empty on failure)
           - "error" (str, optional): Error message if success is False
           - "provider" (str, optional): Which provider was used
+
     """
     # Validate input
     error = _validate_audio_file(file_path)

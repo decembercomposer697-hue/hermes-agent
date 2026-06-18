@@ -125,7 +125,8 @@ class TestSteerInjection:
 
     def test_multimodal_content_list_preserved(self):
         """Anthropic-style list content should be preserved, with the steer
-        appended as a text block."""
+        appended as a text block.
+        """
         agent = _bare_agent()
         agent.steer("extra note")
         original_blocks = [{"type": "text", "text": "existing output"}]
@@ -143,7 +144,8 @@ class TestSteerInjection:
     def test_restashed_when_no_tool_result_in_batch(self):
         """If the 'batch' contains no tool-role messages (e.g. all skipped
         after an interrupt), the steer should be put back into the pending
-        slot so the caller's fallback path can deliver it."""
+        slot so the caller's fallback path can deliver it.
+        """
         agent = _bare_agent()
         agent.steer("ping")
         messages = [
@@ -185,7 +187,8 @@ class TestSteerClearedOnInterrupt:
     def test_clear_interrupt_drops_pending_steer(self):
         """A hard interrupt supersedes any pending steer — the agent's
         next tool iteration won't happen, so delivering the steer later
-        would be surprising."""
+        would be surprising.
+        """
         agent = _bare_agent()
         # Minimal surface needed by clear_interrupt()
         agent._interrupt_requested = True
@@ -206,12 +209,14 @@ class TestPreApiCallSteerDrain:
     """Test that steers arriving during an API call are drained before the
     next API call — not deferred until the next tool batch.  This is the
     fix for the scenario where /steer sent during model thinking only lands
-    after the agent is completely done."""
+    after the agent is completely done.
+    """
 
     def test_pre_api_drain_injects_into_last_tool_result(self):
         """If a steer is pending when the main loop starts building
         api_messages, it should be injected into the last tool result
-        in the messages list."""
+        in the messages list.
+        """
         agent = _bare_agent()
         # Simulate messages after a tool batch completed
         messages = [
@@ -237,7 +242,8 @@ class TestPreApiCallSteerDrain:
 
     def test_pre_api_drain_restashes_when_no_tool_message(self):
         """If there are no tool results yet (first iteration), the steer
-        should be put back into _pending_steer for the post-tool drain."""
+        should be put back into _pending_steer for the post-tool drain.
+        """
         agent = _bare_agent()
         messages = [
             {"role": "user", "content": "hello"},
@@ -259,7 +265,8 @@ class TestPreApiCallSteerDrain:
     def test_pre_api_drain_finds_tool_msg_past_assistant(self):
         """The pre-API drain should scan backwards past a non-tool message
         (e.g., if an assistant message was somehow appended after tools)
-        and still find the tool result."""
+        and still find the tool result.
+        """
         agent = _bare_agent()
         messages = [
             {"role": "user", "content": "do something"},
@@ -282,7 +289,8 @@ class TestSteerMarkerContract:
     def test_system_prompt_note_describes_the_real_marker(self):
         """The system-prompt note tells the model which marker to trust; it
         must reference the exact open/close the injector emits, or the model
-        trusts a marker that never appears (and vice-versa)."""
+        trusts a marker that never appears (and vice-versa).
+        """
         from agent.prompt_builder import STEER_CHANNEL_NOTE, STEER_MARKER_CLOSE
 
         emitted = format_steer_marker("hi")
@@ -291,7 +299,8 @@ class TestSteerMarkerContract:
 
     def test_marker_no_longer_uses_the_distrusted_label(self):
         """Regression: the bare 'User guidance:' line read as tool content and
-        got refused as injection — it must not come back."""
+        got refused as injection — it must not come back.
+        """
         assert "User guidance:" not in format_steer_marker("hi")
 
 
@@ -314,7 +323,10 @@ class TestSteerCommandRegistry:
         handler. Otherwise it would be queued as user text and only
         delivered at turn end — defeating the whole point.
         """
-        from hermes_cli.commands import ACTIVE_SESSION_BYPASS_COMMANDS, should_bypass_active_session
+        from hermes_cli.commands import (
+            ACTIVE_SESSION_BYPASS_COMMANDS,
+            should_bypass_active_session,
+        )
 
         assert "steer" in ACTIVE_SESSION_BYPASS_COMMANDS
         assert should_bypass_active_session("steer") is True

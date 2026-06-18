@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from hermes_cli.config import set_config_value, config_command
+from hermes_cli.config import config_command, set_config_value
 
 
 @pytest.fixture(autouse=True)
@@ -151,13 +151,13 @@ class TestFalsyValues:
         assert "verbose: 0" in config
 
     def test_config_command_rejects_missing_value(self):
-        """config set with no value arg (None) should still exit."""
+        """Config set with no value arg (None) should still exit."""
         args = argparse.Namespace(config_command="set", key="model", value=None)
         with pytest.raises(SystemExit):
             config_command(args)
 
     def test_config_command_accepts_empty_string(self, _isolated_hermes_home):
-        """config set KEY '' should not exit — it should set the value."""
+        """Config set KEY '' should not exit — it should set the value."""
         args = argparse.Namespace(config_command="set", key="model", value="")
         config_command(args)
         config = _read_config(_isolated_hermes_home)

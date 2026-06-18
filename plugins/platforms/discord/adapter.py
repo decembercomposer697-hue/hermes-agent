@@ -20,8 +20,8 @@ import tempfile
 import threading
 import time
 from collections import defaultdict
-from typing import Dict, List, Optional, Any, Tuple
 from collections.abc import Callable
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,8 @@ _DISCORD_COMMAND_SYNC_MAX_RATE_LIMIT_SLEEP_SECONDS = 30.0
 
 try:
     import discord
-    from discord import Message as DiscordMessage, Intents
+    from discord import Intents
+    from discord import Message as DiscordMessage
     from discord.ext import commands
     DISCORD_AVAILABLE = True
 except ImportError:
@@ -46,27 +47,28 @@ except ImportError:
 
 import sys
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from gateway.config import Platform, PlatformConfig
 import re
 
-from gateway.platforms.helpers import MessageDeduplicator, ThreadParticipationTracker
-from utils import atomic_json_write
+from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import (
+    SUPPORTED_DOCUMENT_TYPES,
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     ProcessingOutcome,
     SendResult,
-    cache_image_from_url,
-    cache_image_from_bytes,
-    cache_audio_from_url,
     cache_audio_from_bytes,
+    cache_audio_from_url,
     cache_document_from_bytes,
-    SUPPORTED_DOCUMENT_TYPES,
+    cache_image_from_bytes,
+    cache_image_from_url,
 )
+from gateway.platforms.helpers import MessageDeduplicator, ThreadParticipationTracker
 from tools.url_safety import is_safe_url
+from utils import atomic_json_write
 
 
 def _find_discord_windows_bundled_opus(discord_module: Any = None) -> str | None:
@@ -123,7 +125,8 @@ def check_discord_requirements() -> bool:
         return False
     try:
         import discord as _discord
-        from discord import Message as _DM, Intents as _Intents
+        from discord import Intents as _Intents
+        from discord import Message as _DM
         from discord.ext import commands as _commands
     except ImportError:
         return False
@@ -283,7 +286,7 @@ class VoiceReceiver:
         # Set on the current live websocket (for immediate effect)
         try:
             from discord.utils import MISSING
-            if hasattr(conn, 'ws') and conn.ws is not MISSING:
+            if hasattr(conn, "ws") and conn.ws is not MISSING:
                 conn.ws._hook = wrapped_hook
                 logger.info("Speaking hook installed on live websocket")
         except Exception as e:
@@ -559,8 +562,7 @@ def _read_dm_role_auth_guild() -> int | None:
 
 
 class DiscordAdapter(BasePlatformAdapter):
-    """
-    Discord bot adapter.
+    """Discord bot adapter.
 
     Handles:
     - Receiving messages from servers and DMs
@@ -628,7 +630,7 @@ class DiscordAdapter(BasePlatformAdapter):
         self._dedup = MessageDeduplicator()
         # Reply threading mode: "off" (no replies), "first" (reply on first
         # chunk only, default), "all" (reply-reference on every chunk).
-        self._reply_to_mode: str = getattr(config, 'reply_to_mode', 'first') or 'first'
+        self._reply_to_mode: str = getattr(config, "reply_to_mode", "first") or "first"
         self._slash_commands: bool = self.config.extra.get("slash_commands", True)
         # In-memory cache of the bot's last message ID per channel, used by
         # history backfill to skip the full scan on hot paths.  Falls back to
@@ -678,7 +680,7 @@ class DiscordAdapter(BasePlatformAdapter):
             return False
 
         try:
-            if not self._acquire_platform_lock('discord-bot-token', self.config.token, 'Discord bot token'):
+            if not self._acquire_platform_lock("discord-bot-token", self.config.token, "Discord bot token"):
                 return False
 
             # Parse allowed user entries (may contain usernames or IDs)
@@ -716,7 +718,7 @@ class DiscordAdapter(BasePlatformAdapter):
             intents.voice_states = True
 
             # Resolve proxy (DISCORD_PROXY > generic env vars > macOS system proxy)
-            from gateway.platforms.base import resolve_proxy_url, proxy_kwargs_for_bot
+            from gateway.platforms.base import proxy_kwargs_for_bot, resolve_proxy_url
             proxy_url = resolve_proxy_url(platform_env_var="DISCORD_PROXY")
             if proxy_url:
                 logger.info("[%s] Using proxy for Discord: %s", self.name, proxy_url)
@@ -1075,7 +1077,8 @@ class DiscordAdapter(BasePlatformAdapter):
         Narrower than ``hasattr(exc, 'retry_after')``: discord.py's own
         ``RateLimited`` exception and any HTTPException with status 429
         qualify. This prevents suppressing unrelated failures that happen
-        to expose a ``retry_after`` attribute."""
+        to expose a ``retry_after`` attribute.
+        """
         # discord.py emits RateLimited / HTTPException subclasses for 429s.
         # Guard with isinstance-of-class so a mocked ``discord`` module
         # (where attrs are MagicMocks, not types) doesn't trip isinstance.
@@ -1225,7 +1228,8 @@ class DiscordAdapter(BasePlatformAdapter):
     @staticmethod
     def _normalize_permissions(value: Any) -> str | None:
         """Discord emits default_member_permissions as str server-side but discord.py
-        sets it as int locally. Normalize to str-or-None so the comparison is stable."""
+        sets it as int locally. Normalize to str-or-None so the comparison is stable.
+        """
         if value is None:
             return None
         return str(value)
@@ -1726,9 +1730,10 @@ class DiscordAdapter(BasePlatformAdapter):
             return
 
         try:
-            import discord as _discord_mod
             import io as _io
             from urllib.parse import unquote as _unquote
+
+            import discord as _discord_mod
         except Exception:  # pragma: no cover
             await super().send_multiple_images(chat_id, images, metadata, human_delay)
             return
@@ -1772,7 +1777,11 @@ class DiscordAdapter(BasePlatformAdapter):
                         # Download to BytesIO so it renders inline
                         try:
                             import aiohttp as _aiohttp
-                            from gateway.platforms.base import resolve_proxy_url, proxy_kwargs_for_aiohttp
+
+                            from gateway.platforms.base import (
+                                proxy_kwargs_for_aiohttp,
+                                resolve_proxy_url,
+                            )
                             _proxy = resolve_proxy_url(platform_env_var="DISCORD_PROXY")
                             _sess_kw, _req_kw = proxy_kwargs_for_aiohttp(_proxy)
                             if aiohttp_session is None:
@@ -2401,7 +2410,7 @@ class DiscordAdapter(BasePlatformAdapter):
                     try:
                         vc = self._voice_clients.get(guild_id)
                         if vc and vc.is_connected():
-                            vc._connection.send_packet(b'\xf8\xff\xfe')
+                            vc._connection.send_packet(b"\xf8\xff\xfe")
                     except Exception:
                         pass
 
@@ -2489,6 +2498,7 @@ class DiscordAdapter(BasePlatformAdapter):
             author: Optional Member/User object for in-guild role lookup.
             guild: The guild the message arrived in (None for DMs).
             is_dm: True if the message came from a DM channel.
+
         """
         # ``getattr`` fallbacks here guard against test fixtures that build
         # an adapter via ``object.__new__(DiscordAdapter)`` and skip __init__
@@ -2820,7 +2830,10 @@ class DiscordAdapter(BasePlatformAdapter):
 
             # Download the image and send as a Discord file attachment
             # (Discord renders attachments inline, unlike plain URLs)
-            from gateway.platforms.base import resolve_proxy_url, proxy_kwargs_for_aiohttp
+            from gateway.platforms.base import (
+                proxy_kwargs_for_aiohttp,
+                resolve_proxy_url,
+            )
             _proxy = resolve_proxy_url(platform_env_var="DISCORD_PROXY")
             _sess_kw, _req_kw = proxy_kwargs_for_aiohttp(_proxy)
             async with aiohttp.ClientSession(**_sess_kw) as session:
@@ -2899,7 +2912,10 @@ class DiscordAdapter(BasePlatformAdapter):
 
             # Download the GIF and send as a Discord file attachment
             # (Discord renders .gif attachments as auto-playing animations inline)
-            from gateway.platforms.base import resolve_proxy_url, proxy_kwargs_for_aiohttp
+            from gateway.platforms.base import (
+                proxy_kwargs_for_aiohttp,
+                resolve_proxy_url,
+            )
             _proxy = resolve_proxy_url(platform_env_var="DISCORD_PROXY")
             _sess_kw, _req_kw = proxy_kwargs_for_aiohttp(_proxy)
             async with aiohttp.ClientSession(**_sess_kw) as session:
@@ -3080,8 +3096,7 @@ class DiscordAdapter(BasePlatformAdapter):
             return {"name": str(chat_id), "type": "dm", "error": str(e)}
 
     async def _resolve_allowed_usernames(self) -> None:
-        """
-        Resolve non-numeric entries in DISCORD_ALLOWED_USERS to Discord user IDs.
+        """Resolve non-numeric entries in DISCORD_ALLOWED_USERS to Discord user IDs.
 
         Users can specify usernames (e.g. "teknium") or display names instead of
         raw numeric IDs.  After resolution, the env var and internal set are updated
@@ -3144,8 +3159,7 @@ class DiscordAdapter(BasePlatformAdapter):
             print(f"[{self.name}] Updated DISCORD_ALLOWED_USERS with {resolved_count} resolved ID(s)")
 
     def format_message(self, content: str) -> str:
-        """
-        Format message for Discord.
+        """Format message for Discord.
 
         Discord uses its own markdown variant.
         """
@@ -3389,7 +3403,11 @@ class DiscordAdapter(BasePlatformAdapter):
 
         already_registered: set[str] = set()
         try:
-            from hermes_cli.commands import COMMAND_REGISTRY, _is_gateway_available, _resolve_config_gates
+            from hermes_cli.commands import (
+                COMMAND_REGISTRY,
+                _is_gateway_available,
+                _resolve_config_gates,
+            )
 
             try:
                 already_registered = {cmd.name for cmd in tree.get_commands()}
@@ -4304,8 +4322,7 @@ class DiscordAdapter(BasePlatformAdapter):
         description: str = "dangerous command",
         metadata: dict | None = None,
     ) -> SendResult:
-        """
-        Send a button-based exec approval prompt for a dangerous command.
+        """Send a button-based exec approval prompt for a dangerous command.
 
         The buttons call ``resolve_gateway_approval()`` to unblock the waiting
         agent thread — this replaces the text-based ``/approve`` flow on Discord.
@@ -4716,7 +4733,8 @@ class DiscordAdapter(BasePlatformAdapter):
                 f"Blocked unsafe attachment URL (SSRF protection): {att.url}",
             )
         import aiohttp
-        from gateway.platforms.base import resolve_proxy_url, proxy_kwargs_for_aiohttp
+
+        from gateway.platforms.base import proxy_kwargs_for_aiohttp, resolve_proxy_url
         _proxy = resolve_proxy_url(platform_env_var="DISCORD_PROXY")
         _sess_kw, _req_kw = proxy_kwargs_for_aiohttp(_proxy)
         async with aiohttp.ClientSession(**_sess_kw) as session:
@@ -5005,7 +5023,7 @@ class DiscordAdapter(BasePlatformAdapter):
                                 try:
                                     text_content = raw_bytes.decode("utf-8")
                                     display_name = att.filename or f"document{ext}"
-                                    display_name = re.sub(r'[^\w.\- ]', '_', display_name)
+                                    display_name = re.sub(r"[^\w.\- ]", "_", display_name)
                                     injection = f"[Content of {display_name}]:\n{text_content}"
                                     if pending_text_injection:
                                         pending_text_injection = f"{pending_text_injection}\n\n{injection}"
@@ -5290,8 +5308,7 @@ def _define_discord_view_classes() -> None:
     global ExecApprovalView, SlashConfirmView, UpdatePromptView, ModelPickerView, ClarifyChoiceView
 
     class ExecApprovalView(discord.ui.View):
-        """
-        Interactive button view for exec approval of dangerous commands.
+        """Interactive button view for exec approval of dangerous commands.
 
         Shows four buttons: Allow Once, Allow Session, Always Allow, Deny.
         Clicking a button calls ``resolve_gateway_approval()`` to unblock the
@@ -5389,7 +5406,7 @@ def _define_discord_view_classes() -> None:
             for child in self.children:
                 child.disabled = True
             # Visually update the Discord message so buttons appear disabled.
-            msg = getattr(self, '_message', None)
+            msg = getattr(self, "_message", None)
             if msg:
                 try:
                     embed = msg.embeds[0] if msg.embeds else None
@@ -5504,7 +5521,7 @@ def _define_discord_view_classes() -> None:
             for child in self.children:
                 child.disabled = True
             # Visually update the Discord message so buttons appear disabled.
-            msg = getattr(self, '_message', None)
+            msg = getattr(self, "_message", None)
             if msg:
                 try:
                     embed = msg.embeds[0] if msg.embeds else None
@@ -5600,7 +5617,7 @@ def _define_discord_view_classes() -> None:
             for child in self.children:
                 child.disabled = True
             # Visually update the Discord message so buttons appear disabled.
-            msg = getattr(self, '_message', None)
+            msg = getattr(self, "_message", None)
             if msg:
                 try:
                     embed = msg.embeds[0] if msg.embeds else None
@@ -5919,7 +5936,7 @@ def _define_discord_view_classes() -> None:
             self.resolved = True
             self.clear_items()
             # Visually update the Discord message so it appears expired.
-            msg = getattr(self, '_message', None)
+            msg = getattr(self, "_message", None)
             if msg:
                 try:
                     embed = discord.Embed(
@@ -5930,7 +5947,6 @@ def _define_discord_view_classes() -> None:
                     await msg.edit(embed=embed, view=self)
                 except Exception:
                     pass
-
 
     class ClarifyChoiceView(discord.ui.View):
         """Interactive button view for the clarify tool's multiple-choice prompts.
@@ -6039,7 +6055,9 @@ def _define_discord_view_classes() -> None:
             # we round-trip the original value, not a button-label variant.
             resolved_text: str | None = None
             try:
-                from tools.clarify_gateway import _entries as _clarify_entries  # type: ignore
+                from tools.clarify_gateway import (
+                    _entries as _clarify_entries,  # type: ignore
+                )
                 entry = _clarify_entries.get(self.clarify_id)
                 if entry and entry.choices and 0 <= index < len(entry.choices):
                     resolved_text = entry.choices[index]
@@ -6116,7 +6134,7 @@ def _define_discord_view_classes() -> None:
             for child in self.children:
                 child.disabled = True
             # Visually update the Discord message so buttons appear disabled.
-            msg = getattr(self, '_message', None)
+            msg = getattr(self, "_message", None)
             if msg:
                 try:
                     embed = msg.embeds[0] if msg.embeds else None
@@ -6216,7 +6234,7 @@ async def _standalone_send(
         return {"error": "Discord standalone send: DISCORD_BOT_TOKEN is not set"}
 
     try:
-        from gateway.platforms.base import resolve_proxy_url, proxy_kwargs_for_aiohttp
+        from gateway.platforms.base import proxy_kwargs_for_aiohttp, resolve_proxy_url
         _proxy = resolve_proxy_url(platform_env_var="DISCORD_PROXY")
         _sess_kw, _req_kw = proxy_kwargs_for_aiohttp(_proxy)
         auth_headers = {"Authorization": f"Bot {token}"}
@@ -6410,14 +6428,14 @@ def interactive_setup() -> None:
     the plugin's import surface stays small, prompts for the bot token,
     captures an allowlist, and offers to set a home channel.
     """
-    from hermes_cli.config import get_env_value, save_env_value
     from hermes_cli.cli_output import (
-        prompt,
-        prompt_yes_no,
         print_header,
         print_info,
         print_success,
+        prompt,
+        prompt_yes_no,
     )
+    from hermes_cli.config import get_env_value, save_env_value
 
     print_header("Discord")
     existing = get_env_value("DISCORD_BOT_TOKEN")

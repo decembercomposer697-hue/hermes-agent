@@ -63,9 +63,10 @@ def test_xai_routes_default_models_by_modality():
 
 
 def test_xai_capabilities_text_and_image_only():
-    """xAI was previously advertised with edit/extend operations. The
+    """XAI was previously advertised with edit/extend operations. The
     simplified surface only exposes text-to-video and image-to-video —
-    confirm those are the only modalities advertised."""
+    confirm those are the only modalities advertised.
+    """
     from plugins.video_gen.xai import XAIVideoGenProvider
 
     caps = XAIVideoGenProvider().capabilities()
@@ -137,7 +138,8 @@ def test_xai_resolved_credentials_threaded_through_request(monkeypatch):
 
 def test_xai_no_operation_kwarg():
     """The ABC's generate() signature no longer accepts 'operation'.
-    Passing it through **kwargs should be ignored (forward-compat)."""
+    Passing it through **kwargs should be ignored (forward-compat).
+    """
     from plugins.video_gen.xai import XAIVideoGenProvider
 
     # We're not actually hitting the network — just verify the call

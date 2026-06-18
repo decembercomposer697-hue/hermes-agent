@@ -40,9 +40,9 @@ from __future__ import annotations
 import json
 import logging
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Optional
-from collections.abc import Callable
 from urllib import request as urllib_request
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
@@ -153,7 +153,8 @@ def _http_get_json(url: str,
                    token_provider: Callable[[], str] | None = None,
                    ) -> tuple[int, dict | None]:
     """GET a URL with the appropriate auth headers.  Return
-    ``(status_code, parsed_json_or_None)``.  Never raises."""
+    ``(status_code, parsed_json_or_None)``.  Never raises.
+    """
     token, mode = _resolve_credential(api_key, token_provider)
     req = urllib_request.Request(url, method="GET")
     _apply_auth_headers(req, token, mode)
@@ -183,7 +184,8 @@ def _strip_trailing_v1(url: str) -> str:
 def _looks_like_anthropic_path(url: str) -> bool:
     """Return True when the URL's path ends in ``/anthropic`` or
     contains a ``/anthropic/`` segment.  Used by Azure Foundry
-    resources that route Claude traffic through a dedicated path."""
+    resources that route Claude traffic through a dedicated path.
+    """
     try:
         parsed = urlparse(url)
         path = (parsed.path or "").lower().rstrip("/")
@@ -194,7 +196,8 @@ def _looks_like_anthropic_path(url: str) -> bool:
 
 def _extract_model_ids(payload: dict) -> list[str]:
     """Extract a list of model IDs from an OpenAI-shaped ``/models``
-    response.  Returns ``[]`` on any shape mismatch."""
+    response.  Returns ``[]`` on any shape mismatch.
+    """
     data = payload.get("data") if isinstance(payload, dict) else None
     if not isinstance(data, list):
         return []

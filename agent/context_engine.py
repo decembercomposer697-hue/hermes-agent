@@ -103,6 +103,7 @@ class ContextEngine(ABC):
                 Engines that support guided compression should prioritise
                 preserving information related to this topic.  Engines that
                 don't support it may simply ignore this argument.
+
         """
 
     # -- Optional: pre-flight check ----------------------------------------

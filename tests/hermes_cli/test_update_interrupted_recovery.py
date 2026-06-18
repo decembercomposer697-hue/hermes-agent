@@ -7,7 +7,6 @@ finished automatically on the next launch instead of leaving a half-built venv.
 
 from __future__ import annotations
 
-
 import hermes_cli.main as m
 
 

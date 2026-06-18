@@ -106,12 +106,12 @@ _sif_build_lock = threading.Lock()
 
 
 def _get_or_build_sif(image: str, executable: str = "apptainer") -> str:
-    if image.endswith('.sif') and Path(image).exists():
+    if image.endswith(".sif") and Path(image).exists():
         return image
-    if not image.startswith('docker://'):
+    if not image.startswith("docker://"):
         return image
 
-    image_name = image.replace('docker://', '').replace('/', '-').replace(':', '-')
+    image_name = image.replace("docker://", "").replace("/", "-").replace(":", "-")
     cache_dir = _get_apptainer_cache_dir()
     sif_path = cache_dir / f"{image_name}.sif"
 
@@ -204,7 +204,10 @@ class SingularityEnvironment(BaseEnvironment):
             cmd.append("--writable-tmpfs")
 
         try:
-            from tools.credential_files import get_credential_file_mounts, get_skills_directory_mount
+            from tools.credential_files import (
+                get_credential_file_mounts,
+                get_skills_directory_mount,
+            )
             for mount_entry in get_credential_file_mounts():
                 cmd.extend(["--bind", f"{mount_entry['host_path']}:{mount_entry['container_path']}:ro"])
             for skills_mount in get_skills_directory_mount():

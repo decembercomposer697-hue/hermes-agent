@@ -661,6 +661,7 @@ def _route_capture_through_aux_vision(
     Returns:
       A JSON-encoded text response on success.
       ``None`` on failure (caller falls back to the multimodal envelope).
+
     """
     if not cap.png_b64:
         return None

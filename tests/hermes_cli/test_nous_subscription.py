@@ -1,8 +1,7 @@
 """Tests for Nous subscription feature detection."""
 
-from hermes_cli.nous_account import NousPortalAccountInfo, NousToolAccessInfo
 from hermes_cli import nous_subscription as ns
-
+from hermes_cli.nous_account import NousPortalAccountInfo, NousToolAccessInfo
 
 _POOL_COVERAGE = {
     "firecrawl": True,
@@ -127,7 +126,8 @@ def test_get_nous_subscription_features_marks_browser_use_as_managed_when_gatewa
 
 def test_get_nous_subscription_features_uses_direct_browserbase_when_no_managed_gateway(monkeypatch):
     """When direct Browserbase keys are set and no managed gateway is available,
-    the unconfigured fallback should pick Browserbase as a direct provider."""
+    the unconfigured fallback should pick Browserbase as a direct provider.
+    """
     env = {
         "BROWSERBASE_API_KEY": "bb-key",
         "BROWSERBASE_PROJECT_ID": "bb-project",
@@ -341,7 +341,8 @@ def test_default_local_browser_unavailable_without_chromium(monkeypatch):
 
 def test_cloud_browserbase_available_without_local_chromium(monkeypatch):
     """Cloud providers host their own Chromium, so the new local gate must not
-    regress them: agent-browser binary present + Browserbase creds is enough."""
+    regress them: agent-browser binary present + Browserbase creds is enough.
+    """
     env = {"BROWSERBASE_API_KEY": "bb-key", "BROWSERBASE_PROJECT_ID": "bb-project"}
     monkeypatch.setattr(ns, "get_env_value", lambda name: env.get(name, ""))
     monkeypatch.setattr(
@@ -479,7 +480,8 @@ def test_prompt_enable_tool_gateway_paid_user_offers_video(monkeypatch):
 def test_apply_nous_managed_defaults_writes_video_gen_config(monkeypatch):
     """apply_nous_managed_defaults must write video_gen.provider and
     video_gen.use_gateway when a Nous subscriber selects video_gen
-    without a direct FAL_KEY."""
+    without a direct FAL_KEY.
+    """
     monkeypatch.setattr(ns, "managed_nous_tools_enabled", lambda **kw: True)
     monkeypatch.delenv("FAL_KEY", raising=False)
     monkeypatch.setattr(ns, "fal_key_is_configured", lambda: False)
@@ -500,7 +502,8 @@ def test_apply_nous_managed_defaults_writes_video_gen_config(monkeypatch):
 
 def test_apply_nous_managed_defaults_writes_image_gen_config(monkeypatch):
     """apply_nous_managed_defaults must write image_gen.use_gateway
-    when a Nous subscriber selects image_gen without a direct FAL_KEY."""
+    when a Nous subscriber selects image_gen without a direct FAL_KEY.
+    """
     monkeypatch.setattr(ns, "managed_nous_tools_enabled", lambda **kw: True)
     monkeypatch.delenv("FAL_KEY", raising=False)
     monkeypatch.setattr(ns, "fal_key_is_configured", lambda: False)
@@ -520,7 +523,8 @@ def test_apply_nous_managed_defaults_writes_image_gen_config(monkeypatch):
 
 def test_apply_nous_managed_defaults_skips_fal_tools_when_key_present(monkeypatch):
     """When FAL_KEY is set, apply_nous_managed_defaults should not touch
-    image_gen or video_gen config — the user's direct key takes precedence."""
+    image_gen or video_gen config — the user's direct key takes precedence.
+    """
     monkeypatch.setattr(ns, "managed_nous_tools_enabled", lambda **kw: True)
     monkeypatch.setenv("FAL_KEY", "fal-direct-key")
     monkeypatch.setattr(ns, "fal_key_is_configured", lambda: True)
@@ -542,7 +546,8 @@ def test_apply_nous_managed_defaults_skips_fal_tools_when_key_present(monkeypatc
 
 def test_apply_nous_managed_defaults_preserves_existing_video_gen_section(monkeypatch):
     """When video_gen config already exists as a dict, the function should
-    update it in-place rather than replacing it."""
+    update it in-place rather than replacing it.
+    """
     monkeypatch.setattr(ns, "managed_nous_tools_enabled", lambda **kw: True)
     monkeypatch.delenv("FAL_KEY", raising=False)
     monkeypatch.setattr(ns, "fal_key_is_configured", lambda: False)

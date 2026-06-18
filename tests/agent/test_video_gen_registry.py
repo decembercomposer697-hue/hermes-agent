@@ -102,7 +102,8 @@ class TestGetActiveProvider:
 
     def test_unknown_config_falls_back(self, tmp_path, monkeypatch):
         """If video_gen.provider names a provider that isn't registered,
-        the single-provider fallback still applies."""
+        the single-provider fallback still applies.
+        """
         import yaml
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))

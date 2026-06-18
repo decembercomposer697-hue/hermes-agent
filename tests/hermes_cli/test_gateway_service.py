@@ -208,7 +208,8 @@ class TestSystemdServiceRefresh:
     def test_run_gateway_refreshes_outdated_unit_on_boot(self, tmp_path, monkeypatch):
         """run_gateway() should refresh the systemd unit on boot so that
         restart settings take effect even when the process was respawned
-        via exit-code-75 (bypassing `hermes gateway restart`)."""
+        via exit-code-75 (bypassing `hermes gateway restart`).
+        """
         unit_path = tmp_path / "hermes-gateway.service"
         unit_path.write_text("old unit\n", encoding="utf-8")
 
@@ -399,7 +400,8 @@ class TestGeneratedSystemdUnits:
 class TestGatewayStopCleanup:
     def test_stop_only_kills_current_profile_by_default(self, tmp_path, monkeypatch):
         """Without --all, stop uses systemd (if available) and does NOT call
-        the global kill_gateway_processes()."""
+        the global kill_gateway_processes().
+        """
         unit_path = tmp_path / "hermes-gateway.service"
         unit_path.write_text("unit\n", encoding="utf-8")
 
@@ -773,7 +775,7 @@ class TestLaunchdServiceRecovery:
         assert "background process" in capsys.readouterr().out.lower()
 
     def test_launchd_install_falls_back_to_detached_on_bootstrap_5(self, tmp_path, monkeypatch, capsys):
-        """macOS bootstrap error 5 should spawn a detached gateway, not crash."""
+        """MacOS bootstrap error 5 should spawn a detached gateway, not crash."""
         plist_path = tmp_path / "ai.hermes.gateway.plist"
         monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
 
@@ -797,7 +799,7 @@ class TestLaunchdServiceRecovery:
         assert "Service installed and loaded" not in capsys.readouterr().out
 
     def test_launchd_restart_falls_back_to_detached_on_error_5(self, monkeypatch, capsys):
-        """kickstart -k error 5 (domain unmanageable) should relaunch detached."""
+        """Kickstart -k error 5 (domain unmanageable) should relaunch detached."""
         target = f"{gateway_cli._launchd_domain()}/{gateway_cli.get_launchd_label()}"
 
         monkeypatch.setattr(gateway_cli, "_get_restart_drain_timeout", lambda: 5.0)
@@ -825,7 +827,7 @@ class TestLaunchdServiceRecovery:
         assert spawned == [True]
 
     def test_launchd_stop_tolerates_domain_unsupported_bootout(self, monkeypatch, capsys):
-        """bootout exit 125 (macOS 26) must fall through to PID-based kill, not raise."""
+        """Bootout exit 125 (macOS 26) must fall through to PID-based kill, not raise."""
         def fake_run(cmd, check=False, **kwargs):
             if "bootout" in cmd:
                 raise gateway_cli.subprocess.CalledProcessError(
@@ -864,7 +866,8 @@ class TestLaunchdDomainDetection:
 
     def test_prefers_gui_domain_when_service_loaded_there(self, monkeypatch):
         """In an Aqua session where the service is loaded under gui/<uid>,
-        _launchd_domain() must return ``gui/<uid>`` — not ``user/<uid>``."""
+        _launchd_domain() must return ``gui/<uid>`` — not ``user/<uid>``.
+        """
         self._reset_domain_cache()
         monkeypatch.setattr(os, "getuid", lambda: 501)
         label = gateway_cli.get_launchd_label()
@@ -884,7 +887,8 @@ class TestLaunchdDomainDetection:
 
     def test_falls_back_to_user_domain_when_gui_fails(self, monkeypatch):
         """In a Background/SSH session where gui/<uid> fails but user/<uid>
-        works, _launchd_domain() must return ``user/<uid>``."""
+        works, _launchd_domain() must return ``user/<uid>``.
+        """
         self._reset_domain_cache()
         monkeypatch.setattr(os, "getuid", lambda: 501)
         label = gateway_cli.get_launchd_label()
@@ -906,7 +910,8 @@ class TestLaunchdDomainDetection:
 
     def test_uses_managername_heuristic_when_both_probe_fail(self, monkeypatch):
         """When neither domain contains a loaded service, use
-        ``launchctl managername`` as a tiebreaker: Aqua -> gui, else -> user."""
+        ``launchctl managername`` as a tiebreaker: Aqua -> gui, else -> user.
+        """
         self._reset_domain_cache()
         monkeypatch.setattr(os, "getuid", lambda: 501)
         label = gateway_cli.get_launchd_label()
@@ -1015,6 +1020,7 @@ class TestGatewayServiceDetection:
         monkeypatch.setattr(gateway_cli.subprocess, "run", fake_run)
 
         assert gateway_cli._is_service_running() is False
+
 
 class TestGatewaySystemServiceRouting:
     def test_systemd_restart_gracefully_restarts_running_service_and_waits(self, monkeypatch, capsys):
@@ -1477,8 +1483,8 @@ class TestSystemUnitHermesHome:
 
         unit = gateway_cli.generate_systemd_unit(system=True, run_as_user="alice")
 
-        assert 'HERMES_HOME=/home/alice/.hermes' in unit
-        assert '/root/.hermes' not in unit
+        assert "HERMES_HOME=/home/alice/.hermes" in unit
+        assert "/root/.hermes" not in unit
 
     def test_system_unit_remaps_profile_to_target_user(self, monkeypatch):
         # Simulate sudo with a profile: HERMES_HOME was resolved under root
@@ -1495,8 +1501,8 @@ class TestSystemUnitHermesHome:
 
         unit = gateway_cli.generate_systemd_unit(system=True, run_as_user="alice")
 
-        assert 'HERMES_HOME=/home/alice/.hermes/profiles/coder' in unit
-        assert '/root/' not in unit
+        assert "HERMES_HOME=/home/alice/.hermes/profiles/coder" in unit
+        assert "/root/" not in unit
 
     def test_system_unit_preserves_custom_hermes_home(self, monkeypatch):
         # Custom HERMES_HOME not under any user's home — keep as-is
@@ -1513,14 +1519,14 @@ class TestSystemUnitHermesHome:
 
         unit = gateway_cli.generate_systemd_unit(system=True, run_as_user="alice")
 
-        assert 'HERMES_HOME=/opt/hermes-shared' in unit
+        assert "HERMES_HOME=/opt/hermes-shared" in unit
 
     def test_user_unit_unaffected_by_change(self):
         # User-scope units should still use the calling user's HERMES_HOME
         unit = gateway_cli.generate_systemd_unit(system=False)
 
         hermes_home = str(gateway_cli.get_hermes_home().resolve())
-        assert f'HERMES_HOME={hermes_home}' in unit
+        assert f"HERMES_HOME={hermes_home}" in unit
 
 
 class TestHermesHomeForTargetUser:
@@ -2204,7 +2210,8 @@ class TestLegacyHermesUnitDetection:
 
     def test_detects_both_scopes_simultaneously(self, tmp_path, monkeypatch):
         """When a user has BOTH user-scope and system-scope legacy units,
-        both are reported so the migration step can remove them together."""
+        both are reported so the migration step can remove them together.
+        """
         user_dir, system_dir = self._setup_search_paths(tmp_path, monkeypatch)
         (user_dir / "hermes.service").write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
         (system_dir / "hermes.service").write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
@@ -2401,7 +2408,8 @@ class TestRemoveLegacyHermesUnits:
     ):
         """Teknium's constraint: profile units (hermes-gateway-coder.service)
         must survive a migration call, even if we somehow include them in the
-        search dir."""
+        search dir.
+        """
         user_dir, _, _ = self._setup(tmp_path, monkeypatch, as_root=True)
         profile_unit = user_dir / "hermes-gateway-coder.service"
         profile_unit.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
@@ -2543,7 +2551,8 @@ class TestSystemdInstallOffersLegacyRemoval:
         self, tmp_path, monkeypatch, capsys,
     ):
         """When legacy units exist, install flow should call the removal
-        helper before writing the new unit."""
+        helper before writing the new unit.
+        """
         remove_called = {}
 
         def fake_remove(interactive=True, dry_run=False):
@@ -2584,7 +2593,8 @@ class TestSystemdInstallOffersLegacyRemoval:
         self, tmp_path, monkeypatch,
     ):
         """When legacy units exist and user declines, install still proceeds
-        but doesn't touch them."""
+        but doesn't touch them.
+        """
         remove_called = {"invoked": False}
 
         def fake_remove(interactive=True, dry_run=False):

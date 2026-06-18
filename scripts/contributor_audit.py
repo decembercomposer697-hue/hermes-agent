@@ -156,6 +156,7 @@ def collect_commit_authors(since_tag, until="HEAD"):
     Returns:
         contributors: dict mapping github_handle -> set of source labels
         unknown_emails: dict mapping email -> git name (for emails not in AUTHOR_MAP)
+
     """
     range_spec = f"{since_tag}..{until}"
     log = git(
@@ -196,6 +197,7 @@ def collect_co_authors(since_tag, until="HEAD"):
     Returns:
         contributors: dict mapping github_handle -> set of source labels
         unknown_emails: dict mapping email -> git name
+
     """
     range_spec = f"{since_tag}..{until}"
     # Get full commit messages to scan for trailers
@@ -235,6 +237,7 @@ def collect_salvaged_contributors(since_tag, until="HEAD"):
     Returns:
         contributors: dict mapping github_handle -> set of source labels
         pr_refs: dict mapping github_handle -> list of PR numbers where found
+
     """
     contributors = defaultdict(set)
     pr_refs = defaultdict(list)
@@ -293,6 +296,7 @@ def check_release_file(release_file, all_contributors):
     Returns:
         mentioned: set of handles found in the file
         missing: set of handles NOT found in the file
+
     """
     try:
         content = Path(release_file).read_text(encoding="utf-8")

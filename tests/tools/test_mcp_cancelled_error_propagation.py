@@ -21,7 +21,6 @@ import asyncio
 from unittest.mock import patch
 
 
-
 async def _hanging_run(self, cfg):
     """Stand-in transport that hangs forever so we can cancel it."""
     await asyncio.sleep(3600)
@@ -30,7 +29,8 @@ async def _hanging_run(self, cfg):
 class TestCancelledErrorPropagation:
     def test_cancelled_error_is_not_swallowed_by_except_exception(self):
         """CancelledError raised inside the transport call must re-raise
-        so the reconnect loop terminates cleanly on cancel — not stay wedged."""
+        so the reconnect loop terminates cleanly on cancel — not stay wedged.
+        """
         from tools.mcp_tool import MCPServerTask
 
         server = MCPServerTask("cancel-test")
@@ -69,7 +69,8 @@ class TestCancelledErrorPropagation:
     def test_shutdown_completes_promptly_when_task_is_cancelled(self):
         """``shutdown()`` falls through to ``task.cancel()`` + ``await self._task``
         after a grace period. That cancel must unwedge the reconnect loop —
-        otherwise ``await self._task`` hangs indefinitely."""
+        otherwise ``await self._task`` hangs indefinitely.
+        """
         from tools.mcp_tool import MCPServerTask
 
         server = MCPServerTask("shutdown-cancel-test")

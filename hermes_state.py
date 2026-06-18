@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-SQLite State Store for Hermes Agent.
+"""SQLite State Store for Hermes Agent.
 
 Provides persistent session storage with FTS5 full-text search, replacing
 the per-session JSONL file approach. Stores session metadata, full message
@@ -21,12 +20,12 @@ import re
 import sqlite3
 import threading
 import time
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, TypeVar
 
 from agent.memory_manager import sanitize_context
 from hermes_constants import get_hermes_home
-from typing import Any, Dict, List, Optional, Tuple, TypeVar
-from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -582,8 +581,7 @@ END;
 
 
 class SessionDB:
-    """
-    SQLite-backed session storage with FTS5 search.
+    """SQLite-backed session storage with FTS5 search.
 
     Thread-safe for the common gateway pattern (multiple reader threads,
     single writer via WAL mode). Each method opens its own cursor.
@@ -1507,6 +1505,7 @@ class SessionDB:
             api_call_count,
             session_id,
         )
+
         def _do(conn):
             conn.execute(sql, params)
         self._execute_write(_do)
@@ -1650,19 +1649,19 @@ class SessionDB:
         # Remove ASCII control characters (0x00-0x1F, 0x7F) but keep
         # whitespace chars (\t=0x09, \n=0x0A, \r=0x0D) so they can be
         # normalized to spaces by the whitespace collapsing step below
-        cleaned = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', title)
+        cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", title)
 
         # Remove problematic Unicode control characters:
         # - Zero-width chars (U+200B-U+200F, U+FEFF)
         # - Directional overrides (U+202A-U+202E, U+2066-U+2069)
         # - Object replacement (U+FFFC), interlinear annotation (U+FFF9-U+FFFB)
         cleaned = re.sub(
-            r'[\u200b-\u200f\u2028-\u202e\u2060-\u2069\ufeff\ufffc\ufff9-\ufffb]',
-            '', cleaned,
+            r"[\u200b-\u200f\u2028-\u202e\u2060-\u2069\ufeff\ufffc\ufff9-\ufffb]",
+            "", cleaned,
         )
 
         # Collapse internal whitespace runs and strip
-        cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+        cleaned = re.sub(r"\s+", " ", cleaned).strip()
 
         if not cleaned:
             return None
@@ -1683,6 +1682,7 @@ class SessionDB:
         Empty/whitespace-only strings are normalized to None (clearing the title).
         """
         title = self.sanitize_title(title)
+
         def _do(conn):
             if title:
                 # Check uniqueness (allow the same session to keep its own title)
@@ -1809,7 +1809,7 @@ class SessionDB:
         the highest existing number and increments.
         """
         # Strip existing #N suffix to find the true base
-        match = re.match(r'^(.*?) #(\d+)$', base_title)
+        match = re.match(r"^(.*?) #(\d+)$", base_title)
         if match:
             base = match.group(1)
         else:
@@ -1831,7 +1831,7 @@ class SessionDB:
         # Find the highest number
         max_num = 1  # The unnumbered original counts as #1
         for t in existing:
-            m = re.match(r'^.* #(\d+)$', t)
+            m = re.match(r"^.* #(\d+)$", t)
             if m:
                 max_num = max(max_num, int(m.group(1)))
 
@@ -2282,8 +2282,7 @@ class SessionDB:
         platform_message_id: str = None,
         observed: bool = False,
     ) -> int:
-        """
-        Append a message to a session. Returns the message row ID.
+        """Append a message to a session. Returns the message row ID.
 
         Also increments the session's message_count (and tool_call_count
         if role is 'tool' or tool_calls is present).
@@ -2751,8 +2750,7 @@ class SessionDB:
         include_ancestors: bool = False,
         include_inactive: bool = False,
     ) -> list[dict[str, Any]]:
-        """
-        Load messages in the OpenAI conversation format (role + content dicts).
+        """Load messages in the OpenAI conversation format (role + content dicts).
         Used by the gateway to restore conversation history.
 
         By default only active messages are returned. Pass
@@ -3100,7 +3098,6 @@ class SessionDB:
 
         return sanitized.strip()
 
-
     @staticmethod
     def _is_cjk_codepoint(cp: int) -> bool:
         return (0x4E00 <= cp <= 0x9FFF or    # CJK Unified Ideographs
@@ -3142,8 +3139,7 @@ class SessionDB:
         sort: str = None,
         include_inactive: bool = False,
     ) -> list[dict[str, Any]]:
-        """
-        Full-text search across session messages using FTS5.
+        """Full-text search across session messages using FTS5.
 
         Supports FTS5 query syntax:
           - Simple keywords: "docker deployment"
@@ -3611,8 +3607,7 @@ class SessionDB:
         return {**session, "messages": messages}
 
     def export_all(self, source: str = None) -> list[dict[str, Any]]:
-        """
-        Export all sessions (with messages) as a list of dicts.
+        """Export all sessions (with messages) as a list of dicts.
         Suitable for writing to a JSONL file for backup/analysis.
         """
         sessions = self.search_sessions(source=source, limit=100000)

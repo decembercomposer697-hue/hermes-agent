@@ -8,14 +8,14 @@ silently dropped.
 
 from __future__ import annotations
 
-
 from run_agent import AIAgent
 
 
 def _make_bare_agent():
     """Construct an AIAgent without running __init__ — we only need the
     buffered-status helpers, which are pure-Python and depend only on a
-    handful of attributes."""
+    handful of attributes.
+    """
     agent = object.__new__(AIAgent)
     agent.log_prefix = ""
     agent.status_callback = None

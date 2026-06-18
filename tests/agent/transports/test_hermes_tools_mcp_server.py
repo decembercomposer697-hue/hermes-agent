@@ -9,8 +9,6 @@ build helper assembles a server when the SDK is present.
 from __future__ import annotations
 
 
-
-
 class TestModuleSurface:
     def test_module_imports_clean(self):
         from agent.transports import hermes_tools_mcp_server as m
@@ -23,7 +21,8 @@ class TestModuleSurface:
         """We MUST NOT expose tools codex already has, because codex'
         own builtins are better-integrated with its sandbox + approvals.
         Specifically: no terminal/shell, no read_file/write_file, no
-        patch — those are codex's built-in tools."""
+        patch — those are codex's built-in tools.
+        """
         from agent.transports.hermes_tools_mcp_server import EXPOSED_TOOLS
         forbidden = {
             "terminal", "shell", "read_file", "write_file", "patch",
@@ -37,7 +36,8 @@ class TestModuleSurface:
 
     def test_expected_hermes_specific_tools_listed(self):
         """The Hermes-specific tools should be present so users on the
-        codex runtime keep access to them."""
+        codex runtime keep access to them.
+        """
         from agent.transports.hermes_tools_mcp_server import EXPOSED_TOOLS
         for required in (
             "web_search",
@@ -52,7 +52,8 @@ class TestModuleSurface:
     def test_agent_loop_tools_not_exposed(self):
         """delegate_task / memory / session_search / todo require the
         running AIAgent context to dispatch, so a stateless MCP callback
-        can't drive them. They must NOT be in EXPOSED_TOOLS."""
+        can't drive them. They must NOT be in EXPOSED_TOOLS.
+        """
         from agent.transports.hermes_tools_mcp_server import EXPOSED_TOOLS
         for agent_loop_tool in ("delegate_task", "memory", "session_search", "todo"):
             assert agent_loop_tool not in EXPOSED_TOOLS, (
@@ -65,7 +66,8 @@ class TestModuleSurface:
         come up on the codex_app_server runtime, the worker can do the
         actual work via codex's shell but needs the kanban tools through
         the MCP callback to report back to the kernel. Without these
-        tools available, the worker would hang at completion time."""
+        tools available, the worker would hang at completion time.
+        """
         from agent.transports.hermes_tools_mcp_server import EXPOSED_TOOLS
         # Worker handoff tools — every dispatched worker uses at least
         # one of {complete, block, comment} to close out its task.
@@ -83,7 +85,8 @@ class TestModuleSurface:
     def test_kanban_orchestrator_tools_exposed(self):
         """Orchestrator agents need to dispatch new tasks, query the
         board, and unblock/link tasks. Exposed so an orchestrator on
-        codex_app_server can do its job."""
+        codex_app_server can do its job.
+        """
         from agent.transports.hermes_tools_mcp_server import EXPOSED_TOOLS
         for orch_tool in (
             "kanban_create",
@@ -100,7 +103,8 @@ class TestModuleSurface:
 class TestMain:
     def test_main_returns_2_when_mcp_unavailable(self, monkeypatch):
         """When the mcp package isn't installed, main() should exit
-        cleanly with code 2 and an install hint, not crash."""
+        cleanly with code 2 and an install hint, not crash.
+        """
         import agent.transports.hermes_tools_mcp_server as m
 
         def boom_build(*a, **kw):

@@ -98,7 +98,8 @@ CONFIG_REG_TOKEN = "testreg"  # matches docker-compose.yml
 def _register_bot(*, prefer_token: str = CONFIG_REG_TOKEN, fallback_token: str | None = None) -> dict:
     """Register a fresh bot. Tries the configured token first; falls back to
     the homeserver's one-time admin token (only valid until the first user
-    is created)."""
+    is created).
+    """
     user = "bot" + secrets.token_hex(3)
     password = secrets.token_urlsafe(20)
     last_err = None

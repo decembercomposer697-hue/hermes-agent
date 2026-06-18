@@ -4,14 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import os
+from collections.abc import AsyncIterator, Awaitable, Callable
 from pathlib import Path
 from typing import Any
-from collections.abc import AsyncIterator, Awaitable, Callable
 
 import httpx
 
 from tools.microsoft_graph_auth import GraphCredentials, MicrosoftGraphTokenProvider
-
 
 DEFAULT_GRAPH_BASE_URL = "https://graph.microsoft.com/v1.0"
 

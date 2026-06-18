@@ -1,5 +1,4 @@
-"""
-Tests for Telegram document handling in gateway/platforms/telegram.py.
+"""Tests for Telegram document handling in gateway/platforms/telegram.py.
 
 Covers: document type detection, download/cache flow, size limits,
         text injection, error handling.
@@ -18,16 +17,16 @@ import pytest
 
 from gateway.config import PlatformConfig
 from gateway.platforms.base import (
+    SUPPORTED_VIDEO_TYPES,
     MessageEvent,
     MessageType,
     SendResult,
-    SUPPORTED_VIDEO_TYPES,
 )
-
 
 # ---------------------------------------------------------------------------
 # Mock the telegram package if it's not installed
 # ---------------------------------------------------------------------------
+
 
 def _ensure_telegram_mock():
     """Install mock telegram modules so TelegramAdapter can be imported."""
@@ -53,10 +52,10 @@ _ensure_telegram_mock()
 # Now we can safely import
 from gateway.platforms.telegram import TelegramAdapter
 
-
 # ---------------------------------------------------------------------------
 # Helpers to build mock Telegram objects
 # ---------------------------------------------------------------------------
+
 
 def _make_file_obj(data: bytes = b"hello"):
     """Create a mock Telegram File with download_as_bytearray."""
@@ -748,7 +747,7 @@ class TestSendDocument:
 
     @pytest.mark.asyncio
     async def test_send_document_thread_id(self, connected_adapter, tmp_path):
-        """metadata thread_id is forwarded as message_thread_id (required for Telegram forum groups)."""
+        """Metadata thread_id is forwarded as message_thread_id (required for Telegram forum groups)."""
         test_file = tmp_path / "report.pdf"
         test_file.write_bytes(b"%PDF-1.4 data")
 
@@ -876,7 +875,7 @@ class TestSendVideo:
 
     @pytest.mark.asyncio
     async def test_send_video_thread_id(self, connected_adapter, tmp_path):
-        """metadata thread_id is forwarded as message_thread_id (required for Telegram forum groups)."""
+        """Metadata thread_id is forwarded as message_thread_id (required for Telegram forum groups)."""
         test_file = tmp_path / "clip.mp4"
         test_file.write_bytes(b"\x00\x00\x00\x1c" + b"ftyp" + b"\x00" * 100)
 

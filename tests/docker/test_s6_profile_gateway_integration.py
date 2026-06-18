@@ -24,7 +24,6 @@ import time
 
 from tests.docker.conftest import docker_exec
 
-
 _REGISTER_SCRIPT = """
 import sys
 sys.path.insert(0, "/opt/hermes")
@@ -54,7 +53,8 @@ def test_s6_register_creates_service_dir_in_live_container(
 ) -> None:
     """S6ServiceManager.register_profile_gateway must create
     ``/run/service/gateway-<profile>/`` and trigger s6-svscan rescan
-    against the real s6 supervision tree."""
+    against the real s6 supervision tree.
+    """
     subprocess.run(
         ["docker", "run", "-d", "--name", container_name, built_image,
          "sleep", "120"],
@@ -99,7 +99,8 @@ def test_s6_unregister_removes_service_dir_in_live_container(
 ) -> None:
     """unregister_profile_gateway must stop the service, remove the
     directory, and trigger s6-svscan rescan so the supervise process
-    is dropped."""
+    is dropped.
+    """
     subprocess.run(
         ["docker", "run", "-d", "--name", container_name, built_image,
          "sleep", "120"],

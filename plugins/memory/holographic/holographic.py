@@ -17,12 +17,13 @@ identical across processes, machines, and language versions.
 References:
   Plate (1995) — Holographic Reduced Representations
   Gayler (2004) — Vector Symbolic Architectures answer Jackendoff's challenges
+
 """
 
 import hashlib
 import logging
-import struct
 import math
+import struct
 
 try:
     import numpy as np

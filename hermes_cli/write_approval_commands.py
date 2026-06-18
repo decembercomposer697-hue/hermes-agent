@@ -73,6 +73,7 @@ def handle_pending_subcommand(
     Returns a text string to show the user. Returns None when the args are not
     a write-approval subcommand (caller falls through to its other handling,
     e.g. /skills search).
+
     """
     if not args:
         # Bare /memory or /skills with no sub → show pending + gate state.

@@ -203,7 +203,8 @@ def test_fuzzy_skipped_when_path_has_slash(tmp_path, monkeypatch):
 
 def test_fuzzy_skipped_when_folder_tag(tmp_path, monkeypatch):
     """`@folder:<name>` still lists directories — fuzzy scanner only walks
-    files (git-tracked + untracked), so defer to the dir-listing path."""
+    files (git-tracked + untracked), so defer to the dir-listing path.
+    """
     monkeypatch.chdir(tmp_path)
     _nested_fixture(tmp_path)
 

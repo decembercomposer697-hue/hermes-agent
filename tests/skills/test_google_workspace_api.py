@@ -5,12 +5,11 @@ import json
 import subprocess
 import sys
 import types
-from datetime import datetime, timedelta, timezone, UTC
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 
 BRIDGE_PATH = (
     Path(__file__).resolve().parents[2]
@@ -105,7 +104,8 @@ def test_bridge_refreshes_expired_token(bridge_module, tmp_path):
 def test_bridge_refresh_passes_timeout_to_urlopen(bridge_module):
     """Token refresh must pass an explicit timeout so a hung Google endpoint
     cannot block the agent turn indefinitely (no `timeout=` defaults to the
-    global socket timeout, which is unset)."""
+    global socket timeout, which is unset).
+    """
     past = (datetime.now(UTC) - timedelta(hours=1)).isoformat()
     token_path = bridge_module.get_token_path()
     _write_token(token_path, token="ya29.old", expiry=past)
@@ -130,7 +130,8 @@ def test_bridge_refresh_passes_timeout_to_urlopen(bridge_module):
 
 def test_bridge_refresh_exits_cleanly_on_network_error(bridge_module):
     """URLError/timeout during refresh exits 1 with a readable message
-    instead of crashing with a raw traceback."""
+    instead of crashing with a raw traceback.
+    """
     import urllib.error
 
     past = (datetime.now(UTC) - timedelta(hours=1)).isoformat()
@@ -204,7 +205,7 @@ def test_api_calendar_list_uses_events_list(api_module):
 
 
 def test_api_calendar_list_respects_date_range(api_module):
-    """calendar list with --start/--end passes correct time bounds."""
+    """Calendar list with --start/--end passes correct time bounds."""
     captured = {}
 
     def capture_run(cmd, **kwargs):

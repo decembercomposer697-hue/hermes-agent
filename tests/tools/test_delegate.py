@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for the subagent delegation tool.
+"""Tests for the subagent delegation tool.
 
 Uses mock AIAgent instances to test the delegation logic without
 requiring API keys or real LLM calls.
@@ -17,21 +16,21 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from tools.delegate_tool import (
+    _LEGACY_EVENT_MAP,
     DELEGATE_BLOCKED_TOOLS,
     DELEGATE_TASK_SCHEMA,
-    DelegateEvent,
-    _get_max_concurrent_children,
-    _LEGACY_EVENT_MAP,
     MAX_DEPTH,
-    check_delegate_requirements,
-    delegate_task,
+    DelegateEvent,
     _build_child_agent,
     _build_child_progress_callback,
     _build_child_system_prompt,
     _extract_output_tail,
-    _strip_blocked_tools,
+    _get_max_concurrent_children,
     _resolve_child_credential_pool,
     _resolve_delegation_credentials,
+    _strip_blocked_tools,
+    check_delegate_requirements,
+    delegate_task,
 )
 
 
@@ -421,7 +420,8 @@ class TestToolNamePreservation(unittest.TestCase):
     def test_global_tool_names_restored_after_delegation(self):
         """The process-global _last_resolved_tool_names must be restored
         after a subagent completes so the parent's execute_code sandbox
-        generates correct imports."""
+        generates correct imports.
+        """
         import model_tools
 
         parent = _make_mock_parent(depth=0)
@@ -487,7 +487,8 @@ class TestToolNamePreservation(unittest.TestCase):
 
     def test_saved_tool_names_set_on_child_before_run(self):
         """_run_single_child must set _delegate_saved_tool_names on the child
-        from model_tools._last_resolved_tool_names before run_conversation."""
+        from model_tools._last_resolved_tool_names before run_conversation.
+        """
         import model_tools
 
         parent = _make_mock_parent(depth=0)
@@ -589,7 +590,8 @@ class TestDelegateObservability(unittest.TestCase):
     def test_output_tail_flattens_list_content_blocks(self):
         """_extract_output_tail (live overlay) must flatten content-block lists
         so error markers buried inside blocks are detected and previews are
-        real text, not a "[{'type': 'text'...}]" repr blob."""
+        real text, not a "[{'type': 'text'...}]" repr blob.
+        """
         result = {
             "messages": [
                 {"role": "assistant", "tool_calls": [
@@ -741,7 +743,8 @@ class TestDelegateObservability(unittest.TestCase):
 
 class TestSubagentCostRollup(unittest.TestCase):
     """Port of Kilo-Org/kilocode#9448 — parent's session_estimated_cost_usd
-    must include subagent spend, not just the parent's own API calls."""
+    must include subagent spend, not just the parent's own API calls.
+    """
 
     def _make_parent_with_cost_counters(self, depth=0, starting_cost=0.0):
         parent = _make_mock_parent(depth=depth)
@@ -833,7 +836,8 @@ class TestSubagentCostRollup(unittest.TestCase):
 
     def test_zero_cost_children_leave_parent_source_untouched(self):
         """If every child reports 0 cost (e.g. free local model), we should
-        not invent a fake 'subagent' source — the parent's 'none' stays."""
+        not invent a fake 'subagent' source — the parent's 'none' stays.
+        """
         parent = self._make_parent_with_cost_counters(starting_cost=0.00)
 
         with patch("tools.delegate_tool._run_single_child") as mock_run:
@@ -853,7 +857,8 @@ class TestSubagentCostRollup(unittest.TestCase):
 
     def test_parent_with_real_source_not_overwritten(self):
         """If the parent already has its own cost billed (cost_source != 'none'),
-        adding subagent cost must not clobber the existing source label."""
+        adding subagent cost must not clobber the existing source label.
+        """
         parent = self._make_parent_with_cost_counters(starting_cost=0.20)
         parent.session_cost_status = "exact"
         parent.session_cost_source = "openrouter"
@@ -877,7 +882,8 @@ class TestSubagentCostRollup(unittest.TestCase):
 
     def test_rollup_tolerates_missing_cost_fields(self):
         """Older fixtures / fabricated error entries may not carry
-        _child_cost_usd.  Rollup must degrade to zero-add silently."""
+        _child_cost_usd.  Rollup must degrade to zero-add silently.
+        """
         parent = self._make_parent_with_cost_counters(starting_cost=0.10)
 
         with patch("tools.delegate_tool._run_single_child") as mock_run:
@@ -903,8 +909,9 @@ class TestBlockedTools(unittest.TestCase):
 
     def test_constants(self):
         from tools.delegate_tool import (
-            _get_max_spawn_depth, _get_orchestrator_enabled,
             _MIN_SPAWN_DEPTH,
+            _get_max_spawn_depth,
+            _get_orchestrator_enabled,
         )
         self.assertEqual(_get_max_concurrent_children(), 3)
         self.assertEqual(MAX_DEPTH, 1)
@@ -936,8 +943,6 @@ class TestDelegationCredentialResolution(unittest.TestCase):
         self.assertIsNone(creds["provider"])
         self.assertIsNone(creds["base_url"])
         self.assertIsNone(creds["api_key"])
-
-
 
     def test_direct_endpoint_uses_configured_base_url_and_api_key(self):
         parent = _make_mock_parent(depth=0)
@@ -1042,7 +1047,6 @@ class TestDelegationCredentialResolution(unittest.TestCase):
             creds = _resolve_delegation_credentials(cfg, parent)
         self.assertIsNone(creds["api_key"])
         self.assertEqual(creds["provider"], "custom")
-
 
     @patch("hermes_cli.runtime_provider.resolve_runtime_provider")
     def test_provider_resolution_failure_raises_valueerror(self, mock_resolve):
@@ -1522,7 +1526,8 @@ class TestChildCredentialPoolResolution(unittest.TestCase):
 
     def test_custom_different_endpoint_does_not_inherit_parent_pool(self):
         """A child on custom endpoint B must not inherit the parent's custom
-        endpoint A pool just because both normalize to provider='custom'."""
+        endpoint A pool just because both normalize to provider='custom'.
+        """
         parent = _make_mock_parent()
         parent.provider = "custom"
         parent.base_url = "https://endpoint-a.example.com/v1"
@@ -1550,7 +1555,8 @@ class TestChildCredentialPoolResolution(unittest.TestCase):
 
     def test_custom_same_endpoint_shares_parent_pool(self):
         """A child on the SAME custom endpoint as the parent reuses the parent's
-        pool so rotation/cooldown state stays synchronized."""
+        pool so rotation/cooldown state stays synchronized.
+        """
         parent = _make_mock_parent()
         parent.provider = "custom"
         parent.base_url = "https://endpoint-a.example.com/v1"
@@ -1569,7 +1575,8 @@ class TestChildCredentialPoolResolution(unittest.TestCase):
     def test_custom_unregistered_endpoint_returns_none(self):
         """A raw delegation.base_url with no matching custom_providers entry
         must NOT inherit the parent's pool — return None so the child keeps its
-        fixed delegated credential."""
+        fixed delegated credential.
+        """
         parent = _make_mock_parent()
         parent.provider = "custom"
         parent.base_url = "https://endpoint-a.example.com/v1"
@@ -1924,7 +1931,6 @@ class TestDelegateHeartbeat(unittest.TestCase):
         )
 
 
-
 class TestDelegationReasoningEffort(unittest.TestCase):
     """Tests for delegation.reasoning_effort config override."""
 
@@ -2036,6 +2042,7 @@ class TestDispatchDelegateTask(unittest.TestCase):
             self.assertEqual(kwargs["override_acp_command"], "claude")
             self.assertEqual(kwargs["override_acp_args"], ["--acp", "--stdio"])
 
+
 class TestDelegateEventEnum(unittest.TestCase):
     """Tests for DelegateEvent enum and back-compat aliases."""
 
@@ -2103,7 +2110,8 @@ class TestDelegateEventEnum(unittest.TestCase):
     def test_progress_callback_accepts_enum_value_directly(self):
         """cb(DelegateEvent.TASK_THINKING, ...) must route to the thinking
         branch.  Pre-fix the callback only handled legacy strings via
-        _LEGACY_EVENT_MAP.get and silently dropped enum-typed callers."""
+        _LEGACY_EVENT_MAP.get and silently dropped enum-typed callers.
+        """
         parent = _make_mock_parent()
         parent._delegate_spinner = MagicMock()
         parent.tool_progress_callback = None
@@ -2119,7 +2127,8 @@ class TestDelegateEventEnum(unittest.TestCase):
     def test_progress_callback_accepts_new_style_string(self):
         """cb('delegate.task_thinking', ...) — the string form of the
         enum value — must route to the thinking branch too, so new-style
-        emitters don't have to import DelegateEvent."""
+        emitters don't have to import DelegateEvent.
+        """
         parent = _make_mock_parent()
         parent._delegate_spinner = MagicMock()
 
@@ -2212,6 +2221,7 @@ class TestMaxSpawnDepth(unittest.TestCase):
            return_value={"max_spawn_depth": 0})
     def test_max_spawn_depth_clamped_below_one(self, mock_cfg):
         import logging
+
         from tools.delegate_tool import _get_max_spawn_depth
         with self.assertLogs("tools.delegate_tool", level=logging.WARNING) as cm:
             result = _get_max_spawn_depth()
@@ -2279,7 +2289,8 @@ class TestOrchestratorRoleSchema(unittest.TestCase):
     def test_explicit_orchestrator_role_stashed(self):
         """role='orchestrator' reaches _build_child_agent and is stashed.
         Full behavior (toolset re-add) lands in commit 3; commit 2 only
-        verifies the plumbing."""
+        verifies the plumbing.
+        """
         child = self._run_with_mock_child("orchestrator")
         self.assertEqual(child._delegate_role, "orchestrator")
 
@@ -2363,7 +2374,8 @@ class TestOrchestratorRoleBehavior(unittest.TestCase):
         """role='orchestrator' + depth-0 parent with max_spawn_depth=2 →
         child at depth 1 gets 'delegation' in enabled_toolsets (can
         further delegate).  Requires max_spawn_depth>=2 since the new
-        default is 1 (flat)."""
+        default is 1 (flat).
+        """
         mock_creds.return_value = {
             "provider": None, "base_url": None,
             "api_key": None, "api_mode": None, "model": None,
@@ -2385,7 +2397,8 @@ class TestOrchestratorRoleBehavior(unittest.TestCase):
         self, mock_cfg, mock_creds,
     ):
         """Parent at depth 1 with max_spawn_depth=2 spawns child
-        at depth 2 (the floor); role='orchestrator' degrades to leaf."""
+        at depth 2 (the floor); role='orchestrator' degrades to leaf.
+        """
         mock_creds.return_value = {
             "provider": None, "base_url": None,
             "api_key": None, "api_mode": None, "model": None,
@@ -2408,7 +2421,8 @@ class TestOrchestratorRoleBehavior(unittest.TestCase):
         """With default max_spawn_depth=1 (flat), role='orchestrator'
         on a depth-0 parent produces a depth-1 child that is already at
         the floor — the role degrades to 'leaf' and the delegation
-        toolset is stripped.  This is the new default posture."""
+        toolset is stripped.  This is the new default posture.
+        """
         mock_creds.return_value = {
             "provider": None, "base_url": None,
             "api_key": None, "api_mode": None, "model": None,
@@ -2426,7 +2440,8 @@ class TestOrchestratorRoleBehavior(unittest.TestCase):
     @patch("tools.delegate_tool._resolve_delegation_credentials")
     def test_orchestrator_enabled_false_forces_leaf(self, mock_creds):
         """Kill switch delegation.orchestrator_enabled=false overrides
-        role='orchestrator'."""
+        role='orchestrator'.
+        """
         mock_creds.return_value = {
             "provider": None, "base_url": None,
             "api_key": None, "api_mode": None, "model": None,
@@ -2467,7 +2482,8 @@ class TestOrchestratorRoleBehavior(unittest.TestCase):
 
     def test_orchestrator_prompt_at_depth_floor_says_children_are_leaves(self):
         """With max_spawn_depth=2 and child_depth=1, the orchestrator's
-        own children would be at depth 2 (the floor) → must be leaves."""
+        own children would be at depth 2 (the floor) → must be leaves.
+        """
         prompt = _build_child_system_prompt(
             "Survey", role="orchestrator",
             max_spawn_depth=2, child_depth=1,
@@ -2476,7 +2492,8 @@ class TestOrchestratorRoleBehavior(unittest.TestCase):
 
     def test_orchestrator_prompt_below_floor_allows_more_nesting(self):
         """With max_spawn_depth=3 and child_depth=1, the orchestrator's
-        own children can themselves be orchestrators (depth 2 < 3)."""
+        own children can themselves be orchestrators (depth 2 < 3).
+        """
         prompt = _build_child_system_prompt(
             "Deep work", role="orchestrator",
             max_spawn_depth=3, child_depth=1,
@@ -2721,11 +2738,14 @@ class TestSubagentApprovalCallback(unittest.TestCase):
         not the parent's — verifies the fix actually scopes to workers.
         """
         from concurrent.futures import ThreadPoolExecutor
+
+        from tools.delegate_tool import _subagent_auto_deny
         from tools.terminal_tool import (
-            set_approval_callback as _set_cb,
             _get_approval_callback,
         )
-        from tools.delegate_tool import _subagent_auto_deny
+        from tools.terminal_tool import (
+            set_approval_callback as _set_cb,
+        )
 
         # Parent thread has no callback.
         _set_cb(None)

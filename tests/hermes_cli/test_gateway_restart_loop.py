@@ -15,10 +15,10 @@ from hermes_cli.cron import (
     cron_command,
 )
 
-
 # ---------------------------------------------------------------------------
 # Defense 2: _contains_gateway_lifecycle_command pattern tests
 # ---------------------------------------------------------------------------
+
 
 class TestGatewayLifecyclePattern:
     """Verify the regex catches gateway lifecycle commands."""
@@ -165,7 +165,8 @@ class TestCronCreateLifecycleBlock:
     def test_allow_empty_prompt(self, capsys):
         """Empty prompt (no lifecycle content) should pass the filter — the
         API will still reject it for lacking prompt+skill, but that's a
-        separate validation, not the lifecycle guard."""
+        separate validation, not the lifecycle guard.
+        """
         args = Namespace(
             cron_command="create",
             schedule="30m",

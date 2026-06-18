@@ -184,7 +184,8 @@ def test_openrouter_headers_include_response_cache_when_enabled(mock_openai):
 @patch("run_agent.OpenAI")
 def test_user_default_headers_override_sdk_user_agent(mock_openai):
     """``model.default_headers`` lets a custom endpoint swap the OpenAI SDK
-    User-Agent that some gateways/WAFs reject (the #40033 reproduction)."""
+    User-Agent that some gateways/WAFs reject (the #40033 reproduction).
+    """
     mock_openai.return_value = MagicMock()
     agent = AIAgent(
         api_key="test-key",

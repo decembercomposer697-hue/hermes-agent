@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Toolset Distributions Module
+"""Toolset Distributions Module
 
 This module defines distributions of toolsets for data generation runs.
 Each distribution specifies which toolsets should be used and their probability
@@ -19,10 +18,10 @@ Usage:
     all_dists = list_distributions()
 """
 
-from typing import Dict, List, Optional
 import random
-from toolsets import validate_toolset
+from typing import Dict, List, Optional
 
+from toolsets import validate_toolset
 
 # Distribution definitions
 # Each key is a distribution name, and the value is a dict of toolset_name: probability_percentage
@@ -221,8 +220,7 @@ DISTRIBUTIONS = {
 
 
 def get_distribution(name: str) -> dict[str, any] | None:
-    """
-    Get a toolset distribution by name.
+    """Get a toolset distribution by name.
     
     Args:
         name (str): Name of the distribution
@@ -230,23 +228,23 @@ def get_distribution(name: str) -> dict[str, any] | None:
     Returns:
         Dict: Distribution definition with description and toolsets
         None: If distribution not found
+
     """
     return DISTRIBUTIONS.get(name)
 
 
 def list_distributions() -> dict[str, dict]:
-    """
-    List all available distributions.
+    """List all available distributions.
     
     Returns:
         Dict: All distribution definitions
+
     """
     return DISTRIBUTIONS.copy()
 
 
 def sample_toolsets_from_distribution(distribution_name: str) -> list[str]:
-    """
-    Sample toolsets based on a distribution's probabilities.
+    """Sample toolsets based on a distribution's probabilities.
     
     Each toolset in the distribution has a % chance of being included.
     This allows multiple toolsets to be active simultaneously.
@@ -259,6 +257,7 @@ def sample_toolsets_from_distribution(distribution_name: str) -> list[str]:
         
     Raises:
         ValueError: If distribution name is not found
+
     """
     dist = get_distribution(distribution_name)
     if not dist:
@@ -289,24 +288,24 @@ def sample_toolsets_from_distribution(distribution_name: str) -> list[str]:
 
 
 def validate_distribution(distribution_name: str) -> bool:
-    """
-    Check if a distribution name is valid.
+    """Check if a distribution name is valid.
     
     Args:
         distribution_name (str): Distribution name to validate
         
     Returns:
         bool: True if valid, False otherwise
+
     """
     return distribution_name in DISTRIBUTIONS
 
 
 def print_distribution_info(distribution_name: str) -> None:
-    """
-    Print detailed information about a distribution.
+    """Print detailed information about a distribution.
     
     Args:
         distribution_name (str): Distribution name
+
     """
     dist = get_distribution(distribution_name)
     if not dist:

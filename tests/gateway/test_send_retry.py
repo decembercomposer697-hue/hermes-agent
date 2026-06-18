@@ -1,5 +1,4 @@
-"""
-Tests for BasePlatformAdapter._send_with_retry and _is_retryable_error.
+"""Tests for BasePlatformAdapter._send_with_retry and _is_retryable_error.
 
 Verifies that:
 - Transient network errors trigger retry with backoff
@@ -8,16 +7,22 @@ Verifies that:
 - Successful sends on retry return success
 - SendResult.retryable flag is respected
 """
-import pytest
 from unittest.mock import AsyncMock, patch
 
-from gateway.platforms.base import BasePlatformAdapter, SendResult, _RETRYABLE_ERROR_PATTERNS
-from gateway.platforms.base import Platform, PlatformConfig
+import pytest
 
+from gateway.platforms.base import (
+    _RETRYABLE_ERROR_PATTERNS,
+    BasePlatformAdapter,
+    Platform,
+    PlatformConfig,
+    SendResult,
+)
 
 # ---------------------------------------------------------------------------
 # Minimal concrete adapter for testing (no real network)
 # ---------------------------------------------------------------------------
+
 
 class _StubAdapter(BasePlatformAdapter):
     def __init__(self):
@@ -152,7 +157,8 @@ class TestSendWithRetryNetworkRetry:
     async def test_timeout_not_retried_to_prevent_duplicates(self):
         """ReadTimeout is NOT retried because the request may have reached
         the server — retrying a non-idempotent send risks duplicate delivery.
-        It also skips plain-text fallback (timeout is not a formatting issue)."""
+        It also skips plain-text fallback (timeout is not a formatting issue).
+        """
         adapter = _StubAdapter()
         adapter._send_results = [
             SendResult(success=False, error="ReadTimeout: request timed out"),

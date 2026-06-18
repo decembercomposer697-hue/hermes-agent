@@ -1,10 +1,10 @@
 """Tests for hermes_cli.doctor."""
 
+import contextlib
+import io
 import os
 import sys
 import types
-import io
-import contextlib
 from argparse import Namespace
 from types import SimpleNamespace
 
@@ -54,7 +54,8 @@ class TestProviderEnvDetection:
 class TestDoctorEnvFileEncoding:
     """Regression for #18637 (bug 3): `hermes doctor` crashed on Windows
     Chinese locale (GBK) because `.env` was read with Path.read_text() which
-    defaults to the system locale encoding, not UTF-8."""
+    defaults to the system locale encoding, not UTF-8.
+    """
 
     def test_doctor_reads_env_as_utf8_even_when_locale_is_not_utf8(
         self, monkeypatch, tmp_path,
@@ -292,7 +293,8 @@ class TestDoctorMemoryProviderSection:
         except Exception:
             pass
 
-        import io, contextlib
+        import contextlib
+        import io
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             doctor_mod.run_doctor(Namespace(fix=False))
@@ -588,8 +590,6 @@ def test_run_doctor_accepts_vendor_slugs_for_named_custom_provider(monkeypatch, 
     assert "Either set model.provider to 'openrouter', or drop the vendor prefix." not in out
 
 
-
-
 def test_run_doctor_accepts_kimi_coding_cn_provider(monkeypatch, tmp_path):
     home = tmp_path / ".hermes"
     home.mkdir(parents=True, exist_ok=True)
@@ -660,7 +660,8 @@ def test_run_doctor_termux_does_not_mark_browser_available_without_agent_browser
     except Exception:
         pass
 
-    import io, contextlib
+    import contextlib
+    import io
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         doctor_mod.run_doctor(Namespace(fix=False))
@@ -709,7 +710,8 @@ def test_run_doctor_kimi_cn_env_is_detected_and_probe_is_null_safe(monkeypatch, 
     import httpx
     monkeypatch.setattr(httpx, "get", fake_get)
 
-    import io, contextlib
+    import contextlib
+    import io
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         doctor_mod.run_doctor(Namespace(fix=False))
@@ -817,7 +819,8 @@ def test_run_doctor_opencode_go_skips_invalid_models_probe(monkeypatch, tmp_path
     import httpx
     monkeypatch.setattr(httpx, "get", fake_get)
 
-    import io, contextlib
+    import contextlib
+    import io
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         doctor_mod.run_doctor(Namespace(fix=False))
@@ -840,8 +843,10 @@ class TestGitHubTokenCheck:
         monkeypatch.setenv("HERMES_HOME", str(home))
         monkeypatch.setenv("PATH", "/nonexistent")  # gh not found
 
+        import contextlib
+        import io
+
         from hermes_cli.doctor import run_doctor
-        import io, contextlib
 
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
@@ -858,8 +863,10 @@ class TestGitHubTokenCheck:
         monkeypatch.setenv("GITHUB_TOKEN", "ghp_test123")
         monkeypatch.setenv("PATH", "/nonexistent")  # gh not found
 
+        import contextlib
+        import io
+
         from hermes_cli.doctor import run_doctor
-        import io, contextlib
 
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
@@ -879,11 +886,13 @@ class TestGitHubTokenCheck:
         # Mock gh to return success
         import shutil
         real_which = shutil.which
+
         def mock_which(cmd):
             return "/usr/local/bin/gh" if cmd == "gh" else real_which(cmd)
         monkeypatch.setattr(shutil, "which", mock_which)
 
         call_log = []
+
         def mock_run(cmd, **kwargs):
             call_log.append(cmd)
             if cmd[:2] == ["gh", "auth"]:
@@ -895,8 +904,10 @@ class TestGitHubTokenCheck:
         import subprocess
         monkeypatch.setattr(subprocess, "run", mock_run)
 
+        import contextlib
+        import io
+
         from hermes_cli.doctor import run_doctor
-        import io, contextlib
 
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
@@ -1063,6 +1074,7 @@ class TestHasHealthyOauthFallbackForXai:
 
     def test_xai_import_failure_does_not_affect_gemini(self, monkeypatch):
         import sys
+
         from hermes_cli import auth as _auth_mod
         # xAI function missing, but Gemini is healthy
         monkeypatch.delattr(_auth_mod, "get_xai_oauth_auth_status", raising=False)

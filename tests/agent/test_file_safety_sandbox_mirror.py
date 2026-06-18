@@ -18,7 +18,6 @@ from pathlib import Path
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # classify_sandbox_mirror_target — pure path-shape detection
 # ---------------------------------------------------------------------------
@@ -83,7 +82,8 @@ class TestClassifySandboxMirrorTarget:
 
     def test_sandboxes_segment_without_home_hermes_returns_none(self, tmp_path):
         """A ``sandboxes/`` directory unrelated to Hermes-state mirroring (e.g.
-        the sandbox workspace itself) is not flagged."""
+        the sandbox workspace itself) is not flagged.
+        """
         from agent.file_safety import classify_sandbox_mirror_target
 
         target = (
@@ -119,7 +119,8 @@ class TestClassifySandboxMirrorTarget:
 
     def test_non_existent_path_still_classifies_by_shape(self, tmp_path):
         """Detection is path-shape only — it must not require the file to exist
-        (the agent is about to CREATE the mirror file, that's the bug)."""
+        (the agent is about to CREATE the mirror file, that's the bug).
+        """
         from agent.file_safety import classify_sandbox_mirror_target
 
         target = (
@@ -200,7 +201,8 @@ class TestGetSandboxMirrorWarning:
 class TestSandboxMirrorIsOrthogonalToCrossProfile:
     """The sandbox-mirror guard must fire even when the inner path is
     in-profile from the host's view — the bug is the mirror, not the
-    profile mismatch."""
+    profile mismatch.
+    """
 
     def test_same_profile_mirror_still_flagged(self, tmp_path, monkeypatch):
         import agent.file_safety as fs

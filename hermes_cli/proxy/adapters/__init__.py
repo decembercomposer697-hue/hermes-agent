@@ -24,6 +24,7 @@ def get_adapter(name: str) -> UpstreamAdapter:
 
     Raises:
         ValueError: if ``name`` is not a registered adapter.
+
     """
     key = (name or "").strip().lower()
     if key not in ADAPTERS:

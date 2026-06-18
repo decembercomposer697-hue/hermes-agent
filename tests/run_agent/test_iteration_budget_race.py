@@ -6,7 +6,6 @@ data races with concurrent `consume()` / `refund()` calls.
 from concurrent.futures import ThreadPoolExecutor
 
 
-
 def test_iteration_budget_used_is_thread_safe():
     """Iterating `used` while other threads consume/refund must not crash.
 
@@ -74,7 +73,7 @@ def test_iteration_budget_refund_restores_consume():
 
 
 def test_iteration_budget_used_reflects_consume_and_refund():
-    """used property must accurately reflect consume() and refund() calls."""
+    """Used property must accurately reflect consume() and refund() calls."""
     from run_agent import IterationBudget
 
     budget = IterationBudget(max_total=10)
@@ -91,7 +90,7 @@ def test_iteration_budget_used_reflects_consume_and_refund():
 
 
 def test_iteration_budget_remaining():
-    """remaining property must equal max_total - used."""
+    """Remaining property must equal max_total - used."""
     from run_agent import IterationBudget
 
     budget = IterationBudget(max_total=5)

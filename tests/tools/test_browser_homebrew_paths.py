@@ -3,18 +3,18 @@
 import json
 import os
 from pathlib import Path
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
+import tools.browser_tool as _bt
 from tools.browser_tool import (
+    _SANE_PATH,
     _discover_homebrew_node_dirs,
     _find_agent_browser,
     _run_browser_command,
-    _SANE_PATH,
     check_browser_requirements,
 )
-import tools.browser_tool as _bt
 
 
 @pytest.fixture(autouse=True)
@@ -357,7 +357,8 @@ class TestRunBrowserCommandPathConstruction:
 
     def test_subprocess_path_includes_homebrew_node_dirs(self, tmp_path):
         """When _discover_homebrew_node_dirs returns dirs, they should appear
-        in the subprocess env PATH passed to Popen."""
+        in the subprocess env PATH passed to Popen.
+        """
         captured_env = {}
 
         # Create a mock Popen that captures the env dict

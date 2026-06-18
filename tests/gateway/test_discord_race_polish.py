@@ -1,5 +1,6 @@
 """Discord adapter race polish: concurrent join_voice_channel must not
-double-invoke channel.connect() on the same guild."""
+double-invoke channel.connect() on the same guild.
+"""
 
 import asyncio
 from unittest.mock import MagicMock, patch
@@ -34,7 +35,8 @@ async def test_concurrent_joins_do_not_double_connect():
     """Two concurrent join_voice_channel calls on the same guild must
     serialize through the per-guild lock — only ONE channel.connect()
     actually fires; the second sees the _voice_clients entry the first
-    just installed."""
+    just installed.
+    """
     adapter = _make_adapter()
 
     connect_count = [0]

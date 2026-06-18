@@ -1,5 +1,5 @@
 """Tests for agent.models_dev — models.dev registry integration."""
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from agent.models_dev import (
     PROVIDER_TO_MODELS_DEV,
@@ -8,7 +8,6 @@ from agent.models_dev import (
     get_model_capabilities,
     lookup_models_dev_context,
 )
-
 
 SAMPLE_REGISTRY = {
     "anthropic": {
@@ -146,7 +145,7 @@ class TestLookupModelsDevContext:
 
     @patch("agent.models_dev.fetch_models_dev")
     def test_xai_oauth_resolves_xai_context(self, mock_fetch):
-        """xAI OAuth is an auth path, not a separate model catalog."""
+        """XAI OAuth is an auth path, not a separate model catalog."""
         mock_fetch.return_value = SAMPLE_REGISTRY
         assert lookup_models_dev_context("xai-oauth", "grok-build-0.1") == 256000
 
@@ -198,8 +197,9 @@ class TestFetchModelsDev:
 
     @patch("agent.models_dev.requests.get")
     def test_in_memory_cache_used(self, mock_get):
-        import agent.models_dev as md
         import time
+
+        import agent.models_dev as md
         md._models_dev_cache = SAMPLE_REGISTRY
         md._models_dev_cache_time = time.time()  # fresh
 
@@ -236,7 +236,8 @@ class TestFetchModelsDev:
     @patch("agent.models_dev.requests.get")
     def test_stale_disk_cache_falls_through_to_network(self, mock_get):
         """When the disk cache is OLDER than TTL, we must hit the network
-        (and only fall back to the stale disk data if network fails)."""
+        (and only fall back to the stale disk data if network fails).
+        """
         import agent.models_dev as md
         md._models_dev_cache = {}
         md._models_dev_cache_time = 0
@@ -285,7 +286,8 @@ class TestFetchModelsDev:
     @patch("agent.models_dev.requests.get")
     def test_missing_disk_cache_falls_through_to_network(self, mock_get):
         """If the disk cache file doesn't exist (first-ever run, or it
-        was deleted), fall through cleanly to network."""
+        was deleted), fall through cleanly to network.
+        """
         import agent.models_dev as md
         md._models_dev_cache = {}
         md._models_dev_cache_time = 0
@@ -360,7 +362,8 @@ class TestGetModelCapabilities:
 
     def test_vision_from_modalities_input_image(self):
         """Models with 'image' in modalities.input but attachment=False should
-        still report supports_vision=True (the core fix in this PR)."""
+        still report supports_vision=True (the core fix in this PR).
+        """
         with patch("agent.models_dev.fetch_models_dev", return_value=CAPS_REGISTRY):
             caps = get_model_capabilities("google", "gemma-4-31b-it")
         assert caps is not None

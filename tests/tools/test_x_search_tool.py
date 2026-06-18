@@ -37,8 +37,8 @@ class _FakeResponse:
 # ---------------------------------------------------------------------------
 
 def test_x_search_posts_responses_request(monkeypatch):
-    from tools.x_search_tool import x_search_tool
     from hermes_cli import __version__
+    from tools.x_search_tool import x_search_tool
 
     captured = {}
 

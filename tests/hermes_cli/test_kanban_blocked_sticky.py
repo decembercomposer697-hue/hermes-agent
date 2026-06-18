@@ -57,7 +57,8 @@ def test_worker_block_is_not_auto_promoted_by_recompute_ready(kanban_home: Path)
     """A standalone task that a worker explicitly blocks for review
     must stay blocked across an arbitrary number of dispatcher ticks.
     Before #28712's fix, ``recompute_ready`` would silently flip it
-    back to ``ready`` on the very next tick."""
+    back to ``ready`` on the very next tick.
+    """
     with kb.connect() as conn:
         tid = kb.create_task(conn, title="needs human review")
         kb.claim_task(conn, tid)
@@ -80,7 +81,8 @@ def test_worker_block_on_child_with_done_parents_is_still_sticky(kanban_home: Pa
     """The parent-completion path is the one ``recompute_ready`` was
     designed for, so it's the most dangerous false-positive: even when
     every parent is done, a worker-initiated block on the child must
-    stay blocked."""
+    stay blocked.
+    """
     with kb.connect() as conn:
         parent = kb.create_task(conn, title="parent")
         child = kb.create_task(conn, title="child", parents=[parent])
@@ -147,7 +149,8 @@ def test_gave_up_event_alone_does_not_make_block_sticky(kanban_home: Path) -> No
     """The circuit-breaker emits ``gave_up`` (not ``blocked``).  Make
     sure ``_has_sticky_block`` doesn't accidentally treat ``gave_up``
     as sticky — otherwise we'd regress the safety net for genuinely
-    transient crashes."""
+    transient crashes.
+    """
     with kb.connect() as conn:
         parent = kb.create_task(conn, title="parent")
         child = kb.create_task(conn, title="child", parents=[parent])
@@ -179,7 +182,8 @@ def test_unblock_clears_sticky_state_and_lets_block_recover(kanban_home: Path) -
     """``hermes kanban unblock`` (or the ``kanban_unblock`` tool) is
     the only legitimate way out of a worker-initiated block.  After
     unblock, a *subsequent* circuit-breaker block on the same task
-    must again be eligible for auto-recovery."""
+    must again be eligible for auto-recovery.
+    """
     with kb.connect() as conn:
         tid = kb.create_task(conn, title="t")
         kb.claim_task(conn, tid)

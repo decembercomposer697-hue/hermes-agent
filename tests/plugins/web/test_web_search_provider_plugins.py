@@ -23,7 +23,6 @@ import inspect
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -241,7 +240,7 @@ class TestIsAvailable:
         _ = bool(p.is_available())
 
     def test_xai_requires_api_key_or_oauth(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        """xAI needs XAI_API_KEY or OAuth tokens in auth.json."""
+        """XAI needs XAI_API_KEY or OAuth tokens in auth.json."""
         _ensure_plugins_loaded()
         from agent.web_search_registry import get_provider
 
@@ -431,10 +430,11 @@ class TestErrorResponseShapes:
         self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Without a key, extract routes to the free MCP web_fetch tool rather
-        than erroring. The MCP transport is mocked so the test stays offline."""
+        than erroring. The MCP transport is mocked so the test stays offline.
+        """
         _ensure_plugins_loaded()
-        from agent.web_search_registry import get_provider
         import plugins.web.parallel.provider as parallel_provider
+        from agent.web_search_registry import get_provider
 
         monkeypatch.delenv("PARALLEL_API_KEY", raising=False)
         captured = {}
@@ -507,7 +507,7 @@ class TestErrorResponseShapes:
         assert "managed Firecrawl web tools denied by test entitlement" in str(exc_info.value)
 
     def test_xai_search_returns_error_dict_when_unconfigured(self) -> None:
-        """xAI returns a typed error dict (no XAI_API_KEY)."""
+        """XAI returns a typed error dict (no XAI_API_KEY)."""
         _ensure_plugins_loaded()
         from agent.web_search_registry import get_provider
 

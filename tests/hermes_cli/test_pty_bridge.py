@@ -18,7 +18,6 @@ pytest.importorskip("ptyprocess", reason="ptyprocess not installed")
 
 from hermes_cli.pty_bridge import PtyBridge, PtyUnavailableError
 
-
 skip_on_windows = pytest.mark.skipif(
     sys.platform.startswith("win"), reason="PTY bridge is POSIX-only",
 )
@@ -309,7 +308,8 @@ class TestPtyBridgeEnv:
 
 class TestPtyBridgeUnavailable:
     """Platform fallback semantics — PtyUnavailableError is importable and
-    carries a user-readable message."""
+    carries a user-readable message.
+    """
 
     def test_error_carries_user_message(self):
         err = PtyUnavailableError("platform not supported")

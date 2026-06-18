@@ -191,8 +191,8 @@ class WebhookAdapter(BasePlatformAdapter):
         try:
             with _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM) as _s:
                 _s.settimeout(1)
-                _s.connect(('127.0.0.1', self._port))
-            logger.error('[webhook] Port %d already in use. Set a different port in config.yaml: platforms.webhook.port', self._port)
+                _s.connect(("127.0.0.1", self._port))
+            logger.error("[webhook] Port %d already in use. Set a different port in config.yaml: platforms.webhook.port", self._port)
             return False
         except (ConnectionRefusedError, OSError):
             pass  # port is free

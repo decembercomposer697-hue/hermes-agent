@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Delegate Tool -- Subagent Architecture
+"""Delegate Tool -- Subagent Architecture
 
 Spawns child AIAgent instances with isolated context, restricted toolsets,
 and their own terminal sessions. Supports single-task and batch (parallel)
@@ -26,6 +25,8 @@ import threading
 import time
 from concurrent.futures import (
     ThreadPoolExecutor,
+)
+from concurrent.futures import (
     TimeoutError as FuturesTimeoutError,
 )
 from typing import Any, Dict, List, Optional
@@ -39,7 +40,6 @@ _RUNTIME_PROVIDER_CUSTOM = "custom"
 from tools import file_state
 from tools.terminal_tool import set_approval_callback as _set_subagent_approval_cb
 from utils import base_url_hostname, is_truthy_value
-
 
 # Tools that children must never have access to
 DELEGATE_BLOCKED_TOOLS = frozenset(
@@ -923,8 +923,7 @@ def _build_child_agent(
     # toolset subject to depth/kill-switch bounds applied below.
     role: str = "leaf",
 ):
-    """
-    Build a child AIAgent on the main thread (thread-safe construction).
+    """Build a child AIAgent on the main thread (thread-safe construction).
     Returns the constructed child agent without running it.
 
     When override_* params are set (from delegation config), the child uses
@@ -932,8 +931,9 @@ def _build_child_agent(
     routing subagents to a different provider:model pair (e.g. cheap/fast
     model on OpenRouter while the parent runs on Nous Portal).
     """
-    from run_agent import AIAgent
     import uuid as _uuid
+
+    from run_agent import AIAgent
 
     # ── Role resolution ─────────────────────────────────────────────────
     # Honor the caller's role only when BOTH the kill switch and the
@@ -1247,10 +1247,11 @@ def _dump_subagent_timeout_diagnostic(
     Returns the absolute path to the diagnostic file, or None on failure.
     """
     try:
-        from hermes_constants import get_hermes_home
         import datetime as _dt
         import sys as _sys
         import traceback as _traceback
+
+        from hermes_constants import get_hermes_home
 
         hermes_home = get_hermes_home()
         logs_dir = hermes_home / "logs"
@@ -1264,6 +1265,7 @@ def _dump_subagent_timeout_diagnostic(
         dump_path = logs_dir / f"subagent-timeout-{subagent_id}-{ts}.log"
 
         lines: list[str] = []
+
         def _w(line: str = "") -> None:
             lines.append(line)
 
@@ -1376,8 +1378,7 @@ def _run_single_child(
     parent_agent=None,
     **_kwargs,
 ) -> dict[str, Any]:
-    """
-    Run a pre-built child agent. Called from within a thread.
+    """Run a pre-built child agent. Called from within a thread.
     Returns a structured result dict.
     """
     child_start = time.monotonic()
@@ -1977,8 +1978,7 @@ def delegate_task(
     role: str | None = None,
     parent_agent=None,
 ) -> str:
-    """
-    Spawn one or more child agents to handle delegated tasks.
+    """Spawn one or more child agents to handle delegated tasks.
 
     Supports two modes:
       - Single: provide goal (+ optional context, toolsets, role)
@@ -2210,7 +2210,8 @@ def delegate_task(
                         completed_count += 1
                     break
 
-                from concurrent.futures import wait as _cf_wait, FIRST_COMPLETED
+                from concurrent.futures import FIRST_COMPLETED
+                from concurrent.futures import wait as _cf_wait
 
                 done, pending = _cf_wait(
                     pending, timeout=0.5, return_when=FIRST_COMPLETED,

@@ -24,8 +24,8 @@ from __future__ import annotations
 import logging
 
 from hermes_cli.auth import (
-    DEFAULT_NOUS_INFERENCE_URL,
     _ALLOWED_NOUS_INFERENCE_HOSTS,
+    DEFAULT_NOUS_INFERENCE_URL,
     _validate_nous_inference_url_from_network,
 )
 
@@ -141,15 +141,17 @@ class TestCallSiteWiring:
     """
 
     def _read_auth_source(self):
-        import hermes_cli.auth as _auth_mod
         from pathlib import Path
+
+        import hermes_cli.auth as _auth_mod
         return Path(_auth_mod.__file__).read_text(encoding="utf-8")
 
     def test_no_unvalidated_inference_base_url_assignments_remain(self):
         """No remaining ``_optional_base_url(...inference_base_url...)`` reads
         from Portal payloads. If you see a failure here, you've either
         added a new NETWORK site that needs validation, or downgraded an
-        existing one back to the unsafe helper."""
+        existing one back to the unsafe helper.
+        """
         source = self._read_auth_source()
         for needle in (
             '_optional_base_url(refreshed.get("inference_base_url"))',
@@ -163,7 +165,8 @@ class TestCallSiteWiring:
     def test_validator_wired_at_all_known_call_sites(self):
         """All 2 known auth.py NETWORK sites use the validator. If this count
         drops, someone removed protection; if it grows, audit the new
-        site to be sure validation is appropriate."""
+        site to be sure validation is appropriate.
+        """
         source = self._read_auth_source()
         refresh_count = source.count(
             '_validate_nous_inference_url_from_network(refreshed.get("inference_base_url"))',
@@ -178,8 +181,10 @@ class TestCallSiteWiring:
         """The Nous proxy adapter applies the validator as defense-in-depth
         even though auth.py already validates at the source, so a future
         bypass at the source layer still gets caught at the forward
-        boundary."""
+        boundary.
+        """
         from pathlib import Path
+
         import hermes_cli.proxy.adapters.nous_portal as _nous_adapter
         source = Path(_nous_adapter.__file__).read_text(encoding="utf-8")
         assert "_validate_nous_inference_url_from_network" in source
@@ -200,9 +205,11 @@ class TestEnvOverrideNotGated:
         """In resolve_nous_runtime_credentials, the env override is
         read via os.getenv directly, not via the validator. Grep the
         source to confirm: the env line should NOT mention the
-        validator."""
-        import hermes_cli.auth as _auth_mod
+        validator.
+        """
         from pathlib import Path
+
+        import hermes_cli.auth as _auth_mod
         source = Path(_auth_mod.__file__).read_text(encoding="utf-8")
         # Find the env-override read line.
         for line in source.splitlines():

@@ -11,7 +11,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-
 MIGRATION_GUIDE_URL = "https://docs.x.ai/developers/migration/may-15-retirement"
 RETIREMENT_DATE = "May 15, 2026"
 
@@ -21,13 +20,13 @@ RETIREMENT_DATE = "May 15, 2026"
 # have a one-to-one replacement: ``grok-4.3`` reasons by default, so emulating
 # ``*-non-reasoning`` behavior on it requires ``reasoning_effort="none"``.
 _RETIRED_MODELS: dict[str, dict[str, str | None]] = {
-    "grok-4-0709":                  {"replacement": "grok-4.3", "reasoning_effort": None,  "note": None},
-    "grok-4-fast-reasoning":        {"replacement": "grok-4.3", "reasoning_effort": None,  "note": None},
+    "grok-4-0709":                  {"replacement": "grok-4.3", "reasoning_effort": None, "note": None},
+    "grok-4-fast-reasoning":        {"replacement": "grok-4.3", "reasoning_effort": None, "note": None},
     "grok-4-fast-non-reasoning":    {"replacement": "grok-4.3", "reasoning_effort": "none", "note": None},
-    "grok-4-1-fast-reasoning":      {"replacement": "grok-4.3", "reasoning_effort": None,  "note": None},
+    "grok-4-1-fast-reasoning":      {"replacement": "grok-4.3", "reasoning_effort": None, "note": None},
     "grok-4-1-fast-non-reasoning":  {"replacement": "grok-4.3", "reasoning_effort": "none", "note": None},
-    "grok-code-fast-1":             {"replacement": "grok-4.3", "reasoning_effort": None,  "note": None},
-    "grok-3":                       {"replacement": "grok-4.3", "reasoning_effort": None,  "note": None},
+    "grok-code-fast-1":             {"replacement": "grok-4.3", "reasoning_effort": None, "note": None},
+    "grok-3":                       {"replacement": "grok-4.3", "reasoning_effort": None, "note": None},
     "grok-imagine-image-pro":       {"replacement": "grok-imagine-image-quality", "reasoning_effort": None, "note": None},
 }
 
@@ -137,8 +136,8 @@ def format_issue(issue: RetirementIssue) -> str:
 # ---------------------------------------------------------------------------
 
 import datetime as _dt
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 
 @dataclass(frozen=True)

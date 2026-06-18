@@ -59,7 +59,8 @@ class TestRenderNoticeLine:
 def test_real_policy_notices_render_without_doubling():
     """End-to-end regression: every notice evaluate_credits_notices emits already
     carries its glyph, so render_notice_line must return it unchanged (no second
-    glyph prepended) for the messaging push."""
+    glyph prepended) for the messaging push.
+    """
     from agent.credits_tracker import CreditsState, evaluate_credits_notices
 
     def _emitted(uf=None, paid=True, purchased=0):

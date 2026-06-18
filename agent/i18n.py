@@ -266,6 +266,7 @@ def t(key: str, lang: str | None = None, **format_kwargs: Any) -> str:
     -------
     The translated string, or the English fallback if the key is missing in
     the target language, or the bare key if English is also missing.
+
     """
     target = _normalize_lang(lang) if lang else get_language()
     catalog = _load_catalog(target)

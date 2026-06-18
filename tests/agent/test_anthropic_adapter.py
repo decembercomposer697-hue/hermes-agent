@@ -4,19 +4,18 @@ import json
 import sys
 import time
 from types import SimpleNamespace
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from agent.prompt_caching import apply_anthropic_cache_control
 from agent.anthropic_adapter import (
     _is_azure_anthropic_endpoint,
     _is_oauth_token,
     _refresh_oauth_token,
     _to_plain_data,
     _write_claude_code_credentials,
-    build_anthropic_client,
     build_anthropic_bedrock_client,
+    build_anthropic_client,
     build_anthropic_kwargs,
     convert_messages_to_anthropic,
     convert_tools_to_anthropic,
@@ -26,8 +25,8 @@ from agent.anthropic_adapter import (
     resolve_anthropic_token,
     run_oauth_setup_token,
 )
+from agent.prompt_caching import apply_anthropic_cache_control
 from agent.transports import get_transport
-
 
 # ---------------------------------------------------------------------------
 # Auth helpers
@@ -76,7 +75,8 @@ class TestBuildAnthropicClient:
 
     def test_oauth_drop_context_1m_beta_strips_only_1m(self):
         """drop_context_1m_beta=True strips context-1m-2025-08-07 while
-        preserving every other OAuth-relevant beta."""
+        preserving every other OAuth-relevant beta.
+        """
         with patch("agent.anthropic_adapter._anthropic_sdk") as mock_sdk:
             build_anthropic_client(
                 "sk-ant-oat01-" + "x" * 60,
@@ -1083,7 +1083,8 @@ class TestBuildAnthropicKwargs:
 
     def test_fast_mode_oauth_drop_context_1m_beta_strips_only_1m(self):
         """drop_context_1m_beta=True strips context-1m from fast-mode
-        extra_headers while preserving every other OAuth + fast-mode beta."""
+        extra_headers while preserving every other OAuth + fast-mode beta.
+        """
         kwargs = build_anthropic_kwargs(
             model="claude-opus-4-6",
             messages=[{"role": "user", "content": "Hi"}],
@@ -1221,10 +1222,10 @@ class TestBuildAnthropicKwargs:
         legacy list stays on the manual path.
         """
         from agent.anthropic_adapter import (
-            _supports_adaptive_thinking,
-            _supports_xhigh_effort,
             _forbids_sampling_params,
             _get_anthropic_max_output,
+            _supports_adaptive_thinking,
+            _supports_xhigh_effort,
         )
         # New / unknown Claude models → modern contract by default.
         for m in (
@@ -1242,8 +1243,8 @@ class TestBuildAnthropicKwargs:
     def test_legacy_claude_stays_on_manual_thinking(self):
         """Older Claude families keep the legacy manual-thinking contract."""
         from agent.anthropic_adapter import (
-            _supports_adaptive_thinking,
             _forbids_sampling_params,
+            _supports_adaptive_thinking,
         )
         for m in (
             "claude-3-5-sonnet",
@@ -1258,9 +1259,9 @@ class TestBuildAnthropicKwargs:
     def test_claude_46_is_adaptive_but_not_xhigh_or_no_sampling(self):
         """4.6 is adaptive, but predates xhigh and still accepts sampling."""
         from agent.anthropic_adapter import (
+            _forbids_sampling_params,
             _supports_adaptive_thinking,
             _supports_xhigh_effort,
-            _forbids_sampling_params,
         )
         for m in ("claude-opus-4.6", "claude-sonnet-4-6"):
             assert _supports_adaptive_thinking(m) is True, m
@@ -1269,11 +1270,12 @@ class TestBuildAnthropicKwargs:
 
     def test_non_claude_anthropic_models_use_manual_path(self):
         """Non-Claude Anthropic-Messages models (minimax, qwen3, kimi) must not
-        be misclassified as adaptive by the default-to-modern rule."""
+        be misclassified as adaptive by the default-to-modern rule.
+        """
         from agent.anthropic_adapter import (
+            _forbids_sampling_params,
             _supports_adaptive_thinking,
             _supports_xhigh_effort,
-            _forbids_sampling_params,
         )
         for m in ("minimax-m2", "qwen3-max", "moonshotai/kimi-k2.5", "glm-4.6"):
             assert _supports_adaptive_thinking(m) is False, m
@@ -1650,7 +1652,8 @@ class TestRoleAlternation:
 
 class TestThinkingBlockSignatureManagement:
     """Tests for the thinking block handling strategy:
-    strip from old turns, preserve latest signed, downgrade unsigned."""
+    strip from old turns, preserve latest signed, downgrade unsigned.
+    """
 
     def test_thinking_stripped_from_non_last_assistant(self):
         """Thinking blocks are removed from all assistant messages except the last."""
@@ -2019,14 +2022,13 @@ class TestToolChoice:
         assert kwargs["tool_choice"] == {"type": "tool", "name": "search"}
 
 
-
 # ---------------------------------------------------------------------------
 # max_tokens resolver — openclaw/openclaw#66664 port
 # ---------------------------------------------------------------------------
 
 from agent.anthropic_adapter import (
-    _resolve_positive_anthropic_max_tokens,
     _resolve_anthropic_messages_max_tokens,
+    _resolve_positive_anthropic_max_tokens,
 )
 
 

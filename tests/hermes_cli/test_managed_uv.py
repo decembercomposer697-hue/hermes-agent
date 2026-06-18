@@ -8,10 +8,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_executable(path: Path) -> None:
     """Create a minimal fake uv binary at *path*."""
@@ -170,6 +170,7 @@ class TestEnsureUvWindowsSafe:
         # change makes _UvResult char-iterable (and thus list2cmdline-safe),
         # the gate may be revisited.
         import subprocess
+
         from hermes_cli.managed_uv import _UvResult
         with pytest.raises(TypeError):
             subprocess.list2cmdline([_UvResult("C:\\hermes\\uv.exe"), "pip"])

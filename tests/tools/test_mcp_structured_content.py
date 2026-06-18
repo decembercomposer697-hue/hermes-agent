@@ -97,7 +97,8 @@ class TestStructuredContentPreservation:
 
     def test_both_content_and_structured_desktop_commander(self, _patch_mcp_server):
         """Real-world case: Desktop Commander returns file text in content,
-        metadata in structuredContent.  Agent must see file contents."""
+        metadata in structuredContent.  Agent must see file contents.
+        """
         session = _patch_mcp_server
         file_text = "import os\nprint('hello')\n"
         metadata = {"fileName": "main.py", "filePath": "/tmp/main.py", "fileType": "python"}

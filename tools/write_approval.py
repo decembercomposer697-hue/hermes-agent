@@ -81,7 +81,7 @@ def write_approval_enabled(subsystem: str) -> bool:
     if subsystem not in _SUBSYSTEMS:
         return False
     try:
-        from hermes_cli.config import load_config, cfg_get
+        from hermes_cli.config import cfg_get, load_config
         cfg = load_config()
         raw = cfg_get(cfg, subsystem, CONFIG_KEY, default=False)
     except Exception:
@@ -128,6 +128,7 @@ def stage_write(subsystem: str, payload: dict[str, Any],
     Returns a dict with ``id`` and metadata. Best-effort: on disk failure it
     logs and still returns a record (the write is simply lost, which is the
     safe failure for an approval gate — nothing is silently committed).
+
     """
     pid = uuid.uuid4().hex[:8]
     record = {
@@ -270,6 +271,7 @@ def evaluate_gate(subsystem: str, *, inline_summary: str = "",
     Note: there is no config-driven "blocked" outcome — the gate only ever
     delays a write for approval, never silently refuses it. ``blocked`` is
     still produced when the user *actively denies* an inline prompt.
+
     """
     if not write_approval_enabled(subsystem):
         return GateDecision(allow=True)

@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -360,7 +359,8 @@ class TestPickerIntegration:
 
     def test_picker_rows_carry_post_setup_hook(self) -> None:
         """Every browser plugin row has post_setup='agent_browser' so
-        selecting it triggers the agent-browser CLI install."""
+        selecting it triggers the agent-browser CLI install.
+        """
         _ensure_plugins_loaded()
         from hermes_cli.tools_config import _plugin_browser_providers
 
@@ -371,7 +371,8 @@ class TestPickerIntegration:
 
     def test_picker_rows_carry_browser_plugin_name_marker(self) -> None:
         """`browser_plugin_name` matches `browser_provider` so downstream
-        code can route through the registry when it wants to."""
+        code can route through the registry when it wants to.
+        """
         _ensure_plugins_loaded()
         from hermes_cli.tools_config import _plugin_browser_providers
 

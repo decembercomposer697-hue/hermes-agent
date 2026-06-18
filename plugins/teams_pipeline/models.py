@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from typing import Any, Literal
-
 
 ArtifactType = Literal["transcript", "recording", "call_record"]
 

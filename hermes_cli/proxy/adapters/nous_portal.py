@@ -12,11 +12,11 @@ import threading
 from typing import Any, Dict, FrozenSet, Optional
 
 from hermes_cli.auth import (
-    AuthError,
     DEFAULT_NOUS_INFERENCE_URL,
-    _load_auth_store,
+    AuthError,
     _auth_store_lock,
     _is_terminal_nous_refresh_error,
+    _load_auth_store,
     _quarantine_nous_oauth_state,
     _quarantine_nous_pool_entries,
     _save_auth_store,

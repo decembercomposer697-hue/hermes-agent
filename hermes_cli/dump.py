@@ -1,5 +1,4 @@
-"""
-Dump command for hermes CLI.
+"""Dump command for hermes CLI.
 
 Outputs a compact, plain-text summary of the user's Hermes setup
 that can be copy-pasted into Discord/GitHub/Telegram for support context.
@@ -13,10 +12,15 @@ import subprocess
 import sys
 from pathlib import Path
 
-from hermes_cli.config import get_hermes_home, get_env_path, get_project_root, load_config
+from agent.skill_utils import is_excluded_skill_path
+from hermes_cli.config import (
+    get_env_path,
+    get_hermes_home,
+    get_project_root,
+    load_config,
+)
 from hermes_cli.env_loader import load_hermes_dotenv
 from hermes_constants import display_hermes_home
-from agent.skill_utils import is_excluded_skill_path
 
 
 def _get_git_commit(project_root: Path) -> str:
@@ -231,7 +235,7 @@ def run_dump(args):
     hermes_home = get_hermes_home()
 
     try:
-        from hermes_cli import __version__, __release_date__
+        from hermes_cli import __release_date__, __version__
     except ImportError:
         __version__ = "(unknown)"
         __release_date__ = ""

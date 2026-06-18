@@ -21,8 +21,8 @@ import pytest
 from aiohttp import web
 from aiohttp.test_utils import TestClient, TestServer
 
-from gateway.platforms.webhook import WebhookAdapter
 from gateway.config import PlatformConfig
+from gateway.platforms.webhook import WebhookAdapter
 
 
 def _make_adapter(routes, rate_limit=5, **extra_kw) -> WebhookAdapter:
@@ -201,7 +201,8 @@ class TestSignatureBeforeRateLimit:
     @pytest.mark.asyncio
     async def test_mixed_valid_and_invalid_signatures(self):
         """Interleave invalid and valid requests. Only valid ones count
-        against the rate limit."""
+        against the rate limit.
+        """
         secret = "test-secret-key"
         route_name = "test-route"
         routes = {

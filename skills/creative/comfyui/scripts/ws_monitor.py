@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-ws_monitor.py — Real-time ComfyUI WebSocket monitor.
+"""ws_monitor.py — Real-time ComfyUI WebSocket monitor.
 
 Connects to /ws and pretty-prints execution events: node start/finish, sampling
 progress, cached nodes, errors. Optionally writes preview frames to disk.
@@ -36,9 +35,13 @@ from urllib.parse import urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _common import (
-    DEFAULT_LOCAL_HOST, ENV_API_KEY, log, new_client_id, resolve_api_key, is_cloud_host,
+    DEFAULT_LOCAL_HOST,
+    ENV_API_KEY,
+    is_cloud_host,
+    log,
+    new_client_id,
+    resolve_api_key,
 )
-
 
 # Binary frame types from ComfyUI WebSocket protocol
 BINARY_PREVIEW_IMAGE = 1

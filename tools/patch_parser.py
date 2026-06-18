@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-V4A Patch Format Parser
+"""V4A Patch Format Parser
 
 Parses the V4A patch format used by codex, cline, and other coding agents.
 
@@ -31,8 +30,8 @@ Usage:
 import difflib
 import re
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple, Any
 from enum import Enum
+from typing import Any, List, Optional, Tuple
 
 
 class OperationType(Enum):
@@ -67,8 +66,7 @@ class PatchOperation:
 
 
 def parse_v4a_patch(patch_content: str) -> tuple[list[PatchOperation], str | None]:
-    """
-    Parse a V4A format patch.
+    """Parse a V4A format patch.
     
     Args:
         patch_content: The patch text in V4A format
@@ -77,8 +75,9 @@ def parse_v4a_patch(patch_content: str) -> tuple[list[PatchOperation], str | Non
         Tuple of (operations, error_message)
         - If successful: (list_of_operations, None)
         - If failed: ([], error_description)
+
     """
-    lines = patch_content.split('\n')
+    lines = patch_content.split("\n")
     operations: list[PatchOperation] = []
     
     # Find patch boundaries
@@ -86,9 +85,9 @@ def parse_v4a_patch(patch_content: str) -> tuple[list[PatchOperation], str | Non
     end_idx = None
     
     for i, line in enumerate(lines):
-        if '*** Begin Patch' in line or '***Begin Patch' in line:
+        if "*** Begin Patch" in line or "***Begin Patch" in line:
             start_idx = i
-        elif '*** End Patch' in line or '***End Patch' in line:
+        elif "*** End Patch" in line or "***End Patch" in line:
             end_idx = i
             break
     
@@ -108,10 +107,10 @@ def parse_v4a_patch(patch_content: str) -> tuple[list[PatchOperation], str | Non
         line = lines[i]
         
         # Check for file operation markers
-        update_match = re.match(r'\*\*\*\s*Update\s+File:\s*(.+)', line)
-        add_match = re.match(r'\*\*\*\s*Add\s+File:\s*(.+)', line)
-        delete_match = re.match(r'\*\*\*\s*Delete\s+File:\s*(.+)', line)
-        move_match = re.match(r'\*\*\*\s*Move\s+File:\s*(.+?)\s*->\s*(.+)', line)
+        update_match = re.match(r"\*\*\*\s*Update\s+File:\s*(.+)", line)
+        add_match = re.match(r"\*\*\*\s*Add\s+File:\s*(.+)", line)
+        delete_match = re.match(r"\*\*\*\s*Delete\s+File:\s*(.+)", line)
+        move_match = re.match(r"\*\*\*\s*Move\s+File:\s*(.+?)\s*->\s*(.+)", line)
         
         if update_match:
             # Save previous operation
@@ -167,14 +166,14 @@ def parse_v4a_patch(patch_content: str) -> tuple[list[PatchOperation], str | Non
             current_op = None
             current_hunk = None
             
-        elif line.startswith('@@'):
+        elif line.startswith("@@"):
             # Context hint / hunk marker
             if current_op:
                 if current_hunk and current_hunk.lines:
                     current_op.hunks.append(current_hunk)
                 
                 # Extract context hint
-                hint_match = re.match(r'@@\s*(.+?)\s*@@', line)
+                hint_match = re.match(r"@@\s*(.+?)\s*@@", line)
                 hint = hint_match.group(1) if hint_match else None
                 current_hunk = Hunk(context_hint=hint)
                 
@@ -183,18 +182,18 @@ def parse_v4a_patch(patch_content: str) -> tuple[list[PatchOperation], str | Non
             if current_hunk is None:
                 current_hunk = Hunk()
             
-            if line.startswith('+'):
-                current_hunk.lines.append(HunkLine('+', line[1:]))
-            elif line.startswith('-'):
-                current_hunk.lines.append(HunkLine('-', line[1:]))
-            elif line.startswith(' '):
-                current_hunk.lines.append(HunkLine(' ', line[1:]))
-            elif line.startswith('\\'):
+            if line.startswith("+"):
+                current_hunk.lines.append(HunkLine("+", line[1:]))
+            elif line.startswith("-"):
+                current_hunk.lines.append(HunkLine("-", line[1:]))
+            elif line.startswith(" "):
+                current_hunk.lines.append(HunkLine(" ", line[1:]))
+            elif line.startswith("\\"):
                 # "\ No newline at end of file" marker - skip
                 pass
             else:
                 # Treat as context line (implicit space prefix)
-                current_hunk.lines.append(HunkLine(' ', line))
+                current_hunk.lines.append(HunkLine(" ", line))
         
         i += 1
     
@@ -263,7 +262,7 @@ def _validate_operations(
 
             simulated = read_result.content
             for hunk in op.hunks:
-                search_lines = [l.content for l in hunk.lines if l.prefix in {' ', '-'}]
+                search_lines = [l.content for l in hunk.lines if l.prefix in {" ", "-"}]
                 if not search_lines:
                     # Addition-only hunk: validate context hint uniqueness
                     if hunk.context_hint:
@@ -281,9 +280,9 @@ def _validate_operations(
                             )
                     continue
 
-                search_pattern = '\n'.join(search_lines)
-                replace_lines = [l.content for l in hunk.lines if l.prefix in {' ', '+'}]
-                replacement = '\n'.join(replace_lines)
+                search_pattern = "\n".join(search_lines)
+                replace_lines = [l.content for l in hunk.lines if l.prefix in {" ", "+"}]
+                replacement = "\n".join(replace_lines)
 
                 new_simulated, count, _strategy, match_error = fuzzy_find_and_replace(
                     simulated, search_pattern, replacement, replace_all=False,
@@ -329,7 +328,7 @@ def _validate_operations(
 
 
 def apply_v4a_operations(operations: list[PatchOperation],
-                          file_ops: Any) -> 'PatchResult':
+                          file_ops: Any) -> "PatchResult":
     """Apply V4A patch operations using a file operations interface.
 
     Uses a two-phase validate-then-apply approach:
@@ -345,6 +344,7 @@ def apply_v4a_operations(operations: list[PatchOperation],
 
     Returns:
         PatchResult with results of all operations
+
     """
     # Import here to avoid circular imports
     from tools.file_operations import PatchResult
@@ -415,11 +415,11 @@ def apply_v4a_operations(operations: list[PatchOperation],
     # Run lint on all modified/created files
     lint_results = {}
     for f in files_modified + files_created:
-        if hasattr(file_ops, '_check_lint'):
+        if hasattr(file_ops, "_check_lint"):
             lint_result = file_ops._check_lint(f)
             lint_results[f] = lint_result.to_dict()
 
-    combined_diff = '\n'.join(all_diffs)
+    combined_diff = "\n".join(all_diffs)
 
     # Combine per-file LSP diagnostics blocks.  Each block already has
     # the ``<diagnostics file="...">`` header from
@@ -465,17 +465,17 @@ def _apply_add(op: PatchOperation, file_ops: Any) -> tuple[bool, str, str | None
     content_lines = []
     for hunk in op.hunks:
         for line in hunk.lines:
-            if line.prefix == '+':
+            if line.prefix == "+":
                 content_lines.append(line.content)
     
-    content = '\n'.join(content_lines)
+    content = "\n".join(content_lines)
     
     result = file_ops.write_file(op.file_path, content)
     if result.error:
         return False, result.error, None
     
     diff = f"--- /dev/null\n+++ b/{op.file_path}\n"
-    diff += '\n'.join(f"+{line}" for line in content_lines)
+    diff += "\n".join(f"+{line}" for line in content_lines)
     
     return True, diff, getattr(result, "lsp_diagnostics", None)
 
@@ -493,7 +493,7 @@ def _apply_delete(op: PatchOperation, file_ops: Any) -> tuple[bool, str]:
         return False, result.error
 
     removed_lines = read_result.content.splitlines(keepends=True)
-    diff = ''.join(difflib.unified_diff(
+    diff = "".join(difflib.unified_diff(
         removed_lines, [],
         fromfile=f"a/{op.file_path}",
         tofile="/dev/null",
@@ -537,17 +537,17 @@ def _apply_update(op: PatchOperation, file_ops: Any) -> tuple[bool, str, str | N
         replace_lines = []
 
         for line in hunk.lines:
-            if line.prefix == ' ':
+            if line.prefix == " ":
                 search_lines.append(line.content)
                 replace_lines.append(line.content)
-            elif line.prefix == '-':
+            elif line.prefix == "-":
                 search_lines.append(line.content)
-            elif line.prefix == '+':
+            elif line.prefix == "+":
                 replace_lines.append(line.content)
 
         if search_lines:
-            search_pattern = '\n'.join(search_lines)
-            replacement = '\n'.join(replace_lines)
+            search_pattern = "\n".join(search_lines)
+            replacement = "\n".join(replace_lines)
 
             new_content, count, _strategy, error = fuzzy_find_and_replace(
                 new_content, search_pattern, replacement, replace_all=False,
@@ -583,12 +583,12 @@ def _apply_update(op: PatchOperation, file_ops: Any) -> tuple[bool, str, str | N
         else:
             # Addition-only hunk (no context or removed lines).
             # Insert at the location indicated by the context hint, or at end of file.
-            insert_text = '\n'.join(replace_lines)
+            insert_text = "\n".join(replace_lines)
             if hunk.context_hint:
                 occurrences = _count_occurrences(new_content, hunk.context_hint)
                 if occurrences == 0:
                     # Hint not found — append at end as a safe fallback
-                    new_content = new_content.rstrip('\n') + '\n' + insert_text + '\n'
+                    new_content = new_content.rstrip("\n") + "\n" + insert_text + "\n"
                 elif occurrences > 1:
                     return False, (
                         f"Addition-only hunk: context hint '{hunk.context_hint}' is ambiguous "
@@ -597,13 +597,13 @@ def _apply_update(op: PatchOperation, file_ops: Any) -> tuple[bool, str, str | N
                 else:
                     hint_pos = new_content.find(hunk.context_hint)
                     # Insert after the line containing the context hint
-                    eol = new_content.find('\n', hint_pos)
+                    eol = new_content.find("\n", hint_pos)
                     if eol != -1:
-                        new_content = new_content[:eol + 1] + insert_text + '\n' + new_content[eol + 1:]
+                        new_content = new_content[:eol + 1] + insert_text + "\n" + new_content[eol + 1:]
                     else:
-                        new_content = new_content + '\n' + insert_text
+                        new_content = new_content + "\n" + insert_text
             else:
-                new_content = new_content.rstrip('\n') + '\n' + insert_text + '\n'
+                new_content = new_content.rstrip("\n") + "\n" + insert_text + "\n"
     
     # Write new content
     write_result = file_ops.write_file(op.file_path, new_content)
@@ -617,6 +617,6 @@ def _apply_update(op: PatchOperation, file_ops: Any) -> tuple[bool, str, str | N
         fromfile=f"a/{op.file_path}",
         tofile=f"b/{op.file_path}",
     )
-    diff = ''.join(diff_lines)
+    diff = "".join(diff_lines)
     
     return True, diff, getattr(write_result, "lsp_diagnostics", None)

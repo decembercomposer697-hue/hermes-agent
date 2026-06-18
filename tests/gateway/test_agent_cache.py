@@ -13,7 +13,6 @@ import threading
 from unittest.mock import MagicMock, patch
 
 
-
 def _make_runner():
     """Create a minimal GatewayRunner with just the cache infrastructure."""
     from gateway.run import GatewayRunner
@@ -201,7 +200,8 @@ class TestAgentConfigSignature:
 
 class TestExtractCacheBustingConfig:
     """Verify _extract_cache_busting_config pulls the documented subset of
-    config values that must invalidate the cached agent on change."""
+    config values that must invalidate the cached agent on change.
+    """
 
     def test_reads_model_context_length(self):
         from gateway.run import GatewayRunner
@@ -276,7 +276,6 @@ class TestExtractCacheBustingConfig:
 
         assert out["tools.registry_generation"] == 12345
 
-
     def test_skips_honcho_config_read_when_provider_is_not_honcho(self, monkeypatch):
         """Non-Honcho gateways must not read/parse honcho.json on every message."""
         from gateway.run import GatewayRunner
@@ -322,7 +321,8 @@ class TestExtractCacheBustingConfig:
     def test_memory_provider_change_busts_signature(self, monkeypatch):
         """Switching memory.provider must itself change the cache-busting
         signature, so the agent is rebuilt when a user swaps providers
-        mid-gateway (independent of the honcho.json identity keys)."""
+        mid-gateway (independent of the honcho.json identity keys).
+        """
         from gateway.run import GatewayRunner
 
         # Neutralize honcho.json reads so the only varying input is the
@@ -343,6 +343,7 @@ class TestExtractCacheBustingConfig:
     def test_honcho_cache_busting_config_memoized_by_mtime(self, monkeypatch, tmp_path):
         """Repeated Honcho extraction for unchanged honcho.json should reuse parse result."""
         from types import SimpleNamespace
+
         from gateway.run import GatewayRunner
 
         config_path = tmp_path / "honcho.json"
@@ -383,7 +384,8 @@ class TestExtractCacheBustingConfig:
 
     def test_full_round_trip_busts_cache_on_real_edit(self):
         """End-to-end: simulate a config edit on main and verify the
-        extracted cache_keys change produces a new signature."""
+        extracted cache_keys change produces a new signature.
+        """
         from gateway.run import GatewayRunner
 
         runtime = {"api_key": "k", "base_url": "u", "provider": "p"}
@@ -577,6 +579,7 @@ class TestAgentCacheBoundedGrowth:
     def _bounded_runner(self):
         """Runner with an OrderedDict cache (matches real gateway init)."""
         from collections import OrderedDict
+
         from gateway.run import GatewayRunner
 
         runner = GatewayRunner.__new__(GatewayRunner)
@@ -651,6 +654,7 @@ class TestAgentCacheBoundedGrowth:
         release_calls: list = []
         cleanup_calls: list = []
         # Intercept both paths; only release_clients path should fire.
+
         def _soft(agent):
             release_calls.append(agent)
         runner._release_evicted_agent_soft = _soft
@@ -757,6 +761,7 @@ class TestAgentCacheActiveSafety:
 
     def _runner(self):
         from collections import OrderedDict
+
         from gateway.run import GatewayRunner
 
         runner = GatewayRunner.__new__(GatewayRunner)
@@ -849,8 +854,9 @@ class TestAgentCacheActiveSafety:
         Better to temporarily exceed the cap than to crash an in-flight
         turn by tearing down its clients.
         """
-        from gateway import run as gw_run
         import logging as _logging
+
+        from gateway import run as gw_run
 
         monkeypatch.setattr(gw_run, "_AGENT_CACHE_MAX_SIZE", 1)
         runner = self._runner()
@@ -941,6 +947,7 @@ class TestAgentCacheActiveSafety:
         active = MagicMock()
         active._last_activity_ts = __import__("time").time()
         active.client = MagicMock()  # simulate an OpenAI client
+
         def _real_close():
             active.client = None  # mirrors run_agent.py:3299
         active.close = _real_close
@@ -973,6 +980,7 @@ class TestAgentCacheSpilloverLive:
 
     def _runner(self):
         from collections import OrderedDict
+
         from gateway.run import GatewayRunner
 
         runner = GatewayRunner.__new__(GatewayRunner)
@@ -1027,8 +1035,9 @@ class TestAgentCacheSpilloverLive:
 
     def test_spillover_all_active_keeps_cache_over_cap(self, monkeypatch, caplog):
         """Every slot active: cache goes over cap, no one gets torn down."""
-        from gateway import run as gw_run
         import logging as _logging
+
+        from gateway import run as gw_run
 
         CAP = 4
         monkeypatch.setattr(gw_run, "_AGENT_CACHE_MAX_SIZE", CAP)
@@ -1057,7 +1066,6 @@ class TestAgentCacheSpilloverLive:
                 a.close()
             except Exception:
                 pass
-
 
     def test_evicted_session_next_turn_gets_fresh_agent(self, monkeypatch):
         """After eviction, the same session_key can insert a fresh agent.
@@ -1120,6 +1128,7 @@ class TestAgentCacheIdleResume:
 
     def _runner(self):
         from collections import OrderedDict
+
         from gateway.run import GatewayRunner
 
         runner = GatewayRunner.__new__(GatewayRunner)
@@ -1162,8 +1171,8 @@ class TestAgentCacheIdleResume:
     def test_release_clients_does_not_touch_terminal_or_browser(self, monkeypatch):
         """release_clients must not call cleanup_vm or cleanup_browser."""
         from run_agent import AIAgent
-        from tools import terminal_tool as _tt
         from tools import browser_tool as _bt
+        from tools import terminal_tool as _tt
 
         agent = AIAgent(
             model="anthropic/claude-sonnet-4", api_key="test",
@@ -1223,8 +1232,8 @@ class TestAgentCacheIdleResume:
         (full teardown — session is done), cache-eviction path uses
         release_clients() (soft — session may resume).
         """
-        from run_agent import AIAgent
         import run_agent as _ra
+        from run_agent import AIAgent
 
         # Agent A: evicted from cache (soft) — terminal survives.
         # Agent B: session expired (hard) — terminal torn down.
@@ -1342,7 +1351,8 @@ class TestCachedAgentInactivityReset:
 
     def test_fresh_turn_resets_idle_clock(self):
         """interrupt_depth=0: clock resets so a post-idle turn gets a
-        fresh 30-min inactivity window (guard for #9051)."""
+        fresh 30-min inactivity window (guard for #9051).
+        """
         from gateway.run import GatewayRunner
 
         agent = self._fake_agent(stale_seconds=1800.0)
@@ -1373,7 +1383,8 @@ class TestCachedAgentInactivityReset:
 
     def test_interrupt_turn_preserves_idle_clock(self):
         """interrupt_depth=1: clock preserved so accumulated stuck-turn
-        idle time is not discarded by an interrupt-recursive re-entry (#15654)."""
+        idle time is not discarded by an interrupt-recursive re-entry (#15654).
+        """
         from gateway.run import GatewayRunner
 
         agent = self._fake_agent(stale_seconds=1200.0)

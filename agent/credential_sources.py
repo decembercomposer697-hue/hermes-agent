@@ -46,9 +46,9 @@ No more per-source if/elif chain in ``auth_remove_command``.
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import List, Optional
-from collections.abc import Callable
 
 
 @dataclass
@@ -69,6 +69,7 @@ class RemovalResult:
             Default True — almost every source needs this to stay sticky.
             The only legitimate False is ``manual`` entries, which aren't
             seeded from anywhere external.
+
     """
 
     cleaned: list[str] = field(default_factory=list)
@@ -94,6 +95,7 @@ class RemovalStep:
         remove_fn: ``(provider, removed_entry) -> RemovalResult``.  Does the
             actual cleanup and returns what happened for the user.
         description: One-line human-readable description for docs / tests.
+
     """
 
     provider: str
@@ -267,7 +269,7 @@ def _remove_minimax_oauth(provider: str, removed) -> RemovalResult:
 
 
 def _remove_xai_oauth_loopback_pkce(provider: str, removed) -> RemovalResult:
-    """xAI OAuth tokens live in auth.json providers.xai-oauth — clear them.
+    """XAI OAuth tokens live in auth.json providers.xai-oauth — clear them.
 
     Without this step, ``hermes auth remove xai-oauth <N>`` silently undoes
     itself: the central dispatcher only removes the in-memory pool entry,

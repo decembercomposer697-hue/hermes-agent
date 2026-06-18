@@ -26,7 +26,8 @@ VALID_RUNTIMES = ("auto", "codex_app_server")
 @dataclass
 class CodexRuntimeStatus:
     """Result of a /codex-runtime invocation. Callers render this however
-    suits their surface (CLI uses Rich panels, gateway sends a text message)."""
+    suits their surface (CLI uses Rich panels, gateway sends a text message).
+    """
 
     success: bool
     new_value: str | None = None
@@ -61,7 +62,8 @@ def parse_args(arg_string: str) -> tuple[str | None, list[str]]:
 
 def get_current_runtime(config: dict) -> str:
     """Read the current `model.openai_runtime` value from a config dict.
-    Returns 'auto' for unset / empty / unrecognized values."""
+    Returns 'auto' for unset / empty / unrecognized values.
+    """
     if not isinstance(config, dict):
         return "auto"
     model_cfg = config.get("model") or {}
@@ -75,7 +77,8 @@ def get_current_runtime(config: dict) -> str:
 
 def set_runtime(config: dict, new_value: str) -> str:
     """Mutate the config dict in place to persist the new runtime value.
-    Returns the previous value for callers that want to report a delta."""
+    Returns the previous value for callers that want to report a delta.
+    """
     if new_value not in VALID_RUNTIMES:
         raise ValueError(
             f"invalid runtime {new_value!r}; must be one of {VALID_RUNTIMES}",
@@ -89,7 +92,8 @@ def set_runtime(config: dict, new_value: str) -> str:
 
 def check_codex_binary_ok() -> tuple[bool, str | None]:
     """Best-effort verification that codex CLI is installed at acceptable
-    version. Returns (ok, version_or_message)."""
+    version. Returns (ok, version_or_message).
+    """
     try:
         from agent.transports.codex_app_server import check_codex_binary
 
@@ -113,6 +117,7 @@ def apply(
             and persisting it to disk. Skipped when None (used by tests).
 
     Returns: CodexRuntimeStatus describing the outcome.
+
     """
     current = get_current_runtime(config)
 

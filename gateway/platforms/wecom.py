@@ -1,5 +1,4 @@
-"""
-WeCom (Enterprise WeChat) platform adapter.
+"""WeCom (Enterprise WeChat) platform adapter.
 
 Uses the WeCom AI Bot WebSocket gateway for inbound and outbound messages.
 The adapter focuses on the core gateway path:
@@ -39,7 +38,7 @@ import os
 import re
 import time
 import uuid
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import unquote, urlparse
@@ -59,7 +58,6 @@ except ImportError:
     httpx = None  # type: ignore[assignment]
 
 from gateway.config import Platform, PlatformConfig
-from gateway.platforms.helpers import MessageDeduplicator
 from gateway.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
@@ -68,6 +66,7 @@ from gateway.platforms.base import (
     cache_document_from_bytes,
     cache_image_from_bytes,
 )
+from gateway.platforms.helpers import MessageDeduplicator
 
 logger = logging.getLogger(__name__)
 
@@ -1043,7 +1042,7 @@ class WeComAdapter(BasePlatformAdapter):
             raise ValueError("aes_key is required")
 
         # WeCom doesn't pad base64 keys; add padding if needed
-        aes_key = aes_key + '=' * ((4 - len(aes_key) % 4) % 4)
+        aes_key = aes_key + "=" * ((4 - len(aes_key) % 4) % 4)
         key = base64.b64decode(aes_key)
         if len(key) != 32:
             raise ValueError(f"Invalid WeCom AES key length: expected 32 bytes, got {len(key)}")
@@ -1534,8 +1533,8 @@ def qr_scan_for_bot_info(
     The same pattern is used by the feishu/dingtalk QR setup wizards.
     """
     try:
-        import urllib.request
         import urllib.parse
+        import urllib.request
     except ImportError:  # pragma: no cover
         logger.error("urllib is required for WeCom QR scan")
         return None

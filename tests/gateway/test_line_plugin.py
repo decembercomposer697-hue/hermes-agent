@@ -15,9 +15,9 @@ Covers the seven synthesis areas from the PR review:
 from __future__ import annotations
 
 import asyncio
+import base64
 import hashlib
 import hmac
-import base64
 import json
 from unittest.mock import AsyncMock, MagicMock
 
@@ -652,7 +652,8 @@ class TestMessageTypeMapping:
     MessageType so the gateway routes media correctly (e.g. voice → STT,
     files → document handling). Regression guard for the old code that
     referenced the non-existent ``MessageType.IMAGE`` and collapsed every
-    non-text message onto a single type."""
+    non-text message onto a single type.
+    """
 
     def test_image_event_not_attributeerror_regression(self):
         # The bug: MessageType.IMAGE doesn't exist on the enum.

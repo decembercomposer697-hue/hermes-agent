@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, Optional
 from collections.abc import Iterable
+from typing import Any, Dict, Optional
 from urllib.parse import urlparse
 
 import httpx

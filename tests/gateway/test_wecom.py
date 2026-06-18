@@ -289,7 +289,8 @@ class TestPolicyHelpers:
         """Env-only setup (WECOM_DM_POLICY + WECOM_ALLOWED_USERS, no config
         ``extra``) must populate the DM allowlist. Otherwise ``dm_policy:
         allowlist`` runs with an empty allowlist and drops every listed user
-        at intake — the documented env vars become no-ops."""
+        at intake — the documented env vars become no-ops.
+        """
         from gateway.platforms.wecom import WeComAdapter
 
         monkeypatch.setenv("WECOM_DM_POLICY", "allowlist")
@@ -305,7 +306,8 @@ class TestPolicyHelpers:
 
     def test_dm_allowlist_extra_takes_precedence_over_env(self, monkeypatch):
         """Config ``extra`` wins over the env fallback, so an explicit
-        allowlist is never silently widened by a stray WECOM_ALLOWED_USERS."""
+        allowlist is never silently widened by a stray WECOM_ALLOWED_USERS.
+        """
         from gateway.platforms.wecom import WeComAdapter
 
         monkeypatch.setenv("WECOM_ALLOWED_USERS", "env-user")
@@ -365,6 +367,7 @@ class TestMediaHelpers:
 
     def test_decrypt_file_bytes_round_trip(self):
         from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
         from gateway.platforms.wecom import WeComAdapter
 
         plaintext = b"wecom-secret"
@@ -825,7 +828,8 @@ class TestWeComZombieSessionFix:
     async def test_proactive_group_send_falls_back_to_cached_req_id(self):
         """Sending into a group without reply_to should use the last cached
         req_id via APP_CMD_RESPONSE — WeCom AI Bots cannot initiate APP_CMD_SEND
-        in group chats (errcode 600039)."""
+        in group chats (errcode 600039).
+        """
         from gateway.platforms.wecom import WeComAdapter
 
         adapter = WeComAdapter(PlatformConfig(enabled=True))
@@ -866,7 +870,6 @@ class TestWeComZombieSessionFix:
         assert cmd == APP_CMD_SEND
 
 
-
 class TestTextBatchFlushRace:
     """Regression tests for the cancel-delivery race in _flush_text_batch.
 
@@ -882,7 +885,8 @@ class TestTextBatchFlushRace:
     @pytest.mark.asyncio
     async def test_superseded_task_does_not_pop_or_process_event(self):
         """A flush task that has been superseded must leave the event in the
-        batch dict for the new task to handle."""
+        batch dict for the new task to handle.
+        """
         from gateway.platforms.base import MessageEvent, MessageType
         from gateway.platforms.wecom import WeComAdapter
 

@@ -22,13 +22,13 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from gateway.config import Platform, PlatformConfig
-from gateway.platforms.helpers import MessageDeduplicator
 from gateway.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     SendResult,
 )
+from gateway.platforms.helpers import MessageDeduplicator
 
 logger = logging.getLogger(__name__)
 
@@ -248,7 +248,6 @@ class MattermostAdapter(BasePlatformAdapter):
             await self._session.close()
 
         logger.info("Mattermost: disconnected")
-
 
     async def _resolve_root_id(self, post_id: str) -> str:
         """Resolve a post_id to the thread root_id for Mattermost.
@@ -536,8 +535,9 @@ class MattermostAdapter(BasePlatformAdapter):
             return
 
         import mimetypes
-        import aiohttp
         from urllib.parse import unquote as _unquote
+
+        import aiohttp
 
         CHUNK = 5  # Mattermost post file_ids cap
         chunks = [images[i:i + CHUNK] for i in range(0, len(images), CHUNK)]
@@ -815,7 +815,10 @@ class MattermostAdapter(BasePlatformAdapter):
                 ) as resp:
                     if resp.status < 400:
                         file_data = await resp.read()
-                        from gateway.platforms.base import cache_image_from_bytes, cache_document_from_bytes
+                        from gateway.platforms.base import (
+                            cache_document_from_bytes,
+                            cache_image_from_bytes,
+                        )
                         if mime.startswith("image/"):
                             local_path = cache_image_from_bytes(file_data, ext or ".png")
                             media_urls.append(local_path)
@@ -869,8 +872,6 @@ class MattermostAdapter(BasePlatformAdapter):
         )
 
         await self.handle_message(msg_event)
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -935,7 +936,7 @@ async def _standalone_send(
     try:
         # Resolve proxy + session kwargs once so a single ClientSession can
         # cover the optional file uploads + final post.
-        from gateway.platforms.base import resolve_proxy_url, proxy_kwargs_for_aiohttp
+        from gateway.platforms.base import proxy_kwargs_for_aiohttp, resolve_proxy_url
         _proxy = resolve_proxy_url(platform_env_var="MATTERMOST_PROXY")
         _sess_kw, _req_kw = proxy_kwargs_for_aiohttp(_proxy)
 
@@ -1029,14 +1030,14 @@ def interactive_setup() -> None:
     ``hermes_cli/setup.py::_setup_mattermost`` function this migration
     removes.
     """
-    from hermes_cli.config import get_env_value, save_env_value
     from hermes_cli.cli_output import (
-        prompt,
-        prompt_yes_no,
         print_header,
         print_info,
         print_success,
+        prompt,
+        prompt_yes_no,
     )
+    from hermes_cli.config import get_env_value, save_env_value
 
     print_header("Mattermost")
     existing = get_env_value("MATTERMOST_TOKEN")

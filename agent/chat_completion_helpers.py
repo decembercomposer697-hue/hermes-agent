@@ -25,14 +25,14 @@ import uuid
 from types import SimpleNamespace
 from typing import Any, Dict, Optional
 
-from hermes_cli.timeouts import get_provider_request_timeout, get_provider_stale_timeout
-from hermes_constants import PARTIAL_STREAM_STUB_ID, FINISH_REASON_LENGTH
 from agent.error_classifier import FailoverReason
-from agent.model_metadata import is_local_endpoint
 from agent.message_sanitization import (
-    _sanitize_surrogates,
     _repair_tool_call_arguments,
+    _sanitize_surrogates,
 )
+from agent.model_metadata import is_local_endpoint
+from hermes_cli.timeouts import get_provider_request_timeout, get_provider_stale_timeout
+from hermes_constants import FINISH_REASON_LENGTH, PARTIAL_STREAM_STUB_ID
 from tools.terminal_tool import is_persistent_env
 from utils import base_url_host_matches, base_url_hostname, env_int
 
@@ -123,8 +123,7 @@ def _env_float(name: str, default: float) -> float:
 
 
 def interruptible_api_call(agent, api_kwargs: dict):
-    """
-    Run the API call in a background thread so the main conversation loop
+    """Run the API call in a background thread so the main conversation loop
     can detect interrupts without waiting for the full HTTP round-trip.
 
     Each worker thread gets its own OpenAI client instance. Interrupts only
@@ -551,7 +550,6 @@ def interruptible_api_call(agent, api_kwargs: dict):
     return result["response"]
 
 
-
 def build_api_kwargs(agent, api_messages: list) -> dict:
     """Build the keyword arguments dict for the active API mode."""
     tools_for_api = agent.tools
@@ -628,6 +626,7 @@ def build_api_kwargs(agent, api_messages: list) -> dict:
         if is_xai_responses:
             try:
                 import copy as _copy
+
                 from tools.schema_sanitizer import (
                     strip_pattern_and_format,
                     strip_slash_enum,
@@ -682,7 +681,10 @@ def build_api_kwargs(agent, api_messages: list) -> dict:
     # Temperature: _fixed_temperature_for_model may return OMIT_TEMPERATURE
     # sentinel (temperature omitted entirely), a numeric override, or None.
     try:
-        from agent.auxiliary_client import _fixed_temperature_for_model, OMIT_TEMPERATURE
+        from agent.auxiliary_client import (
+            OMIT_TEMPERATURE,
+            _fixed_temperature_for_model,
+        )
         _ft = _fixed_temperature_for_model(agent.model, agent.base_url)
         _omit_temp = _ft is OMIT_TEMPERATURE
         _fixed_temp = _ft if not _omit_temp else None
@@ -811,7 +813,6 @@ def build_api_kwargs(agent, api_messages: list) -> dict:
     )
 
 
-
 def build_assistant_message(agent, assistant_message, finish_reason: str) -> dict:
     """Build a normalized assistant message dict from an API response message.
 
@@ -827,7 +828,7 @@ def build_assistant_message(agent, assistant_message, finish_reason: str) -> dic
     # directly in the content rather than returning separate API fields).
     if not reasoning_text:
         content = assistant_message.content or ""
-        think_blocks = re.findall(r'<think>(.*?)</think>', content, flags=re.DOTALL)
+        think_blocks = re.findall(r"<think>(.*?)</think>", content, flags=re.DOTALL)
         if think_blocks:
             combined = "\n\n".join(b.strip() for b in think_blocks if b.strip())
             reasoning_text = combined or None
@@ -935,7 +936,7 @@ def build_assistant_message(agent, assistant_message, finish_reason: str) -> dic
     if "reasoning_content" not in msg and reasoning_text:
         msg["reasoning_content"] = reasoning_text
 
-    if hasattr(assistant_message, 'reasoning_details') and assistant_message.reasoning_details:
+    if hasattr(assistant_message, "reasoning_details") and assistant_message.reasoning_details:
         # Pass reasoning_details back unmodified so providers (OpenRouter,
         # Anthropic, OpenAI) can maintain reasoning continuity across turns.
         # Each provider may include opaque fields (signature, encrypted_content)
@@ -1039,7 +1040,6 @@ def build_assistant_message(agent, assistant_message, finish_reason: str) -> dic
         msg["tool_calls"] = tool_calls
 
     return msg
-
 
 
 def try_activate_fallback(agent, reason: FailoverReason | None = None) -> bool:
@@ -1207,7 +1207,11 @@ def try_activate_fallback(agent, reason: FailoverReason | None = None) -> bool:
 
         if fb_api_mode == "anthropic_messages":
             # Build native Anthropic client instead of using OpenAI client
-            from agent.anthropic_adapter import build_anthropic_client, resolve_anthropic_token, _is_oauth_token
+            from agent.anthropic_adapter import (
+                _is_oauth_token,
+                build_anthropic_client,
+                resolve_anthropic_token,
+            )
             effective_key = (fb_client.api_key or resolve_anthropic_token() or "") if fb_provider == "anthropic" else (fb_client.api_key or "")
             agent.api_key = effective_key
             agent._anthropic_api_key = effective_key
@@ -1265,7 +1269,7 @@ def try_activate_fallback(agent, reason: FailoverReason | None = None) -> bool:
         # Also pass _config_context_length so the explicit config override
         # (model.context_length in config.yaml) is respected — without this,
         # the fallback activation drops to 128K even when config says 204800.
-        if hasattr(agent, 'context_compressor') and agent.context_compressor:
+        if hasattr(agent, "context_compressor") and agent.context_compressor:
             from agent.model_metadata import get_model_context_length
             # ``agent.api_key`` may be callable (Entra ID); the
             # context-length resolver expects a string for live
@@ -1299,7 +1303,6 @@ def try_activate_fallback(agent, reason: FailoverReason | None = None) -> bool:
     except Exception as e:
         logger.error("Failed to activate fallback %s: %s", fb_model, e)
         return agent._try_activate_fallback()  # try next in chain
-
 
 
 def handle_max_iterations(agent, messages: list, api_call_count: int) -> str:
@@ -1362,7 +1365,8 @@ def handle_max_iterations(agent, messages: list, api_call_count: int) -> str:
 
         summary_extra_body = {}
         try:
-            from agent.auxiliary_client import _fixed_temperature_for_model, OMIT_TEMPERATURE as _OMIT_TEMP
+            from agent.auxiliary_client import OMIT_TEMPERATURE as _OMIT_TEMP
+            from agent.auxiliary_client import _fixed_temperature_for_model
         except Exception:
             _fixed_temperature_for_model = None
             _OMIT_TEMP = None
@@ -1473,7 +1477,7 @@ def handle_max_iterations(agent, messages: list, api_call_count: int) -> str:
 
         if final_response:
             if "<think>" in final_response:
-                final_response = re.sub(r'<think>.*?</think>\s*', '', final_response, flags=re.DOTALL).strip()
+                final_response = re.sub(r"<think>.*?</think>\s*", "", final_response, flags=re.DOTALL).strip()
             if final_response:
                 messages.append({"role": "assistant", "content": final_response})
             else:
@@ -1516,7 +1520,7 @@ def handle_max_iterations(agent, messages: list, api_call_count: int) -> str:
 
             if final_response:
                 if "<think>" in final_response:
-                    final_response = re.sub(r'<think>.*?</think>\s*', '', final_response, flags=re.DOTALL).strip()
+                    final_response = re.sub(r"<think>.*?</think>\s*", "", final_response, flags=re.DOTALL).strip()
                 if final_response:
                     messages.append({"role": "assistant", "content": final_response})
                 else:
@@ -1529,7 +1533,6 @@ def handle_max_iterations(agent, messages: list, api_call_count: int) -> str:
         final_response = f"I reached the maximum iterations ({agent.max_iterations}) but couldn't summarize. Error: {str(e)}"
 
     return final_response
-
 
 
 def cleanup_task_resources(agent, task_id: str) -> None:
@@ -1560,8 +1563,6 @@ def cleanup_task_resources(agent, task_id: str) -> None:
     except Exception as e:
         if agent.verbose_logging:
             logger.warning(f"Failed to cleanup browser for task {task_id}: {e}")
-
-
 
 
 def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=None):
@@ -2618,7 +2619,6 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
     return result["response"]
 
 # ── Provider fallback ──────────────────────────────────────────────────
-
 
 
 __all__ = [

@@ -1,5 +1,4 @@
-"""
-parrot_openrouter: same as the upstream `parrot` example but the LLM call goes
+"""parrot_openrouter: same as the upstream `parrot` example but the LLM call goes
 through OpenRouter (OpenAI SDK) instead of Anthropic native. Lets us run an
 end-to-end evolution with whatever model the user already has paid access to.
 
@@ -17,20 +16,24 @@ import sys
 from pathlib import Path
 
 import jinja2
-from openai import OpenAI
 
 # Vendored problem types from upstream (AGPL — only run via subprocess in production)
-from darwinian_evolver.cli_common import build_hyperparameter_config_from_args
-from darwinian_evolver.cli_common import register_hyperparameter_args
-from darwinian_evolver.cli_common import parse_learning_log_view_type
+from darwinian_evolver.cli_common import (
+    build_hyperparameter_config_from_args,
+    parse_learning_log_view_type,
+    register_hyperparameter_args,
+)
 from darwinian_evolver.evolve_problem_loop import EvolveProblemLoop
 from darwinian_evolver.learning_log import LearningLogEntry
-from darwinian_evolver.problem import EvaluationFailureCase
-from darwinian_evolver.problem import EvaluationResult
-from darwinian_evolver.problem import Evaluator
-from darwinian_evolver.problem import Mutator
-from darwinian_evolver.problem import Organism
-from darwinian_evolver.problem import Problem
+from darwinian_evolver.problem import (
+    EvaluationFailureCase,
+    EvaluationResult,
+    Evaluator,
+    Mutator,
+    Organism,
+    Problem,
+)
+from openai import OpenAI
 
 DEFAULT_MODEL = os.environ.get("EVOLVER_MODEL", "openai/gpt-4o-mini")
 

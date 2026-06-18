@@ -18,7 +18,6 @@ from unittest.mock import patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # _resolve_hermes_uid_gid
 # ---------------------------------------------------------------------------
@@ -103,7 +102,8 @@ class TestChownToHermesUid:
 
     def test_uses_minus_one_for_missing_field(self, tmp_path, monkeypatch):
         """When only one env var is set, the other field passes -1 to
-        os.chown which means 'do not change' on POSIX."""
+        os.chown which means 'do not change' on POSIX.
+        """
         monkeypatch.setenv("HERMES_UID", "1000")
         monkeypatch.delenv("HERMES_GID", raising=False)
         from hermes_cli import config as cfg
@@ -131,7 +131,8 @@ class TestChownToHermesUid:
         """When running as non-root, os.chown raises EPERM. That's fine —
         the entrypoint's startup chown -R will pick it up on restart, and
         in most cases the dir was already correctly-owned by the calling
-        user anyway."""
+        user anyway.
+        """
         monkeypatch.setenv("HERMES_UID", "1000")
         monkeypatch.setenv("HERMES_GID", "911")
         from hermes_cli import config as cfg
@@ -148,7 +149,8 @@ class TestChownToHermesUid:
 
     def test_attributeerror_swallowed_for_windows_compat(self, tmp_path, monkeypatch):
         """os.chown doesn't exist on Windows. Catching AttributeError keeps
-        the helper portable."""
+        the helper portable.
+        """
         monkeypatch.setenv("HERMES_UID", "1000")
         monkeypatch.setenv("HERMES_GID", "911")
         from hermes_cli import config as cfg

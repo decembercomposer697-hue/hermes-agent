@@ -221,6 +221,7 @@ def test_stop_signals_process_and_clears_pointer(tmp_path):
     })
 
     alive_seq = iter([True, True, False])  # alive at first, gone after SIGTERM
+
     def _alive(pid):
         try:
             return next(alive_seq)
@@ -228,6 +229,7 @@ def test_stop_signals_process_and_clears_pointer(tmp_path):
             return False
 
     sent = []
+
     def _kill(pid, sig):
         sent.append((pid, sig))
 
@@ -316,8 +318,7 @@ def test_on_session_end_noop_when_nothing_active():
 
 
 def test_on_session_end_stops_live_bot():
-    from plugins.google_meet import _on_session_end
-    from plugins.google_meet import pm
+    from plugins.google_meet import _on_session_end, pm
 
     with patch.object(pm, "status", return_value={"ok": True, "alive": True}), \
          patch.object(pm, "stop") as stop_mock:
@@ -442,6 +443,7 @@ def test_start_realtime_env_vars_threaded_through():
         def __init__(self, pid): self.pid = pid
 
     captured_env = {}
+
     def _fake_popen(argv, **kwargs):
         captured_env.update(kwargs.get("env") or {})
         return _FakeProc(11111)
@@ -503,8 +505,8 @@ def test_meet_join_unknown_node_returns_clear_error():
 
 
 def test_meet_join_routes_to_registered_node():
-    from plugins.google_meet.tools import handle_meet_join
     from plugins.google_meet.node.registry import NodeRegistry
+    from plugins.google_meet.tools import handle_meet_join
 
     reg = NodeRegistry()
     reg.add("my-mac", "ws://1.2.3.4:18789", "tok")
@@ -522,8 +524,8 @@ def test_meet_join_routes_to_registered_node():
 
 
 def test_meet_say_routes_to_node():
-    from plugins.google_meet.tools import handle_meet_say
     from plugins.google_meet.node.registry import NodeRegistry
+    from plugins.google_meet.tools import handle_meet_say
 
     reg = NodeRegistry()
     reg.add("my-mac", "ws://1.2.3.4:18789", "tok")
@@ -537,8 +539,8 @@ def test_meet_say_routes_to_node():
 
 
 def test_meet_join_auto_node_selects_sole_registered():
-    from plugins.google_meet.tools import handle_meet_join
     from plugins.google_meet.node.registry import NodeRegistry
+    from plugins.google_meet.tools import handle_meet_join
 
     reg = NodeRegistry()
     reg.add("only-one", "ws://1.2.3.4:18789", "tok")
@@ -555,8 +557,8 @@ def test_meet_join_auto_node_selects_sole_registered():
 
 
 def test_meet_join_auto_node_ambiguous_returns_error():
-    from plugins.google_meet.tools import handle_meet_join
     from plugins.google_meet.node.registry import NodeRegistry
+    from plugins.google_meet.tools import handle_meet_join
 
     reg = NodeRegistry()
     reg.add("a", "ws://1.2.3.4:18789", "tok")
@@ -573,6 +575,7 @@ def test_meet_join_auto_node_ambiguous_returns_error():
 def test_cli_register_includes_node_subcommand():
     """`hermes meet` argparse tree includes the node subtree."""
     import argparse
+
     from plugins.google_meet.cli import register_cli
 
     parser = argparse.ArgumentParser(prog="hermes meet")
@@ -586,6 +589,7 @@ def test_cli_register_includes_node_subcommand():
 
 def test_cli_join_accepts_mode_and_node_flags():
     import argparse
+
     from plugins.google_meet.cli import register_cli
 
     parser = argparse.ArgumentParser(prog="hermes meet")
@@ -601,6 +605,7 @@ def test_cli_join_accepts_mode_and_node_flags():
 
 def test_cli_say_subcommand_exists():
     import argparse
+
     from plugins.google_meet.cli import register_cli
 
     parser = argparse.ArgumentParser(prog="hermes meet")
@@ -727,6 +732,7 @@ def test_realtime_session_counters_initialized():
 
 def test_cli_install_subcommand_is_registered():
     import argparse
+
     from plugins.google_meet.cli import register_cli
 
     parser = argparse.ArgumentParser(prog="hermes meet")
@@ -740,6 +746,7 @@ def test_cli_install_subcommand_is_registered():
 
 def test_cli_install_flags_parse():
     import argparse
+
     from plugins.google_meet.cli import register_cli
 
     parser = argparse.ArgumentParser(prog="hermes meet")
@@ -766,6 +773,7 @@ def test_cmd_install_runs_pip_and_playwright(capsys):
     from plugins.google_meet.cli import _cmd_install
 
     calls = []
+
     class _FakeRes:
         def __init__(self, rc=0): self.returncode = rc
 
@@ -794,6 +802,7 @@ def test_cmd_install_realtime_skips_when_deps_present(capsys):
     from plugins.google_meet.cli import _cmd_install
 
     calls = []
+
     class _FakeRes:
         def __init__(self, rc=0): self.returncode = rc
 

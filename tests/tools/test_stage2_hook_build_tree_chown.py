@@ -41,7 +41,8 @@ def stage2_text() -> str:
 
 def _build_tree_block(text: str) -> str:
     """Extract the build-tree chown block: from the `venv_owner=` probe
-    through the closing `fi` of the chown."""
+    through the closing `fi` of the chown.
+    """
     m = re.search(
         r"(venv_owner=\$\(stat[^\n]*\n(?:.*\n)*?fi)",
         text,
@@ -52,7 +53,8 @@ def _build_tree_block(text: str) -> str:
 
 def test_build_tree_chown_not_gated_on_hermes_home(stage2_text: str) -> None:
     """The build-tree chown must NOT live inside the `if [ "$needs_chown" = true ]`
-    block keyed on $HERMES_HOME ownership — that is exactly the #35027 bug."""
+    block keyed on $HERMES_HOME ownership — that is exactly the #35027 bug.
+    """
     block = _build_tree_block(stage2_text)
     # The block probes the venv owner, not $HERMES_HOME.
     assert "venv_owner" in block
@@ -66,7 +68,8 @@ def _run_build_tree_block(
     text: str, *, venv_owner: int, hermes_uid: int,
 ) -> bool:
     """Run the extracted build-tree block with `stat`, `id`, and `chown`
-    stubbed. Returns True iff the block attempted the recursive chown."""
+    stubbed. Returns True iff the block attempted the recursive chown.
+    """
     bash = shutil.which("bash")
     if bash is None:
         pytest.skip("bash not available")
@@ -97,7 +100,8 @@ def _run_build_tree_block(
 def test_chown_fires_when_venv_owner_differs(stage2_text: str) -> None:
     """The #35027 regression scenario: after a remap $HERMES_HOME already
     matches the new UID, but the venv is still owned by the build-time UID
-    (10000). The build-tree chown MUST still fire."""
+    (10000). The build-tree chown MUST still fire.
+    """
     fired = _run_build_tree_block(stage2_text, venv_owner=10000, hermes_uid=4242)
     assert fired, (
         "build-tree chown must fire when the venv is not owned by the runtime "
@@ -107,7 +111,8 @@ def test_chown_fires_when_venv_owner_differs(stage2_text: str) -> None:
 
 def test_chown_skipped_when_venv_already_owned(stage2_text: str) -> None:
     """Idempotency: once the venv is hermes-owned, the recursive chown is
-    skipped on subsequent boots."""
+    skipped on subsequent boots.
+    """
     fired = _run_build_tree_block(stage2_text, venv_owner=4242, hermes_uid=4242)
     assert not fired, (
         "build-tree chown must be skipped when the venv already matches the "
@@ -117,6 +122,7 @@ def test_chown_skipped_when_venv_already_owned(stage2_text: str) -> None:
 
 def test_chown_skipped_for_default_uid(stage2_text: str) -> None:
     """No remap: venv owned by the default build UID (10000) and hermes is
-    still 10000 — nothing to do."""
+    still 10000 — nothing to do.
+    """
     fired = _run_build_tree_block(stage2_text, venv_owner=10000, hermes_uid=10000)
     assert not fired

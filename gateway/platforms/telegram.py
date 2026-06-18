@@ -1,5 +1,4 @@
-"""
-Telegram platform adapter.
+"""Telegram platform adapter.
 
 Uses python-telegram-bot library for:
 - Receiving messages from users/groups
@@ -9,32 +8,40 @@ Uses python-telegram-bot library for:
 
 import asyncio
 import dataclasses
+import html as _html
 import json
 import logging
 import os
-import tempfile
-import html as _html
 import re
-from datetime import datetime, timezone, UTC
-from typing import Dict, List, Optional, Set, Any
+import tempfile
+from datetime import UTC, datetime, timezone
+from typing import Any, Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
 try:
-    from telegram import Update, Bot, Message, InlineKeyboardButton, InlineKeyboardMarkup
+    from telegram import (
+        Bot,
+        InlineKeyboardButton,
+        InlineKeyboardMarkup,
+        Message,
+        Update,
+    )
     try:
         from telegram import LinkPreviewOptions
     except ImportError:
         LinkPreviewOptions = None
+    from telegram.constants import ChatType, ParseMode
     from telegram.ext import (
         Application,
-        CommandHandler,
         CallbackQueryHandler,
-        MessageHandler as TelegramMessageHandler,
+        CommandHandler,
         ContextTypes,
         filters,
     )
-    from telegram.constants import ParseMode, ChatType
+    from telegram.ext import (
+        MessageHandler as TelegramMessageHandler,
+    )
     from telegram.request import HTTPXRequest
     TELEGRAM_AVAILABLE = True
 except ImportError:
@@ -62,23 +69,24 @@ except ImportError:
 
 import sys
 from pathlib import Path as _Path
+
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import (
+    SUPPORTED_DOCUMENT_TYPES,
+    SUPPORTED_IMAGE_DOCUMENT_TYPES,
+    SUPPORTED_VIDEO_TYPES,
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     ProcessingOutcome,
     SendResult,
-    cache_image_from_bytes,
     cache_audio_from_bytes,
-    cache_video_from_bytes,
     cache_document_from_bytes,
+    cache_image_from_bytes,
+    cache_video_from_bytes,
     resolve_proxy_url,
-    SUPPORTED_VIDEO_TYPES,
-    SUPPORTED_DOCUMENT_TYPES,
-    SUPPORTED_IMAGE_DOCUMENT_TYPES,
     utf16_len,
 )
 from gateway.platforms.telegram_network import (
@@ -128,19 +136,35 @@ def check_telegram_requirements() -> bool:
     except Exception:
         return False
     try:
-        from telegram import Update as _Update, Bot as _Bot, Message as _Message
-        from telegram import InlineKeyboardButton as _IKB, InlineKeyboardMarkup as _IKM
+        from telegram import Bot as _Bot
+        from telegram import InlineKeyboardButton as _IKB
+        from telegram import InlineKeyboardMarkup as _IKM
+        from telegram import Message as _Message
+        from telegram import Update as _Update
         try:
             from telegram import LinkPreviewOptions as _LPO
         except ImportError:
             _LPO = None
+        from telegram.constants import ChatType as _CtT
+        from telegram.constants import ParseMode as _PM
         from telegram.ext import (
-            Application as _App, CommandHandler as _CH,
-            CallbackQueryHandler as _CQH,
-            MessageHandler as _MH,
-            ContextTypes as _CT, filters as _filters,
+            Application as _App,
         )
-        from telegram.constants import ParseMode as _PM, ChatType as _CtT
+        from telegram.ext import (
+            CallbackQueryHandler as _CQH,
+        )
+        from telegram.ext import (
+            CommandHandler as _CH,
+        )
+        from telegram.ext import (
+            ContextTypes as _CT,
+        )
+        from telegram.ext import (
+            MessageHandler as _MH,
+        )
+        from telegram.ext import (
+            filters as _filters,
+        )
         from telegram.request import HTTPXRequest as _HR
     except ImportError:
         return False
@@ -165,12 +189,12 @@ def check_telegram_requirements() -> bool:
 
 # Matches every character that MarkdownV2 requires to be backslash-escaped
 # when it appears outside a code span or fenced code block.
-_MDV2_ESCAPE_RE = re.compile(r'([_*\[\]()~`>#\+\-=|{}.!\\])')
+_MDV2_ESCAPE_RE = re.compile(r"([_*\[\]()~`>#\+\-=|{}.!\\])")
 
 
 def _escape_mdv2(text: str) -> str:
     """Escape Telegram MarkdownV2 special characters with a preceding backslash."""
-    return _MDV2_ESCAPE_RE.sub(r'\\\1', text)
+    return _MDV2_ESCAPE_RE.sub(r"\\\1", text)
 
 
 def _strip_mdv2(text: str) -> str:
@@ -180,18 +204,18 @@ def _strip_mdv2(text: str) -> str:
     doesn't show stray syntax characters from format_message conversion.
     """
     # Remove escape backslashes before special characters
-    cleaned = re.sub(r'\\([_*\[\]()~`>#\+\-=|{}.!\\])', r'\1', text)
+    cleaned = re.sub(r"\\([_*\[\]()~`>#\+\-=|{}.!\\])", r"\1", text)
     # Remove standard markdown bold (**text** → text) BEFORE MarkdownV2 bold
-    cleaned = re.sub(r'\*\*([^*]+)\*\*', r'\1', cleaned)
+    cleaned = re.sub(r"\*\*([^*]+)\*\*", r"\1", cleaned)
     # Remove MarkdownV2 bold markers that format_message converted from **bold**
-    cleaned = re.sub(r'\*([^*]+)\*', r'\1', cleaned)
+    cleaned = re.sub(r"\*([^*]+)\*", r"\1", cleaned)
     # Remove MarkdownV2 italic markers that format_message converted from *italic*
     # Use word boundary (\b) to avoid breaking snake_case like my_variable_name
-    cleaned = re.sub(r'(?<!\w)_([^_]+)_(?!\w)', r'\1', cleaned)
+    cleaned = re.sub(r"(?<!\w)_([^_]+)_(?!\w)", r"\1", cleaned)
     # Remove MarkdownV2 strikethrough markers (~text~ → text)
-    cleaned = re.sub(r'~([^~]+)~', r'\1', cleaned)
+    cleaned = re.sub(r"~([^~]+)~", r"\1", cleaned)
     # Remove MarkdownV2 spoiler markers (||text|| → text)
-    cleaned = re.sub(r'\|\|([^|]+)\|\|', r'\1', cleaned)
+    cleaned = re.sub(r"\|\|([^|]+)\|\|", r"\1", cleaned)
     return cleaned
 
 
@@ -208,14 +232,14 @@ def _strip_mdv2(text: str) -> str:
 # by '|'.  Requires at least one internal '|' so lone '---' horizontal rules
 # are NOT matched.
 _TABLE_SEPARATOR_RE = re.compile(
-    r'^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*){1,}\|?\s*$',
+    r"^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*){1,}\|?\s*$",
 )
 
 
 def _is_table_row(line: str) -> bool:
     """Return True if *line* could plausibly be a table data row."""
     stripped = line.strip()
-    return bool(stripped) and '|' in stripped
+    return bool(stripped) and "|" in stripped
 
 
 def _split_markdown_table_row(line: str) -> list[str]:
@@ -289,10 +313,10 @@ def _wrap_markdown_tables(text: str) -> str:
     per-row bullet groups. Tables inside existing fenced code blocks are left
     alone.
     """
-    if '|' not in text or '-' not in text:
+    if "|" not in text or "-" not in text:
         return text
 
-    lines = text.split('\n')
+    lines = text.split("\n")
     out: list[str] = []
     in_fence = False
     i = 0
@@ -301,7 +325,7 @@ def _wrap_markdown_tables(text: str) -> str:
         stripped = line.lstrip()
 
         # Track existing fenced code blocks — never touch content inside.
-        if stripped.startswith('```'):
+        if stripped.startswith("```"):
             in_fence = not in_fence
             out.append(line)
             i += 1
@@ -314,7 +338,7 @@ def _wrap_markdown_tables(text: str) -> str:
         # Look for a header row (contains '|') immediately followed by a
         # delimiter row.
         if (
-            '|' in line
+            "|" in line
             and i + 1 < len(lines)
             and _TABLE_SEPARATOR_RE.match(lines[i + 1])
         ):
@@ -330,12 +354,11 @@ def _wrap_markdown_tables(text: str) -> str:
         out.append(line)
         i += 1
 
-    return '\n'.join(out)
+    return "\n".join(out)
 
 
 class TelegramAdapter(BasePlatformAdapter):
-    """
-    Telegram bot adapter.
+    """Telegram bot adapter.
 
     Handles:
     - Receiving messages from users and groups
@@ -410,7 +433,7 @@ class TelegramAdapter(BasePlatformAdapter):
         self._bot: Bot | None = None
         self._webhook_mode: bool = False
         self._mention_patterns = self._compile_mention_patterns()
-        self._reply_to_mode: str = getattr(config, 'reply_to_mode', 'first') or 'first'
+        self._reply_to_mode: str = getattr(config, "reply_to_mode", "first") or "first"
         self._disable_link_previews: bool = self._coerce_bool_extra("disable_link_previews", False)
         # Buffer rapid/album photo updates so Telegram image bursts are handled
         # as a single MessageEvent instead of self-interrupting multiple turns.
@@ -1521,7 +1544,7 @@ class TelegramAdapter(BasePlatformAdapter):
             return False
         
         try:
-            if not self._acquire_platform_lock('telegram-bot-token', self.config.token, 'Telegram bot token'):
+            if not self._acquire_platform_lock("telegram-bot-token", self.config.token, "Telegram bot token"):
                 return False
 
             # Build the application
@@ -1735,10 +1758,11 @@ class TelegramAdapter(BasePlatformAdapter):
             try:
                 from telegram import (
                     BotCommand,
-                    BotCommandScopeAllPrivateChats,
                     BotCommandScopeAllGroupChats,
+                    BotCommandScopeAllPrivateChats,
                     BotCommandScopeDefault,
                 )
+
                 from hermes_cli.commands import telegram_menu_commands
                 # Telegram allows up to 100 commands but has an undocumented
                 # payload size limit (~4KB total).  Limit to 30 core commands
@@ -1838,6 +1862,7 @@ class TelegramAdapter(BasePlatformAdapter):
 
         Returns:
             True if this chunk should be threaded to the original message
+
         """
         if not reply_to:
             return False
@@ -3626,7 +3651,9 @@ class TelegramAdapter(BasePlatformAdapter):
                 # has been cleaned up (race with timeout / session reset).
                 resolved_text: str | None = None
                 try:
-                    from tools.clarify_gateway import _entries as _clarify_entries  # type: ignore
+                    from tools.clarify_gateway import (
+                        _entries as _clarify_entries,  # type: ignore
+                    )
                     entry = _clarify_entries.get(clarify_id)
                     if entry and entry.choices and 0 <= idx < len(entry.choices):
                         resolved_text = entry.choices[idx]
@@ -3716,16 +3743,16 @@ class TelegramAdapter(BasePlatformAdapter):
     # is_state=False is a per-email one-shot (send, archive, draft, spam) that
     # strips the keyboard on success.
     _GT_VERB_DISPATCH = {
-        "send":         ("send-draft.sh",      [],         "✓ sent draft",         False),
-        "archive":      ("archive.sh",         [],         "✓ archived",           False),
-        "draft":        ("draft-blank.sh",     [],         "✓ drafted reply",      False),
-        "spam":         ("spam.sh",            [],         "✓ marked spam",        False),
-        "mute":         ("mute-add.sh",        ["email"],  "✓ muted",              True),
-        "mute-domain":  ("mute-add.sh",        ["domain"], "✓ muted domain",       True),
-        "trust":        ("trusted-ops-add.sh", ["email"],  "✓ trusted",            True),
-        "trust-domain": ("trusted-ops-add.sh", ["domain"], "✓ trusted domain",     True),
-        "vip":          ("vip-add.sh",         ["email"],  "✓ marked VIP",         True),
-        "vip-domain":   ("vip-add.sh",         ["domain"], "✓ marked VIP domain",  True),
+        "send":         ("send-draft.sh", [], "✓ sent draft", False),
+        "archive":      ("archive.sh", [], "✓ archived", False),
+        "draft":        ("draft-blank.sh", [], "✓ drafted reply", False),
+        "spam":         ("spam.sh", [], "✓ marked spam", False),
+        "mute":         ("mute-add.sh", ["email"], "✓ muted", True),
+        "mute-domain":  ("mute-add.sh", ["domain"], "✓ muted domain", True),
+        "trust":        ("trusted-ops-add.sh", ["email"], "✓ trusted", True),
+        "trust-domain": ("trusted-ops-add.sh", ["domain"], "✓ trusted domain", True),
+        "vip":          ("vip-add.sh", ["email"], "✓ marked VIP", True),
+        "vip-domain":   ("vip-add.sh", ["domain"], "✓ marked VIP domain", True),
     }
 
     async def _handle_gmail_triage_callback(
@@ -4465,8 +4492,7 @@ class TelegramAdapter(BasePlatformAdapter):
             return {"name": str(chat_id), "type": "dm", "error": str(e)}
 
     def format_message(self, content: str) -> str:
-        """
-        Convert standard markdown to Telegram MarkdownV2 format.
+        """Convert standard markdown to Telegram MarkdownV2 format.
 
         Protected regions (code blocks, inline code) are extracted first so
         their contents are never modified.  Standard markdown constructs
@@ -4497,15 +4523,15 @@ class TelegramAdapter(BasePlatformAdapter):
         def _protect_fenced(m):
             raw = m.group(0)
             # Split off opening ``` (with optional language) and closing ```
-            open_end = raw.index('\n') + 1 if '\n' in raw[3:] else 3
+            open_end = raw.index("\n") + 1 if "\n" in raw[3:] else 3
             opening = raw[:open_end]
             body_and_close = raw[open_end:]
             body = body_and_close[:-3]
-            body = body.replace('\\', '\\\\').replace('`', '\\`')
-            return _ph(opening + body + '```')
+            body = body.replace("\\", "\\\\").replace("`", "\\`")
+            return _ph(opening + body + "```")
 
         text = re.sub(
-            r'(```(?:[^\n]*\n)?[\s\S]*?```)',
+            r"(```(?:[^\n]*\n)?[\s\S]*?```)",
             _protect_fenced,
             text,
         )
@@ -4513,8 +4539,8 @@ class TelegramAdapter(BasePlatformAdapter):
         # 2) Protect inline code (`...`)
         #    Escape \ inside inline code per MarkdownV2 spec.
         text = re.sub(
-            r'(`[^`]+`)',
-            lambda m: _ph(m.group(0).replace('\\', '\\\\')),
+            r"(`[^`]+`)",
+            lambda m: _ph(m.group(0).replace("\\", "\\\\")),
             text,
         )
 
@@ -4522,26 +4548,26 @@ class TelegramAdapter(BasePlatformAdapter):
         #    only ')' and '\' need escaping per the MarkdownV2 spec.
         def _convert_link(m):
             display = _escape_mdv2(m.group(1))
-            url = m.group(2).replace('\\', '\\\\').replace(')', '\\)')
-            return _ph(f'[{display}]({url})')
+            url = m.group(2).replace("\\", "\\\\").replace(")", "\\)")
+            return _ph(f"[{display}]({url})")
 
-        text = re.sub(r'\[([^\]]+)\]\(([^()]*(?:\([^()]*\)[^()]*)*)\)', _convert_link, text)
+        text = re.sub(r"\[([^\]]+)\]\(([^()]*(?:\([^()]*\)[^()]*)*)\)", _convert_link, text)
 
         # 4) Convert markdown headers (## Title) → bold *Title*
         def _convert_header(m):
             inner = m.group(1).strip()
             # Strip redundant bold markers that may appear inside a header
-            inner = re.sub(r'\*\*(.+?)\*\*', r'\1', inner)
-            return _ph(f'*{_escape_mdv2(inner)}*')
+            inner = re.sub(r"\*\*(.+?)\*\*", r"\1", inner)
+            return _ph(f"*{_escape_mdv2(inner)}*")
 
         text = re.sub(
-            r'^#{1,6}\s+(.+)$', _convert_header, text, flags=re.MULTILINE,
+            r"^#{1,6}\s+(.+)$", _convert_header, text, flags=re.MULTILINE,
         )
 
         # 5) Convert bold: **text** → *text* (MarkdownV2 bold)
         text = re.sub(
-            r'\*\*(.+?)\*\*',
-            lambda m: _ph(f'*{_escape_mdv2(m.group(1))}*'),
+            r"\*\*(.+?)\*\*",
+            lambda m: _ph(f"*{_escape_mdv2(m.group(1))}*"),
             text,
         )
 
@@ -4549,22 +4575,22 @@ class TelegramAdapter(BasePlatformAdapter):
         #    [^*\n]+ prevents matching across newlines (which would corrupt
         #    bullet lists using * markers and multi-line content).
         text = re.sub(
-            r'\*([^*\n]+)\*',
-            lambda m: _ph(f'_{_escape_mdv2(m.group(1))}_'),
+            r"\*([^*\n]+)\*",
+            lambda m: _ph(f"_{_escape_mdv2(m.group(1))}_"),
             text,
         )
 
         # 7) Convert strikethrough: ~~text~~ → ~text~ (MarkdownV2)
         text = re.sub(
-            r'~~(.+?)~~',
-            lambda m: _ph(f'~{_escape_mdv2(m.group(1))}~'),
+            r"~~(.+?)~~",
+            lambda m: _ph(f"~{_escape_mdv2(m.group(1))}~"),
             text,
         )
 
         # 8) Convert spoiler: ||text|| → ||text|| (protect from | escaping)
         text = re.sub(
-            r'\|\|(.+?)\|\|',
-            lambda m: _ph(f'||{_escape_mdv2(m.group(1))}||'),
+            r"\|\|(.+?)\|\|",
+            lambda m: _ph(f"||{_escape_mdv2(m.group(1))}||"),
             text,
         )
 
@@ -4576,12 +4602,12 @@ class TelegramAdapter(BasePlatformAdapter):
             content = m.group(2)
             # Check if content ends with || (expandable blockquote end marker)
             # In this case, preserve the trailing || unescaped for Telegram
-            if prefix.startswith('**') and content.endswith('||'):
-                return _ph(f'{prefix} {_escape_mdv2(content[:-2])}||')
-            return _ph(f'{prefix} {_escape_mdv2(content)}')
+            if prefix.startswith("**") and content.endswith("||"):
+                return _ph(f"{prefix} {_escape_mdv2(content[:-2])}||")
+            return _ph(f"{prefix} {_escape_mdv2(content)}")
 
         text = re.sub(
-            r'^((?:\*\*)?>{1,3}) (.+)$',
+            r"^((?:\*\*)?>{1,3}) (.+)$",
             _convert_blockquote,
             text,
             flags=re.MULTILINE,
@@ -4598,7 +4624,7 @@ class TelegramAdapter(BasePlatformAdapter):
         # 12) Safety net: escape unescaped ( ) { } that slipped through
         #     placeholder processing.  Split the text into code/non-code
         #     segments so we never touch content inside ``` or ` spans.
-        _code_split = re.split(r'(```[\s\S]*?```|`[^`]+`)', text)
+        _code_split = re.split(r"(```[\s\S]*?```|`[^`]+`)", text)
         _safe_parts = []
         for _idx, _seg in enumerate(_code_split):
             if _idx % 2 == 1:
@@ -4610,29 +4636,29 @@ class TelegramAdapter(BasePlatformAdapter):
                     s = m.start()
                     ch = m.group(0)
                     # Already escaped
-                    if s > 0 and _seg[s - 1] == '\\':
+                    if s > 0 and _seg[s - 1] == "\\":
                         return ch
                     # ( that opens a MarkdownV2 link [text](url)
-                    if ch == '(' and s > 0 and _seg[s - 1] == ']':
+                    if ch == "(" and s > 0 and _seg[s - 1] == "]":
                         return ch
                     # ) that closes a link URL
-                    if ch == ')':
+                    if ch == ")":
                         before = _seg[:s]
-                        if '](http' in before or '](' in before:
+                        if "](http" in before or "](" in before:
                             # Check depth
                             depth = 0
                             for j in range(s - 1, max(s - 2000, -1), -1):
-                                if _seg[j] == '(':
+                                if _seg[j] == "(":
                                     depth -= 1
                                     if depth < 0:
-                                        if j > 0 and _seg[j - 1] == ']':
+                                        if j > 0 and _seg[j - 1] == "]":
                                             return ch
                                         break
-                                elif _seg[j] == ')':
+                                elif _seg[j] == ")":
                                     depth += 1
-                    return '\\' + ch
-                _safe_parts.append(re.sub(r'[(){}]', _esc_bare, _seg))
-        text = ''.join(_safe_parts)
+                    return "\\" + ch
+                _safe_parts.append(re.sub(r"[(){}]", _esc_bare, _seg))
+        text = "".join(_safe_parts)
 
         return text
 
@@ -5292,6 +5318,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 if chat_id in self._forum_command_registered:
                     return
                 from telegram import BotCommand, BotCommandScopeChat
+
                 from hermes_cli.commands import telegram_menu_commands
                 menu_commands, _ = telegram_menu_commands(max_commands=MAX_COMMANDS_PER_SCOPE)
                 bot_commands = [BotCommand(name, desc) for name, desc in menu_commands]
@@ -5759,7 +5786,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     try:
                         text_content = raw_bytes.decode("utf-8")
                         display_name = original_filename or f"document{ext}"
-                        display_name = re.sub(r'[^\w.\- ]', '_', display_name)
+                        display_name = re.sub(r"[^\w.\- ]", "_", display_name)
                         injection = f"[Content of {display_name}]:\n{text_content}"
                         if event.text:
                             event.text = f"{injection}\n\n{event.text}"
@@ -5818,19 +5845,18 @@ class TelegramAdapter(BasePlatformAdapter):
             self._media_group_tasks.pop(media_group_id, None)
 
     async def _handle_sticker(self, msg: Message, event: "MessageEvent") -> None:
-        """
-        Describe a Telegram sticker via vision analysis, with caching.
+        """Describe a Telegram sticker via vision analysis, with caching.
 
         For static stickers (WEBP), we download, analyze with vision, and cache
         the description by file_unique_id. For animated/video stickers, we inject
         a placeholder noting the emoji.
         """
         from gateway.sticker_cache import (
-            get_cached_description,
-            cache_sticker_description,
-            build_sticker_injection,
-            build_animated_sticker_injection,
             STICKER_VISION_PROMPT,
+            build_animated_sticker_injection,
+            build_sticker_injection,
+            cache_sticker_description,
+            get_cached_description,
         )
 
         sticker = msg.sticker

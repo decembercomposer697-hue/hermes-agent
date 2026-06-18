@@ -1,5 +1,4 @@
-"""
-Gateway runtime status helpers.
+"""Gateway runtime status helpers.
 
 Provides PID-file based detection of whether the gateway daemon is running,
 used by send_message's check_fn to gate availability in the CLI.
@@ -17,10 +16,11 @@ import os
 import signal
 import subprocess
 import sys
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
-from hermes_constants import get_hermes_home
 from typing import Any, Optional
+
+from hermes_constants import get_hermes_home
 from utils import atomic_json_write
 
 if sys.platform == "win32":
@@ -408,7 +408,6 @@ def _pid_exists(pid: int) -> bool:
             return True
         except OSError:
             return False
-
 
 
 def _release_file_lock(handle) -> None:

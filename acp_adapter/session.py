@@ -8,8 +8,6 @@ history.
 """
 from __future__ import annotations
 
-from hermes_constants import get_hermes_home
-
 import copy
 import json
 import logging
@@ -18,10 +16,12 @@ import re
 import sys
 import time
 import uuid
-from datetime import datetime, timezone, UTC
 from dataclasses import dataclass, field
+from datetime import UTC, datetime, timezone
 from threading import Lock
 from typing import Any, Dict, List, Optional
+
+from hermes_constants import get_hermes_home
 
 logger = logging.getLogger(__name__)
 
@@ -192,13 +192,13 @@ class SessionManager:
     """
 
     def __init__(self, agent_factory=None, db=None):
-        """
-        Args:
+        """Args:
             agent_factory: Optional callable that creates an AIAgent-like object.
                            Used by tests. When omitted, a real AIAgent is created
                            using the current Hermes runtime provider configuration.
             db:            Optional SessionDB instance. When omitted, the default
                            SessionDB (``~/.hermes/state.db``) is lazily created.
+
         """
         self._sessions: dict[str, SessionState] = {}
         self._lock = Lock()
@@ -568,9 +568,9 @@ class SessionManager:
         if self._agent_factory is not None:
             return self._agent_factory()
 
-        from run_agent import AIAgent
         from hermes_cli.config import load_config
         from hermes_cli.runtime_provider import resolve_runtime_provider
+        from run_agent import AIAgent
 
         config = load_config()
         model_cfg = config.get("model")

@@ -32,7 +32,6 @@ import urllib.error
 import urllib.request
 from typing import Optional
 
-
 # Docker-style name generator. Same vibe as Docker's adjective_surname, but
 # adjective_noun with a space-free underscore join so it drops cleanly into a
 # label field. There is NO uniqueness constraint on the portal side (the row

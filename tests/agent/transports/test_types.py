@@ -10,10 +10,10 @@ from agent.transports.types import (
     map_finish_reason,
 )
 
-
 # ---------------------------------------------------------------------------
 # ToolCall
 # ---------------------------------------------------------------------------
+
 
 class TestToolCall:
     def test_basic_construction(self):
@@ -156,7 +156,8 @@ class TestMapFinishReason:
 
 class TestToolCallBackwardCompat:
     """Test duck-typing properties that let ToolCall pass through code expecting
-    the old SimpleNamespace(id, type, function=SimpleNamespace(name, arguments)) shape."""
+    the old SimpleNamespace(id, type, function=SimpleNamespace(name, arguments)) shape.
+    """
 
     def test_type_is_function(self):
         tc = ToolCall(id="1", name="search", arguments='{"q":"test"}')

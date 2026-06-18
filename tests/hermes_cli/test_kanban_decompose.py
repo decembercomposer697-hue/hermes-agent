@@ -58,7 +58,8 @@ def _patch_extra_body():
 def _patch_list_profiles(names: list[str]):
     """Pretend the named profiles exist. The decomposer uses
     profiles_mod.list_profiles() to build the roster + valid-set, and
-    profiles_mod.profile_exists() to resolve orchestrator/default."""
+    profiles_mod.profile_exists() to resolve orchestrator/default.
+    """
     from types import SimpleNamespace
     fake_profiles = [
         SimpleNamespace(

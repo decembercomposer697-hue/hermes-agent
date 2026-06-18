@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-
-Tests for the code execution sandbox (programmatic tool calling).
+"""Tests for the code execution sandbox (programmatic tool calling).
 
 These tests monkeypatch handle_function_call so they don't require API keys
 or a running terminal backend. They verify the core sandbox mechanics:
@@ -12,11 +10,11 @@ Run with:  python -m pytest tests/test_code_execution.py -v
    or:     python tests/test_code_execution.py
 """
 
-import pytest
 # pytestmark removed — tests run fine (61 pass, ~99s)
-
 import json
 import os
+
+import pytest
 
 os.environ["TERMINAL_ENV"] = "local"
 
@@ -33,17 +31,17 @@ def _force_local_terminal(monkeypatch):
 import sys
 import threading
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from tools.code_execution_tool import (
+    _TOOL_DOC_LINES,
+    EXECUTE_CODE_SCHEMA,
     SANDBOX_ALLOWED_TOOLS,
+    _execute_remote,
+    build_execute_code_schema,
+    check_sandbox_requirements,
     execute_code,
     generate_hermes_tools_module,
-    check_sandbox_requirements,
-    build_execute_code_schema,
-    EXECUTE_CODE_SCHEMA,
-    _TOOL_DOC_LINES,
-    _execute_remote,
 )
 
 
@@ -124,7 +122,8 @@ class TestHermesToolsGeneration(unittest.TestCase):
     def test_uds_transport_serializes_concurrent_calls(self):
         """Regression: UDS _call() must hold a lock across send+recv so that
         concurrent tool calls from multiple threads don't interleave on the
-        shared socket and receive each other's responses."""
+        shared socket and receive each other's responses.
+        """
         src = generate_hermes_tools_module(["terminal"], transport="uds")
         self.assertIn("_call_lock = threading.Lock()", src)
         self.assertIn("with _call_lock:", src)
@@ -132,7 +131,8 @@ class TestHermesToolsGeneration(unittest.TestCase):
     def test_file_transport_serializes_seq_allocation(self):
         """Regression: file transport _call() must allocate `_seq` under a
         lock, otherwise concurrent threads can pick the same seq and clobber
-        each other's request files."""
+        each other's request files.
+        """
         src = generate_hermes_tools_module(["terminal"], transport="file")
         self.assertIn("_seq_lock = threading.Lock()", src)
         self.assertIn("with _seq_lock:", src)
@@ -201,7 +201,7 @@ class TestExecuteCode(unittest.TestCase):
 
     def test_repo_root_modules_are_importable(self):
         """Sandboxed scripts can import modules that live at the repo root."""
-        result = self._run('import hermes_constants; print(hermes_constants.__file__)')
+        result = self._run("import hermes_constants; print(hermes_constants.__file__)")
         self.assertEqual(result["status"], "success")
         self.assertIn("hermes_constants.py", result["output"])
 
@@ -397,7 +397,7 @@ assert escaped.startswith("'")
         self.assertEqual(result["status"], "success")
 
     def test_retry_helper_success(self):
-        """retry returns on first success."""
+        """Retry returns on first success."""
         code = """
 from hermes_tools import retry
 counter = [0]
@@ -412,7 +412,7 @@ print(result)
         self.assertIn("ok on attempt 1", result["output"])
 
     def test_retry_helper_eventual_success(self):
-        """retry retries on failure and succeeds eventually."""
+        """Retry retries on failure and succeeds eventually."""
         code = """
 from hermes_tools import retry
 counter = [0]
@@ -429,7 +429,7 @@ print(result)
         self.assertIn("success", result["output"])
 
     def test_retry_helper_all_fail(self):
-        """retry raises the last error when all attempts fail."""
+        """Retry raises the last error when all attempts fail."""
         code = """
 from hermes_tools import retry
 def always_fail():
@@ -461,8 +461,10 @@ class TestStubSchemaDrift(unittest.TestCase):
 
     def test_stubs_cover_all_schema_params(self):
         """Every user-facing parameter in the real schema must appear in the
-        corresponding _TOOL_STUBS entry."""
+        corresponding _TOOL_STUBS entry.
+        """
         import re
+
         from tools.code_execution_tool import _TOOL_STUBS
 
         # Import the registry and trigger tool registration
@@ -482,7 +484,7 @@ class TestStubSchemaDrift(unittest.TestCase):
 
             # Extract parameter names from the stub signature string
             # Match word before colon: "pattern: str, target: str = ..."
-            stub_params = set(re.findall(r'(\w+)\s*:', sig))
+            stub_params = set(re.findall(r"(\w+)\s*:", sig))
 
             missing = schema_params - stub_params
             self.assertEqual(
@@ -494,12 +496,14 @@ class TestStubSchemaDrift(unittest.TestCase):
 
     def test_stubs_pass_all_params_to_rpc(self):
         """The args_dict_expr in each stub must include every parameter from
-        the signature, so that all params are actually sent over RPC."""
+        the signature, so that all params are actually sent over RPC.
+        """
         import re
+
         from tools.code_execution_tool import _TOOL_STUBS
 
         for tool_name, (func_name, sig, doc, args_expr) in _TOOL_STUBS.items():
-            stub_params = set(re.findall(r'(\w+)\s*:', sig))
+            stub_params = set(re.findall(r"(\w+)\s*:", sig))
             # Check that each param name appears in the args dict expression
             for param in stub_params:
                 self.assertIn(
@@ -522,7 +526,8 @@ class TestStubSchemaDrift(unittest.TestCase):
 
     def test_generated_module_accepts_all_params(self):
         """The generated hermes_tools.py module should accept all current params
-        without TypeError when called with keyword arguments."""
+        without TypeError when called with keyword arguments.
+        """
         src = generate_hermes_tools_module(list(SANDBOX_ALLOWED_TOOLS))
 
         # Compile the generated module to check for syntax errors
@@ -583,7 +588,8 @@ class TestBuildExecuteCodeSchema(unittest.TestCase):
 
     def test_import_examples_fallback_when_no_preferred(self):
         """When neither web_search nor terminal are enabled, falls back to
-        sorted first two tools."""
+        sorted first two tools.
+        """
         enabled = {"read_file", "write_file", "patch"}
         schema = build_execute_code_schema(enabled)
         code_desc = schema["parameters"]["properties"]["code"]["description"]
@@ -593,7 +599,8 @@ class TestBuildExecuteCodeSchema(unittest.TestCase):
 
     def test_empty_set_produces_valid_description(self):
         """build_execute_code_schema(set()) must not produce 'import , ...'
-        in the code property description."""
+        in the code property description.
+        """
         schema = build_execute_code_schema(set())
         code_desc = schema["parameters"]["properties"]["code"]["description"]
         self.assertNotIn("import , ...", code_desc,
@@ -683,7 +690,7 @@ class TestEnvVarFiltering(unittest.TestCase):
         try:
             if extra_env:
                 os.environ.update(extra_env)
-            with patch("model_tools.handle_function_call", return_value='{}'), \
+            with patch("model_tools.handle_function_call", return_value="{}"), \
                  patch("tools.code_execution_tool._load_config",
                        return_value={"timeout": 10, "max_tool_calls": 50}):
                 raw = execute_code(code, task_id="test-env",
@@ -777,7 +784,8 @@ class TestExecuteCodeEdgeCases(unittest.TestCase):
         regular tool calls.  Previously this was a Windows-only gate;
         execute_code now works on Windows via loopback TCP, so the
         error is only emitted when SANDBOX_AVAILABLE is explicitly
-        flipped off (e.g. for future platform-specific disables)."""
+        flipped off (e.g. for future platform-specific disables).
+        """
         with patch("tools.code_execution_tool.SANDBOX_AVAILABLE", False):
             result = json.loads(execute_code("print('hi')", task_id="test"))
             self.assertIn("error", result)
@@ -819,7 +827,8 @@ class TestExecuteCodeEdgeCases(unittest.TestCase):
     @unittest.skipIf(sys.platform == "win32", "UDS not available on Windows")
     def test_nonoverlapping_tools_fallback(self):
         """When enabled_tools has no overlap with SANDBOX_ALLOWED_TOOLS,
-        should fall back to all allowed tools."""
+        should fall back to all allowed tools.
+        """
         code = (
             "from hermes_tools import terminal\n"
             "print('fallback ok')\n"

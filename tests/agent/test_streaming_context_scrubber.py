@@ -191,7 +191,8 @@ class TestSanitizeContextUnchanged:
 class TestStreamingContextScrubberCrossTurn:
     """A scrubber instance is reused across turns (per agent).  reset() must
     clear any held state so a partial-tag tail from turn N doesn't bleed
-    into turn N+1's first delta."""
+    into turn N+1's first delta.
+    """
 
     def test_reset_clears_held_partial_tag(self):
         s = StreamingContextScrubber()
@@ -219,10 +220,12 @@ class TestStreamingContextScrubberCrossTurn:
 
 class TestBuildMemoryContextBlockWarnsOnViolation:
     """Providers must return raw context — not pre-wrapped.  When they do,
-    we strip and warn so the buggy provider surfaces."""
+    we strip and warn so the buggy provider surfaces.
+    """
 
     def test_provider_emitting_wrapper_warns(self, caplog):
         import logging
+
         from agent.memory_manager import build_memory_context_block
 
         prewrapped = (
@@ -240,6 +243,7 @@ class TestBuildMemoryContextBlockWarnsOnViolation:
 
     def test_clean_provider_output_does_not_warn(self, caplog):
         import logging
+
         from agent.memory_manager import build_memory_context_block
 
         with caplog.at_level(logging.WARNING, logger="agent.memory_manager"):

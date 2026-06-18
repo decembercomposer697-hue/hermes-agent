@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""
-Test script for batch runner
+"""Test script for batch runner
 
 This script tests the batch runner with a small sample dataset
 to verify functionality before running large batches.
 """
 
 import pytest
+
 pytestmark = pytest.mark.integration
 
 import json
@@ -25,7 +25,7 @@ def create_test_dataset():
         {"prompt": "Explain what Python is in one sentence."},
     ]
     
-    with open(test_file, 'w') as f:
+    with open(test_file, "w") as f:
         for prompt in prompts:
             f.write(json.dumps(prompt, ensure_ascii=False) + "\n")
     
@@ -82,9 +82,9 @@ def verify_output(run_name):
     print(f"   - Total batches: {stats['total_batches']}")
     print(f"   - Duration: {stats['duration_seconds']}s")
     
-    if stats.get('tool_statistics'):
+    if stats.get("tool_statistics"):
         print("   - Tool calls:")
-        for tool, tool_stats in stats['tool_statistics'].items():
+        for tool, tool_stats in stats["tool_statistics"].items():
             print(f"     • {tool}: {tool_stats['count']} calls, {tool_stats['success_rate']:.1f}% success")
     
     return True

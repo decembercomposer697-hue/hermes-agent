@@ -104,7 +104,8 @@ class TestModal:
     def test_daemon_thread_uses_modal_via_app_loop(self, platform):
         """Off the process_loop daemon thread, the confirm uses the modal via
         call_soon_threadsafe on every platform — including native Windows, where
-        the old win32 early-return deadlocked on raw input() (#33961)."""
+        the old win32 early-return deadlocked on raw input() (#33961).
+        """
         cli = _make_cli()
         outcome = _run_on_daemon(
             lambda: cli._prompt_text_input_modal(
@@ -161,7 +162,8 @@ class TestModal:
 
     def test_windows_no_app_falls_back_to_stdin(self):
         """win32 without a running app keeps stdin — the only case where the raw
-        prompt is safe on Windows, since no app owns the console to deadlock."""
+        prompt is safe on Windows, since no app owns the console to deadlock.
+        """
         cli = _make_cli()
         cli._app = None
 
@@ -179,7 +181,8 @@ class TestModal:
     def test_windows_scheduling_failure_clean_cancels(self):
         """win32 off the main thread: if marshaling onto the app loop fails, cancel
         cleanly (None) rather than fall to raw input() (which deadlocks on native
-        Windows) or hang. Asserts the _stdin_fallback guard (#33961)."""
+        Windows) or hang. Asserts the _stdin_fallback guard (#33961).
+        """
         cli = _make_cli()
 
         def _raise(_cb):
@@ -210,7 +213,8 @@ class TestModal:
         is None / raises), the modal can never be scheduled, so the method short-
         circuits at the app_loop-is-None site (cli.py ~7260) — a distinct path
         from a call_soon_threadsafe failure. win32 clean-cancels (None) instead of
-        deadlocking on raw input(); other platforms keep the stdin prompt."""
+        deadlocking on raw input(); other platforms keep the stdin prompt.
+        """
         cli = _make_cli()
         cli._app.loop = None  # forces app_loop is None, off the main thread
 
@@ -273,7 +277,8 @@ class TestConfirmDestructiveSlashWindows:
     )
     def test_confirm_destructive_slash_uses_modal_on_windows(self, response, expected):
         """On native Windows, the bare /new confirm drives the modal (not stdin)
-        and returns the chosen outcome — the bug #33961 froze this path."""
+        and returns the chosen outcome — the bug #33961 froze this path.
+        """
         cli = self._make_interactive_cli()
         with patch("cli.load_cli_config", return_value={"approvals": {"destructive_slash_confirm": True}}):
             outcome = _run_on_daemon(

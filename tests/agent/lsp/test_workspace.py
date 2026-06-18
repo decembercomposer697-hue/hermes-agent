@@ -118,7 +118,8 @@ def test_resolve_workspace_for_file_no_repo_returns_none(tmp_path: Path, monkeyp
 
 def test_resolve_workspace_falls_back_to_file_location(tmp_path: Path, monkeypatch):
     """When cwd isn't a git repo but the file is inside one, we still
-    discover the workspace from the file's path."""
+    discover the workspace from the file's path.
+    """
     not_a_repo = tmp_path / "loose"
     not_a_repo.mkdir()
     monkeypatch.chdir(str(not_a_repo))

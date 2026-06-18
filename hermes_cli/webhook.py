@@ -19,10 +19,9 @@ import time
 from pathlib import Path
 from typing import Dict
 
+from hermes_cli.config import cfg_get
 from hermes_constants import display_hermes_home
 from utils import atomic_replace
-from hermes_cli.config import cfg_get
-
 
 _SUBSCRIPTIONS_FILENAME = "webhook_subscriptions.json"
 _SUBSCRIPTIONS_FILE_MODE = 0o600
@@ -160,7 +159,7 @@ def webhook_command(args):
 
 def _cmd_subscribe(args):
     name = args.name.strip().lower().replace(" ", "-")
-    if not re.match(r'^[a-z0-9][a-z0-9_-]*$', name):
+    if not re.match(r"^[a-z0-9][a-z0-9_-]*$", name):
         print(f"Error: Invalid name '{name}'. Use lowercase alphanumeric with hyphens/underscores.")
         return
 
@@ -271,8 +270,8 @@ def _cmd_test(args):
 
     payload = args.payload or '{"test": true, "event_type": "test", "message": "Hello from hermes webhook test"}'
 
-    import hmac
     import hashlib
+    import hmac
     sig = "sha256=" + hmac.new(
         secret.encode(), payload.encode(), hashlib.sha256,
     ).hexdigest()

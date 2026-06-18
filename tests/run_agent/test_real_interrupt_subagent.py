@@ -87,7 +87,7 @@ class TestRealSubagentInterrupt(unittest.TestCase):
         def run_delegate():
             try:
                 # Patch the OpenAI client creation inside AIAgent.__init__
-                with patch('run_agent.OpenAI') as MockOpenAI:
+                with patch("run_agent.OpenAI") as MockOpenAI:
                     mock_client = MagicMock()
                     # API call takes 5 seconds — should be interrupted before that
                     mock_client.chat.completions.create = _make_slow_api_response(delay=5.0)
@@ -95,7 +95,7 @@ class TestRealSubagentInterrupt(unittest.TestCase):
                     MockOpenAI.return_value = mock_client
 
                     # Patch the instance method so it skips prompt assembly
-                    with patch.object(AIAgent, '_build_system_prompt', return_value="You are a test agent"):
+                    with patch.object(AIAgent, "_build_system_prompt", return_value="You are a test agent"):
                         # Signal when child starts
                         original_run = AIAgent.run_conversation
 
@@ -103,7 +103,7 @@ class TestRealSubagentInterrupt(unittest.TestCase):
                             child_started.set()
                             return original_run(self_agent, *args, **kwargs)
 
-                        with patch.object(AIAgent, 'run_conversation', patched_run):
+                        with patch.object(AIAgent, "run_conversation", patched_run):
                             # Build a real child agent (AIAgent is NOT patched here,
                             # only run_conversation and _build_system_prompt are)
                             child = AIAgent(

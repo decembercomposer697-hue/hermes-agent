@@ -1,5 +1,4 @@
-"""
-Plugin LLM facade — host-owned LLM access for trusted plugins.
+"""Plugin LLM facade — host-owned LLM access for trusted plugins.
 ==============================================================
 
 Plugins built on Hermes Agent often need to make their own LLM calls
@@ -63,9 +62,9 @@ import base64
 import json
 import logging
 import re
+from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
-from collections.abc import Awaitable, Callable, Sequence
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +114,8 @@ same shape — dicts are normalized internally. Dict shape::
 @dataclass
 class PluginLlmUsage:
     """Token + cost usage for a completion. All fields optional — providers
-    differ on what they return. ``cost_usd`` is the host's best estimate."""
+    differ on what they return. ``cost_usd`` is the host's best estimate.
+    """
 
     input_tokens: int = 0
     output_tokens: int = 0
@@ -144,7 +144,8 @@ class PluginLlmStructuredResult:
     ``parsed`` is set only when ``json_mode=True`` or ``json_schema`` is
     provided AND the response was valid JSON. ``content_type`` is
     ``"json"`` in that case, ``"text"`` otherwise (e.g. the model
-    refused or the response wasn't requested as JSON)."""
+    refused or the response wasn't requested as JSON).
+    """
 
     text: str
     provider: str
@@ -337,7 +338,8 @@ def _check_overrides(
 
 def _normalize_input_block(block: PluginLlmInput) -> dict[str, Any]:
     """Coerce a structured input block to a plain dict the message
-    builder understands. Unknown shapes raise ``ValueError``."""
+    builder understands. Unknown shapes raise ``ValueError``.
+    """
     if isinstance(block, PluginLlmTextInput):
         return {"type": "text", "text": block.text}
     if isinstance(block, PluginLlmImageInput):
@@ -447,7 +449,8 @@ _FENCE_RE = re.compile(r"```(?:json)?\s*(.+?)```", re.DOTALL | re.IGNORECASE)
 
 def _strip_code_fences(text: str) -> str:
     """Pull the first fenced code block out of ``text`` if any. Returns
-    ``text`` unchanged when no fence is present."""
+    ``text`` unchanged when no fence is present.
+    """
     match = _FENCE_RE.search(text)
     if match:
         return match.group(1).strip()
@@ -459,7 +462,8 @@ def _parse_structured_text(
 ) -> tuple[Any | None, str]:
     """Return ``(parsed, content_type)``. ``content_type`` is ``"json"``
     when parsing succeeded and (when a schema was given) validation
-    passed; ``"text"`` otherwise."""
+    passed; ``"text"`` otherwise.
+    """
     if not (json_mode or json_schema is not None):
         return None, "text"
     if not text:
@@ -495,7 +499,8 @@ def _extract_usage(response: Any) -> PluginLlmUsage:
 
     Tolerant of provider differences — Anthropic via the auxiliary
     adapter exposes ``usage.prompt_tokens`` / ``usage.completion_tokens``;
-    direct OpenAI also exposes ``cache_read_input_tokens``."""
+    direct OpenAI also exposes ``cache_read_input_tokens``.
+    """
     usage = PluginLlmUsage()
     raw = getattr(response, "usage", None)
     if raw is None:
@@ -901,7 +906,8 @@ class PluginLlm:
     ) -> dict[str, Any] | None:
         """Build the ``extra_body.response_format`` payload for the
         provider request. Falls back to ``json_object`` when no schema
-        is given so providers that ignore json_schema still get a hint."""
+        is given so providers that ignore json_schema still get a hint.
+        """
         if json_schema is not None:
             return {
                 "response_format": {
@@ -931,7 +937,8 @@ class PluginLlm:
     ) -> tuple[str, str, Any]:
         """Invoke the host's ``call_llm``. Lazy-imports
         ``agent.auxiliary_client`` to avoid circular deps at plugin
-        discovery time."""
+        discovery time.
+        """
         if self._sync_caller is not None:
             return self._sync_caller(
                 messages=messages,

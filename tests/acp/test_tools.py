@@ -1,6 +1,14 @@
 """Tests for acp_adapter.tools — tool kind mapping and ACP content building."""
 
 
+from acp.schema import (
+    ContentToolCallContent,
+    FileEditToolCallContent,
+    ToolCallLocation,
+    ToolCallProgress,
+    ToolCallStart,
+)
+
 from acp_adapter.edit_approval import EditProposal
 from acp_adapter.tools import (
     TOOL_KIND_MAP,
@@ -11,14 +19,6 @@ from acp_adapter.tools import (
     get_tool_kind,
     make_tool_call_id,
 )
-from acp.schema import (
-    FileEditToolCallContent,
-    ContentToolCallContent,
-    ToolCallLocation,
-    ToolCallStart,
-    ToolCallProgress,
-)
-
 
 # ---------------------------------------------------------------------------
 # TOOL_KIND_MAP coverage
@@ -147,7 +147,7 @@ class TestBuildToolTitle:
 
 class TestBuildToolStart:
     def test_build_tool_start_for_patch(self):
-        """patch start should not duplicate the edit-approval diff."""
+        """Patch start should not duplicate the edit-approval diff."""
         args = {
             "path": "src/main.py",
             "old_string": "print('hello')",
@@ -194,7 +194,7 @@ class TestBuildToolStart:
         assert item.new_text == "new\n"
 
     def test_build_tool_start_for_terminal(self):
-        """terminal should produce text content with the command."""
+        """Terminal should produce text content with the command."""
         args = {"command": "ls -la /tmp"}
         result = build_tool_start("tc-2", "terminal", args)
         assert isinstance(result, ToolCallStart)

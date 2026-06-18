@@ -25,9 +25,9 @@ Usage in run_agent.py:
 
 from __future__ import annotations
 
+import inspect
 import logging
 import re
-import inspect
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional
@@ -48,22 +48,22 @@ _SYNC_DRAIN_TIMEOUT_S = 5.0
 # Context fencing helpers
 # ---------------------------------------------------------------------------
 
-_FENCE_TAG_RE = re.compile(r'</?\s*memory-context\s*>', re.IGNORECASE)
+_FENCE_TAG_RE = re.compile(r"</?\s*memory-context\s*>", re.IGNORECASE)
 _INTERNAL_CONTEXT_RE = re.compile(
-    r'<\s*memory-context\s*>[\s\S]*?</\s*memory-context\s*>',
+    r"<\s*memory-context\s*>[\s\S]*?</\s*memory-context\s*>",
     re.IGNORECASE,
 )
 _INTERNAL_NOTE_RE = re.compile(
-    r'\[System note:\s*The following is recalled memory context,\s*NOT new user input\.\s*Treat as (?:informational background data|authoritative reference data[^\]]*)\.\]\s*',
+    r"\[System note:\s*The following is recalled memory context,\s*NOT new user input\.\s*Treat as (?:informational background data|authoritative reference data[^\]]*)\.\]\s*",
     re.IGNORECASE,
 )
 
 
 def sanitize_context(text: str) -> str:
     """Strip fence tags, injected context blocks, and system notes from provider output."""
-    text = _INTERNAL_CONTEXT_RE.sub('', text)
-    text = _INTERNAL_NOTE_RE.sub('', text)
-    text = _FENCE_TAG_RE.sub('', text)
+    text = _INTERNAL_CONTEXT_RE.sub("", text)
+    text = _INTERNAL_NOTE_RE.sub("", text)
+    text = _FENCE_TAG_RE.sub("", text)
     return text
 
 

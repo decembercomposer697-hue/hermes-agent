@@ -9,7 +9,6 @@ can't render it.
 
 from __future__ import annotations
 
-
 from gateway.stream_dispatch import GatewayEventDispatcher
 from gateway.stream_events import (
     Commentary,
@@ -24,7 +23,8 @@ from gateway.stream_events import (
 
 def _base_adapter():
     """A real BasePlatformAdapter instance (abstractmethods cleared) so we
-    exercise the genuine default render hooks, not a mock."""
+    exercise the genuine default render hooks, not a mock.
+    """
     from gateway.platforms.base import BasePlatformAdapter
 
     Concrete = type("Concrete", (BasePlatformAdapter,), {})
@@ -129,7 +129,8 @@ def test_off_mode_emits_nothing():
 
 def test_adapter_can_eat_tool_chrome():
     """An adapter that returns None from format_tool_event drops the event —
-    the 'iMessage can't render tool chrome' case."""
+    the 'iMessage can't render tool chrome' case.
+    """
     adapter = _base_adapter()
     adapter.format_tool_event = lambda event, **kw: None  # eat everything
     lines = []
@@ -174,6 +175,7 @@ def test_gateway_notice_routes_to_hook():
 def test_dispatch_swallows_render_errors():
     """A render error must never propagate into the agent worker thread."""
     adapter = _base_adapter()
+
     def _boom(event, sink):
         raise RuntimeError("render blew up")
     adapter.render_message_event = _boom

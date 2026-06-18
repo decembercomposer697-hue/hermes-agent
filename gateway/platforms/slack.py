@@ -1,5 +1,4 @@
-"""
-Slack platform adapter.
+"""Slack platform adapter.
 
 Uses slack-bolt (Python) with Socket Mode for:
 - Receiving messages from channels and DMs
@@ -16,13 +15,13 @@ import os
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Dict, Optional, Any, Tuple, List
+from typing import Any, Dict, List, Optional, Tuple
 
 try:
-    from slack_bolt.async_app import AsyncApp
-    from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
-    from slack_sdk.web.async_client import AsyncWebClient
     import aiohttp
+    from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
+    from slack_bolt.async_app import AsyncApp
+    from slack_sdk.web.async_client import AsyncWebClient
 
     SLACK_AVAILABLE = True
 except ImportError:
@@ -37,20 +36,19 @@ from pathlib import Path as _Path
 sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 from gateway.config import Platform, PlatformConfig
-from gateway.platforms.helpers import MessageDeduplicator
 from gateway.platforms.base import (
+    SUPPORTED_DOCUMENT_TYPES,
     BasePlatformAdapter,
     MessageEvent,
     MessageType,
     ProcessingOutcome,
     SendResult,
-    SUPPORTED_DOCUMENT_TYPES,
+    cache_document_from_bytes,
     is_host_excluded_by_no_proxy,
     resolve_proxy_url,
     safe_url_for_log,
-    cache_document_from_bytes,
 )
-
+from gateway.platforms.helpers import MessageDeduplicator
 
 logger = logging.getLogger(__name__)
 
@@ -86,10 +84,10 @@ def check_slack_requirements() -> bool:
         return True
 
     def _import():
-        from slack_bolt.async_app import AsyncApp
-        from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
-        from slack_sdk.web.async_client import AsyncWebClient
         import aiohttp
+        from slack_bolt.adapter.socket_mode.async_handler import AsyncSocketModeHandler
+        from slack_bolt.async_app import AsyncApp
+        from slack_sdk.web.async_client import AsyncWebClient
 
         return {
             "AsyncApp": AsyncApp,
@@ -301,8 +299,7 @@ def _resolve_slack_proxy_url() -> str | None:
 
 
 class SlackAdapter(BasePlatformAdapter):
-    """
-    Slack bot adapter using Socket Mode.
+    """Slack bot adapter using Socket Mode.
 
     Requires two tokens:
       - SLACK_BOT_TOKEN (xoxb-...) for API calls
@@ -911,8 +908,9 @@ class SlackAdapter(BasePlatformAdapter):
             # routes the command event through the socket regardless of the
             # manifest's request URL, but it will not deliver an event for
             # a slash command the manifest doesn't declare.
-            from hermes_cli.commands import slack_native_slashes
             import re as _re
+
+            from hermes_cli.commands import slack_native_slashes
 
             _slash_names = [name for name, _d, _h in slack_native_slashes()]
             if _slash_names:
@@ -1366,8 +1364,10 @@ class SlackAdapter(BasePlatformAdapter):
             return
 
         try:
-            import httpx as _httpx
             from urllib.parse import unquote as _unquote
+
+            import httpx as _httpx
+
             from tools.url_safety import is_safe_url as _is_safe_url
         except Exception:
             await super().send_multiple_images(chat_id, images, metadata, human_delay)

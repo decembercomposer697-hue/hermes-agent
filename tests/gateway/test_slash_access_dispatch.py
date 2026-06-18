@@ -352,7 +352,8 @@ async def test_running_agent_fastpath_allows_admin_command():
     """Admins must still be able to run privileged commands like /restart
     through the running-agent fast-path. We check that we don't get the
     denial message; the actual /restart handler is mocked out via the
-    runner's MagicMock."""
+    runner's MagicMock.
+    """
     runner = _make_runner(
         platform_extra={
             "allow_admin_from": ["111"],
@@ -374,7 +375,8 @@ async def test_running_agent_fastpath_allows_admin_command():
 @pytest.mark.asyncio
 async def test_running_agent_fastpath_status_always_works():
     """/status is intentionally pre-gate on the fast-path so users can
-    always see session state, even non-admins."""
+    always see session state, even non-admins.
+    """
     runner = _make_runner(
         platform_extra={
             "allow_admin_from": ["111"],
@@ -401,7 +403,8 @@ async def test_running_agent_fastpath_status_always_works():
 @pytest.mark.asyncio
 async def test_gate_uses_canonical_name_not_alias():
     """If /hist resolves to canonical 'history' and history is in
-    user_allowed_commands, the alias must be allowed too."""
+    user_allowed_commands, the alias must be allowed too.
+    """
     runner = _make_runner(
         platform_extra={
             "allow_admin_from": ["111"],
@@ -429,7 +432,8 @@ async def test_gate_uses_canonical_name_not_alias():
 async def test_gate_does_not_intercept_unknown_command():
     """Random non-command text like /xyzzy is not in the registry. The gate
     must not produce a denial message — the existing unknown-command path
-    will handle it (or the agent will see it as plain text)."""
+    will handle it (or the agent will see it as plain text).
+    """
     runner = _make_runner(
         platform_extra={
             "allow_admin_from": ["111"],
@@ -483,9 +487,10 @@ async def test_dm_admin_blocked_in_group_with_separate_admin_list():
 @pytest.mark.asyncio
 async def test_gating_isolated_per_platform():
     """When Discord is gated and Telegram isn't, the same user_id on
-    Telegram must be unrestricted."""
-    from gateway.run import GatewayRunner
+    Telegram must be unrestricted.
+    """
     from gateway.config import GatewayConfig, Platform, PlatformConfig
+    from gateway.run import GatewayRunner
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(

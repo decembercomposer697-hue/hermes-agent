@@ -6,7 +6,6 @@ accepted as base_url, and unknown keys go unreported.
 
 import logging
 
-
 from hermes_cli.config import _normalize_custom_provider_entry
 
 
@@ -26,7 +25,7 @@ class TestNormalizeCustomProviderEntry:
         assert result["api_key"] == "sk-test-key"
 
     def test_camel_case_api_key_mapped(self):
-        """camelCase apiKey should be auto-mapped to api_key."""
+        """CamelCase apiKey should be auto-mapped to api_key."""
         entry = {
             "base_url": "https://api.example.com/v1",
             "apiKey": "sk-test-key",
@@ -36,7 +35,7 @@ class TestNormalizeCustomProviderEntry:
         assert result["api_key"] == "sk-test-key"
 
     def test_camel_case_base_url_mapped(self):
-        """camelCase baseUrl should be auto-mapped to base_url."""
+        """CamelCase baseUrl should be auto-mapped to base_url."""
         entry = {
             "baseUrl": "https://api.example.com/v1",
             "api_key": "sk-test-key",
@@ -103,7 +102,7 @@ class TestNormalizeCustomProviderEntry:
         assert not any("unknown config keys" in r.message.lower() for r in caplog.records)
 
     def test_camel_case_warning_logged(self, caplog):
-        """camelCase alias mapping should produce a warning."""
+        """CamelCase alias mapping should produce a warning."""
         entry = {
             "baseUrl": "https://api.example.com/v1",
             "apiKey": "sk-test-key",
@@ -149,7 +148,8 @@ class TestNormalizeCustomProviderEntry:
 
     def test_models_list_converted_to_dict(self):
         """List-format models should be preserved as an empty-value dict so
-        /model picks them up instead of showing the provider with (0) models."""
+        /model picks them up instead of showing the provider with (0) models.
+        """
         entry = {
             "name": "tencent-coding-plan",
             "base_url": "https://api.lkeap.cloud.tencent.com/coding/v3",

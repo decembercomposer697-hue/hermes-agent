@@ -1,5 +1,4 @@
-"""
-Web Search Provider ABC
+"""Web Search Provider ABC
 =======================
 
 Defines the pluggable-backend interface for web search and content extraction.
@@ -53,7 +52,6 @@ from __future__ import annotations
 
 import abc
 from typing import Any, Dict, List
-
 
 # ---------------------------------------------------------------------------
 # ABC

@@ -12,10 +12,8 @@ from __future__ import annotations
 import inspect
 from unittest.mock import patch
 
-
 from agent.credits_tracker import AgentNotice
 from run_agent import AIAgent
-
 
 # ── A. Emitter behaviour ─────────────────────────────────────────────────────
 
@@ -147,7 +145,8 @@ class TestAgentCbsNoticeBinding:
 
     def test_notice_callback_payload_is_full_snake_case_dict(self):
         """All six snake_case fields must be present in the payload — no extras,
-        no camelCase variants."""
+        no camelCase variants.
+        """
         from tui_gateway import server
 
         captured = []

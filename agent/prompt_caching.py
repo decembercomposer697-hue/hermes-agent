@@ -58,6 +58,7 @@ def apply_anthropic_cache_control(
 
     Returns:
         Deep copy of messages with cache_control breakpoints injected.
+
     """
     messages = copy.deepcopy(api_messages)
     if not messages:

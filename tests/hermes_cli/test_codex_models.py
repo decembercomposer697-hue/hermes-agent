@@ -85,6 +85,7 @@ def test_fetch_from_api_keeps_supported_in_api_false_models(monkeypatch):
     the separate signal that *should* still filter entries out.
     """
     import sys
+
     from hermes_cli import codex_models
 
     class _FakeResp:
@@ -310,7 +311,8 @@ class TestNormalizeModelForProvider:
 
     def test_any_provider_prefix_stripped(self):
         """anthropic/claude-opus-4.6 → claude-opus-4.6 (strip prefix only).
-        User explicitly chose this — let the API decide if it works."""
+        User explicitly chose this — let the API decide if it works.
+        """
         cli = _make_cli(model="anthropic/claude-opus-4.6")
         changed = cli._normalize_model_for_provider("openai-codex")
         assert changed is True

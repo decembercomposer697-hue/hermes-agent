@@ -8,8 +8,8 @@ JSONL file gone.  When a row has no platform id (e.g. agent-processed
 @bot messages whose adapter didn't carry a msg_id, or pre-column legacy
 rows), recall falls through to content-match.
 """
-from gateway.session import SessionStore
 from gateway.config import GatewayConfig
+from gateway.session import SessionStore
 
 
 def _pin_db(monkeypatch, tmp_path):
@@ -20,7 +20,8 @@ def _pin_db(monkeypatch, tmp_path):
 
 def test_recall_branch_a1_exact_id_match_round_trips_through_db(tmp_path, monkeypatch):
     """A user message persisted with ``message_id`` must round-trip through
-    state.db so recall can find and redact it by exact id (branch A1)."""
+    state.db so recall can find and redact it by exact id (branch A1).
+    """
     _pin_db(monkeypatch, tmp_path)
 
     config = GatewayConfig()
@@ -60,7 +61,8 @@ def test_recall_branch_a1_exact_id_match_round_trips_through_db(tmp_path, monkey
 
 def test_recall_branch_a2_content_match_when_no_platform_id(tmp_path, monkeypatch):
     """Rows that lack a platform_message_id (e.g. agent-processed @bot
-    messages) still match by content as a fallback."""
+    messages) still match by content as a fallback.
+    """
     _pin_db(monkeypatch, tmp_path)
 
     config = GatewayConfig()

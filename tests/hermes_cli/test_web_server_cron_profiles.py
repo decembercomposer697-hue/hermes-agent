@@ -134,7 +134,8 @@ async def test_cron_mutation_without_profile_finds_named_profile_job(isolated_pr
 @pytest.mark.asyncio
 async def test_update_cron_job_rejects_id_mutation(isolated_profiles):
     """Dashboard surfaces a 400 (not a 500 or silent rename) when an
-    id-mutation attempt is rejected by cron/jobs.update_job."""
+    id-mutation attempt is rejected by cron/jobs.update_job.
+    """
     from hermes_cli import web_server
 
     worker_job = web_server._call_cron_for_profile(

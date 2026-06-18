@@ -1,7 +1,8 @@
 """Tests for gateway.platforms.feishu — Feishu scan-to-create registration."""
 
 import json
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 
@@ -306,8 +307,9 @@ class TestProbeBot:
     @patch("gateway.platforms.feishu.FEISHU_AVAILABLE", False)
     @patch("gateway.platforms.feishu.urlopen")
     def test_http_fallback_returns_none_on_network_error(self, mock_urlopen_fn):
-        from gateway.platforms.feishu import probe_bot
         from urllib.error import URLError
+
+        from gateway.platforms.feishu import probe_bot
 
         mock_urlopen_fn.side_effect = URLError("connection refused")
         result = probe_bot("cli_app", "secret", "feishu")
@@ -384,8 +386,9 @@ class TestQrRegister:
     @patch("gateway.platforms.feishu._init_registration")
     def test_qr_register_returns_none_on_network_error(self, mock_init):
         """URLError (network down) is an expected failure → None."""
-        from gateway.platforms.feishu import qr_register
         from urllib.error import URLError
+
+        from gateway.platforms.feishu import qr_register
 
         mock_init.side_effect = URLError("DNS resolution failed")
         result = qr_register()

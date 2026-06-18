@@ -54,7 +54,8 @@ def test_hermes_tui_dir_env_is_set(built_image: str) -> None:
 
 def test_prebuilt_bundle_present_and_no_runtime_install(built_image: str) -> None:
     """The launcher must (a) find the prebuilt bundle and (b) NOT want an
-    npm install — i.e. it takes the same path as a nix/packaged release."""
+    npm install — i.e. it takes the same path as a nix/packaged release.
+    """
     py = (
         "import json\n"
         "from pathlib import Path\n"

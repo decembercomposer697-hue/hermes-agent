@@ -18,10 +18,10 @@ import pytest
 
 from gateway.config import Platform, PlatformConfig
 
-
 # ---------------------------------------------------------------------------
 # Telegram
 # ---------------------------------------------------------------------------
+
 
 def _make_telegram_adapter(*, allowed_chats=None, require_mention=None, guest_mode=False):
     from gateway.platforms.telegram import TelegramAdapter
@@ -238,7 +238,8 @@ class TestDingTalkAllowedChats:
 class TestMattermostAllowedChannels:
     """Mattermost whitelist logic — replicated since the adapter reads config
     with env-var fallback inline inside _handle_post rather than through a
-    helper method."""
+    helper method.
+    """
 
     @staticmethod
     def _would_process(channel_id, channel_type="O", allowed_cfg=None, allowed_env=""):
@@ -312,7 +313,8 @@ class TestMattermostAllowedChannels:
 
 class TestMatrixAllowedRooms:
     """Matrix whitelist behavior — tested via the env-var-initialized
-    instance attribute _allowed_rooms."""
+    instance attribute _allowed_rooms.
+    """
 
     def test_empty_env_empty_set(self, monkeypatch):
         monkeypatch.delenv("MATRIX_ALLOWED_ROOMS", raising=False)

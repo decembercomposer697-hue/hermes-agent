@@ -206,16 +206,18 @@ class TestAdditionOnlyHunks:
 
         hunk = ops[0].hunks[0]
         # All lines should be additions
-        assert all(l.prefix == '+' for l in hunk.lines)
+        assert all(l.prefix == "+" for l in hunk.lines)
 
         # Apply to a file that contains the context hint
         class FakeFileOps:
             written = None
+
             def read_file_raw(self, path):
                 return SimpleNamespace(
                     content="def main():\n    pass\n",
                     error=None,
                 )
+
             def write_file(self, path, content):
                 self.written = content
                 return SimpleNamespace(error=None)
@@ -239,11 +241,13 @@ class TestAdditionOnlyHunks:
 
         class FakeFileOps:
             written = None
+
             def read_file_raw(self, path):
                 return SimpleNamespace(
                     content="existing = True\n",
                     error=None,
                 )
+
             def write_file(self, path, content):
                 self.written = content
                 return SimpleNamespace(error=None)
@@ -279,8 +283,10 @@ class TestReadFileRaw:
 
         class FakeFileOps:
             written = None
+
             def read_file_raw(self, path):
                 return SimpleNamespace(content=file_content, error=None)
+
             def write_file(self, path, content):
                 self.written = content
                 return SimpleNamespace(error=None)
@@ -313,8 +319,10 @@ class TestReadFileRaw:
 
         class FakeFileOps:
             written = None
+
             def read_file_raw(self, path):
                 return SimpleNamespace(content=file_content, error=None)
+
             def write_file(self, path, content):
                 self.written = content
                 return SimpleNamespace(error=None)
@@ -540,7 +548,8 @@ class TestV4ALspDiagnosticsPropagation:
 
     def test_lsp_diagnostics_propagated_from_write_file_on_add(self):
         """ADD op: ``WriteResult.lsp_diagnostics`` flows through to
-        ``PatchResult.lsp_diagnostics``."""
+        ``PatchResult.lsp_diagnostics``.
+        """
         ops = self._build_ops_writing("foo.ts", "const x: number = 1\n")
 
         diag_block = (
@@ -563,7 +572,8 @@ class TestV4ALspDiagnosticsPropagation:
 
     def test_lsp_diagnostics_propagated_from_write_file_on_update(self):
         """UPDATE op: ``WriteResult.lsp_diagnostics`` flows through to
-        ``PatchResult.lsp_diagnostics``."""
+        ``PatchResult.lsp_diagnostics``.
+        """
         patch_text = (
             "*** Begin Patch\n"
             "*** Update File: bar.ts\n"
@@ -598,7 +608,8 @@ class TestV4ALspDiagnosticsPropagation:
     def test_lsp_diagnostics_none_when_no_blocks_emitted(self):
         """When no underlying ``write_file`` produced diagnostics, the
         aggregated field stays ``None`` (so it doesn't get serialized
-        as an empty string in ``PatchResult.to_dict``)."""
+        as an empty string in ``PatchResult.to_dict``).
+        """
         ops = self._build_ops_writing("foo.py", "x = 1\n")
 
         class FakeFileOps:
@@ -617,7 +628,8 @@ class TestV4ALspDiagnosticsPropagation:
     def test_lsp_diagnostics_combined_across_multiple_files(self):
         """When several files in one V4A patch produce diagnostics,
         each block appears in the combined output so per-file attribution
-        is preserved."""
+        is preserved.
+        """
         patch_text = (
             "*** Begin Patch\n"
             "*** Add File: a.ts\n"

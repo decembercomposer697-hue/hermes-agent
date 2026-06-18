@@ -64,7 +64,7 @@ def _normalize_ruff(entries: list[dict]) -> list[dict]:
 
 
 def _normalize_ty(entries: list[dict]) -> list[dict]:
-    """ty gitlab JSON: {check_name, location.path, location.positions.begin.line, description}."""
+    """Ty gitlab JSON: {check_name, location.path, location.positions.begin.line, description}."""
     out: list[dict] = []
     for e in entries:
         loc = e.get("location") or {}

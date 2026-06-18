@@ -308,7 +308,6 @@ def test_strip_none_returns_zero():
     assert stripped == 0
 
 
-
 def test_strip_responses_format_strips_format_keyword():
     """Responses-format:  keyword should be stripped."""
     from tools.schema_sanitizer import strip_pattern_and_format
@@ -507,7 +506,7 @@ def test_strip_responses_mixed_formats():
 
 
 def test_strip_slash_enum_removes_huggingface_id_enum():
-    """enum containing HF-style 'owner/name' IDs → stripped."""
+    """Enum containing HF-style 'owner/name' IDs → stripped."""
     tools = [_tool("train", {
         "type": "object",
         "properties": {
@@ -526,7 +525,7 @@ def test_strip_slash_enum_removes_huggingface_id_enum():
 
 
 def test_strip_slash_enum_preserves_slashless_enum():
-    """enum without any '/' → preserved."""
+    """Enum without any '/' → preserved."""
     tools = [_tool("pick", {
         "type": "object",
         "properties": {

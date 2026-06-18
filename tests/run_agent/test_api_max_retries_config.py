@@ -11,7 +11,8 @@ from run_agent import AIAgent
 
 def _make_agent(api_max_retries=None):
     """Build an AIAgent with a mocked config.load_config that returns a
-    config tree containing the given agent.api_max_retries (or default)."""
+    config tree containing the given agent.api_max_retries (or default).
+    """
     cfg = {"agent": {}}
     if api_max_retries is not None:
         cfg["agent"]["api_max_retries"] = api_max_retries
@@ -46,7 +47,8 @@ def test_api_max_retries_honors_config_override():
 def test_api_max_retries_clamps_below_one_to_one():
     """0 or negative values would disable the retry loop entirely
     (the ``while retry_count < max_retries`` guard would never execute),
-    so clamp to 1 = single attempt, no retry."""
+    so clamp to 1 = single attempt, no retry.
+    """
     agent = _make_agent(api_max_retries=0)
     assert agent._api_max_retries == 1
 

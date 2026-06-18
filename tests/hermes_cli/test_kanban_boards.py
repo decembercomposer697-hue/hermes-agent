@@ -30,10 +30,10 @@ if str(_WORKTREE) not in sys.path:
 
 from hermes_cli import kanban_db as kb
 
-
 # ---------------------------------------------------------------------------
 # Fixture
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def fresh_home(tmp_path, monkeypatch):

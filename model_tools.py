@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Model Tools Module
+"""Model Tools Module
 
 Thin orchestration layer over the tool registry. Each tool file in tools/
 self-registers its schema, handler, and metadata via tools.registry.register().
@@ -20,14 +19,14 @@ Public API (signatures preserved from the original 2,400-line version):
     check_tool_availability(quiet) -> tuple
 """
 
-import os
-import json
-import re
 import asyncio
+import json
 import logging
+import os
+import re
 import threading
 import time
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from tools.registry import discover_builtin_tools, registry
 from toolsets import resolve_toolset, validate_toolset
@@ -73,7 +72,7 @@ def _get_worker_loop():
     By keeping the loop alive for the thread's lifetime, cached clients
     stay valid and their cleanup runs on a live loop.
     """
-    loop = getattr(_worker_thread_local, 'loop', None)
+    loop = getattr(_worker_thread_local, "loop", None)
     if loop is None or loop.is_closed():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -265,7 +264,8 @@ _TOOL_DEFS_CACHE_MAX = 8
 def _clear_tool_defs_cache() -> None:
     """Drop memoized get_tool_definitions() results. Called when dynamic
     schema dependencies change (e.g. discord capability cache reset,
-    execute_code sandbox reconfigured)."""
+    execute_code sandbox reconfigured).
+    """
     _tool_defs_cache.clear()
 
 
@@ -275,8 +275,7 @@ def get_tool_definitions(
     quiet_mode: bool = False,
     skip_tool_search_assembly: bool = False,
 ) -> list[dict[str, Any]]:
-    """
-    Get tool definitions for model API calls with toolset-based filtering.
+    """Get tool definitions for model API calls with toolset-based filtering.
 
     All tools must be part of a toolset to be accessible.
 
@@ -292,6 +291,7 @@ def get_tool_definitions(
 
     Returns:
         Filtered list of OpenAI-format tool definitions.
+
     """
     # Fast path: memoized result when the caller doesn't need stdout prints.
     # The cache key captures every argument-level input; the registry
@@ -424,7 +424,11 @@ def _compute_tool_definitions(
     # execute_code" even when the API key isn't configured or the toolset is
     # disabled (#560-discord).
     if "execute_code" in available_tool_names:
-        from tools.code_execution_tool import SANDBOX_ALLOWED_TOOLS, build_execute_code_schema, _get_execution_mode
+        from tools.code_execution_tool import (
+            SANDBOX_ALLOWED_TOOLS,
+            _get_execution_mode,
+            build_execute_code_schema,
+        )
         sandbox_enabled = SANDBOX_ALLOWED_TOOLS & available_tool_names
         dynamic_schema = build_execute_code_schema(sandbox_enabled, mode=_get_execution_mode())
         for i, td in enumerate(filtered_tools):
@@ -514,7 +518,8 @@ def _compute_tool_definitions(
     # has already normalized schemas, and the assembly is idempotent in
     # case some caller invokes get_tool_definitions twice.
     try:
-        from tools.tool_search import assemble_tool_defs, load_config as _load_ts_config
+        from tools.tool_search import assemble_tool_defs
+        from tools.tool_search import load_config as _load_ts_config
         ts_cfg = _load_ts_config()
         if not skip_tool_search_assembly and ts_cfg.enabled != "off":
             context_length = _resolve_active_context_length()
@@ -587,12 +592,12 @@ _READ_SEARCH_TOOLS = {"read_file", "search_files"}
 #
 # Ported from ironclaw#1639.
 _TOOL_ERROR_ROLE_TAG_RE = re.compile(
-    r'</?(?:tool_call|function_call|result|response|output|input|system|assistant|user)>',
+    r"</?(?:tool_call|function_call|result|response|output|input|system|assistant|user)>",
     re.IGNORECASE,
 )
-_TOOL_ERROR_FENCE_OPEN_RE = re.compile(r'^\s*```(?:json|xml|html|markdown)?\s*', re.MULTILINE)
-_TOOL_ERROR_FENCE_CLOSE_RE = re.compile(r'\s*```\s*$', re.MULTILINE)
-_TOOL_ERROR_CDATA_RE = re.compile(r'<!\[CDATA\[.*?\]\]>', re.DOTALL)
+_TOOL_ERROR_FENCE_OPEN_RE = re.compile(r"^\s*```(?:json|xml|html|markdown)?\s*", re.MULTILINE)
+_TOOL_ERROR_FENCE_CLOSE_RE = re.compile(r"\s*```\s*$", re.MULTILINE)
+_TOOL_ERROR_CDATA_RE = re.compile(r"<!\[CDATA\[.*?\]\]>", re.DOTALL)
 _TOOL_ERROR_MAX_LEN = 2000
 
 
@@ -889,8 +894,7 @@ def handle_function_call(
     enabled_toolsets: list[str] | None = None,
     disabled_toolsets: list[str] | None = None,
 ) -> str:
-    """
-    Main function call dispatcher that routes calls to the tool registry.
+    """Main function call dispatcher that routes calls to the tool registry.
 
     Args:
         function_name: Name of the function to call.
@@ -912,6 +916,7 @@ def handle_function_call(
 
     Returns:
         Function result as a JSON string.
+
     """
     # Coerce string arguments to their schema-declared types (e.g. "42"→42)
     function_args = coerce_tool_args(function_name, function_args)
@@ -1111,6 +1116,7 @@ def handle_function_call(
                 # Prefer the caller-provided list so subagents can't overwrite
                 # the parent's tool set via the process-global.
                 sandbox_enabled = enabled_tools if enabled_tools is not None else _last_resolved_tool_names
+
                 def _dispatch(next_args: dict[str, Any]) -> Any:
                     return registry.dispatch(
                         function_name, next_args,

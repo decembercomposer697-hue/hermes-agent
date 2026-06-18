@@ -80,6 +80,7 @@ def resolve_node_command(name: str, argv: Sequence[str]) -> list[str]:
 
     Returns:
         A list suitable for passing to subprocess.Popen/run/call.
+
     """
     resolved = shutil.which(name)
     if resolved:

@@ -7,11 +7,10 @@ import pytest
 
 from hermes_cli.auth import (
     PROVIDER_REGISTRY,
-    resolve_provider,
     get_api_key_provider_status,
     resolve_api_key_provider_credentials,
+    resolve_provider,
 )
-
 
 # Other provider env vars to clear during auto-detection tests
 _OTHER_PROVIDER_KEYS = (
@@ -227,7 +226,8 @@ class TestTencentTokenhubNormalization:
 
     def test_vendor_prefixed_passthrough(self):
         """tencent/hy3-preview is not stripped since tencent-tokenhub is not in
-        _MATCHING_PREFIX_STRIP_PROVIDERS — the slash survives."""
+        _MATCHING_PREFIX_STRIP_PROVIDERS — the slash survives.
+        """
         from hermes_cli.model_normalize import normalize_model_for_provider
         result = normalize_model_for_provider("tencent/hy3-preview", "tencent-tokenhub")
         # Direct providers not in any special set → passthrough
@@ -235,7 +235,8 @@ class TestTencentTokenhubNormalization:
 
     def test_not_in_matching_prefix_strip_set(self):
         """tencent-tokenhub does NOT need prefix stripping — it only has
-        one model (hy3-preview) and users won't copy vendor/ form."""
+        one model (hy3-preview) and users won't copy vendor/ form.
+        """
         from hermes_cli.model_normalize import _MATCHING_PREFIX_STRIP_PROVIDERS
         assert "tencent-tokenhub" not in _MATCHING_PREFIX_STRIP_PROVIDERS
 
@@ -421,6 +422,7 @@ class TestTencentTokenhubCLIDispatch:
         so ``hermes model`` routes it through the generic api_key_provider flow.
         """
         import inspect
+
         from hermes_cli import main as main_mod
         source = inspect.getsource(main_mod)
         # The source should contain tencent-tokenhub in the dispatch block

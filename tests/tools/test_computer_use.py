@@ -11,10 +11,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(autouse=True)
 def _reset_backend():
@@ -176,7 +176,7 @@ class TestDispatch:
         assert click_kw["button"] == "right"
 
     def test_type_action_routes_to_type_text_backend(self, noop_backend):
-        """type action must call backend.type_text, not type_text_chars (issue #24170, bug 3)."""
+        """Type action must call backend.type_text, not type_text_chars (issue #24170, bug 3)."""
         from tools.computer_use.tool import handle_computer_use
         out = handle_computer_use({"action": "type", "text": "hello"})
         parsed = json.loads(out)
@@ -187,7 +187,7 @@ class TestDispatch:
         assert type_kw["text"] == "hello"
 
     def test_drag_action_routes_to_backend_by_coordinate(self, noop_backend):
-        """drag action must dispatch to backend.drag with coordinates (issue #24170, bug 4)."""
+        """Drag action must dispatch to backend.drag with coordinates (issue #24170, bug 4)."""
         from tools.computer_use.tool import handle_computer_use
         out = handle_computer_use({
             "action": "drag",
@@ -203,7 +203,7 @@ class TestDispatch:
         assert drag_kw["to_xy"] == (400, 500)
 
     def test_drag_action_routes_to_backend_by_element(self, noop_backend):
-        """drag action must dispatch to backend.drag with element indices (issue #24170, bug 4)."""
+        """Drag action must dispatch to backend.drag with element indices (issue #24170, bug 4)."""
         from tools.computer_use.tool import handle_computer_use
         out = handle_computer_use({
             "action": "drag",
@@ -219,7 +219,7 @@ class TestDispatch:
         assert drag_kw["to_element"] == 5
 
     def test_drag_action_requires_coordinates_or_elements(self, noop_backend):
-        """drag without from/to must return an error."""
+        """Drag without from/to must return an error."""
         from tools.computer_use.tool import handle_computer_use
         out = handle_computer_use({"action": "drag"})
         parsed = json.loads(out)
@@ -246,6 +246,7 @@ class TestDispatch:
         normal state, misleading the model into thinking the action succeeded.
         """
         from unittest.mock import patch
+
         from tools.computer_use.backend import ActionResult
         from tools.computer_use.tool import handle_computer_use
 
@@ -333,8 +334,8 @@ class TestCaptureResponse:
 
     def test_capture_vision_mode_with_image_returns_multimodal_envelope(self):
         """Inject a fake backend that returns a PNG to exercise the envelope path."""
-        from tools.computer_use.backend import CaptureResult
         from tools.computer_use import tool as cu_tool
+        from tools.computer_use.backend import CaptureResult
 
         fake_png = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAADUlEQVR4nGNgGAUgAAABCAABgukLHQAAAABJRU5ErkJggg=="
 
@@ -342,6 +343,7 @@ class TestCaptureResponse:
             def start(self): pass
             def stop(self): pass
             def is_available(self): return True
+
             def capture(self, mode="som", app=None):
                 return CaptureResult(
                     mode=mode, width=1024, height=768,
@@ -350,6 +352,7 @@ class TestCaptureResponse:
                     png_bytes_len=100,
                 )
             # unused
+
             def click(self, **kw): ...
             def drag(self, **kw): ...
             def scroll(self, **kw): ...
@@ -372,8 +375,8 @@ class TestCaptureResponse:
 
     def test_capture_tiny_image_returns_text_json(self):
         """Providers can reject <8px images, so placeholders must be omitted."""
-        from tools.computer_use.backend import CaptureResult, UIElement
         from tools.computer_use import tool as cu_tool
+        from tools.computer_use.backend import CaptureResult, UIElement
 
         tiny_png = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAC0lEQVR4nGNgQAcAABIAAXfx+gAAAAAASUVORK5CYII="
 
@@ -401,8 +404,8 @@ class TestCaptureResponse:
         assert parsed["elements"][0]["label"] == "Continue"
 
     def test_capture_som_with_elements_formats_index(self):
-        from tools.computer_use.backend import CaptureResult, UIElement
         from tools.computer_use import tool as cu_tool
+        from tools.computer_use.backend import CaptureResult, UIElement
 
         fake_png = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAADUlEQVR4nGNgGAUgAAABCAABgukLHQAAAABJRU5ErkJggg=="
 
@@ -410,6 +413,7 @@ class TestCaptureResponse:
             def start(self): pass
             def stop(self): pass
             def is_available(self): return True
+
             def capture(self, mode="som", app=None):
                 return CaptureResult(
                     mode=mode, width=800, height=600,
@@ -420,6 +424,7 @@ class TestCaptureResponse:
                     ],
                     app="Safari",
                 )
+
             def click(self, **kw): ...
             def drag(self, **kw): ...
             def scroll(self, **kw): ...
@@ -452,6 +457,7 @@ class TestCaptureResponse:
             def start(self): pass
             def stop(self): pass
             def is_available(self): return True
+
             def capture(self, mode="som", app=None):
                 return CaptureResult(
                     mode=mode, width=800, height=600,
@@ -459,6 +465,7 @@ class TestCaptureResponse:
                     elements=list(elements),
                     app="Obsidian",
                 )
+
             def click(self, **kw): ...
             def drag(self, **kw): ...
             def scroll(self, **kw): ...
@@ -468,7 +475,6 @@ class TestCaptureResponse:
             def focus_app(self, app, raise_window=False): ...
 
         return FakeBackend()
-
 
     def test_capture_ax_caps_elements_at_default_for_dense_trees(self):
         """Regression for #22865: an Electron-style 600-element AX tree must
@@ -588,8 +594,8 @@ class TestCaptureResponse:
         `elements` array — so a "response truncated to N of M elements"
         claim in the summary would be inaccurate.
         """
-        from tools.computer_use.backend import CaptureResult, UIElement
         from tools.computer_use import tool as cu_tool
+        from tools.computer_use.backend import CaptureResult, UIElement
 
         fake_png = "iVBORw0KGgo="
         elements = [
@@ -601,12 +607,14 @@ class TestCaptureResponse:
             def start(self): pass
             def stop(self): pass
             def is_available(self): return True
+
             def capture(self, mode="som", app=None):
                 return CaptureResult(
                     mode=mode, width=800, height=600,
                     png_b64=fake_png, elements=list(elements),
                     app="Obsidian",
                 )
+
             def click(self, **kw): ...
             def drag(self, **kw): ...
             def scroll(self, **kw): ...
@@ -1115,8 +1123,8 @@ class TestCaptureAfterAppContext:
 
     def test_capture_after_uses_last_app(self):
         """capture_after=True should pass _last_app to the follow-up capture."""
-        from tools.computer_use.backend import ActionResult, CaptureResult
         from tools.computer_use import tool as cu_tool
+        from tools.computer_use.backend import ActionResult, CaptureResult
 
         captured_app_args = []
 
@@ -1181,8 +1189,8 @@ class TestCaptureAfterAppContext:
 
     def test_capture_after_without_prior_app_uses_none(self):
         """When no app context is set, follow-up capture uses app=None (frontmost)."""
-        from tools.computer_use.backend import ActionResult, CaptureResult
         from tools.computer_use import tool as cu_tool
+        from tools.computer_use.backend import ActionResult, CaptureResult
 
         captured_app_args = []
 
@@ -1249,9 +1257,11 @@ class TestCaptureAfterAppContext:
 #   matches nothing instead of silently picking the frontmost window.
 # ---------------------------------------------------------------------------
 
+
 def _make_cua_backend_with_windows(windows: list[dict[str, Any]]):
     """Construct a CuaDriverBackend with a mocked MCP session that returns
-    the supplied list_windows payload."""
+    the supplied list_windows payload.
+    """
     from tools.computer_use.cua_backend import CuaDriverBackend
 
     backend = CuaDriverBackend()
@@ -1270,7 +1280,9 @@ class TestCuaDriverSessionReconnect:
         """A daemon restart closes the cached MCP stdio channel; recover once."""
         import threading
         from typing import Any, cast
+
         from anyio import ClosedResourceError
+
         from tools.computer_use.cua_backend import _CuaDriverSession
 
         class FakeBridge:
@@ -1309,6 +1321,7 @@ class TestCuaDriverSessionReconnect:
         """Non-transport errors must propagate without a reconnect attempt."""
         import threading
         from typing import Any, cast
+
         from tools.computer_use.cua_backend import _CuaDriverSession
 
         class FakeBridge:
@@ -1381,7 +1394,7 @@ class TestCaptureAppFilterNoMatch:
         backend._session.call_tool.side_effect = [
             {"data": "", "images": [], "isError": False,
              "structuredContent": {"windows": windows}},
-            {"data": '✅ 計算機 — 0 elements\n', "images": [], "isError": False,
+            {"data": "✅ 計算機 — 0 elements\n", "images": [], "isError": False,
              "structuredContent": None},
         ]
 
@@ -1392,7 +1405,8 @@ class TestCaptureAppFilterNoMatch:
 
     def test_no_app_filter_still_picks_frontmost(self):
         """When no app= is given, capture continues to pick the frontmost
-        window — the no-match early-return must not fire on the empty case."""
+        window — the no-match early-return must not fire on the empty case.
+        """
         windows = [
             {"app_name": "Fuwari", "pid": 100, "window_id": 1,
              "is_on_screen": True, "title": "menu bar", "z_index": 0},
@@ -1401,7 +1415,7 @@ class TestCaptureAppFilterNoMatch:
         backend._session.call_tool.side_effect = [
             {"data": "", "images": [], "isError": False,
              "structuredContent": {"windows": windows}},
-            {"data": '✅ Fuwari — 0 elements\n', "images": [], "isError": False,
+            {"data": "✅ Fuwari — 0 elements\n", "images": [], "isError": False,
              "structuredContent": None},
         ]
 

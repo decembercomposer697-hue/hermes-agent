@@ -1,5 +1,4 @@
-"""
-Regex-based security pattern definitions for the security-guidance plugin.
+"""Regex-based security pattern definitions for the security-guidance plugin.
 
 Pure data + one pure helper. No env-var reads, no I/O — kept side-effect-free
 so it can be imported in isolation.
@@ -28,7 +27,6 @@ Modifications by NousResearch for the Hermes Agent plugin port:
     __init__.py.
 """
 from enum import IntEnum
-
 
 _JS_EXTS = (".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".mts", ".cts", ".vue", ".svelte")
 _PY_EXTS = (".py", ".pyi", ".ipynb")
@@ -285,8 +283,7 @@ Additionally, validate user inputs:
 
 
 class RuleId(IntEnum):
-    """
-    Stable numeric IDs for SECURITY_PATTERNS rules, emitted via the PostToolUse
+    """Stable numeric IDs for SECURITY_PATTERNS rules, emitted via the PostToolUse
     metrics field so telemetry can attribute pattern-warning events to
     specific checks. The metrics schema only allows bool|number values (no
     strings), so rule names can't be sent directly.
@@ -360,7 +357,8 @@ assert set(_RULE_NAME_TO_ID) == {p["ruleName"] for p in SECURITY_PATTERNS}, (
 def rule_names_to_mask(rule_names):
     """Pack a set of rule names into a bitmask. Bit N set means RuleId(N) matched.
     User-defined patterns (rule_name starting with "user:") have no static
-    RuleId and are excluded from the mask."""
+    RuleId and are excluded from the mask.
+    """
     mask = 0
     for name in rule_names:
         if name in _RULE_NAME_TO_ID:

@@ -62,7 +62,8 @@ def test_reasoning_effort_esc_cancels():
 
 def test_model_selection_with_pricing_passes_description():
     """When pricing is supplied, the aligned header is passed as the curses
-    description (multi-line text above the list), not lost."""
+    description (multi-line text above the list), not lost.
+    """
     from hermes_cli.auth import _prompt_model_selection
 
     seen = {}

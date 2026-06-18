@@ -24,10 +24,10 @@ import pytest
 from hermes_cli import kanban_db as kb
 from hermes_cli.kanban import run_slash
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def kanban_home(tmp_path, monkeypatch):
@@ -129,6 +129,7 @@ def test_successful_spawn_does_not_reset_failure_counter(kanban_home, all_assign
     complete_task reset for the replacement point.)
     """
     calls = [0]
+
     def _flaky_spawn(task, ws):
         calls[0] += 1
         if calls[0] <= 2:
@@ -157,7 +158,8 @@ def test_successful_spawn_does_not_reset_failure_counter(kanban_home, all_assign
 
 def test_successful_completion_resets_failure_counter(kanban_home, all_assignees_spawnable):
     """A successful kb.complete_task wipes the counter — the task+profile
-    combination proved it can succeed, so past failures are history."""
+    combination proved it can succeed, so past failures are history.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="x", assignee="worker")
@@ -181,7 +183,8 @@ def test_successful_completion_resets_failure_counter(kanban_home, all_assignees
 
 def test_reassign_resets_failure_counter_for_new_profile(kanban_home, all_assignees_spawnable):
     """Retry streaks are scoped to a task/profile pair; reassigning is a
-    human recovery action and gives the new profile a fresh budget."""
+    human recovery action and gives the new profile a fresh budget.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="x", assignee="worker")
@@ -247,7 +250,8 @@ def test_per_task_max_retries_overrides_dispatcher_limit(kanban_home, all_assign
 
 def test_per_task_max_retries_allows_more_than_default(kanban_home, all_assignees_spawnable):
     """A task with ``max_retries=5`` does NOT auto-block at the default
-    limit of 2 — it must reach the per-task override first."""
+    limit of 2 — it must reach the per-task override first.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(
@@ -289,7 +293,8 @@ def test_per_task_max_retries_allows_more_than_default(kanban_home, all_assignee
 
 def test_max_retries_none_falls_through_to_dispatcher_limit(kanban_home, all_assignees_spawnable):
     """``max_retries=None`` (the default) falls through to the caller-
-    supplied ``failure_limit`` — the gateway config tier."""
+    supplied ``failure_limit`` — the gateway config tier.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="standard", assignee="worker")
@@ -333,7 +338,8 @@ def test_max_retries_none_falls_through_to_dispatcher_limit(kanban_home, all_ass
 
 def test_workspace_resolution_failure_also_counts(kanban_home, all_assignees_spawnable):
     """`dir:` workspace with no path should fail workspace resolution AND
-    count against the failure budget — not just crash the tick."""
+    count against the failure budget — not just crash the tick.
+    """
     conn = kb.connect()
     try:
         # Manually insert a broken task: dir workspace but workspace_path is NULL
@@ -392,7 +398,8 @@ def test_pid_alive_detects_darwin_zombie(monkeypatch):
 
 def test_detect_crashed_workers_reclaims(kanban_home):
     """A running task whose pid vanished gets dropped to ready with a
-    ``crashed`` event, independent of the claim TTL."""
+    ``crashed`` event, independent of the claim TTL.
+    """
     def _spawn_pid_that_exits(task, ws):
         # Spawn a real child that exits instantly.
         import subprocess
@@ -431,7 +438,8 @@ def test_detect_crashed_workers_reclaims(kanban_home):
 
 def test_daemon_runs_and_stops(kanban_home):
     """run_daemon should execute at least one tick and exit cleanly on
-    stop_event."""
+    stop_event.
+    """
     ticks = []
     stop = threading.Event()
 
@@ -466,6 +474,7 @@ def test_daemon_keeps_going_after_tick_exception(kanban_home, monkeypatch):
     monkeypatch.setattr(kb, "dispatch_once", _boom)
 
     stop = threading.Event()
+
     def _runner():
         kb.run_daemon(interval=0.05, stop_event=stop)
 
@@ -892,7 +901,8 @@ def test_cli_gc_reports_counts(kanban_home):
 
 def test_run_slash_every_verb_returns_sensible_output(kanban_home):
     """Smoke-test every verb with minimal args. None may raise, none may
-    return the empty string (must either succeed or report a usage error)."""
+    return the empty string (must either succeed or report a usage error).
+    """
     # Set up a pair of tasks to reference.
     conn = kb.connect()
     try:
@@ -937,8 +947,10 @@ def test_run_slash_every_verb_returns_sensible_output(kanban_home):
 
 def test_max_runtime_terminates_overrun_worker(kanban_home):
     """A running task whose elapsed time exceeds max_runtime_seconds gets
-    SIGTERM'd, emits a ``timed_out`` event, and goes back to ready."""
+    SIGTERM'd, emits a ``timed_out`` event, and goes back to ready.
+    """
     killed = []
+
     def _signal_fn(pid, sig):
         killed.append((pid, sig))
 
@@ -976,7 +988,7 @@ def test_max_runtime_terminates_overrun_worker(kanban_home):
             assert killed and killed[0][0] == os.getpid()
 
             task = kb.get_task(conn, tid)
-            assert task.status == "ready",                 f"timed-out task should reset to ready, got {task.status}"
+            assert task.status == "ready", f"timed-out task should reset to ready, got {task.status}"
             assert task.worker_pid is None
             assert task.last_heartbeat_at is None
 
@@ -1035,7 +1047,8 @@ def test_repeated_timeouts_auto_block_at_default_limit(kanban_home):
 
 def test_max_runtime_none_means_no_cap(kanban_home):
     """A task with max_runtime_seconds=None is never timed out regardless
-    of how long it runs."""
+    of how long it runs.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="uncapped", assignee="worker")
@@ -1068,14 +1081,17 @@ def test_create_task_persists_max_runtime(kanban_home):
 def test_enforce_max_runtime_integrates_with_dispatch(kanban_home, monkeypatch):
     """enforce_max_runtime + dispatch_once integrate cleanly — a timed-out
     task goes through ``timed_out`` → ``ready`` and dispatch_once can then
-    re-spawn it without re-reporting the timeout."""
+    re-spawn it without re-reporting the timeout.
+    """
     import hermes_cli.kanban_db as _kb
     # Leave _pid_alive=True so the crash detector doesn't steal the task
     # before timeout enforcement runs. After SIGTERM in enforce_max_runtime,
     # pretend the worker died so the grace wait exits fast.
     state = {"sent_term": False}
+
     def _alive(pid):
         return not state["sent_term"]
+
     def _signal(pid, sig):
         import signal as _sig
         if sig == _sig.SIGTERM:
@@ -1215,7 +1231,8 @@ def test_spawn_failure_circuit_breaker_emits_gave_up(kanban_home, all_assignees_
 
 def test_spawned_event_emitted_with_pid(kanban_home, all_assignees_spawnable):
     """Successful spawn must append a ``spawned`` event with the pid in
-    the payload so humans tailing events see pid tracking."""
+    the payload so humans tailing events see pid tracking.
+    """
     def _spawn_returns_pid(task, ws):
         return 98765
     conn = kb.connect()
@@ -1232,7 +1249,8 @@ def test_spawned_event_emitted_with_pid(kanban_home, all_assignees_spawnable):
 
 def test_migration_renames_legacy_event_kinds(tmp_path, monkeypatch):
     """A DB created with the old vocab must have its event rows renamed
-    in place on init_db()."""
+    in place on init_db().
+    """
     home = tmp_path / ".hermes"
     home.mkdir()
     monkeypatch.setenv("HERMES_HOME", str(home))
@@ -1273,7 +1291,8 @@ def test_migration_renames_legacy_event_kinds(tmp_path, monkeypatch):
 
 def test_list_profiles_on_disk(tmp_path, monkeypatch):
     """list_profiles_on_disk returns the implicit default profile plus
-    named profiles under ~/.hermes/profiles/ that contain a config.yaml."""
+    named profiles under ~/.hermes/profiles/ that contain a config.yaml.
+    """
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
     monkeypatch.delenv("HERMES_HOME", raising=False)
     profiles = tmp_path / ".hermes" / "profiles"
@@ -1306,7 +1325,8 @@ def test_list_profiles_on_disk_custom_root(tmp_path, monkeypatch):
 
 def test_known_assignees_merges_disk_and_board(tmp_path, monkeypatch):
     """known_assignees unions profiles on disk with currently-assigned
-    names, and reports per-status counts."""
+    names, and reports per-status counts.
+    """
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
     profiles = tmp_path / ".hermes" / "profiles"
     profiles.mkdir(parents=True)
@@ -1367,8 +1387,9 @@ def test_parse_duration_accepts_formats():
 
 
 def test_parse_duration_rejects_garbage():
-    from hermes_cli.kanban import _parse_duration
     import pytest as _p
+
+    from hermes_cli.kanban import _parse_duration
     with _p.raises(ValueError):
         _parse_duration("tenminutes")
     with _p.raises(ValueError):
@@ -1425,7 +1446,8 @@ def test_run_created_on_claim(kanban_home):
 
 def test_run_closed_on_complete_with_summary(kanban_home):
     """complete_task ends the active run with outcome='completed' and
-    persists summary + metadata."""
+    persists summary + metadata.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="x", assignee="worker")
@@ -1456,7 +1478,8 @@ def test_run_closed_on_complete_with_summary(kanban_home):
 
 def test_run_summary_falls_back_to_result(kanban_home):
     """If the caller doesn't pass summary, we fall back to result so
-    single-run workflows don't need to pass the same string twice."""
+    single-run workflows don't need to pass the same string twice.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="x", assignee="worker")
@@ -1470,7 +1493,8 @@ def test_run_summary_falls_back_to_result(kanban_home):
 
 def test_multiple_attempts_preserved_as_runs(kanban_home):
     """Crash / retry / complete flow produces one run per attempt, all
-    visible in list_runs in chronological order."""
+    visible in list_runs in chronological order.
+    """
     import hermes_cli.kanban_db as _kb
     conn = kb.connect()
     try:
@@ -1604,7 +1628,8 @@ def test_run_on_block_with_reason(kanban_home):
 
 def test_run_on_spawn_failure_records_failed_runs(kanban_home, all_assignees_spawnable):
     """Each spawn_failed event closes a run with outcome='spawn_failed',
-    and the Nth failure closes a run with outcome='gave_up'."""
+    and the Nth failure closes a run with outcome='gave_up'.
+    """
     def _bad(task, ws):
         raise RuntimeError("no PATH")
 
@@ -1627,7 +1652,8 @@ def test_run_on_spawn_failure_records_failed_runs(kanban_home, all_assignees_spa
 
 def test_event_rows_carry_run_id(kanban_home):
     """task_events.run_id is populated for run-scoped kinds and NULL for
-    task-scoped ones."""
+    task-scoped ones.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="x", assignee="worker")
@@ -1652,7 +1678,8 @@ def test_event_rows_carry_run_id(kanban_home):
 
 def test_build_worker_context_includes_prior_attempts(kanban_home):
     """A worker spawned after a prior attempt sees that attempt's outcome
-    + summary in its context so it can skip the failed path."""
+    + summary in its context so it can skip the failed path.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="port x", assignee="worker")
@@ -1676,7 +1703,8 @@ def test_build_worker_context_includes_prior_attempts(kanban_home):
 
 def test_build_worker_context_uses_parent_run_summary(kanban_home):
     """Downstream children read the parent's run.summary + metadata, not
-    just task.result."""
+    just task.result.
+    """
     conn = kb.connect()
     try:
         parent = kb.create_task(conn, title="research", assignee="researcher")
@@ -1704,7 +1732,8 @@ def test_build_worker_context_uses_parent_run_summary(kanban_home):
 def test_migration_backfills_inflight_run_for_legacy_db(kanban_home):
     """An existing 'running' task from before task_runs existed should
     get a synthesized run row so subsequent operations (complete,
-    heartbeat) have something to write to."""
+    heartbeat) have something to write to.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="pre-migration", assignee="worker")
@@ -1748,7 +1777,8 @@ def test_forward_compat_columns_writable(kanban_home):
     """v2 will route by workflow_template_id + current_step_key. In v1
     these are nullable, kernel doesn't consult them for routing, but
     they must be writable so a v2 client can populate them without
-    schema changes."""
+    schema changes.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="x")
@@ -1878,7 +1908,8 @@ def test_cli_complete_bad_metadata_exits_nonzero(kanban_home):
 
 def test_archive_of_running_task_closes_run(kanban_home):
     """Archiving a claimed task must close the in-flight run with
-    outcome='reclaimed', not orphan it."""
+    outcome='reclaimed', not orphan it.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="x", assignee="worker")
@@ -1943,7 +1974,7 @@ def test_dashboard_direct_status_change_off_running_closes_run(kanban_home):
 
 
 def test_dashboard_direct_status_change_within_same_state_is_noop_for_runs(kanban_home):
-    """todo -> ready on an unclaimed task must not create any run rows."""
+    """Todo -> ready on an unclaimed task must not create any run rows."""
     from plugins.kanban.dashboard.plugin_api import _set_status_direct
 
     conn = kb.connect()
@@ -1970,8 +2001,9 @@ def test_cli_bulk_complete_with_summary_rejects(kanban_home):
     # Note: hermes_cli.main doesn't propagate sub-command exit codes
     # (args.func(args) discards the return value), so we check the side
     # effects instead.
+    import os
+    import sys
     from subprocess import run as _run
-    import os, sys
     env = os.environ.copy()
     r = _run(
         [sys.executable, "-m", "hermes_cli.main", "kanban",
@@ -2004,7 +2036,8 @@ def test_cli_bulk_complete_without_summary_still_works(kanban_home):
 
 def test_completed_event_payload_carries_summary(kanban_home):
     """The 'completed' event must embed the run summary so gateway
-    notifiers render structured handoffs without a second SQL hit."""
+    notifiers render structured handoffs without a second SQL hit.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="x", assignee="worker")
@@ -2040,7 +2073,8 @@ def test_completed_event_payload_summary_none_when_missing(kanban_home):
 
 def test_complete_never_claimed_task_synthesizes_run(kanban_home):
     """complete_task on a ready (never-claimed) task must persist the
-    handoff instead of silently dropping summary/metadata."""
+    handoff instead of silently dropping summary/metadata.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="skip claim", assignee="worker")
@@ -2095,7 +2129,8 @@ def test_block_never_claimed_task_synthesizes_run(kanban_home):
 
 def test_complete_never_claimed_without_handoff_skips_synthesis(kanban_home):
     """If a bulk-complete passes no summary/metadata/result, don't spam
-    the runs table with empty synthetic rows."""
+    the runs table with empty synthetic rows.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="simple", assignee="worker")
@@ -2108,7 +2143,8 @@ def test_complete_never_claimed_without_handoff_skips_synthesis(kanban_home):
 
 def test_event_dataclass_carries_run_id(kanban_home):
     """list_events and the Event dataclass must expose run_id so
-    downstream consumers (notifier, dashboard) can group by attempt."""
+    downstream consumers (notifier, dashboard) can group by attempt.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="x", assignee="worker")
@@ -2157,7 +2193,8 @@ def test_unseen_events_for_sub_includes_run_id(kanban_home):
 def test_claim_task_recovers_from_invariant_leak(kanban_home):
     """Belt-and-suspenders: if a prior run somehow leaked (stranded
     current_run_id on a ready task), claim_task should recover rather
-    than strand it further."""
+    than strand it further.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="invariant test", assignee="worker")
@@ -2194,7 +2231,8 @@ def test_claim_task_recovers_from_invariant_leak(kanban_home):
 
 def test_cli_create_on_fresh_home_auto_inits(tmp_path, monkeypatch):
     """First CLI action on an empty HERMES_HOME must not error with
-    'no such table: tasks' — init_db auto-runs now."""
+    'no such table: tasks' — init_db auto-runs now.
+    """
     home = tmp_path / ".hermes"
     home.mkdir()
     monkeypatch.setenv("HERMES_HOME", str(home))
@@ -2220,7 +2258,8 @@ def test_cli_create_on_fresh_home_auto_inits(tmp_path, monkeypatch):
 
 def test_connect_auto_inits_fresh_db(tmp_path, monkeypatch):
     """Calling connect() on a fresh HERMES_HOME must create the
-    schema. Previously callers had to remember kb.init_db() first."""
+    schema. Previously callers had to remember kb.init_db() first.
+    """
     home = tmp_path / ".hermes"
     home.mkdir()
     monkeypatch.setenv("HERMES_HOME", str(home))
@@ -2239,8 +2278,9 @@ def test_connect_auto_inits_fresh_db(tmp_path, monkeypatch):
 
 
 def test_cli_show_json_carries_runs(kanban_home):
-    """hermes kanban show --json must include runs[] so scripts that
-    inspect attempt history don't need a separate 'runs' call."""
+    """Hermes kanban show --json must include runs[] so scripts that
+    inspect attempt history don't need a separate 'runs' call.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="show test", assignee="worker")
@@ -2276,7 +2316,8 @@ def test_cli_show_json_carries_runs(kanban_home):
 
 def test_unblock_invariant_recovery(kanban_home):
     """unblock_task must leave current_run_id NULL even if some other
-    code path left it dangling. Engineer the leak, verify recovery."""
+    code path left it dangling. Engineer the leak, verify recovery.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="unblock invariant", assignee="worker")
@@ -2308,7 +2349,8 @@ def test_unblock_invariant_recovery(kanban_home):
 
 def test_unblock_normal_path_no_spurious_run(kanban_home):
     """Happy path: claim -> block -> unblock. Unblock must be a no-op
-    on runs (block_task already closed the run cleanly)."""
+    on runs (block_task already closed the run cleanly).
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="normal unblock", assignee="worker")
@@ -2330,7 +2372,8 @@ def test_unblock_normal_path_no_spurious_run(kanban_home):
 def test_migration_backfill_idempotent_under_re_run(tmp_path, monkeypatch):
     """init_db must be safe to re-run repeatedly. Each call should leave
     at most one run row per in-flight task, even if called while a
-    dispatcher is simultaneously claiming."""
+    dispatcher is simultaneously claiming.
+    """
     home = tmp_path / ".hermes"
     home.mkdir()
     monkeypatch.setenv("HERMES_HOME", str(home))
@@ -2367,7 +2410,8 @@ def test_migration_backfill_idempotent_under_re_run(tmp_path, monkeypatch):
 
 def test_build_worker_context_includes_role_history(kanban_home):
     """build_worker_context must surface recent completed runs for the
-    same assignee, giving cross-task continuity."""
+    same assignee, giving cross-task continuity.
+    """
     conn = kb.connect()
     try:
         # Three completed tasks for 'reviewer'
@@ -2409,7 +2453,8 @@ def test_build_worker_context_role_history_skipped_when_no_assignee(kanban_home)
 
 def test_build_worker_context_role_history_bounded_to_5(kanban_home):
     """Role history must be capped at 5 entries even when the assignee
-    has many completed tasks."""
+    has many completed tasks.
+    """
     conn = kb.connect()
     try:
         for i in range(10):
@@ -2535,7 +2580,8 @@ def test_cli_show_clamps_negative_elapsed(kanban_home):
 def test_resolve_workspace_rejects_relative_dir_path(kanban_home):
     """dir: workspace_path must be absolute. A relative path like
     '../../../tmp/attacker' would be resolved against the dispatcher's
-    CWD — a confused-deputy escape vector."""
+    CWD — a confused-deputy escape vector.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(
@@ -2590,7 +2636,8 @@ def test_build_worker_context_caps_prior_attempts(kanban_home):
     """When a task has more than _CTX_MAX_PRIOR_ATTEMPTS runs, only
     the most recent N are shown in full; earlier attempts are summarised
     in a one-line marker so the worker knows more exist without
-    blowing the prompt."""
+    blowing the prompt.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="retry", assignee="worker")
@@ -2633,7 +2680,8 @@ def test_build_worker_context_renders_author_with_safe_framing(kanban_home):
     """Author rendering wraps the operator-controlled author in code fences
     + "comment from worker" prefix so a misleading HERMES_PROFILE name
     (e.g. "hermes-system", "operator") can't be misread as a system
-    directive above the comment body. Defense-in-depth — see #22452."""
+    directive above the comment body. Defense-in-depth — see #22452.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="t", assignee="worker")
@@ -2679,7 +2727,8 @@ def test_build_worker_context_caps_comments(kanban_home):
 
 def test_build_worker_context_caps_huge_summary(kanban_home):
     """A 1 MB summary on a single prior run must not dominate the
-    worker prompt. Per-field cap truncates with a visible ellipsis."""
+    worker prompt. Per-field cap truncates with a visible ellipsis.
+    """
     conn = kb.connect()
     try:
         tid = kb.create_task(conn, title="giant", assignee="worker")
@@ -2876,7 +2925,6 @@ def test_build_worker_context_includes_runtime_timeout_budget(kanban_home, monke
     assert "Terminal timeout: 3570s" in ctx
 
 
-
 # ---------------------------------------------------------------------------
 # Per-task force-loaded skills
 # ---------------------------------------------------------------------------
@@ -2985,7 +3033,8 @@ def test_create_task_skills_lists_all_toolset_typos(kanban_home):
 
 def test_default_spawn_appends_per_task_skills(kanban_home, monkeypatch):
     """Dispatcher argv must carry one `--skills X` pair per task skill,
-    in addition to the built-in kanban-worker."""
+    in addition to the built-in kanban-worker.
+    """
     monkeypatch.setattr(kb, "_kanban_worker_skill_available", lambda _h: True)
     captured = {}
 
@@ -3084,7 +3133,8 @@ def test_cli_create_skill_flag_repeatable(kanban_home):
 
 def test_cli_create_without_skill_flag_leaves_none(kanban_home):
     """No --skill on the CLI means Task.skills stays None (not []) —
-    we don't want to silently write [] when the user didn't opt in."""
+    we don't want to silently write [] when the user didn't opt in.
+    """
     out = run_slash("create 'no-skill' --assignee x --json")
     tid = json.loads(out)["id"]
     with kb.connect() as conn:
@@ -3106,7 +3156,8 @@ def test_cli_show_renders_skills(kanban_home):
 
 def test_legacy_db_without_skills_column_migrates(tmp_path):
     """_migrate_add_optional_columns is idempotent and adds skills
-    when absent. Run it twice on a pared-down schema to confirm."""
+    when absent. Run it twice on a pared-down schema to confirm.
+    """
     import sqlite3
     db_path = tmp_path / "legacy.db"
     conn = sqlite3.connect(str(db_path))
@@ -3365,7 +3416,8 @@ def test_legacy_migration_both_columns_already_present(tmp_path):
 def test_config_default_dispatch_in_gateway_is_true():
     """Default config must enable gateway-embedded dispatch out of the box.
     Flipping this default to false is a user-visible behaviour change and
-    should require a conscious migration."""
+    should require a conscious migration.
+    """
     from hermes_cli.config import DEFAULT_CONFIG
     kanban = DEFAULT_CONFIG.get("kanban", {})
     assert kanban.get("dispatch_in_gateway") is True, (
@@ -3419,6 +3471,7 @@ def test_check_dispatcher_presence_warns_when_flag_off(monkeypatch):
 def test_check_dispatcher_presence_silent_on_probe_error(monkeypatch):
     """If the probe itself errors, we stay silent."""
     from hermes_cli import kanban as kb_cli
+
     def _raise():
         raise RuntimeError("boom")
     monkeypatch.setattr("gateway.status.get_running_pid", _raise)
@@ -3457,7 +3510,7 @@ def test_cli_create_warns_when_no_gateway(kanban_home, monkeypatch, capsys):
 
 
 def test_cli_create_silent_when_gateway_up(kanban_home, monkeypatch, capsys):
-    """gateway running + dispatch enabled -> no warning."""
+    """Gateway running + dispatch enabled -> no warning."""
     from hermes_cli import kanban as kb_cli
     monkeypatch.setattr("gateway.status.get_running_pid", lambda: 4242)
     monkeypatch.setattr(
@@ -3514,8 +3567,10 @@ def test_cli_daemon_without_force_prints_deprecation_exits_2(kanban_home, capsys
 
 def test_cli_daemon_help_marks_deprecated():
     """The argparse help string on `daemon` mentions deprecation so users
-    scanning `--help` see the migration before running the stub."""
+    scanning `--help` see the migration before running the stub.
+    """
     import argparse as _ap
+
     from hermes_cli import kanban as kb_cli
     root = _ap.ArgumentParser()
     subs = root.add_subparsers()
@@ -3553,8 +3608,9 @@ def test_cli_daemon_help_marks_deprecated():
 def test_gateway_dispatcher_watcher_respects_config_flag_off(monkeypatch):
     """dispatch_in_gateway=false -> watcher exits fast, no loop."""
     import asyncio
-    from gateway.run import GatewayRunner
+
     import hermes_cli.config as _cfg_mod
+    from gateway.run import GatewayRunner
 
     runner = object.__new__(GatewayRunner)
     runner._running = True
@@ -3574,6 +3630,7 @@ def test_gateway_dispatcher_watcher_respects_config_flag_off(monkeypatch):
 def test_gateway_dispatcher_watcher_respects_env_override(monkeypatch):
     """HERMES_KANBAN_DISPATCH_IN_GATEWAY=0 disables without touching config."""
     import asyncio
+
     from gateway.run import GatewayRunner
     monkeypatch.setenv("HERMES_KANBAN_DISPATCH_IN_GATEWAY", "0")
 
@@ -3590,10 +3647,12 @@ def test_gateway_dispatcher_watcher_respects_env_override(monkeypatch):
 def test_gateway_dispatcher_watcher_env_truthy_uses_config(monkeypatch):
     """Truthy env value doesn't force-enable — config still decides.
     (We only treat explicit falses as an override; unset or truthy
-    defers to config.)"""
+    defers to config.)
+    """
     import asyncio
-    from gateway.run import GatewayRunner
+
     import hermes_cli.config as _cfg_mod
+    from gateway.run import GatewayRunner
 
     monkeypatch.setenv("HERMES_KANBAN_DISPATCH_IN_GATEWAY", "yes")
     monkeypatch.setattr(
@@ -3622,9 +3681,9 @@ def test_gateway_dispatcher_disables_corrupt_board_without_traceback(
     import logging
     import sqlite3
 
-    from gateway.run import GatewayRunner
     import hermes_cli.config as _cfg_mod
     import hermes_cli.kanban_db as _kb
+    from gateway.run import GatewayRunner
 
     runner = object.__new__(GatewayRunner)
     runner._running = True
@@ -3716,9 +3775,9 @@ def test_gateway_dispatcher_retries_corrupt_board_after_quarantine(
     import logging
     import sqlite3
 
-    from gateway.run import GatewayRunner
     import hermes_cli.config as _cfg_mod
     import hermes_cli.kanban_db as _kb
+    from gateway.run import GatewayRunner
 
     runner = object.__new__(GatewayRunner)
     runner._running = True
@@ -3804,7 +3863,8 @@ def test_gateway_dispatcher_retries_corrupt_board_after_quarantine(
 
 def test_complete_with_created_cards_all_verified_records_manifest(kanban_home):
     """A completion with created_cards that all exist + belong to this
-    worker records them on the ``completed`` event payload."""
+    worker records them on the ``completed`` event payload.
+    """
     conn = kb.connect()
     try:
         parent = kb.create_task(conn, title="parent", assignee="alice")
@@ -3832,7 +3892,8 @@ def test_complete_with_created_cards_all_verified_records_manifest(kanban_home):
 def test_complete_with_phantom_created_cards_raises_and_audits(kanban_home):
     """A completion claiming a card id that doesn't exist raises
     HallucinatedCardsError, leaves the task in its prior state, and
-    records a ``completion_blocked_hallucination`` event for auditing."""
+    records a ``completion_blocked_hallucination`` event for auditing.
+    """
     conn = kb.connect()
     try:
         parent = kb.create_task(conn, title="parent", assignee="alice")
@@ -3868,7 +3929,8 @@ def test_complete_with_phantom_created_cards_raises_and_audits(kanban_home):
 
 def test_complete_with_cross_worker_card_is_rejected(kanban_home):
     """A card that exists but was created by a different worker profile
-    is treated as phantom (hallucinated attribution)."""
+    is treated as phantom (hallucinated attribution).
+    """
     conn = kb.connect()
     try:
         parent = kb.create_task(conn, title="parent", assignee="alice")
@@ -3998,7 +4060,8 @@ def test_complete_can_retry_after_phantom_rejection(kanban_home):
 def test_complete_prose_scan_flags_nonexistent_ids(kanban_home):
     """Successful completion whose summary references a ``t_<hex>`` id
     that doesn't resolve emits a ``suspected_hallucinated_references``
-    event. Does not block the completion."""
+    event. Does not block the completion.
+    """
     conn = kb.connect()
     try:
         parent = kb.create_task(conn, title="parent", assignee="x")
@@ -4052,10 +4115,12 @@ def test_complete_prose_scan_ignores_existing_ids(kanban_home):
 
 def test_reclaim_task_resets_running_to_ready(kanban_home, monkeypatch):
     """Manual reclaim releases the claim, resets status, and emits a
-    ``reclaimed`` event even when claim_expires has not passed."""
+    ``reclaimed`` event even when claim_expires has not passed.
+    """
+    import secrets
     import signal
     import time
-    import secrets
+
     import hermes_cli.kanban_db as _kb
     conn = kb.connect()
     try:
@@ -4131,7 +4196,8 @@ def test_reclaim_task_returns_false_for_already_ready(kanban_home):
 def test_reassign_task_refuses_running_without_reclaim_first(kanban_home):
     """Without ``reclaim_first=True``, reassigning a running task is a
     no-op returning False (matches assign_task's RuntimeError via
-    internal catch)."""
+    internal catch).
+    """
     conn = kb.connect()
     try:
         t = kb.create_task(conn, title="running", assignee="orig")
@@ -4152,9 +4218,10 @@ def test_reassign_task_refuses_running_without_reclaim_first(kanban_home):
 
 def test_reassign_task_with_reclaim_first_switches_profile(kanban_home):
     """With ``reclaim_first=True``, a running task is reclaimed and
-    reassigned in one operation."""
-    import time
+    reassigned in one operation.
+    """
     import secrets
+    import time
     conn = kb.connect()
     try:
         t = kb.create_task(conn, title="switch me", assignee="orig")
@@ -4196,11 +4263,14 @@ def test_reassign_task_with_reclaim_first_switches_profile(kanban_home):
 
 def test_enforce_max_runtime_increments_consecutive_failures(kanban_home, monkeypatch):
     """A single timeout increments consecutive_failures by 1 (was the
-    infinite-respawn gap before unification)."""
+    infinite-respawn gap before unification).
+    """
     import hermes_cli.kanban_db as _kb
     state = {"sent_term": False}
+
     def _alive(pid):
         return not state["sent_term"]
+
     def _signal(pid, sig):
         import signal as _sig
         if sig == _sig.SIGTERM:
@@ -4252,8 +4322,10 @@ def test_repeated_timeouts_trip_the_circuit_breaker(kanban_home, monkeypatch):
     """
     import hermes_cli.kanban_db as _kb
     state = {"sent_term": False}
+
     def _alive(pid):
         return not state["sent_term"]
+
     def _signal(pid, sig):
         import signal as _sig
         if sig == _sig.SIGTERM:
@@ -4438,7 +4510,8 @@ def test_detect_crashed_workers_nonzero_exit_uses_default_limit(kanban_home):
 
 def test_reclaim_task_clears_failure_counter(kanban_home):
     """Operator reclaim wipes the counter so the next retry gets a fresh
-    budget."""
+    budget.
+    """
     import secrets
     conn = kb.connect()
     try:

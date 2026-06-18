@@ -188,7 +188,8 @@ def test_goal_requires_session(server):
 def test_slash_exec_rejects_goal_routes_to_command_dispatch(server, session):
     """slash.exec must reject /goal with 4018 so the TUI client falls through
     to command.dispatch. Without this, the HermesCLI slash-worker subprocess
-    would set the goal but silently drop the kickoff — the queue is in-proc."""
+    would set the goal but silently drop the kickoff — the queue is in-proc.
+    """
     sid, _, _ = session
     r = _call(server, "slash.exec", command="goal status", session_id=sid)
     assert "error" in r
@@ -198,5 +199,6 @@ def test_slash_exec_rejects_goal_routes_to_command_dispatch(server, session):
 
 def test_pending_input_commands_includes_goal(server):
     """Guard: _PENDING_INPUT_COMMANDS must list 'goal' — removing it would
-    silently re-break the TUI."""
+    silently re-break the TUI.
+    """
     assert "goal" in server._PENDING_INPUT_COMMANDS

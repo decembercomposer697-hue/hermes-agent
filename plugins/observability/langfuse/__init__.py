@@ -539,8 +539,9 @@ def _usage_and_cost(response: Any, *, provider: str, api_mode: str, model: str, 
             # Langfuse cost_details keys must match usage_details keys.
             # Provide per-type breakdown so dashboard can show cost by type.
             try:
-                from agent.usage_pricing import get_pricing_entry
                 from decimal import Decimal
+
+                from agent.usage_pricing import get_pricing_entry
                 _ONE_M = Decimal("1000000")
                 entry = get_pricing_entry(model, provider=provider, base_url=base_url)
                 if entry:
@@ -900,8 +901,13 @@ def on_post_llm_call(*, task_id: str = "", session_id: str = "", provider: str =
         cost_details = {}
         # Estimate per-type cost from the summary if possible
         try:
-            from agent.usage_pricing import CanonicalUsage, estimate_usage_cost, get_pricing_entry
             from decimal import Decimal
+
+            from agent.usage_pricing import (
+                CanonicalUsage,
+                estimate_usage_cost,
+                get_pricing_entry,
+            )
             _ONE_M = Decimal("1000000")
             _cu = CanonicalUsage(
                 input_tokens=_input,

@@ -10,7 +10,6 @@ Verifies that:
 
 from unittest.mock import MagicMock, patch
 
-
 # ---------------------------------------------------------------------------
 # Test 1: Agent heuristic — generic 400 with large session → compression
 # ---------------------------------------------------------------------------
@@ -18,7 +17,8 @@ from unittest.mock import MagicMock, patch
 
 class TestGeneric400Heuristic:
     """The agent should treat a generic 400 with a large session as a
-    probable context-length error and trigger compression, not abort."""
+    probable context-length error and trigger compression, not abort.
+    """
 
     def _make_agent(self):
         """Create a minimal AIAgent for testing error handling."""
@@ -44,7 +44,8 @@ class TestGeneric400Heuristic:
 
     def test_generic_400_with_small_session_is_client_error(self):
         """A generic 400 with a small session should still be treated
-        as a non-retryable client error (not context overflow)."""
+        as a non-retryable client error (not context overflow).
+        """
         error_msg = "error"
         status_code = 400
         approx_tokens = 1000  # Small session
@@ -52,11 +53,11 @@ class TestGeneric400Heuristic:
 
         # Simulate the phrase matching
         is_context_length_error = any(phrase in error_msg for phrase in [
-            'context length', 'context size', 'maximum context',
-            'token limit', 'too many tokens', 'reduce the length',
-            'exceeds the limit', 'context window',
-            'request entity too large',
-            'prompt is too long',
+            "context length", "context size", "maximum context",
+            "token limit", "too many tokens", "reduce the length",
+            "exceeds the limit", "context window",
+            "request entity too large",
+            "prompt is too long",
         ])
         assert not is_context_length_error
 
@@ -68,7 +69,8 @@ class TestGeneric400Heuristic:
 
     def test_generic_400_with_large_token_count_triggers_heuristic(self):
         """A generic 400 with high token count should be treated as
-        probable context overflow."""
+        probable context overflow.
+        """
         error_msg = "error"
         status_code = 400
         ctx_len = 200000
@@ -76,7 +78,7 @@ class TestGeneric400Heuristic:
         api_messages = [{"role": "user", "content": "hi"}] * 20
 
         is_context_length_error = any(phrase in error_msg for phrase in [
-            'context length', 'context size', 'maximum context',
+            "context length", "context size", "maximum context",
         ])
         assert not is_context_length_error
 
@@ -89,7 +91,8 @@ class TestGeneric400Heuristic:
 
     def test_generic_400_with_many_messages_triggers_heuristic(self):
         """A generic 400 with >80 messages should trigger the heuristic
-        even if estimated tokens are low."""
+        even if estimated tokens are low.
+        """
         error_msg = "error"
         status_code = 400
         ctx_len = 200000
@@ -103,7 +106,8 @@ class TestGeneric400Heuristic:
 
     def test_specific_error_message_bypasses_heuristic(self):
         """A 400 with a specific, long error message should NOT trigger
-        the heuristic even with a large session."""
+        the heuristic even with a large session.
+        """
         error_msg = "invalid model: anthropic/claude-nonexistent-model is not available"
         status_code = 400
         ctx_len = 200000
@@ -114,14 +118,15 @@ class TestGeneric400Heuristic:
 
     def test_descriptive_context_error_caught_by_phrases(self):
         """Descriptive context-length errors should still be caught by
-        the existing phrase matching (not the heuristic)."""
+        the existing phrase matching (not the heuristic).
+        """
         error_msg = "prompt is too long: 250000 tokens > 200000 maximum"
         is_context_length_error = any(phrase in error_msg for phrase in [
-            'context length', 'context size', 'maximum context',
-            'token limit', 'too many tokens', 'reduce the length',
-            'exceeds the limit', 'context window',
-            'request entity too large',
-            'prompt is too long',
+            "context length", "context size", "maximum context",
+            "token limit", "too many tokens", "reduce the length",
+            "exceeds the limit", "context window",
+            "request entity too large",
+            "prompt is too long",
         ])
         assert is_context_length_error
 
@@ -132,11 +137,13 @@ class TestGeneric400Heuristic:
 
 class TestGatewaySkipsPersistenceOnFailure:
     """When the agent returns failed=True with no final_response,
-    the gateway should NOT persist messages to the transcript."""
+    the gateway should NOT persist messages to the transcript.
+    """
 
     def test_agent_failed_early_detected(self):
         """The agent_failed_early flag is True when failed=True,
-        regardless of final_response."""
+        regardless of final_response.
+        """
         agent_result = {
             "failed": True,
             "final_response": None,
@@ -150,7 +157,8 @@ class TestGatewaySkipsPersistenceOnFailure:
         """When _run_agent_blocking converts an error to final_response,
         the failed flag should still trigger agent_failed_early.  This
         was the core bug in #9893 — the old guard checked
-        ``not final_response`` which was always truthy after conversion."""
+        ``not final_response`` which was always truthy after conversion.
+        """
         agent_result = {
             "failed": True,
             "final_response": "⚠️ Request payload too large: max compression attempts reached.",
@@ -172,7 +180,8 @@ class TestGatewaySkipsPersistenceOnFailure:
 class TestCompressionExhaustedFlag:
     """When compression is exhausted, the agent should set both
     failed=True and compression_exhausted=True so the gateway can
-    auto-reset the session.  (#9893)"""
+    auto-reset the session.  (#9893)
+    """
 
     def test_compression_exhausted_returns_carry_flag(self):
         """Simulate the return dict from a compression-exhausted agent."""
@@ -206,11 +215,13 @@ class TestCompressionExhaustedFlag:
 
 class TestContextOverflowErrorMessages:
     """The gateway should produce helpful error messages when the failure
-    looks like a context overflow."""
+    looks like a context overflow.
+    """
 
     def test_detects_context_keywords(self):
         """Error messages containing context-related keywords should be
-        identified as context failures."""
+        identified as context failures.
+        """
         keywords = [
             "context length exceeded",
             "too many tokens in the prompt",
@@ -227,7 +238,8 @@ class TestContextOverflowErrorMessages:
 
     def test_detects_generic_400_with_large_history(self):
         """A generic 400 error code in the string with a large history
-        should be flagged as context failure."""
+        should be flagged as context failure.
+        """
         error_str = "error code: 400 - {'type': 'error', 'message': 'Error'}"
         history_len = 100  # Large session
 
@@ -261,7 +273,8 @@ class TestContextOverflowErrorMessages:
 
 class TestAgentSkipsPersistenceForLargeFailedSessions:
     """When a 400 error occurs and the session is large, the agent
-    should skip persisting to prevent the growth loop."""
+    should skip persisting to prevent the growth loop.
+    """
 
     def test_large_session_400_skips_persistence(self):
         """Status 400 + high token count should skip persistence."""

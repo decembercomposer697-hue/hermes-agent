@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for read_file_tool safety guards: device-path blocking,
+"""Tests for read_file_tool safety guards: device-path blocking,
 character-count limits, file deduplication, and dedup reset on
 context compression.
 
@@ -12,24 +11,24 @@ import os
 import tempfile
 import time
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from tools.file_tools import (
-    read_file_tool,
-    write_file_tool,
-    reset_file_dedup,
-    _is_blocked_device,
-    _invalidate_dedup_for_path,
-    _READ_DEDUP_STATUS_MESSAGE,
     _DEFAULT_MAX_READ_CHARS,
+    _READ_DEDUP_STATUS_MESSAGE,
+    _invalidate_dedup_for_path,
+    _is_blocked_device,
     _read_tracker,
     notify_other_tool_call,
+    read_file_tool,
+    reset_file_dedup,
+    write_file_tool,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 class _FakeReadResult:
     """Minimal stand-in for FileOperations.read_file return value."""
@@ -367,7 +366,8 @@ class TestFileDedup(unittest.TestCase):
 class TestDedupStubLoopGuard(unittest.TestCase):
     """Repeated dedup stubs must escalate to a hard BLOCKED error so weak
     tool-following models don't burn iteration budget in an infinite loop
-    of ``read_file → stub → read_file → stub → ...``"""
+    of ``read_file → stub → read_file → stub → ...``
+    """
 
     def setUp(self):
         _read_tracker.clear()
@@ -386,7 +386,7 @@ class TestDedupStubLoopGuard(unittest.TestCase):
 
     @patch("tools.file_tools._get_file_ops")
     def test_third_read_is_blocked(self, mock_ops):
-        """read → stub → BLOCKED.  Second stub escalates to hard error."""
+        """Read → stub → BLOCKED.  Second stub escalates to hard error."""
         mock_ops.return_value = _make_fake_ops(
             content="line one\nline two\n", file_size=20,
         )
@@ -429,7 +429,8 @@ class TestDedupStubLoopGuard(unittest.TestCase):
     @patch("tools.file_tools._get_file_ops")
     def test_file_modification_clears_block(self, mock_ops):
         """Real file change should break out of the block — new content
-        is legitimately different and the agent should see it."""
+        is legitimately different and the agent should see it.
+        """
         mock_ops.return_value = _make_fake_ops(
             content="line one\nline two\n", file_size=20,
         )
@@ -450,7 +451,8 @@ class TestDedupStubLoopGuard(unittest.TestCase):
     @patch("tools.file_tools._get_file_ops")
     def test_other_tool_call_clears_hits(self, mock_ops):
         """An intervening non-read tool call resets stub-hit counters,
-        just like it resets the consecutive-read counter."""
+        just like it resets the consecutive-read counter.
+        """
         mock_ops.return_value = _make_fake_ops(
             content="line one\nline two\n", file_size=20,
         )
@@ -469,7 +471,8 @@ class TestDedupStubLoopGuard(unittest.TestCase):
     @patch("tools.file_tools._get_file_ops")
     def test_different_ranges_tracked_independently(self, mock_ops):
         """Stub-hit counter is keyed by (path, offset, limit), so hammering
-        one range shouldn't block reads of a different range."""
+        one range shouldn't block reads of a different range.
+        """
         mock_ops.return_value = _make_fake_ops(
             content="line one\nline two\n", file_size=20,
         )
@@ -490,7 +493,8 @@ class TestDedupStubLoopGuard(unittest.TestCase):
     @patch("tools.file_tools._get_file_ops")
     def test_reset_file_dedup_clears_hits(self, mock_ops):
         """Post-compression reset must clear stub-hit counters too,
-        otherwise the agent stays blocked after compression."""
+        otherwise the agent stays blocked after compression.
+        """
         mock_ops.return_value = _make_fake_ops(
             content="line one\nline two\n", file_size=20,
         )
@@ -513,7 +517,8 @@ class TestDedupStubLoopGuard(unittest.TestCase):
 
 class TestDedupResetOnCompression(unittest.TestCase):
     """reset_file_dedup should clear the dedup cache so post-compression
-    reads return full content."""
+    reads return full content.
+    """
 
     def setUp(self):
         _read_tracker.clear()
@@ -608,9 +613,11 @@ class TestLargeFileHint(unittest.TestCase):
         fake = _make_fake_ops(content=content, total_lines=10000, file_size=600_000)
         # Make to_dict return truncated=True
         orig_read = fake.read_file
+
         def patched_read(path, offset=1, limit=500):
             r = orig_read(path, offset, limit)
             orig_to_dict = r.to_dict
+
             def new_to_dict():
                 d = orig_to_dict()
                 d["truncated"] = True

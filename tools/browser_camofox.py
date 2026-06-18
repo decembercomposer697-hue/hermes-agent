@@ -666,7 +666,7 @@ def camofox_get_images(task_id: str | None = None) -> str:
                 # Look for URL on the next line
                 src = ""
                 if i + 1 < len(lines):
-                    url_match = re.search(r'/url:\s*(\S+)', lines[i + 1].strip())
+                    url_match = re.search(r"/url:\s*(\S+)", lines[i + 1].strip())
                     if url_match:
                         src = url_match.group(1)
                 if alt or src:

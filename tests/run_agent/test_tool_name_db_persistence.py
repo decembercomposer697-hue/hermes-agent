@@ -5,8 +5,8 @@ time. This test verifies that the value survives the flush path into the session
 """
 from unittest.mock import MagicMock, patch
 
-from run_agent import AIAgent
 from agent.tool_dispatch_helpers import make_tool_result_message
+from run_agent import AIAgent
 
 
 def _make_agent(session_db):
@@ -27,7 +27,8 @@ def _make_agent(session_db):
 
 def test_tool_name_persisted_to_session_db():
     """tool_name set by make_tool_result_message must be passed through to
-    append_message so the column is populated on first flush to the session DB."""
+    append_message so the column is populated on first flush to the session DB.
+    """
     session_db = MagicMock()
     agent = _make_agent(session_db)
 

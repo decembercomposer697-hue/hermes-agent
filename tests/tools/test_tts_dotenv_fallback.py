@@ -57,12 +57,11 @@ class TestDotenvFallbackPerProvider:
             mock_import.return_value.assert_called_once_with(api_key="el-dotenv-key")
 
     def test_xai_reads_dotenv_key(self, tmp_path):
-        """xAI TTS now resolves credentials through ``tools.xai_http``; the
+        """XAI TTS now resolves credentials through ``tools.xai_http``; the
         dotenv fallback contract from #17140 is preserved by patching the
         resolver's ``get_env_value`` rather than ``tts_tool.get_env_value``.
         """
-        from tools import tts_tool
-        from tools import xai_http
+        from tools import tts_tool, xai_http
 
         captured: dict = {}
 
@@ -184,6 +183,7 @@ class TestRegressionGuard:
         not freeze that temporary helper into this module forever.
         """
         import importlib
+
         import hermes_cli.config as config_mod
         from tools import tts_tool
 

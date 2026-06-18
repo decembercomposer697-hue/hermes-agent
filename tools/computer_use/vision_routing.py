@@ -113,7 +113,9 @@ def _lookup_supports_vision(
     if not provider or not model:
         return None
     try:
-        from agent.image_routing import _lookup_supports_vision as _lookup_image_supports
+        from agent.image_routing import (
+            _lookup_supports_vision as _lookup_image_supports,
+        )
     except Exception:
         _lookup_image_supports = None
     if _lookup_image_supports is not None:
@@ -179,6 +181,7 @@ def should_route_capture_to_aux_vision(
       pipeline (and surface a text-only tool result). ``False`` when the
       caller should keep the existing multimodal envelope (main model
       handles vision natively).
+
     """
     if _explicit_aux_vision_override(cfg):
         return True

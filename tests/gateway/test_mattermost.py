@@ -2,15 +2,16 @@
 import json
 import os
 import time
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from unittest.mock import MagicMock, patch, AsyncMock
 
 from gateway.config import Platform, PlatformConfig
-
 
 # ---------------------------------------------------------------------------
 # Platform & Config
 # ---------------------------------------------------------------------------
+
 
 class TestMattermostConfigLoading:
     def test_apply_env_overrides_mattermost(self, monkeypatch):
@@ -660,7 +661,8 @@ class TestMattermostRequirements:
 class TestMattermostMediaTypes:
     """Verify that media_types contains actual MIME types (e.g. 'image/png')
     rather than bare category strings ('image'), so downstream
-    ``mtype.startswith("image/")`` checks in run.py work correctly."""
+    ``mtype.startswith("image/")`` checks in run.py work correctly.
+    """
 
     def setup_method(self):
         self.adapter = _make_adapter()

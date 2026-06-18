@@ -214,7 +214,8 @@ class TestPatchHandler:
         carry prompt-injection-controlled paths (skill content, web extract).
         ``..`` traversal in the header must be rejected before the patch is
         applied, even though the explicit ``path=`` arg is allowed to use
-        ``..`` for legitimate cross-worktree edits."""
+        ``..`` for legitimate cross-worktree edits.
+        """
         from tools.file_tools import patch_tool
         result = json.loads(patch_tool(
             mode="patch",
@@ -468,7 +469,8 @@ class TestSensitivePathCheck:
 class TestPatchSchemaShape:
     """PATCH_SCHEMA must advertise per-mode required params via description
     text (not JSON-schema ``required``), so strict models like kimi-k2.x stop
-    silently omitting old_string / new_string / patch content."""
+    silently omitting old_string / new_string / patch content.
+    """
 
     def test_per_mode_required_params_documented_in_descriptions(self):
         desc = PATCH_SCHEMA["description"]

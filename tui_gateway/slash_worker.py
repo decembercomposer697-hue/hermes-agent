@@ -13,17 +13,19 @@ import threading
 import time
 
 import psutil
+from rich.console import Console
 
 import cli as cli_mod
 from cli import HermesCLI
-from rich.console import Console
+
 
 # Env-overridable so the integration test can drive sub-second timing.
 def _env_float(name: str, default: float) -> float:
     """Parse a float env knob, falling back to ``default`` on absent/malformed
     values. A bare ``float(os.environ.get(...))`` would raise ValueError at
     import time on a typo (e.g. ``HERMES_SLASH_WATCHDOG_POLL_S=2s``) and kill
-    the worker before it can serve a single command."""
+    the worker before it can serve a single command.
+    """
     raw = os.environ.get(name)
     if not raw:
         return default
@@ -41,7 +43,8 @@ _in_flight = threading.Event()  # set while a command is executing
 def _is_orphaned(original_ppid, parent_create_time, getppid=os.getppid) -> bool:
     """True once our spawning gateway is gone. Compare to the ORIGINAL ppid
     (never ==1: Linux reparents to a subreaper) and guard PID reuse via
-    create_time."""
+    create_time.
+    """
     if getppid() != original_ppid:
         return True
     try:

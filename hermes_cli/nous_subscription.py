@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional, Set
-from collections.abc import Iterable
 
 from hermes_cli.config import get_env_value, load_config
 from hermes_cli.nous_account import (
@@ -14,7 +14,6 @@ from hermes_cli.nous_account import (
     get_nous_portal_account_info,
 )
 from tools.managed_tool_gateway import is_managed_tool_gateway_ready
-from utils import is_truthy_value
 from tools.tool_backend_helpers import (
     fal_key_is_configured,
     has_direct_modal_credentials,
@@ -24,7 +23,7 @@ from tools.tool_backend_helpers import (
     resolve_modal_backend_state,
     resolve_openai_audio_api_key,
 )
-
+from utils import is_truthy_value
 
 _DEFAULT_PLATFORM_TOOLSETS = {
     "cli": "hermes-cli",
@@ -620,9 +619,6 @@ def get_nous_subscription_features(
         features=features,
         account_info=account_info,
     )
-
-
-
 
 
 def apply_nous_managed_defaults(

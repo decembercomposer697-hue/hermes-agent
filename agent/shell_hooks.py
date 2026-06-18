@@ -1,5 +1,4 @@
-"""
-Shell-script hooks bridge.
+"""Shell-script hooks bridge.
 
 Reads the ``hooks:`` block from ``cli-config.yaml``, prompts the user for
 consent on first use of each ``(event, command)`` pair, and registers
@@ -64,12 +63,12 @@ import sys
 import tempfile
 import threading
 import time
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
-from collections.abc import Callable, Iterator
 
 try:
     import fcntl  # POSIX only; Windows falls back to best-effort without flock.
@@ -224,7 +223,8 @@ def register_from_config(
 
 def iter_configured_hooks(cfg: dict[str, Any] | None) -> list[ShellHookSpec]:
     """Return the parsed ``ShellHookSpec`` entries from config without
-    registering anything.  Used by ``hermes hooks list`` and ``doctor``."""
+    registering anything.  Used by ``hermes hooks list`` and ``doctor``.
+    """
     if not isinstance(cfg, dict):
         return []
     return _parse_hooks_block(cfg.get("hooks"))
@@ -466,7 +466,8 @@ def _make_callback(spec: ShellHookSpec) -> Callable[..., dict[str, Any] | None]:
 
 def _serialize_payload(event: str, kwargs: dict[str, Any]) -> str:
     """Render the stdin JSON payload.  Unserialisable values are
-    stringified via ``default=str`` rather than dropped."""
+    stringified via ``default=str`` rather than dropped.
+    """
     extras = {k: v for k, v in kwargs.items() if k not in _TOP_LEVEL_PAYLOAD_KEYS}
     try:
         cwd = str(Path.cwd())
@@ -568,7 +569,8 @@ def save_allowlist(data: dict[str, Any]) -> None:
     ``os.replace``.  Cross-process read-modify-write races are handled
     by :func:`_locked_update_approvals` (``fcntl.flock``).  On OSError
     the failure is logged; the in-process hook still registers but
-    the approval won't survive across runs."""
+    the approval won't survive across runs.
+    """
     p = allowlist_path()
     try:
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -792,7 +794,8 @@ def allowlist_entry_for(event: str, command: str) -> dict[str, Any] | None:
 
 def script_mtime_iso(command: str) -> str | None:
     """ISO-8601 mtime of the resolved script path, or ``None`` if the
-    script is missing."""
+    script is missing.
+    """
     path = _command_script_path(command)
     if not path:
         return None
@@ -812,7 +815,8 @@ def script_is_executable(command: str) -> bool:
     executable.  For interpreter-prefixed commands (``python3
     /path/hook.py``, ``/usr/bin/env bash hook.sh``) the script just has
     to be readable — the interpreter doesn't care about the ``X_OK``
-    bit.  Mirrors what ``_spawn`` would actually do at runtime."""
+    bit.  Mirrors what ``_spawn`` would actually do at runtime.
+    """
     path = _command_script_path(command)
     if not path:
         return False
@@ -841,7 +845,8 @@ def run_once(
     diverge silently from production behaviour.
 
     Returns the :func:`_spawn` diagnostic dict plus a ``parsed`` field
-    holding the canonical Hermes-wire-shape response."""
+    holding the canonical Hermes-wire-shape response.
+    """
     stdin_json = _serialize_payload(spec.event, kwargs)
     result = _spawn(spec, stdin_json)
     result["parsed"] = _parse_response(spec.event, result["stdout"])

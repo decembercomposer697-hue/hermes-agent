@@ -13,8 +13,8 @@ They do NOT boot the full AIAgent — the prologue-fix guarantees are pure
 function contracts at module scope.
 """
 
-from run_agent import _summarize_user_message_for_log
 from agent.codex_responses_adapter import _chat_content_to_responses_parts
+from run_agent import _summarize_user_message_for_log
 
 
 class TestSummarizeUserMessageForLog:
@@ -95,7 +95,8 @@ class TestChatContentToResponsesParts:
 
     def test_unknown_parts_skipped(self):
         """Unknown types shouldn't crash — filtered silently at this level
-        (the API server's normalizer rejects them earlier)."""
+        (the API server's normalizer rejects them earlier).
+        """
         content = [{"type": "text", "text": "ok"}, {"type": "audio", "x": "y"}]
         assert _chat_content_to_responses_parts(content) == [{"type": "input_text", "text": "ok"}]
 

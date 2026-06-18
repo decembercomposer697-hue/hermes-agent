@@ -26,7 +26,6 @@ from unittest.mock import patch
 
 import pytest
 
-
 pytestmark = pytest.mark.skipif(
     sys.platform.startswith("win"),
     reason="POSIX mode bits not enforced on Windows",
@@ -164,7 +163,8 @@ def test_save_auth_store_uses_os_open_with_0o600_mode(tmp_path, monkeypatch):
     """Regression: the writer must call ``os.open`` with an explicit restricted
     mode so the file is created at 0o600 atomically — closing the TOCTOU
     window the previous ``Path.open('w')`` left open (fd inherited process
-    umask and was briefly 0o644 before post-write chmod)."""
+    umask and was briefly 0o644 before post-write chmod).
+    """
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
     observed_opens: list[tuple[str, int, int]] = []

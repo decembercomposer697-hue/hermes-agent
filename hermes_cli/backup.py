@@ -1,5 +1,4 @@
-"""
-Backup and import commands for hermes CLI.
+"""Backup and import commands for hermes CLI.
 
 `hermes backup` creates a zip archive of the entire ~/.hermes/ directory
 (excluding the hermes-agent repo and transient files).
@@ -17,11 +16,15 @@ import sys
 import tempfile
 import time
 import zipfile
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from hermes_constants import get_default_hermes_root, get_hermes_home, display_hermes_home
+from hermes_constants import (
+    display_hermes_home,
+    get_default_hermes_root,
+    get_hermes_home,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -439,8 +442,10 @@ def run_import(args) -> None:
         if profiles_dir.is_dir():
             try:
                 from hermes_cli.profiles import (
-                    create_wrapper_script, check_alias_collision,
-                    _is_wrapper_dir_in_path, _get_wrapper_dir,
+                    _get_wrapper_dir,
+                    _is_wrapper_dir_in_path,
+                    check_alias_collision,
+                    create_wrapper_script,
                 )
                 for entry in sorted(profiles_dir.iterdir()):
                     if not entry.is_dir():
@@ -466,7 +471,7 @@ def run_import(args) -> None:
                         print(f"  Profile aliases skipped:  {', '.join(skipped)}")
                     if not _is_wrapper_dir_in_path():
                         print(f"\n  Note: {_get_wrapper_dir()} is not in your PATH.")
-                        print('  Add to your shell config (~/.bashrc or ~/.zshrc):')
+                        print("  Add to your shell config (~/.bashrc or ~/.zshrc):")
                         print('    export PATH="$HOME/.local/bin:$PATH"')
             except ImportError:
                 # hermes_cli.profiles might not be available (fresh install)
@@ -538,6 +543,7 @@ def create_quick_snapshot(
 
     Returns:
         Snapshot ID (timestamp-based), or None if no files found.
+
     """
     home = hermes_home or get_hermes_home()
     root = _quick_snapshot_root(home)
@@ -703,6 +709,7 @@ def _count_cron_jobs(path: Path) -> int | None:
         the file is missing or cannot be parsed. ``None`` means "unknown" —
         callers must not treat it as "zero jobs", because acting on an
         unreadable file could mask a real corruption the user needs to see.
+
     """
     if not path.is_file():
         return None
@@ -749,6 +756,7 @@ def restore_cron_jobs_if_emptied(
         ``None`` when no action was taken (the common, healthy path). On a
         successful restore, a dict ``{"restored": True, "job_count": N,
         "snapshot_id": ...}`` so the caller can warn the user.
+
     """
     if not snapshot_id:
         return None

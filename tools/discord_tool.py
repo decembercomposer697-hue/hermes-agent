@@ -50,6 +50,7 @@ _FLAG_GATEWAY_MESSAGE_CONTENT_LIMITED = 1 << 19
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _get_bot_token() -> str | None:
     """Resolve the Discord bot token from environment."""
     return os.getenv("DISCORD_BOT_TOKEN", "").strip() or None

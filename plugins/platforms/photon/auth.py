@@ -1,5 +1,4 @@
-"""
-Photon Dashboard API client + device-code login flow.
+"""Photon Dashboard API client + device-code login flow.
 
 This module is pure Python — it intentionally does not depend on
 ``spectrum-ts``.  Every management-plane operation (login, find/create
@@ -42,10 +41,10 @@ import os
 import re
 import time
 from base64 import b64encode
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-from collections.abc import Callable
 
 try:
     import httpx

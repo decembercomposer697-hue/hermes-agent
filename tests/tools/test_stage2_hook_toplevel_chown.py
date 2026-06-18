@@ -40,7 +40,8 @@ def stage2_text() -> str:
 
 def _toplevel_chown_loop(text: str) -> str:
     """Extract the `for f in … chown hermes:hermes "$HERMES_HOME/$f" … done`
-    block that repairs top-level state-file ownership."""
+    block that repairs top-level state-file ownership.
+    """
     m = re.search(
         r"(for f in \\\n(?:.*\\\n)*?.*; do\n(?:.*\n)*?done)",
         text,
@@ -65,7 +66,8 @@ def test_toplevel_chown_loop_present(stage2_text: str) -> None:
 def test_no_blanket_find_user_root_sweep(stage2_text: str) -> None:
     """The fix must NOT reintroduce a blanket `find … -user root` chown of
     $HERMES_HOME contents — that would clobber host-owned files in a bind mount
-    (#19788 / PR #19795)."""
+    (#19788 / PR #19795).
+    """
     assert not re.search(r"find\s+\"?\$\{?HERMES_HOME\}?\"?[^\n]*-user\s+root", stage2_text), (
         "stage2-hook.sh must not blanket-chown root-owned files under "
         "$HERMES_HOME via `find -user root`; use the targeted allowlist instead "
@@ -76,7 +78,8 @@ def test_no_blanket_find_user_root_sweep(stage2_text: str) -> None:
 def _run_loop(text: str, present_files: list[str]) -> list[str]:
     """Run the extracted chown loop in a sandbox $HERMES_HOME, with `chown`
     stubbed to record which paths it was asked to touch. Returns the basenames
-    the loop attempted to chown."""
+    the loop attempted to chown.
+    """
     bash = shutil.which("bash")
     if bash is None:
         pytest.skip("bash not available")
@@ -123,7 +126,8 @@ def test_loop_chowns_present_allowlisted_files(stage2_text: str) -> None:
 
 def test_loop_skips_nonallowlisted_host_file(stage2_text: str) -> None:
     """A file NOT on the allowlist (e.g. a host-owned file in a bind mount) must
-    never be chowned, even if present."""
+    never be chowned, even if present.
+    """
     touched = _run_loop(stage2_text, ["auth.json"])
     assert "host_secret.json" not in touched, (
         "the allowlist loop must not touch non-allowlisted files (#19788)"

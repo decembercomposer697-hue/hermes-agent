@@ -7,7 +7,7 @@ the standard log dir, not inside the user's ``skills/`` data directory.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -24,6 +24,7 @@ def curator_env(tmp_path, monkeypatch):
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
     import importlib
+
     import hermes_constants
     importlib.reload(hermes_constants)
     from agent import curator
@@ -48,7 +49,8 @@ def _make_llm_meta(**overrides):
 
 def test_reports_root_is_under_logs_not_skills(curator_env):
     """Reports live in logs/curator/, not skills/ — operational telemetry
-    belongs with the logs, not with user-authored skill data."""
+    belongs with the logs, not with user-authored skill data.
+    """
     curator = curator_env["curator"]
     root = curator._reports_root()
     home = curator_env["home"]
@@ -196,7 +198,8 @@ def test_report_md_is_human_readable(curator_env):
 
 def test_same_second_reruns_get_unique_dirs(curator_env):
     """If the curator somehow runs twice in the same second, the second
-    report still gets its own directory rather than overwriting the first."""
+    report still gets its own directory rather than overwriting the first.
+    """
     curator = curator_env["curator"]
     start = datetime(2026, 4, 29, 5, 33, 34, tzinfo=UTC)
 
@@ -220,7 +223,8 @@ def test_same_second_reruns_get_unique_dirs(curator_env):
 
 def test_report_captures_llm_error_and_continues(curator_env):
     """If the LLM pass recorded an error, the report still writes and
-    surfaces the error prominently."""
+    surfaces the error prominently.
+    """
     curator = curator_env["curator"]
     run_dir = curator._write_run_report(
         started_at=datetime.now(UTC),
@@ -244,7 +248,8 @@ def test_report_captures_llm_error_and_continues(curator_env):
 
 def test_state_transitions_captured_in_report(curator_env):
     """When a skill moves active → stale or stale → archived between
-    before/after snapshots, the report records it."""
+    before/after snapshots, the report records it.
+    """
     curator = curator_env["curator"]
     start = datetime.now(UTC)
 
@@ -292,6 +297,7 @@ def curator_env_with_cron(curator_env, monkeypatch):
     (home / "cron" / "output").mkdir(exist_ok=True)
 
     import importlib
+
     import cron.jobs as jobs_mod
     importlib.reload(jobs_mod)
     monkeypatch.setattr(jobs_mod, "HERMES_DIR", home)
@@ -305,7 +311,8 @@ def curator_env_with_cron(curator_env, monkeypatch):
 def test_curator_rewrites_cron_skills_when_skill_consolidated(curator_env_with_cron):
     """A skill consolidated into an umbrella should be rewritten in any
     cron job's skills list; the rewrite should be visible in run.json
-    and cron_rewrites.json."""
+    and cron_rewrites.json.
+    """
     curator = curator_env_with_cron["curator"]
     jobs = curator_env_with_cron["jobs"]
 
@@ -373,7 +380,8 @@ def test_curator_rewrites_cron_skills_when_skill_consolidated(curator_env_with_c
 
 def test_curator_drops_pruned_skill_from_cron_job(curator_env_with_cron):
     """A pruned (no-umbrella) skill should be dropped from the cron
-    job's skill list entirely — there's no forwarding target."""
+    job's skill list entirely — there's no forwarding target.
+    """
     curator = curator_env_with_cron["curator"]
     jobs = curator_env_with_cron["jobs"]
 
@@ -408,7 +416,8 @@ def test_curator_drops_pruned_skill_from_cron_job(curator_env_with_cron):
 
 def test_curator_report_has_no_cron_section_when_nothing_changes(curator_env_with_cron):
     """When the curator run doesn't touch any skills, cron jobs are
-    untouched and cron_rewrites.json is not even written."""
+    untouched and cron_rewrites.json is not even written.
+    """
     curator = curator_env_with_cron["curator"]
     jobs = curator_env_with_cron["jobs"]
 

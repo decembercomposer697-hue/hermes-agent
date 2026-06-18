@@ -1,5 +1,4 @@
-"""
-Tests for #24870 — Telegram: audio file attachments must NOT be routed to STT.
+"""Tests for #24870 — Telegram: audio file attachments must NOT be routed to STT.
 
 Telegram distinguishes three kinds of audio payloads:
   - message.voice  → Opus/OGG voice message  → STT pipeline

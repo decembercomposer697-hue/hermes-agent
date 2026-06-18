@@ -176,7 +176,7 @@ def test_gui_install_summary_shape(tmp_path, monkeypatch):
 
 
 def test_userdata_dir_per_platform(monkeypatch):
-    """userData path matches Electron's app.getPath('userData') for "Hermes"."""
+    """UserData path matches Electron's app.getPath('userData') for "Hermes"."""
     home = Path("/home/tester")
     monkeypatch.setattr(Path, "home", classmethod(lambda cls: home))
 

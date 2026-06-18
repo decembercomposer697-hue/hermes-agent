@@ -43,7 +43,8 @@ class TestMemorySetupProviderRouting:
 
     def test_unknown_provider_reports_and_returns_early(self, capsys):
         """An unknown provider name surfaces a helpful message and returns
-        before any config load/save (the not-found guard precedes those imports)."""
+        before any config load/save (the not-found guard precedes those imports).
+        """
         memory_setup.cmd_setup_provider("notaprovider")
         out = capsys.readouterr().out
         assert "not found" in out
@@ -53,11 +54,13 @@ class TestMemorySetupProviderRouting:
 class TestInstallDependenciesRunner:
     """`_install_dependencies` must install via `uv` when present and fall back
     to standard `pip` when `uv` is unavailable (e.g. slim containers / CI images
-    that don't ship uv) instead of dead-ending with "cannot install"."""
+    that don't ship uv) instead of dead-ending with "cannot install".
+    """
 
     def _run_with_missing_dep(self, tmp_path, which_side_effect):
         """Drive _install_dependencies for a plugin that declares one missing
-        pip dep, capturing the subprocess.run argv (or None if never called)."""
+        pip dep, capturing the subprocess.run argv (or None if never called).
+        """
         import sys
 
         (tmp_path / "plugin.yaml").write_text(

@@ -1,5 +1,4 @@
-"""
-Session Insights Engine for Hermes Agent.
+"""Session Insights Engine for Hermes Agent.
 
 Analyzes historical session data from the SQLite state database to produce
 comprehensive usage insights — token consumption, cost estimates, tool usage
@@ -28,8 +27,6 @@ from agent.usage_pricing import (
     format_duration_compact,
     has_known_pricing,
 )
-
-
 
 
 def _estimate_cost(
@@ -71,8 +68,6 @@ def _estimate_cost(
     return float(result.amount_usd or 0.0), result.status
 
 
-
-
 def _bar_chart(values: list[int], max_width: int = 20) -> list[str]:
     """Create simple horizontal bar chart strings from values."""
     peak = max(values) if values else 1
@@ -82,26 +77,24 @@ def _bar_chart(values: list[int], max_width: int = 20) -> list[str]:
 
 
 class InsightsEngine:
-    """
-    Analyzes session history and produces usage insights.
+    """Analyzes session history and produces usage insights.
 
     Works directly with a SessionDB instance (or raw sqlite3 connection)
     to query session and message data.
     """
 
     def __init__(self, db):
-        """
-        Initialize with a SessionDB instance.
+        """Initialize with a SessionDB instance.
 
         Args:
             db: A SessionDB instance (from hermes_state.py)
+
         """
         self.db = db
         self._conn = db._conn
 
     def generate(self, days: int = 30, source: str = None) -> dict[str, Any]:
-        """
-        Generate a complete insights report.
+        """Generate a complete insights report.
 
         Args:
             days: Number of days to look back (default: 30)
@@ -109,6 +102,7 @@ class InsightsEngine:
 
         Returns:
             Dict with all computed insights
+
         """
         cutoff = time.time() - (days * 86400)
 

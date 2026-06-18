@@ -12,8 +12,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from run_agent import AIAgent
 from agent.context_compressor import ContextCompressor
+from run_agent import AIAgent
 
 
 @pytest.fixture(autouse=True)
@@ -69,7 +69,8 @@ def _make_agent(
 @patch("agent.auxiliary_client.get_text_auxiliary_client")
 def test_auto_corrects_threshold_when_aux_context_below_threshold(mock_get_client, mock_ctx_len):
     """Auto-correction: aux >= 64K floor but < threshold → lower threshold
-    to aux_context so compression still works this session."""
+    to aux_context so compression still works this session.
+    """
     agent = _make_agent(main_context=200_000, threshold_percent=0.50)
     # threshold = 100,000 — aux has 80,000 (above 64K floor, below threshold)
     mock_client = MagicMock()
@@ -102,7 +103,8 @@ def test_auto_corrects_threshold_when_aux_context_below_threshold(mock_get_clien
 @patch("agent.auxiliary_client.get_text_auxiliary_client")
 def test_rejects_aux_below_minimum_context(mock_get_client, mock_ctx_len):
     """Hard floor: aux context < MINIMUM_CONTEXT_LENGTH (64K) → session
-    refuses to start (ValueError), mirroring the main-model rejection."""
+    refuses to start (ValueError), mirroring the main-model rejection.
+    """
     agent = _make_agent(main_context=200_000, threshold_percent=0.50)
     mock_client = MagicMock()
     mock_client.base_url = "https://openrouter.ai/api/v1"
@@ -176,7 +178,8 @@ def test_feasibility_check_passes_live_main_runtime():
 def test_feasibility_check_passes_config_context_length(mock_get_client, mock_ctx_len):
     """auxiliary.compression.context_length from config is forwarded to
     get_model_context_length so custom endpoints that lack /models still
-    report the correct context window (fixes #8499)."""
+    report the correct context window (fixes #8499).
+    """
     agent = _make_agent(main_context=200_000, threshold_percent=0.85)
     agent._aux_compression_context_length_config = 1_000_000
     mock_client = MagicMock()
@@ -357,7 +360,8 @@ def test_exact_threshold_boundary_no_warning(mock_get_client, mock_ctx_len):
 @patch("agent.auxiliary_client.get_text_auxiliary_client")
 def test_just_below_threshold_auto_corrects(mock_get_client, mock_ctx_len):
     """Auto-correct fires when aux context is one token below the threshold
-    (and above the 64K hard floor)."""
+    (and above the 64K hard floor).
+    """
     agent = _make_agent(main_context=200_000, threshold_percent=0.50)
     mock_client = MagicMock()
     mock_client.base_url = "https://openrouter.ai/api/v1"
@@ -443,7 +447,8 @@ def test_replay_without_callback_is_noop():
 @patch("agent.auxiliary_client.get_text_auxiliary_client")
 def test_run_conversation_clears_warning_after_replay(mock_get_client, mock_ctx_len):
     """After replay in run_conversation, _compression_warning is cleared
-    so the warning is not sent again on subsequent turns."""
+    so the warning is not sent again on subsequent turns.
+    """
     agent = _make_agent(main_context=200_000, threshold_percent=0.50)
     mock_client = MagicMock()
     mock_client.base_url = "https://openrouter.ai/api/v1"

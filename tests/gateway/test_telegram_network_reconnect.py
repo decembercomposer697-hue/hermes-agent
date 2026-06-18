@@ -1,5 +1,4 @@
-"""
-Tests for Telegram polling network error recovery.
+"""Tests for Telegram polling network error recovery.
 
 Specifically tests the fix for #3173 — when start_polling() fails after a
 network error, the adapter must self-reschedule the next reconnect attempt
@@ -50,8 +49,7 @@ def _make_adapter() -> TelegramAdapter:
 
 @pytest.mark.asyncio
 async def test_reconnect_self_schedules_on_start_polling_failure():
-    """
-    When start_polling() raises during a network error retry, the adapter must
+    """When start_polling() raises during a network error retry, the adapter must
     schedule a new _handle_polling_network_error task — otherwise polling stays
     dead with no further error callbacks to trigger recovery.
 
@@ -90,8 +88,7 @@ async def test_reconnect_self_schedules_on_start_polling_failure():
 
 @pytest.mark.asyncio
 async def test_reconnect_does_not_self_schedule_when_fatal_error_set():
-    """
-    When a fatal error is already set, the failed reconnect should NOT create
+    """When a fatal error is already set, the failed reconnect should NOT create
     another retry task — the gateway is already shutting down this adapter.
     """
     adapter = _make_adapter()
@@ -119,8 +116,7 @@ async def test_reconnect_does_not_self_schedule_when_fatal_error_set():
 
 @pytest.mark.asyncio
 async def test_reconnect_success_resets_error_count():
-    """
-    When start_polling() succeeds, _polling_network_error_count should reset to 0.
+    """When start_polling() succeeds, _polling_network_error_count should reset to 0.
     """
     adapter = _make_adapter()
     adapter._polling_network_error_count = 3
@@ -152,8 +148,7 @@ async def test_reconnect_success_resets_error_count():
 
 @pytest.mark.asyncio
 async def test_reconnect_triggers_fatal_after_max_retries():
-    """
-    After MAX_NETWORK_RETRIES attempts, the adapter should set a fatal error
+    """After MAX_NETWORK_RETRIES attempts, the adapter should set a fatal error
     rather than retrying forever.
     """
     adapter = _make_adapter()
@@ -301,8 +296,7 @@ async def test_drain_helper_noop_without_app():
 
 @pytest.mark.asyncio
 async def test_heartbeat_probe_no_op_when_polling_healthy():
-    """
-    Probe scheduled after a successful reconnect: Updater.running=True and
+    """Probe scheduled after a successful reconnect: Updater.running=True and
     bot.get_me() returns quickly → recovery confirmed, no further action.
     """
     adapter = _make_adapter()
@@ -326,8 +320,7 @@ async def test_heartbeat_probe_no_op_when_polling_healthy():
 
 @pytest.mark.asyncio
 async def test_heartbeat_probe_reenters_ladder_when_updater_not_running():
-    """
-    If Updater.running has flipped to False by the heartbeat delay, treat
+    """If Updater.running has flipped to False by the heartbeat delay, treat
     as wedged: re-enter the reconnect ladder.
     """
     adapter = _make_adapter()
@@ -354,8 +347,7 @@ async def test_heartbeat_probe_reenters_ladder_when_updater_not_running():
 
 @pytest.mark.asyncio
 async def test_heartbeat_probe_reenters_ladder_when_get_me_times_out():
-    """
-    If bot.get_me() hangs longer than PROBE_TIMEOUT, treat as wedged.
+    """If bot.get_me() hangs longer than PROBE_TIMEOUT, treat as wedged.
     Simulates the connection-pool wedge that motivated this fix.
     """
     adapter = _make_adapter()
@@ -387,8 +379,7 @@ async def test_heartbeat_probe_reenters_ladder_when_get_me_times_out():
 
 @pytest.mark.asyncio
 async def test_heartbeat_probe_reenters_ladder_on_get_me_network_error():
-    """
-    Any exception raised by bot.get_me() (NetworkError, ConnectionError, etc.)
+    """Any exception raised by bot.get_me() (NetworkError, ConnectionError, etc.)
     should re-enter the reconnect ladder with the original exception.
     """
     adapter = _make_adapter()
@@ -414,8 +405,7 @@ async def test_heartbeat_probe_reenters_ladder_on_get_me_network_error():
 
 @pytest.mark.asyncio
 async def test_heartbeat_probe_skips_when_already_fatal():
-    """
-    If the adapter is already in fatal-error state by the time the probe
+    """If the adapter is already in fatal-error state by the time the probe
     delay elapses, the probe should bail without further action.
     """
     adapter = _make_adapter()
@@ -436,8 +426,7 @@ async def test_heartbeat_probe_skips_when_already_fatal():
 
 @pytest.mark.asyncio
 async def test_reconnect_schedules_heartbeat_probe_on_success():
-    """
-    After a successful start_polling() in the reconnect path, a probe task
+    """After a successful start_polling() in the reconnect path, a probe task
     must be added to _background_tasks. Without it, a wedged Updater would
     sit silent indefinitely with no further error_callback to advance the
     reconnect ladder.

@@ -7,7 +7,8 @@ from agent.copilot_acp_client import _is_gh_copilot_deprecation_message
 
 class TestDeprecationPatternDetection:
     """Verify that stderr from the deprecated `gh copilot` extension is caught
-    without false-positiving on the new `@github/copilot` CLI."""
+    without false-positiving on the new `@github/copilot` CLI.
+    """
 
     _REAL_DEPRECATION_STDERR = (
         "The gh-copilot extension has been deprecated in favor of the newer "

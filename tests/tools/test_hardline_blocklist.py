@@ -21,7 +21,6 @@ from tools.approval import (
     set_current_session_key,
 )
 
-
 # -------------------------------------------------------------------------
 # Pattern detection
 # -------------------------------------------------------------------------
@@ -213,7 +212,7 @@ def test_session_yolo_cannot_bypass_hardline(clean_session):
 
 
 def test_approvals_mode_off_cannot_bypass_hardline(clean_session, monkeypatch, tmp_path):
-    """config approvals.mode=off (yolo-equivalent) must not bypass hardline."""
+    """Config approvals.mode=off (yolo-equivalent) must not bypass hardline."""
     # _get_approval_mode() reads from hermes config; simplest path: monkeypatch the helper.
     import tools.approval as approval_mod
     monkeypatch.setattr(approval_mod, "_get_approval_mode", lambda: "off")
@@ -320,7 +319,7 @@ _SUDO_STDIN_BLOCK_YOLO = [
 
 
 def test_sudo_stdin_guard_detects_without_password():
-    """sudo -S is dangerous when SUDO_PASSWORD is not configured."""
+    """Sudo -S is dangerous when SUDO_PASSWORD is not configured."""
     import tools.approval as approval_mod
 
     for cmd in _SUDO_STDIN_BLOCK:

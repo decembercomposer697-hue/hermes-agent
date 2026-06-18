@@ -8,7 +8,6 @@ import pytest
 
 from gateway.stream_consumer import GatewayStreamConsumer, StreamConsumerConfig
 
-
 # ── _clean_for_display unit tests ────────────────────────────────────────
 
 
@@ -36,7 +35,7 @@ class TestCleanForDisplay:
 
     def test_media_tag_with_quotes(self):
         """MEDIA: tags wrapped in quotes or backticks are removed."""
-        for wrapper in ['`MEDIA:/path/file.png`', '"MEDIA:/path/file.png"', "'MEDIA:/path/file.png'"]:
+        for wrapper in ["`MEDIA:/path/file.png`", '"MEDIA:/path/file.png"', "'MEDIA:/path/file.png'"]:
             text = f"Result: {wrapper}"
             result = GatewayStreamConsumer._clean_for_display(text)
             assert "MEDIA:" not in result, f"Failed for wrapper: {wrapper}"
@@ -101,7 +100,8 @@ class TestFinalizeCapabilityGate:
     @pytest.mark.asyncio
     async def test_identical_text_skip_respects_adapter_flag(self):
         """_send_or_edit short-circuits identical-text only when the
-        adapter doesn't require an explicit finalize signal."""
+        adapter doesn't require an explicit finalize signal.
+        """
         # Adapter without finalize requirement — should skip identical edit.
         plain = MagicMock()
         plain.REQUIRES_EDIT_FINALIZE = False
@@ -366,7 +366,8 @@ class TestStreamRunMediaStripping:
 
 class TestSegmentBreakOnToolBoundary:
     """Verify that on_delta(None) finalizes the current message and starts a
-    new one so the final response appears below tool-progress messages."""
+    new one so the final response appears below tool-progress messages.
+    """
 
     @pytest.mark.asyncio
     async def test_segment_break_creates_new_message(self):
@@ -540,7 +541,8 @@ class TestSegmentBreakOnToolBoundary:
     @pytest.mark.asyncio
     async def test_segment_break_clears_failed_edit_fallback_state(self):
         """A tool boundary after edit failure must flush the undelivered tail
-        without duplicating the prefix the user already saw (#8124)."""
+        without duplicating the prefix the user already saw (#8124).
+        """
         adapter = MagicMock()
         send_results = [
             SimpleNamespace(success=True, message_id="msg_1"),
@@ -574,7 +576,8 @@ class TestSegmentBreakOnToolBoundary:
         """Regression for #8124: when an earlier edit succeeded but later edits
         fail (persistent flood control) and a tool boundary arrives before the
         fallback threshold is reached, the pre-boundary tail must still be
-        delivered — not silently dropped by the segment reset."""
+        delivered — not silently dropped by the segment reset.
+        """
         adapter = MagicMock()
         # msg_1 for the initial partial, msg_2 for the flushed tail,
         # msg_3 for the post-boundary segment.
@@ -624,7 +627,8 @@ class TestSegmentBreakOnToolBoundary:
     async def test_no_message_id_enters_fallback_mode(self):
         """Platform returns success but no message_id (Signal) — must not
         re-send on every delta.  Should enter fallback mode and send only
-        the continuation at finish."""
+        the continuation at finish.
+        """
         adapter = MagicMock()
         # First send succeeds but returns no message_id (Signal behavior)
         send_result_no_id = SimpleNamespace(success=True, message_id=None)
@@ -656,7 +660,8 @@ class TestSegmentBreakOnToolBoundary:
     async def test_no_message_id_single_delta_marks_already_sent(self):
         """When the entire response fits in one delta and platform returns no
         message_id, already_sent must still be True to prevent the gateway
-        from re-sending the full response."""
+        from re-sending the full response.
+        """
         adapter = MagicMock()
         send_result = SimpleNamespace(success=True, message_id=None)
         adapter.send = AsyncMock(return_value=send_result)
@@ -679,7 +684,8 @@ class TestSegmentBreakOnToolBoundary:
         """On a platform that never returns a message_id (e.g. webhook with
         github_comment delivery), tool-call segment breaks must NOT trigger
         a new adapter.send() per boundary.  The fix: _message_id == '__no_edit__'
-        suppresses the reset so all text accumulates and is sent once."""
+        suppresses the reset so all text accumulates and is sent once.
+        """
         adapter = MagicMock()
         # No message_id on first send, then one more for the fallback final
         adapter.send = AsyncMock(side_effect=[
@@ -747,7 +753,8 @@ class TestSegmentBreakOnToolBoundary:
     async def test_fallback_final_sends_full_text_at_tool_boundary(self):
         """After a tool call, the streamed prefix is stale (from the pre-tool
         segment).  _send_fallback_final must still send the post-tool response
-        even when continuation_text calculates as empty (#10807)."""
+        even when continuation_text calculates as empty (#10807).
+        """
         adapter = MagicMock()
         adapter.send = AsyncMock(
             return_value=SimpleNamespace(success=True, message_id="msg_1"),
@@ -798,7 +805,8 @@ class TestSegmentBreakOnToolBoundary:
         """After fallback re-sends the COMPLETE response, the frozen partial
         must be deleted so the user sees only the complete response (#16668).
         Full resend happens when the visible prefix doesn't match the final
-        text (e.g. post-segment-break content, #10807)."""
+        text (e.g. post-segment-break content, #10807).
+        """
         adapter = MagicMock()
         adapter.send = AsyncMock(
             return_value=SimpleNamespace(success=True, message_id="msg_new"),
@@ -827,7 +835,8 @@ class TestSegmentBreakOnToolBoundary:
         """When the fallback sends only the missing TAIL (visible prefix
         matches the final text), the partial message IS the head of the
         answer — deleting it would leave the user with only the last part
-        of the response (the 'model sent only the second half' bug)."""
+        of the response (the 'model sent only the second half' bug).
+        """
         adapter = MagicMock()
         adapter.send = AsyncMock(
             return_value=SimpleNamespace(success=True, message_id="msg_new"),
@@ -860,7 +869,8 @@ class TestSegmentBreakOnToolBoundary:
     @pytest.mark.asyncio
     async def test_fallback_final_does_not_delete_when_no_chunks_reach_user(self):
         """If every fallback send fails, the partial is the only thing the
-        user has — must NOT be deleted."""
+        user has — must NOT be deleted.
+        """
         adapter = MagicMock()
         adapter.send = AsyncMock(
             return_value=SimpleNamespace(success=False, error="network down"),
@@ -908,12 +918,14 @@ class TestFinalResponseDeliveryGuard:
     """Regression coverage for #10748 — _final_response_sent must reflect
     actual delivery of the *current* chunked send, not the cumulative
     `_already_sent` flag (which earlier tool-progress edits or fallback-mode
-    promotion can taint)."""
+    promotion can taint).
+    """
 
     @pytest.mark.asyncio
     async def test_split_overflow_failed_send_does_not_mark_final_sent(self):
         """Split-overflow path: if every chunk send fails on done frame,
-        _final_response_sent must stay False so the gateway falls back."""
+        _final_response_sent must stay False so the gateway falls back.
+        """
         adapter = MagicMock()
         # Every send fails — _send_new_chunk returns the passed-in reply_to.
         adapter.send = AsyncMock(
@@ -949,7 +961,8 @@ class TestFinalResponseDeliveryGuard:
     @pytest.mark.asyncio
     async def test_split_overflow_partial_send_marks_final_sent(self):
         """Split-overflow path: if at least one chunk lands on done frame,
-        we did deliver the final answer — _final_response_sent must be True."""
+        we did deliver the final answer — _final_response_sent must be True.
+        """
         adapter = MagicMock()
         adapter.send = AsyncMock(side_effect=[
             SimpleNamespace(success=True, message_id="msg_1"),
@@ -981,7 +994,8 @@ class TestFinalContentDeliveredGuard:
     set when the final response is actually confirmed delivered to the user,
     not when a mid-stream edit happened to show partial content.  Prematurely
     setting this flag causes the gateway to suppress the normal final send,
-    leaving the user with an incomplete partial message."""
+    leaving the user with an incomplete partial message.
+    """
 
     @pytest.mark.asyncio
     async def test_mid_stream_edit_success_does_not_mark_content_delivered(self):
@@ -990,7 +1004,8 @@ class TestFinalContentDeliveredGuard:
         False so the gateway does not suppress its fallback send (#25010).
 
         Simulates TelegramAdapter which sets REQUIRES_EDIT_FINALIZE=True,
-        requiring a second finalize edit even when content is unchanged."""
+        requiring a second finalize edit even when content is unchanged.
+        """
         adapter = MagicMock()
         adapter.REQUIRES_EDIT_FINALIZE = True  # Telegram adapter behavior
         # First send (initial streaming message) succeeds
@@ -1036,7 +1051,8 @@ class TestFinalContentDeliveredGuard:
     @pytest.mark.asyncio
     async def test_final_edit_success_does_mark_content_delivered(self):
         """When the final finalize edit succeeds, _final_content_delivered
-        must be True — the normal happy path should still work."""
+        must be True — the normal happy path should still work.
+        """
         adapter = MagicMock()
         adapter.edit_message = AsyncMock(return_value=SimpleNamespace(success=True))
         adapter.send = AsyncMock(
@@ -1063,7 +1079,8 @@ class TestFinalContentDeliveredGuard:
     async def test_fallback_partial_send_does_not_mark_final_sent(self):
         """When fallback final send delivers only some chunks before failing,
         _final_response_sent must stay False so the gateway can still attempt
-        a complete final send (#25010)."""
+        a complete final send (#25010).
+        """
         call_count = 0
 
         async def fake_send(*, chat_id, content, **kwargs):
@@ -1108,7 +1125,8 @@ class TestEditOverflowSplitAndDeliver:
     original message + N continuations (Telegram >4096 UTF-16), the consumer
     must update _message_id to the latest continuation, reset _last_sent_text,
     and fire on_new_message so subsequent tool-progress bubbles linearize
-    below the new visible message."""
+    below the new visible message.
+    """
 
     @pytest.mark.asyncio
     async def test_consumer_advances_message_id_on_split_and_deliver(self):
@@ -1516,7 +1534,8 @@ class TestFilterAndAccumulateIntegration:
 
 class TestBufferOnlyMode:
     """Verify buffer_only mode suppresses intermediate edits and only
-    flushes on structural boundaries (done, segment break, commentary)."""
+    flushes on structural boundaries (done, segment break, commentary).
+    """
 
     @pytest.mark.asyncio
     async def test_suppresses_intermediate_edits(self):
@@ -1675,7 +1694,8 @@ class TestCursorStrippingOnFallback:
     @pytest.mark.asyncio
     async def test_cursor_strip_edit_failure_handled(self):
         """If the cursor-stripping edit itself fails, it must not crash and
-        must not corrupt _last_sent_text."""
+        must not corrupt _last_sent_text.
+        """
         adapter = MagicMock()
         adapter.MAX_MESSAGE_LENGTH = 4096
         adapter.edit_message = AsyncMock(
@@ -1858,12 +1878,14 @@ class TestUtf16OverflowDetection:
     """Regression coverage for #11170 — Telegram counts message length in
     UTF-16 code units, not Python codepoints. A response with supplementary
     characters (emoji, CJK in some ranges) can have len()=3000 codepoints
-    but utf16_len()=5000+ units, blowing past Telegram's 4096 limit."""
+    but utf16_len()=5000+ units, blowing past Telegram's 4096 limit.
+    """
 
     def _make_telegram_like_adapter(self):
         """Construct a minimal BasePlatformAdapter subclass that overrides
-        message_len_fn like Telegram does."""
-        from gateway.platforms.base import utf16_len, BasePlatformAdapter
+        message_len_fn like Telegram does.
+        """
+        from gateway.platforms.base import BasePlatformAdapter, utf16_len
 
         TelegramLikeAdapter = type(
             "TelegramLikeAdapter",
@@ -1884,7 +1906,8 @@ class TestUtf16OverflowDetection:
     @pytest.mark.asyncio
     async def test_emoji_text_exceeding_utf16_limit_triggers_overflow_split(self):
         """A response that is under 4096 codepoints but over 4096 UTF-16
-        units must trigger the overflow-split path."""
+        units must trigger the overflow-split path.
+        """
         from gateway.platforms.base import utf16_len
 
         adapter = self._make_telegram_like_adapter()
@@ -1935,7 +1958,8 @@ class TestUtf16OverflowDetection:
 
     def test_codepoint_only_adapter_falls_back_to_len(self):
         """Adapters without message_len_fn override (or test MagicMocks)
-        must use plain len for backwards compatibility."""
+        must use plain len for backwards compatibility.
+        """
         adapter = MagicMock()
         adapter.MAX_MESSAGE_LENGTH = 4096
         config = StreamConsumerConfig(cursor=" ▉")

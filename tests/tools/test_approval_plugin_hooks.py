@@ -13,15 +13,16 @@ import pytest
 import tools.approval as approval_module
 from tools.approval import (
     check_all_command_guards,
-    set_current_session_key,
     clear_session,
+    set_current_session_key,
 )
 
 
 @pytest.fixture
 def isolated_session(monkeypatch, tmp_path):
     """Give each test a fresh session_key, clean approval-state, and isolated
-    HERMES_HOME so the real user's command_allowlist doesn't leak in."""
+    HERMES_HOME so the real user's command_allowlist doesn't leak in.
+    """
     import tools.approval as _am
 
     session_key = "test:session:approval_hooks"
@@ -48,7 +49,8 @@ def isolated_session(monkeypatch, tmp_path):
 
 class TestCliPathFiresHooks:
     """CLI-interactive approval path: HERMES_INTERACTIVE is set, the
-    prompt_dangerous_approval() result decides the outcome."""
+    prompt_dangerous_approval() result decides the outcome.
+    """
 
     def test_pre_and_post_fire_with_expected_kwargs(
         self, isolated_session, monkeypatch,
@@ -122,7 +124,8 @@ class TestCliPathFiresHooks:
     ):
         """A crashing plugin must never prevent the approval flow from
         reaching the user. Hooks are observer-only and safety-critical
-        behavior must be preserved."""
+        behavior must be preserved.
+        """
         monkeypatch.setenv("HERMES_INTERACTIVE", "1")
         monkeypatch.delenv("HERMES_GATEWAY_SESSION", raising=False)
         monkeypatch.delenv("HERMES_EXEC_ASK", raising=False)
@@ -147,6 +150,7 @@ class TestGatewayPathFiresHooks:
     """Async gateway approval path: HERMES_GATEWAY_SESSION is set and a
     gateway notify callback is registered. The agent thread blocks on the
     approval event until resolve_gateway_approval() is called from another
-    thread."""
+    thread.
+    """
 
 

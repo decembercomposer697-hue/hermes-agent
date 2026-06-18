@@ -14,14 +14,14 @@ The fix adds two safeguards:
    an ineffective compression so should_compress() anti-thrashing fires.
 """
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from agent.context_compressor import ContextCompressor
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_compressor(**kwargs) -> ContextCompressor:
     defaults = dict(
@@ -56,7 +56,8 @@ class TestCompressNoOpRegistersIneffective:
 
     We trigger this path by having _find_tail_cut_by_tokens return
     head_end (which makes compress_end = head_end + 1, same as
-    compress_start after alignment)."""
+    compress_start after alignment).
+    """
 
     def test_no_op_increments_counter(self):
         """compress_start >= compress_end -> _ineffective_compression_count += 1"""
@@ -136,11 +137,13 @@ class TestCompressNoOpRegistersIneffective:
 
 class TestTailCutRawBudgetFallback:
     """When the entire transcript fits within soft_ceiling, the fix
-    re-walks with the raw budget to find a meaningful cut point."""
+    re-walks with the raw budget to find a meaningful cut point.
+    """
 
     def test_meaningful_cut_with_large_ratio(self):
         """With summary_target_ratio=0.45, _find_tail_cut_by_tokens still
-        leaves a meaningful compressable region."""
+        leaves a meaningful compressable region.
+        """
         comp = _make_compressor(
             summary_target_ratio=0.45,
             config_context_length=96000,
@@ -178,7 +181,8 @@ class TestTailCutRawBudgetFallback:
     def test_proactive_fix_prevents_no_op_window(self):
         """The raw-budget fallback in _find_tail_cut_by_tokens should prevent
         compress_start >= compress_end for the exact issue scenario:
-        context_length=96000, summary_target_ratio=0.45."""
+        context_length=96000, summary_target_ratio=0.45.
+        """
         comp = _make_compressor(
             summary_target_ratio=0.45,
             config_context_length=96000,

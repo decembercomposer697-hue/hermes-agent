@@ -16,7 +16,6 @@ import pytest
 
 from agent.lsp.client import LSPClient
 
-
 MOCK_SERVER = str(Path(__file__).parent / "_mock_lsp_server.py")
 
 
@@ -96,7 +95,8 @@ async def test_client_didchange_bumps_version(tmp_path: Path):
 @pytest.mark.asyncio
 async def test_client_handles_crashing_server(tmp_path: Path):
     """When the server exits right after initialize, subsequent requests
-    fail gracefully (not hang)."""
+    fail gracefully (not hang).
+    """
     f = tmp_path / "x.py"
     f.write_text("")
 

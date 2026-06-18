@@ -250,7 +250,8 @@ def test_description_truncation_in_labels():
 
 def test_modifying_include_stays_in_include_mode(capsys):
     """Changing the selection updates the include list — never switches
-    to exclude mode. Standardized on include-mode writes across the codebase."""
+    to exclude mode. Standardized on include-mode writes across the codebase.
+    """
     config = {
         "mcp_servers": {
             "github": {

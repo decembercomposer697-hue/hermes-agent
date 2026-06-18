@@ -12,7 +12,7 @@ No LLM, no real platform connections.
 import asyncio
 import sys
 import uuid
-from datetime import datetime, timezone, UTC
+from datetime import UTC, datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -23,6 +23,7 @@ from gateway.platforms.base import MessageEvent, SendResult
 from gateway.session import SessionEntry, SessionSource, build_session_key
 
 E2E_MESSAGE_SETTLE_DELAY = 0.3
+
 
 # Platform library mocks
 
@@ -118,15 +119,16 @@ _ensure_discord_mock()
 _ensure_slack_mock()
 
 import discord
+
+import gateway.platforms.slack as _slack_mod
 from gateway.platforms.telegram import TelegramAdapter
 from plugins.platforms.discord.adapter import DiscordAdapter
 
-import gateway.platforms.slack as _slack_mod
 _slack_mod.SLACK_AVAILABLE = True
 from gateway.platforms.slack import SlackAdapter
 
-
 # Platform-generic factories
+
 
 def make_source(platform: Platform, chat_id: str = "e2e-chat-1", user_id: str = "e2e-user-1", chat_type: str = "dm") -> SessionSource:
     return SessionSource(

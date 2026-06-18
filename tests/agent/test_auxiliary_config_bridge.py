@@ -7,8 +7,7 @@ Also tests the vision_tools and browser_tool model override env vars.
 import os
 import sys
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-
+from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -292,11 +291,13 @@ class TestDefaultConfigShape:
 
 class TestCLIDefaultsHaveAuxiliaryKeys:
     """Verify cli.py load_cli_config() defaults dict does NOT include auxiliary
-    (it comes from config.yaml deep merge, not hardcoded defaults)."""
+    (it comes from config.yaml deep merge, not hardcoded defaults).
+    """
 
     def test_cli_defaults_can_merge_auxiliary(self):
         """The load_cli_config deep merge logic handles keys not in defaults.
-        Verify auxiliary would be picked up from config.yaml."""
+        Verify auxiliary would be picked up from config.yaml.
+        """
         # This is a structural assertion: cli.py's second-pass loop
         # carries over keys from file_config that aren't in defaults.
         # So auxiliary config from config.yaml gets merged even though

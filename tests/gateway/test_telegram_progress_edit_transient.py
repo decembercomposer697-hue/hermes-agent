@@ -17,11 +17,9 @@ Two layers are tested:
 
 from __future__ import annotations
 
-
 import pytest
 
 from gateway.platforms.base import SendResult
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -130,8 +128,7 @@ def test_send_result_retryable_false_for_permanent():
 # ---------------------------------------------------------------------------
 
 def _simulate_progress_loop(edit_results):
-    """
-    Simulate the can_edit decision for a sequence of edit_message results.
+    """Simulate the can_edit decision for a sequence of edit_message results.
 
     Returns the final value of can_edit after processing all results.
     """

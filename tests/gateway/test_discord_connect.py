@@ -602,6 +602,7 @@ async def test_post_connect_initialization_respects_discord_retry_after(tmp_path
         application_id=999,
         user=SimpleNamespace(id=999),
     )
+
     class _DiscordRateLimit(RuntimeError):
         retry_after = 123.0
 

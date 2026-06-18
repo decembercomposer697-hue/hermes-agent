@@ -5,9 +5,9 @@ from unittest.mock import MagicMock, patch
 from hermes_cli.models import (
     azure_foundry_model_api_mode,
     copilot_model_api_mode,
-    fetch_github_model_catalog,
     curated_models_for_provider,
     fetch_api_models,
+    fetch_github_model_catalog,
     fetch_lmstudio_models,
     github_model_reasoning_efforts,
     normalize_copilot_model_id,
@@ -20,7 +20,6 @@ from hermes_cli.models import (
     provider_model_ids,
     validate_requested_model,
 )
-
 
 # -- helpers -----------------------------------------------------------------
 
@@ -649,8 +648,10 @@ class TestValidateApiFallback:
 
     def test_fetch_lmstudio_models_raises_auth_error_on_401(self):
         import urllib.error
-        from hermes_cli.auth import AuthError
+
         import pytest
+
+        from hermes_cli.auth import AuthError
 
         http_error = urllib.error.HTTPError(
             url="http://localhost:1234/api/v1/models",
@@ -739,7 +740,6 @@ class TestValidateCodexAutoCorrection:
         assert result["recognized"] is True
         assert result.get("corrected_model") is None
         assert result["message"] is None
-
 
 
 # -- probe_api_models — Cloudflare UA mitigation --------------------------------

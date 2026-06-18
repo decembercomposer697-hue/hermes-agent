@@ -178,6 +178,8 @@ def is_stale_connection_error(exc: BaseException) -> bool:
     try:
         from botocore.exceptions import (
             ConnectionError as BotoConnectionError,
+        )
+        from botocore.exceptions import (
             HTTPClientError,
         )
         botocore_errors: tuple = (BotoConnectionError, HTTPClientError)
@@ -189,9 +191,11 @@ def is_stale_connection_error(exc: BaseException) -> bool:
     # urllib3: low-level transport failures
     try:
         from urllib3.exceptions import (
-            ProtocolError,
-            NewConnectionError,
             ConnectionError as Urllib3ConnectionError,
+        )
+        from urllib3.exceptions import (
+            NewConnectionError,
+            ProtocolError,
         )
         urllib3_errors = (ProtocolError, NewConnectionError, Urllib3ConnectionError)
     except ImportError:  # pragma: no cover
@@ -751,6 +755,7 @@ def stream_converse_with_callbacks(
     Returns:
         An OpenAI-compatible SimpleNamespace response, identical in shape to
         ``normalize_converse_response()``.
+
     """
     text_parts: list[str] = []
     reasoning_parts: list[str] = []
@@ -1213,6 +1218,7 @@ def classify_bedrock_error(error_message: str) -> str:
       - ``"rate_limit"`` — throttled, backoff and retry
       - ``"overloaded"`` — model temporarily unavailable, retry with delay
       - ``"unknown"`` — unclassified error
+
     """
     if is_context_overflow_error(error_message):
         return "context_overflow"

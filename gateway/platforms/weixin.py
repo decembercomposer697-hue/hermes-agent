@@ -1,5 +1,4 @@
-"""
-Weixin platform adapter.
+"""Weixin platform adapter.
 
 Connects Hermes Agent to WeChat personal accounts via Tencent's iLink Bot API.
 
@@ -56,7 +55,6 @@ except ImportError:  # pragma: no cover - dependency gate
     CRYPTO_AVAILABLE = False
 
 from gateway.config import Platform, PlatformConfig
-from gateway.platforms.helpers import MessageDeduplicator
 from gateway.platforms.base import (
     BasePlatformAdapter,
     MessageEvent,
@@ -66,6 +64,7 @@ from gateway.platforms.base import (
     cache_document_from_bytes,
     cache_image_from_bytes,
 )
+from gateway.platforms.helpers import MessageDeduplicator
 from hermes_constants import get_hermes_home
 from utils import atomic_json_write
 
@@ -101,7 +100,8 @@ def _is_stale_session_ret(
 ) -> bool:
     """True when iLink returns ret=-2 / errcode=-2 with 'unknown error',
     which is a stale-session signal (same as errcode=-14) rather than
-    a genuine rate limit."""
+    a genuine rate limit.
+    """
     if ret != RATE_LIMIT_ERRCODE and errcode != RATE_LIMIT_ERRCODE:
         return False
     return (errmsg or "").lower() == "unknown error"
@@ -126,6 +126,7 @@ def _make_ssl_connector() -> aiohttp.TCPConnector | None:
     """
     try:
         import ssl
+
         import certifi
     except ImportError:
         return None
@@ -381,6 +382,7 @@ async def _api_post(
     # Use asyncio.wait_for() instead of aiohttp ClientTimeout to avoid
     # "Timeout context manager should be used inside a task" errors when
     # invoked via asyncio.run_coroutine_threadsafe() from cron jobs.
+
     async def _do() -> dict[str, Any]:
         async with session.post(url, data=body, headers=_headers(token, body)) as response:
             raw = await response.text()
@@ -405,6 +407,7 @@ async def _api_get(
     # Use asyncio.wait_for() instead of aiohttp ClientTimeout to avoid
     # "Timeout context manager should be used inside a task" errors when
     # invoked via asyncio.run_coroutine_threadsafe() from cron jobs.
+
     async def _do() -> dict[str, Any]:
         async with session.get(url, headers=headers) as response:
             raw = await response.text()
@@ -1006,8 +1009,7 @@ async def qr_login(
     bot_type: str = "3",
     timeout_seconds: int = 480,
 ) -> dict[str, str] | None:
-    """
-    Run the interactive iLink QR login flow.
+    """Run the interactive iLink QR login flow.
 
     Returns a credential dict on success, or ``None`` if login fails or times out.
     """
@@ -1278,7 +1280,7 @@ class WeixinAdapter(BasePlatformAdapter):
             return False
 
         try:
-            if not self._acquire_platform_lock('weixin-bot-token', self._token, 'Weixin bot token'):
+            if not self._acquire_platform_lock("weixin-bot-token", self._token, "Weixin bot token"):
                 return False
         except Exception as exc:
             logger.debug("[%s] Token lock unavailable (non-fatal): %s", self.name, exc)
@@ -2070,6 +2072,7 @@ class WeixinAdapter(BasePlatformAdapter):
         assert self._send_session is not None
         # Use asyncio.wait_for() instead of aiohttp ClientTimeout to avoid
         # "Timeout context manager should be used inside a task" errors.
+
         async def _do_fetch():
             async with self._send_session.get(url) as response:
                 response.raise_for_status()
@@ -2265,8 +2268,7 @@ async def send_weixin_direct(
     message: str,
     media_files: list[tuple[str, bool]] | None = None,
 ) -> dict[str, Any]:
-    """
-    One-shot send helper for ``send_message`` and cron delivery.
+    """One-shot send helper for ``send_message`` and cron delivery.
 
     This bypasses the long-poll adapter lifecycle and uses the raw API directly.
     """
@@ -2284,7 +2286,7 @@ async def send_weixin_direct(
     context_token = token_store.get(account_id, chat_id)
 
     live_adapter = _LIVE_ADAPTERS.get(resolved_token)
-    send_session = getattr(live_adapter, '_send_session', None)
+    send_session = getattr(live_adapter, "_send_session", None)
     if (live_adapter is not None and send_session is not None
             and not send_session.closed
             and send_session._loop is asyncio.get_running_loop()):
