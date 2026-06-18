@@ -1266,8 +1266,7 @@ def _cleanup_inactive_browser_sessions():
             logger.info("Cleaning up inactive session for task: %s (inactive for %ss)", task_id, elapsed)
             cleanup_browser(task_id)
             with _cleanup_lock:
-                if task_id in _session_last_activity:
-                    del _session_last_activity[task_id]
+                _session_last_activity.pop(task_id, None)
         except Exception as e:
             logger.warning("Error cleaning up inactive session %s: %s", task_id, e)
 

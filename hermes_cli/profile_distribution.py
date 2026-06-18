@@ -678,7 +678,7 @@ def update_distribution(
     if not existing_manifest.source:
         raise DistributionError(
             f"Profile '{canon}' has no recorded source.  Re-install with "
-            "`hermes profile install <source> --name {canon} --force`."
+            f"`hermes profile install <source> --name {canon} --force`."
         )
 
     with tempfile.TemporaryDirectory(prefix="hermes_dist_update_") as tmp:

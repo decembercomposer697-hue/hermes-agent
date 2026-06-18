@@ -1293,8 +1293,7 @@ def _dump_subagent_timeout_diagnostic(
             try:
                 val = getattr(child, attr, None)
                 # Redact api_key-shaped values defensively
-                if isinstance(val, str) and attr == "base_url":
-                    pass
+                isinstance(val, str) and attr == "base_url"
                 _w(f"  {attr}: {val!r}")
             except Exception:
                 _w(f"  {attr}: <unreadable>")

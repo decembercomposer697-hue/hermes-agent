@@ -445,8 +445,6 @@ class TestCancellationHandlerDeliveryConfirmation:
         message_id = None
 
         _best_effort_ok = False
-        if accumulated and message_id:
-            pass
         if _best_effort_ok and not final_response_sent:
             final_response_sent = True
 
