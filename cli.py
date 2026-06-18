@@ -9058,16 +9058,18 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
             except Exception:
                 pass
 
-            # Track consecutive no-speech cycles to avoid infinite restart loops.
-            if not submitted:
-                self._no_speech_count = getattr(self, '_no_speech_count', 0) + 1
-                if self._no_speech_count >= 3:
-                    self._voice_continuous = False
-                    self._no_speech_count = 0
-                    _cprint(f"{_DIM}No speech detected 3 times, continuous mode stopped.{_RST}")
-                    return
-            else:
+        # Track consecutive no-speech cycles to avoid infinite restart loops.
+        # NOTE: this MUST be outside the `finally` block — return inside finally
+        # would silence any exception propagating from the try block (B012).
+        if not submitted:
+            self._no_speech_count = getattr(self, '_no_speech_count', 0) + 1
+            if self._no_speech_count >= 3:
+                self._voice_continuous = False
                 self._no_speech_count = 0
+                _cprint(f"{_DIM}No speech detected 3 times, continuous mode stopped.{_RST}")
+                return
+        else:
+            self._no_speech_count = 0
 
             # If no transcript was submitted but continuous mode is active,
             # restart recording so the user can keep talking.

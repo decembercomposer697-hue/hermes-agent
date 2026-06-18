@@ -1047,7 +1047,7 @@ def delete_profile(name: str, yes: bool = False) -> Path:
                         pass
                 func(path)
             else:
-                raise
+                raise RuntimeError(f"Unsupported path type: {type(path).__name__}")
 
         # ``onexc`` was added in 3.12; fall back to ``onerror`` on 3.11.
         try:
