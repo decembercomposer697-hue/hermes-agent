@@ -56,7 +56,6 @@ _VENDOR_PREFIXES: dict[str, str] = {
     "grok": "x-ai",
     "qwen": "qwen",
     "mimo": "xiaomi",
-    "trinity": "arcee-ai",
     "nemotron": "nvidia",
     "llama": "meta-llama",
     "step": "stepfun",
