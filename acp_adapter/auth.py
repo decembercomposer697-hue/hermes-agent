@@ -8,7 +8,7 @@ from typing import Any, Optional
 TERMINAL_SETUP_AUTH_METHOD_ID = "hermes-setup"
 
 
-def detect_provider() -> Optional[str]:
+def detect_provider() -> str | None:
     """Resolve the active Hermes runtime provider, or None if unavailable.
 
     Treats a ``Callable`` ``api_key`` (Azure Foundry Entra ID bearer

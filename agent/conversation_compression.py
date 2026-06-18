@@ -273,11 +273,11 @@ def compress_context(
     messages: list,
     system_message: str,
     *,
-    approx_tokens: Optional[int] = None,
+    approx_tokens: int | None = None,
     task_id: str = "default",
-    focus_topic: Optional[str] = None,
+    focus_topic: str | None = None,
     force: bool = False,
-) -> Tuple[list, str]:
+) -> tuple[list, str]:
     """Compress conversation context and split the session in SQLite.
 
     Args:
@@ -352,7 +352,7 @@ def compress_context(
     # we just sit out this round and let the winner finish.
     _lock_db = getattr(agent, "_session_db", None)
     _lock_sid = agent.session_id or ""
-    _lock_holder: Optional[str] = None
+    _lock_holder: str | None = None
     # Probe whether the lock subsystem is actually available on this
     # SessionDB instance.  A process running mismatched module versions
     # (e.g. ``conversation_compression.py`` reloaded after a pull but the
@@ -676,7 +676,7 @@ def try_shrink_image_parts_in_messages(api_messages: list) -> bool:
     # actually brought under the target.
     unshrinkable_oversized = 0
 
-    def _shrink_data_url(url: str) -> Optional[str]:
+    def _shrink_data_url(url: str) -> str | None:
         """Return a smaller data URL, or None if shrink can't help."""
         if not isinstance(url, str) or not url.startswith("data:"):
             return None

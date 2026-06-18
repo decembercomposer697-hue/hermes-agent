@@ -286,7 +286,7 @@ def _assistant_copy_text(content: Any) -> str:
 # Configuration Loading
 # =============================================================================
 
-def _load_prefill_messages(file_path: str) -> List[Dict[str, Any]]:
+def _load_prefill_messages(file_path: str) -> list[dict[str, Any]]:
     """Load ephemeral prefill messages from a JSON file.
     
     The file should contain a JSON array of {role, content} dicts, e.g.:
@@ -304,7 +304,7 @@ def _load_prefill_messages(file_path: str) -> List[Dict[str, Any]]:
         logger.warning("Prefill messages file not found: %s", path)
         return []
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             data = json.load(f)
         if not isinstance(data, list):
             logger.warning("Prefill messages file must contain a JSON array: %s", path)
@@ -315,7 +315,7 @@ def _load_prefill_messages(file_path: str) -> List[Dict[str, Any]]:
         return []
 
 
-def _resolve_prefill_messages_file(config: Dict[str, Any]) -> str:
+def _resolve_prefill_messages_file(config: dict[str, Any]) -> str:
     """Resolve the prefill file path from env/config.
 
     ``prefill_messages_file`` at the top level is the canonical config key.
@@ -353,7 +353,7 @@ def _parse_service_tier_config(raw: str) -> str | None:
     logger.warning("Unknown service_tier '%s', ignoring", raw)
     return None
 
-def load_cli_config() -> Dict[str, Any]:
+def load_cli_config() -> dict[str, Any]:
     """
     Load CLI configuration from config files.
     
@@ -503,7 +503,7 @@ def load_cli_config() -> Dict[str, Any]:
     # Load from file if exists
     if config_path.exists():
         try:
-            with open(config_path, "r", encoding="utf-8") as f:
+            with open(config_path, encoding="utf-8") as f:
                 from hermes_cli.config import _normalize_root_model_keys
 
                 file_config = _normalize_root_model_keys(yaml.safe_load(f) or {})
@@ -1153,10 +1153,10 @@ def _reset_terminal_input_modes_on_exit() -> None:
 # =============================================================================
 
 # Tracks the active worktree for cleanup on exit
-_active_worktree: Optional[Dict[str, str]] = None
+_active_worktree: dict[str, str] | None = None
 
 
-def _normalize_git_bash_path(p: Optional[str]) -> Optional[str]:
+def _normalize_git_bash_path(p: str | None) -> str | None:
     """Translate a Git Bash-style path (``/c/Users/...``) to the native
     Windows form (``C:\\Users\\...``) that Python's ``subprocess.Popen``
     and ``pathlib.Path`` accept.
@@ -1185,7 +1185,7 @@ def _normalize_git_bash_path(p: Optional[str]) -> Optional[str]:
     return p
 
 
-def _git_repo_root() -> Optional[str]:
+def _git_repo_root() -> str | None:
     """Return the git repo root for CWD, or None if not in a repo.
 
     Runs through :func:`_normalize_git_bash_path` so callers can pass
@@ -1215,7 +1215,7 @@ def _path_is_within_root(path: Path, root: Path) -> bool:
         return False
 
 
-def _setup_worktree(repo_root: str = None) -> Optional[Dict[str, str]]:
+def _setup_worktree(repo_root: str = None) -> dict[str, str] | None:
     """Create an isolated git worktree for this CLI session.
 
     Returns a dict with worktree metadata on success, None on failure.
@@ -1374,7 +1374,7 @@ def _worktree_has_unpushed_commits(worktree_path: str, timeout: int = 10) -> boo
         return True
 
 
-def _cleanup_worktree(info: Dict[str, str] = None) -> None:
+def _cleanup_worktree(info: dict[str, str] = None) -> None:
     """Remove a worktree and its branch on exit.
 
     Preserves the worktree only if it has unpushed commits (real work
@@ -2740,7 +2740,7 @@ def _preserve_ctrl_enter_newline() -> bool:
     # WSL detection — env vars can be scrubbed under sudo, also peek /proc.
     for p in ("/proc/version", "/proc/sys/kernel/osrelease"):
         try:
-            with open(p, "r", encoding="utf-8", errors="ignore") as f:
+            with open(p, encoding="utf-8", errors="ignore") as f:
                 if "microsoft" in f.read().lower():
                     return True
         except OSError:
@@ -3144,12 +3144,12 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
     def __init__(
         self,
         model: str = None,
-        toolsets: List[str] = None,
+        toolsets: list[str] = None,
         provider: str = None,
         api_key: str = None,
         base_url: str = None,
         max_turns: int = None,
-        verbose: Optional[bool] = None,
+        verbose: bool | None = None,
         compact: bool = False,
         resume: str = None,
         checkpoints: bool = False,
@@ -3299,10 +3299,10 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
             or os.getenv("HERMES_INFERENCE_PROVIDER")
             or "auto"
         )
-        self._provider_source: Optional[str] = None
+        self._provider_source: str | None = None
         self.provider = self.requested_provider
         self.api_mode = "chat_completions"
-        self.acp_command: Optional[str] = None
+        self.acp_command: str | None = None
         self.acp_args: list[str] = []
         self.base_url = (
             base_url
@@ -3393,7 +3393,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
         # Empty string / None / out-of-range = unset (let OR pick strongest coder).
         _or_cfg = CLI_CONFIG.get("openrouter", {}) or {}
         _raw_score = _or_cfg.get("min_coding_score")
-        self._openrouter_min_coding_score: Optional[float] = None
+        self._openrouter_min_coding_score: float | None = None
         if _raw_score not in {None, ""}:
             try:
                 _f = float(_raw_score)
@@ -3413,18 +3413,18 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
         self._active_agent_route_signature = None
 
         # Agent will be initialized on first use
-        self.agent: Optional[Any] = None
+        self.agent: Any | None = None
         self._tool_callbacks_installed = False
         self._tirith_security_checked = False
         self._app = None  # prompt_toolkit Application (set in run())
         
         # Conversation state
-        self.conversation_history: List[Dict[str, Any]] = []
+        self.conversation_history: list[dict[str, Any]] = []
         self.session_start = datetime.now()
         self._resumed = False
         # Per-prompt elapsed timer — started at the beginning of each chat turn,
         # frozen when the agent thread completes, displayed in the status bar.
-        self._prompt_start_time: Optional[float] = None  # time.time() when turn started
+        self._prompt_start_time: float | None = None  # time.time() when turn started
         self._prompt_duration: float = 0.0  # frozen duration of last completed turn
         # Initialize SQLite session store early so /title works before first message
         self._session_db = None
@@ -3446,7 +3446,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
         _run_checkpoint_auto_maintenance()
 
         # Deferred title: stored in memory until the session is created in the DB
-        self._pending_title: Optional[str] = None
+        self._pending_title: str | None = None
         
         # Session ID: reuse existing one when resuming, otherwise generate fresh
         if resume:
@@ -3541,7 +3541,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
         self._resize_recovery_pending = False
 
         # Background task tracking: {task_id: threading.Thread}
-        self._background_tasks: Dict[str, threading.Thread] = {}
+        self._background_tasks: dict[str, threading.Thread] = {}
         self._background_task_counter = 0
 
     def _claim_active_session(self, surface: str = "cli", *, stderr: bool = False) -> bool:
@@ -3749,7 +3749,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
             self._resize_recovery_pending = False
             self._recover_after_resize(app, original_on_resize)
 
-    def _status_bar_context_style(self, percent_used: Optional[int]) -> str:
+    def _status_bar_context_style(self, percent_used: int | None) -> str:
         if percent_used is None:
             return "class:status-bar-dim"
         if percent_used >= 95:
@@ -3769,13 +3769,13 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
             return "class:status-bar-warn"
         return "class:status-bar-dim"
 
-    def _build_context_bar(self, percent_used: Optional[int], width: int = 10) -> str:
+    def _build_context_bar(self, percent_used: int | None, width: int = 10) -> str:
         safe_percent = max(0, min(100, percent_used or 0))
         filled = round((safe_percent / 100) * width)
         return f"[{('█' * filled) + ('░' * max(0, width - filled))}]"
 
     @staticmethod
-    def _format_prompt_elapsed(prompt_start_time: Optional[float], prompt_duration: float, live: bool = False) -> str:
+    def _format_prompt_elapsed(prompt_start_time: float | None, prompt_duration: float, live: bool = False) -> str:
         """Format per-prompt elapsed time for the status bar.
 
         Always returns a string — shows 0s on fresh start before first turn.
@@ -3812,7 +3812,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
         emoji = "⏱" if live else "⏲"
         return f"{emoji} {time_str}"
 
-    def _get_status_bar_snapshot(self) -> Dict[str, Any]:
+    def _get_status_bar_snapshot(self) -> dict[str, Any]:
         # Prefer the agent's model name — it updates on fallback.
         # self.model reflects the originally configured model and never
         # changes mid-session, so the TUI would show a stale name after
@@ -3960,14 +3960,14 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
         except Exception:
             return shutil.get_terminal_size(default).columns
 
-    def _use_minimal_tui_chrome(self, width: Optional[int] = None) -> bool:
+    def _use_minimal_tui_chrome(self, width: int | None = None) -> bool:
         """Hide low-value chrome on narrow/mobile terminals to preserve rows."""
         if width is None:
             width = self._get_tui_terminal_width()
         return width < 64
 
     @staticmethod
-    def _scrollback_box_width(width: Optional[int] = None) -> int:
+    def _scrollback_box_width(width: int | None = None) -> int:
         """Return the full viewport width for printed scrollback box rules.
 
         Previously this clamped to ``max(32, min(width, 56))`` as a defense
@@ -3990,7 +3990,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
                 width = 80
         return max(32, int(width or 80))
 
-    def _tui_input_rule_height(self, position: str, width: Optional[int] = None) -> int:
+    def _tui_input_rule_height(self, position: str, width: int | None = None) -> int:
         """Return the visible height for the top/bottom input separator rules."""
         if position not in {"top", "bottom"}:
             raise ValueError(f"Unknown input rule position: {position}")
@@ -4000,13 +4000,13 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
             return 1
         return 0 if self._use_minimal_tui_chrome(width=width) else 1
 
-    def _agent_spacer_height(self, width: Optional[int] = None) -> int:
+    def _agent_spacer_height(self, width: int | None = None) -> int:
         """Return the spacer height shown above the status bar while the agent runs."""
         if not getattr(self, "_agent_running", False):
             return 0
         return 0 if self._use_minimal_tui_chrome(width=width) else 1
 
-    def _spinner_widget_height(self, width: Optional[int] = None) -> int:
+    def _spinner_widget_height(self, width: int | None = None) -> int:
         """Return the visible height for the spinner/status text line above the status bar."""
         spinner_line = self._render_spinner_text()
         if not spinner_line:
@@ -4074,7 +4074,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
         except Exception:
             self._voice_record_key_display_cache = "Ctrl+B"
 
-    def _get_voice_status_fragments(self, width: Optional[int] = None):
+    def _get_voice_status_fragments(self, width: int | None = None):
         """Return the voice status bar fragments for the interactive TUI."""
         width = width or self._get_tui_terminal_width()
         compact = self._use_minimal_tui_chrome(width=width)
@@ -4093,7 +4093,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
         cont = " | Continuous" if self._voice_continuous else ""
         return [("class:voice-status", f" 🎤 Voice mode{tts}{cont}  —  {label} to record ")]
 
-    def _build_status_bar_text(self, width: Optional[int] = None) -> str:
+    def _build_status_bar_text(self, width: int | None = None) -> str:
         """Return a compact one-line session status string for the TUI footer."""
         try:
             snapshot = self._get_status_bar_snapshot()
@@ -4561,7 +4561,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
             # the input to be silently dropped (#17666).
             try:
                 return path.read_text(encoding="utf-8")
-            except (OSError, IOError):
+            except OSError:
                 logger.warning("Paste file gone or unreadable, returning placeholder: %s", path)
                 return match.group(0)
 
@@ -8374,7 +8374,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
     _DESTRUCTIVE_SKIP_TOKENS = frozenset({"now", "--yes", "-y"})
 
     @classmethod
-    def _split_destructive_skip(cls, cmd_text: Optional[str]) -> tuple[str, bool]:
+    def _split_destructive_skip(cls, cmd_text: str | None) -> tuple[str, bool]:
         """Split inline-skip tokens out of a destructive slash command.
 
         Returns ``(remainder, skip)`` where ``remainder`` is the original
@@ -8408,8 +8408,8 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
         self,
         command: str,
         detail: str,
-        cmd_original: Optional[str] = None,
-    ) -> Optional[str]:
+        cmd_original: str | None = None,
+    ) -> str | None:
         """Prompt the user to confirm a destructive session slash command.
 
         Used by ``/clear``, ``/new``/``/reset``, and ``/undo`` before they
@@ -9724,7 +9724,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
             except Exception:
                 pass
 
-    def chat(self, message, images: list = None) -> Optional[str]:
+    def chat(self, message, images: list = None) -> str | None:
         """
         Send a message to the agent and get a response.
         
@@ -13226,7 +13226,7 @@ def main(
     api_key: str = None,
     base_url: str = None,
     max_turns: int = None,
-    verbose: Optional[bool] = None,
+    verbose: bool | None = None,
     quiet: bool = False,
     compact: bool = False,
     list_tools: bool = False,

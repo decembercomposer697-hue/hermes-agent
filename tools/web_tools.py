@@ -77,11 +77,11 @@ from plugins.web.exa.provider import _get_exa_client
 # Module-level cache slots for the per-vendor clients. The plugins read/write
 # these via tools.web_tools so unit tests that reset
 # ``tools.web_tools._<vendor>_client = None`` between cases keep working.
-_firecrawl_client: Optional[Any] = None
-_firecrawl_client_config: Optional[Any] = None
-_parallel_client: Optional[Any] = None
-_async_parallel_client: Optional[Any] = None
-_exa_client: Optional[Any] = None
+_firecrawl_client: Any | None = None
+_firecrawl_client_config: Any | None = None
+_parallel_client: Any | None = None
+_async_parallel_client: Any | None = None
+_exa_client: Any | None = None
 
 from agent.auxiliary_client import (
     async_call_llm,
@@ -355,13 +355,13 @@ def _is_nous_auxiliary_client(client: Any) -> bool:
     return host == "nousresearch.com" or host.endswith(".nousresearch.com")
 
 
-def _resolve_web_extract_auxiliary(model: Optional[str] = None) -> tuple[Optional[Any], Optional[str], Dict[str, Any]]:
+def _resolve_web_extract_auxiliary(model: str | None = None) -> tuple[Any | None, str | None, dict[str, Any]]:
     """Resolve the current web-extract auxiliary client, model, and extra body."""
     client, default_model = get_async_text_auxiliary_client("web_extract")
     configured_model = os.getenv("AUXILIARY_WEB_EXTRACT_MODEL", "").strip()
     effective_model = model or configured_model or default_model
 
-    extra_body: Dict[str, Any] = {}
+    extra_body: dict[str, Any] = {}
     if client is not None and _is_nous_auxiliary_client(client):
         from agent.auxiliary_client import get_auxiliary_extra_body
         from agent.portal_tags import nous_portal_tags
@@ -370,7 +370,7 @@ def _resolve_web_extract_auxiliary(model: Optional[str] = None) -> tuple[Optiona
     return client, effective_model, extra_body
 
 
-def _get_default_summarizer_model() -> Optional[str]:
+def _get_default_summarizer_model() -> str | None:
     """Return the current default model for web extraction summarization."""
     _, model, _ = _resolve_web_extract_auxiliary()
     return model
@@ -382,9 +382,9 @@ async def process_content_with_llm(
     content: str, 
     url: str = "", 
     title: str = "",
-    model: Optional[str] = None,
+    model: str | None = None,
     min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION
-) -> Optional[str]:
+) -> str | None:
     """
     Process web content using LLM to create intelligent summaries with key excerpts.
     
@@ -481,11 +481,11 @@ async def process_content_with_llm(
 async def _call_summarizer_llm(
     content: str, 
     context_str: str, 
-    model: Optional[str], 
+    model: str | None, 
     max_tokens: int = 20000,
     is_chunk: bool = False,
     chunk_info: str = ""
-) -> Optional[str]:
+) -> str | None:
     """
     Make a single LLM call to summarize content.
     
@@ -599,10 +599,10 @@ Create a markdown summary that captures all key information in a well-organized,
 async def _process_large_content_chunked(
     content: str, 
     context_str: str, 
-    model: Optional[str], 
+    model: str | None, 
     chunk_size: int,
     max_output_size: int
-) -> Optional[str]:
+) -> str | None:
     """
     Process large content by chunking, summarizing each chunk in parallel,
     then synthesizing the summaries.
@@ -626,7 +626,7 @@ async def _process_large_content_chunked(
     logger.info("Split into %d chunks of ~%d chars each", len(chunks), chunk_size)
     
     # Summarize each chunk in parallel
-    async def summarize_chunk(chunk_idx: int, chunk_content: str) -> tuple[int, Optional[str]]:
+    async def summarize_chunk(chunk_idx: int, chunk_content: str) -> tuple[int, str | None]:
         """Summarize a single chunk."""
         try:
             chunk_info = f"[Processing chunk {chunk_idx + 1} of {len(chunks)}]"
@@ -931,10 +931,10 @@ def web_search_tool(query: str, limit: int = 5) -> str:
 
 
 async def web_extract_tool(
-    urls: List[str],
+    urls: list[str],
     format: str = None,
     use_llm_processing: bool = True,
-    model: Optional[str] = None,
+    model: str | None = None,
     min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION
 ) -> str:
     """
@@ -963,7 +963,7 @@ async def web_extract_tool(
     # URL-decode first so percent-encoded secrets (%73k- = sk-) are caught.
     from agent.redact import _PREFIX_RE
     from urllib.parse import unquote
-    normalized_urls: List[str] = []
+    normalized_urls: list[str] = []
     for _url in urls:
         normalized_url = normalize_url_for_request(_url)
         if (
@@ -1001,7 +1001,7 @@ async def web_extract_tool(
 
         # ── SSRF protection — filter out private/internal URLs before any backend ──
         safe_urls = []
-        ssrf_blocked: List[Dict[str, Any]] = []
+        ssrf_blocked: list[dict[str, Any]] = []
         for url in normalized_urls:
             if not await async_is_safe_url(url):
                 ssrf_blocked.append({

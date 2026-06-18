@@ -26,7 +26,7 @@ import json
 import logging
 import os
 import shutil
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 from pathlib import Path, PurePosixPath
 from hermes_constants import get_bundled_skills_dir, get_hermes_home, get_optional_skills_dir
 from agent.skill_utils import is_excluded_skill_path
@@ -65,7 +65,7 @@ def _get_optional_dir() -> Path:
     return get_optional_skills_dir(Path(__file__).parent.parent / "optional-skills")
 
 
-def _read_manifest() -> Dict[str, str]:
+def _read_manifest() -> dict[str, str]:
     """
     Read the manifest as a dict of {skill_name: origin_hash}.
 
@@ -88,7 +88,7 @@ def _read_manifest() -> Dict[str, str]:
                 # v1 format: plain name — empty hash triggers migration
                 result[line] = ""
         return result
-    except (OSError, IOError):
+    except OSError:
         return {}
 
 
@@ -118,7 +118,7 @@ def _read_suppressed_names() -> set:
         return names
 
 
-def _write_manifest(entries: Dict[str, str]):
+def _write_manifest(entries: dict[str, str]):
     """Write the manifest file atomically in v2 format (name:hash).
 
     Uses a temp file + os.replace() to avoid corruption if the process
@@ -172,7 +172,7 @@ def _read_skill_name(skill_md: Path, fallback: str) -> str:
     return fallback
 
 
-def _discover_bundled_skills(bundled_dir: Path) -> List[Tuple[str, Path]]:
+def _discover_bundled_skills(bundled_dir: Path) -> list[tuple[str, Path]]:
     """
     Find all SKILL.md files in the bundled directory.
     Returns list of (skill_name, skill_directory_path) tuples.
@@ -209,7 +209,7 @@ def _dir_hash(directory: Path) -> str:
                 rel = fpath.relative_to(directory)
                 hasher.update(str(rel).encode("utf-8"))
                 hasher.update(fpath.read_bytes())
-    except (OSError, IOError):
+    except OSError:
         pass
     return hasher.hexdigest()
 
@@ -225,9 +225,9 @@ def _safe_rel_install_path(path: Path, base: Path) -> str:
     return "/".join(parts)
 
 
-def _skill_file_list(skill_dir: Path) -> List[str]:
+def _skill_file_list(skill_dir: Path) -> list[str]:
     """List files inside a skill directory in lock-file format."""
-    files: List[str] = []
+    files: list[str] = []
     for fpath in sorted(skill_dir.rglob("*")):
         if fpath.is_file():
             files.append(fpath.relative_to(skill_dir).as_posix())
@@ -246,7 +246,7 @@ def _content_hash(directory: Path) -> str:
         return _dir_hash(directory)
 
 
-def _optional_skill_index() -> Dict[str, Tuple[str, str, Path]]:
+def _optional_skill_index() -> dict[str, tuple[str, str, Path]]:
     """Return official optional skills keyed by folder name and frontmatter name.
 
     Values are ``(folder_name, install_path, source_dir)``. Multiple keys may
@@ -254,7 +254,7 @@ def _optional_skill_index() -> Dict[str, Tuple[str, str, Path]]:
     by the hub lock or the user-facing frontmatter name.
     """
     optional_dir = _get_optional_dir()
-    index: Dict[str, Tuple[str, str, Path]] = {}
+    index: dict[str, tuple[str, str, Path]] = {}
     if not optional_dir.exists():
         return index
     for skill_md in sorted(optional_dir.rglob("SKILL.md")):
@@ -305,9 +305,9 @@ def restore_official_optional_skill(name: str, *, restore: bool = False) -> dict
             return {"ok": False, "message": f"Official optional skill not found: {name}", "restored": [], "backfilled": [], "backed_up": []}
         targets = [target]
 
-    restored: List[str] = []
-    backed_up: List[str] = []
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    restored: list[str] = []
+    backed_up: list[str] = []
+    timestamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     backup_root = SKILLS_DIR / ".restore-backups" / f"official-optional-{timestamp}"
 
     for folder_name, install_path, src in targets:
@@ -318,7 +318,7 @@ def restore_official_optional_skill(name: str, *, restore: bool = False) -> dict
         # Find already-active copies of this official skill by frontmatter name
         # or folder slug, even if curator moved it into another category.
         src_frontmatter = _read_skill_name(src / "SKILL.md", folder_name)
-        matches: List[Path] = []
+        matches: list[Path] = []
         if SKILLS_DIR.exists():
             for skill_md in sorted(SKILLS_DIR.rglob("SKILL.md")):
                 if is_excluded_skill_path(skill_md):
@@ -358,7 +358,7 @@ def restore_official_optional_skill(name: str, *, restore: bool = False) -> dict
     }
 
 
-def _backfill_optional_provenance(quiet: bool = False) -> List[str]:
+def _backfill_optional_provenance(quiet: bool = False) -> list[str]:
     """Mark already-present official optional skills as hub-installed.
 
     This covers the migration case where a skill used to be bundled (or was
@@ -383,7 +383,7 @@ def _backfill_optional_provenance(quiet: bool = False) -> List[str]:
         if isinstance(entry, dict)
     }
 
-    backfilled: List[str] = []
+    backfilled: list[str] = []
     changed = False
     for skill_md in sorted(optional_dir.rglob("SKILL.md")):
         if is_excluded_skill_path(skill_md):
@@ -404,7 +404,7 @@ def _backfill_optional_provenance(quiet: bool = False) -> List[str]:
         if lock_name in installed or install_path in existing_paths:
             continue
 
-        timestamp = datetime.now(timezone.utc).isoformat()
+        timestamp = datetime.now(UTC).isoformat()
         installed[lock_name] = {
             "source": "official",
             "identifier": f"official/{install_path}",
@@ -490,7 +490,7 @@ def sync_skills(quiet: bool = False) -> dict:
     copied = []
     updated = []
     user_modified = []
-    suppressed_skipped: List[str] = []
+    suppressed_skipped: list[str] = []
     skipped = 0
 
     for skill_name, skill_src in bundled_skills:
@@ -536,7 +536,7 @@ def sync_skills(quiet: bool = False) -> dict:
                     manifest[skill_name] = bundled_hash
                     if not quiet:
                         print(f"  + {skill_name}")
-            except (OSError, IOError) as e:
+            except OSError as e:
                 if not quiet:
                     print(f"  ! Failed to copy {skill_name}: {e}")
                 # Do NOT add to manifest — next sync should retry
@@ -579,14 +579,14 @@ def sync_skills(quiet: bool = False) -> dict:
                         # Remove backup after successful copy
                         try:
                             _rmtree_writable(backup)
-                        except (OSError, IOError):
+                        except OSError:
                             logger.debug("Could not remove backup %s", backup, exc_info=True)
-                    except (OSError, IOError):
+                    except OSError:
                         # Restore from backup
                         if backup.exists() and not dest.exists():
                             shutil.move(str(backup), str(dest))
                         raise
-                except (OSError, IOError) as e:
+                except OSError as e:
                     if not quiet:
                         print(f"  ! Failed to update {skill_name}: {e}")
             else:
@@ -609,7 +609,7 @@ def sync_skills(quiet: bool = False) -> dict:
             try:
                 dest_desc.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(desc_md, dest_desc)
-            except (OSError, IOError) as e:
+            except OSError as e:
                 logger.debug("Could not copy %s: %s", desc_md, e)
 
     _write_manifest(manifest)
@@ -714,7 +714,7 @@ def reset_bundled_skill(name: str, restore: bool = False) -> dict:
             try:
                 _rmtree_writable(dest)
                 deleted_user_copy = True
-            except (OSError, IOError) as e:
+            except OSError as e:
                 return {
                     "ok": False,
                     "action": "not_reset",
@@ -832,8 +832,8 @@ def remove_pristine_bundled_skills(dry_run: bool = False) -> dict:
     bundled_dir = _get_bundled_dir()
     bundled_by_name = dict(_discover_bundled_skills(bundled_dir))
 
-    removed: List[str] = []
-    skipped: List[dict] = []
+    removed: list[str] = []
+    skipped: list[dict] = []
 
     for name, origin_hash in sorted(manifest.items()):
         src = bundled_by_name.get(name)
@@ -857,7 +857,7 @@ def remove_pristine_bundled_skills(dry_run: bool = False) -> dict:
             continue
         try:
             _rmtree_writable(dest)
-        except (OSError, IOError) as e:
+        except OSError as e:
             skipped.append({"name": name, "reason": f"delete failed: {e}"})
             continue
         if name in manifest:

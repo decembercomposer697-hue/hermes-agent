@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 import base64
 import contextvars
 import json
@@ -517,7 +517,7 @@ class HermesACPAgent(acp.Agent):
     def __init__(self, session_manager: SessionManager | None = None):
         super().__init__()
         self.session_manager = session_manager or SessionManager()
-        self._conn: Optional[acp.Client] = None
+        self._conn: acp.Client | None = None
 
     # ---- Connection lifecycle -----------------------------------------------
 
@@ -714,8 +714,8 @@ class HermesACPAgent(acp.Agent):
         self,
         acp_session_id: str,
         current_hermes_session_id: str,
-        previous_hermes_session_id: Optional[str] = None,
-    ) -> Optional[dict]:
+        previous_hermes_session_id: str | None = None,
+    ) -> dict | None:
         """Best-effort ``_meta.hermes.sessionProvenance`` for an ACP session."""
         try:
             return session_provenance_meta(
@@ -734,8 +734,8 @@ class HermesACPAgent(acp.Agent):
         self,
         session_id: str,
         *,
-        current_hermes_session_id: Optional[str] = None,
-        previous_hermes_session_id: Optional[str] = None,
+        current_hermes_session_id: str | None = None,
+        previous_hermes_session_id: str | None = None,
     ) -> None:
         """Send ACP native session metadata after Hermes changes it.
 
@@ -758,7 +758,7 @@ class HermesACPAgent(acp.Agent):
         # hermes_state.py schema — only started_at/ended_at). Use "now" as
         # the updated_at since we're emitting this notification precisely
         # because the title was just refreshed.
-        updated_at = datetime.now(timezone.utc).isoformat()
+        updated_at = datetime.now(UTC).isoformat()
         meta = self._provenance_meta(
             session_id,
             current_hermes_session_id or session_id,
@@ -1386,7 +1386,7 @@ class HermesACPAgent(acp.Agent):
         if state.cancel_event:
             state.cancel_event.clear()
 
-        tool_call_ids: dict[str, Deque[str]] = defaultdict(deque)
+        tool_call_ids: dict[str, deque[str]] = defaultdict(deque)
         tool_call_meta: dict[str, dict[str, Any]] = {}
         previous_approval_cb = None
         edit_approval_requester = None

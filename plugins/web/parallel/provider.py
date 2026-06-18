@@ -211,7 +211,7 @@ def _mcp_headers(
     session_id: str | None,
     api_key: str | None,
     protocol_version: str | None = None,
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """Headers for an MCP request.
 
     A Bearer token is attached only when we actually hold a key — the free
@@ -261,7 +261,7 @@ def _iter_mcp_messages(text: str):
         yield from _emit(parsed)
         return
 
-    data_lines: List[str] = []
+    data_lines: list[str] = []
 
     def _flush():
         if not data_lines:
@@ -281,7 +281,7 @@ def _iter_mcp_messages(text: str):
     yield from _emit(_flush())
 
 
-def _mcp_response_envelope(text: str, request_id: str) -> Dict[str, Any]:
+def _mcp_response_envelope(text: str, request_id: str) -> dict[str, Any]:
     """Select the JSON-RPC response for *request_id* from an MCP response body.
 
     Streamable-HTTP servers may emit progress/log notifications before the
@@ -289,7 +289,7 @@ def _mcp_response_envelope(text: str, request_id: str) -> Dict[str, Any]:
     message whose ``id`` matches our request. Falls back to the last
     result/error-bearing message if no id matches; ``{}`` if none is present.
     """
-    fallback: Dict[str, Any] = {}
+    fallback: dict[str, Any] = {}
     for msg in _iter_mcp_messages(text):
         if not isinstance(msg, dict) or not ("result" in msg or "error" in msg):
             continue
@@ -299,7 +299,7 @@ def _mcp_response_envelope(text: str, request_id: str) -> Dict[str, Any]:
     return fallback
 
 
-def _mcp_payload(envelope: Dict[str, Any]) -> Dict[str, Any]:
+def _mcp_payload(envelope: dict[str, Any]) -> dict[str, Any]:
     """Extract the tool result payload from a ``tools/call`` envelope.
 
     Prefers ``structuredContent`` (authoritative machine-readable form);
@@ -331,8 +331,8 @@ def _mcp_payload(envelope: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _mcp_call(
-    tool_name: str, arguments: Dict[str, Any], api_key: str | None
-) -> Dict[str, Any]:
+    tool_name: str, arguments: dict[str, Any], api_key: str | None
+) -> dict[str, Any]:
     """Run the MCP handshake then a single ``tools/call`` and return its payload.
 
     initialize → (capture ``Mcp-Session-Id``) → notifications/initialized →
@@ -398,7 +398,7 @@ def _mcp_call(
         return _mcp_payload(_mcp_response_envelope(call.text, call_id))
 
 
-def _mcp_web_search(query: str, limit: int, api_key: str | None) -> Dict[str, Any]:
+def _mcp_web_search(query: str, limit: int, api_key: str | None) -> dict[str, Any]:
     """Run a ``web_search`` tool call against the hosted Search MCP.
 
     Returns the standard provider search shape
@@ -416,7 +416,7 @@ def _mcp_web_search(query: str, limit: int, api_key: str | None) -> Dict[str, An
         api_key,
     )
 
-    web_results: List[Dict[str, Any]] = []
+    web_results: list[dict[str, Any]] = []
     for i, result in enumerate((payload.get("results") or [])[: max(limit, 1)]):
         if not isinstance(result, dict):
             continue
@@ -440,7 +440,7 @@ def _mcp_web_search(query: str, limit: int, api_key: str | None) -> Dict[str, An
     }
 
 
-def _mcp_web_fetch(urls: List[str], api_key: str | None) -> List[Dict[str, Any]]:
+def _mcp_web_fetch(urls: list[str], api_key: str | None) -> list[dict[str, Any]]:
     """Run a ``web_fetch`` tool call against the hosted Search MCP.
 
     Returns the per-URL extract shape that
@@ -459,12 +459,12 @@ def _mcp_web_fetch(urls: List[str], api_key: str | None) -> List[Dict[str, Any]]
 
     # Index the response by URL, then emit one row per *input* URL in order so
     # duplicates and positional alignment with the request list are preserved.
-    by_url: Dict[str, Dict[str, Any]] = {}
+    by_url: dict[str, dict[str, Any]] = {}
     for item in payload.get("results") or []:
         if isinstance(item, dict) and item.get("url"):
             by_url.setdefault(item["url"], item)
 
-    results: List[Dict[str, Any]] = []
+    results: list[dict[str, Any]] = []
     for url in urls:
         item = by_url.get(url)
         if item is None:
@@ -523,7 +523,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
     def supports_extract(self) -> bool:
         return True
 
-    def search(self, query: str, limit: int = 5) -> Dict[str, Any]:
+    def search(self, query: str, limit: int = 5) -> dict[str, Any]:
         """Execute a Parallel search (sync).
 
         With ``PARALLEL_API_KEY`` set, uses the v1 ``search`` REST endpoint with
@@ -588,8 +588,8 @@ class ParallelWebSearchProvider(WebSearchProvider):
             return {"success": False, "error": f"Parallel search failed: {exc}"}
 
     async def extract(
-        self, urls: List[str], **kwargs: Any
-    ) -> List[Dict[str, Any]]:
+        self, urls: list[str], **kwargs: Any
+    ) -> list[dict[str, Any]]:
         """Extract content from one or more URLs.
 
         With ``PARALLEL_API_KEY`` set, uses the async SDK's v1 ``extract`` for
@@ -627,7 +627,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
                 session_id=_new_session_id(),
             )
 
-            results: List[Dict[str, Any]] = []
+            results: list[dict[str, Any]] = []
             for result in response.results or []:
                 content = result.full_content or ""
                 if not content:
@@ -677,7 +677,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
                 for u in urls
             ]
 
-    def get_setup_schema(self) -> Dict[str, Any]:
+    def get_setup_schema(self) -> dict[str, Any]:
         return {
             "name": "Parallel",
             "badge": "free",

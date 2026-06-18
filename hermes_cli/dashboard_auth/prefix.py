@@ -72,7 +72,7 @@ def _warn_if_malformed(source: str, raw: str) -> None:
     )
 
 
-def normalise_prefix(raw: Optional[str]) -> str:
+def normalise_prefix(raw: str | None) -> str:
     """Normalise an X-Forwarded-Prefix header value.
 
     Returns a string like ``"/hermes"`` (no trailing slash) or ``""``
@@ -112,7 +112,7 @@ def prefix_from_request(request) -> str:
 # ---------------------------------------------------------------------------
 
 
-def _normalise_public_url(raw: Optional[str]) -> str:
+def _normalise_public_url(raw: str | None) -> str:
     """Normalise a ``dashboard.public_url`` value.
 
     Returns the cleaned URL (scheme://netloc[/path], trailing slash

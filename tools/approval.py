@@ -631,7 +631,7 @@ class _ApprovalEntry:
     def __init__(self, data: dict):
         self.event = threading.Event()
         self.data = data          # command, description, pattern_keys, …
-        self.result: Optional[str] = None  # "once"|"session"|"always"|"deny"
+        self.result: str | None = None  # "once"|"session"|"always"|"deny"
 
 
 _gateway_queues: dict[str, list] = {}        # session_key → [_ApprovalEntry, …]

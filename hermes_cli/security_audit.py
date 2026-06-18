@@ -28,7 +28,8 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Optional
+from collections.abc import Iterable
 
 from hermes_constants import get_hermes_home
 
@@ -213,7 +214,7 @@ _NPX_PKG = re.compile(r"^(@[A-Za-z0-9._-]+/[A-Za-z0-9._-]+|[A-Za-z0-9._-]+)@([A-
 _UVX_PKG = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)==([A-Za-z0-9._+!-]+)$")
 
 
-def _extract_mcp_component(server_name: str, command: str, args: list[str]) -> Optional[Component]:
+def _extract_mcp_component(server_name: str, command: str, args: list[str]) -> Component | None:
     """Best-effort: parse `command/args` into a (name, version, ecosystem).
 
     Returns None when the entry doesn't pin a version we can audit (local
@@ -340,7 +341,7 @@ def _osv_severity_from_record(record: dict) -> str:
         if upper in SEVERITY_ORDER:
             return upper
     # Fall back to CVSS score → tier
-    score: Optional[float] = None
+    score: float | None = None
     for sev_entry in record.get("severity") or []:
         s = sev_entry.get("score")
         if isinstance(s, str):
@@ -416,7 +417,7 @@ def run_audit(
     skip_venv: bool = False,
     skip_plugins: bool = False,
     skip_mcp: bool = False,
-    hermes_home: Optional[Path] = None,
+    hermes_home: Path | None = None,
 ) -> list[Finding]:
     """Discover components, query OSV, return findings sorted by severity desc."""
     home = hermes_home or Path(get_hermes_home())

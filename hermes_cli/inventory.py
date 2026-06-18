@@ -56,10 +56,10 @@ class ConfigContext:
     def with_overrides(
         self,
         *,
-        current_provider: Optional[str] = None,
-        current_model: Optional[str] = None,
-        current_base_url: Optional[str] = None,
-    ) -> "ConfigContext":
+        current_provider: str | None = None,
+        current_model: str | None = None,
+        current_base_url: str | None = None,
+    ) -> ConfigContext:
         """Return a copy with truthy overrides applied.
 
         Truthy-only because the TUI reads agent attributes that may be
@@ -329,7 +329,7 @@ def _apply_pricing(
     )
 
     # Resolve Nous free-tier once (cached in models.py for the TTL window).
-    nous_free_tier: Optional[bool] = None
+    nous_free_tier: bool | None = None
 
     for row in rows:
         slug = str(row.get("slug", "")).lower()

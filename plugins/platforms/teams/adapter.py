@@ -162,7 +162,7 @@ class TeamsSummaryWriter:
         self,
         payload: Any,
         config: dict[str, Any] | None,
-        existing_record: Optional[dict[str, Any]] = None,
+        existing_record: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         merged = self._resolve_delivery_config(config)
         if existing_record and not _parse_bool(merged.get("force_resend"), default=False):
@@ -358,16 +358,16 @@ class _AiohttpBridgeAdapter:
     route registrations and wires them into our own aiohttp ``Application``.
     """
 
-    def __init__(self, aiohttp_app: "web.Application"):
+    def __init__(self, aiohttp_app: web.Application):
         self._aiohttp_app = aiohttp_app
 
-    def register_route(self, method: "HttpMethod", path: str, handler: "HttpRouteHandler") -> None:
+    def register_route(self, method: HttpMethod, path: str, handler: HttpRouteHandler) -> None:
         """Register an SDK route handler as an aiohttp route."""
 
-        async def _aiohttp_handler(request: "web.Request") -> "web.Response":
+        async def _aiohttp_handler(request: web.Request) -> web.Response:
             body = await request.json()
             headers = dict(request.headers)
-            result: "HttpResponse" = await handler(HttpRequest(body=body, headers=headers))
+            result: HttpResponse = await handler(HttpRequest(body=body, headers=headers))
             status = result.get("status", 200)
             resp_body = result.get("body")
             if resp_body is not None:
@@ -470,7 +470,7 @@ import re as _re_teams
 _TEAMS_CONV_ID_RE = _re_teams.compile(r"^[A-Za-z0-9:@\-_.]+$")
 
 
-def _validate_teams_service_url(raw: str) -> Optional[str]:
+def _validate_teams_service_url(raw: str) -> str | None:
     """Return a normalized service URL or ``None`` if it is not allowed.
 
     Requires ``https://`` and a host in ``_ALLOWED_TEAMS_SERVICE_HOSTS``.
@@ -498,10 +498,10 @@ async def _standalone_send(
     chat_id: str,
     message: str,
     *,
-    thread_id: Optional[str] = None,
-    media_files: Optional[list] = None,
+    thread_id: str | None = None,
+    media_files: list | None = None,
     force_document: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Acquire a Bot Framework bearer token and POST a single message activity.
 
     Used by ``tools/send_message_tool._send_via_adapter`` when the gateway
@@ -633,12 +633,12 @@ class TeamsAdapter(BasePlatformAdapter):
         self._port = _coerce_port(
             extra.get("port") or os.getenv("TEAMS_PORT", str(_DEFAULT_PORT))
         )
-        self._app: Optional["App"] = None
-        self._runner: Optional["web.AppRunner"] = None
+        self._app: App | None = None
+        self._runner: web.AppRunner | None = None
         self._dedup = MessageDeduplicator(max_size=1000)
         # Maps chat_id → ConversationReference captured from incoming messages.
         # Used to send cards with the correct conversation type (personal/group/channel).
-        self._conv_refs: Dict[str, Any] = {}
+        self._conv_refs: dict[str, Any] = {}
 
     async def connect(self) -> bool:
         if not TEAMS_SDK_AVAILABLE:
@@ -806,7 +806,7 @@ class TeamsAdapter(BasePlatformAdapter):
         )
         await self.handle_message(event)
 
-    async def _send_card(self, chat_id: str, card: "AdaptiveCard") -> "Any":
+    async def _send_card(self, chat_id: str, card: AdaptiveCard) -> Any:
         """Send an AdaptiveCard, using a stored ConversationReference when available."""
         from microsoft_teams.api import MessageActivityInput
 
@@ -819,8 +819,8 @@ class TeamsAdapter(BasePlatformAdapter):
         return None
 
     async def _on_card_action(
-        self, ctx: "ActivityContext[AdaptiveCardInvokeActivity]"
-    ) -> "InvokeResponse[AdaptiveCardActionMessageResponse]":
+        self, ctx: ActivityContext[AdaptiveCardInvokeActivity]
+    ) -> InvokeResponse[AdaptiveCardActionMessageResponse]:
         """Handle an Adaptive Card Action.Execute button click."""
         from tools.approval import resolve_gateway_approval, has_blocking_approval
 
@@ -919,7 +919,7 @@ class TeamsAdapter(BasePlatformAdapter):
         command: str,
         session_key: str,
         description: str = "dangerous command",
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Send an Adaptive Card approval prompt with Allow/Deny buttons."""
         if not self._app:
@@ -979,8 +979,8 @@ class TeamsAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         content: str,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         if not self._app:
             return SendResult(success=False, error="Teams app not initialized")
@@ -1011,7 +1011,7 @@ class TeamsAdapter(BasePlatformAdapter):
 
         return SendResult(success=True, message_id=last_message_id)
 
-    async def send_typing(self, chat_id: str, metadata: Optional[Dict[str, Any]] = None) -> None:
+    async def send_typing(self, chat_id: str, metadata: dict[str, Any] | None = None) -> None:
         if not self._app:
             return
         try:
@@ -1023,9 +1023,9 @@ class TeamsAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         image_url: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         if not self._app:
             return SendResult(success=False, error="Teams app not initialized")
@@ -1065,8 +1065,8 @@ class TeamsAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         image_path: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
         **kwargs,
     ) -> SendResult:
         return await self.send_image(

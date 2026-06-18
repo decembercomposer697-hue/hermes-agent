@@ -45,14 +45,14 @@ class NodeServer:
         self,
         host: str = "127.0.0.1",
         port: int = 18789,
-        token_path: Optional[Path] = None,
+        token_path: Path | None = None,
         display_name: str = "hermes-meet-node",
     ) -> None:
         self.host = host
         self.port = port
         self.display_name = display_name
         self.token_path = Path(token_path) if token_path is not None else _default_token_path()
-        self._token: Optional[str] = None
+        self._token: str | None = None
 
     # ----- token management --------------------------------------------
 
@@ -93,7 +93,7 @@ class NodeServer:
 
     # ----- dispatch -----------------------------------------------------
 
-    async def _handle_request(self, msg: Dict[str, Any]) -> Dict[str, Any]:
+    async def _handle_request(self, msg: dict[str, Any]) -> dict[str, Any]:
         """Validate + dispatch a single decoded request envelope.
 
         Always returns a response envelope (success or error); never

@@ -39,9 +39,9 @@ _SUCCESS_EXIT = 0
 
 
 def _read_message_body(
-    positional: Optional[str],
-    file_path: Optional[str],
-) -> Optional[str]:
+    positional: str | None,
+    file_path: str | None,
+) -> str | None:
     """Resolve the message body from (in order):
 
     1. An explicit positional message argument.
@@ -74,7 +74,7 @@ def _read_message_body(
     return None
 
 
-def _resolve_target(arg_to: Optional[str]) -> Optional[str]:
+def _resolve_target(arg_to: str | None) -> str | None:
     """Return a cleaned ``--to`` value, or ``None`` when nothing is set."""
     if arg_to and arg_to.strip():
         return arg_to.strip()
@@ -126,7 +126,7 @@ def _emit_result(
     return _FAILURE_EXIT
 
 
-def _list_targets(platform_filter: Optional[str], *, json_mode: bool) -> int:
+def _list_targets(platform_filter: str | None, *, json_mode: bool) -> int:
     """Print the channel directory (all configured targets across platforms).
 
     Uses ``load_directory()`` for structured JSON output and
@@ -252,7 +252,7 @@ def _load_hermes_env() -> None:
         return
 
     try:
-        with open(config_path, "r", encoding="utf-8") as fh:
+        with open(config_path, encoding="utf-8") as fh:
             raw = yaml.safe_load(fh) or {}
     except Exception:
         return

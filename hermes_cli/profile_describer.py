@@ -94,7 +94,7 @@ class DescribeOutcome:
     profile_name: str
     ok: bool
     reason: str = ""
-    description: Optional[str] = None
+    description: str | None = None
 
 
 def _collect_skills(profile_dir: Path) -> list[str]:
@@ -135,7 +135,7 @@ def _collect_skills(profile_dir: Path) -> list[str]:
     return sampled
 
 
-def _extract_json_blob(raw: str) -> Optional[dict]:
+def _extract_json_blob(raw: str) -> dict | None:
     if not raw:
         return None
     stripped = _FENCE_RE.sub("", raw.strip())
@@ -157,7 +157,7 @@ def describe_profile(
     profile_name: str,
     *,
     overwrite: bool = False,
-    timeout: Optional[int] = None,
+    timeout: int | None = None,
 ) -> DescribeOutcome:
     """Auto-generate a description for one profile.
 

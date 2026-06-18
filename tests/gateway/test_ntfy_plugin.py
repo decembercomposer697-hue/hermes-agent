@@ -21,6 +21,7 @@ import pytest
 
 from gateway.config import PlatformConfig
 from tests.gateway._plugin_adapter_loader import load_plugin_adapter
+from datetime import UTC
 
 _ntfy = load_plugin_adapter("ntfy")
 
@@ -617,7 +618,7 @@ class TestOnMessage:
             "time": 1700000000,
         }))
         ts = captured[0].timestamp
-        assert ts.tzinfo == timezone.utc
+        assert ts.tzinfo == UTC
 
     def test_message_id_set_from_event(self):
         adapter = self._make_adapter()
@@ -1018,4 +1019,4 @@ class TestTruncateHelper:
 
     def test_unicode_message_encoded(self):
         result = _ntfy._truncate_body("héllo 🔔", context="test")
-        assert result == "héllo 🔔".encode("utf-8")
+        assert result == "héllo 🔔".encode()

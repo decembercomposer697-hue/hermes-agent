@@ -33,9 +33,9 @@ class _FakeProvider(TTSProvider):
     def __init__(
         self,
         name: str = "fake",
-        display: Optional[str] = None,
+        display: str | None = None,
         voice_compat: bool = False,
-        synthesize_impl: Optional[Any] = None,
+        synthesize_impl: Any | None = None,
     ):
         self._name = name
         self._display = display

@@ -107,8 +107,8 @@ def wait_for_registration_success(
     device_code: str,
     interval: int = 3,
     expires_in: int = 7200,
-    on_waiting: Optional[callable] = None,
-) -> Tuple[str, str]:
+    on_waiting: callable | None = None,
+) -> tuple[str, str]:
     """Block until the registration succeeds or times out.
 
     Returns (client_id, client_secret).
@@ -227,7 +227,7 @@ def render_qr_to_terminal(url: str) -> bool:
 
 # ── High-level entry point for the setup wizard ───────────────────────────
 
-def dingtalk_qr_auth() -> Optional[Tuple[str, str]]:
+def dingtalk_qr_auth() -> tuple[str, str] | None:
     """Run the interactive QR-code device-flow authorization.
 
     Returns (client_id, client_secret) on success, or None if the user

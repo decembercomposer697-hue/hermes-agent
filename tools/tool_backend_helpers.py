@@ -105,7 +105,7 @@ def resolve_modal_backend_state(
     has_direct: bool,
     managed_ready: bool,
     managed_enabled: bool | None = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Resolve direct vs managed Modal backend selection.
 
     Semantics:

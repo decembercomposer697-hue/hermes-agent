@@ -17,7 +17,8 @@ from __future__ import annotations
 import os
 import sys
 import time
-from typing import Optional, Sequence
+from typing import Optional
+from collections.abc import Sequence
 
 try:
     from winpty import PtyProcess  # type: ignore
@@ -62,7 +63,7 @@ class WinPtyBridge:
     no selectable fd, so we poll with a short sleep instead of ``select``.
     """
 
-    def __init__(self, proc: "PtyProcess") -> None:  # type: ignore[name-defined]
+    def __init__(self, proc: PtyProcess) -> None:  # type: ignore[name-defined]
         self._proc = proc
         self._closed = False
 
@@ -77,11 +78,11 @@ class WinPtyBridge:
         cls,
         argv: Sequence[str],
         *,
-        cwd: Optional[str] = None,
-        env: Optional[dict] = None,
+        cwd: str | None = None,
+        env: dict | None = None,
         cols: int = 80,
         rows: int = 24,
-    ) -> "WinPtyBridge":
+    ) -> WinPtyBridge:
         if not _PTY_AVAILABLE:
             if PtyProcess is None:
                 raise PtyUnavailableError(
@@ -115,7 +116,7 @@ class WinPtyBridge:
 
     # -- I/O --------------------------------------------------------------
 
-    def read(self, timeout: float = 0.2) -> Optional[bytes]:
+    def read(self, timeout: float = 0.2) -> bytes | None:
         """Up to 64 KiB of child output.
 
         Returns bytes, ``b""`` when nothing is available this tick, or
@@ -172,7 +173,7 @@ class WinPtyBridge:
         except Exception:
             pass
 
-    def __enter__(self) -> "WinPtyBridge":
+    def __enter__(self) -> WinPtyBridge:
         return self
 
     def __exit__(self, *_exc) -> None:

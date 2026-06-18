@@ -5,7 +5,8 @@ from __future__ import annotations
 import asyncio
 import os
 from pathlib import Path
-from typing import Any, AsyncIterator, Awaitable, Callable
+from typing import Any
+from collections.abc import AsyncIterator, Awaitable, Callable
 
 import httpx
 
@@ -65,7 +66,7 @@ class MicrosoftGraphClient:
         self.user_agent = user_agent
 
     @classmethod
-    def from_env(cls, **kwargs: Any) -> "MicrosoftGraphClient":
+    def from_env(cls, **kwargs: Any) -> MicrosoftGraphClient:
         credentials = GraphCredentials.from_env()
         provider = MicrosoftGraphTokenProvider(credentials)
         return cls(provider, **kwargs)

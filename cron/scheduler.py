@@ -160,8 +160,8 @@ SILENT_MARKER = "[SILENT]"
 # The tick function submits jobs here and returns immediately so the ticker
 # thread is never blocked by long-running jobs (e.g. the fixer running 15+ min).
 # ---------------------------------------------------------------------------
-_parallel_pool: Optional[concurrent.futures.ThreadPoolExecutor] = None
-_parallel_pool_max_workers: Optional[int] = None
+_parallel_pool: concurrent.futures.ThreadPoolExecutor | None = None
+_parallel_pool_max_workers: int | None = None
 _running_job_ids: set = set()
 _running_lock = threading.Lock()
 
@@ -169,10 +169,10 @@ _running_lock = threading.Lock()
 # process-global runtime state — must run one at a time, but must NOT block the
 # ticker thread.  A persistent single-thread executor preserves ordering across
 # ticks while keeping dispatch fire-and-forget, the same as the parallel pool.
-_sequential_pool: Optional[concurrent.futures.ThreadPoolExecutor] = None
+_sequential_pool: concurrent.futures.ThreadPoolExecutor | None = None
 
 
-def _get_parallel_pool(max_workers: Optional[int]) -> concurrent.futures.ThreadPoolExecutor:
+def _get_parallel_pool(max_workers: int | None) -> concurrent.futures.ThreadPoolExecutor:
     """Return (or create) the persistent parallel pool."""
     global _parallel_pool, _parallel_pool_max_workers
     if _parallel_pool is None or _parallel_pool_max_workers != max_workers:
@@ -234,7 +234,7 @@ def _get_lock_paths() -> tuple[Path, Path]:
     return lock_dir, lock_dir / ".tick.lock"
 
 
-def _resolve_origin(job: dict) -> Optional[dict]:
+def _resolve_origin(job: dict) -> dict | None:
     """Extract origin info from a job, preserving any extra routing metadata.
 
     Treats non-dict origins (free-form provenance strings, ints, lists from
@@ -338,7 +338,7 @@ def _get_home_target_chat_id(platform_name: str) -> str:
     return value
 
 
-def _get_home_target_thread_id(platform_name: str) -> Optional[str]:
+def _get_home_target_thread_id(platform_name: str) -> str | None:
     """Return the optional thread/topic ID for a platform home target.
 
     Telegram-only override: ``TELEGRAM_CRON_THREAD_ID`` takes precedence over
@@ -423,7 +423,7 @@ def cron_delivery_targets() -> list[dict]:
     return targets
 
 
-def _resolve_single_delivery_target(job: dict, deliver_value: str) -> Optional[dict]:
+def _resolve_single_delivery_target(job: dict, deliver_value: str) -> dict | None:
     """Resolve one concrete auto-delivery target for a cron job."""
 
     origin = _resolve_origin(job)
@@ -536,7 +536,7 @@ def _normalize_deliver_value(deliver) -> str:
 _ROUTING_TOKENS = frozenset({"all"})
 
 
-def _expand_routing_tokens(part: str) -> List[str]:
+def _expand_routing_tokens(part: str) -> list[str]:
     """Expand a routing-intent token to concrete platform names.
 
     ``all`` expands to every platform in ``_iter_home_target_platforms()``
@@ -547,14 +547,14 @@ def _expand_routing_tokens(part: str) -> List[str]:
     token = part.lower()
     if token not in _ROUTING_TOKENS:
         return [part]
-    expanded: List[str] = []
+    expanded: list[str] = []
     for platform_name in _iter_home_target_platforms():
         if _get_home_target_chat_id(platform_name):
             expanded.append(platform_name)
     return expanded
 
 
-def _resolve_delivery_targets(job: dict) -> List[dict]:
+def _resolve_delivery_targets(job: dict) -> list[dict]:
     """Resolve all concrete auto-delivery targets for a cron job.
 
     Accepts the legacy comma-separated ``deliver`` string plus the
@@ -571,7 +571,7 @@ def _resolve_delivery_targets(job: dict) -> List[dict]:
     raw_parts = [p.strip() for p in deliver.split(",") if p.strip()]
 
     # Expand routing intents.
-    parts: List[str] = []
+    parts: list[str] = []
     for raw in raw_parts:
         parts.extend(_expand_routing_tokens(raw))
 
@@ -587,7 +587,7 @@ def _resolve_delivery_targets(job: dict) -> List[dict]:
     return targets
 
 
-def _resolve_delivery_target(job: dict) -> Optional[dict]:
+def _resolve_delivery_target(job: dict) -> dict | None:
     """Resolve the concrete auto-delivery target for a cron job, if any."""
     targets = _resolve_delivery_targets(job)
     return targets[0] if targets else None
@@ -655,7 +655,7 @@ def _send_media_via_adapter(
             logger.warning("Job '%s': failed to send media %s: %s", job.get("id", "?"), media_path, e)
 
 
-def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> Optional[str]:
+def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> str | None:
     """
     Deliver job output to the configured target(s) (origin chat, specific platform, etc.).
 
@@ -1029,7 +1029,7 @@ def _parse_wake_gate(script_output: str) -> bool:
     return gate.get("wakeAgent", True) is not False
 
 
-def _build_job_prompt(job: dict, prerun_script: Optional[tuple] = None) -> str:
+def _build_job_prompt(job: dict, prerun_script: tuple | None = None) -> str:
     """Build the effective prompt for a cron job, optionally loading one or more skills first.
 
     Args:
@@ -1238,7 +1238,7 @@ def _scan_assembled_cron_prompt(
     *,
     has_skills: bool = False,
     has_injected_data: bool = False,
-    user_prompt: Optional[str] = None,
+    user_prompt: str | None = None,
 ) -> str:
     """Scan the fully-assembled cron prompt for injection patterns. Raises
     ``CronPromptInjectionBlocked`` when a match fires so ``run_job`` can
@@ -1302,7 +1302,7 @@ def _scan_assembled_cron_prompt(
     return assembled
 
 
-def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
+def run_job(job: dict) -> tuple[bool, str, str, str | None]:
     """
     Execute a single cron job.
     
@@ -1626,7 +1626,7 @@ def run_job(job: dict) -> tuple[bool, str, str, Optional[str]]:
                 pfpath = _get_hermes_home() / pfpath
             if pfpath.exists():
                 try:
-                    with open(pfpath, "r", encoding="utf-8") as _pf:
+                    with open(pfpath, encoding="utf-8") as _pf:
                         prefill_messages = json.load(_pf)
                     if not isinstance(prefill_messages, list):
                         prefill_messages = None
@@ -1992,7 +1992,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
             fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         elif msvcrt:
             msvcrt.locking(lock_fd.fileno(), msvcrt.LK_NBLCK, 1)
-    except (OSError, IOError):
+    except OSError:
         logger.debug("Tick skipped — another instance holds the lock")
         if lock_fd is not None:
             lock_fd.close()
@@ -2018,7 +2018,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
 
         # Resolve max parallel workers: env var > config.yaml > unbounded.
         # Set HERMES_CRON_MAX_PARALLEL=1 to restore old serial behaviour.
-        _max_workers: Optional[int] = None
+        _max_workers: int | None = None
         try:
             _env_par = os.getenv("HERMES_CRON_MAX_PARALLEL", "").strip()
             if _env_par:
@@ -2198,12 +2198,12 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
         if fcntl:
             try:
                 fcntl.flock(lock_fd, fcntl.LOCK_UN)
-            except (OSError, IOError):
+            except OSError:
                 pass
         elif msvcrt:
             try:
                 msvcrt.locking(lock_fd.fileno(), msvcrt.LK_UNLCK, 1)
-            except (OSError, IOError):
+            except OSError:
                 pass
         lock_fd.close()
 

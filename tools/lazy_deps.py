@@ -59,7 +59,8 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Optional
+from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -531,7 +532,7 @@ def is_available(feature: str) -> bool:
     return not feature_missing(feature)
 
 
-def feature_install_command(feature: str) -> Optional[str]:
+def feature_install_command(feature: str) -> str | None:
     """Return the ``pip install`` command a user could run manually, or None."""
     if feature not in LAZY_DEPS:
         return None

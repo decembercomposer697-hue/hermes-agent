@@ -6,7 +6,8 @@ adds latency to the user-facing reply.
 
 import logging
 import threading
-from typing import Callable, Optional
+from typing import Optional
+from collections.abc import Callable
 
 from agent.auxiliary_client import call_llm
 
@@ -30,9 +31,9 @@ def generate_title(
     user_message: str,
     assistant_response: str,
     timeout: float = 30.0,
-    failure_callback: Optional[FailureCallback] = None,
+    failure_callback: FailureCallback | None = None,
     main_runtime: dict = None,
-) -> Optional[str]:
+) -> str | None:
     """Generate a session title from the first exchange.
 
     Uses the main runtime's model when available, falling back to the
@@ -89,9 +90,9 @@ def auto_title_session(
     session_id: str,
     user_message: str,
     assistant_response: str,
-    failure_callback: Optional[FailureCallback] = None,
+    failure_callback: FailureCallback | None = None,
     main_runtime: dict = None,
-    title_callback: Optional[TitleCallback] = None,
+    title_callback: TitleCallback | None = None,
 ) -> None:
     """Generate and set a session title if one doesn't already exist.
 
@@ -136,9 +137,9 @@ def maybe_auto_title(
     user_message: str,
     assistant_response: str,
     conversation_history: list,
-    failure_callback: Optional[FailureCallback] = None,
+    failure_callback: FailureCallback | None = None,
     main_runtime: dict = None,
-    title_callback: Optional[TitleCallback] = None,
+    title_callback: TitleCallback | None = None,
 ) -> None:
     """Fire-and-forget title generation after the first exchange.
 

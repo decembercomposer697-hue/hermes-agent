@@ -250,9 +250,9 @@ class WhatsAppAdapter(BasePlatformAdapter):
 
     def __init__(self, config: PlatformConfig):
         super().__init__(config, Platform.WHATSAPP)
-        self._bridge_process: Optional[subprocess.Popen] = None
+        self._bridge_process: subprocess.Popen | None = None
         self._bridge_port: int = config.extra.get("bridge_port", 3000)
-        self._bridge_script: Optional[str] = config.extra.get(
+        self._bridge_script: str | None = config.extra.get(
             "bridge_script",
             str(self._DEFAULT_BRIDGE_DIR / "bridge.js"),
         )
@@ -260,7 +260,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
             "session_path",
             get_hermes_dir("platforms/whatsapp/session", "whatsapp/session")
         ))
-        self._reply_prefix: Optional[str] = config.extra.get("reply_prefix")
+        self._reply_prefix: str | None = config.extra.get("reply_prefix")
         self._dm_policy = str(config.extra.get("dm_policy") or os.getenv("WHATSAPP_DM_POLICY", "open")).strip().lower()
         self._allow_from = self._coerce_allow_list(config.extra.get("allow_from") or config.extra.get("allowFrom"))
         self._group_policy = str(config.extra.get("group_policy") or os.getenv("WHATSAPP_GROUP_POLICY", "open")).strip().lower()
@@ -268,9 +268,9 @@ class WhatsAppAdapter(BasePlatformAdapter):
         self._mention_patterns = self._compile_mention_patterns()
         self._message_queue: asyncio.Queue = asyncio.Queue()
         self._bridge_log_fh = None
-        self._bridge_log: Optional[Path] = None
-        self._poll_task: Optional[asyncio.Task] = None
-        self._http_session: Optional["aiohttp.ClientSession"] = None
+        self._bridge_log: Path | None = None
+        self._poll_task: asyncio.Task | None = None
+        self._http_session: aiohttp.ClientSession | None = None
         # Set to True by disconnect() before we SIGTERM our child bridge so
         # _check_managed_bridge_exit() can distinguish an intentional
         # shutdown-time exit (returncode -15 / -2 / 0) from a real crash.
@@ -294,8 +294,8 @@ class WhatsAppAdapter(BasePlatformAdapter):
         self._text_batch_split_delay_seconds = self._coerce_float_extra(
             "text_batch_split_delay_seconds", 10.0
         )
-        self._pending_text_batches: Dict[str, MessageEvent] = {}
-        self._pending_text_batch_tasks: Dict[str, asyncio.Task] = {}
+        self._pending_text_batches: dict[str, MessageEvent] = {}
+        self._pending_text_batch_tasks: dict[str, asyncio.Task] = {}
 
     def _coerce_float_extra(self, key: str, default: float) -> float:
         """Read a float from ``config.extra``, guarding against bad/non-finite values.
@@ -435,7 +435,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
         return compiled
 
     @staticmethod
-    def _normalize_whatsapp_id(value: Optional[str]) -> str:
+    def _normalize_whatsapp_id(value: str | None) -> str:
         if not value:
             return ""
         normalized = str(value).strip()
@@ -443,7 +443,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
             normalized = normalized.replace(":", "@", 1)
         return normalized
 
-    def _bot_ids_from_message(self, data: Dict[str, Any]) -> set[str]:
+    def _bot_ids_from_message(self, data: dict[str, Any]) -> set[str]:
         bot_ids = set()
         for candidate in data.get("botIds") or []:
             normalized = self._normalize_whatsapp_id(candidate)
@@ -451,13 +451,13 @@ class WhatsAppAdapter(BasePlatformAdapter):
                 bot_ids.add(normalized)
         return bot_ids
 
-    def _message_is_reply_to_bot(self, data: Dict[str, Any]) -> bool:
+    def _message_is_reply_to_bot(self, data: dict[str, Any]) -> bool:
         quoted_participant = self._normalize_whatsapp_id(data.get("quotedParticipant"))
         if not quoted_participant:
             return False
         return quoted_participant in self._bot_ids_from_message(data)
 
-    def _message_mentions_bot(self, data: Dict[str, Any]) -> bool:
+    def _message_mentions_bot(self, data: dict[str, Any]) -> bool:
         bot_ids = self._bot_ids_from_message(data)
         if not bot_ids:
             return False
@@ -477,13 +477,13 @@ class WhatsAppAdapter(BasePlatformAdapter):
                 return True
         return False
 
-    def _message_matches_mention_patterns(self, data: Dict[str, Any]) -> bool:
+    def _message_matches_mention_patterns(self, data: dict[str, Any]) -> bool:
         if not self._mention_patterns:
             return False
         body = str(data.get("body") or "")
         return any(pattern.search(body) for pattern in self._mention_patterns)
 
-    def _clean_bot_mention_text(self, text: str, data: Dict[str, Any]) -> str:
+    def _clean_bot_mention_text(self, text: str, data: dict[str, Any]) -> str:
         if not text:
             return text
         bot_ids = self._bot_ids_from_message(data)
@@ -494,7 +494,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
                 cleaned = re.sub(rf"@{re.escape(bare_id)}\b[,:\-]*\s*", "", cleaned)
         return cleaned.strip() or text
 
-    def _should_process_message(self, data: Dict[str, Any]) -> bool:
+    def _should_process_message(self, data: dict[str, Any]) -> bool:
         chat_id_raw = str(data.get("chatId") or "")
         # WhatsApp uses pseudo-chats for Status updates (Stories) and
         # Channel/Newsletter broadcasts. These are not real conversations
@@ -768,7 +768,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
                 pass
             self._bridge_log_fh = None
 
-    async def _check_managed_bridge_exit(self) -> Optional[str]:
+    async def _check_managed_bridge_exit(self) -> str | None:
         """Return a fatal error message if the managed bridge child exited."""
         if self._bridge_process is None:
             return None
@@ -912,8 +912,8 @@ class WhatsAppAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         content: str,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None
     ) -> SendResult:
         """Send a message via the WhatsApp bridge.
 
@@ -938,7 +938,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
 
             last_message_id = None
             for chunk in chunks:
-                payload: Dict[str, Any] = {
+                payload: dict[str, Any] = {
                     "chatId": chat_id,
                     "message": chunk,
                 }
@@ -1007,8 +1007,8 @@ class WhatsAppAdapter(BasePlatformAdapter):
         chat_id: str,
         file_path: str,
         media_type: str,
-        caption: Optional[str] = None,
-        file_name: Optional[str] = None,
+        caption: str | None = None,
+        file_name: str | None = None,
     ) -> SendResult:
         """Send any media file via bridge /send-media endpoint."""
         if not self._running or not self._http_session:
@@ -1022,7 +1022,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
             if not os.path.exists(file_path):
                 return SendResult(success=False, error=f"File not found: {file_path}")
 
-            payload: Dict[str, Any] = {
+            payload: dict[str, Any] = {
                 "chatId": chat_id,
                 "filePath": file_path,
                 "mediaType": media_type,
@@ -1055,8 +1055,8 @@ class WhatsAppAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         image_url: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
     ) -> SendResult:
         """Download image URL to cache, send natively via bridge."""
         try:
@@ -1069,8 +1069,8 @@ class WhatsAppAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         image_path: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
         **kwargs,
     ) -> SendResult:
         """Send a local image file natively via bridge."""
@@ -1080,8 +1080,8 @@ class WhatsAppAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         video_path: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
         **kwargs,
     ) -> SendResult:
         """Send a video natively via bridge — plays inline in WhatsApp."""
@@ -1091,8 +1091,8 @@ class WhatsAppAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         audio_path: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
         **kwargs,
     ) -> SendResult:
         """Send an audio file as a WhatsApp voice message via bridge."""
@@ -1102,9 +1102,9 @@ class WhatsAppAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         file_path: str,
-        caption: Optional[str] = None,
-        file_name: Optional[str] = None,
-        reply_to: Optional[str] = None,
+        caption: str | None = None,
+        file_name: str | None = None,
+        reply_to: str | None = None,
         **kwargs,
     ) -> SendResult:
         """Send a document/file as a downloadable attachment via bridge."""
@@ -1135,7 +1135,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
         except Exception:
             pass  # Ignore typing indicator failures
     
-    async def get_chat_info(self, chat_id: str) -> Dict[str, Any]:
+    async def get_chat_info(self, chat_id: str) -> dict[str, Any]:
         """Get information about a WhatsApp chat."""
         if not self._running or not self._http_session:
             return {"name": "Unknown", "type": "dm"}
@@ -1258,7 +1258,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
             if self._pending_text_batch_tasks.get(key) is current_task:
                 self._pending_text_batch_tasks.pop(key, None)
 
-    async def _build_message_event(self, data: Dict[str, Any]) -> Optional[MessageEvent]:
+    async def _build_message_event(self, data: dict[str, Any]) -> MessageEvent | None:
         """Build a MessageEvent from bridge message data, downloading images to cache."""
         try:
             if not self._should_process_message(data):

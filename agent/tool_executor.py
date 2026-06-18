@@ -70,7 +70,7 @@ def _emit_terminal_post_tool_call(
     status: str | None = None,
     error_type: str | None = None,
     error_message: str | None = None,
-    middleware_trace: Optional[list[dict[str, Any]]] = None,
+    middleware_trace: list[dict[str, Any]] | None = None,
 ) -> None:
     try:
         from model_tools import _emit_post_tool_call_hook
@@ -113,7 +113,7 @@ def _emit_cancelled_terminal_post_tool_call(
     start_time: float,
     reason: str = "user interrupt",
     error_type: str = "keyboard_interrupt",
-    middleware_trace: Optional[list[dict[str, Any]]] = None,
+    middleware_trace: list[dict[str, Any]] | None = None,
 ) -> str:
     result = _cancelled_tool_result(reason)
     _emit_terminal_post_tool_call(
@@ -801,7 +801,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
         # Tool Search unwrap — see execute_tool_calls_concurrent for full
         # rationale, including the scope gate (the unwrap dispatches the
         # underlying tool directly, so session toolset scope is enforced here).
-        _ts_scope_block: Optional[str] = None
+        _ts_scope_block: str | None = None
         try:
             from tools import tool_search as _ts
             if function_name == _ts.TOOL_CALL_NAME:
@@ -827,7 +827,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
         )
 
         # Check plugin hooks for a block directive before executing.
-        _block_msg: Optional[str] = None
+        _block_msg: str | None = None
         _block_error_type = "plugin_block"
         if _ts_scope_block is not None:
             _block_msg = _ts_scope_block

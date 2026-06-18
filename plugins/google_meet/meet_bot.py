@@ -93,20 +93,20 @@ class _BotState:
         self.captioning = False
         self.captions_enabled_attempted = False
         self.lobby_waiting = False
-        self.join_attempted_at: Optional[float] = None
-        self.joined_at: Optional[float] = None
-        self.last_caption_at: Optional[float] = None
+        self.join_attempted_at: float | None = None
+        self.joined_at: float | None = None
+        self.last_caption_at: float | None = None
         self.transcript_lines = 0
-        self.error: Optional[str] = None
+        self.error: str | None = None
         self.exited = False
         # v2 realtime fields.
         self.realtime = False
         self.realtime_ready = False
-        self.realtime_device: Optional[str] = None
+        self.realtime_device: str | None = None
         self.audio_bytes_out: int = 0
-        self.last_audio_out_at: Optional[float] = None
-        self.last_barge_in_at: Optional[float] = None
-        self.leave_reason: Optional[str] = None
+        self.last_audio_out_at: float | None = None
+        self.last_barge_in_at: float | None = None
+        self.leave_reason: str | None = None
         # Scraped captions, in order, deduped. Each entry is a dict of
         # {"ts": <epoch>, "speaker": str, "text": str}.
         self._seen: set = set()
@@ -272,7 +272,7 @@ def _start_realtime_speaker(
     voice: str,
     instructions: str,
     stop_flag: dict,
-    state: "_BotState",
+    state: _BotState,
 ) -> None:
     """Wire up the OpenAI Realtime session + speaker thread + PCM pump.
 
@@ -837,7 +837,7 @@ def _click_join(page, state: _BotState) -> None:
             continue
 
 
-def _parse_duration(raw: str) -> Optional[float]:
+def _parse_duration(raw: str) -> float | None:
     """Parse ``30m`` / ``2h`` / ``90`` (seconds) → float seconds, or None."""
     if not raw:
         return None

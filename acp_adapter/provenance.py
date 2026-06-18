@@ -24,8 +24,8 @@ def build_session_provenance(
     acp_session_id: str,
     current_hermes_session_id: str,
     *,
-    previous_hermes_session_id: Optional[str] = None,
-) -> Optional[Dict[str, Any]]:
+    previous_hermes_session_id: str | None = None,
+) -> dict[str, Any] | None:
     """Build ``_meta.hermes.sessionProvenance`` for an ACP session.
 
     Args:
@@ -89,7 +89,7 @@ def build_session_provenance(
         and previous_hermes_session_id != current_hermes_session_id
     )
 
-    provenance: Dict[str, Any] = {
+    provenance: dict[str, Any] = {
         "acpSessionId": acp_session_id,
         "currentHermesSessionId": current_hermes_session_id,
         "rootHermesSessionId": root_id,
@@ -113,8 +113,8 @@ def session_provenance_meta(
     acp_session_id: str,
     current_hermes_session_id: str,
     *,
-    previous_hermes_session_id: Optional[str] = None,
-) -> Optional[Dict[str, Any]]:
+    previous_hermes_session_id: str | None = None,
+) -> dict[str, Any] | None:
     """Return a ready ``_meta`` payload: ``{"hermes": {"sessionProvenance": ...}}``."""
     prov = build_session_provenance(
         db,

@@ -772,7 +772,7 @@ def get_honcho_client(config: HonchoClientConfig | None = None) -> Honcho:
     # slot's factory so it executes exactly once even when several threads
     # race the first call — the slot's double-checked lock serializes them and
     # the losers get the winner's client instead of building their own.
-    def _build() -> "Honcho":
+    def _build() -> Honcho:
         # Lazy-install the honcho SDK on demand. ensure() honors
         # security.allow_lazy_installs (default true). On failure we surface
         # the original ImportError-shape message so existing callers still get

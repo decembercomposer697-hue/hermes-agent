@@ -34,7 +34,8 @@ import logging
 import os
 import uuid
 from pathlib import Path
-from typing import Any, Awaitable, Dict, Optional
+from typing import Any, Dict, Optional
+from collections.abc import Awaitable
 from urllib.parse import urlparse
 import httpx
 from agent.auxiliary_client import async_call_llm, extract_content_or_reasoning
@@ -106,7 +107,7 @@ async def _validate_image_url_async(url: str) -> bool:
     return await async_is_safe_url(url)
 
 
-def _detect_image_mime_type(image_path: Path) -> Optional[str]:
+def _detect_image_mime_type(image_path: Path) -> str | None:
     """Return a MIME type when the file looks like a supported image."""
     with image_path.open("rb") as f:
         header = f.read(64)
@@ -286,7 +287,7 @@ def _determine_mime_type(image_path: Path) -> str:
     return mime_types.get(extension, 'image/jpeg')
 
 
-def _image_to_base64_data_url(image_path: Path, mime_type: Optional[str] = None) -> str:
+def _image_to_base64_data_url(image_path: Path, mime_type: str | None = None) -> str:
     """
     Convert an image file to a base64-encoded data URL.
     
@@ -369,9 +370,9 @@ def _image_exceeds_dimension(image_path: Path, max_dimension: int) -> bool:
         return False
 
 
-def _resize_image_for_vision(image_path: Path, mime_type: Optional[str] = None,
+def _resize_image_for_vision(image_path: Path, mime_type: str | None = None,
                               max_base64_bytes: int = _RESIZE_TARGET_BYTES,
-                              max_dimension: Optional[int] = None) -> str:
+                              max_dimension: int | None = None) -> str:
     """Convert an image to a base64 data URL, auto-resizing if too large.
 
     Tries Pillow first to progressively downscale oversized images.  If Pillow
@@ -635,7 +636,7 @@ def _build_native_vision_tool_result(
     question: str,
     image_data_url: str,
     image_size_bytes: int,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Build the multimodal tool-result envelope returned by the fast path.
 
     Shape:
@@ -704,7 +705,7 @@ async def _vision_analyze_native(
     if not isinstance(image_url, str) or not image_url.strip():
         return tool_error("image_url is required", success=False)
 
-    temp_image_path: Optional[Path] = None
+    temp_image_path: Path | None = None
     should_cleanup = False
     try:
         from tools.interrupt import is_interrupted
@@ -1194,7 +1195,7 @@ VISION_ANALYZE_SCHEMA = {
 }
 
 
-def _handle_vision_analyze(args: Dict[str, Any], **kw: Any) -> Awaitable[str]:
+def _handle_vision_analyze(args: dict[str, Any], **kw: Any) -> Awaitable[str]:
     image_url = args.get("image_url", "")
     question = args.get("question", "")
 
@@ -1247,13 +1248,13 @@ _MAX_VIDEO_BASE64_BYTES = 50 * 1024 * 1024  # 50 MB hard cap
 _VIDEO_SIZE_WARN_BYTES = 20 * 1024 * 1024
 
 
-def _detect_video_mime_type(video_path: Path) -> Optional[str]:
+def _detect_video_mime_type(video_path: Path) -> str | None:
     """Return a video MIME type based on file extension, or None if unsupported."""
     ext = video_path.suffix.lower()
     return _VIDEO_MIME_TYPES.get(ext)
 
 
-def _video_to_base64_data_url(video_path: Path, mime_type: Optional[str] = None) -> str:
+def _video_to_base64_data_url(video_path: Path, mime_type: str | None = None) -> str:
     """Convert a video file to a base64-encoded data URL."""
     data = video_path.read_bytes()
     encoded = base64.b64encode(data).decode("ascii")
@@ -1568,7 +1569,7 @@ VIDEO_ANALYZE_SCHEMA = {
 }
 
 
-def _handle_video_analyze(args: Dict[str, Any], **kw: Any) -> Awaitable[str]:
+def _handle_video_analyze(args: dict[str, Any], **kw: Any) -> Awaitable[str]:
     video_url = args.get("video_url", "")
     question = args.get("question", "")
     full_prompt = (

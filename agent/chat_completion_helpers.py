@@ -382,7 +382,7 @@ def interruptible_api_call(agent, api_kwargs: dict):
             and _elapsed > _ttfb_timeout
             and getattr(agent, "_codex_stream_last_event_ts", None) is None
         ):
-            _silent_hint: Optional[str] = None
+            _silent_hint: str | None = None
             _hint_fn = getattr(agent, "_codex_silent_hang_hint", None)
             if callable(_hint_fn):
                 try:
@@ -473,7 +473,7 @@ def interruptible_api_call(agent, api_kwargs: dict):
         # arrives within the configured timeout.
         if _elapsed > _stale_timeout:
             _est_ctx = estimate_request_context_tokens(api_kwargs)
-            _silent_hint: Optional[str] = None
+            _silent_hint: str | None = None
             _hint_fn = getattr(agent, "_codex_silent_hang_hint", None)
             if callable(_hint_fn):
                 try:
@@ -691,7 +691,7 @@ def build_api_kwargs(agent, api_messages: list) -> dict:
         _fixed_temp = None
 
     # Provider preferences (OpenRouter-style)
-    _prefs: Dict[str, Any] = {}
+    _prefs: dict[str, Any] = {}
     if agent.providers_allowed:
         _prefs["only"] = agent.providers_allowed
     if agent.providers_ignored:
@@ -1042,7 +1042,7 @@ def build_assistant_message(agent, assistant_message, finish_reason: str) -> dic
 
 
 
-def try_activate_fallback(agent, reason: "FailoverReason | None" = None) -> bool:
+def try_activate_fallback(agent, reason: FailoverReason | None = None) -> bool:
     """Switch to the next fallback model/provider in the chain.
 
     Called when the current model is failing after retries.  Swaps the

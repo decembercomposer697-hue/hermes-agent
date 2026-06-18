@@ -128,7 +128,7 @@ def _record_pending(urls: list[str], delay_seconds: int = _AUTO_DELETE_SECONDS) 
     _save_pending(merged)
 
 
-def _sweep_expired_pastes(now: Optional[float] = None) -> tuple[int, int]:
+def _sweep_expired_pastes(now: float | None = None) -> tuple[int, int]:
     """Synchronously DELETE any pending pastes whose ``expire_at`` has passed.
 
     Returns ``(deleted, remaining)``.  Best-effort: failed deletes stay in
@@ -208,7 +208,7 @@ _GATEWAY_PRIVACY_NOTICE = (
 )
 
 
-def _extract_paste_id(url: str) -> Optional[str]:
+def _extract_paste_id(url: str) -> str | None:
     """Extract the paste ID from a paste.rs or dpaste.com URL.
 
     Returns the ID string, or None if the URL doesn't match a known service.
@@ -347,12 +347,12 @@ def upload_to_pastebin(content: str, expiry_days: int = 7) -> str:
 class LogSnapshot:
     """Single-read snapshot of a log file used by debug-share."""
 
-    path: Optional[Path]
+    path: Path | None
     tail_text: str
-    full_text: Optional[str]
+    full_text: str | None
 
 
-def _primary_log_path(log_name: str) -> Optional[Path]:
+def _primary_log_path(log_name: str) -> Path | None:
     """Where *log_name* would live if present. Doesn't check existence."""
     from hermes_cli.logs import LOG_FILES
 
@@ -360,7 +360,7 @@ def _primary_log_path(log_name: str) -> Optional[Path]:
     return (get_hermes_home() / "logs" / filename) if filename else None
 
 
-def _resolve_log_path(log_name: str) -> Optional[Path]:
+def _resolve_log_path(log_name: str) -> Path | None:
     """Find the log file for *log_name*, falling back to the .1 rotation.
 
     Returns the first non-empty candidate (primary, then .1), or None.
@@ -536,7 +536,7 @@ def collect_debug_report(
     *,
     log_lines: int = 200,
     dump_text: str = "",
-    log_snapshots: Optional[dict[str, LogSnapshot]] = None,
+    log_snapshots: dict[str, LogSnapshot] | None = None,
 ) -> str:
     """Build the summary debug report: system dump + log tails.
 

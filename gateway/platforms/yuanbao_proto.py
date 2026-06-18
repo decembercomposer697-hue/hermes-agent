@@ -634,7 +634,7 @@ def _decode_log_ext(data: bytes) -> dict:
 #   20: log_ext (message LogInfoExt)
 
 
-def decode_inbound_push(data: bytes) -> Optional[dict]:
+def decode_inbound_push(data: bytes) -> dict | None:
     """
     解析入站消息推送的 biz payload（InboundMessagePush proto bytes）。
 
@@ -719,7 +719,7 @@ def _encode_send_c2c_req(
     msg_body: list,
     msg_id: str = "",
     msg_random: int = 0,
-    msg_seq: Optional[int] = None,
+    msg_seq: int | None = None,
     group_code: str = "",
     trace_id: str = "",
 ) -> bytes:
@@ -764,7 +764,7 @@ def _encode_send_group_req(
     msg_id: str = "",
     to_account: str = "",
     random: str = "",
-    msg_seq: Optional[int] = None,
+    msg_seq: int | None = None,
     ref_msg_id: str = "",
     trace_id: str = "",
 ) -> bytes:
@@ -811,7 +811,7 @@ def encode_send_c2c_message(
     from_account: str,
     msg_id: str = "",
     msg_random: int = 0,
-    msg_seq: Optional[int] = None,
+    msg_seq: int | None = None,
     group_code: str = "",
     trace_id: str = "",
 ) -> bytes:
@@ -861,7 +861,7 @@ def encode_send_group_message(
     msg_id: str = "",
     to_account: str = "",
     random: str = "",
-    msg_seq: Optional[int] = None,
+    msg_seq: int | None = None,
     ref_msg_id: str = "",
     trace_id: str = "",
 ) -> bytes:
@@ -1073,7 +1073,7 @@ def encode_query_group_info(group_code: str) -> bytes:
     )
 
 
-def decode_query_group_info_rsp(data: bytes) -> Optional[dict]:
+def decode_query_group_info_rsp(data: bytes) -> dict | None:
     """
     解码 QueryGroupInfoRsp biz payload。
 
@@ -1154,7 +1154,7 @@ def encode_get_group_member_list(
     )
 
 
-def decode_get_group_member_list_rsp(data: bytes) -> Optional[dict]:
+def decode_get_group_member_list_rsp(data: bytes) -> dict | None:
     """
     解码 GetGroupMemberListRsp biz payload。
 

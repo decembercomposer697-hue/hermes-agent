@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 _INIT_FAILED = object()
 _LOCK = threading.RLock()
-_RUNTIME: "_Runtime | object | None" = None
+_RUNTIME: _Runtime | object | None = None
 
 
 @dataclass
@@ -619,7 +619,7 @@ def on_tool_execution_middleware(**kwargs: Any) -> Any:
     return args
 
 
-def _get_runtime() -> Optional[_Runtime]:
+def _get_runtime() -> _Runtime | None:
     global _RUNTIME
     with _LOCK:
         if _RUNTIME is _INIT_FAILED:

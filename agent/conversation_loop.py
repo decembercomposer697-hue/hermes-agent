@@ -71,7 +71,7 @@ logger = logging.getLogger(__name__)
 INTERRUPT_WAITING_FOR_MODEL_PREFIX = "Operation interrupted: waiting for model response ("
 
 
-def _ollama_context_limit_error(agent: Any, request_tokens: int) -> Optional[str]:
+def _ollama_context_limit_error(agent: Any, request_tokens: int) -> str | None:
     """Return a user-facing error when Ollama is loaded with too little context."""
     if not getattr(agent, "tools", None):
         return None
@@ -337,7 +337,7 @@ def _restore_or_build_system_prompt(agent, system_message, conversation_history)
             )
 
 
-def _get_continuation_prompt(is_partial_stub: bool, dropped_tools: Optional[List[str]] = None) -> str:
+def _get_continuation_prompt(is_partial_stub: bool, dropped_tools: list[str] | None = None) -> str:
     if is_partial_stub and dropped_tools:
         tool_list = ", ".join(dropped_tools[:3])
         return (
@@ -372,11 +372,11 @@ def run_conversation(
     agent,
     user_message: str,
     system_message: str = None,
-    conversation_history: List[Dict[str, Any]] = None,
+    conversation_history: list[dict[str, Any]] = None,
     task_id: str = None,
-    stream_callback: Optional[callable] = None,
-    persist_user_message: Optional[str] = None,
-) -> Dict[str, Any]:
+    stream_callback: callable | None = None,
+    persist_user_message: str | None = None,
+) -> dict[str, Any]:
     """
     Run a complete conversation with tool calling until completion.
 
@@ -440,7 +440,7 @@ def run_conversation(
     codex_ack_continuations = 0
     length_continue_retries = 0
     truncated_tool_call_retries = 0
-    truncated_response_parts: List[str] = []
+    truncated_response_parts: list[str] = []
     compression_attempts = 0
     _turn_exit_reason = "unknown"  # Diagnostic: why the loop ended
 

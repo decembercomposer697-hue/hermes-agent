@@ -93,13 +93,13 @@ class ProcessSession:
     command: str                                 # Original command string
     task_id: str = ""                           # Task/sandbox isolation key
     session_key: str = ""                       # Gateway session key (for reset protection)
-    pid: Optional[int] = None                   # OS process ID
-    process: Optional[subprocess.Popen] = None  # Popen handle (local only)
+    pid: int | None = None                   # OS process ID
+    process: subprocess.Popen | None = None  # Popen handle (local only)
     env_ref: Any = None                         # Reference to the environment object
-    cwd: Optional[str] = None                   # Working directory
+    cwd: str | None = None                   # Working directory
     started_at: float = 0.0                     # time.time() of spawn
     exited: bool = False                        # Whether the process has finished
-    exit_code: Optional[int] = None             # Exit code (None if still running)
+    exit_code: int | None = None             # Exit code (None if still running)
     output_buffer: str = ""                     # Rolling output (last MAX_OUTPUT_CHARS)
     max_output_chars: int = MAX_OUTPUT_CHARS
     detached: bool = False                      # True if recovered from crash (no pipe)
@@ -114,7 +114,7 @@ class ProcessSession:
     watcher_interval: int = 0                   # 0 = no watcher configured
     notify_on_complete: bool = False             # Queue agent notification on exit
     # Watch patterns — trigger agent notification when output matches any pattern
-    watch_patterns: List[str] = field(default_factory=list)
+    watch_patterns: list[str] = field(default_factory=list)
     _watch_hits: int = field(default=0, repr=False)          # total matches delivered
     _watch_suppressed: int = field(default=0, repr=False)    # matches dropped by rate limit
     _watch_disabled: bool = field(default=False, repr=False) # permanently killed after strike limit
@@ -130,7 +130,7 @@ class ProcessSession:
     _watch_strike_candidate: bool = field(default=False, repr=False)
     _watch_consecutive_strikes: int = field(default=0, repr=False)
     _lock: threading.Lock = field(default_factory=threading.Lock)
-    _reader_thread: Optional[threading.Thread] = field(default=None, repr=False)
+    _reader_thread: threading.Thread | None = field(default=None, repr=False)
     _pty: Any = field(default=None, repr=False)  # ptyprocess handle (when use_pty=True)
 
 
@@ -153,12 +153,12 @@ class ProcessRegistry:
     )
 
     def __init__(self):
-        self._running: Dict[str, ProcessSession] = {}
-        self._finished: Dict[str, ProcessSession] = {}
+        self._running: dict[str, ProcessSession] = {}
+        self._finished: dict[str, ProcessSession] = {}
         self._lock = threading.Lock()
 
         # Side-channel for check_interval watchers (gateway reads after agent run)
-        self.pending_watchers: List[Dict[str, Any]] = []
+        self.pending_watchers: list[dict[str, Any]] = []
 
         # Notification queue — unified queue for all background process events.
         # Completion notifications (notify_on_complete) and watch pattern matches
@@ -404,7 +404,7 @@ class ProcessRegistry:
         return admit
 
     @staticmethod
-    def _is_host_pid_alive(pid: Optional[int]) -> bool:
+    def _is_host_pid_alive(pid: int | None) -> bool:
         """Best-effort liveness check for host-visible PIDs."""
         if not pid:
             return False
@@ -413,7 +413,7 @@ class ProcessRegistry:
         from gateway.status import _pid_exists
         return _pid_exists(pid)
 
-    def _refresh_detached_session(self, session: Optional[ProcessSession]) -> Optional[ProcessSession]:
+    def _refresh_detached_session(self, session: ProcessSession | None) -> ProcessSession | None:
         """Update recovered host-PID sessions when the underlying process has exited."""
         if session is None or session.exited or not session.detached or session.pid_scope != "host":
             return session
@@ -913,7 +913,7 @@ class ProcessRegistry:
                 results.append((evt, text))
         return results
 
-    def get(self, session_id: str) -> Optional[ProcessSession]:
+    def get(self, session_id: str) -> ProcessSession | None:
         """Get a session by ID (running or finished)."""
         with self._lock:
             session = self._running.get(session_id) or self._finished.get(session_id)

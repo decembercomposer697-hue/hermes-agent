@@ -61,7 +61,7 @@ def _scan_context_content(content: str, filename: str) -> str:
     return content
 
 
-def _find_git_root(start: Path) -> Optional[Path]:
+def _find_git_root(start: Path) -> Path | None:
     """Walk *start* and its parents looking for a ``.git`` directory.
 
     Returns the directory containing ``.git``, or ``None`` if we hit the
@@ -77,7 +77,7 @@ def _find_git_root(start: Path) -> Optional[Path]:
 _HERMES_MD_NAMES = (".hermes.md", "HERMES.md")
 
 
-def _find_hermes_md(cwd: Path) -> Optional[Path]:
+def _find_hermes_md(cwd: Path) -> Path | None:
     """Discover the nearest ``.hermes.md`` or ``HERMES.md``.
 
     Search order: *cwd* first, then each parent directory up to (and
@@ -970,7 +970,7 @@ def _build_skills_manifest(skills_dir: Path) -> dict[str, list[int]]:
     return manifest
 
 
-def _load_skills_snapshot(skills_dir: Path) -> Optional[dict]:
+def _load_skills_snapshot(skills_dir: Path) -> dict | None:
     """Load the disk snapshot if it exists and its manifest still matches."""
     snapshot_path = _skills_prompt_snapshot_path()
     if not snapshot_path.exists():
@@ -1443,7 +1443,7 @@ def _truncate_content(content: str, filename: str, max_chars: int = CONTEXT_FILE
     return head + marker + tail
 
 
-def load_soul_md() -> Optional[str]:
+def load_soul_md() -> str | None:
     """Load SOUL.md from HERMES_HOME and return its content, or None.
 
     Used as the agent identity (slot #1 in the system prompt).  When this
@@ -1556,7 +1556,7 @@ def _load_cursorrules(cwd_path: Path) -> str:
     return _truncate_content(cursorrules_content, ".cursorrules")
 
 
-def build_context_files_prompt(cwd: Optional[str] = None, skip_soul: bool = False) -> str:
+def build_context_files_prompt(cwd: str | None = None, skip_soul: bool = False) -> str:
     """Discover and load context files for the system prompt.
 
     Priority (first found wins — only ONE project context type is loaded):

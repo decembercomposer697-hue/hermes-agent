@@ -154,7 +154,7 @@ _spawn_paused: bool = False
 _active_subagents_lock = threading.Lock()
 # subagent_id -> mutable record tracking the live child agent.  Stays only
 # for the lifetime of the run; _run_single_child is the owner.
-_active_subagents: Dict[str, Dict[str, Any]] = {}
+_active_subagents: dict[str, dict[str, Any]] = {}
 
 
 def set_spawn_paused(paused: bool) -> bool:
@@ -174,7 +174,7 @@ def is_spawn_paused() -> bool:
         return _spawn_paused
 
 
-def _register_subagent(record: Dict[str, Any]) -> None:
+def _register_subagent(record: dict[str, Any]) -> None:
     sid = record.get("subagent_id")
     if not sid:
         return
@@ -210,7 +210,7 @@ def interrupt_subagent(subagent_id: str) -> bool:
     return True
 
 
-def list_active_subagents() -> List[Dict[str, Any]]:
+def list_active_subagents() -> list[dict[str, Any]]:
     """Snapshot of the currently running subagent tree.
 
     Each record: {subagent_id, parent_id, depth, goal, model, started_at,
@@ -224,11 +224,11 @@ def list_active_subagents() -> List[Dict[str, Any]]:
 
 
 def _extract_output_tail(
-    result: Dict[str, Any],
+    result: dict[str, Any],
     *,
     max_entries: int = 12,
     max_chars: int = 8000,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Pull the last N tool-call results from a child's conversation.
 
     Powers the overlay's "Output" section — the cc-swarm-parity feature.
@@ -241,8 +241,8 @@ def _extract_output_tail(
         return []
 
     # Walk in reverse to build a tail; stop when we have enough.
-    tail: List[Dict[str, Any]] = []
-    pending_call_by_id: Dict[str, str] = {}
+    tail: list[dict[str, Any]] = []
+    pending_call_by_id: dict[str, str] = {}
 
     # First pass (forward): build tool_call_id -> tool_name map
     for msg in messages:
@@ -342,7 +342,7 @@ def _looks_like_error_output(content: Any) -> bool:
     )
 
 
-def _normalize_role(r: Optional[str]) -> str:
+def _normalize_role(r: str | None) -> str:
     """Normalise a caller-provided role to 'leaf' or 'orchestrator'.
 
     None/empty -> 'leaf'.  Unknown strings coerce to 'leaf' with a
@@ -533,8 +533,8 @@ def _expand_parent_toolsets(parent_toolsets: set) -> set:
 
 
 def _preserve_parent_mcp_toolsets(
-    child_toolsets: List[str], parent_toolsets: set[str]
-) -> List[str]:
+    child_toolsets: list[str], parent_toolsets: set[str]
+) -> list[str]:
     """Append any parent MCP toolsets that are missing from a narrowed child."""
     preserved = list(child_toolsets)
     for toolset_name in sorted(parent_toolsets):
@@ -586,7 +586,7 @@ class DelegateEvent(str, enum.Enum):
 
 # Legacy event strings → DelegateEvent mapping.
 # Incoming child-agent events use the old names; the callback normalises them.
-_LEGACY_EVENT_MAP: Dict[str, DelegateEvent] = {
+_LEGACY_EVENT_MAP: dict[str, DelegateEvent] = {
     "_thinking": DelegateEvent.TASK_THINKING,
     "reasoning.available": DelegateEvent.TASK_THINKING,
     "tool.started": DelegateEvent.TASK_TOOL_STARTED,
@@ -602,9 +602,9 @@ def check_delegate_requirements() -> bool:
 
 def _build_child_system_prompt(
     goal: str,
-    context: Optional[str] = None,
+    context: str | None = None,
     *,
-    workspace_path: Optional[str] = None,
+    workspace_path: str | None = None,
     role: str = "leaf",
     max_spawn_depth: int = 2,
     child_depth: int = 1,
@@ -676,7 +676,7 @@ def _build_child_system_prompt(
     return "\n".join(parts)
 
 
-def _resolve_workspace_hint(parent_agent) -> Optional[str]:
+def _resolve_workspace_hint(parent_agent) -> str | None:
     """Best-effort local workspace hint for child prompts.
 
     We only inject a path when we have a concrete absolute directory. This avoids
@@ -703,7 +703,7 @@ def _resolve_workspace_hint(parent_agent) -> Optional[str]:
     return None
 
 
-def _strip_blocked_tools(toolsets: List[str]) -> List[str]:
+def _strip_blocked_tools(toolsets: list[str]) -> list[str]:
     """Remove toolsets that contain only blocked tools."""
     blocked_toolset_names = {
         "delegation",
@@ -720,12 +720,12 @@ def _build_child_progress_callback(
     parent_agent,
     task_count: int = 1,
     *,
-    subagent_id: Optional[str] = None,
-    parent_id: Optional[str] = None,
-    depth: Optional[int] = None,
-    model: Optional[str] = None,
-    toolsets: Optional[List[str]] = None,
-) -> Optional[callable]:
+    subagent_id: str | None = None,
+    parent_id: str | None = None,
+    depth: int | None = None,
+    model: str | None = None,
+    toolsets: list[str] | None = None,
+) -> callable | None:
     """Build a callback that relays child agent tool calls to the parent display.
 
     Two display paths:
@@ -753,11 +753,11 @@ def _build_child_progress_callback(
 
     # Gateway: batch tool names, flush periodically
     _BATCH_SIZE = 5
-    _batch: List[str] = []
+    _batch: list[str] = []
     _tool_count = [0]  # per-subagent running counter (list for closure mutation)
 
-    def _identity_kwargs() -> Dict[str, Any]:
-        kw: Dict[str, Any] = {
+    def _identity_kwargs() -> dict[str, Any]:
+        kw: dict[str, Any] = {
             "task_index": task_index,
             "task_count": task_count,
             "goal": goal_label,
@@ -904,20 +904,20 @@ def _build_child_progress_callback(
 def _build_child_agent(
     task_index: int,
     goal: str,
-    context: Optional[str],
-    toolsets: Optional[List[str]],
-    model: Optional[str],
+    context: str | None,
+    toolsets: list[str] | None,
+    model: str | None,
     max_iterations: int,
     task_count: int,
     parent_agent,
     # Credential overrides from delegation config (provider:model resolution)
-    override_provider: Optional[str] = None,
-    override_base_url: Optional[str] = None,
-    override_api_key: Optional[str] = None,
-    override_api_mode: Optional[str] = None,
+    override_provider: str | None = None,
+    override_base_url: str | None = None,
+    override_api_key: str | None = None,
+    override_api_mode: str | None = None,
     # ACP transport overrides — lets a non-ACP parent spawn ACP child agents
-    override_acp_command: Optional[str] = None,
-    override_acp_args: Optional[List[str]] = None,
+    override_acp_command: str | None = None,
+    override_acp_args: list[str] | None = None,
     # Per-call role controlling whether the child can further delegate.
     # 'leaf' (default) cannot; 'orchestrator' retains the delegation
     # toolset subject to depth/kill-switch bounds applied below.
@@ -1232,9 +1232,9 @@ def _dump_subagent_timeout_diagnostic(
     task_index: int,
     timeout_seconds: float,
     duration_seconds: float,
-    worker_thread: Optional[threading.Thread],
+    worker_thread: threading.Thread | None,
     goal: str,
-) -> Optional[str]:
+) -> str | None:
     """Write a structured diagnostic dump for a subagent that timed out
     before making any API call.
 
@@ -1263,7 +1263,7 @@ def _dump_subagent_timeout_diagnostic(
         ts = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
         dump_path = logs_dir / f"subagent-timeout-{subagent_id}-{ts}.log"
 
-        lines: List[str] = []
+        lines: list[str] = []
         def _w(line: str = "") -> None:
             lines.append(line)
 
@@ -1375,7 +1375,7 @@ def _run_single_child(
     child=None,
     parent_agent=None,
     **_kwargs,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Run a pre-built child agent. Called from within a thread.
     Returns a structured result dict.
@@ -1551,7 +1551,7 @@ def _run_single_child(
         )
         # Capture the worker thread so the timeout diagnostic can dump its
         # Python stack (see #14726 — 0-API-call hangs are opaque without it).
-        _worker_thread_holder: Dict[str, Optional[threading.Thread]] = {"t": None}
+        _worker_thread_holder: dict[str, threading.Thread | None] = {"t": None}
 
         def _run_with_thread_capture():
             _worker_thread_holder["t"] = threading.current_thread()
@@ -1585,7 +1585,7 @@ def _run_single_child(
             # When a subagent times out BEFORE making any API call, dump a
             # diagnostic to help users (and us) see what the child was doing.
             # See #14726 — without this, 0-API-call hangs are black boxes.
-            diagnostic_path: Optional[str] = None
+            diagnostic_path: str | None = None
             child_api_calls = 0
             try:
                 _summary = child.get_activity_summary()
@@ -1685,8 +1685,8 @@ def _run_single_child(
 
         # Build tool trace from conversation messages (already in memory).
         # Uses tool_call_id to correctly pair parallel tool calls with results.
-        tool_trace: list[Dict[str, Any]] = []
-        trace_by_id: Dict[str, Dict[str, Any]] = {}
+        tool_trace: list[dict[str, Any]] = []
+        trace_by_id: dict[str, dict[str, Any]] = {}
         messages = result.get("messages") or []
         if isinstance(messages, list):
             for msg in messages:
@@ -1732,7 +1732,7 @@ def _run_single_child(
         _output_tokens = getattr(child, "session_completion_tokens", 0)
         _model = getattr(child, "model", None)
 
-        entry: Dict[str, Any] = {
+        entry: dict[str, Any] = {
             "task_index": task_index,
             "status": status,
             "summary": summary,
@@ -1831,7 +1831,7 @@ def _run_single_child(
 
         _output_tail = _extract_output_tail(result, max_entries=8, max_chars=600)
 
-        complete_kwargs: Dict[str, Any] = {
+        complete_kwargs: dict[str, Any] = {
             "preview": summary[:160] if summary else entry.get("error", ""),
             "status": status,
             "duration_seconds": duration,
@@ -1945,7 +1945,7 @@ def _run_single_child(
 
 def _recover_tasks_from_json_string(
     tasks: Any,
-) -> tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
+) -> tuple[list[dict[str, Any]] | None, str | None]:
     if not isinstance(tasks, str):
         return None, None
     raw = tasks.strip()
@@ -1967,14 +1967,14 @@ def _recover_tasks_from_json_string(
 
 
 def delegate_task(
-    goal: Optional[str] = None,
-    context: Optional[str] = None,
-    toolsets: Optional[List[str]] = None,
-    tasks: Optional[List[Dict[str, Any]]] = None,
-    max_iterations: Optional[int] = None,
-    acp_command: Optional[str] = None,
-    acp_args: Optional[List[str]] = None,
-    role: Optional[str] = None,
+    goal: str | None = None,
+    context: str | None = None,
+    toolsets: list[str] | None = None,
+    tasks: list[dict[str, Any]] | None = None,
+    max_iterations: int | None = None,
+    acp_command: str | None = None,
+    acp_args: list[str] | None = None,
+    role: str | None = None,
     parent_agent=None,
 ) -> str:
     """
@@ -2370,9 +2370,9 @@ def delegate_task(
 
 
 def _resolve_child_credential_pool(
-    effective_provider: Optional[str],
+    effective_provider: str | None,
     parent_agent,
-    effective_base_url: Optional[str] = None,
+    effective_base_url: str | None = None,
 ):
     """Resolve a credential pool for the child agent.
 

@@ -17,7 +17,7 @@ class TestClarifyToolBasics:
 
     def test_simple_question_with_callback(self):
         """Should return user response for simple question."""
-        def mock_callback(question: str, choices: Optional[List[str]]) -> str:
+        def mock_callback(question: str, choices: list[str] | None) -> str:
             assert question == "What color?"
             assert choices is None
             return "blue"
@@ -29,7 +29,7 @@ class TestClarifyToolBasics:
 
     def test_question_with_choices(self):
         """Should pass choices to callback and return response."""
-        def mock_callback(question: str, choices: Optional[List[str]]) -> str:
+        def mock_callback(question: str, choices: list[str] | None) -> str:
             assert question == "Pick a number"
             assert choices == ["1", "2", "3"]
             return "2"
@@ -68,7 +68,7 @@ class TestClarifyToolChoicesValidation:
         """Should trim choices to MAX_CHOICES."""
         choices_passed = []
 
-        def mock_callback(question: str, choices: Optional[List[str]]) -> str:
+        def mock_callback(question: str, choices: list[str] | None) -> str:
             choices_passed.extend(choices or [])
             return "picked"
 
@@ -81,7 +81,7 @@ class TestClarifyToolChoicesValidation:
         """Empty choices list should become None (open-ended)."""
         choices_received = ["marker"]
 
-        def mock_callback(question: str, choices: Optional[List[str]]) -> str:
+        def mock_callback(question: str, choices: list[str] | None) -> str:
             choices_received.clear()
             if choices is not None:
                 choices_received.extend(choices)
@@ -94,7 +94,7 @@ class TestClarifyToolChoicesValidation:
         """Whitespace-only choices should be stripped out."""
         choices_received = []
 
-        def mock_callback(question: str, choices: Optional[List[str]]) -> str:
+        def mock_callback(question: str, choices: list[str] | None) -> str:
             choices_received.extend(choices or [])
             return "answer"
 
@@ -115,7 +115,7 @@ class TestClarifyToolChoicesValidation:
         """Non-string choices should be converted to strings."""
         choices_received = []
 
-        def mock_callback(question: str, choices: Optional[List[str]]) -> str:
+        def mock_callback(question: str, choices: list[str] | None) -> str:
             choices_received.extend(choices or [])
             return "answer"
 
@@ -128,7 +128,7 @@ class TestClarifyToolCallbackHandling:
 
     def test_callback_exception_returns_error(self):
         """Should return error if callback raises exception."""
-        def failing_callback(question: str, choices: Optional[List[str]]) -> str:
+        def failing_callback(question: str, choices: list[str] | None) -> str:
             raise RuntimeError("User cancelled")
 
         result = json.loads(clarify_tool("Question?", callback=failing_callback))
@@ -140,7 +140,7 @@ class TestClarifyToolCallbackHandling:
         """Callback should receive trimmed question."""
         received_question = []
 
-        def mock_callback(question: str, choices: Optional[List[str]]) -> str:
+        def mock_callback(question: str, choices: list[str] | None) -> str:
             received_question.append(question)
             return "answer"
 
@@ -149,7 +149,7 @@ class TestClarifyToolCallbackHandling:
 
     def test_user_response_stripped(self):
         """User response should be stripped of whitespace."""
-        def mock_callback(question: str, choices: Optional[List[str]]) -> str:
+        def mock_callback(question: str, choices: list[str] | None) -> str:
             return "  response with spaces  \n"
 
         result = json.loads(clarify_tool("Q?", callback=mock_callback))

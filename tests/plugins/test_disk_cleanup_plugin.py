@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from datetime import UTC
 
 
 @pytest.fixture(autouse=True)
@@ -283,7 +284,7 @@ class TestStaleCronEntryMigration:
 
         # Old enough to be deleted (>14 days)
         from datetime import datetime, timezone, timedelta
-        old_ts = (datetime.now(timezone.utc) - timedelta(days=20)).isoformat()
+        old_ts = (datetime.now(UTC) - timedelta(days=20)).isoformat()
 
         tracked_file = _isolate_env / "disk-cleanup" / "tracked.json"
         tracked_file.parent.mkdir(parents=True, exist_ok=True)

@@ -22,9 +22,9 @@ _LM_EFFORT_ALIASES = {"off": "none", "on": "medium"}
 
 
 def resolve_lmstudio_effort(
-    reasoning_config: Optional[dict],
-    allowed_options: Optional[List[str]],
-) -> Optional[str]:
+    reasoning_config: dict | None,
+    allowed_options: list[str] | None,
+) -> str | None:
     """Return the ``reasoning_effort`` string to send to LM Studio, or ``None``.
 
     ``None`` means "omit the field": the user picked a level the model can't

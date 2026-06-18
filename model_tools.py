@@ -114,7 +114,7 @@ def _run_async(coro):
         # worker, which previously leaked the thread on every 300 s timeout).
         import concurrent.futures
 
-        worker_loop: Optional[asyncio.AbstractEventLoop] = None
+        worker_loop: asyncio.AbstractEventLoop | None = None
         loop_ready = threading.Event()
 
         def _run_in_worker():
@@ -204,13 +204,13 @@ except Exception as e:
 # Backward-compat constants  (built once after discovery)
 # =============================================================================
 
-TOOL_TO_TOOLSET_MAP: Dict[str, str] = registry.get_tool_to_toolset_map()
+TOOL_TO_TOOLSET_MAP: dict[str, str] = registry.get_tool_to_toolset_map()
 
-TOOLSET_REQUIREMENTS: Dict[str, dict] = registry.get_toolset_requirements()
+TOOLSET_REQUIREMENTS: dict[str, dict] = registry.get_toolset_requirements()
 
 # Resolved tool names from the last get_tool_definitions() call.
 # Used by code_execution_tool to know which tools are available in this session.
-_last_resolved_tool_names: List[str] = []
+_last_resolved_tool_names: list[str] = []
 
 
 # =============================================================================
@@ -251,7 +251,7 @@ _LEGACY_TOOLSET_MAP = {
 # which bumps on register() / deregister() / register_toolset_alias(). The
 # inner check_fn TTL cache in registry.py handles environment drift (Docker
 # daemon start/stop, env var changes, etc.) on a 30 s horizon.
-_tool_defs_cache: Dict[tuple, List[Dict[str, Any]]] = {}
+_tool_defs_cache: dict[tuple, list[dict[str, Any]]] = {}
 
 # Hard cap on memoized get_tool_definitions() results. A long-lived Gateway
 # process sees many distinct toolset/config fingerprints over its lifetime
@@ -270,11 +270,11 @@ def _clear_tool_defs_cache() -> None:
 
 
 def get_tool_definitions(
-    enabled_toolsets: Optional[List[str]] = None,
-    disabled_toolsets: Optional[List[str]] = None,
+    enabled_toolsets: list[str] | None = None,
+    disabled_toolsets: list[str] | None = None,
     quiet_mode: bool = False,
     skip_tool_search_assembly: bool = False,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Get tool definitions for model API calls with toolset-based filtering.
 
@@ -348,11 +348,11 @@ def get_tool_definitions(
 
 
 def _compute_tool_definitions(
-    enabled_toolsets: Optional[List[str]] = None,
-    disabled_toolsets: Optional[List[str]] = None,
+    enabled_toolsets: list[str] | None = None,
+    disabled_toolsets: list[str] | None = None,
     quiet_mode: bool = False,
     skip_tool_search_assembly: bool = False,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Uncached implementation of :func:`get_tool_definitions`."""
     # Determine which tool names the caller wants
     tools_to_include: set = set()
@@ -616,7 +616,7 @@ def _sanitize_tool_error(error_msg: str) -> str:
 # Tool argument type coercion
 # =========================================================================
 
-def coerce_tool_args(tool_name: str, args: Dict[str, Any]) -> Dict[str, Any]:
+def coerce_tool_args(tool_name: str, args: dict[str, Any]) -> dict[str, Any]:
     """Coerce tool call arguments to match their JSON Schema types.
 
     LLMs frequently return numbers as strings (``"42"`` instead of ``42``)
@@ -812,7 +812,7 @@ def _coerce_boolean(value: str):
     return value
 
 
-def _tool_result_observer_fields(result: Any) -> tuple[str, Optional[str], Optional[str]]:
+def _tool_result_observer_fields(result: Any) -> tuple[str, str | None, str | None]:
     try:
         parsed_result = json.loads(result) if isinstance(result, str) else result
         if isinstance(parsed_result, dict) and parsed_result.get("error"):
@@ -825,18 +825,18 @@ def _tool_result_observer_fields(result: Any) -> tuple[str, Optional[str], Optio
 def _emit_post_tool_call_hook(
     *,
     function_name: str,
-    function_args: Dict[str, Any],
+    function_args: dict[str, Any],
     result: Any,
-    task_id: Optional[str] = None,
-    session_id: Optional[str] = None,
-    tool_call_id: Optional[str] = None,
-    turn_id: Optional[str] = None,
-    api_request_id: Optional[str] = None,
+    task_id: str | None = None,
+    session_id: str | None = None,
+    tool_call_id: str | None = None,
+    turn_id: str | None = None,
+    api_request_id: str | None = None,
     duration_ms: int = 0,
-    status: Optional[str] = None,
-    error_type: Optional[str] = None,
-    error_message: Optional[str] = None,
-    middleware_trace: Optional[List[Dict[str, Any]]] = None,
+    status: str | None = None,
+    error_type: str | None = None,
+    error_message: str | None = None,
+    middleware_trace: list[dict[str, Any]] | None = None,
 ) -> None:
     """Emit the ``post_tool_call`` observer hook.
 
@@ -875,19 +875,19 @@ def _emit_post_tool_call_hook(
 
 def handle_function_call(
     function_name: str,
-    function_args: Dict[str, Any],
-    task_id: Optional[str] = None,
-    tool_call_id: Optional[str] = None,
-    session_id: Optional[str] = None,
-    turn_id: Optional[str] = None,
-    api_request_id: Optional[str] = None,
-    user_task: Optional[str] = None,
-    enabled_tools: Optional[List[str]] = None,
+    function_args: dict[str, Any],
+    task_id: str | None = None,
+    tool_call_id: str | None = None,
+    session_id: str | None = None,
+    turn_id: str | None = None,
+    api_request_id: str | None = None,
+    user_task: str | None = None,
+    enabled_tools: list[str] | None = None,
     skip_pre_tool_call_hook: bool = False,
     skip_tool_request_middleware: bool = False,
-    tool_request_middleware_trace: Optional[List[Dict[str, Any]]] = None,
-    enabled_toolsets: Optional[List[str]] = None,
-    disabled_toolsets: Optional[List[str]] = None,
+    tool_request_middleware_trace: list[dict[str, Any]] | None = None,
+    enabled_toolsets: list[str] | None = None,
+    disabled_toolsets: list[str] | None = None,
 ) -> str:
     """
     Main function call dispatcher that routes calls to the tool registry.
@@ -1029,7 +1029,7 @@ def handle_function_call(
         # pass. When skip=True, the caller already fired it — do nothing
         # here.
         if not skip_pre_tool_call_hook:
-            block_message: Optional[str] = None
+            block_message: str | None = None
             try:
                 from hermes_cli.plugins import get_pre_tool_call_block_message
                 block_message = get_pre_tool_call_block_message(
@@ -1111,14 +1111,14 @@ def handle_function_call(
                 # Prefer the caller-provided list so subagents can't overwrite
                 # the parent's tool set via the process-global.
                 sandbox_enabled = enabled_tools if enabled_tools is not None else _last_resolved_tool_names
-                def _dispatch(next_args: Dict[str, Any]) -> Any:
+                def _dispatch(next_args: dict[str, Any]) -> Any:
                     return registry.dispatch(
                         function_name, next_args,
                         task_id=task_id,
                         enabled_tools=sandbox_enabled,
                     )
             else:
-                def _dispatch(next_args: Dict[str, Any]) -> Any:
+                def _dispatch(next_args: dict[str, Any]) -> Any:
                     return registry.dispatch(
                         function_name, next_args,
                         task_id=task_id,
@@ -1204,26 +1204,26 @@ def handle_function_call(
 # Backward-compat wrapper functions
 # =============================================================================
 
-def get_all_tool_names() -> List[str]:
+def get_all_tool_names() -> list[str]:
     """Return all registered tool names."""
     return registry.get_all_tool_names()
 
 
-def get_toolset_for_tool(tool_name: str) -> Optional[str]:
+def get_toolset_for_tool(tool_name: str) -> str | None:
     """Return the toolset a tool belongs to."""
     return registry.get_toolset_for_tool(tool_name)
 
 
-def get_available_toolsets() -> Dict[str, dict]:
+def get_available_toolsets() -> dict[str, dict]:
     """Return toolset availability info for UI display."""
     return registry.get_available_toolsets()
 
 
-def check_toolset_requirements() -> Dict[str, bool]:
+def check_toolset_requirements() -> dict[str, bool]:
     """Return {toolset: available_bool} for every registered toolset."""
     return registry.check_toolset_requirements()
 
 
-def check_tool_availability(quiet: bool = False) -> Tuple[List[str], List[dict]]:
+def check_tool_availability(quiet: bool = False) -> tuple[list[str], list[dict]]:
     """Return (available_toolsets, unavailable_info)."""
     return registry.check_tool_availability(quiet=quiet)

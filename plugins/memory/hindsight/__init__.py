@@ -37,7 +37,7 @@ import os
 import queue
 import threading
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 from typing import Any, Dict, List
 
 from agent.memory_provider import MemoryProvider
@@ -106,7 +106,7 @@ def _check_local_runtime() -> tuple[bool, str | None]:
 # Cache of API_URL -> bool (whether that API supports update_mode='append').
 # Probed once per URL per process — every provider talking to the same API
 # gets the same answer without re-hitting /version on each initialize().
-_append_capability_cache: Dict[str, bool] = {}
+_append_capability_cache: dict[str, bool] = {}
 _append_capability_lock = threading.Lock()
 
 
@@ -339,7 +339,7 @@ def _load_config() -> dict:
     }
 
 
-def _normalize_retain_tags(value: Any) -> List[str]:
+def _normalize_retain_tags(value: Any) -> list[str]:
     """Normalize tag config/tool values to a deduplicated list of strings."""
     if value is None:
         return []
@@ -378,7 +378,7 @@ def _normalize_retain_tags(value: Any) -> List[str]:
 
 def _utc_timestamp() -> str:
     """Return current UTC timestamp in ISO-8601 with milliseconds and Z suffix."""
-    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
 def _embedded_profile_name(config: dict[str, Any]) -> str:
@@ -528,7 +528,7 @@ class HindsightMemoryProvider(MemoryProvider):
         self._llm_base_url = ""
         self._memory_mode = "hybrid"  # "context", "tools", or "hybrid"
         self._prefetch_method = "recall"  # "recall" or "reflect"
-        self._retain_tags: List[str] = []
+        self._retain_tags: list[str] = []
         self._retain_source = ""
         self._retain_user_prefix = "User"
         self._retain_assistant_prefix = "Assistant"
@@ -1368,8 +1368,8 @@ class HindsightMemoryProvider(MemoryProvider):
         self._prefetch_thread = threading.Thread(target=_run, daemon=True, name="hindsight-prefetch")
         self._prefetch_thread.start()
 
-    def _build_turn_messages(self, user_content: str, assistant_content: str) -> List[Dict[str, str]]:
-        now = datetime.now(timezone.utc).isoformat()
+    def _build_turn_messages(self, user_content: str, assistant_content: str) -> list[dict[str, str]]:
+        now = datetime.now(UTC).isoformat()
         return [
             {
                 "role": "user",
@@ -1383,8 +1383,8 @@ class HindsightMemoryProvider(MemoryProvider):
             },
         ]
 
-    def _build_metadata(self, *, message_count: int, turn_index: int) -> Dict[str, str]:
-        metadata: Dict[str, str] = {
+    def _build_metadata(self, *, message_count: int, turn_index: int) -> dict[str, str]:
+        metadata: dict[str, str] = {
             "retained_at": _utc_timestamp(),
             "message_count": str(message_count),
             "turn_index": str(turn_index),
@@ -1417,11 +1417,11 @@ class HindsightMemoryProvider(MemoryProvider):
         *,
         context: str | None = None,
         document_id: str | None = None,
-        metadata: Dict[str, str] | None = None,
-        tags: List[str] | None = None,
+        metadata: dict[str, str] | None = None,
+        tags: list[str] | None = None,
         retain_async: bool | None = None,
-    ) -> Dict[str, Any]:
-        kwargs: Dict[str, Any] = {
+    ) -> dict[str, Any]:
+        kwargs: dict[str, Any] = {
             "bank_id": self._bank_id,
             "content": content,
             "metadata": metadata or self._build_metadata(message_count=1, turn_index=self._turn_index),
@@ -1535,7 +1535,7 @@ class HindsightMemoryProvider(MemoryProvider):
         if update_mode == "append":
             self._last_retained_turn_count = len(self._session_turns)
 
-    def get_tool_schemas(self) -> List[Dict[str, Any]]:
+    def get_tool_schemas(self) -> list[dict[str, Any]]:
         if self._memory_mode == "context":
             return []
         return [RETAIN_SCHEMA, RECALL_SCHEMA, REFLECT_SCHEMA]

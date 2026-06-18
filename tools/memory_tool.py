@@ -75,12 +75,12 @@ ENTRY_DELIMITER = "\n§\n"
 from tools.threat_patterns import first_threat_message as _first_threat_message
 
 
-def _scan_memory_content(content: str) -> Optional[str]:
+def _scan_memory_content(content: str) -> str | None:
     """Scan memory content for injection/exfil patterns. Returns error string if blocked."""
     return _first_threat_message(content, scope="strict")
 
 
-def _drift_error(path: "Path", bak_path: str) -> Dict[str, Any]:
+def _drift_error(path: "Path", bak_path: str) -> dict[str, Any]:
     """Build the error dict returned when external drift is detected.
 
     The on-disk memory file contains content that wouldn't round-trip
@@ -122,12 +122,12 @@ class MemoryStore:
     """
 
     def __init__(self, memory_char_limit: int = 2200, user_char_limit: int = 1375):
-        self.memory_entries: List[str] = []
-        self.user_entries: List[str] = []
+        self.memory_entries: list[str] = []
+        self.user_entries: list[str] = []
         self.memory_char_limit = memory_char_limit
         self.user_char_limit = user_char_limit
         # Frozen snapshot for system prompt -- set once at load_from_disk()
-        self._system_prompt_snapshot: Dict[str, str] = {"memory": "", "user": ""}
+        self._system_prompt_snapshot: dict[str, str] = {"memory": "", "user": ""}
 
     def load_from_disk(self):
         """Load entries from MEMORY.md and USER.md, capture system prompt snapshot.
@@ -170,7 +170,7 @@ class MemoryStore:
         }
 
     @staticmethod
-    def _sanitize_entries_for_snapshot(entries: List[str], filename: str) -> List[str]:
+    def _sanitize_entries_for_snapshot(entries: list[str], filename: str) -> list[str]:
         """Return ``entries`` with any threat-matching entry replaced by a placeholder.
 
         Each entry is scanned with the shared threat-pattern library at the
@@ -184,7 +184,7 @@ class MemoryStore:
         """
         from tools.threat_patterns import scan_for_threats
 
-        sanitized: List[str] = []
+        sanitized: list[str] = []
         for entry in entries:
             if not entry or entry.startswith("[BLOCKED:"):
                 sanitized.append(entry)
@@ -232,13 +232,13 @@ class MemoryStore:
             if fcntl:
                 try:
                     fcntl.flock(fd, fcntl.LOCK_UN)
-                except (OSError, IOError):
+                except OSError:
                     pass
             elif msvcrt:
                 try:
                     fd.seek(0)
                     msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 1)
-                except (OSError, IOError):
+                except OSError:
                     pass
             fd.close()
 
@@ -249,7 +249,7 @@ class MemoryStore:
             return mem_dir / "USER.md"
         return mem_dir / "MEMORY.md"
 
-    def _reload_target(self, target: str) -> Optional[str]:
+    def _reload_target(self, target: str) -> str | None:
         """Re-read entries from disk into in-memory state.
 
         Called under file lock to get the latest state before mutating.
@@ -272,12 +272,12 @@ class MemoryStore:
         get_memory_dir().mkdir(parents=True, exist_ok=True)
         self._write_file(self._path_for(target), self._entries_for(target))
 
-    def _entries_for(self, target: str) -> List[str]:
+    def _entries_for(self, target: str) -> list[str]:
         if target == "user":
             return self.user_entries
         return self.memory_entries
 
-    def _set_entries(self, target: str, entries: List[str]):
+    def _set_entries(self, target: str, entries: list[str]):
         if target == "user":
             self.user_entries = entries
         else:
@@ -294,7 +294,7 @@ class MemoryStore:
             return self.user_char_limit
         return self.memory_char_limit
 
-    def add(self, target: str, content: str) -> Dict[str, Any]:
+    def add(self, target: str, content: str) -> dict[str, Any]:
         """Append a new entry. Returns error if it would exceed the char limit."""
         content = content.strip()
         if not content:
@@ -346,7 +346,7 @@ class MemoryStore:
 
         return self._success_response(target, "Entry added.")
 
-    def replace(self, target: str, old_text: str, new_content: str) -> Dict[str, Any]:
+    def replace(self, target: str, old_text: str, new_content: str) -> dict[str, Any]:
         """Find entry containing old_text substring, replace it with new_content."""
         old_text = old_text.strip()
         new_content = new_content.strip()
@@ -411,7 +411,7 @@ class MemoryStore:
 
         return self._success_response(target, "Entry replaced.")
 
-    def remove(self, target: str, old_text: str) -> Dict[str, Any]:
+    def remove(self, target: str, old_text: str) -> dict[str, Any]:
         """Remove the entry containing old_text substring."""
         old_text = old_text.strip()
         if not old_text:
@@ -447,7 +447,7 @@ class MemoryStore:
 
         return self._success_response(target, "Entry removed.")
 
-    def format_for_system_prompt(self, target: str) -> Optional[str]:
+    def format_for_system_prompt(self, target: str) -> str | None:
         """
         Return the frozen snapshot for system prompt injection.
 
@@ -462,7 +462,7 @@ class MemoryStore:
 
     # -- Internal helpers --
 
-    def _success_response(self, target: str, message: str = None) -> Dict[str, Any]:
+    def _success_response(self, target: str, message: str = None) -> dict[str, Any]:
         entries = self._entries_for(target)
         current = self._char_count(target)
         limit = self._char_limit(target)
@@ -479,7 +479,7 @@ class MemoryStore:
             resp["message"] = message
         return resp
 
-    def _render_block(self, target: str, entries: List[str]) -> str:
+    def _render_block(self, target: str, entries: list[str]) -> str:
         """Render a system prompt block with header and usage indicator."""
         if not entries:
             return ""
@@ -498,7 +498,7 @@ class MemoryStore:
         return f"{separator}\n{header}\n{separator}\n{content}"
 
     @staticmethod
-    def _read_file(path: Path) -> List[str]:
+    def _read_file(path: Path) -> list[str]:
         """Read a memory file and split into entries.
 
         No file locking needed: _write_file uses atomic rename, so readers
@@ -508,7 +508,7 @@ class MemoryStore:
             return []
         try:
             raw = path.read_text(encoding="utf-8")
-        except (OSError, IOError):
+        except OSError:
             return []
 
         if not raw.strip():
@@ -519,7 +519,7 @@ class MemoryStore:
         entries = [e.strip() for e in raw.split(ENTRY_DELIMITER)]
         return [e for e in entries if e]
 
-    def _detect_external_drift(self, target: str) -> Optional[str]:
+    def _detect_external_drift(self, target: str) -> str | None:
         """Return a backup-path string if on-disk content shows external drift.
 
         The memory file is supposed to be a list of small entries the tool
@@ -548,7 +548,7 @@ class MemoryStore:
             return None
         try:
             raw = path.read_text(encoding="utf-8")
-        except (OSError, IOError):
+        except OSError:
             return None
         if not raw.strip():
             return None
@@ -570,12 +570,12 @@ class MemoryStore:
         bak_path = path.with_suffix(path.suffix + f".bak.{ts}")
         try:
             bak_path.write_text(raw, encoding="utf-8")
-        except (OSError, IOError):
+        except OSError:
             return str(bak_path) + " (BACKUP FAILED — file unchanged on disk)"
         return str(bak_path)
 
     @staticmethod
-    def _write_file(path: Path, entries: List[str]):
+    def _write_file(path: Path, entries: list[str]):
         """Write entries to a memory file using atomic temp-file + rename.
 
         Previous implementation used open("w") + flock, but "w" truncates the
@@ -602,12 +602,12 @@ class MemoryStore:
                 except OSError:
                     pass
                 raise
-        except (OSError, IOError) as e:
+        except OSError as e:
             raise RuntimeError(f"Failed to write memory file {path}: {e}")
 
 
-def _apply_write_gate(action: str, target: str, content: Optional[str],
-                      old_text: Optional[str]) -> Optional[str]:
+def _apply_write_gate(action: str, target: str, content: str | None,
+                      old_text: str | None) -> str | None:
     """Evaluate the memory write gate. Returns a JSON tool-result string when
     the write should NOT proceed normally (blocked or staged), or None when the
     caller should perform the real write.
@@ -668,7 +668,7 @@ def memory_tool(
     target: str = "memory",
     content: str = None,
     old_text: str = None,
-    store: Optional[MemoryStore] = None,
+    store: MemoryStore | None = None,
 ) -> str:
     """
     Single entry point for the memory tool. Dispatches to MemoryStore methods.
@@ -717,7 +717,7 @@ def check_memory_requirements() -> bool:
     return True
 
 
-def apply_memory_pending(payload: Dict[str, Any], store: "MemoryStore") -> Dict[str, Any]:
+def apply_memory_pending(payload: dict[str, Any], store: "MemoryStore") -> dict[str, Any]:
     """Replay a staged memory write directly against the store, bypassing the
     write gate. Called by the /memory approve handler.
 

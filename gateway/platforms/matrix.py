@@ -455,7 +455,7 @@ class MatrixAdapter(BasePlatformAdapter):
 
         self._client: Any = None  # mautrix.client.Client
         self._crypto_db: Any = None  # mautrix.util.async_db.Database
-        self._sync_task: Optional[asyncio.Task] = None
+        self._sync_task: asyncio.Task | None = None
         self._closing = False
         self._startup_ts: float = 0.0
         # Clock-skew detection: count grace-check drops that happen well
@@ -471,9 +471,9 @@ class MatrixAdapter(BasePlatformAdapter):
         self._clock_skew_warned: bool = False
 
         # Cache: room_id → bool (is DM)
-        self._dm_rooms: Dict[str, bool] = {}
+        self._dm_rooms: dict[str, bool] = {}
         # Set of room IDs we've joined
-        self._joined_rooms: Set[str] = set()
+        self._joined_rooms: set[str] = set()
         # Event deduplication (bounded deque keeps newest entries)
         from collections import deque
 
@@ -495,11 +495,11 @@ class MatrixAdapter(BasePlatformAdapter):
         if free_rooms_raw is None:
             free_rooms_raw = os.getenv("MATRIX_FREE_RESPONSE_ROOMS", "")
         if isinstance(free_rooms_raw, list):
-            self._free_rooms: Set[str] = {
+            self._free_rooms: set[str] = {
                 str(r).strip() for r in free_rooms_raw if str(r).strip()
             }
         else:
-            self._free_rooms: Set[str] = {
+            self._free_rooms: set[str] = {
                 r.strip() for r in str(free_rooms_raw).split(",") if r.strip()
             }
         # If non-empty, bot ONLY responds in these rooms (whitelist); DMs exempt.
@@ -507,11 +507,11 @@ class MatrixAdapter(BasePlatformAdapter):
         if allowed_rooms_raw is None:
             allowed_rooms_raw = os.getenv("MATRIX_ALLOWED_ROOMS", "")
         if isinstance(allowed_rooms_raw, list):
-            self._allowed_rooms: Set[str] = {
+            self._allowed_rooms: set[str] = {
                 str(r).strip() for r in allowed_rooms_raw if str(r).strip()
             }
         else:
-            self._allowed_rooms: Set[str] = {
+            self._allowed_rooms: set[str] = {
                 r.strip() for r in str(allowed_rooms_raw).split(",") if r.strip()
             }
         self._auto_thread: bool = os.getenv("MATRIX_AUTO_THREAD", "true").lower() in {
@@ -536,7 +536,7 @@ class MatrixAdapter(BasePlatformAdapter):
         # errors in some clients.  5s is empirically safe; not user-tunable —
         # if that changes, add a config.yaml entry rather than an env var.
         self._reaction_redaction_delay_seconds = 5.0
-        self._reaction_redaction_tasks: Set[asyncio.Task] = set()
+        self._reaction_redaction_tasks: set[asyncio.Task] = set()
 
         # Proxy support — resolve once at init, reuse for all HTTP traffic.
         self._proxy_url: str | None = resolve_proxy_url(platform_env_var="MATRIX_PROXY")
@@ -551,18 +551,18 @@ class MatrixAdapter(BasePlatformAdapter):
         self._text_batch_split_delay_seconds = float(
             os.getenv("HERMES_MATRIX_TEXT_BATCH_SPLIT_DELAY_SECONDS", "2.0")
         )
-        self._pending_text_batches: Dict[str, MessageEvent] = {}
-        self._pending_text_batch_tasks: Dict[str, asyncio.Task] = {}
+        self._pending_text_batches: dict[str, MessageEvent] = {}
+        self._pending_text_batch_tasks: dict[str, asyncio.Task] = {}
 
         # Matrix reaction-based dangerous command approvals.
         self._approval_reaction_map = {
             "✅": "once",
             "❎": "deny",
         }
-        self._approval_prompts_by_event: Dict[str, _MatrixApprovalPrompt] = {}
-        self._approval_prompt_by_session: Dict[str, str] = {}
+        self._approval_prompts_by_event: dict[str, _MatrixApprovalPrompt] = {}
+        self._approval_prompt_by_session: dict[str, str] = {}
         allowed_users_raw = os.getenv("MATRIX_ALLOWED_USERS", "")
-        self._allowed_user_ids: Set[str] = {
+        self._allowed_user_ids: set[str] = {
             u.strip() for u in allowed_users_raw.split(",") if u.strip()
         }
 
@@ -605,7 +605,7 @@ class MatrixAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _extract_server_ed25519(device_keys_obj: Any) -> Optional[str]:
+    def _extract_server_ed25519(device_keys_obj: Any) -> str | None:
         """Extract the ed25519 identity key from a DeviceKeys object."""
         for kid, kval in (getattr(device_keys_obj, "keys", {}) or {}).items():
             if str(kid).startswith("ed25519:"):
@@ -1078,8 +1078,8 @@ class MatrixAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         content: str,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Send a message to a Matrix room."""
 
@@ -1151,7 +1151,7 @@ class MatrixAdapter(BasePlatformAdapter):
 
         return SendResult(success=True, message_id=last_event_id)
 
-    async def get_chat_info(self, chat_id: str) -> Dict[str, Any]:
+    async def get_chat_info(self, chat_id: str) -> dict[str, Any]:
         """Return room name and type (dm/group)."""
         name = chat_id
         chat_type = "dm" if await self._is_dm_room(chat_id) else "group"
@@ -1174,7 +1174,7 @@ class MatrixAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     async def send_typing(
-        self, chat_id: str, metadata: Optional[Dict[str, Any]] = None
+        self, chat_id: str, metadata: dict[str, Any] | None = None
     ) -> None:
         """Send a typing indicator."""
         if self._client:
@@ -1199,7 +1199,7 @@ class MatrixAdapter(BasePlatformAdapter):
 
         formatted = self.format_message(content)
         new_content = self._build_text_message_content(formatted)
-        msg_content: Dict[str, Any] = {
+        msg_content: dict[str, Any] = {
             "msgtype": "m.text",
             "body": f"* {formatted}",
             "m.new_content": new_content,
@@ -1228,9 +1228,9 @@ class MatrixAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         image_url: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Download an image URL and upload it to Matrix."""
         from tools.url_safety import is_safe_url
@@ -1283,9 +1283,9 @@ class MatrixAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         image_path: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Upload a local image file to Matrix."""
         return await self._send_local_file(
@@ -1296,10 +1296,10 @@ class MatrixAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         file_path: str,
-        caption: Optional[str] = None,
-        file_name: Optional[str] = None,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        caption: str | None = None,
+        file_name: str | None = None,
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Upload a local file as a document."""
         return await self._send_local_file(
@@ -1310,9 +1310,9 @@ class MatrixAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         audio_path: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Upload an audio file as a voice message (MSC3245 native voice)."""
         return await self._send_local_file(
@@ -1329,9 +1329,9 @@ class MatrixAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         video_path: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Upload a video file."""
         return await self._send_local_file(
@@ -1344,7 +1344,7 @@ class MatrixAdapter(BasePlatformAdapter):
         command: str,
         session_key: str,
         description: str = "dangerous command",
-        metadata: Optional[dict] = None,
+        metadata: dict | None = None,
     ) -> SendResult:
         """Send a reaction-based exec approval prompt for Matrix."""
         if not self._client:
@@ -1405,9 +1405,9 @@ class MatrixAdapter(BasePlatformAdapter):
         filename: str,
         content_type: str,
         msgtype: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None,
         is_voice: bool = False,
     ) -> SendResult:
         """Upload bytes to Matrix and send as a media message."""
@@ -1442,7 +1442,7 @@ class MatrixAdapter(BasePlatformAdapter):
             return SendResult(success=False, error=str(exc))
 
         # Build media message content.
-        msg_content: Dict[str, Any] = {
+        msg_content: dict[str, Any] = {
             "msgtype": msgtype,
             "body": caption or filename,
             "info": {
@@ -1487,10 +1487,10 @@ class MatrixAdapter(BasePlatformAdapter):
         room_id: str,
         file_path: str,
         msgtype: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
-        file_name: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
+        file_name: str | None = None,
+        metadata: dict[str, Any] | None = None,
         is_voice: bool = False,
     ) -> SendResult:
         """Read a local file and upload it."""
@@ -1786,7 +1786,7 @@ class MatrixAdapter(BasePlatformAdapter):
         body: str,
         source_content: dict,
         relates_to: dict,
-    ) -> Optional[tuple]:
+    ) -> tuple | None:
         """Shared mention/thread/DM gating for text and media handlers.
 
         Returns (body, is_dm, chat_type, thread_id, display_name, source)
@@ -2157,7 +2157,7 @@ class MatrixAdapter(BasePlatformAdapter):
             logger.warning("Matrix: error joining %s: %s", room_id, exc)
             return False
 
-    async def _join_pending_invites(self, sync_data: Dict[str, Any]) -> None:
+    async def _join_pending_invites(self, sync_data: dict[str, Any]) -> None:
         """Join rooms still present in rooms.invite after sync processing."""
         rooms = sync_data.get("rooms", {}) if isinstance(sync_data, dict) else {}
         invites = rooms.get("invite", {})
@@ -2178,7 +2178,7 @@ class MatrixAdapter(BasePlatformAdapter):
         room_id: str,
         event_id: str,
         emoji: str,
-    ) -> Optional[str]:
+    ) -> str | None:
         """Send an emoji reaction to a message in a room.
         Returns the reaction event_id on success, None on failure.
         """
@@ -2350,7 +2350,7 @@ class MatrixAdapter(BasePlatformAdapter):
     async def _redact_bot_approval_reactions(
         self,
         room_id: str,
-        prompt: "_MatrixApprovalPrompt",
+        prompt: _MatrixApprovalPrompt,
     ) -> None:
         """Redact the bot's seed ✅/❎ reactions, leaving only the user's reaction."""
         for emoji, evt_id in prompt.bot_reaction_events.items():
@@ -2498,10 +2498,10 @@ class MatrixAdapter(BasePlatformAdapter):
         self,
         name: str = "",
         topic: str = "",
-        invite: Optional[list] = None,
+        invite: list | None = None,
         is_direct: bool = False,
         preset: str = "private_chat",
-    ) -> Optional[str]:
+    ) -> str | None:
         """Create a new Matrix room."""
         if not self._client:
             return None
@@ -2620,7 +2620,7 @@ class MatrixAdapter(BasePlatformAdapter):
         if not self._client:
             return
 
-        dm_data: Optional[Dict] = None
+        dm_data: dict | None = None
 
         try:
             resp = await self._client.get_account_data("m.direct")
@@ -2634,7 +2634,7 @@ class MatrixAdapter(BasePlatformAdapter):
         if dm_data is None:
             return
 
-        dm_room_ids: Set[str] = set()
+        dm_room_ids: set[str] = set()
         for user_id, rooms in dm_data.items():
             if isinstance(rooms, list):
                 dm_room_ids.update(str(r) for r in rooms)
@@ -2645,9 +2645,9 @@ class MatrixAdapter(BasePlatformAdapter):
     # Mention detection helpers
     # ------------------------------------------------------------------
 
-    def _build_text_message_content(self, text: str, msgtype: str = "m.text") -> Dict[str, Any]:
+    def _build_text_message_content(self, text: str, msgtype: str = "m.text") -> dict[str, Any]:
         """Build Matrix text content with HTML and outbound mention metadata."""
-        msg_content: Dict[str, Any] = {"msgtype": msgtype, "body": text}
+        msg_content: dict[str, Any] = {"msgtype": msgtype, "body": text}
         mention_user_ids = self._extract_outbound_mentions(text)
         if mention_user_ids:
             msg_content["m.mentions"] = {"user_ids": mention_user_ids}
@@ -2663,7 +2663,7 @@ class MatrixAdapter(BasePlatformAdapter):
     def _extract_outbound_mentions(self, text: str) -> list[str]:
         """Return unique Matrix user IDs mentioned in outbound text."""
         protected, _ = self._protect_outbound_mention_regions(text)
-        seen: Set[str] = set()
+        seen: set[str] = set()
         mentions: list[str] = []
         for match in _OUTBOUND_MENTION_RE.finditer(protected):
             user_id = match.group(1)
@@ -2719,8 +2719,8 @@ class MatrixAdapter(BasePlatformAdapter):
     def _is_bot_mentioned(
         self,
         body: str,
-        formatted_body: Optional[str] = None,
-        mention_user_ids: Optional[list] = None,
+        formatted_body: str | None = None,
+        mention_user_ids: list | None = None,
     ) -> bool:
         """Return True if the bot is mentioned in the message.
 
@@ -2879,10 +2879,7 @@ class MatrixAdapter(BasePlatformAdapter):
         result = re.sub(
             r"\[([^\]]+)\]\(([^)]+)\)",
             lambda m: _protect_html(
-                '<a href="{}">{}</a>'.format(
-                    MatrixAdapter._sanitize_link_url(m.group(2)),
-                    _html_escape(m.group(1)),
-                )
+                f'<a href="{MatrixAdapter._sanitize_link_url(m.group(2))}">{_html_escape(m.group(1))}</a>'
             ),
             result,
         )

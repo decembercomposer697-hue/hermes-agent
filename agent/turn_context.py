@@ -43,11 +43,11 @@ class TurnContext:
     # Clean message preserved for transcripts / memory queries (no nudge injection).
     original_user_message: Any
     # Working message list for this turn (loop appends to it).
-    messages: List[Dict[str, Any]]
+    messages: list[dict[str, Any]]
     # May be reset to None by preflight compression (new session created).
-    conversation_history: Optional[List[Dict[str, Any]]]
+    conversation_history: list[dict[str, Any]] | None
     # Cached system prompt active for this turn (may be rebuilt by compression).
-    active_system_prompt: Optional[str]
+    active_system_prompt: str | None
     # Task / turn identifiers.
     effective_task_id: str
     turn_id: str
@@ -64,11 +64,11 @@ class TurnContext:
 def build_turn_context(
     agent,
     user_message: str,
-    system_message: Optional[str],
-    conversation_history: Optional[List[Dict[str, Any]]],
-    task_id: Optional[str],
+    system_message: str | None,
+    conversation_history: list[dict[str, Any]] | None,
+    task_id: str | None,
     stream_callback,
-    persist_user_message: Optional[str],
+    persist_user_message: str | None,
     *,
     restore_or_build_system_prompt,
     install_safe_stdio,

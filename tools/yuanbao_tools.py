@@ -240,7 +240,7 @@ async def send_sticker(
         return {"success": False, "error": "Yuanbao adapter is not connected"}
 
     raw = (sticker or "").strip()
-    sticker_obj: Optional[dict] = None
+    sticker_obj: dict | None = None
     if not raw:
         sticker_obj = get_random_sticker()
     else:
@@ -292,7 +292,7 @@ async def send_dm(
     name: str,
     message: str,
     user_id: str = "",
-    media_files: Optional[List[Tuple[str, bool]]] = None,
+    media_files: list[tuple[str, bool]] | None = None,
 ) -> dict:
     """
     Send a DM (private chat message) to a group member, with optional media.

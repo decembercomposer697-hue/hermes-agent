@@ -50,7 +50,7 @@ class SignalRateLimitError(Exception):
     ``retry_after`` is None when the version doesn't expose it.
     """
 
-    def __init__(self, message: str, retry_after: Optional[float] = None) -> None:
+    def __init__(self, message: str, retry_after: float | None = None) -> None:
         super().__init__(message)
         self.retry_after = retry_after
 
@@ -71,7 +71,7 @@ class SignalSchedulerError(Exception):
 _RETRY_AFTER_RE = re.compile(r"Retry after (\d+(?:\.\d+)?)\s*second", re.IGNORECASE)
 
 
-def _extract_retry_after_seconds(err: Any) -> Optional[float]:
+def _extract_retry_after_seconds(err: Any) -> float | None:
     """Pull the per-token Retry-After window from a signal-cli rate-limit error.
 
     Tries two sources, in order:
@@ -300,7 +300,7 @@ class SignalAttachmentScheduler:
             n_attachments, self.refill_rate,
         )
 
-    def feedback(self, retry_after: Optional[float], n_attempted: int) -> None:
+    def feedback(self, retry_after: float | None, n_attempted: int) -> None:
         """Apply server feedback after a 429.
 
         ``retry_after`` is the per-*token* refill window the server
@@ -345,7 +345,7 @@ class SignalAttachmentScheduler:
 # Process-wide singleton
 # ---------------------------------------------------------------------------
 
-_scheduler: Optional[SignalAttachmentScheduler] = None
+_scheduler: SignalAttachmentScheduler | None = None
 
 
 def get_scheduler() -> SignalAttachmentScheduler:

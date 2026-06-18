@@ -491,7 +491,7 @@ if _FORCE_IPV4_EARLY:
 import logging
 import threading
 import time as _time
-from datetime import datetime
+from datetime import datetime, UTC
 
 from hermes_cli import __version__, __release_date__
 
@@ -792,7 +792,7 @@ def _has_any_provider_configured() -> bool:
     return False
 
 
-def _session_browse_picker(sessions: list) -> Optional[str]:
+def _session_browse_picker(sessions: list) -> str | None:
     """Interactive curses-based session browser with live search filtering.
 
     Returns the selected session ID, or None if cancelled.
@@ -1033,7 +1033,7 @@ def _session_browse_picker(sessions: list) -> Optional[str]:
             return None
 
 
-def _resolve_last_session(source: str = "cli") -> Optional[str]:
+def _resolve_last_session(source: str = "cli") -> str | None:
     """Look up the most recently-used session ID for a source."""
     db = None
     try:
@@ -1164,7 +1164,7 @@ def _exec_in_container(container_info: dict, cli_args: list):
     os.execvp(exec_cmd[0], exec_cmd)
 
 
-def _resolve_session_by_name_or_id(name_or_id: str) -> Optional[str]:
+def _resolve_session_by_name_or_id(name_or_id: str) -> str | None:
     """Resolve a session name (title) or ID to a session ID.
 
     - If it looks like a session ID (contains underscore + hex), try direct lookup first.
@@ -1182,7 +1182,7 @@ def _resolve_session_by_name_or_id(name_or_id: str) -> Optional[str]:
 
         # Try as exact session ID first
         session = db.get_session(name_or_id)
-        resolved_id: Optional[str] = None
+        resolved_id: str | None = None
         if session:
             resolved_id = session["id"]
         else:
@@ -1204,7 +1204,7 @@ def _resolve_session_by_name_or_id(name_or_id: str) -> Optional[str]:
     return None
 
 
-def _read_tui_active_session_file(path: Optional[str]) -> Optional[str]:
+def _read_tui_active_session_file(path: str | None) -> str | None:
     if not path:
         return None
     try:
@@ -1216,7 +1216,7 @@ def _read_tui_active_session_file(path: Optional[str]) -> Optional[str]:
 
 
 def _print_tui_exit_summary(
-    session_id: Optional[str], active_session_file: Optional[str] = None
+    session_id: str | None, active_session_file: str | None = None
 ) -> None:
     """Print a shell-visible epilogue after TUI exits."""
     target = (
@@ -1736,7 +1736,7 @@ def _normalize_tui_toolsets(toolsets: object) -> list[str]:
         return [item for item in normalized if item]
 
 
-def _read_cgroup_memory_limit() -> Optional[int]:
+def _read_cgroup_memory_limit() -> int | None:
     """Return the container memory limit in bytes, or None if unconstrained.
 
     Node's V8 heap is NOT cgroup-aware: with a flat ``--max-old-space-size=8192``
@@ -1758,7 +1758,7 @@ def _read_cgroup_memory_limit() -> Optional[int]:
     )
     for path in candidates:
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 raw = f.read().strip()
         except (OSError, ValueError):
             continue
@@ -1808,20 +1808,20 @@ def _resolve_tui_heap_mb(default_mb: int = 8192) -> int:
 
 
 def _launch_tui(
-    resume_session_id: Optional[str] = None,
+    resume_session_id: str | None = None,
     tui_dev: bool = False,
-    model: Optional[str] = None,
-    provider: Optional[str] = None,
+    model: str | None = None,
+    provider: str | None = None,
     toolsets: object = None,
     skills: object = None,
-    verbose: Optional[bool] = None,
+    verbose: bool | None = None,
     quiet: bool = False,
-    query: Optional[str] = None,
-    image: Optional[str] = None,
+    query: str | None = None,
+    image: str | None = None,
     worktree: bool = False,
     checkpoints: bool = False,
     pass_session_id: bool = False,
-    max_turns: Optional[int] = None,
+    max_turns: int | None = None,
     accept_hooks: bool = False,
 ):
     """Replace current process with the TUI."""
@@ -1937,7 +1937,7 @@ def _launch_tui(
         env["HERMES_TUI_RESUME"] = resume_session_id
 
     argv, cwd = _make_tui_argv(tui_dir, tui_dev)
-    code: Optional[int] = None
+    code: int | None = None
     try:
         try:
             code = subprocess.call(argv, cwd=str(cwd), env=env)
@@ -3404,7 +3404,7 @@ _DEFAULT_QWEN_PORTAL_MODELS = [
 
 
 
-def _prompt_custom_api_mode_selection(base_url: str, current_api_mode: str = "") -> Optional[str]:
+def _prompt_custom_api_mode_selection(base_url: str, current_api_mode: str = "") -> str | None:
     """Prompt for a custom provider API mode.
 
     Returns an explicit mode string, or None to keep auto-detect behavior.
@@ -4758,7 +4758,7 @@ def _compute_desktop_content_hash(project_root: Path) -> str:
             with open(path, "rb") as f:
                 for chunk in iter(lambda: f.read(65536), b""):
                     h.update(chunk)
-        except (OSError, IOError):
+        except OSError:
             pass
         h.update(b"\0")
 
@@ -4849,7 +4849,7 @@ def _write_desktop_build_stamp(project_root: Path, *, source_mode: bool) -> None
         stamp_data = {
             "contentHash": content_hash,
             "sourceMode": source_mode,
-            "builtAt": datetime.now(timezone.utc).isoformat(),
+            "builtAt": datetime.now(UTC).isoformat(),
         }
         stamp_file.write_text(json.dumps(stamp_data, indent=2) + "\n", encoding="utf-8")
     except Exception as exc:
@@ -4857,7 +4857,7 @@ def _write_desktop_build_stamp(project_root: Path, *, source_mode: bool) -> None
         logger.debug("Failed to write desktop build stamp: %s", exc)
 
 
-def _desktop_packaged_executable(desktop_dir: Path) -> Optional[Path]:
+def _desktop_packaged_executable(desktop_dir: Path) -> Path | None:
     """Return the current platform's unpacked Electron app executable."""
     release_dir = desktop_dir / "release"
     if sys.platform == "darwin":
@@ -5534,8 +5534,8 @@ def _format_time_ago(iso_ts: str) -> str:
         from datetime import datetime, timezone
         ts = datetime.fromisoformat(iso_ts.replace("Z", "+00:00"))
         if ts.tzinfo is None:
-            ts = ts.replace(tzinfo=timezone.utc)
-        delta = datetime.now(timezone.utc) - ts
+            ts = ts.replace(tzinfo=UTC)
+        delta = datetime.now(UTC) - ts
         secs = int(delta.total_seconds())
         if secs < 60:
             return "just now"
@@ -5867,7 +5867,7 @@ def _update_via_zip(args):
     _kill_stale_dashboard_processes()
 
 
-def _stash_local_changes_if_needed(git_cmd: list[str], cwd: Path) -> Optional[str]:
+def _stash_local_changes_if_needed(git_cmd: list[str], cwd: Path) -> str | None:
     status = subprocess.run(
         git_cmd + ["status", "--porcelain"],
         cwd=cwd,
@@ -5894,7 +5894,7 @@ def _stash_local_changes_if_needed(git_cmd: list[str], cwd: Path) -> Optional[st
 
     from datetime import datetime, timezone
 
-    stash_name = datetime.now(timezone.utc).strftime(
+    stash_name = datetime.now(UTC).strftime(
         "hermes-update-autostash-%Y%m%d-%H%M%S"
     )
     print("→ Local changes detected — stashing before update...")
@@ -5915,7 +5915,7 @@ def _stash_local_changes_if_needed(git_cmd: list[str], cwd: Path) -> Optional[st
 
 def _resolve_stash_selector(
     git_cmd: list[str], cwd: Path, stash_ref: str
-) -> Optional[str]:
+) -> str | None:
     stash_list = subprocess.run(
         git_cmd + ["stash", "list", "--format=%gd %H"],
         cwd=cwd,
@@ -5931,7 +5931,7 @@ def _resolve_stash_selector(
 
 
 def _print_stash_cleanup_guidance(
-    stash_ref: str, stash_selector: Optional[str] = None
+    stash_ref: str, stash_selector: str | None = None
 ) -> None:
     print(
         "  Check `git status` first so you don't accidentally reapply the same change twice."
@@ -6115,7 +6115,7 @@ OFFICIAL_REPO_URL = "https://github.com/NousResearch/hermes-agent.git"
 SKIP_UPSTREAM_PROMPT_FILE = ".skip_upstream_prompt"
 
 
-def _get_origin_url(git_cmd: list[str], cwd: Path) -> Optional[str]:
+def _get_origin_url(git_cmd: list[str], cwd: Path) -> str | None:
     """Get the URL of the origin remote, or None if not set."""
     try:
         result = subprocess.run(
@@ -6131,7 +6131,7 @@ def _get_origin_url(git_cmd: list[str], cwd: Path) -> Optional[str]:
     return None
 
 
-def _is_fork(origin_url: Optional[str]) -> bool:
+def _is_fork(origin_url: str | None) -> bool:
     """Check if the origin remote points to a fork (not the official repo)."""
     if not origin_url:
         return False
@@ -7146,7 +7146,7 @@ def _verify_core_dependencies_installed(
     # We use packaging.requirements when available (it ships with pip/uv envs),
     # falling back to a naive split that's good enough for the canonical
     # ``name==version[; marker]`` style this repo uses.
-    deps: list[tuple[str, "object | None"]] = []
+    deps: list[tuple[str, object | None]] = []
     try:
         from packaging.requirements import Requirement  # type: ignore
 
@@ -9698,9 +9698,7 @@ def cmd_profile(args):
                     print(f"{copied} bundled skills synced.")
                 else:
                     print(
-                        "⚠ Skills could not be seeded. Run `{} update` to retry.".format(
-                            name
-                        )
+                        f"⚠ Skills could not be seeded. Run `{name} update` to retry."
                     )
 
             # Create wrapper alias

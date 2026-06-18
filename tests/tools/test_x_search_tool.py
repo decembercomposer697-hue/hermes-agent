@@ -503,7 +503,7 @@ def test_x_search_rejects_future_from_date(monkeypatch):
     class _FrozenDateTime(_dt.datetime):
         @classmethod
         def now(cls, tz=None):
-            return _dt.datetime(2026, 5, 21, 12, 0, 0, tzinfo=tz or _dt.timezone.utc)
+            return _dt.datetime(2026, 5, 21, 12, 0, 0, tzinfo=tz or _dt.UTC)
 
     monkeypatch.setattr("tools.x_search_tool.datetime", _FrozenDateTime)
 
@@ -523,7 +523,7 @@ def test_x_search_allows_future_to_date(monkeypatch):
     class _FrozenDateTime(_dt.datetime):
         @classmethod
         def now(cls, tz=None):
-            return _dt.datetime(2026, 5, 21, 12, 0, 0, tzinfo=tz or _dt.timezone.utc)
+            return _dt.datetime(2026, 5, 21, 12, 0, 0, tzinfo=tz or _dt.UTC)
 
     monkeypatch.setattr("tools.x_search_tool.datetime", _FrozenDateTime)
 
@@ -557,7 +557,7 @@ def test_x_search_accepts_today_as_from_date(monkeypatch):
     class _FrozenDateTime(_dt.datetime):
         @classmethod
         def now(cls, tz=None):
-            return _dt.datetime(2026, 5, 21, 12, 0, 0, tzinfo=tz or _dt.timezone.utc)
+            return _dt.datetime(2026, 5, 21, 12, 0, 0, tzinfo=tz or _dt.UTC)
 
     monkeypatch.setattr("tools.x_search_tool.datetime", _FrozenDateTime)
     monkeypatch.setattr(

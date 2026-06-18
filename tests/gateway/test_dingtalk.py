@@ -1,6 +1,6 @@
 """Tests for DingTalk platform adapter."""
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -1138,7 +1138,7 @@ class TestDingTalkAdapterAICards:
         msg.text = MagicMock(content="Hello")
         msg.session_webhook = "https://api.dingtalk.com/robot/sendBySession?session=test"
         msg.session_webhook_expired_time = 999999999999
-        msg.create_at = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
+        msg.create_at = int(datetime.now(tz=UTC).timestamp() * 1000)
         msg.at_users = []
         return msg
 

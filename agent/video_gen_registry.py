@@ -30,7 +30,7 @@ from agent.video_gen_provider import VideoGenProvider
 logger = logging.getLogger(__name__)
 
 
-_providers: Dict[str, VideoGenProvider] = {}
+_providers: dict[str, VideoGenProvider] = {}
 _lock = threading.Lock()
 
 
@@ -58,14 +58,14 @@ def register_provider(provider: VideoGenProvider) -> None:
         logger.debug("Registered video gen provider '%s' (%s)", name, type(provider).__name__)
 
 
-def list_providers() -> List[VideoGenProvider]:
+def list_providers() -> list[VideoGenProvider]:
     """Return all registered providers, sorted by name."""
     with _lock:
         items = list(_providers.values())
     return sorted(items, key=lambda p: p.name)
 
 
-def get_provider(name: str) -> Optional[VideoGenProvider]:
+def get_provider(name: str) -> VideoGenProvider | None:
     """Return the provider registered under *name*, or None."""
     if not isinstance(name, str):
         return None
@@ -73,13 +73,13 @@ def get_provider(name: str) -> Optional[VideoGenProvider]:
         return _providers.get(name.strip())
 
 
-def get_active_provider() -> Optional[VideoGenProvider]:
+def get_active_provider() -> VideoGenProvider | None:
     """Resolve the currently-active provider.
 
     Reads ``video_gen.provider`` from config.yaml; falls back per the
     module docstring.
     """
-    configured: Optional[str] = None
+    configured: str | None = None
     try:
         from hermes_cli.config import load_config
 

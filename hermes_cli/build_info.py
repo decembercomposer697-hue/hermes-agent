@@ -33,7 +33,7 @@ from typing import Optional
 _BUILD_SHA_FILE = Path(__file__).parent.parent / ".hermes_build_sha"
 
 
-def get_build_sha(short: int = 8) -> Optional[str]:
+def get_build_sha(short: int = 8) -> str | None:
     """Return the baked-in build SHA, truncated to ``short`` chars, or None.
 
     Reads ``<project_root>/.hermes_build_sha`` if present.  The file is

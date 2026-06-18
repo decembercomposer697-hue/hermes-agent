@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 BASE_URL = "https://api.krea.ai"
 
 # Map our short model IDs to Krea's URL path segment.
-_MODELS: Dict[str, Dict[str, Any]] = {
+_MODELS: dict[str, dict[str, Any]] = {
     "krea-2-medium": {
         "display": "Krea 2 Medium",
         "speed": "~15-25s",
@@ -102,7 +102,7 @@ _TERMINAL_STATES = {"completed", "failed", "cancelled"}
 # ---------------------------------------------------------------------------
 
 
-def _load_krea_config() -> Dict[str, Any]:
+def _load_krea_config() -> dict[str, Any]:
     """Read ``image_gen.krea`` (with fallthrough to ``image_gen``) from config.yaml."""
     try:
         from hermes_cli.config import load_config
@@ -115,7 +115,7 @@ def _load_krea_config() -> Dict[str, Any]:
         return {}
 
 
-def _resolve_model() -> Tuple[str, Dict[str, Any]]:
+def _resolve_model() -> tuple[str, dict[str, Any]]:
     """Decide which model to use and return ``(model_id, meta)``."""
     env_override = os.environ.get("KREA_IMAGE_MODEL")
     if env_override and env_override in _MODELS:
@@ -123,7 +123,7 @@ def _resolve_model() -> Tuple[str, Dict[str, Any]]:
 
     cfg = _load_krea_config()
     krea_cfg = cfg.get("krea") if isinstance(cfg.get("krea"), dict) else {}
-    candidate: Optional[str] = None
+    candidate: str | None = None
     if isinstance(krea_cfg, dict):
         value = krea_cfg.get("model")
         if isinstance(value, str) and value in _MODELS:
@@ -139,7 +139,7 @@ def _resolve_model() -> Tuple[str, Dict[str, Any]]:
     return DEFAULT_MODEL, _MODELS[DEFAULT_MODEL]
 
 
-def _resolve_creativity(value: Optional[str]) -> str:
+def _resolve_creativity(value: str | None) -> str:
     """Coerce ``creativity`` kwarg to a valid Krea value (default ``medium``)."""
     if isinstance(value, str):
         v = value.strip().lower()
@@ -172,7 +172,7 @@ class KreaImageGenProvider(ImageGenProvider):
     def is_available(self) -> bool:
         return bool(os.environ.get("KREA_API_KEY"))
 
-    def list_models(self) -> List[Dict[str, Any]]:
+    def list_models(self) -> list[dict[str, Any]]:
         return [
             {
                 "id": model_id,
@@ -184,10 +184,10 @@ class KreaImageGenProvider(ImageGenProvider):
             for model_id, meta in _MODELS.items()
         ]
 
-    def default_model(self) -> Optional[str]:
+    def default_model(self) -> str | None:
         return DEFAULT_MODEL
 
-    def get_setup_schema(self) -> Dict[str, Any]:
+    def get_setup_schema(self) -> dict[str, Any]:
         return {
             "name": "Krea",
             "badge": "paid",
@@ -210,7 +210,7 @@ class KreaImageGenProvider(ImageGenProvider):
         prompt: str,
         aspect_ratio: str = DEFAULT_ASPECT_RATIO,
         **kwargs: Any,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         prompt = (prompt or "").strip()
         aspect = resolve_aspect_ratio(aspect_ratio)
         krea_ar = _ASPECT_MAP.get(aspect, "1:1")
@@ -239,7 +239,7 @@ class KreaImageGenProvider(ImageGenProvider):
         model_id, meta = _resolve_model()
         creativity = _resolve_creativity(kwargs.get("creativity"))
 
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "prompt": prompt,
             "aspect_ratio": krea_ar,
             "resolution": DEFAULT_RESOLUTION,
@@ -353,7 +353,7 @@ class KreaImageGenProvider(ImageGenProvider):
         }
         interval = _POLL_INITIAL_INTERVAL
         deadline = time.monotonic() + _POLL_TIMEOUT_SECONDS
-        last_status: Optional[str] = None
+        last_status: str | None = None
 
         while True:
             time.sleep(interval)
@@ -483,7 +483,7 @@ class KreaImageGenProvider(ImageGenProvider):
         # Per Krea's job-lifecycle docs the completed payload exposes
         # ``result.urls`` (an array). Fall back to a single ``url`` field
         # for forward/backward compatibility.
-        image_url: Optional[str] = None
+        image_url: str | None = None
         urls = result.get("urls")
         if isinstance(urls, list) and urls:
             for candidate in urls:
@@ -519,7 +519,7 @@ class KreaImageGenProvider(ImageGenProvider):
         else:
             image_ref = str(saved_path)
 
-        extra: Dict[str, Any] = {
+        extra: dict[str, Any] = {
             "krea_aspect_ratio": krea_ar,
             "resolution": DEFAULT_RESOLUTION,
             "creativity": creativity,

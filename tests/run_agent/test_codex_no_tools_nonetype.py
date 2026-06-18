@@ -56,7 +56,7 @@ def transport():
 
 
 @pytest.fixture
-def codex_messages() -> List[Dict[str, Any]]:
+def codex_messages() -> list[dict[str, Any]]:
     """Minimal Codex-shaped chat history mirroring the #32892 reproducer:
     one system + one short user message, with no tool calls in history."""
     return [
@@ -65,7 +65,7 @@ def codex_messages() -> List[Dict[str, Any]]:
     ]
 
 
-def _build_kwargs_no_tools(transport, messages) -> Dict[str, Any]:
+def _build_kwargs_no_tools(transport, messages) -> dict[str, Any]:
     """Exercise the real ``build_kwargs`` for the codex backend with no tools."""
     return transport.build_kwargs(
         model="gpt-5.5",

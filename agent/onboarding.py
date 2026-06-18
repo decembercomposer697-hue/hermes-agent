@@ -14,7 +14,8 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, Mapping, Optional
+from typing import Any, Optional
+from collections.abc import Mapping
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +116,7 @@ def openclaw_residue_hint_cli() -> str:
     )
 
 
-def detect_openclaw_residue(home: Optional[Path] = None) -> bool:
+def detect_openclaw_residue(home: Path | None = None) -> bool:
     """Return True if an OpenClaw workspace directory is present in ``$HOME``.
 
     Pure filesystem check — no side effects. ``home`` override exists for tests.

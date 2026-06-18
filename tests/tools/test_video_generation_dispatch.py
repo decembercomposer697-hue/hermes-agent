@@ -23,16 +23,16 @@ class _RecordingProvider(VideoGenProvider):
 
     def __init__(self, name: str = "fake"):
         self._name = name
-        self.last_kwargs: Dict[str, Any] = {}
+        self.last_kwargs: dict[str, Any] = {}
 
     @property
     def name(self) -> str:
         return self._name
 
-    def list_models(self) -> List[Dict[str, Any]]:
+    def list_models(self) -> list[dict[str, Any]]:
         return [{"id": "model-a"}]
 
-    def default_model(self) -> Optional[str]:
+    def default_model(self) -> str | None:
         return "model-a"
 
     def generate(self, prompt, **kwargs):
@@ -60,7 +60,7 @@ class _RaisingProvider(VideoGenProvider):
 
 
 class TestUnifiedDispatch:
-    def _run(self, args: Dict[str, Any], *, configured: Optional[str] = None) -> Dict[str, Any]:
+    def _run(self, args: dict[str, Any], *, configured: str | None = None) -> dict[str, Any]:
         from tools import video_generation_tool
         import hermes_cli.plugins as plugins_module
 

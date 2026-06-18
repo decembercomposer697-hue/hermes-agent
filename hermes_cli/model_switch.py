@@ -274,8 +274,8 @@ class ModelSwitchResult:
     warning_message: str = ""
     provider_label: str = ""
     resolved_via_alias: str = ""
-    capabilities: Optional[ModelCapabilities] = None
-    model_info: Optional[ModelInfo] = None
+    capabilities: ModelCapabilities | None = None
+    model_info: ModelInfo | None = None
     is_global: bool = False
 # ---------------------------------------------------------------------------
 # Flag parsing
@@ -444,7 +444,7 @@ def _model_sort_key(model_id: str, prefix: str) -> tuple:
 def resolve_alias(
     raw_input: str,
     current_provider: str,
-) -> Optional[tuple[str, str, str]]:
+) -> tuple[str, str, str] | None:
     """Resolve a short alias against the current provider's catalog.
 
     Looks up *raw_input* in :data:`MODEL_ALIASES`, then searches the
@@ -543,7 +543,7 @@ def get_authenticated_provider_slugs(
 def _resolve_alias_fallback(
     raw_input: str,
     authenticated_providers: list[str] = (),
-) -> Optional[tuple[str, str, str]]:
+) -> tuple[str, str, str] | None:
     """Try to resolve an alias on the user's authenticated providers.
 
     Falls back to ``("openrouter", "nous")`` only when no authenticated
@@ -562,10 +562,10 @@ def resolve_display_context_length(
     provider: str,
     base_url: str = "",
     api_key: str = "",
-    model_info: Optional[ModelInfo] = None,
+    model_info: ModelInfo | None = None,
     custom_providers: list | None = None,
     config_context_length: int | None = None,
-) -> Optional[int]:
+) -> int | None:
     """Resolve the context length to show in /model output.
 
     models.dev reports per-vendor context (e.g. gpt-5.5 = 1.05M on openai)
@@ -1125,7 +1125,7 @@ import threading as _threading
 _picker_prewarm_done = _threading.Event()
 
 
-def prewarm_picker_cache_async() -> Optional["_threading.Thread"]:
+def prewarm_picker_cache_async() -> _threading.Thread | None:
     """Warm the provider-models disk cache in a background daemon thread.
 
     The no-args ``/model`` picker calls ``list_authenticated_providers()``,
@@ -1182,7 +1182,7 @@ def list_authenticated_providers(
     force_fresh_nous_tier: bool = False,
     max_models: int = 8,
     current_model: str = "",
-) -> List[dict]:
+) -> list[dict]:
     """Detect which providers have credentials and list their curated models.
 
     Uses the curated model lists from hermes_cli/models.py (OPENROUTER_MODELS,
@@ -1216,7 +1216,7 @@ def list_authenticated_providers(
         get_curated_nous_model_ids,
     )
 
-    results: List[dict] = []
+    results: list[dict] = []
     seen_slugs: set = set()  # lowercase-normalized to catch case variants (#9545)
     seen_mdev_ids: set = set()  # prevent duplicate entries for aliases (e.g. kimi-coding + kimi-coding-cn)
     # Effective base URLs of every built-in row we emit (normalized lower+rstrip).
@@ -1765,7 +1765,7 @@ def list_authenticated_providers(
         # endpoint stays the same.  Keep same-host providers with distinct
         # env-backed credentials or API protocols separate so picker selection
         # cannot route through the wrong credential/mode pair.
-        groups: "OrderedDict[tuple, dict]" = OrderedDict()
+        groups: OrderedDict[tuple, dict] = OrderedDict()
         for entry in custom_providers:
             if not isinstance(entry, dict):
                 continue
@@ -1970,7 +1970,7 @@ def list_picker_providers(
     custom_providers: list | None = None,
     max_models: int = 8,
     current_model: str = "",
-) -> List[dict]:
+) -> list[dict]:
     """Interactive-picker variant of :func:`list_authenticated_providers`.
 
     Post-processes the base list so the ``/model`` picker (Telegram/Discord
@@ -2001,7 +2001,7 @@ def list_picker_providers(
         current_model=current_model,
     )
 
-    filtered: List[dict] = []
+    filtered: list[dict] = []
     for p in providers:
         slug = str(p.get("slug", "")).lower()
         if slug == "openrouter":

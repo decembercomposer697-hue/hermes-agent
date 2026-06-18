@@ -17,7 +17,7 @@ import sys
 import tempfile
 import time
 import zipfile
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -521,16 +521,16 @@ _QUICK_SNAPSHOTS_DIR = "state-snapshots"
 _QUICK_DEFAULT_KEEP = 20
 
 
-def _quick_snapshot_root(hermes_home: Optional[Path] = None) -> Path:
+def _quick_snapshot_root(hermes_home: Path | None = None) -> Path:
     home = hermes_home or get_hermes_home()
     return home / _QUICK_SNAPSHOTS_DIR
 
 
 def create_quick_snapshot(
-    label: Optional[str] = None,
-    hermes_home: Optional[Path] = None,
-    keep: Optional[int] = None,
-) -> Optional[str]:
+    label: str | None = None,
+    hermes_home: Path | None = None,
+    keep: int | None = None,
+) -> str | None:
     """Create a quick state snapshot of critical files.
 
     Copies STATE_FILES to a timestamped directory under state-snapshots/.
@@ -542,12 +542,12 @@ def create_quick_snapshot(
     home = hermes_home or get_hermes_home()
     root = _quick_snapshot_root(home)
 
-    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    ts = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
     snap_id = f"{ts}-{label}" if label else ts
     snap_dir = root / snap_id
     snap_dir.mkdir(parents=True, exist_ok=True)
 
-    manifest: Dict[str, int] = {}  # rel_path -> file size
+    manifest: dict[str, int] = {}  # rel_path -> file size
 
     for rel in _QUICK_STATE_FILES:
         src = home / rel
@@ -614,8 +614,8 @@ def create_quick_snapshot(
 
 def list_quick_snapshots(
     limit: int = 20,
-    hermes_home: Optional[Path] = None,
-) -> List[Dict[str, Any]]:
+    hermes_home: Path | None = None,
+) -> list[dict[str, Any]]:
     """List existing quick state snapshots, most recent first."""
     root = _quick_snapshot_root(hermes_home)
     if not root.exists():
@@ -640,7 +640,7 @@ def list_quick_snapshots(
 
 def restore_quick_snapshot(
     snapshot_id: str,
-    hermes_home: Optional[Path] = None,
+    hermes_home: Path | None = None,
 ) -> bool:
     """Restore state from a quick snapshot.
 
@@ -692,7 +692,7 @@ def restore_quick_snapshot(
 _CRON_JOBS_REL = "cron/jobs.json"
 
 
-def _count_cron_jobs(path: Path) -> Optional[int]:
+def _count_cron_jobs(path: Path) -> int | None:
     """Return the number of cron jobs stored in ``path``.
 
     The canonical on-disk shape is ``{"jobs": [...]}`` (see ``cron/jobs.py``).
@@ -707,7 +707,7 @@ def _count_cron_jobs(path: Path) -> Optional[int]:
     if not path.is_file():
         return None
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             data = json.load(f)
     except (OSError, json.JSONDecodeError):
         return None
@@ -721,8 +721,8 @@ def _count_cron_jobs(path: Path) -> Optional[int]:
 
 def restore_cron_jobs_if_emptied(
     snapshot_id: str,
-    hermes_home: Optional[Path] = None,
-) -> Optional[Dict[str, Any]]:
+    hermes_home: Path | None = None,
+) -> dict[str, Any] | None:
     """Safety net for silent cron-job loss across ``hermes update``.
 
     Config-version migrations have been observed to leave ``cron/jobs.json``
@@ -810,7 +810,7 @@ def _prune_quick_snapshots(root: Path, keep: int = _QUICK_DEFAULT_KEEP) -> int:
 
 def prune_quick_snapshots(
     keep: int = _QUICK_DEFAULT_KEEP,
-    hermes_home: Optional[Path] = None,
+    hermes_home: Path | None = None,
 ) -> int:
     """Manually prune quick snapshots. Returns count deleted."""
     return _prune_quick_snapshots(_quick_snapshot_root(hermes_home), keep=keep)
@@ -833,7 +833,7 @@ def run_quick_backup(args) -> None:
 # Shared full-zip backup helper
 # ---------------------------------------------------------------------------
 
-def _write_full_zip_backup(out_path: Path, hermes_root: Path) -> Optional[Path]:
+def _write_full_zip_backup(out_path: Path, hermes_root: Path) -> Path | None:
     """Write a full zip snapshot of ``hermes_root`` to ``out_path``.
 
     Uses the same exclusion rules and SQLite safe-copy as :func:`run_backup`.
@@ -909,7 +909,7 @@ _PRE_UPDATE_PREFIX = "pre-update-"
 _PRE_UPDATE_DEFAULT_KEEP = 5
 
 
-def _pre_update_backup_dir(hermes_home: Optional[Path] = None) -> Path:
+def _pre_update_backup_dir(hermes_home: Path | None = None) -> Path:
     home = hermes_home or get_hermes_home()
     return home / _PRE_UPDATE_BACKUPS_DIR
 
@@ -952,9 +952,9 @@ def _prune_pre_update_backups(backup_dir: Path, keep: int) -> int:
 
 
 def create_pre_update_backup(
-    hermes_home: Optional[Path] = None,
+    hermes_home: Path | None = None,
     keep: int = _PRE_UPDATE_DEFAULT_KEEP,
-) -> Optional[Path]:
+) -> Path | None:
     """Create a full zip backup of HERMES_HOME under ``backups/``.
 
     Mirrors :func:`run_backup` (same exclusion rules, same SQLite safe-copy)
@@ -1024,9 +1024,9 @@ def _prune_pre_migration_backups(backup_dir: Path, keep: int) -> int:
 
 
 def create_pre_migration_backup(
-    hermes_home: Optional[Path] = None,
+    hermes_home: Path | None = None,
     keep: int = _PRE_MIGRATION_DEFAULT_KEEP,
-) -> Optional[Path]:
+) -> Path | None:
     """Create a full zip backup of HERMES_HOME under ``backups/`` before a
     ``hermes claw migrate`` apply.
 

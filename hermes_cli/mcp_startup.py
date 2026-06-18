@@ -7,7 +7,7 @@ from typing import Optional
 
 _mcp_discovery_lock = threading.Lock()
 _mcp_discovery_started = False
-_mcp_discovery_thread: Optional[threading.Thread] = None
+_mcp_discovery_thread: threading.Thread | None = None
 
 
 def _has_configured_mcp_servers() -> bool:

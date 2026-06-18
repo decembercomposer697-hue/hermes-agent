@@ -109,7 +109,7 @@ class _SafeWriter:
         return getattr(self._inner, name)
 
 
-def _get_proxy_from_env() -> Optional[str]:
+def _get_proxy_from_env() -> str | None:
     """Read proxy URL from environment variables.
 
     Checks HTTPS_PROXY, HTTP_PROXY, ALL_PROXY (and lowercase variants) in order.
@@ -123,7 +123,7 @@ def _get_proxy_from_env() -> Optional[str]:
     return None
 
 
-def _get_proxy_for_base_url(base_url: Optional[str]) -> Optional[str]:
+def _get_proxy_for_base_url(base_url: str | None) -> str | None:
     """Return an env-configured proxy unless NO_PROXY excludes this base URL."""
     proxy = _get_proxy_from_env()
     if not proxy or not base_url:

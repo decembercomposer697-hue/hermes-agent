@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 _CONFIG_PARSE_WARNED: set = set()
 
 
-def _backup_corrupt_config(config_path: Path) -> Optional[Path]:
+def _backup_corrupt_config(config_path: Path) -> Path | None:
     """Preserve a corrupted ``config.yaml`` by copying it to a timestamped ``.bak``.
 
     When the YAML can't be parsed, ``load_config()`` silently falls back to
@@ -215,7 +215,7 @@ def _reject_denylisted_env_var(key: str) -> None:
             "~/.hermes/.env directly."
         )
 
-_LAST_EXPANDED_CONFIG_BY_PATH: Dict[str, Any] = {}
+_LAST_EXPANDED_CONFIG_BY_PATH: dict[str, Any] = {}
 # (path, mtime_ns, size) -> cached expanded config dict.
 # load_config() returns a deepcopy of the cached value when the file
 # hasn't changed since the last load, skipping yaml.safe_load +
@@ -223,11 +223,11 @@ _LAST_EXPANDED_CONFIG_BY_PATH: Dict[str, Any] = {}
 # save_config() + migrate_config() write via atomic_yaml_write which
 # produces a fresh inode, so stat() sees a new mtime_ns and the next
 # load repopulates automatically — no explicit invalidation hook.
-_LOAD_CONFIG_CACHE: Dict[str, Tuple[int, int, Dict[str, Any]]] = {}
+_LOAD_CONFIG_CACHE: dict[str, tuple[int, int, dict[str, Any]]] = {}
 # (path, mtime_ns, size) -> cached raw yaml dict. Same pattern as
 # _LOAD_CONFIG_CACHE but for read_raw_config() — used when callers want
 # the user's on-disk values without defaults merged in.
-_RAW_CONFIG_CACHE: Dict[str, Tuple[int, int, Dict[str, Any]]] = {}
+_RAW_CONFIG_CACHE: dict[str, tuple[int, int, dict[str, Any]]] = {}
 # Serializes all config read/write paths. libyaml's C extension is not
 # thread-safe for concurrent safe_load() on the same file, and multiple
 # tool threads (approval.py, browser_tool.py, setup flows) hit
@@ -307,7 +307,7 @@ _MANAGED_SYSTEM_NAMES = {
 }
 
 
-def get_managed_system() -> Optional[str]:
+def get_managed_system() -> str | None:
     """Return the package manager owning this install, if any."""
     raw = os.getenv("HERMES_MANAGED", "").strip()
     if raw:
@@ -335,7 +335,7 @@ def is_managed() -> bool:
 _NIX_UPDATE_MSG = "Update your Nix flake input and rebuild (e.g. nix flake update, nixos-rebuild, or home-manager switch)"
 
 
-def get_managed_update_command() -> Optional[str]:
+def get_managed_update_command() -> str | None:
     """Return the preferred upgrade command for a managed install."""
     managed_system = get_managed_system()
     if managed_system == "Homebrew":
@@ -345,7 +345,7 @@ def get_managed_update_command() -> Optional[str]:
     return None
 
 
-def detect_install_method(project_root: Optional[Path] = None) -> str:
+def detect_install_method(project_root: Path | None = None) -> str:
     """Detect how Hermes was installed: 'docker', 'nixos', 'homebrew', 'git', or 'pip'.
 
     Resolution order:
@@ -539,7 +539,7 @@ def managed_error(action: str = "modify configuration"):
 # Container-aware CLI (NixOS container mode)
 # =============================================================================
 
-def get_container_exec_info() -> Optional[dict]:
+def get_container_exec_info() -> dict | None:
     """Read container mode metadata from HERMES_HOME/.container-mode.
 
     Returns a dict with keys: backend, container_name, exec_user, hermes_bin
@@ -561,7 +561,7 @@ def get_container_exec_info() -> Optional[dict]:
 
     try:
         info = {}
-        with open(container_mode_file, "r", encoding="utf-8") as f:
+        with open(container_mode_file, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if "=" in line and not line.startswith("#"):
@@ -604,7 +604,7 @@ def get_project_root() -> Path:
     """Get the project installation directory."""
     return Path(__file__).parent.parent.resolve()
 
-def _resolve_hermes_uid_gid() -> tuple[Optional[int], Optional[int]]:
+def _resolve_hermes_uid_gid() -> tuple[int | None, int | None]:
     """Read the HERMES_UID / HERMES_GID env vars set by Docker deployments.
 
     Docker containers running Hermes commonly set these to map the in-container
@@ -711,11 +711,11 @@ def _is_container() -> bool:
         return True
     # LXC / cgroup-based detection
     try:
-        with open("/proc/1/cgroup", "r", encoding="utf-8") as f:
+        with open("/proc/1/cgroup", encoding="utf-8") as f:
             cgroup_content = f.read()
         if "docker" in cgroup_content or "lxc" in cgroup_content or "kubepods" in cgroup_content:
             return True
-    except (OSError, IOError):
+    except OSError:
         pass
     return False
 
@@ -2508,7 +2508,7 @@ DEFAULT_CONFIG = {
 
 # Track which env vars were introduced in each config version.
 # Migration only mentions vars new since the user's previous version.
-ENV_VARS_BY_VERSION: Dict[int, List[str]] = {
+ENV_VARS_BY_VERSION: dict[int, list[str]] = {
     3: ["FIRECRAWL_API_KEY", "BROWSERBASE_API_KEY", "BROWSERBASE_PROJECT_ID", "FAL_KEY"],
     4: ["VOICE_TOOLS_OPENAI_KEY", "ELEVENLABS_API_KEY"],
     5: ["WHATSAPP_ENABLED", "WHATSAPP_MODE", "WHATSAPP_ALLOWED_USERS",
@@ -3592,7 +3592,7 @@ OPTIONAL_ENV_VARS = {
 # self-hosted / custom gateway setups regardless of subscription state.
 
 
-def get_missing_env_vars(required_only: bool = False) -> List[Dict[str, Any]]:
+def get_missing_env_vars(required_only: bool = False) -> list[dict[str, Any]]:
     """
     Check which environment variables are missing.
     
@@ -3665,7 +3665,7 @@ def _set_nested(config, dotted_key: str, value):
         current[last] = value
 
 
-def get_missing_config_fields() -> List[Dict[str, Any]]:
+def get_missing_config_fields() -> list[dict[str, Any]]:
     """
     Check which config fields are missing or outdated (recursive).
     
@@ -3693,7 +3693,7 @@ def get_missing_config_fields() -> List[Dict[str, Any]]:
     return missing
 
 
-def get_missing_skill_config_vars() -> List[Dict[str, Any]]:
+def get_missing_skill_config_vars() -> list[dict[str, Any]]:
     """Return skill-declared config vars that are missing or empty in config.yaml.
 
     Scans all enabled skills for ``metadata.hermes.config`` entries, then checks
@@ -3720,7 +3720,7 @@ def get_missing_skill_config_vars() -> List[Dict[str, Any]]:
         return []
 
     config = load_config()
-    missing: List[Dict[str, Any]] = []
+    missing: list[dict[str, Any]] = []
     for var in all_vars:
         # Skill config is stored under skills.config.<logical_key>
         storage_key = f"{SKILL_CONFIG_PREFIX}.{var['key']}"
@@ -3744,13 +3744,13 @@ def _normalize_custom_provider_entry(
     entry: Any,
     *,
     provider_key: str = "",
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     """Return a runtime-compatible custom provider entry or ``None``."""
     if not isinstance(entry, dict):
         return None
 
     # Accept camelCase aliases commonly used in hand-written configs.
-    _CAMEL_ALIASES: Dict[str, str] = {
+    _CAMEL_ALIASES: dict[str, str] = {
         "apiKey": "api_key",
         "baseUrl": "base_url",
         "apiMode": "api_mode",
@@ -3816,7 +3816,7 @@ def _normalize_custom_provider_entry(
     if not name:
         return None
 
-    normalized: Dict[str, Any] = {
+    normalized: dict[str, Any] = {
         "name": name,
         "base_url": base_url,
     }
@@ -3876,7 +3876,7 @@ def _custom_provider_entry_to_provider_config(
     entry: Any,
     *,
     provider_key: str = "",
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     """Translate a legacy custom provider entry to the v12 providers shape."""
     normalized = _normalize_custom_provider_entry(
         dict(entry) if isinstance(entry, dict) else entry,
@@ -3885,7 +3885,7 @@ def _custom_provider_entry_to_provider_config(
     if normalized is None:
         return None
 
-    provider_entry: Dict[str, Any] = {"api": normalized["base_url"]}
+    provider_entry: dict[str, Any] = {"api": normalized["base_url"]}
 
     for field in (
         "name",
@@ -3908,12 +3908,12 @@ def _custom_provider_entry_to_provider_config(
     return provider_entry
 
 
-def providers_dict_to_custom_providers(providers_dict: Any) -> List[Dict[str, Any]]:
+def providers_dict_to_custom_providers(providers_dict: Any) -> list[dict[str, Any]]:
     """Normalize ``providers`` config entries into the legacy custom-provider shape."""
     if not isinstance(providers_dict, dict):
         return []
 
-    custom_providers: List[Dict[str, Any]] = []
+    custom_providers: list[dict[str, Any]] = []
     for key, entry in providers_dict.items():
         normalized = _normalize_custom_provider_entry(entry, provider_key=str(key))
         if normalized is not None:
@@ -3923,8 +3923,8 @@ def providers_dict_to_custom_providers(providers_dict: Any) -> List[Dict[str, An
 
 
 def get_compatible_custom_providers(
-    config: Optional[Dict[str, Any]] = None,
-) -> List[Dict[str, Any]]:
+    config: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
     """Return a deduplicated custom-provider view across legacy and v12+ config.
 
     ``custom_providers`` remains the on-disk legacy format, while ``providers``
@@ -3935,11 +3935,11 @@ def get_compatible_custom_providers(
     if config is None:
         config = load_config()
 
-    compatible: List[Dict[str, Any]] = []
+    compatible: list[dict[str, Any]] = []
     seen_provider_keys: set = set()
     seen_name_url_pairs: set = set()
 
-    def _append_if_new(entry: Optional[Dict[str, Any]]) -> None:
+    def _append_if_new(entry: dict[str, Any] | None) -> None:
         if entry is None:
             return
         provider_key = str(entry.get("provider_key", "") or "").strip().lower()
@@ -3975,9 +3975,9 @@ def get_compatible_custom_providers(
 def get_custom_provider_context_length(
     model: str,
     base_url: str,
-    custom_providers: Optional[List[Dict[str, Any]]] = None,
-    config: Optional[Dict[str, Any]] = None,
-) -> Optional[int]:
+    custom_providers: list[dict[str, Any]] | None = None,
+    config: dict[str, Any] | None = None,
+) -> int | None:
     """Look up a per-model ``context_length`` override from ``custom_providers``.
 
     Matches any entry whose ``base_url`` equals ``base_url`` (trailing-slash
@@ -4048,7 +4048,7 @@ def _coerce_config_version(value: Any) -> int:
     return max(version, 0)
 
 
-def check_config_version() -> Tuple[int, int]:
+def check_config_version() -> tuple[int, int]:
     """
     Check the raw on-disk config schema version.
 
@@ -4115,7 +4115,7 @@ class ConfigIssue:
     hint: str
 
 
-def validate_config_structure(config: Optional[Dict[str, Any]] = None) -> List["ConfigIssue"]:
+def validate_config_structure(config: dict[str, Any] | None = None) -> list["ConfigIssue"]:
     """Validate config.yaml structure and return a list of detected issues.
 
     Catches common YAML formatting mistakes that produce confusing runtime
@@ -4129,7 +4129,7 @@ def validate_config_structure(config: Optional[Dict[str, Any]] = None) -> List["
         except Exception:
             return [ConfigIssue("error", "Could not load config.yaml", "Run 'hermes setup' to create a valid config")]
 
-    issues: List[ConfigIssue] = []
+    issues: list[ConfigIssue] = []
 
     # ── custom_providers must be a list, not a dict ──────────────────────
     cp = config.get("custom_providers")
@@ -4259,7 +4259,7 @@ def validate_config_structure(config: Optional[Dict[str, Any]] = None) -> List["
     return issues
 
 
-def print_config_warnings(config: Optional[Dict[str, Any]] = None) -> None:
+def print_config_warnings(config: dict[str, Any] | None = None) -> None:
     """Print config structure warnings to stderr at startup.
 
     Called early in CLI and gateway init so users see problems before
@@ -4281,7 +4281,7 @@ def print_config_warnings(config: Optional[Dict[str, Any]] = None) -> None:
     sys.stderr.write("\n".join(lines) + "\n\n")
 
 
-def warn_deprecated_cwd_env_vars(config: Optional[Dict[str, Any]] = None) -> None:
+def warn_deprecated_cwd_env_vars(config: dict[str, Any] | None = None) -> None:
     """Warn if MESSAGING_CWD or TERMINAL_CWD is set in .env instead of config.yaml.
 
     These env vars are deprecated — the canonical setting is terminal.cwd
@@ -4326,7 +4326,7 @@ def warn_deprecated_cwd_env_vars(config: Optional[Dict[str, Any]] = None) -> Non
         sys.stderr.write("\n".join(lines) + "\n\n")
 
 
-def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, Any]:
+def migrate_config(interactive: bool = True, quiet: bool = False) -> dict[str, Any]:
     """
     Migrate config to latest version, prompting for new required fields.
     
@@ -4628,7 +4628,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
             disabled_set = set(disabled)
 
             # Scan ``$HERMES_HOME/plugins/`` for currently installed user plugins.
-            grandfathered: List[str] = []
+            grandfathered: list[str] = []
             try:
                 user_plugins_dir = get_hermes_home() / "plugins"
                 if user_plugins_dir.is_dir():
@@ -4704,7 +4704,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
         raw_curator = config.get("curator")
         if not isinstance(raw_curator, dict):
             raw_curator = {}
-        added_curator: List[str] = []
+        added_curator: list[str] = []
         for k, v in _curator_defaults.items():
             if k not in raw_curator:
                 raw_curator[k] = copy.deepcopy(v)
@@ -4723,7 +4723,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
         raw_aux_curator = raw_aux.get("curator")
         if not isinstance(raw_aux_curator, dict):
             raw_aux_curator = {}
-        added_aux: List[str] = []
+        added_aux: list[str] = []
         for k, v in _aux_curator_defaults.items():
             if k not in raw_aux_curator:
                 raw_aux_curator[k] = copy.deepcopy(v)
@@ -5069,7 +5069,7 @@ def _preserve_env_ref_templates(current, raw, loaded_expanded=None):
     return current
 
 
-def _normalize_root_model_keys(config: Dict[str, Any]) -> Dict[str, Any]:
+def _normalize_root_model_keys(config: dict[str, Any]) -> dict[str, Any]:
     """Move stale root-level provider/base_url/context_length into model section.
 
     Some users (or older code) placed ``provider:``, ``base_url:``, or
@@ -5099,7 +5099,7 @@ def _normalize_root_model_keys(config: Dict[str, Any]) -> Dict[str, Any]:
     return config
 
 
-def _normalize_max_turns_config(config: Dict[str, Any]) -> Dict[str, Any]:
+def _normalize_max_turns_config(config: dict[str, Any]) -> dict[str, Any]:
     """Normalize legacy root-level max_turns into agent.max_turns."""
     config = dict(config)
     agent_config = dict(config.get("agent") or {})
@@ -5115,7 +5115,7 @@ def _normalize_max_turns_config(config: Dict[str, Any]) -> Dict[str, Any]:
     return config
 
 
-def cfg_get(cfg: Optional[Dict[str, Any]], *keys: str, default: Any = None) -> Any:
+def cfg_get(cfg: dict[str, Any] | None, *keys: str, default: Any = None) -> Any:
     """Traverse nested dict keys safely, returning ``default`` on any miss.
 
     Canonical helper for the ``cfg.get("X", {}).get("Y", default)`` pattern
@@ -5162,7 +5162,7 @@ def cfg_get(cfg: Optional[Dict[str, Any]], *keys: str, default: Any = None) -> A
 
 
 
-def read_raw_config() -> Dict[str, Any]:
+def read_raw_config() -> dict[str, Any]:
     """Read ~/.hermes/config.yaml as-is, without merging defaults or migrating.
 
     Returns the raw YAML dict, or ``{}`` if the file doesn't exist or can't
@@ -5200,7 +5200,7 @@ def read_raw_config() -> Dict[str, Any]:
         return data
 
 
-def load_config() -> Dict[str, Any]:
+def load_config() -> dict[str, Any]:
     """Load configuration from ~/.hermes/config.yaml.
 
     Cached on the config file's (mtime_ns, size). Returns a deepcopy of
@@ -5217,7 +5217,7 @@ def load_config() -> Dict[str, Any]:
     return _load_config_impl(want_deepcopy=True)
 
 
-def load_config_readonly() -> Dict[str, Any]:
+def load_config_readonly() -> dict[str, Any]:
     """Fast-path variant of ``load_config()`` for callers that ONLY READ.
 
     Returns the cached config dict directly without the defensive deepcopy
@@ -5277,7 +5277,7 @@ def _terminal_env_value(value: Any) -> str:
     return str(value)
 
 
-def terminal_config_env_var_for_key(key: str) -> Optional[str]:
+def terminal_config_env_var_for_key(key: str) -> str | None:
     """Return the env var mirrored by a ``terminal.*`` config key."""
     prefix = "terminal."
     if not key.startswith(prefix):
@@ -5287,10 +5287,10 @@ def terminal_config_env_var_for_key(key: str) -> Optional[str]:
 
 def apply_terminal_config_to_env(
     *,
-    env: Optional[Dict[str, str]] = None,
-    config: Optional[Dict[str, Any]] = None,
-    override: Optional[bool] = None,
-) -> Dict[str, str]:
+    env: dict[str, str] | None = None,
+    config: dict[str, Any] | None = None,
+    override: bool | None = None,
+) -> dict[str, str]:
     """Bridge ``terminal.*`` config into the env vars terminal tools read.
 
     ``tools.terminal_tool`` is intentionally environment-driven because it also
@@ -5328,7 +5328,7 @@ def apply_terminal_config_to_env(
     return target
 
 
-def _load_config_impl(*, want_deepcopy: bool) -> Dict[str, Any]:
+def _load_config_impl(*, want_deepcopy: bool) -> dict[str, Any]:
     with _CONFIG_LOCK:
         ensure_hermes_home()
         config_path = get_config_path()
@@ -5336,7 +5336,7 @@ def _load_config_impl(*, want_deepcopy: bool) -> Dict[str, Any]:
 
         try:
             st = config_path.stat()
-            cache_key: Optional[Tuple[int, int]] = (st.st_mtime_ns, st.st_size)
+            cache_key: tuple[int, int] | None = (st.st_mtime_ns, st.st_size)
         except FileNotFoundError:
             cache_key = None
 
@@ -5462,7 +5462,7 @@ _COMMENTED_SECTIONS = """
 """
 
 
-def save_config(config: Dict[str, Any]):
+def save_config(config: dict[str, Any]):
     """Save configuration to ~/.hermes/config.yaml."""
     with _CONFIG_LOCK:
         if is_managed():
@@ -5506,7 +5506,7 @@ def save_config(config: Dict[str, Any]):
         _LAST_EXPANDED_CONFIG_BY_PATH[str(config_path)] = copy.deepcopy(current_normalized)
 
 
-def load_env() -> Dict[str, str]:
+def load_env() -> dict[str, str]:
     """Load environment variables from ~/.hermes/.env.
 
     Sanitizes lines before parsing so that corrupted files (e.g.
@@ -5539,7 +5539,7 @@ def load_env() -> Dict[str, str]:
         if cached_key == cache_key:
             return dict(cached_vars)
 
-    env_vars: Dict[str, str] = {}
+    env_vars: dict[str, str] = {}
 
     if env_path.exists():
         # On Windows, open() defaults to the system locale (cp1252) which can
@@ -5568,7 +5568,7 @@ def load_env() -> Dict[str, str]:
 # is the explicit knob for writers that update .env via this module
 # (set_env_value, save_env, etc.) without relying on filesystem mtime
 # resolution.
-_env_cache: Optional[Tuple[Tuple[str, Optional[float], Optional[int]], Dict[str, str]]] = None
+_env_cache: tuple[tuple[str, float | None, int | None], dict[str, str]] | None = None
 
 
 def invalidate_env_cache() -> None:
@@ -5885,7 +5885,7 @@ def save_anthropic_api_key(value: str, save_fn=None):
     writer("ANTHROPIC_TOKEN", "")
 
 
-def save_env_value_secure(key: str, value: str) -> Dict[str, Any]:
+def save_env_value_secure(key: str, value: str) -> dict[str, Any]:
     save_env_value(key, value)
     return {
         "success": True,
@@ -5917,7 +5917,7 @@ def reload_env() -> int:
     return count
 
 
-def get_env_value(key: str) -> Optional[str]:
+def get_env_value(key: str) -> str | None:
     """Get a value from ~/.hermes/.env or environment."""
     # Check environment first
     if key in os.environ:
@@ -6463,7 +6463,7 @@ def _inject_platform_plugin_env_vars() -> None:
             if not manifest_path.exists():
                 continue
             try:
-                with open(manifest_path, "r", encoding="utf-8") as f:
+                with open(manifest_path, encoding="utf-8") as f:
                     manifest = yaml.safe_load(f) or {}
             except Exception:
                 continue

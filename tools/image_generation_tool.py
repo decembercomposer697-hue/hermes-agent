@@ -94,7 +94,7 @@ logger = logging.getLogger(__name__)
 #
 # ``upscale`` controls whether to chain Clarity Upscaler after generation.
 
-FAL_MODELS: Dict[str, Dict[str, Any]] = {
+FAL_MODELS: dict[str, dict[str, Any]] = {
     "fal-ai/flux-2/klein/9b": {
         "display": "FLUX 2 Klein 9B",
         "speed": "<1s",
@@ -430,7 +430,7 @@ def _get_managed_fal_client(managed_gateway):
         return _managed_fal_client
 
 
-def _submit_fal_request(model: str, arguments: Dict[str, Any]):
+def _submit_fal_request(model: str, arguments: dict[str, Any]):
     """Submit a FAL request using direct credentials or the managed queue gateway."""
     # Trigger the lazy import on first call. Idempotent.
     _load_fal_client()
@@ -515,9 +515,9 @@ def _build_fal_payload(
     model_id: str,
     prompt: str,
     aspect_ratio: str = DEFAULT_ASPECT_RATIO,
-    seed: Optional[int] = None,
-    overrides: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    seed: int | None = None,
+    overrides: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Build a FAL request payload for `model_id` from unified inputs.
 
     Translates aspect_ratio into the model's native size spec (preset enum,
@@ -532,7 +532,7 @@ def _build_fal_payload(
     if aspect not in sizes:
         aspect = DEFAULT_ASPECT_RATIO
 
-    payload: Dict[str, Any] = dict(meta.get("defaults", {}))
+    payload: dict[str, Any] = dict(meta.get("defaults", {}))
     payload["prompt"] = (prompt or "").strip()
 
     if size_style in {"image_size_preset", "gpt_literal"}:
@@ -557,7 +557,7 @@ def _build_fal_payload(
 # ---------------------------------------------------------------------------
 # Upscaler
 # ---------------------------------------------------------------------------
-def _upscale_image(image_url: str, original_prompt: str) -> Optional[Dict[str, Any]]:
+def _upscale_image(image_url: str, original_prompt: str) -> dict[str, Any] | None:
     """Upscale an image using FAL.ai's Clarity Upscaler.
 
     Returns upscaled image dict, or None on failure (caller falls back to
@@ -724,11 +724,11 @@ def _postprocess_image_generate_result(raw: str, task_id: str | None = None) -> 
 def image_generate_tool(
     prompt: str,
     aspect_ratio: str = DEFAULT_ASPECT_RATIO,
-    num_inference_steps: Optional[int] = None,
-    guidance_scale: Optional[float] = None,
-    num_images: Optional[int] = None,
-    output_format: Optional[str] = None,
-    seed: Optional[int] = None,
+    num_inference_steps: int | None = None,
+    guidance_scale: float | None = None,
+    num_images: int | None = None,
+    output_format: str | None = None,
+    seed: int | None = None,
 ) -> str:
     """Generate an image from a text prompt using the configured FAL model.
 
@@ -776,7 +776,7 @@ def image_generate_tool(
             )
             aspect_lc = DEFAULT_ASPECT_RATIO
 
-        overrides: Dict[str, Any] = {}
+        overrides: dict[str, Any] = {}
         if num_inference_steps is not None:
             overrides["num_inference_steps"] = num_inference_steps
         if guidance_scale is not None:

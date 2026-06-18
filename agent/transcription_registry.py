@@ -47,7 +47,7 @@ _BUILTIN_NAMES = frozenset({
 })
 
 
-_providers: Dict[str, TranscriptionProvider] = {}
+_providers: dict[str, TranscriptionProvider] = {}
 _lock = threading.Lock()
 
 
@@ -97,14 +97,14 @@ def register_provider(provider: TranscriptionProvider) -> None:
         )
 
 
-def list_providers() -> List[TranscriptionProvider]:
+def list_providers() -> list[TranscriptionProvider]:
     """Return all registered providers, sorted by name."""
     with _lock:
         items = list(_providers.values())
     return sorted(items, key=lambda p: p.name)
 
 
-def get_provider(name: str) -> Optional[TranscriptionProvider]:
+def get_provider(name: str) -> TranscriptionProvider | None:
     """Return the provider registered under *name*, or None.
 
     Name matching is case-insensitive and whitespace-tolerant — mirrors

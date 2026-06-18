@@ -59,8 +59,8 @@ load_hermes_dotenv(hermes_home=_hermes_home, project_env=_project_env)
 def _effective_temperature_for_model(
     model: str,
     requested_temperature: float,
-    base_url: Optional[str] = None,
-) -> Optional[float]:
+    base_url: str | None = None,
+) -> float | None:
     """Apply fixed model temperature contracts to direct client calls.
 
     Returns ``None`` when the model manages temperature server-side (Kimi);
@@ -125,7 +125,7 @@ class CompressionConfig:
     @classmethod
     def from_yaml(cls, yaml_path: str) -> "CompressionConfig":
         """Load configuration from YAML file."""
-        with open(yaml_path, 'r', encoding="utf-8") as f:
+        with open(yaml_path, encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
 
         config = cls()
@@ -202,7 +202,7 @@ class TrajectoryMetrics:
     summarization_api_calls: int = 0
     summarization_errors: int = 0
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "original_tokens": self.original_tokens,
             "compressed_tokens": self.compressed_tokens,
@@ -245,9 +245,9 @@ class AggregateMetrics:
     total_summarization_errors: int = 0
     
     # Distribution stats
-    compression_ratios: List[float] = field(default_factory=list)
-    tokens_saved_list: List[int] = field(default_factory=list)
-    turns_removed_list: List[int] = field(default_factory=list)
+    compression_ratios: list[float] = field(default_factory=list)
+    tokens_saved_list: list[int] = field(default_factory=list)
+    turns_removed_list: list[int] = field(default_factory=list)
     
     processing_start_time: str = ""
     processing_end_time: str = ""
@@ -277,7 +277,7 @@ class AggregateMetrics:
         if metrics.still_over_limit:
             self.trajectories_still_over_limit += 1
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         avg_compression_ratio = (
             sum(self.compression_ratios) / len(self.compression_ratios) 
             if self.compression_ratios else 1.0
@@ -471,15 +471,15 @@ class TrajectoryCompressor:
             # Fallback to character estimate
             return len(text) // 4
     
-    def count_trajectory_tokens(self, trajectory: List[Dict[str, str]]) -> int:
+    def count_trajectory_tokens(self, trajectory: list[dict[str, str]]) -> int:
         """Count total tokens in a trajectory."""
         return sum(self.count_tokens(turn.get("value", "")) for turn in trajectory)
     
-    def count_turn_tokens(self, trajectory: List[Dict[str, str]]) -> List[int]:
+    def count_turn_tokens(self, trajectory: list[dict[str, str]]) -> list[int]:
         """Count tokens for each turn in a trajectory."""
         return [self.count_tokens(turn.get("value", "")) for turn in trajectory]
     
-    def _find_protected_indices(self, trajectory: List[Dict[str, str]]) -> Tuple[set, int, int]:
+    def _find_protected_indices(self, trajectory: list[dict[str, str]]) -> tuple[set, int, int]:
         """
         Find indices of protected turns.
         
@@ -528,7 +528,7 @@ class TrajectoryCompressor:
         return protected, compressible_start, compressible_end
 
     @staticmethod
-    def _is_boundary_clean(trajectory: List[Dict[str, str]], idx: int) -> bool:
+    def _is_boundary_clean(trajectory: list[dict[str, str]], idx: int) -> bool:
         """Return True if a region boundary at ``idx`` does not split a turn pair.
 
         In the from/value trajectory format a ``tool`` turn (carrying
@@ -543,7 +543,7 @@ class TrajectoryCompressor:
     @classmethod
     def _snap_boundary(
         cls,
-        trajectory: List[Dict[str, str]],
+        trajectory: list[dict[str, str]],
         idx: int,
         min_idx: int,
         max_idx: int,
@@ -566,7 +566,7 @@ class TrajectoryCompressor:
             backward -= 1
         return backward
 
-    def _extract_turn_content_for_summary(self, trajectory: List[Dict[str, str]], start: int, end: int) -> str:
+    def _extract_turn_content_for_summary(self, trajectory: list[dict[str, str]], start: int, end: int) -> str:
         """
         Extract content from turns to be summarized.
         
@@ -747,8 +747,8 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
     
     def compress_trajectory(
         self,
-        trajectory: List[Dict[str, str]]
-    ) -> Tuple[List[Dict[str, str]], TrajectoryMetrics]:
+        trajectory: list[dict[str, str]]
+    ) -> tuple[list[dict[str, str]], TrajectoryMetrics]:
         """
         Compress a single trajectory to fit within target token budget.
         
@@ -883,8 +883,8 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
     
     async def compress_trajectory_async(
         self,
-        trajectory: List[Dict[str, str]]
-    ) -> Tuple[List[Dict[str, str]], TrajectoryMetrics]:
+        trajectory: list[dict[str, str]]
+    ) -> tuple[list[dict[str, str]], TrajectoryMetrics]:
         """
         Compress a single trajectory to fit within target token budget (async version).
         
@@ -995,7 +995,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
         
         return compressed, metrics
     
-    async def process_entry_async(self, entry: Dict[str, Any]) -> Tuple[Dict[str, Any], TrajectoryMetrics]:
+    async def process_entry_async(self, entry: dict[str, Any]) -> tuple[dict[str, Any], TrajectoryMetrics]:
         """
         Process a single JSONL entry (async version).
         """
@@ -1016,7 +1016,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
         
         return result, metrics
     
-    def process_entry(self, entry: Dict[str, Any]) -> Tuple[Dict[str, Any], TrajectoryMetrics]:
+    def process_entry(self, entry: dict[str, Any]) -> tuple[dict[str, Any], TrajectoryMetrics]:
         """
         Process a single JSONL entry.
         
@@ -1076,7 +1076,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
         all_entries = []  # List of (file_path, entry_idx, entry)
         
         for file_path in jsonl_files:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, encoding='utf-8') as f:
                 for line_num, line in enumerate(f):
                     line = line.strip()
                     if line:
@@ -1114,7 +1114,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
         # Track timeouts separately
         timeout_count = 0
         
-        async def process_single(file_path: Path, entry_idx: int, entry: Dict, 
+        async def process_single(file_path: Path, entry_idx: int, entry: dict, 
                                   progress, main_task, status_task):
             """Process a single entry with semaphore rate limiting and timeout."""
             nonlocal compressed_count, skipped_count, api_calls, in_flight, timeout_count
@@ -1152,7 +1152,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
                             description=f"[dim]✅ {compressed_count} compressed | ⏭️ {skipped_count} skipped | ⏱️ {timeout_count} timeout | 🔄 {api_calls} API calls | ⚡ {in_flight} in-flight[/dim]"
                         )
                 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     self.logger.warning(f"Timeout processing entry from {file_path}:{entry_idx} (>{self.config.per_trajectory_timeout}s)")
                     
                     async with progress_lock:
@@ -1446,7 +1446,7 @@ def main(
         
         # Load entries from the single file
         entries = []
-        with open(input_path, 'r', encoding='utf-8') as f:
+        with open(input_path, encoding='utf-8') as f:
             for line_num, line in enumerate(f, 1):
                 line = line.strip()
                 if line:
@@ -1491,7 +1491,7 @@ def main(
             output_path.parent.mkdir(parents=True, exist_ok=True)
             with open(output_path, 'w', encoding='utf-8') as out_f:
                 for jsonl_file in sorted(temp_output_dir.glob("*.jsonl")):
-                    with open(jsonl_file, 'r', encoding='utf-8') as in_f:
+                    with open(jsonl_file, encoding='utf-8') as in_f:
                         for line in in_f:
                             out_f.write(line)
             
@@ -1530,7 +1530,7 @@ def main(
                 # Sample from each JSONL file
                 for jsonl_file in sorted(input_path.glob("*.jsonl")):
                     entries = []
-                    with open(jsonl_file, 'r', encoding='utf-8') as f:
+                    with open(jsonl_file, encoding='utf-8') as f:
                         for line in f:
                             line = line.strip()
                             if line:

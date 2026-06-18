@@ -328,7 +328,7 @@ STICKER_MAP: dict[str, dict] = {
 }
 
 
-def get_sticker_by_name(name: str) -> Optional[dict]:
+def get_sticker_by_name(name: str) -> dict | None:
     """
     按名称查找贴纸，支持模糊匹配。
 
@@ -378,7 +378,7 @@ def get_random_sticker(category: str = None) -> dict:
     return random.choice(list(STICKER_MAP.values()))
 
 
-def get_sticker_by_id(sticker_id: str) -> Optional[dict]:
+def get_sticker_by_id(sticker_id: str) -> dict | None:
     """按 sticker_id 精确查找贴纸。"""
     if not sticker_id:
         return None
@@ -511,7 +511,7 @@ def search_stickers(query: str, limit: int = 10) -> list[dict]:
 def build_face_msg_body(
     face_index: int,
     face_type: int = 1,
-    data: Optional[str] = None,
+    data: str | None = None,
 ) -> list:
     """
     构造 TIMFaceElem 消息体。

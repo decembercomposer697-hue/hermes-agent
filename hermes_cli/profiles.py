@@ -137,7 +137,7 @@ def _clone_all_copytree_ignore(source_dir: Path):
     source_resolved = source_dir.resolve()
     is_default_source = source_resolved == _get_default_hermes_home().resolve()
 
-    def _ignore(directory: str, names: List[str]) -> List[str]:
+    def _ignore(directory: str, names: list[str]) -> list[str]:
         ignored: list[str] = []
         for entry in names:
             # Universal exclusions at any depth.
@@ -316,7 +316,7 @@ def profile_exists(name: str) -> bool:
 # Alias / wrapper script management
 # ---------------------------------------------------------------------------
 
-def check_alias_collision(name: str) -> Optional[str]:
+def check_alias_collision(name: str) -> str | None:
     """Return a human-readable collision message, or None if the name is safe.
 
     Checks: reserved names, hermes subcommands, existing binaries in PATH.
@@ -359,7 +359,7 @@ def _is_wrapper_dir_in_path() -> bool:
     return wrapper_dir in os.environ.get("PATH", "").split(os.pathsep)
 
 
-def create_wrapper_script(name: str, target: Optional[str] = None) -> Optional[Path]:
+def create_wrapper_script(name: str, target: str | None = None) -> Path | None:
     """Create a shell wrapper script at ~/.local/bin/<name>.
 
     The wrapper file is named after ``name`` (the alias). The profile it
@@ -422,7 +422,7 @@ def remove_wrapper_script(name: str) -> bool:
     return False
 
 
-def find_alias_for_profile(profile_name: str) -> Optional[str]:
+def find_alias_for_profile(profile_name: str) -> str | None:
     """Return the alias name of the wrapper that activates *profile_name*, or None.
 
     A wrapper created by :func:`create_wrapper_script` is a file named after the
@@ -442,8 +442,8 @@ def find_alias_for_profile(profile_name: str) -> Optional[str]:
     is_windows = sys.platform == "win32"
     needle = f"hermes -p {canon}"
 
-    custom: Optional[str] = None
-    profile_named: Optional[str] = None
+    custom: str | None = None
+    profile_named: str | None = None
     for entry in sorted(wrapper_dir.iterdir()):
         if not entry.is_file():
             continue
@@ -477,19 +477,19 @@ class ProfileInfo:
     path: Path
     is_default: bool
     gateway_running: bool
-    model: Optional[str] = None
-    provider: Optional[str] = None
+    model: str | None = None
+    provider: str | None = None
     has_env: bool = False
     skill_count: int = 0
-    alias_path: Optional[Path] = None
+    alias_path: Path | None = None
     # Custom alias name (the wrapper file name) when it differs from ``name``;
     # falls back to ``name`` when a profile-named wrapper exists. None if no
     # wrapper points at this profile. See ``find_alias_for_profile``.
-    alias_name: Optional[str] = None
+    alias_name: str | None = None
     # Distribution metadata (None if the profile wasn't installed from a distribution).
-    distribution_name: Optional[str] = None
-    distribution_version: Optional[str] = None
-    distribution_source: Optional[str] = None
+    distribution_name: str | None = None
+    distribution_version: str | None = None
+    distribution_source: str | None = None
     # Free-form description (1-2 sentences) of what this profile is good
     # at. Persisted in ``<profile_dir>/profile.yaml``. Empty when the
     # user has not described the profile (legacy profiles, fresh
@@ -515,7 +515,7 @@ def _read_distribution_meta(profile_dir: Path) -> tuple:
         return None, None, None
     try:
         import yaml
-        with open(mf_path, "r", encoding="utf-8") as f:
+        with open(mf_path, encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
         if not isinstance(data, dict):
             return None, None, None
@@ -535,7 +535,7 @@ def _read_config_model(profile_dir: Path) -> tuple:
         return None, None
     try:
         import yaml
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(config_path, encoding="utf-8") as f:
             cfg = yaml.safe_load(f) or {}
         model_cfg = cfg.get("model", {})
         if isinstance(model_cfg, str):
@@ -600,7 +600,7 @@ def read_profile_meta(profile_dir: Path) -> dict:
         return {"description": "", "description_auto": False}
     try:
         import yaml
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
     except Exception:
         return {"description": "", "description_auto": False}
@@ -615,8 +615,8 @@ def read_profile_meta(profile_dir: Path) -> dict:
 def write_profile_meta(
     profile_dir: Path,
     *,
-    description: Optional[str] = None,
-    description_auto: Optional[bool] = None,
+    description: str | None = None,
+    description_auto: bool | None = None,
 ) -> None:
     """Update ``<profile_dir>/profile.yaml`` in place.
 
@@ -631,7 +631,7 @@ def write_profile_meta(
     existing: dict = {}
     if path.is_file():
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 loaded = yaml.safe_load(f) or {}
             if isinstance(loaded, dict):
                 existing = loaded
@@ -649,7 +649,7 @@ def write_profile_meta(
 # CRUD operations
 # ---------------------------------------------------------------------------
 
-def list_profiles() -> List[ProfileInfo]:
+def list_profiles() -> list[ProfileInfo]:
     """Return info for all profiles, including the default."""
     profiles = []
     wrapper_dir = _get_wrapper_dir()
@@ -719,12 +719,12 @@ def list_profiles() -> List[ProfileInfo]:
 
 def create_profile(
     name: str,
-    clone_from: Optional[str] = None,
+    clone_from: str | None = None,
     clone_all: bool = False,
     clone_config: bool = False,
     no_alias: bool = False,
     no_skills: bool = False,
-    description: Optional[str] = None,
+    description: str | None = None,
 ) -> Path:
     """Create a new profile directory.
 
@@ -882,7 +882,7 @@ def create_profile(
     return profile_dir
 
 
-def seed_profile_skills(profile_dir: Path, quiet: bool = False) -> Optional[dict]:
+def seed_profile_skills(profile_dir: Path, quiet: bool = False) -> dict | None:
     """Seed bundled skills into a profile via subprocess.
 
     Uses subprocess because sync_skills() caches HERMES_HOME at module level.
@@ -1386,7 +1386,7 @@ def export_profile(name: str, output_path: str) -> Path:
         return Path(result)
 
 
-def _normalize_profile_archive_parts(member_name: str) -> List[str]:
+def _normalize_profile_archive_parts(member_name: str) -> list[str]:
     """Return safe path parts for a profile archive member."""
     normalized_name = member_name.replace("\\", "/")
     posix_path = PurePosixPath(normalized_name)
@@ -1463,7 +1463,7 @@ def _inspect_profile_archive_roots(archive: Path) -> set[str]:
     return top_dirs
 
 
-def import_profile(archive_path: str, name: Optional[str] = None) -> Path:
+def import_profile(archive_path: str, name: str | None = None) -> Path:
     """Import a profile from a tar.gz archive.
 
     If *name* is not given, infers it from the archive's top-level directory.

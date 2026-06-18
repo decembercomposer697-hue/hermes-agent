@@ -42,15 +42,15 @@ class _FakeTTSProvider(TTSProvider):
         self,
         name: str,
         voice_compat: bool = False,
-        raise_exc: Optional[BaseException] = None,
-        return_path: Optional[str] = None,
+        raise_exc: BaseException | None = None,
+        return_path: str | None = None,
     ):
         self._name = name
         self._voice_compat = voice_compat
         self._raise_exc = raise_exc
         self._return_path = return_path
         # Recorded for assertions
-        self.last_call: Optional[dict] = None
+        self.last_call: dict | None = None
 
     @property
     def name(self) -> str:

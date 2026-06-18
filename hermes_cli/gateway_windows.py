@@ -38,6 +38,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from datetime import UTC
 
 # Short timeouts: schtasks occasionally wedges and we don't want to hang forever.
 _SCHTASKS_TIMEOUT_S = 15
@@ -1095,7 +1096,7 @@ def _print_deep_probes() -> None:
             if updated_at:
                 try:
                     updated_dt = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
-                    now = datetime.now(timezone.utc)
+                    now = datetime.now(UTC)
                     age_seconds = int((now - updated_dt).total_seconds())
                     age_str = f" (updated {age_seconds}s ago)"
                 except Exception:

@@ -58,7 +58,7 @@ def _voice_capture_install_hint() -> str:
     return "pip install sounddevice numpy"
 
 
-def _termux_microphone_command() -> Optional[str]:
+def _termux_microphone_command() -> str | None:
     if not _is_termux_environment():
         return None
     return shutil.which("termux-microphone-record")
@@ -99,7 +99,7 @@ def _pulse_socket_reachable() -> bool:
     import socket
     import stat
 
-    candidates: List[str] = []
+    candidates: list[str] = []
 
     pulse_server = os.environ.get('PULSE_SERVER', '')
     # PULSE_SERVER may be "unix:/path", "unix:/path;..." or a bare path.
@@ -193,7 +193,7 @@ def detect_audio_environment() -> dict:
     # WSL detection — PulseAudio bridge makes audio work in WSL.
     # Only block if PULSE_SERVER is not configured.
     try:
-        with open('/proc/version', 'r', encoding="utf-8") as f:
+        with open('/proc/version', encoding="utf-8") as f:
             if 'microsoft' in f.read().lower():
                 if os.environ.get('PULSE_SERVER'):
                     notices.append("Running in WSL with PulseAudio bridge")
@@ -341,7 +341,7 @@ class TermuxAudioRecorder:
         self._lock = threading.Lock()
         self._recording = False
         self._start_time = 0.0
-        self._recording_path: Optional[str] = None
+        self._recording_path: str | None = None
         self._current_rms = 0
 
     @property
@@ -408,7 +408,7 @@ class TermuxAudioRecorder:
             return
         subprocess.run([mic_cmd, "-q"], capture_output=True, text=True, timeout=15, check=False, stdin=subprocess.DEVNULL)
 
-    def stop(self) -> Optional[str]:
+    def stop(self) -> str | None:
         with self._lock:
             if not self._recording:
                 return None
@@ -481,7 +481,7 @@ class AudioRecorder:
     def __init__(self) -> None:
         self._lock = threading.Lock()
         self._stream: Any = None
-        self._frames: List[Any] = []
+        self._frames: list[Any] = []
         self._recording = False
         self._start_time: float = 0.0
         # Silence detection state
@@ -722,7 +722,7 @@ class AudioRecorder:
         if t.is_alive():
             logger.warning("Audio stream close timed out after %.1fs — forcing ahead", timeout)
 
-    def stop(self) -> Optional[str]:
+    def stop(self) -> str | None:
         """Stop recording and write captured audio to a WAV file.
 
         The underlying stream is kept alive for reuse — only frame
@@ -875,7 +875,7 @@ def is_whisper_hallucination(transcript: str) -> bool:
 # ============================================================================
 # STT dispatch
 # ============================================================================
-def transcribe_recording(wav_path: str, model: Optional[str] = None) -> Dict[str, Any]:
+def transcribe_recording(wav_path: str, model: str | None = None) -> dict[str, Any]:
     """Transcribe a WAV recording using the existing Whisper pipeline.
 
     Delegates to ``tools.transcription_tools.transcribe_audio()``.
@@ -916,14 +916,14 @@ def _should_chunk_for_transcription(file_path: str, max_file_size: int) -> bool:
 def _transcribe_wav_in_chunks(
     wav_path: str,
     *,
-    model: Optional[str],
+    model: str | None,
     max_file_size: int,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Split an oversized WAV into provider-sized chunks and join transcripts."""
     from tools.transcription_tools import transcribe_audio
 
-    chunk_paths: List[str] = []
-    transcripts: List[str] = []
+    chunk_paths: list[str] = []
+    transcripts: list[str] = []
 
     try:
         chunk_paths = _split_wav_for_transcription(wav_path, max_file_size=max_file_size)
@@ -963,10 +963,10 @@ def _transcribe_wav_in_chunks(
                 pass
 
 
-def _split_wav_for_transcription(wav_path: str, *, max_file_size: int) -> List[str]:
+def _split_wav_for_transcription(wav_path: str, *, max_file_size: int) -> list[str]:
     """Write WAV chunks small enough to pass the shared STT file-size gate."""
     os.makedirs(_TEMP_DIR, exist_ok=True)
-    chunk_paths: List[str] = []
+    chunk_paths: list[str] = []
     header_reserve = 64 * 1024
 
     with wave.open(wav_path, "rb") as source:
@@ -1016,7 +1016,7 @@ def _split_wav_for_transcription(wav_path: str, *, max_file_size: int) -> List[s
 # ============================================================================
 
 # Global reference to the active playback process so it can be interrupted.
-_active_playback: Optional[subprocess.Popen] = None
+_active_playback: subprocess.Popen | None = None
 _playback_lock = threading.Lock()
 
 
@@ -1121,7 +1121,7 @@ def play_audio_file(file_path: str) -> bool:
 # ============================================================================
 # Requirements check
 # ============================================================================
-def check_voice_requirements() -> Dict[str, Any]:
+def check_voice_requirements() -> dict[str, Any]:
     """Check if all voice mode requirements are met.
 
     Returns:
@@ -1135,7 +1135,7 @@ def check_voice_requirements() -> Dict[str, Any]:
     stt_provider = _get_provider(stt_config)
     stt_available = stt_enabled and stt_provider != "none"
 
-    missing: List[str] = []
+    missing: list[str] = []
     termux_capture = _termux_voice_capture_available()
     has_audio = _audio_available() or termux_capture
 

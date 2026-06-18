@@ -56,7 +56,7 @@ def _save_cache(cache: dict) -> None:
         raise
 
 
-def get_cached_description(file_unique_id: str) -> Optional[dict]:
+def get_cached_description(file_unique_id: str) -> dict | None:
     """
     Look up a cached sticker description.
 

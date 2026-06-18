@@ -266,7 +266,7 @@ def _scan_cron_skill_assembled(assembled: str) -> tuple[str, str]:
     return cleaned, ""
 
 
-def _origin_from_env() -> Optional[Dict[str, str]]:
+def _origin_from_env() -> dict[str, str] | None:
     from gateway.session_context import get_session_env
     origin_platform = get_session_env("HERMES_SESSION_PLATFORM")
     origin_chat_id = get_session_env("HERMES_SESSION_CHAT_ID")
@@ -286,7 +286,7 @@ def _origin_from_env() -> Optional[Dict[str, str]]:
     return None
 
 
-def _repeat_display(job: Dict[str, Any]) -> str:
+def _repeat_display(job: dict[str, Any]) -> str:
     times = (job.get("repeat") or {}).get("times")
     completed = (job.get("repeat") or {}).get("completed", 0)
     if times is None:
@@ -296,7 +296,7 @@ def _repeat_display(job: Dict[str, Any]) -> str:
     return f"{completed}/{times}" if completed else f"{times} times"
 
 
-def _canonical_skills(skill: Optional[str] = None, skills: Optional[Any] = None) -> List[str]:
+def _canonical_skills(skill: str | None = None, skills: Any | None = None) -> list[str]:
     if skills is None:
         raw_items = [skill] if skill else []
     elif isinstance(skills, str):
@@ -304,7 +304,7 @@ def _canonical_skills(skill: Optional[str] = None, skills: Optional[Any] = None)
     else:
         raw_items = list(skills)
 
-    normalized: List[str] = []
+    normalized: list[str] = []
     for item in raw_items:
         text = str(item or "").strip()
         if text and text not in normalized:
@@ -314,7 +314,7 @@ def _canonical_skills(skill: Optional[str] = None, skills: Optional[Any] = None)
 
 
 
-def _resolve_model_override(model_obj: Optional[Dict[str, Any]]) -> tuple:
+def _resolve_model_override(model_obj: dict[str, Any] | None) -> tuple:
     """Resolve a model override object into (provider, model) for job storage.
 
     If provider is omitted, pins the current main provider from config so the
@@ -356,7 +356,7 @@ def _resolve_model_override(model_obj: Optional[Dict[str, Any]]) -> tuple:
     return (provider_name, model_name)
 
 
-def _normalize_optional_job_value(value: Optional[Any], *, strip_trailing_slash: bool = False) -> Optional[str]:
+def _normalize_optional_job_value(value: Any | None, *, strip_trailing_slash: bool = False) -> str | None:
     if value is None:
         return None
     text = str(value).strip()
@@ -365,7 +365,7 @@ def _normalize_optional_job_value(value: Optional[Any], *, strip_trailing_slash:
     return text or None
 
 
-def _normalize_deliver_param(value: Any) -> Optional[str]:
+def _normalize_deliver_param(value: Any) -> str | None:
     """Normalize a user-supplied ``deliver`` value to the canonical string form.
 
     The cron schema documents ``deliver`` as a string (``"local"``, ``"origin"``,
@@ -386,7 +386,7 @@ def _normalize_deliver_param(value: Any) -> Optional[str]:
     return text or None
 
 
-def _validate_cron_script_path(script: Optional[str]) -> Optional[str]:
+def _validate_cron_script_path(script: str | None) -> str | None:
     """Validate a cron job script path at the API boundary.
 
     Scripts must be relative paths that resolve within HERMES_HOME/scripts/.
@@ -425,7 +425,7 @@ def _validate_cron_script_path(script: Optional[str]) -> Optional[str]:
     return None
 
 
-def _format_job(job: Dict[str, Any]) -> Dict[str, Any]:
+def _format_job(job: dict[str, Any]) -> dict[str, Any]:
     prompt = str(job.get("prompt") or "")
     skills = _canonical_skills(job.get("skill"), job.get("skills"))
     job_id = str(job.get("id") or "unknown")
@@ -464,24 +464,24 @@ def _format_job(job: Dict[str, Any]) -> Dict[str, Any]:
 
 def cronjob(
     action: str,
-    job_id: Optional[str] = None,
-    prompt: Optional[str] = None,
-    schedule: Optional[str] = None,
-    name: Optional[str] = None,
-    repeat: Optional[int] = None,
-    deliver: Optional[str] = None,
+    job_id: str | None = None,
+    prompt: str | None = None,
+    schedule: str | None = None,
+    name: str | None = None,
+    repeat: int | None = None,
+    deliver: str | None = None,
     include_disabled: bool = False,
-    skill: Optional[str] = None,
-    skills: Optional[List[str]] = None,
-    model: Optional[str] = None,
-    provider: Optional[str] = None,
-    base_url: Optional[str] = None,
-    reason: Optional[str] = None,
-    script: Optional[str] = None,
-    context_from: Optional[Union[str, List[str]]] = None,
-    enabled_toolsets: Optional[List[str]] = None,
-    workdir: Optional[str] = None,
-    no_agent: Optional[bool] = None,
+    skill: str | None = None,
+    skills: list[str] | None = None,
+    model: str | None = None,
+    provider: str | None = None,
+    base_url: str | None = None,
+    reason: str | None = None,
+    script: str | None = None,
+    context_from: str | list[str] | None = None,
+    enabled_toolsets: list[str] | None = None,
+    workdir: str | None = None,
+    no_agent: bool | None = None,
     task_id: str = None,
 ) -> str:
     """Unified cron job management tool."""
@@ -630,7 +630,7 @@ def cronjob(
             return json.dumps({"success": True, "job": _format_job(updated)}, indent=2)
 
         if normalized == "update":
-            updates: Dict[str, Any] = {}
+            updates: dict[str, Any] = {}
             if prompt is not None:
                 scan_error = _scan_cron_prompt(prompt)
                 if scan_error:

@@ -31,7 +31,7 @@ from gateway.whatsapp_identity import (
 class GatewayAuthorizationMixin:
     """User/chat authorization methods for ``GatewayRunner``."""
 
-    def _adapter_enforces_own_access_policy(self, platform: Optional[Platform]) -> bool:
+    def _adapter_enforces_own_access_policy(self, platform: Platform | None) -> bool:
         """Whether the adapter for *platform* gates access at intake itself.
 
         Mirrors ``BasePlatformAdapter.enforces_own_access_policy``. Adapters
@@ -55,7 +55,7 @@ class GatewayAuthorizationMixin:
             return False
         return bool(getattr(adapter, "enforces_own_access_policy", False))
 
-    def _adapter_dm_policy(self, platform: Optional[Platform]) -> str:
+    def _adapter_dm_policy(self, platform: Platform | None) -> str:
         """Best-effort read of an own-policy adapter's effective DM policy.
 
         Returns the lowercased ``dm_policy`` (``"open"`` / ``"allowlist"`` /
@@ -351,7 +351,7 @@ class GatewayAuthorizationMixin:
 
         return bool(check_ids & allowed_ids)
 
-    def _get_unauthorized_dm_behavior(self, platform: Optional[Platform]) -> str:
+    def _get_unauthorized_dm_behavior(self, platform: Platform | None) -> str:
         """Return how unauthorized DMs should be handled for a platform.
 
         Resolution order:

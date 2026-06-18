@@ -185,7 +185,7 @@ def _extract_email_address(raw: str) -> str:
 def _extract_attachments(
     msg: email_lib.message.Message,
     skip_attachments: bool = False,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Extract attachment metadata and cache files locally.
 
     When *skip_attachments* is True, all attachment/inline parts are ignored
@@ -266,10 +266,10 @@ class EmailAdapter(BasePlatformAdapter):
         # Track message IDs we've already processed to avoid duplicates
         self._seen_uids: set = set()
         self._seen_uids_max: int = 2000   # cap to prevent unbounded memory growth
-        self._poll_task: Optional[asyncio.Task] = None
+        self._poll_task: asyncio.Task | None = None
 
         # Map chat_id (sender email) -> last subject + message-id for threading
-        self._thread_context: Dict[str, Dict[str, str]] = {}
+        self._thread_context: dict[str, dict[str, str]] = {}
 
         logger.info("[Email] Adapter initialized for %s", self._address)
 
@@ -361,7 +361,7 @@ class EmailAdapter(BasePlatformAdapter):
         for msg_data in messages:
             await self._dispatch_message(msg_data)
 
-    def _fetch_new_messages(self) -> List[Dict[str, Any]]:
+    def _fetch_new_messages(self) -> list[dict[str, Any]]:
         """Fetch new (unseen) messages from IMAP. Runs in executor thread."""
         results = []
         try:
@@ -428,7 +428,7 @@ class EmailAdapter(BasePlatformAdapter):
             logger.error("[Email] IMAP fetch error: %s", e)
         return results
 
-    async def _dispatch_message(self, msg_data: Dict[str, Any]) -> None:
+    async def _dispatch_message(self, msg_data: dict[str, Any]) -> None:
         """Convert a fetched email into a MessageEvent and dispatch it."""
         sender_addr = msg_data["sender_addr"]
 
@@ -504,8 +504,8 @@ class EmailAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         content: str,
-        reply_to: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        reply_to: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Send an email reply to the given address."""
         try:
@@ -522,7 +522,7 @@ class EmailAdapter(BasePlatformAdapter):
         self,
         to_addr: str,
         body: str,
-        reply_to_msg_id: Optional[str] = None,
+        reply_to_msg_id: str | None = None,
     ) -> str:
         """Send an email via SMTP. Runs in executor thread."""
         msg = MIMEMultipart()
@@ -562,15 +562,15 @@ class EmailAdapter(BasePlatformAdapter):
         logger.info("[Email] Sent reply to %s (subject: %s)", to_addr, subject)
         return msg_id
 
-    async def send_typing(self, chat_id: str, metadata: Optional[Dict[str, Any]] = None) -> None:
+    async def send_typing(self, chat_id: str, metadata: dict[str, Any] | None = None) -> None:
         """Email has no typing indicator — no-op."""
 
     async def send_image(
         self,
         chat_id: str,
         image_url: str,
-        caption: Optional[str] = None,
-        reply_to: Optional[str] = None,
+        caption: str | None = None,
+        reply_to: str | None = None,
     ) -> SendResult:
         """Send an image URL as part of an email body."""
         text = caption or ""
@@ -580,8 +580,8 @@ class EmailAdapter(BasePlatformAdapter):
     async def send_multiple_images(
         self,
         chat_id: str,
-        images: List[Tuple[str, str]],
-        metadata: Optional[Dict[str, Any]] = None,
+        images: list[tuple[str, str]],
+        metadata: dict[str, Any] | None = None,
         human_delay: float = 0.0,
     ) -> None:
         """Send a batch of images as a single email with multiple MIME attachments.
@@ -596,8 +596,8 @@ class EmailAdapter(BasePlatformAdapter):
 
         from urllib.parse import unquote as _unquote
 
-        body_parts: List[str] = []
-        local_paths: List[str] = []
+        body_parts: list[str] = []
+        local_paths: list[str] = []
         for image_url, alt_text in images:
             if alt_text:
                 body_parts.append(alt_text)
@@ -633,7 +633,7 @@ class EmailAdapter(BasePlatformAdapter):
         self,
         to_addr: str,
         body: str,
-        file_paths: List[str],
+        file_paths: list[str],
     ) -> str:
         """Send an email with multiple file attachments via SMTP."""
         msg = MIMEMultipart()
@@ -688,9 +688,9 @@ class EmailAdapter(BasePlatformAdapter):
         self,
         chat_id: str,
         file_path: str,
-        caption: Optional[str] = None,
-        file_name: Optional[str] = None,
-        reply_to: Optional[str] = None,
+        caption: str | None = None,
+        file_name: str | None = None,
+        reply_to: str | None = None,
         **kwargs,
     ) -> SendResult:
         """Send a file as an email attachment."""
@@ -714,7 +714,7 @@ class EmailAdapter(BasePlatformAdapter):
         to_addr: str,
         body: str,
         file_path: str,
-        file_name: Optional[str] = None,
+        file_name: str | None = None,
     ) -> str:
         """Send an email with a file attachment via SMTP."""
         msg = MIMEMultipart()
@@ -762,7 +762,7 @@ class EmailAdapter(BasePlatformAdapter):
 
         return msg_id
 
-    async def get_chat_info(self, chat_id: str) -> Dict[str, Any]:
+    async def get_chat_info(self, chat_id: str) -> dict[str, Any]:
         """Return basic info about the email chat."""
         ctx = self._thread_context.get(chat_id, {})
         return {

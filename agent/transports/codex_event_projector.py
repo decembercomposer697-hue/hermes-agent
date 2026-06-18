@@ -63,7 +63,7 @@ class ProjectionResult:
 
     messages: list[dict] = field(default_factory=list)
     is_tool_iteration: bool = False
-    final_text: Optional[str] = None  # Set when an agentMessage completes
+    final_text: str | None = None  # Set when an agentMessage completes
 
 
 class CodexEventProjector:

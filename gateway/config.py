@@ -13,7 +13,8 @@ import os
 import json
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Callable
+from typing import Dict, List, Optional, Any
+from collections.abc import Callable
 from enum import Enum
 
 from hermes_cli.config import get_hermes_home
@@ -56,7 +57,7 @@ def _coerce_int(value: Any, default: int) -> int:
         return default
 
 
-def _coerce_optional_positive_int(value: Any, key: str) -> Optional[int]:
+def _coerce_optional_positive_int(value: Any, key: str) -> int | None:
     """Coerce an optional positive integer config value.
 
     ``None``/0/negative disable the setting. Malformed values are ignored with
@@ -130,7 +131,7 @@ def _ensure_platform_extra_dict(platforms_data: dict, name: str) -> tuple[dict, 
 
 # Module-level cache for bundled platform plugin names (lives outside the
 # enum so it doesn't become an accidental enum member).
-_Platform__bundled_plugin_names: Optional[set] = None
+_Platform__bundled_plugin_names: set | None = None
 
 
 class Platform(Enum):
@@ -248,9 +249,9 @@ class HomeChannel:
     platform: Platform
     chat_id: str
     name: str  # Human-readable name for display
-    thread_id: Optional[str] = None
+    thread_id: str | None = None
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         result = {
             "platform": self.platform.value,
             "chat_id": self.chat_id,
@@ -261,7 +262,7 @@ class HomeChannel:
         return result
     
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "HomeChannel":
+    def from_dict(cls, data: dict[str, Any]) -> "HomeChannel":
         return cls(
             platform=Platform(data["platform"]),
             chat_id=str(data["chat_id"]),
@@ -287,7 +288,7 @@ class SessionResetPolicy:
     notify: bool = True  # Send a notification to the user when auto-reset occurs
     notify_exclude_platforms: tuple = ("api_server", "webhook")  # Platforms that don't get reset notifications
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "mode": self.mode,
             "at_hour": self.at_hour,
@@ -297,7 +298,7 @@ class SessionResetPolicy:
         }
     
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "SessionResetPolicy":
+    def from_dict(cls, data: dict[str, Any]) -> "SessionResetPolicy":
         # Handle both missing keys and explicit null values (YAML null → None)
         mode = data.get("mode")
         at_hour = data.get("at_hour")
@@ -317,9 +318,9 @@ class SessionResetPolicy:
 class PlatformConfig:
     """Configuration for a single messaging platform."""
     enabled: bool = False
-    token: Optional[str] = None  # Bot token (Telegram, Discord)
-    api_key: Optional[str] = None  # API key if different from token
-    home_channel: Optional[HomeChannel] = None
+    token: str | None = None  # Bot token (Telegram, Discord)
+    api_key: str | None = None  # API key if different from token
+    home_channel: HomeChannel | None = None
     
     # Reply threading mode (Telegram/Slack)
     # - "off": Never thread replies to original message
@@ -335,9 +336,9 @@ class PlatformConfig:
     gateway_restart_notification: bool = True
 
     # Platform-specific settings
-    extra: Dict[str, Any] = field(default_factory=dict)
+    extra: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         result = {
             "enabled": self.enabled,
             "extra": self.extra,
@@ -353,7 +354,7 @@ class PlatformConfig:
         return result
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "PlatformConfig":
+    def from_dict(cls, data: dict[str, Any]) -> "PlatformConfig":
         home_channel = None
         if "home_channel" in data:
             home_channel = HomeChannel.from_dict(data["home_channel"])
@@ -420,7 +421,7 @@ class StreamingConfig:
     # matches the OpenClaw rollout.  Set to 0 to disable.
     fresh_final_after_seconds: float = 60.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "enabled": self.enabled,
             "transport": self.transport,
@@ -431,7 +432,7 @@ class StreamingConfig:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "StreamingConfig":
+    def from_dict(cls, data: dict[str, Any]) -> "StreamingConfig":
         if not data:
             return cls()
         return cls(
@@ -499,18 +500,18 @@ class GatewayConfig:
     Manages all platform connections, session policies, and delivery settings.
     """
     # Platform configurations
-    platforms: Dict[Platform, PlatformConfig] = field(default_factory=dict)
+    platforms: dict[Platform, PlatformConfig] = field(default_factory=dict)
     
     # Session reset policies by type
     default_reset_policy: SessionResetPolicy = field(default_factory=SessionResetPolicy)
-    reset_by_type: Dict[str, SessionResetPolicy] = field(default_factory=dict)
-    reset_by_platform: Dict[Platform, SessionResetPolicy] = field(default_factory=dict)
+    reset_by_type: dict[str, SessionResetPolicy] = field(default_factory=dict)
+    reset_by_platform: dict[Platform, SessionResetPolicy] = field(default_factory=dict)
     
     # Reset trigger commands
-    reset_triggers: List[str] = field(default_factory=lambda: ["/new", "/reset"])
+    reset_triggers: list[str] = field(default_factory=lambda: ["/new", "/reset"])
 
     # User-defined quick commands (slash commands that bypass the agent loop)
-    quick_commands: Dict[str, Any] = field(default_factory=dict)
+    quick_commands: dict[str, Any] = field(default_factory=dict)
     
     # Storage paths
     sessions_dir: Path = field(default_factory=lambda: get_hermes_home() / "sessions")
@@ -531,7 +532,7 @@ class GatewayConfig:
     # Session isolation in shared chats
     group_sessions_per_user: bool = True  # Isolate group/channel sessions per participant when user IDs are available
     thread_sessions_per_user: bool = False  # When False (default), threads are shared across all participants
-    max_concurrent_sessions: Optional[int] = None  # Positive int caps simultaneous active chat sessions
+    max_concurrent_sessions: int | None = None  # Positive int caps simultaneous active chat sessions
 
     # Unauthorized DM policy
     unauthorized_dm_behavior: str = "pair"  # "pair" or "ignore"
@@ -546,7 +547,7 @@ class GatewayConfig:
     # fresh session exactly as if the reset policy had fired.  0 = disabled.
     session_store_max_age_days: int = 90
 
-    def get_connected_platforms(self) -> List[Platform]:
+    def get_connected_platforms(self) -> list[Platform]:
         """Return list of platforms that are enabled and configured."""
         connected = []
         for platform, config in self.platforms.items():
@@ -590,7 +591,7 @@ class GatewayConfig:
 
         return False
     
-    def get_home_channel(self, platform: Platform) -> Optional[HomeChannel]:
+    def get_home_channel(self, platform: Platform) -> HomeChannel | None:
         """Get the home channel for a platform."""
         config = self.platforms.get(platform)
         if config:
@@ -599,8 +600,8 @@ class GatewayConfig:
     
     def get_reset_policy(
         self, 
-        platform: Optional[Platform] = None,
-        session_type: Optional[str] = None
+        platform: Platform | None = None,
+        session_type: str | None = None
     ) -> SessionResetPolicy:
         """
         Get the appropriate reset policy for a session.
@@ -617,7 +618,7 @@ class GatewayConfig:
         
         return self.default_reset_policy
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "platforms": {
                 p.value: c.to_dict() for p, c in self.platforms.items()
@@ -644,7 +645,7 @@ class GatewayConfig:
         }
     
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "GatewayConfig":
+    def from_dict(cls, data: dict[str, Any]) -> "GatewayConfig":
         platforms = {}
         for platform_name, platform_data in data.get("platforms", {}).items():
             try:
@@ -726,7 +727,7 @@ class GatewayConfig:
             session_store_max_age_days=session_store_max_age_days,
         )
 
-    def get_unauthorized_dm_behavior(self, platform: Optional[Platform] = None) -> str:
+    def get_unauthorized_dm_behavior(self, platform: Platform | None = None) -> str:
         """Return the effective unauthorized-DM behavior for a platform."""
         if platform:
             platform_cfg = self.platforms.get(platform)
@@ -737,7 +738,7 @@ class GatewayConfig:
                 )
         return self.unauthorized_dm_behavior
 
-    def get_notice_delivery(self, platform: Optional[Platform] = None) -> str:
+    def get_notice_delivery(self, platform: Platform | None = None) -> str:
         """Return the effective notice-delivery mode for a platform."""
         if platform:
             platform_cfg = self.platforms.get(platform)
@@ -767,7 +768,7 @@ def load_gateway_config() -> GatewayConfig:
     gateway_json_path = _home / "gateway.json"
     if gateway_json_path.exists():
         try:
-            with open(gateway_json_path, "r", encoding="utf-8") as f:
+            with open(gateway_json_path, encoding="utf-8") as f:
                 gw_data = json.load(f) or {}
             logger.info(
                 "Loaded legacy %s — consider moving settings to config.yaml",

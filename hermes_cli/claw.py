@@ -505,7 +505,7 @@ def _cmd_migrate(args):
     # restorable with `hermes import`.  Mirrors OpenClaw's
     # createPreMigrationBackup posture — one atomic restore point before
     # any mutation, auto-pruned to the last 5 pre-migration zips.
-    backup_archive: Optional[Path] = None
+    backup_archive: Path | None = None
     if not no_backup:
         try:
             from hermes_cli.backup import create_pre_migration_backup, _format_size

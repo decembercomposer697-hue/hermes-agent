@@ -56,7 +56,7 @@ class TestWebProviderABCs:
             def supports_search(self) -> bool:
                 return True
 
-            def search(self, query: str, limit: int = 5) -> Dict[str, Any]:
+            def search(self, query: str, limit: int = 5) -> dict[str, Any]:
                 return {"success": True, "data": {"web": []}}
 
         d = Dummy()
@@ -88,10 +88,10 @@ class TestWebProviderABCs:
             def supports_extract(self) -> bool:
                 return True
 
-            def search(self, query: str, limit: int = 5) -> Dict[str, Any]:
+            def search(self, query: str, limit: int = 5) -> dict[str, Any]:
                 return {"success": True, "data": {"web": []}}
 
-            def extract(self, urls: List[str], **kwargs: Any) -> List[Dict[str, Any]]:
+            def extract(self, urls: list[str], **kwargs: Any) -> list[dict[str, Any]]:
                 return [{"url": urls[0], "content": "x"}]
 
         d = Dummy()
@@ -118,7 +118,7 @@ class TestWebProviderABCs:
             def supports_search(self) -> bool:
                 return True
 
-            def search(self, query: str, limit: int = 5) -> Dict[str, Any]:
+            def search(self, query: str, limit: int = 5) -> dict[str, Any]:
                 return {"success": True, "data": {"web": []}}
 
         # Should instantiate fine — extract has default supports_*()

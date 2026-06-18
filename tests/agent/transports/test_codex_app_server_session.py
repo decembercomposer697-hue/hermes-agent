@@ -45,7 +45,7 @@ class FakeClient:
         return {"userAgent": "fake/0.0.0", "codexHome": "/tmp",
                 "platformOs": "linux", "platformFamily": "unix"}
 
-    def request(self, method: str, params: Optional[dict] = None, timeout: float = 30.0):
+    def request(self, method: str, params: dict | None = None, timeout: float = 30.0):
         self.requests.append((method, params or {}))
         if self._request_handler is not None:
             return self._request_handler(method, params or {})

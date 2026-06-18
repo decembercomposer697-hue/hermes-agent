@@ -60,7 +60,7 @@ class GatewaySlashCommandsMixin:
         adapter = self.adapters.get(platform) if getattr(self, "adapters", None) else None
         return getattr(adapter, "typed_command_prefix", "/") if adapter is not None else "/"
 
-    async def _handle_reset_command(self, event: MessageEvent) -> Union[str, EphemeralReply]:
+    async def _handle_reset_command(self, event: MessageEvent) -> str | EphemeralReply:
         """Handle /new or /reset command."""
         source = event.source
         
@@ -545,7 +545,7 @@ class GatewaySlashCommandsMixin:
 
         return "\n".join(lines)
 
-    async def _handle_stop_command(self, event: MessageEvent) -> Union[str, EphemeralReply]:
+    async def _handle_stop_command(self, event: MessageEvent) -> str | EphemeralReply:
         """Handle /stop command - interrupt a running agent.
 
         When an agent is truly hung (blocked thread that never checks
@@ -701,7 +701,7 @@ class GatewaySlashCommandsMixin:
             "  /platform resume <name> — re-queue a paused platform"
         )
 
-    async def _handle_restart_command(self, event: MessageEvent) -> Union[str, EphemeralReply]:
+    async def _handle_restart_command(self, event: MessageEvent) -> str | EphemeralReply:
         """Handle /restart command - drain active work, then restart the gateway."""
         from gateway.run import _hermes_home
         # Defensive idempotency check: if the previous gateway process
@@ -885,7 +885,7 @@ class GatewaySlashCommandsMixin:
             getattr(getattr(event, "source", None), "platform", None),
         )
 
-    async def _handle_model_command(self, event: MessageEvent) -> Optional[str]:
+    async def _handle_model_command(self, event: MessageEvent) -> str | None:
         """Handle /model command — switch model for this session.
 
         Supports:
@@ -1503,7 +1503,7 @@ class GatewaySlashCommandsMixin:
         # Let the normal message handler process it
         return await self._handle_message(retry_event)
 
-    async def _handle_goal_command(self, event: "MessageEvent") -> str:
+    async def _handle_goal_command(self, event: MessageEvent) -> str:
         """Handle /goal for gateway platforms.
 
         Subcommands: ``/goal`` / ``/goal status`` / ``/goal pause`` /
@@ -1580,7 +1580,7 @@ class GatewaySlashCommandsMixin:
 
         return t("gateway.goal.set", budget=state.max_turns, goal=state.goal)
 
-    async def _handle_subgoal_command(self, event: "MessageEvent") -> str:
+    async def _handle_subgoal_command(self, event: MessageEvent) -> str:
         """Handle /subgoal for gateway platforms (mirror of CLI handler).
 
         Subgoals are extra criteria appended to the active goal mid-loop.
@@ -2170,7 +2170,7 @@ class GatewaySlashCommandsMixin:
             return t("gateway.fast.saved", label=label)
         return t("gateway.fast.session_only", label=label)
 
-    async def _handle_yolo_command(self, event: MessageEvent) -> Union[str, EphemeralReply]:
+    async def _handle_yolo_command(self, event: MessageEvent) -> str | EphemeralReply:
         """Handle /yolo — toggle dangerous command approval bypass for this session only."""
         from tools.approval import (
             disable_session_yolo,
@@ -3062,7 +3062,7 @@ class GatewaySlashCommandsMixin:
             logger.error("Insights command error: %s", e, exc_info=True)
             return t("gateway.insights.error", error=e)
 
-    async def _handle_reload_mcp_command(self, event: MessageEvent) -> Optional[str]:
+    async def _handle_reload_mcp_command(self, event: MessageEvent) -> str | None:
         """Handle /reload-mcp — reconnect MCP servers and rebuild the cached agent.
 
         Reloading MCP tools invalidates the provider prompt cache for the
@@ -3096,7 +3096,7 @@ class GatewaySlashCommandsMixin:
         # stores the resume handler; the button/text response triggers
         # ``_resolve_slash_confirm`` which invokes the handler with the
         # chosen outcome.
-        async def _on_confirm(choice: str) -> Optional[str]:
+        async def _on_confirm(choice: str) -> str | None:
             if choice == "cancel":
                 return t("gateway.reload_mcp.cancelled")
             if choice == "always":
@@ -3260,7 +3260,7 @@ class GatewaySlashCommandsMixin:
         lines.append("Invoke a bundle with `/<slug>` to load all its skills.")
         return "\n".join(lines)
 
-    async def _handle_approve_command(self, event: MessageEvent) -> Optional[str]:
+    async def _handle_approve_command(self, event: MessageEvent) -> str | None:
         """Handle /approve command — unblock waiting agent thread(s).
 
         The agent thread(s) are blocked inside tools/approval.py waiting for
