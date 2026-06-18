@@ -683,7 +683,7 @@ def test_visible_providers_force_fresh_shows_nous_subscription_after_upgrade(mon
                 logged_in=True,
                 source="account_api" if force_fresh else "jwt",
                 fresh=force_fresh,
-                paid_service_access=True if force_fresh else False,
+                paid_service_access=bool(force_fresh),
             ),
             features={},
         )

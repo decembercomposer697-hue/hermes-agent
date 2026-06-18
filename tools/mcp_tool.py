@@ -409,7 +409,7 @@ def _resolve_stdio_command(command: str, env: dict) -> tuple[str, dict]:
     resolved_env = dict(env or {})
 
     if os.sep not in resolved_command:
-        path_arg = resolved_env["PATH"] if "PATH" in resolved_env else None
+        path_arg = resolved_env.get("PATH", None)
         which_hit = shutil.which(resolved_command, path=path_arg)
         if which_hit:
             resolved_command = which_hit
@@ -3081,7 +3081,7 @@ def _normalize_mcp_input_schema(schema: dict | None) -> dict:
             if "properties" not in repaired or not isinstance(
                 repaired.get("properties"), dict
             ):
-                repaired["properties"] = {} if "properties" not in repaired else repaired["properties"]
+                repaired["properties"] = repaired.get("properties", {})
                 if not isinstance(repaired.get("properties"), dict):
                     repaired["properties"] = {}
 

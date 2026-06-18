@@ -237,7 +237,7 @@ def _list_recent_sessions(db, limit: int, current_session_id: str = None) -> str
         results = []
         for s in sessions:
             sid = s.get("id", "")
-            if current_root and (sid == current_root or sid == current_session_id):
+            if current_root and sid in (current_root, current_session_id):
                 continue
             # Skip child / delegation sessions
             if s.get("parent_session_id"):

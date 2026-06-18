@@ -960,7 +960,7 @@ class MatrixAdapter(BasePlatformAdapter):
                 client.crypto = olm
                 logger.info(
                     "Matrix: E2EE enabled (store: %s%s)",
-                    str(_CRYPTO_DB_PATH),
+                    _CRYPTO_DB_PATH,
                     f", device_id={client.device_id}" if client.device_id else "",
                 )
             except Exception as exc:

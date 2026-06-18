@@ -1100,7 +1100,7 @@ def _run_comment_agent(prompt: str, client: Any, session_key: str = "") -> str:
 
         return response
     except Exception as e:
-        logger.exception("[Feishu-Comment] _run_comment_agent: agent failed: %s", e)
+        logger.exception("[Feishu-Comment] _run_comment_agent: agent failed")
         return ""
     finally:
         set_doc_client(None)
