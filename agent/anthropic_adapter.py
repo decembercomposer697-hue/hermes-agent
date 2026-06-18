@@ -887,13 +887,16 @@ def _read_claude_code_credentials_from_keychain() -> Optional[Dict[str, Any]]:
         logger.debug("Keychain: no entry found for 'Claude Code-credentials'")
         return None
 
-    raw = result.stdout.strip()
+    raw = result.stdout
+    if not isinstance(raw, (str, bytes, bytearray)):
+        return None
+    raw = raw.strip()
     if not raw:
         return None
 
     try:
         data = json.loads(raw)
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, TypeError, UnicodeDecodeError):
         logger.debug("Keychain: credentials payload is not valid JSON")
         return None
 
