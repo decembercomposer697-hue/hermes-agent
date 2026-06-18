@@ -807,8 +807,10 @@ def normalize_feishu_message(
     message_type: str,
     raw_content: str,
     mentions: Optional[Sequence[Any]] = None,
-    bot: _FeishuBotIdentity = _FeishuBotIdentity(),
+    bot: Optional[_FeishuBotIdentity] = None,
 ) -> FeishuNormalizedMessage:
+    if bot is None:
+        bot = _FeishuBotIdentity()
     normalized_type = str(message_type or "").strip().lower()
     payload = _load_feishu_payload(raw_content)
     mentions_map = _build_mentions_map(mentions, bot)

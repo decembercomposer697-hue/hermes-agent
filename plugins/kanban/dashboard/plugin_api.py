@@ -687,7 +687,7 @@ def list_task_attachments(task_id: str, board: Optional[str] = Query(None)):
 @router.post("/tasks/{task_id}/attachments")
 async def upload_task_attachment(
     task_id: str,
-    file: UploadFile = File(...),
+    file: UploadFile,
     board: Optional[str] = Query(None),
     uploaded_by: Optional[str] = Form(None),
 ):
