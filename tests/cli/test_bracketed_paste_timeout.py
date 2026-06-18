@@ -54,7 +54,7 @@ def _reset_and_apply_production_patch():
     # importlib.reload() preserves module dict entries that the reloaded source
     # does not redefine, so clear Hermes' sentinel before re-applying.
     if hasattr(vt100_mod, "_hermes_bp_timeout_patched"):
-        delattr(vt100_mod, "_hermes_bp_timeout_patched")
+        del vt100_mod._hermes_bp_timeout_patched
     _load_production_patch_helper()()
     assert getattr(vt100_mod, "_hermes_bp_timeout_patched", False)
     return vt100_mod

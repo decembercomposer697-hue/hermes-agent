@@ -2855,7 +2855,7 @@ def _load_fallback_model():
 def _agent_fallback_model(agent):
     """Return an agent's fallback chain without rehydrating deliberately empty chains."""
     if hasattr(agent, "_fallback_chain"):
-        return getattr(agent, "_fallback_chain") or []
+        return agent._fallback_chain or []
     if hasattr(agent, "_fallback_model"):
         return getattr(agent, "_fallback_model", None)
     return _load_fallback_model()

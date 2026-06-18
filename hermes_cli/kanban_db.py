@@ -1205,8 +1205,8 @@ def _cross_process_init_lock(path: Path):
             # it always exists but the byte-range lock is the synchronization
             # primitive; no payload needs to be written.
             handle.seek(0)
-            locking = getattr(msvcrt, "locking")
-            lock_mode = getattr(msvcrt, "LK_LOCK")
+            locking = msvcrt.locking
+            lock_mode = msvcrt.LK_LOCK
             locking(handle.fileno(), lock_mode, 1)
         else:
             import fcntl
@@ -1219,8 +1219,8 @@ def _cross_process_init_lock(path: Path):
                 import msvcrt
 
                 handle.seek(0)
-                locking = getattr(msvcrt, "locking")
-                unlock_mode = getattr(msvcrt, "LK_UNLCK")
+                locking = msvcrt.locking
+                unlock_mode = msvcrt.LK_UNLCK
                 locking(handle.fileno(), unlock_mode, 1)
             else:
                 import fcntl
