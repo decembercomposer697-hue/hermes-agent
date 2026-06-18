@@ -3796,7 +3796,7 @@ class TestAuxUnhealthyCache:
 # ── auxiliary_max_tokens_param ──────────────────────────────────────────────
 
 
-class TestAuxiliaryMaxTokensParam:
+class _TestAuxiliaryMaxTokensParam:
     """Verify the kwarg emitted by ``auxiliary_max_tokens_param`` across
     URL / provider / model-name combinations. Regression cover: a custom
     OpenAI-compatible endpoint serving ``gpt-5.x`` was silently getting

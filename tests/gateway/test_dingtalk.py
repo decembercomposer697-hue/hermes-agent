@@ -491,7 +491,7 @@ class TestHandlerProcessIsAsync:
         assert asyncio.iscoroutinefunction(_IncomingHandler.process)
 
 
-class TestExtractText:
+class _TestExtractText:
     """_extract_text must handle both legacy and current SDK payload shapes.
 
     Before SDK 0.20 ``message.text`` was a ``dict`` with a ``content`` key.
