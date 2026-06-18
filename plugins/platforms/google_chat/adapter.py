@@ -2006,7 +2006,7 @@ class GoogleChatAdapter(BasePlatformAdapter):
     # often shows a blank box. Pattern lifted from PR #14965.
     _INVISIBLE_RE = re.compile(
         "["
-        "​"          # Zero-Width Space
+        "\\u200b"          # Zero-Width Space
         "‌"          # Zero-Width Non-Joiner
         "‍"          # Zero-Width Joiner (ZWJ)
         "‎‏"    # LTR / RTL marks

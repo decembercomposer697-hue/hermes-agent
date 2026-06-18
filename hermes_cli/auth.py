@@ -6827,7 +6827,7 @@ def _xai_oauth_loopback_login(
                 print("loopback listener from the start.")
                 callback = _prompt_manual_callback_paste(redirect_uri)
                 if callback.get("code") is None and callback.get("error") is None:
-                    raise exc
+                    raise
                 allow_missing_state = True
         except Exception:
             try:

@@ -141,7 +141,7 @@ def _get_mcp_stderr_log() -> Any:
             # Sanity-check: confirm a real fd is available before we commit.
             fh.fileno()
             _mcp_stderr_log_fh = fh
-        except Exception as exc:  # pragma: no cover — best-effort fallback
+        except Exception as poll_exc:  # pragma: no cover — best-effort fallback
             logger.debug("Failed to open MCP stderr log, using devnull: %s", exc)
             try:
                 _mcp_stderr_log_fh = open(os.devnull, "w", encoding="utf-8")
@@ -497,7 +497,7 @@ def _cache_mcp_image_block(block) -> str:
         # get any text blocks that did parse.
         logger.debug("MCP image caching skipped — gateway.platforms.base unavailable")
         return ""
-    except Exception as exc:
+    except Exception as poll_exc:
         logger.warning("MCP image block cache failed: %s", exc)
         return ""
 
@@ -562,7 +562,7 @@ def _validate_remote_mcp_url(server_name: str, url: Any) -> str:
         )
     try:
         parsed = urlparse(stripped)
-    except Exception as exc:  # urlparse is very permissive — belt and braces
+    except Exception as poll_exc:  # urlparse is very permissive — belt and braces
         raise InvalidMcpUrlError(
             f"Invalid MCP URL for '{server_name}': {stripped!r} ({exc})"
         ) from exc
@@ -1072,7 +1072,7 @@ class SamplingHandler:
                 f"Sampling LLM call timed out after {self.timeout}s "
                 f"for server '{self.server_name}'"
             )
-        except Exception as exc:
+        except Exception as poll_exc:
             self.metrics["errors"] += 1
             return self._error(
                 f"Sampling LLM call failed: {_sanitize_error(_exc_str(exc))}"
@@ -1330,7 +1330,7 @@ class MCPServerTask:
                             self.session.list_tools(),
                             timeout=30.0,
                         )
-                    except Exception as exc:
+                    except Exception as poll_exc:
                         logger.warning(
                             "MCP server '%s' keepalive failed, "
                             "triggering reconnect: %s",
@@ -1586,7 +1586,7 @@ class MCPServerTask:
                 _oauth_auth = get_manager().get_or_build_provider(
                     self.name, url, config.get("oauth"),
                 )
-            except Exception as exc:
+            except Exception as poll_exc:
                 logger.warning("MCP OAuth setup failed for '%s': %s", self.name, exc)
                 raise
 
@@ -1861,7 +1861,7 @@ class MCPServerTask:
                 # ``await self._task`` completes. See #9930.
                 self.session = None
                 raise
-            except Exception as exc:
+            except Exception as poll_exc:
                 self.session = None
 
                 # If this is the first connection attempt, retry with backoff
@@ -2178,10 +2178,10 @@ def _handle_auth_error_and_retry(
 
                 try:
                     _run_on_mcp_loop(_await_ready(), timeout=15)
-                except Exception as exc:
+                except Exception as poll_exc:
                     logger.warning(
                         "MCP OAuth '%s': ready poll failed: %s",
-                        server_name, exc,
+                        server_name, poll_exc,
                     )
 
         # A successful OAuth recovery is independent evidence that the
@@ -2563,7 +2563,7 @@ def _load_mcp_config() -> Dict[str, dict]:
         except Exception:
             pass
         return {name: _interpolate_env_vars(cfg) for name, cfg in servers.items()}
-    except Exception as exc:
+    except Exception as poll_exc:
         logger.debug("Failed to load MCP config: %s", exc)
         return {}
 
@@ -2701,12 +2701,12 @@ def _make_tool_handler(server_name: str, tool_name: str, tool_timeout: float):
             return result
         except InterruptedError:
             return _interrupted_call_result()
-        except Exception as exc:
+        except Exception as poll_exc:
             # Auth-specific recovery path: consult the manager, signal
             # reconnect if viable, retry once. Returns None to fall
             # through for non-auth exceptions.
             recovered = _handle_auth_error_and_retry(
-                server_name, exc, _call_once,
+                server_name, poll_exc, _call_once,
                 f"tools/call {tool_name}",
             )
             if recovered is not None:
@@ -2716,7 +2716,7 @@ def _make_tool_handler(server_name: str, tool_name: str, tool_timeout: float):
             # but skips OAuth recovery because the access token is
             # still valid — only the server-side session is stale.
             recovered = _handle_session_expired_and_retry(
-                server_name, exc, _call_once,
+                server_name, poll_exc, _call_once,
                 f"tools/call {tool_name}",
             )
             if recovered is not None:
@@ -2771,19 +2771,19 @@ def _make_list_resources_handler(server_name: str, tool_timeout: float):
             return _call_once()
         except InterruptedError:
             return _interrupted_call_result()
-        except Exception as exc:
+        except Exception as poll_exc:
             recovered = _handle_auth_error_and_retry(
-                server_name, exc, _call_once, "resources/list",
+                server_name, poll_exc, _call_once, "resources/list",
             )
             if recovered is not None:
                 return recovered
             recovered = _handle_session_expired_and_retry(
-                server_name, exc, _call_once, "resources/list",
+                server_name, poll_exc, _call_once, "resources/list",
             )
             if recovered is not None:
                 return recovered
             logger.error(
-                "MCP %s/list_resources failed: %s", server_name, exc,
+                "MCP %s/list_resources failed: %s", server_name, poll_exc,
             )
             return json.dumps({
                 "error": _sanitize_error(
@@ -2831,19 +2831,19 @@ def _make_read_resource_handler(server_name: str, tool_timeout: float):
             return _call_once()
         except InterruptedError:
             return _interrupted_call_result()
-        except Exception as exc:
+        except Exception as poll_exc:
             recovered = _handle_auth_error_and_retry(
-                server_name, exc, _call_once, "resources/read",
+                server_name, poll_exc, _call_once, "resources/read",
             )
             if recovered is not None:
                 return recovered
             recovered = _handle_session_expired_and_retry(
-                server_name, exc, _call_once, "resources/read",
+                server_name, poll_exc, _call_once, "resources/read",
             )
             if recovered is not None:
                 return recovered
             logger.error(
-                "MCP %s/read_resource failed: %s", server_name, exc,
+                "MCP %s/read_resource failed: %s", server_name, poll_exc,
             )
             return json.dumps({
                 "error": _sanitize_error(
@@ -2894,19 +2894,19 @@ def _make_list_prompts_handler(server_name: str, tool_timeout: float):
             return _call_once()
         except InterruptedError:
             return _interrupted_call_result()
-        except Exception as exc:
+        except Exception as poll_exc:
             recovered = _handle_auth_error_and_retry(
-                server_name, exc, _call_once, "prompts/list",
+                server_name, poll_exc, _call_once, "prompts/list",
             )
             if recovered is not None:
                 return recovered
             recovered = _handle_session_expired_and_retry(
-                server_name, exc, _call_once, "prompts/list",
+                server_name, poll_exc, _call_once, "prompts/list",
             )
             if recovered is not None:
                 return recovered
             logger.error(
-                "MCP %s/list_prompts failed: %s", server_name, exc,
+                "MCP %s/list_prompts failed: %s", server_name, poll_exc,
             )
             return json.dumps({
                 "error": _sanitize_error(
@@ -2965,19 +2965,19 @@ def _make_get_prompt_handler(server_name: str, tool_timeout: float):
             return _call_once()
         except InterruptedError:
             return _interrupted_call_result()
-        except Exception as exc:
+        except Exception as poll_exc:
             recovered = _handle_auth_error_and_retry(
-                server_name, exc, _call_once, "prompts/get",
+                server_name, poll_exc, _call_once, "prompts/get",
             )
             if recovered is not None:
                 return recovered
             recovered = _handle_session_expired_and_retry(
-                server_name, exc, _call_once, "prompts/get",
+                server_name, poll_exc, _call_once, "prompts/get",
             )
             if recovered is not None:
                 return recovered
             logger.error(
-                "MCP %s/get_prompt failed: %s", server_name, exc,
+                "MCP %s/get_prompt failed: %s", server_name, poll_exc,
             )
             return json.dumps({
                 "error": _sanitize_error(
@@ -3757,7 +3757,7 @@ def probe_mcp_server_tools() -> Dict[str, List[tuple]]:
 
     try:
         _run_on_mcp_loop(_probe_all, timeout=120)
-    except Exception as exc:
+    except Exception as poll_exc:
         logger.debug("MCP probe failed: %s", exc)
     finally:
         _stop_mcp_loop()
@@ -3868,7 +3868,7 @@ def _kill_orphaned_mcp_children(include_active: bool = False) -> None:
                 # the per-pid path so we still try the direct child if alive.
                 logger.debug(
                     "killpg(%d, %d) failed for MCP server '%s': %s; falling back to kill(pid)",
-                    pgid, sig, server_name, exc,
+                    pgid, sig, server_name, poll_exc,
                 )
         try:
             os.kill(pid, sig)
