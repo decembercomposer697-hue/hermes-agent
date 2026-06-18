@@ -38,7 +38,7 @@ def _capture_sidecar(adapter: PhotonAdapter) -> list[tuple[str, dict[str, Any]]]
     return calls
 
 
-@pytest.fixture()
+@pytest.fixture
 def real_file(tmp_path) -> str:
     p = tmp_path / "photo.jpg"
     p.write_bytes(b"\xff\xd8\xff\xe0fake-jpeg")

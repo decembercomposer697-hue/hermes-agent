@@ -177,7 +177,7 @@ class TestComputeNextRun:
 # Job CRUD (with tmp file storage)
 # =========================================================================
 
-@pytest.fixture()
+@pytest.fixture
 def tmp_cron_dir(tmp_path, monkeypatch):
     """Redirect cron storage to a temp directory."""
     monkeypatch.setattr("cron.jobs.CRON_DIR", tmp_path / "cron")

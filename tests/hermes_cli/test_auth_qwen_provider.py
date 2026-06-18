@@ -63,7 +63,7 @@ def _write_qwen_creds(tmp_path, tokens=None):
     return creds_path
 
 
-@pytest.fixture()
+@pytest.fixture
 def qwen_env(tmp_path, monkeypatch):
     """Redirect _qwen_cli_auth_path to tmp_path/.qwen/oauth_creds.json."""
     creds_path = tmp_path / ".qwen" / "oauth_creds.json"

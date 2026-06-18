@@ -155,7 +155,7 @@ def _base_config(**extra):
     return cfg
 
 
-@pytest.fixture()
+@pytest.fixture
 def adapter(tmp_path):
     """Build an adapter with its loop captured and Chat client mocked.
 

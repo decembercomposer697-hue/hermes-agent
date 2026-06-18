@@ -41,13 +41,13 @@ from acp_adapter.session import SessionManager
 from hermes_state import SessionDB
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_manager():
     """SessionManager with a mock agent factory."""
     return SessionManager(agent_factory=lambda: MagicMock(name="MockAIAgent"))
 
 
-@pytest.fixture()
+@pytest.fixture
 def agent(mock_manager):
     """HermesACPAgent backed by a mock session manager."""
     return HermesACPAgent(session_manager=mock_manager)

@@ -14,7 +14,7 @@ import tempfile
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def isolated_kanban_home_with_profiles(monkeypatch):
     """Spin up a fresh HERMES_HOME with kanban DB + alpha/beta profiles."""
     test_home = tempfile.mkdtemp(prefix="kanban_per_profile_cap_test_")
@@ -25,7 +25,7 @@ def isolated_kanban_home_with_profiles(monkeypatch):
         if mod.startswith("hermes_cli") or mod.startswith("hermes_state") or mod == "hermes_constants":
             del sys.modules[mod]
     from hermes_cli import kanban_db
-    yield kanban_db
+    return kanban_db
 
 
 def _fake_spawn(*args, **kwargs):

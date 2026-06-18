@@ -19,7 +19,7 @@ def _restore_stdout():
     sys.stdout = _original_stdout
 
 
-@pytest.fixture()
+@pytest.fixture
 def server():
     with patch.dict("sys.modules", {
         "hermes_constants": MagicMock(get_hermes_home=MagicMock(return_value="/tmp/hermes_test")),
@@ -43,7 +43,7 @@ def server():
         mod._answers.clear()
 
 
-@pytest.fixture()
+@pytest.fixture
 def capture(server):
     """Redirect server's real stdout to a StringIO and return (server, buf)."""
     buf = io.StringIO()

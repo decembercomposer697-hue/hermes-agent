@@ -58,7 +58,7 @@ def patched_version(monkeypatch: pytest.MonkeyPatch) -> Iterator[dict[str, str]]
     """Override _installed_version with a controllable lookup table."""
     table: dict[str, str] = {}
     monkeypatch.setattr(adv, "_installed_version", lambda pkg: table.get(pkg))
-    yield table
+    return table
 
 
 # ---------------------------------------------------------------------------

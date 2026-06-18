@@ -20,7 +20,7 @@ from gateway.config import Platform, GatewayConfig
 from gateway.session import SessionSource, SessionStore
 
 
-@pytest.fixture()
+@pytest.fixture
 def store(tmp_path, monkeypatch):
     """SessionStore with SQLite — load_transcript reads from DB only.
 

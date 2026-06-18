@@ -126,7 +126,7 @@ def _make_video(file_obj=None):
 # Fixtures
 # ---------------------------------------------------------------------------
 
-@pytest.fixture()
+@pytest.fixture
 def adapter():
     config = PlatformConfig(enabled=True, token="fake-token")
     a = TelegramAdapter(config)
@@ -500,7 +500,7 @@ class TestMediaGroups:
 class TestSendVoice:
     """Tests for TelegramAdapter.send_voice() routing across audio formats."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def connected_adapter(self, adapter):
         """Adapter with a mock bot attached."""
         bot = AsyncMock()
@@ -581,7 +581,7 @@ class TestSendVoice:
 class TestSendDocument:
     """Tests for TelegramAdapter.send_document() — sending files to users."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def connected_adapter(self, adapter):
         """Adapter with a mock bot attached."""
         bot = AsyncMock()
@@ -818,7 +818,7 @@ class TestTelegramPhotoBatching:
 class TestSendVideo:
     """Tests for TelegramAdapter.send_video() — sending videos to users."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def connected_adapter(self, adapter):
         bot = AsyncMock()
         adapter._bot = bot

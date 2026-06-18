@@ -17,7 +17,7 @@ from gateway.config import GatewayConfig
 from gateway.session import SessionStore
 
 
-@pytest.fixture()
+@pytest.fixture
 def store(tmp_path, monkeypatch):
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     monkeypatch.setattr(Path, "home", lambda: tmp_path)

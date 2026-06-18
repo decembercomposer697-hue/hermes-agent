@@ -50,7 +50,7 @@ class _NoFtsExistingTableConnection(sqlite3.Connection):
         return super().cursor(factory or _NoFtsExistingTableCursor)
 
 
-@pytest.fixture()
+@pytest.fixture
 def db(tmp_path):
     """Create a SessionDB with a temp database file."""
     db_path = tmp_path / "test_state.db"

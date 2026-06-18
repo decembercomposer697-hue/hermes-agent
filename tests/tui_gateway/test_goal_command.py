@@ -18,7 +18,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def hermes_home(tmp_path, monkeypatch):
     home = tmp_path / ".hermes"
     home.mkdir()
@@ -33,7 +33,7 @@ def hermes_home(tmp_path, monkeypatch):
     goals._DB_CACHE.clear()
 
 
-@pytest.fixture()
+@pytest.fixture
 def server(hermes_home):
     with patch.dict(
         "sys.modules",
@@ -57,7 +57,7 @@ def server(hermes_home):
         mod._answers.clear()
 
 
-@pytest.fixture()
+@pytest.fixture
 def session(server):
     sid = "sid-test"
     session_key = "tui-goal-session-1"

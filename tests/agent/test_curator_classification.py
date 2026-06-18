@@ -34,7 +34,7 @@ def curator_env(tmp_path, monkeypatch):
     importlib.reload(hermes_constants)
     from agent import curator
     importlib.reload(curator)
-    yield curator
+    return curator
 
 
 def test_classify_consolidated_via_write_file_evidence(curator_env):

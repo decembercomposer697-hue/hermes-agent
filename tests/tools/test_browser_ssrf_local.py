@@ -29,7 +29,7 @@ def _make_browser_result(url="https://example.com"):
 class TestPreNavigationSsrf:
     PRIVATE_URL = "http://127.0.0.1:8080/dashboard"
 
-    @pytest.fixture()
+    @pytest.fixture
     def _common_patches(self, monkeypatch):
         """Shared patches for pre-navigation tests that pass the SSRF check."""
         monkeypatch.setattr(browser_tool, "_is_camofox_mode", lambda: False)
@@ -200,7 +200,7 @@ class TestPostRedirectSsrf:
     PUBLIC_URL = "https://example.com/redirect"
     PRIVATE_FINAL_URL = "http://192.168.1.1/internal"
 
-    @pytest.fixture()
+    @pytest.fixture
     def _common_patches(self, monkeypatch):
         """Shared patches for redirect tests."""
         monkeypatch.setattr(browser_tool, "_is_camofox_mode", lambda: False)

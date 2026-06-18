@@ -56,7 +56,7 @@ _ensure_discord_mock()
 from plugins.platforms.discord.adapter import DiscordAdapter
 
 
-@pytest.fixture()
+@pytest.fixture
 def adapter_factory():
     """Factory to create DiscordAdapter with custom reply_to_mode."""
     def create(reply_to_mode: str = "first"):

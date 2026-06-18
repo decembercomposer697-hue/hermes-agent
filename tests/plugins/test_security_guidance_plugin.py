@@ -31,7 +31,7 @@ def _isolate_env(tmp_path, monkeypatch):
     monkeypatch.setenv("HERMES_HOME", str(hermes_home))
     monkeypatch.delenv("SECURITY_GUIDANCE_BLOCK", raising=False)
     monkeypatch.delenv("SECURITY_GUIDANCE_DISABLE", raising=False)
-    yield hermes_home
+    return hermes_home
 
 
 # ---------------------------------------------------------------------------

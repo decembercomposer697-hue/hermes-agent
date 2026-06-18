@@ -26,7 +26,7 @@ def _make_auth_store(pool: dict | None = None, providers: dict | None = None) ->
     return store
 
 
-@pytest.fixture()
+@pytest.fixture
 def profile_env(tmp_path, monkeypatch):
     """Set up a global root + an active profile under Path.home()/.hermes/profiles/coder.
 

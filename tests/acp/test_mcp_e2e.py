@@ -34,12 +34,12 @@ from acp_adapter.tools import build_tool_start
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_manager():
     return SessionManager(agent_factory=lambda: MagicMock(name="MockAIAgent"))
 
 
-@pytest.fixture()
+@pytest.fixture
 def acp_agent(mock_manager):
     return HermesACPAgent(session_manager=mock_manager)
 

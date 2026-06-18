@@ -56,7 +56,7 @@ def plugin_api(tmp_path, monkeypatch):
     # fake into later tests in the same xdist worker — breaking every
     # test that does ``from hermes_state import SessionDB``.
     module._test_monkeypatch = monkeypatch
-    yield module
+    return module
 
 
 class _FakeSessionDB:

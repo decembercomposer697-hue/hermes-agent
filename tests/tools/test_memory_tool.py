@@ -257,7 +257,7 @@ class TestScanMemoryContent:
 # MemoryStore core operations
 # =========================================================================
 
-@pytest.fixture()
+@pytest.fixture
 def store(tmp_path, monkeypatch):
     """Create a MemoryStore with temp storage."""
     monkeypatch.setattr("tools.memory_tool.get_memory_dir", lambda: tmp_path)

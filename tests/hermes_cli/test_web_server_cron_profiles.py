@@ -4,7 +4,7 @@ import pytest
 from fastapi import HTTPException
 
 
-@pytest.fixture()
+@pytest.fixture
 def isolated_profiles(tmp_path, monkeypatch):
     """Give profile discovery an isolated default home with one named profile."""
     from hermes_cli import profiles

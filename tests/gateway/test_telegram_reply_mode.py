@@ -34,7 +34,7 @@ _ensure_telegram_mock()
 from gateway.platforms.telegram import TelegramAdapter
 
 
-@pytest.fixture()
+@pytest.fixture
 def adapter_factory():
     """Factory to create TelegramAdapter with custom reply_to_mode."""
     def create(reply_to_mode: str = "first"):

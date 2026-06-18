@@ -54,7 +54,7 @@ def test_is_destructive_command_treats_install_as_mutating():
     assert run_agent._is_destructive_command("install template.env .env") is True
 
 
-@pytest.fixture()
+@pytest.fixture
 def agent():
     """Minimal AIAgent with mocked OpenAI client and tool loading."""
     with (
@@ -75,7 +75,7 @@ def agent():
         return a
 
 
-@pytest.fixture()
+@pytest.fixture
 def agent_with_memory_tool():
     """Agent whose valid_tool_names includes 'memory'."""
     with (

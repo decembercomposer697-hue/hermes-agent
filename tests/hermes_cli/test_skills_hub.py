@@ -16,7 +16,7 @@ class _DummyLockFile:
         return self._installed
 
 
-@pytest.fixture()
+@pytest.fixture
 def hub_env(monkeypatch, tmp_path):
     """Set up isolated hub directory paths and return (monkeypatch, tmp_path)."""
     import tools.skills_hub as hub
@@ -48,7 +48,7 @@ _ALL_THREE_SKILLS = [
 _BUILTIN_MANIFEST = {"builtin-skill": "abc123"}
 
 
-@pytest.fixture()
+@pytest.fixture
 def three_source_env(monkeypatch, hub_env):
     """Populate hub/builtin/local skills for source-classification tests."""
     import tools.skills_hub as hub

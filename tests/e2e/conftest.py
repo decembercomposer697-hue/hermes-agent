@@ -278,22 +278,22 @@ def platform(request):
     return request.param
 
 
-@pytest.fixture()
+@pytest.fixture
 def source(platform):
     return make_source(platform)
 
 
-@pytest.fixture()
+@pytest.fixture
 def session_entry(platform, source):
     return make_session_entry(platform, source)
 
 
-@pytest.fixture()
+@pytest.fixture
 def runner(platform, session_entry):
     return make_runner(platform, session_entry)
 
 
-@pytest.fixture()
+@pytest.fixture
 def adapter(platform, runner):
     return make_adapter(platform, runner)
 
@@ -416,21 +416,21 @@ def _make_discord_adapter_wired(runner=None):
     return adapter, runner
 
 
-@pytest.fixture()
+@pytest.fixture
 def discord_setup():
     return _make_discord_adapter_wired()
 
 
-@pytest.fixture()
+@pytest.fixture
 def discord_adapter(discord_setup):
     return discord_setup[0]
 
 
-@pytest.fixture()
+@pytest.fixture
 def discord_runner(discord_setup):
     return discord_setup[1]
 
 
-@pytest.fixture()
+@pytest.fixture
 def bot_user():
     return make_fake_bot_user()

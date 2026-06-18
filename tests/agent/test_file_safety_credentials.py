@@ -19,7 +19,7 @@ from pathlib import Path
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_home(tmp_path, monkeypatch):
     """Point ``_hermes_home_path()`` at a tmp dir for isolated checks."""
     import agent.file_safety as fs

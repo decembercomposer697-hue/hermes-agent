@@ -21,7 +21,7 @@ import tools.browser_tool as browser_tool
 def _reset_resolver_state(monkeypatch):
     monkeypatch.setattr(browser_tool, "_cached_cloud_provider", None)
     monkeypatch.setattr(browser_tool, "_cloud_provider_resolved", False)
-    yield
+    return
 
 
 class TestCloudProviderCachePolicy:

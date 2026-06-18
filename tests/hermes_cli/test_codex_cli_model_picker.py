@@ -28,7 +28,7 @@ def _make_fake_jwt(expiry_offset: int = 3600) -> str:
     return f"{header}.{payload}.fakesig"
 
 
-@pytest.fixture()
+@pytest.fixture
 def hermes_auth_only_env(tmp_path, monkeypatch):
     """Tokens already in Hermes auth store (no Codex CLI needed)."""
     hermes_home = tmp_path / ".hermes"
@@ -103,7 +103,7 @@ def test_codex_picker_uses_live_codex_catalog(hermes_auth_only_env, tmp_path, mo
     assert codex["total_models"] == len(codex["models"])
 
 
-@pytest.fixture()
+@pytest.fixture
 def claude_code_only_env(tmp_path, monkeypatch):
     """Set up an environment where Anthropic credentials only exist in
     ~/.claude/.credentials.json (Claude Code) — not in env vars or Hermes

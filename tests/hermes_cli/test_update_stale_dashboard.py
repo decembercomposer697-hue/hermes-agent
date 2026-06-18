@@ -56,7 +56,7 @@ def _refresh_bindings_against_live_module():
     _find_stale_dashboard_pids = live._find_stale_dashboard_pids
     _kill_stale_dashboard_processes = live._kill_stale_dashboard_processes
     _warn_stale_dashboard_processes = live._warn_stale_dashboard_processes
-    yield
+    return
 
 
 def _ps_line(pid: int, cmd: str) -> str:

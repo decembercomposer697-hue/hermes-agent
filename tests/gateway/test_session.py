@@ -438,7 +438,7 @@ class TestSenderPrefixWithBackfill:
     message, not the channel_context backfill block.
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def runner(self):
         from gateway.run import GatewayRunner
 
@@ -450,7 +450,7 @@ class TestSenderPrefixWithBackfill:
         r._has_setup_skill = lambda: False
         return r
 
-    @pytest.fixture()
+    @pytest.fixture
     def source(self):
         return SessionSource(
             platform=Platform.DISCORD,
@@ -503,7 +503,7 @@ class TestSenderPrefixWithBackfill:
 class TestSessionStoreRewriteTranscript:
     """Regression: /retry and /undo must persist truncated history to DB."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def store(self, tmp_path, monkeypatch):
         import hermes_state
         monkeypatch.setattr(hermes_state, "DEFAULT_DB_PATH", tmp_path / "state.db")
@@ -615,7 +615,7 @@ class TestWhatsAppSessionKeyConsistency:
     """Regression: WhatsApp session keys must collapse JID/LID aliases to a
     single stable identity for both DM chat_ids and group participant_ids."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def store(self, tmp_path):
         config = GatewayConfig()
         with patch("gateway.session.SessionStore._ensure_loaded"):

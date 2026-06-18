@@ -21,7 +21,7 @@ from acp_adapter.events import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_conn():
     """Mock ACP Client connection."""
     conn = MagicMock(spec=acp.Client)
@@ -29,7 +29,7 @@ def mock_conn():
     return conn
 
 
-@pytest.fixture()
+@pytest.fixture
 def event_loop_fixture():
     """Create a real event loop for testing threadsafe coroutine submission."""
     loop = asyncio.new_event_loop()

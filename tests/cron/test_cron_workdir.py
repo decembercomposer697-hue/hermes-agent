@@ -17,7 +17,7 @@ import json
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def tmp_cron_dir(tmp_path, monkeypatch):
     """Isolate cron job storage into a temp dir so tests don't stomp on real jobs."""
     monkeypatch.setattr("cron.jobs.CRON_DIR", tmp_path / "cron")

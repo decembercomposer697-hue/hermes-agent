@@ -286,7 +286,7 @@ class TestLintResult:
 # ShellFileOperations helpers
 # =========================================================================
 
-@pytest.fixture()
+@pytest.fixture
 def mock_env():
     """Create a mock terminal environment."""
     env = MagicMock()
@@ -295,7 +295,7 @@ def mock_env():
     return env
 
 
-@pytest.fixture()
+@pytest.fixture
 def file_ops(mock_env):
     return ShellFileOperations(mock_env)
 

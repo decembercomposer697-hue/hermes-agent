@@ -54,7 +54,7 @@ def patched_manager(monkeypatch):
 
     monkeypatch.setattr(plugins_mod, "get_plugin_manager", _stub_get_manager)
     monkeypatch.setattr(plugins_mod, "_ensure_plugins_discovered", _stub_get_manager)
-    yield fresh
+    return fresh
 
 
 # ── PluginContext.register_auxiliary_task ────────────────────────────────────

@@ -11,7 +11,7 @@ from cli import _detect_file_drop
 # Fixtures
 # ---------------------------------------------------------------------------
 
-@pytest.fixture()
+@pytest.fixture
 def tmp_image(tmp_path):
     """Create a temporary .png file and return its path."""
     img = tmp_path / "screenshot.png"
@@ -19,7 +19,7 @@ def tmp_image(tmp_path):
     return img
 
 
-@pytest.fixture()
+@pytest.fixture
 def tmp_text(tmp_path):
     """Create a temporary .py file and return its path."""
     f = tmp_path / "main.py"
@@ -27,7 +27,7 @@ def tmp_text(tmp_path):
     return f
 
 
-@pytest.fixture()
+@pytest.fixture
 def tmp_image_with_spaces(tmp_path):
     """Create a file whose name contains spaces (like macOS screenshots)."""
     img = tmp_path / "Screenshot 2026-04-01 at 7.25.32 PM.png"

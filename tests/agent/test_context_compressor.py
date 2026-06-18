@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 from agent.context_compressor import ContextCompressor, SUMMARY_PREFIX
 
 
-@pytest.fixture()
+@pytest.fixture
 def compressor():
     """Create a ContextCompressor with mocked dependencies."""
     with patch("agent.context_compressor.get_model_context_length", return_value=100000):
@@ -1692,7 +1692,7 @@ class TestTokenBudgetTailProtection:
     blocking compaction.
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def budget_compressor(self):
         """Compressor with known token budget for tail protection tests."""
         with patch("agent.context_compressor.get_model_context_length", return_value=200_000):

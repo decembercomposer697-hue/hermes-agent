@@ -76,7 +76,7 @@ def _make_413_error(*, use_status_code=True, message="Request entity too large")
     return err
 
 
-@pytest.fixture()
+@pytest.fixture
 def agent():
     with (
         patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")),

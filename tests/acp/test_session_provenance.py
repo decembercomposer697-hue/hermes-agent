@@ -13,10 +13,10 @@ from acp_adapter.provenance import build_session_provenance, session_provenance_
 from hermes_state import SessionDB
 
 
-@pytest.fixture()
+@pytest.fixture
 def db(tmp_path):
     d = SessionDB(db_path=tmp_path / "state.db")
-    yield d
+    return d
 
 
 def _mk(db, sid, parent=None):

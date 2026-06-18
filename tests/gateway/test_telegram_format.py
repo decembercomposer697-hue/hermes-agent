@@ -47,7 +47,7 @@ from gateway.platforms.telegram import (
 # Fixtures
 # ---------------------------------------------------------------------------
 
-@pytest.fixture()
+@pytest.fixture
 def adapter():
     config = PlatformConfig(enabled=True, token="fake-token")
     return TelegramAdapter(config)

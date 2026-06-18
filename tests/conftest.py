@@ -418,13 +418,13 @@ def _isolate_hermes_home(_hermetic_environment):
 # approvals from one test's session into another's.
 
 
-@pytest.fixture()
+@pytest.fixture
 def tmp_dir(tmp_path):
     """Provide a temporary directory that is cleaned up automatically."""
     return tmp_path
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_config():
     """Return a minimal hermes config dict suitable for unit tests."""
     return {

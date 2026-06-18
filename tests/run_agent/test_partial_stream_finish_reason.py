@@ -274,7 +274,7 @@ class TestLengthContinuationPromptBranching:
 
 # ── Integration: live conversation loop ───────────────────────────────────
 
-@pytest.fixture()
+@pytest.fixture
 def loop_agent():
     """AIAgent with a mocked OpenAI client (mirrors test_run_agent's fixture)
     so we can stage a stub + continuation pair on .chat.completions.create."""

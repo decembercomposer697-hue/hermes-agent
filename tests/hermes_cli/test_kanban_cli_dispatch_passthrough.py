@@ -15,7 +15,7 @@ import tempfile
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def isolated_kanban_home(monkeypatch):
     """Spin up a fresh HERMES_HOME with a clean kanban DB."""
     test_home = tempfile.mkdtemp(prefix="kanban_cli_passthrough_")
@@ -24,7 +24,7 @@ def isolated_kanban_home(monkeypatch):
     for mod in list(sys.modules.keys()):
         if mod.startswith("hermes_cli") or mod.startswith("hermes_state") or mod == "hermes_constants":
             del sys.modules[mod]
-    yield test_home
+    return test_home
 
 
 def test_cli_dispatch_passes_max_in_progress_from_config(isolated_kanban_home, monkeypatch):

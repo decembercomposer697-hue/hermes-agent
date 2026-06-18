@@ -50,13 +50,13 @@ def _patch_daytona_imports(monkeypatch):
 # Fixtures
 # ---------------------------------------------------------------------------
 
-@pytest.fixture()
+@pytest.fixture
 def daytona_sdk(monkeypatch):
     """Provide a mock daytona SDK module and return it for assertions."""
     return _patch_daytona_imports(monkeypatch)
 
 
-@pytest.fixture()
+@pytest.fixture
 def make_env(daytona_sdk, monkeypatch):
     """Factory that creates a DaytonaEnvironment with a mocked SDK."""
     # Prevent is_interrupted from interfering — patch where it's used (base.py)

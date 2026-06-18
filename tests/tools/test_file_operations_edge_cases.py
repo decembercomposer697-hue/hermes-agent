@@ -19,7 +19,7 @@ from tools.file_operations import ShellFileOperations, _parse_search_context_lin
 class TestIsLikelyBinary:
     """Verify content-analysis logic after dead-code removal."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def ops(self):
         return ShellFileOperations.__new__(ShellFileOperations)
 
@@ -88,7 +88,7 @@ class TestCheckLintBracePaths:
     through the in-process ast.parse linter (see TestCheckLintInproc).
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def ops(self):
         obj = ShellFileOperations.__new__(ShellFileOperations)
         obj._command_cache = {}
@@ -159,7 +159,7 @@ class TestCheckLintInproc:
     directly in Python — no subprocess, no toolchain dependency.
     """
 
-    @pytest.fixture()
+    @pytest.fixture
     def ops(self):
         obj = ShellFileOperations.__new__(ShellFileOperations)
         obj._command_cache = {}
@@ -218,7 +218,7 @@ class TestCheckLintInproc:
 class TestCheckLintDelta:
     """Verify _check_lint_delta() filters pre-existing errors from post-edit output."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def ops(self):
         obj = ShellFileOperations.__new__(ShellFileOperations)
         obj._command_cache = {}

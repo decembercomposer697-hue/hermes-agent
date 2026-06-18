@@ -13,7 +13,7 @@ import tempfile
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def isolated_kanban_home(monkeypatch):
     """Spin up a fresh HERMES_HOME with a clean kanban DB."""
     test_home = tempfile.mkdtemp(prefix="kanban_default_assignee_test_")
@@ -23,7 +23,7 @@ def isolated_kanban_home(monkeypatch):
         if mod.startswith("hermes_cli") or mod.startswith("hermes_state") or mod == "hermes_constants":
             del sys.modules[mod]
     from hermes_cli import kanban_db
-    yield kanban_db, test_home
+    return kanban_db, test_home
     # Cleanup is best-effort; tempfile dir survives but pytest isolation
     # gives each test its own monkeypatched HERMES_HOME so no cross-test
     # contamination.

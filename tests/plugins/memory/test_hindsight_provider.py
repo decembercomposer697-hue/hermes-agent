@@ -88,7 +88,7 @@ class _FakeSessionDB:
         return list(self._messages)
 
 
-@pytest.fixture()
+@pytest.fixture
 def provider(tmp_path, monkeypatch):
     """Create an initialized HindsightMemoryProvider with a mock client."""
     config = {
@@ -113,7 +113,7 @@ def provider(tmp_path, monkeypatch):
     return p
 
 
-@pytest.fixture()
+@pytest.fixture
 def provider_with_config(tmp_path, monkeypatch):
     """Create a provider factory that accepts custom config overrides."""
     def _make(**overrides):

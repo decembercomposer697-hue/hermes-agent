@@ -40,7 +40,7 @@ def _force_daytona(monkeypatch):
     monkeypatch.setenv("TERMINAL_CONTAINER_PERSISTENT", "false")
 
 
-@pytest.fixture()
+@pytest.fixture
 def task_id(request):
     """Provide a unique task_id and clean up the sandbox after the test."""
     tid = f"daytona_test_{request.node.name}"

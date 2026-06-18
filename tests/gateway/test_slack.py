@@ -99,7 +99,7 @@ def _fake_create_task(coro):
 # ---------------------------------------------------------------------------
 
 
-@pytest.fixture()
+@pytest.fixture
 def adapter():
     config = PlatformConfig(enabled=True, token="xoxb-fake-token")
     a = SlackAdapter(config)
@@ -2505,7 +2505,7 @@ class TestReactions:
 class TestThreadReplyHandling:
     """Test thread reply processing without explicit bot mentions."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_session_store(self):
         """Create a mock session store with entries dict."""
         store = MagicMock()
@@ -2515,7 +2515,7 @@ class TestThreadReplyHandling:
         store.config.group_sessions_per_user = True
         return store
 
-    @pytest.fixture()
+    @pytest.fixture
     def adapter_with_session_store(self, mock_session_store):
         """Create an adapter with a mock session store attached."""
         config = PlatformConfig(enabled=True, token="***")
@@ -2644,7 +2644,7 @@ class TestThreadReplyHandling:
 class TestAssistantThreadLifecycle:
     """Slack Assistant lifecycle events should seed session/user context."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_session_store(self):
         store = MagicMock()
         store._entries = {}
@@ -2654,7 +2654,7 @@ class TestAssistantThreadLifecycle:
         store.get_or_create_session = MagicMock()
         return store
 
-    @pytest.fixture()
+    @pytest.fixture
     def assistant_adapter(self, mock_session_store):
         config = PlatformConfig(enabled=True, token="***")
         a = SlackAdapter(config)

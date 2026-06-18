@@ -35,7 +35,7 @@ from tools.checkpoint_manager import (
 # Fixtures
 # =========================================================================
 
-@pytest.fixture()
+@pytest.fixture
 def work_dir(tmp_path):
     d = tmp_path / "project"
     d.mkdir()
@@ -44,13 +44,13 @@ def work_dir(tmp_path):
     return d
 
 
-@pytest.fixture()
+@pytest.fixture
 def checkpoint_base(tmp_path):
     """Isolated checkpoint base — never writes to ~/.hermes/."""
     return tmp_path / "checkpoints"
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_home(tmp_path, monkeypatch):
     home = tmp_path / "home"
     home.mkdir()
@@ -62,13 +62,13 @@ def fake_home(tmp_path, monkeypatch):
     return home
 
 
-@pytest.fixture()
+@pytest.fixture
 def mgr(work_dir, checkpoint_base, monkeypatch):
     monkeypatch.setattr("tools.checkpoint_manager.CHECKPOINT_BASE", checkpoint_base)
     return CheckpointManager(enabled=True, max_snapshots=50)
 
 
-@pytest.fixture()
+@pytest.fixture
 def disabled_mgr(checkpoint_base, monkeypatch):
     monkeypatch.setattr("tools.checkpoint_manager.CHECKPOINT_BASE", checkpoint_base)
     return CheckpointManager(enabled=False)

@@ -13,7 +13,7 @@ import yaml
 # Shared fixture — isolate HERMES_HOME so save_config writes to tmp_path
 # ---------------------------------------------------------------------------
 
-@pytest.fixture()
+@pytest.fixture
 def isolated_home(tmp_path, monkeypatch):
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
     home = tmp_path / ".hermes"
