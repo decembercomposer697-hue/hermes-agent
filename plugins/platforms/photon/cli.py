@@ -337,7 +337,7 @@ def _install_sidecar() -> int:
     # to the current release before installing — a plain `npm install` would
     # stay pinned to whatever the committed lockfile already resolved.
     print(f"  $ cd {_SIDECAR_DIR} && {npm} install spectrum-ts@latest")
-    proc = subprocess.run(  # noqa: S603
+    proc = subprocess.run(
         [npm, "install", "spectrum-ts@latest"],
         cwd=str(_SIDECAR_DIR),
         check=False,

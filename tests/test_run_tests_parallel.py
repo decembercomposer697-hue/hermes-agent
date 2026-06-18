@@ -191,7 +191,7 @@ def test_grandchild_leak_is_killed_by_runner(tmp_path: Path) -> None:
 # exit-4 retry loop (transient "file or directory not found" on loaded runners)
 # ---------------------------------------------------------------------------
 
-import importlib.util as _importlib_util  # noqa: E402
+import importlib.util as _importlib_util
 
 
 def _load_runner_module():

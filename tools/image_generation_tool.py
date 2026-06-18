@@ -60,7 +60,7 @@ from tools.debug_helpers import DebugSession
 from tools.fal_common import (
     _ManagedFalSyncClient,
     _extract_http_status,
-    _normalize_fal_queue_url_format,  # noqa: F401 — re-exported for tests
+    _normalize_fal_queue_url_format,
 )
 from tools.managed_tool_gateway import resolve_managed_tool_gateway
 from tools.tool_backend_helpers import (
@@ -622,7 +622,7 @@ def _active_terminal_env(task_id: str | None):
         from tools.terminal_tool import get_active_env
 
         return get_active_env(task_id or "default")
-    except Exception as exc:  # noqa: BLE001 - artifact hinting must not break generation
+    except Exception as exc:
         logger.debug("Could not inspect active terminal environment: %s", exc)
         return None
 
@@ -639,7 +639,7 @@ def _agent_cache_base_for_env(env: Any) -> str | None:
                 value = explicit()
                 if value:
                     return str(value).rstrip("/")
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 logger.debug("active env agent_visible_cache_base failed: %s", exc)
 
         remote_home = getattr(env, "_remote_home", None)
@@ -674,7 +674,7 @@ def _agent_visible_cache_path(host_path: str, env: Any) -> str | None:
         from tools.credential_files import map_cache_path_to_container
 
         return map_cache_path_to_container(host_path, container_base=cache_base)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         logger.debug("Could not translate image cache path for backend: %s", exc)
     return None
 
@@ -685,7 +685,7 @@ def _force_artifact_sync(env: Any) -> None:
         return
     try:
         sync_manager.sync(force=True)
-    except Exception as exc:  # noqa: BLE001 - keep generation success; log for operators
+    except Exception as exc:
         logger.warning("Could not force-sync generated image artifact: %s", exc)
 
 
@@ -974,7 +974,7 @@ if __name__ == "__main__":
     print("✅ FAL.ai API key found")
 
     try:
-        import fal_client  # noqa: F401
+        import fal_client
         print("✅ fal_client library available")
     except ImportError:
         print("❌ fal_client library not found — pip install fal-client")

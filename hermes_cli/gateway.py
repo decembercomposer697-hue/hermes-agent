@@ -6111,7 +6111,7 @@ def _dispatch_all_via_service_manager_if_s6(action: str) -> bool:
         service_name = f"gateway-{profile}"
         try:
             fn(service_name)
-        except Exception as exc:  # noqa: BLE001 — report and continue
+        except Exception as exc:
             errors.append((profile, exc))
     succeeded = len(profiles) - len(errors)
     verb = "stopped" if action == "stop" else "restarted"

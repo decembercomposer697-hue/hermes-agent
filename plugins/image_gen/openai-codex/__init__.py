@@ -295,7 +295,7 @@ class OpenAICodexImageGenProvider(ImageGenProvider):
         if not _read_codex_access_token():
             return False
         try:
-            import httpx  # noqa: F401
+            import httpx
         except ImportError:
             return False
         return True
@@ -356,7 +356,7 @@ class OpenAICodexImageGenProvider(ImageGenProvider):
             )
 
         try:
-            import httpx  # noqa: F401
+            import httpx
         except ImportError:
             return error_response(
                 error="httpx Python package not installed (pip install httpx)",

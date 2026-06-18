@@ -208,7 +208,7 @@ def _sanitize_subprocess_env(base_env: dict | None, extra_env: dict | None = Non
     try:
         from tools.env_passthrough import is_env_passthrough as _is_passthrough
     except Exception:
-        _is_passthrough = lambda _: False  # noqa: E731
+        _is_passthrough = lambda _: False
 
     sanitized: dict[str, str] = {}
 
@@ -371,7 +371,7 @@ def _make_run_env(env: dict) -> dict:
     try:
         from tools.env_passthrough import is_env_passthrough as _is_passthrough
     except Exception:
-        _is_passthrough = lambda _: False  # noqa: E731
+        _is_passthrough = lambda _: False
 
     merged = dict(os.environ | env)
     run_env = {}

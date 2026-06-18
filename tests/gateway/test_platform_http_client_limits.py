@@ -76,12 +76,12 @@ def test_helper_is_importable_from_every_platform_that_uses_it():
     If any of those modules fails to import, this test surfaces it before
     the regression shows up as a runtime adapter-startup crash."""
     # Just importing exercises the helper's import path for each adapter.
-    import gateway.platforms.qqbot.adapter  # noqa: F401
-    import gateway.platforms.wecom  # noqa: F401
-    import gateway.platforms.dingtalk  # noqa: F401
-    import gateway.platforms.signal  # noqa: F401
-    import gateway.platforms.bluebubbles  # noqa: F401
-    import gateway.platforms.wecom_callback  # noqa: F401
+    import gateway.platforms.qqbot.adapter
+    import gateway.platforms.wecom
+    import gateway.platforms.dingtalk
+    import gateway.platforms.signal
+    import gateway.platforms.bluebubbles
+    import gateway.platforms.wecom_callback
 
 
 class TestWhatsappTypingLeakFix:

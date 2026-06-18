@@ -1416,7 +1416,7 @@ def run_doctor(args):
                 issues,
             )
         try:
-            from daytona import Daytona  # noqa: F401 — SDK presence check
+            from daytona import Daytona
             check_ok("daytona SDK", "(installed)")
         except ImportError:
             _fail_and_issue(

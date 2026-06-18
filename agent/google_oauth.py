@@ -743,10 +743,10 @@ class _OAuthCallbackHandler(http.server.BaseHTTPRequestHandler):
     captured_error: Optional[str] = None
     ready: Optional[threading.Event] = None
 
-    def log_message(self, format: str, *args: Any) -> None:  # noqa: A002, N802
+    def log_message(self, format: str, *args: Any) -> None:
         logger.debug("OAuth callback: " + format, *args)
 
-    def do_GET(self) -> None:  # noqa: N802
+    def do_GET(self) -> None:
         parsed = urllib.parse.urlparse(self.path)
         if parsed.path != CALLBACK_PATH:
             self.send_response(404)
@@ -904,7 +904,7 @@ def start_oauth_flow(
                     _can_open_graphical_browser as _can_open_gui,
                 )
             except Exception:
-                _can_open_gui = lambda: True  # noqa: E731
+                _can_open_gui = lambda: True
 
             if _can_open_gui():
                 webbrowser.open(auth_url, new=1, autoraise=True)
