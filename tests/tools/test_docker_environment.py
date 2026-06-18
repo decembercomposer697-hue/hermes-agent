@@ -110,7 +110,7 @@ def test_ensure_docker_available_uses_resolved_executable(monkeypatch):
             "text": True,
             "timeout": 5,
             "stdin": subprocess.DEVNULL,
-        })
+        }),
     ]
 
 
@@ -813,7 +813,7 @@ def test_failed_docker_run_cleans_up_orphaned_container(monkeypatch):
                 return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
             if sub == "run":
                 raise subprocess.CalledProcessError(
-                    125, cmd, output="", stderr="docker: Error response from daemon"
+                    125, cmd, output="", stderr="docker: Error response from daemon",
                 )
             if sub == "rm":
                 cleanup_calls.append(list(cmd))
@@ -1177,7 +1177,7 @@ def test_cleanup_uses_subprocess_run_not_detached_shell(monkeypatch):
     def _forbidden_popen(*args, **kwargs):
         raise AssertionError(
             f"cleanup must not use subprocess.Popen anymore (issue #20561); "
-            f"got args={args} kwargs={kwargs}"
+            f"got args={args} kwargs={kwargs}",
         )
 
     monkeypatch.setattr(docker_env.subprocess, "Popen", _forbidden_popen)
@@ -1725,11 +1725,11 @@ def test_is_container_gone_matches_removal_errors(monkeypatch):
 
     # Positive: the daemon's "container gone" phrasings.
     assert env._is_container_gone(
-        "Error response from daemon: No such container: hermes-abc123"
+        "Error response from daemon: No such container: hermes-abc123",
     )
     assert env._is_container_gone("Error: No such container: deadbeef")
     assert env._is_container_gone(
-        "Error response from daemon: Container abc is not running"
+        "Error response from daemon: Container abc is not running",
     )
 
     # Control / negative: a real command failure must NOT be misclassified as
@@ -1771,7 +1771,7 @@ def test_execute_recovers_from_out_of_band_removal(monkeypatch):
 
     monkeypatch.setattr(docker_env.BaseEnvironment, "execute", _fake_super_execute)
     monkeypatch.setattr(
-        docker_env.DockerEnvironment, "_recreate_container", _fake_recreate
+        docker_env.DockerEnvironment, "_recreate_container", _fake_recreate,
     )
 
     result = env.execute("echo hi")
@@ -1801,7 +1801,7 @@ def test_execute_does_not_recover_when_not_persistent(monkeypatch):
 
     monkeypatch.setattr(docker_env.BaseEnvironment, "execute", _fake_super_execute)
     monkeypatch.setattr(
-        docker_env.DockerEnvironment, "_recreate_container", _fail_recreate
+        docker_env.DockerEnvironment, "_recreate_container", _fail_recreate,
     )
 
     result = env.execute("echo hi")
@@ -1827,7 +1827,7 @@ def test_execute_does_not_recover_on_ordinary_failure(monkeypatch):
 
     monkeypatch.setattr(docker_env.BaseEnvironment, "execute", _fake_super_execute)
     monkeypatch.setattr(
-        docker_env.DockerEnvironment, "_recreate_container", _fail_recreate
+        docker_env.DockerEnvironment, "_recreate_container", _fail_recreate,
     )
 
     result = env.execute("badcmd")

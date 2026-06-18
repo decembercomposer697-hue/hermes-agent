@@ -126,7 +126,7 @@ class TestProjectFacts:
     def test_package_json_scripts_surface_verify_commands(self, tmp_path):
         _git_init(tmp_path)
         (tmp_path / "package.json").write_text(
-            json.dumps({"scripts": {"test": "vitest", "lint": "eslint .", "dev": "vite"}})
+            json.dumps({"scripts": {"test": "vitest", "lint": "eslint .", "dev": "vite"}}),
         )
         (tmp_path / "pnpm-lock.yaml").write_text("")
         block = cc.build_coding_workspace_block(tmp_path)
@@ -379,7 +379,7 @@ class TestProfiles:
             assert kept not in hidden
         # General posture hides nothing.
         general = cc.resolve_runtime_mode(
-            platform="telegram", cwd=tmp_path, config={}
+            platform="telegram", cwd=tmp_path, config={},
         )
         assert general.hidden_skill_categories() == frozenset()
 

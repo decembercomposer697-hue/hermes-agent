@@ -177,14 +177,14 @@ class _VikingClient:
 
     def get(self, path: str, **kwargs) -> dict:
         resp = self._httpx.get(
-            self._url(path), headers=self._headers(), timeout=_TIMEOUT, **kwargs
+            self._url(path), headers=self._headers(), timeout=_TIMEOUT, **kwargs,
         )
         return self._parse_response(resp)
 
     def post(self, path: str, payload: dict = None, **kwargs) -> dict:
         resp = self._httpx.post(
             self._url(path), json=payload or {}, headers=self._headers(),
-            timeout=_TIMEOUT, **kwargs
+            timeout=_TIMEOUT, **kwargs,
         )
         return self._parse_response(resp)
 
@@ -207,7 +207,7 @@ class _VikingClient:
     def health(self) -> bool:
         try:
             resp = self._httpx.get(
-                self._url("/health"), headers=self._headers(), timeout=3.0
+                self._url("/health"), headers=self._headers(), timeout=3.0,
             )
             return resp.status_code == 200
         except Exception:
@@ -561,7 +561,7 @@ class OpenVikingMemoryProvider(MemoryProvider):
                 logger.debug("OpenViking prefetch failed: %s", e)
 
         self._prefetch_thread = threading.Thread(
-            target=_run, daemon=True, name="openviking-prefetch"
+            target=_run, daemon=True, name="openviking-prefetch",
         )
         self._prefetch_thread.start()
 
@@ -598,7 +598,7 @@ class OpenVikingMemoryProvider(MemoryProvider):
             self._sync_thread.join(timeout=5.0)
 
         self._sync_thread = threading.Thread(
-            target=_sync, daemon=True, name="openviking-sync"
+            target=_sync, daemon=True, name="openviking-sync",
         )
         self._sync_thread.start()
 

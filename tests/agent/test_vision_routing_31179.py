@@ -94,7 +94,7 @@ auxiliary:
         assert base_url == "https://api.openai.com/v1"
 
     def test_provider_openai_with_explicit_base_url_preserves_user_endpoint(
-        self, isolated_home, monkeypatch
+        self, isolated_home, monkeypatch,
     ):
         """User-supplied base_url wins; alias still normalizes provider name
         to ``custom`` so resolution doesn't hit the unknown-provider path."""
@@ -235,7 +235,7 @@ auxiliary:
         assert check_vision_requirements() is True
 
     def test_check_vision_false_with_text_only_main_and_no_aggregator(
-        self, isolated_home, monkeypatch
+        self, isolated_home, monkeypatch,
     ):
         _write_config(isolated_home, """
 model:

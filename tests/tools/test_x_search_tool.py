@@ -51,7 +51,7 @@ def test_x_search_posts_responses_request(monkeypatch):
             {
                 "output_text": "People on X are discussing xAI's latest launch.",
                 "citations": [{"url": "https://x.com/example/status/1", "title": "Example post"}],
-            }
+            },
         )
 
     monkeypatch.setenv("XAI_API_KEY", "xai-test-key")
@@ -64,7 +64,7 @@ def test_x_search_posts_responses_request(monkeypatch):
             from_date="2026-04-01",
             to_date="2026-04-10",
             enable_image_understanding=True,
-        )
+        ),
     )
 
     tool_def = captured["json"]["tools"][0]
@@ -91,7 +91,7 @@ def test_x_search_rejects_conflicting_handle_filters(monkeypatch):
             query="latest xAI discussion",
             allowed_x_handles=["xai"],
             excluded_x_handles=["grok"],
-        )
+        ),
     )
 
     assert result["error"] == "allowed_x_handles and excluded_x_handles cannot be used together"
@@ -117,13 +117,13 @@ def test_x_search_extracts_inline_url_citations(monkeypatch):
                                         "title": "xAI update",
                                         "start_index": 0,
                                         "end_index": 3,
-                                    }
+                                    },
                                 ],
-                            }
+                            },
                         ],
-                    }
-                ]
-            }
+                    },
+                ],
+            },
         )
 
     monkeypatch.setenv("XAI_API_KEY", "xai-test-key")
@@ -139,7 +139,7 @@ def test_x_search_extracts_inline_url_citations(monkeypatch):
             "title": "xAI update",
             "start_index": 0,
             "end_index": 3,
-        }
+        },
     ]
 
 
@@ -186,7 +186,7 @@ def test_x_search_retries_read_timeout_then_succeeds(monkeypatch):
             {
                 "output_text": "Recovered after retry.",
                 "citations": [],
-            }
+            },
         )
 
     monkeypatch.setenv("XAI_API_KEY", "xai-test-key")
@@ -250,7 +250,7 @@ def test_x_search_uses_xai_oauth_when_only_oauth_available(monkeypatch):
         }
 
     monkeypatch.setattr(
-        "tools.x_search_tool.resolve_xai_http_credentials", _fake_resolve
+        "tools.x_search_tool.resolve_xai_http_credentials", _fake_resolve,
     )
     invalidate_check_fn_cache()
 
@@ -288,7 +288,7 @@ def test_x_search_uses_api_key_when_only_xai_api_key_set(monkeypatch):
         }
 
     monkeypatch.setattr(
-        "tools.x_search_tool.resolve_xai_http_credentials", _fake_resolve
+        "tools.x_search_tool.resolve_xai_http_credentials", _fake_resolve,
     )
     invalidate_check_fn_cache()
 
@@ -332,7 +332,7 @@ def test_x_search_prefers_oauth_when_both_available(monkeypatch):
         }
 
     monkeypatch.setattr(
-        "tools.x_search_tool.resolve_xai_http_credentials", _fake_resolve
+        "tools.x_search_tool.resolve_xai_http_credentials", _fake_resolve,
     )
     invalidate_check_fn_cache()
 
@@ -365,7 +365,7 @@ def test_x_search_returns_tool_error_when_no_credentials(monkeypatch):
         }
 
     monkeypatch.setattr(
-        "tools.x_search_tool.resolve_xai_http_credentials", _fake_resolve
+        "tools.x_search_tool.resolve_xai_http_credentials", _fake_resolve,
     )
     invalidate_check_fn_cache()
 
@@ -389,7 +389,7 @@ def test_x_search_check_fn_false_when_resolver_raises(monkeypatch):
         raise RuntimeError("token revoked and refresh failed")
 
     monkeypatch.setattr(
-        "tools.x_search_tool.resolve_xai_http_credentials", _boom
+        "tools.x_search_tool.resolve_xai_http_credentials", _boom,
     )
     invalidate_check_fn_cache()
 
@@ -485,7 +485,7 @@ def test_x_search_rejects_inverted_date_range(monkeypatch):
             query="anything",
             from_date="2026-05-10",
             to_date="2026-05-01",
-        )
+        ),
     )
 
     assert "from_date (2026-05-10) must be on or before to_date (2026-05-01)" in result["error"]
@@ -529,7 +529,7 @@ def test_x_search_allows_future_to_date(monkeypatch):
 
     def _fake_post(url, headers=None, json=None, timeout=None):
         return _FakeResponse(
-            {"output_text": "future to_date is allowed", "citations": []}
+            {"output_text": "future to_date is allowed", "citations": []},
         )
 
     monkeypatch.setattr("requests.post", _fake_post)
@@ -539,7 +539,7 @@ def test_x_search_allows_future_to_date(monkeypatch):
             query="anything",
             from_date="2026-05-20",
             to_date="2030-01-01",
-        )
+        ),
     )
 
     assert result["success"] is True
@@ -583,12 +583,12 @@ def test_x_search_marks_degraded_when_handle_filter_returns_no_citations(monkeyp
     monkeypatch.setattr(
         "requests.post",
         lambda *a, **k: _FakeResponse(
-            {"output_text": "Generic encyclopedic answer with no citations.", "citations": []}
+            {"output_text": "Generic encyclopedic answer with no citations.", "citations": []},
         ),
     )
 
     result = json.loads(
-        x_search_tool(query="what has @ghostuser posted", allowed_x_handles=["ghostuser"])
+        x_search_tool(query="what has @ghostuser posted", allowed_x_handles=["ghostuser"]),
     )
 
     assert result["success"] is True
@@ -606,7 +606,7 @@ def test_x_search_marks_degraded_when_excluded_handles_and_no_citations(monkeypa
     )
 
     result = json.loads(
-        x_search_tool(query="anything", excluded_x_handles=["someuser"])
+        x_search_tool(query="anything", excluded_x_handles=["someuser"]),
     )
 
     assert result["degraded"] is True
@@ -627,7 +627,7 @@ def test_x_search_marks_degraded_when_date_range_and_no_citations(monkeypatch):
             query="anything",
             from_date="2026-04-01",
             to_date="2026-04-02",
-        )
+        ),
     )
 
     assert result["degraded"] is True
@@ -658,18 +658,18 @@ def test_x_search_not_degraded_when_filter_returns_inline_citations(monkeypatch)
                                         "title": "xAI post",
                                         "start_index": 0,
                                         "end_index": 4,
-                                    }
+                                    },
                                 ],
-                            }
+                            },
                         ],
-                    }
-                ]
-            }
+                    },
+                ],
+            },
         ),
     )
 
     result = json.loads(
-        x_search_tool(query="latest xAI post", allowed_x_handles=["xai"])
+        x_search_tool(query="latest xAI post", allowed_x_handles=["xai"]),
     )
 
     assert result["success"] is True
@@ -689,12 +689,12 @@ def test_x_search_not_degraded_when_filter_returns_top_level_citations(monkeypat
             {
                 "output_text": "Found discussion.",
                 "citations": [{"url": "https://x.com/example/status/1", "title": "Example"}],
-            }
+            },
         ),
     )
 
     result = json.loads(
-        x_search_tool(query="anything", allowed_x_handles=["xai"])
+        x_search_tool(query="anything", allowed_x_handles=["xai"]),
     )
 
     assert result["degraded"] is False

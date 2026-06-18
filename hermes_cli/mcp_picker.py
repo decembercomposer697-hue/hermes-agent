@@ -85,7 +85,7 @@ def _build_rows() -> list[_Row]:
                 description=entry.description,
                 status=status,
                 entry=entry,
-            )
+            ),
         )
 
     # Custom MCPs the user added directly (not in the catalog)

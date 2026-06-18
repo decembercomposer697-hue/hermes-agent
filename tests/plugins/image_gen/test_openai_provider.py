@@ -104,7 +104,7 @@ class TestModelResolution:
     def test_config_openai_model(self, tmp_path):
         import yaml
         (tmp_path / "config.yaml").write_text(
-            yaml.safe_dump({"image_gen": {"openai": {"model": "gpt-image-2-low"}}})
+            yaml.safe_dump({"image_gen": {"openai": {"model": "gpt-image-2-low"}}}),
         )
         model_id, meta = openai_plugin._resolve_model()
         assert model_id == "gpt-image-2-low"
@@ -114,7 +114,7 @@ class TestModelResolution:
         """``image_gen.model: gpt-image-2-high`` also works (top-level)."""
         import yaml
         (tmp_path / "config.yaml").write_text(
-            yaml.safe_dump({"image_gen": {"model": "gpt-image-2-high"}})
+            yaml.safe_dump({"image_gen": {"model": "gpt-image-2-high"}}),
         )
         model_id, meta = openai_plugin._resolve_model()
         assert model_id == "gpt-image-2-high"

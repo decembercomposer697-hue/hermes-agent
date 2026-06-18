@@ -467,7 +467,7 @@ class TestSegmentBreakOnToolBoundary:
         adapter = MagicMock()
         msg_counter = iter(["msg_1", "msg_2", "msg_3"])
         adapter.send = AsyncMock(
-            side_effect=lambda **kw: SimpleNamespace(success=True, message_id=next(msg_counter))
+            side_effect=lambda **kw: SimpleNamespace(success=True, message_id=next(msg_counter)),
         )
         adapter.edit_message = AsyncMock(return_value=SimpleNamespace(success=True))
         adapter.MAX_MESSAGE_LENGTH = 4096
@@ -1245,10 +1245,10 @@ class TestCancelledConsumerSetsFlags:
         """Cancelling after content was sent should set final_response_sent."""
         adapter = MagicMock()
         adapter.send = AsyncMock(
-            return_value=SimpleNamespace(success=True, message_id="msg_1")
+            return_value=SimpleNamespace(success=True, message_id="msg_1"),
         )
         adapter.edit_message = AsyncMock(
-            return_value=SimpleNamespace(success=True)
+            return_value=SimpleNamespace(success=True),
         )
         adapter.MAX_MESSAGE_LENGTH = 4096
 
@@ -1281,10 +1281,10 @@ class TestCancelledConsumerSetsFlags:
         """Cancelling before anything was sent should NOT set final_response_sent."""
         adapter = MagicMock()
         adapter.send = AsyncMock(
-            return_value=SimpleNamespace(success=False, message_id=None)
+            return_value=SimpleNamespace(success=False, message_id=None),
         )
         adapter.edit_message = AsyncMock(
-            return_value=SimpleNamespace(success=True)
+            return_value=SimpleNamespace(success=True),
         )
         adapter.MAX_MESSAGE_LENGTH = 4096
 
@@ -1364,7 +1364,7 @@ class TestFilterAndAccumulate:
         c = _make_consumer()
         # Consecutive blocks with no text between them — both stripped
         c._filter_and_accumulate(
-            "<think>block1</think><think>block2</think>visible"
+            "<think>block1</think><think>block2</think>visible",
         )
         assert c._accumulated == "visible"
 
@@ -1372,7 +1372,7 @@ class TestFilterAndAccumulate:
         """Think tag after non-whitespace is NOT a boundary (prose safety)."""
         c = _make_consumer()
         c._filter_and_accumulate(
-            "<think>block1</think>A<think>block2</think>B"
+            "<think>block1</think>A<think>block2</think>B",
         )
         # Second <think> follows 'A' (not a block boundary) — treated as prose
         assert "A" in c._accumulated
@@ -1391,7 +1391,7 @@ class TestFilterAndAccumulate:
     def test_reasoning_scratchpad_variant(self):
         c = _make_consumer()
         c._filter_and_accumulate(
-            "<REASONING_SCRATCHPAD>long plan</REASONING_SCRATCHPAD>Done"
+            "<REASONING_SCRATCHPAD>long plan</REASONING_SCRATCHPAD>Done",
         )
         assert c._accumulated == "Done"
 
@@ -1451,7 +1451,7 @@ class TestFilterAndAccumulate:
     def test_multiline_think_block(self):
         c = _make_consumer()
         c._filter_and_accumulate(
-            "<think>\nLine 1\nLine 2\nLine 3\n</think>Final answer"
+            "<think>\nLine 1\nLine 2\nLine 3\n</think>Final answer",
         )
         assert c._accumulated == "Final answer"
 
@@ -1473,10 +1473,10 @@ class TestFilterAndAccumulateIntegration:
         """Think blocks should be filtered before platform edit."""
         adapter = MagicMock()
         adapter.send = AsyncMock(
-            return_value=SimpleNamespace(success=True, message_id="msg_1")
+            return_value=SimpleNamespace(success=True, message_id="msg_1"),
         )
         adapter.edit_message = AsyncMock(
-            return_value=SimpleNamespace(success=True)
+            return_value=SimpleNamespace(success=True),
         )
         adapter.MAX_MESSAGE_LENGTH = 4096
 
@@ -1496,7 +1496,7 @@ class TestFilterAndAccumulateIntegration:
 
         # The final text sent to the platform should NOT contain <think>
         all_calls = list(adapter.send.call_args_list) + list(
-            adapter.edit_message.call_args_list
+            adapter.edit_message.call_args_list,
         )
         for call in all_calls:
             args, kwargs = call
@@ -1632,7 +1632,7 @@ class TestCursorStrippingOnFallback:
         adapter = MagicMock()
         adapter.MAX_MESSAGE_LENGTH = 4096
         adapter.edit_message = AsyncMock(
-            return_value=SimpleNamespace(success=True, message_id="msg-1")
+            return_value=SimpleNamespace(success=True, message_id="msg-1"),
         )
 
         consumer = GatewayStreamConsumer(
@@ -1679,7 +1679,7 @@ class TestCursorStrippingOnFallback:
         adapter = MagicMock()
         adapter.MAX_MESSAGE_LENGTH = 4096
         adapter.edit_message = AsyncMock(
-            return_value=SimpleNamespace(success=False, error="flood_control")
+            return_value=SimpleNamespace(success=False, error="flood_control"),
         )
 
         consumer = GatewayStreamConsumer(
@@ -1741,7 +1741,7 @@ class TestOnNewMessageCallback:
         adapter = MagicMock()
         msg_counter = iter(["msg_1", "msg_2", "msg_3"])
         adapter.send = AsyncMock(
-            side_effect=lambda **kw: SimpleNamespace(success=True, message_id=next(msg_counter))
+            side_effect=lambda **kw: SimpleNamespace(success=True, message_id=next(msg_counter)),
         )
         adapter.edit_message = AsyncMock(return_value=SimpleNamespace(success=True))
         adapter.MAX_MESSAGE_LENGTH = 4096

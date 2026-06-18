@@ -36,7 +36,7 @@ def list_tables() -> list[str]:
     """List user-defined SQLite tables."""
     with _connect() as conn:
         rows = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
+            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name",
         ).fetchall()
     return [row[0] for row in rows]
 

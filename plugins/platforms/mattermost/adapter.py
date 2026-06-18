@@ -125,7 +125,7 @@ class MattermostAdapter(BasePlatformAdapter):
             return {}
 
     async def _api_post(
-        self, path: str, payload: dict[str, Any]
+        self, path: str, payload: dict[str, Any],
     ) -> dict[str, Any]:
         """POST /api/v4/{path} with JSON body."""
         import aiohttp
@@ -133,7 +133,7 @@ class MattermostAdapter(BasePlatformAdapter):
         try:
             async with self._session.post(
                 url, headers=self._headers(), json=payload,
-                timeout=aiohttp.ClientTimeout(total=30)
+                timeout=aiohttp.ClientTimeout(total=30),
             ) as resp:
                 if resp.status >= 400:
                     body = await resp.text()
@@ -145,14 +145,14 @@ class MattermostAdapter(BasePlatformAdapter):
             return {}
 
     async def _api_put(
-        self, path: str, payload: dict[str, Any]
+        self, path: str, payload: dict[str, Any],
     ) -> dict[str, Any]:
         """PUT /api/v4/{path} with JSON body."""
         import aiohttp
         url = f"{self._base_url}/api/v4/{path.lstrip('/')}"
         try:
             async with self._session.put(
-                url, headers=self._headers(), json=payload
+                url, headers=self._headers(), json=payload,
             ) as resp:
                 if resp.status >= 400:
                     body = await resp.text()
@@ -164,7 +164,7 @@ class MattermostAdapter(BasePlatformAdapter):
             return {}
 
     async def _upload_file(
-        self, channel_id: str, file_data: bytes, filename: str, content_type: str = "application/octet-stream"
+        self, channel_id: str, file_data: bytes, filename: str, content_type: str = "application/octet-stream",
     ) -> str | None:
         """Upload a file and return its file ID, or None on failure."""
         import aiohttp
@@ -201,7 +201,7 @@ class MattermostAdapter(BasePlatformAdapter):
             return False
 
         self._session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=30)
+            timeout=aiohttp.ClientTimeout(total=30),
         )
         self._closing = False
 
@@ -315,7 +315,7 @@ class MattermostAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     async def send_typing(
-        self, chat_id: str, metadata: dict[str, Any] | None = None
+        self, chat_id: str, metadata: dict[str, Any] | None = None,
     ) -> None:
         """Send a typing indicator."""
         await self._api_post(
@@ -324,7 +324,7 @@ class MattermostAdapter(BasePlatformAdapter):
         )
 
     async def edit_message(
-        self, chat_id: str, message_id: str, content: str, *, finalize: bool = False
+        self, chat_id: str, message_id: str, content: str, *, finalize: bool = False,
     ) -> SendResult:
         """Edit an existing post."""
         formatted = self.format_message(content)
@@ -346,7 +346,7 @@ class MattermostAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Download an image and upload it as a file attachment."""
         return await self._send_url_as_file(
-            chat_id, image_url, caption, reply_to, "image"
+            chat_id, image_url, caption, reply_to, "image",
         )
 
     async def send_image_file(
@@ -359,7 +359,7 @@ class MattermostAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Upload a local image file."""
         return await self._send_local_file(
-            chat_id, image_path, caption, reply_to
+            chat_id, image_path, caption, reply_to,
         )
 
     async def send_document(
@@ -373,7 +373,7 @@ class MattermostAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Upload a local file as a document."""
         return await self._send_local_file(
-            chat_id, file_path, caption, reply_to, file_name
+            chat_id, file_path, caption, reply_to, file_name,
         )
 
     async def send_voice(
@@ -386,7 +386,7 @@ class MattermostAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Upload an audio file."""
         return await self._send_local_file(
-            chat_id, audio_path, caption, reply_to
+            chat_id, audio_path, caption, reply_to,
         )
 
     async def send_video(
@@ -399,7 +399,7 @@ class MattermostAdapter(BasePlatformAdapter):
     ) -> SendResult:
         """Upload a video file."""
         return await self._send_local_file(
-            chat_id, video_path, caption, reply_to
+            chat_id, video_path, caption, reply_to,
         )
 
     def format_message(self, content: str) -> str:
@@ -492,7 +492,7 @@ class MattermostAdapter(BasePlatformAdapter):
         p = Path(file_path)
         if not p.exists():
             logger.warning(
-                "Mattermost: local file not found, skipping: %s", file_path
+                "Mattermost: local file not found, skipping: %s", file_path,
             )
             return SendResult(success=True, message_id=None)
 
@@ -569,7 +569,7 @@ class MattermostAdapter(BasePlatformAdapter):
                             continue
                         try:
                             async with self._session.get(
-                                image_url, timeout=aiohttp.ClientTimeout(total=30)
+                                image_url, timeout=aiohttp.ClientTimeout(total=30),
                             ) as resp:
                                 if resp.status >= 400:
                                     logger.warning(
@@ -752,7 +752,7 @@ class MattermostAdapter(BasePlatformAdapter):
                 return
 
             require_mention = os.getenv(
-                "MATTERMOST_REQUIRE_MENTION", "true"
+                "MATTERMOST_REQUIRE_MENTION", "true",
             ).lower() not in {"false", "0", "no"}
 
             free_channels_raw = os.getenv("MATTERMOST_FREE_RESPONSE_CHANNELS", "")
@@ -779,7 +779,7 @@ class MattermostAdapter(BasePlatformAdapter):
             if has_mention:
                 for pattern in mention_patterns:
                     message_text = re.sub(
-                        re.escape(pattern), "", message_text, flags=re.IGNORECASE
+                        re.escape(pattern), "", message_text, flags=re.IGNORECASE,
                     ).strip()
 
         # Resolve sender info.
@@ -921,7 +921,7 @@ async def _standalone_send(
             "error": (
                 "Mattermost standalone send: MATTERMOST_URL and "
                 "MATTERMOST_TOKEN must both be set"
-            )
+            ),
         }
 
     headers = {
@@ -971,7 +971,7 @@ async def _standalone_send(
                             "error": (
                                 f"Mattermost file upload failed "
                                 f"({upload_resp.status}): {body[:400]}"
-                            )
+                            ),
                         }
                     upload_data = await upload_resp.json()
                     for info in upload_data.get("file_infos", []):
@@ -999,7 +999,7 @@ async def _standalone_send(
                         "error": (
                             f"Mattermost API error ({resp.status}): "
                             f"{body[:400]}"
-                        )
+                        ),
                     }
                 data = await resp.json()
             return {
@@ -1138,7 +1138,7 @@ def _is_connected(config) -> bool:
     import hermes_cli.gateway as gateway_mod
     return bool(
         (gateway_mod.get_env_value("MATTERMOST_TOKEN") or "").strip()
-        and (gateway_mod.get_env_value("MATTERMOST_URL") or "").strip()
+        and (gateway_mod.get_env_value("MATTERMOST_URL") or "").strip(),
     )
 
 

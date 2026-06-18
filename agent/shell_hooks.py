@@ -662,7 +662,7 @@ def _prompt_and_record(
         f"    Event:   {event}\n"
         f"    Command: {command}\n\n"
         f"  Commands run with your full user credentials.  Only approve\n"
-        f"  commands you trust."
+        f"  commands you trust.",
     )
     try:
         answer = input("Allow this hook to run? [y/N]: ").strip().lower()

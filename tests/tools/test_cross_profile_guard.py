@@ -26,7 +26,7 @@ def fake_hermes(tmp_path, monkeypatch):
     root = tmp_path / "fake-hermes"
     (root / "skills" / "shared-skill").mkdir(parents=True)
     (root / "skills" / "shared-skill" / "SKILL.md").write_text(
-        "---\nname: shared-skill\ndescription: default copy.\n---\n"
+        "---\nname: shared-skill\ndescription: default copy.\n---\n",
     )
 
     sec_home = root / "profiles" / "hermes-security"
@@ -87,7 +87,7 @@ class TestWriteFileCrossProfileGuard:
         from tools.file_tools import write_file_tool
         target = fake_hermes["root"] / "skills" / "shared-skill" / "SKILL.md"
         result_json = write_file_tool(
-            str(target), "user-directed override", cross_profile=True
+            str(target), "user-directed override", cross_profile=True,
         )
         result = json.loads(result_json)
         assert not result.get("error"), f"cross_profile=True must succeed: {result}"
@@ -169,11 +169,11 @@ class TestSkillManageCrossProfileErrorUX:
         d = profile_dir / "skills" / name
         d.mkdir(parents=True, exist_ok=True)
         (d / "SKILL.md").write_text(
-            f"---\nname: {name}\ndescription: a skill.\n---\n"
+            f"---\nname: {name}\ndescription: a skill.\n---\n",
         )
 
     def test_error_names_other_profile_when_skill_lives_there(
-        self, fake_hermes, monkeypatch
+        self, fake_hermes, monkeypatch,
     ):
         """The original incident shape — model expects 'foo' in active
         profile, but 'foo' lives in default. Error must point at default."""
@@ -208,7 +208,7 @@ class TestSkillManageCrossProfileErrorUX:
         assert "hermes -p" in err
 
     def test_genuinely_missing_skill_keeps_helpful_hint(
-        self, fake_hermes, monkeypatch
+        self, fake_hermes, monkeypatch,
     ):
         """When no profile has the skill, error falls back to skills_list hint."""
         import importlib

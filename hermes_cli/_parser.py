@@ -96,7 +96,7 @@ def build_top_level_parser():
     )
 
     parser.add_argument(
-        "--version", "-V", action="store_true", help="Show version and exit"
+        "--version", "-V", action="store_true", help="Show version and exit",
     )
     parser.add_argument(
         "-z",
@@ -247,17 +247,17 @@ def build_top_level_parser():
         description="Start an interactive chat session with Hermes Agent",
     )
     chat_parser.add_argument(
-        "-q", "--query", help="Single query (non-interactive mode)"
+        "-q", "--query", help="Single query (non-interactive mode)",
     )
     chat_parser.add_argument(
-        "--image", help="Optional local image path to attach to a single query"
+        "--image", help="Optional local image path to attach to a single query",
     )
     _inherited_flag(
         chat_parser,
         "-m", "--model", help="Model to use (e.g., anthropic/claude-sonnet-4)",
     )
     chat_parser.add_argument(
-        "-t", "--toolsets", help="Comma-separated toolsets to enable"
+        "-t", "--toolsets", help="Comma-separated toolsets to enable",
     )
     _inherited_flag(
         chat_parser,

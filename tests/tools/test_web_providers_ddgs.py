@@ -240,7 +240,7 @@ class TestDDGSSearchOnlyErrors:
         monkeypatch.setattr("tools.interrupt.is_interrupted", lambda: False, raising=False)
 
         result_str = asyncio.get_event_loop().run_until_complete(
-            web_tools.web_extract_tool(["https://example.com"])
+            web_tools.web_extract_tool(["https://example.com"]),
         )
         result = json.loads(result_str)
         assert result["success"] is False

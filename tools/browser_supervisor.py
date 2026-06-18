@@ -41,7 +41,7 @@ DIALOG_POLICY_AUTO_DISMISS = "auto_dismiss"
 DIALOG_POLICY_AUTO_ACCEPT = "auto_accept"
 
 _VALID_POLICIES = frozenset(
-    {DIALOG_POLICY_MUST_RESPOND, DIALOG_POLICY_AUTO_DISMISS, DIALOG_POLICY_AUTO_ACCEPT}
+    {DIALOG_POLICY_MUST_RESPOND, DIALOG_POLICY_AUTO_DISMISS, DIALOG_POLICY_AUTO_ACCEPT},
 )
 
 DEFAULT_DIALOG_POLICY = DIALOG_POLICY_MUST_RESPOND
@@ -284,7 +284,7 @@ class CDPSupervisor:
         if dialog_policy not in _VALID_POLICIES:
             raise ValueError(
                 f"Invalid dialog_policy {dialog_policy!r}; "
-                f"must be one of {sorted(_VALID_POLICIES)}"
+                f"must be one of {sorted(_VALID_POLICIES)}",
             )
         self.task_id = task_id
         self.cdp_url = cdp_url
@@ -343,7 +343,7 @@ class CDPSupervisor:
             self.stop()
             raise TimeoutError(
                 f"CDP supervisor did not attach within {timeout}s "
-                f"(cdp_url={self.cdp_url[:80]}...)"
+                f"(cdp_url={self.cdp_url[:80]}...)",
             )
         if self._start_error is not None:
             err = self._start_error
@@ -449,7 +449,7 @@ class CDPSupervisor:
 
         async def _do_respond():
             return await self._handle_dialog_cdp(
-                snapshot_copy, accept=(action == "accept"), prompt_text=prompt_text or ""
+                snapshot_copy, accept=(action == "accept"), prompt_text=prompt_text or "",
             )
 
         try:
@@ -758,7 +758,7 @@ class CDPSupervisor:
                         {
                             "urlPattern": DIALOG_BRIDGE_URL_PATTERN,
                             "requestStage": "Request",
-                        }
+                        },
                     ],
                     "handleAuthRequests": False,
                 },
@@ -825,7 +825,7 @@ class CDPSupervisor:
                     if fut is not None and not fut.done():
                         if "error" in msg:
                             fut.set_exception(
-                                RuntimeError(f"CDP error on id={msg['id']}: {msg['error']}")
+                                RuntimeError(f"CDP error on id={msg['id']}: {msg['error']}"),
                             )
                         else:
                             fut.set_result(msg)
@@ -837,7 +837,7 @@ class CDPSupervisor:
     # ── Event dispatch ──────────────────────────────────────────────────────
 
     async def _on_event(
-        self, method: str, params: dict[str, Any], session_id: str | None
+        self, method: str, params: dict[str, Any], session_id: str | None,
     ) -> None:
         if method == "Page.javascriptDialogOpening":
             await self._on_dialog_opening(params, session_id)
@@ -861,7 +861,7 @@ class CDPSupervisor:
             self._on_console(params, level_from="exception")
 
     async def _on_dialog_opening(
-        self, params: dict[str, Any], session_id: str | None
+        self, params: dict[str, Any], session_id: str | None,
     ) -> None:
         self._dialog_seq += 1
         dialog = PendingDialog(
@@ -881,15 +881,15 @@ class CDPSupervisor:
             with self._state_lock:
                 self._archive_dialog_locked(dialog, "auto_policy")
             asyncio.create_task(
-                self._auto_handle_dialog(dialog, accept=False, prompt_text="")
+                self._auto_handle_dialog(dialog, accept=False, prompt_text=""),
             )
         elif self.dialog_policy == DIALOG_POLICY_AUTO_ACCEPT:
             with self._state_lock:
                 self._archive_dialog_locked(dialog, "auto_policy")
             asyncio.create_task(
                 self._auto_handle_dialog(
-                    dialog, accept=True, prompt_text=dialog.default_prompt
-                )
+                    dialog, accept=True, prompt_text=dialog.default_prompt,
+                ),
             )
         else:
             # must_respond → add to pending and arm watchdog.
@@ -903,7 +903,7 @@ class CDPSupervisor:
             self._dialog_watchdogs[dialog.id] = handle
 
     async def _auto_handle_dialog(
-        self, dialog: PendingDialog, *, accept: bool, prompt_text: str
+        self, dialog: PendingDialog, *, accept: bool, prompt_text: str,
     ) -> None:
         """Send handleJavaScriptDialog for auto_dismiss/auto_accept.
 
@@ -971,7 +971,7 @@ class CDPSupervisor:
             self._recent_dialogs = self._recent_dialogs[-RECENT_DIALOGS_MAX:]
 
     async def _handle_dialog_cdp(
-        self, dialog: PendingDialog, *, accept: bool, prompt_text: str
+        self, dialog: PendingDialog, *, accept: bool, prompt_text: str,
     ) -> None:
         """Send the Page.handleJavaScriptDialog CDP command (agent path only).
 
@@ -981,7 +981,7 @@ class CDPSupervisor:
         if dialog.bridge_request_id:
             try:
                 await self._fulfill_bridge_request(
-                    dialog, accept=accept, prompt_text=prompt_text
+                    dialog, accept=accept, prompt_text=prompt_text,
                 )
             finally:
                 with self._state_lock:
@@ -1015,7 +1015,7 @@ class CDPSupervisor:
                 handle.cancel()
 
     async def _on_dialog_closed(
-        self, params: dict[str, Any], session_id: str | None
+        self, params: dict[str, Any], session_id: str | None,
     ) -> None:
         # ``Page.javascriptDialogClosed`` spec has only ``result`` (bool) and
         # ``userInput`` (string), not the original ``message``.  Match by
@@ -1044,7 +1044,7 @@ class CDPSupervisor:
                     handle.cancel()
 
     async def _on_fetch_paused(
-        self, params: dict[str, Any], session_id: str | None
+        self, params: dict[str, Any], session_id: str | None,
     ) -> None:
         """Bridge XHR captured mid-flight — materialize as a pending dialog.
 
@@ -1101,15 +1101,15 @@ class CDPSupervisor:
             with self._state_lock:
                 self._archive_dialog_locked(dialog, "auto_policy")
             asyncio.create_task(
-                self._fulfill_bridge_request(dialog, accept=False, prompt_text="")
+                self._fulfill_bridge_request(dialog, accept=False, prompt_text=""),
             )
         elif self.dialog_policy == DIALOG_POLICY_AUTO_ACCEPT:
             with self._state_lock:
                 self._archive_dialog_locked(dialog, "auto_policy")
             asyncio.create_task(
                 self._fulfill_bridge_request(
-                    dialog, accept=True, prompt_text=default_prompt
-                )
+                    dialog, accept=True, prompt_text=default_prompt,
+                ),
             )
         else:
             # must_respond — add to pending + arm watchdog.
@@ -1123,7 +1123,7 @@ class CDPSupervisor:
             self._dialog_watchdogs[dialog.id] = handle
 
     async def _fulfill_bridge_request(
-        self, dialog: PendingDialog, *, accept: bool, prompt_text: str
+        self, dialog: PendingDialog, *, accept: bool, prompt_text: str,
     ) -> None:
         """Resolve a bridge XHR via Fetch.fulfillRequest so the page unblocks."""
         if not dialog.bridge_request_id:
@@ -1156,7 +1156,7 @@ class CDPSupervisor:
     # ── Frame / target tracking ─────────────────────────────────────────────
 
     def _on_frame_attached(
-        self, params: dict[str, Any], session_id: str | None
+        self, params: dict[str, Any], session_id: str | None,
     ) -> None:
         frame_id = params.get("frameId")
         if not frame_id:
@@ -1172,7 +1172,7 @@ class CDPSupervisor:
             )
 
     def _on_frame_navigated(
-        self, params: dict[str, Any], session_id: str | None
+        self, params: dict[str, Any], session_id: str | None,
     ) -> None:
         frame = params.get("frame") or {}
         frame_id = frame.get("id")
@@ -1192,7 +1192,7 @@ class CDPSupervisor:
             self._frames[frame_id] = info
 
     def _on_frame_detached(
-        self, params: dict[str, Any], session_id: str | None
+        self, params: dict[str, Any], session_id: str | None,
     ) -> None:
         """Remove a frame from our state only when it's truly gone.
 

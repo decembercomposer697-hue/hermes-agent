@@ -269,7 +269,7 @@ async def test_send_home_channel_startup_notification_to_configured_home(tmp_pat
 
 @pytest.mark.asyncio
 async def test_send_home_channel_startup_notification_preserves_thread_metadata(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
 
@@ -308,7 +308,7 @@ async def test_send_home_channel_startup_notification_preserves_thread_metadata(
 
 @pytest.mark.asyncio
 async def test_send_home_channel_startup_notification_skips_restart_target(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
 
@@ -321,7 +321,7 @@ async def test_send_home_channel_startup_notification_skips_restart_target(
     adapter.send = AsyncMock()
 
     delivered = await runner._send_home_channel_startup_notifications(
-        skip_targets={("telegram", "42", None)}
+        skip_targets={("telegram", "42", None)},
     )
 
     assert delivered == set()
@@ -330,7 +330,7 @@ async def test_send_home_channel_startup_notification_skips_restart_target(
 
 @pytest.mark.asyncio
 async def test_send_home_channel_startup_notification_does_not_skip_different_thread(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
 
@@ -343,7 +343,7 @@ async def test_send_home_channel_startup_notification_does_not_skip_different_th
     adapter.send = AsyncMock(return_value=SendResult(success=True, message_id="home"))
 
     delivered = await runner._send_home_channel_startup_notifications(
-        skip_targets={("telegram", "42", "topic-7")}
+        skip_targets={("telegram", "42", "topic-7")},
     )
 
     assert delivered == {("telegram", "42", None)}
@@ -352,7 +352,7 @@ async def test_send_home_channel_startup_notification_does_not_skip_different_th
 
 @pytest.mark.asyncio
 async def test_send_home_channel_startup_notification_ignores_false_send_result(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
 
@@ -462,7 +462,7 @@ async def test_send_restart_notification_skips_when_adapter_missing(tmp_path, mo
 
 @pytest.mark.asyncio
 async def test_send_restart_notification_cleans_up_on_send_failure(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     """If the adapter.send() raises, the file is still cleaned up."""
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
@@ -485,7 +485,7 @@ async def test_send_restart_notification_cleans_up_on_send_failure(
 
 @pytest.mark.asyncio
 async def test_send_restart_notification_logs_warning_on_sendresult_failure(
-    tmp_path, monkeypatch, caplog
+    tmp_path, monkeypatch, caplog,
 ):
     """Adapter that returns SendResult(success=False) must log a WARNING, not INFO.
 
@@ -538,7 +538,7 @@ async def test_send_restart_notification_logs_warning_on_sendresult_failure(
 
 @pytest.mark.asyncio
 async def test_send_home_channel_startup_notification_skipped_when_flag_disabled(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     """Per-platform opt-out: gateway_restart_notification=False mutes the home-channel ping."""
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
@@ -560,7 +560,7 @@ async def test_send_home_channel_startup_notification_skipped_when_flag_disabled
 
 @pytest.mark.asyncio
 async def test_send_home_channel_startup_notification_default_flag_true(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     """Default behavior is unchanged: missing flag means notifications still fire."""
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
@@ -585,7 +585,7 @@ async def test_send_home_channel_startup_notification_default_flag_true(
 
 @pytest.mark.asyncio
 async def test_send_restart_notification_skipped_when_flag_disabled(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     """The /restart originator's notification also honors the per-platform flag.
 
@@ -614,7 +614,7 @@ async def test_send_restart_notification_skipped_when_flag_disabled(
 
 @pytest.mark.asyncio
 async def test_send_restart_notification_logs_info_on_sendresult_success(
-    tmp_path, monkeypatch, caplog
+    tmp_path, monkeypatch, caplog,
 ):
     """Adapter returning SendResult(success=True) keeps the INFO log line."""
     from gateway.platforms.base import SendResult

@@ -183,10 +183,10 @@ class DingTalkAdapter(BasePlatformAdapter):
 
         extra = config.extra or {}
         self._client_id: str = extra.get("client_id") or os.getenv(
-            "DINGTALK_CLIENT_ID", ""
+            "DINGTALK_CLIENT_ID", "",
         )
         self._client_secret: str = extra.get("client_secret") or os.getenv(
-            "DINGTALK_CLIENT_SECRET", ""
+            "DINGTALK_CLIENT_SECRET", "",
         )
 
         # Group-chat gating (mirrors Slack/Telegram/Discord/WhatsApp conventions).
@@ -242,12 +242,12 @@ class DingTalkAdapter(BasePlatformAdapter):
             return False
         if not HTTPX_AVAILABLE:
             logger.warning(
-                "[%s] httpx not installed. Run: pip install httpx", self.name
+                "[%s] httpx not installed. Run: pip install httpx", self.name,
             )
             return False
         if not self._client_id or not self._client_secret:
             logger.warning(
-                "[%s] DINGTALK_CLIENT_ID and DINGTALK_CLIENT_SECRET required", self.name
+                "[%s] DINGTALK_CLIENT_ID and DINGTALK_CLIENT_SECRET required", self.name,
             )
             return False
 
@@ -259,7 +259,7 @@ class DingTalkAdapter(BasePlatformAdapter):
             )
 
             credential = dingtalk_stream.Credential(
-                self._client_id, self._client_secret
+                self._client_id, self._client_secret,
             )
             self._stream_client = dingtalk_stream.DingTalkStreamClient(credential)
 
@@ -287,7 +287,7 @@ class DingTalkAdapter(BasePlatformAdapter):
             loop = asyncio.get_running_loop()
             handler = _IncomingHandler(self, loop)
             self._stream_client.register_callback_handler(
-                dingtalk_stream.ChatbotMessage.TOPIC, handler
+                dingtalk_stream.ChatbotMessage.TOPIC, handler,
             )
 
             self._stream_task = asyncio.create_task(self._run_stream())
@@ -726,7 +726,7 @@ class DingTalkAdapter(BasePlatformAdapter):
 
         if not content:
             rich_text = getattr(message, "rich_text_content", None) or getattr(
-                message, "rich_text", None
+                message, "rich_text", None,
             )
             if rich_text:
                 rich_list = getattr(rich_text, "rich_text_list", None) or rich_text
@@ -766,7 +766,7 @@ class DingTalkAdapter(BasePlatformAdapter):
 
         # Check for rich text with mixed content
         rich_text = getattr(message, "rich_text_content", None) or getattr(
-            message, "rich_text", None
+            message, "rich_text", None,
         )
         if rich_text:
             rich_list = getattr(rich_text, "rich_text_list", None) or rich_text
@@ -903,7 +903,7 @@ class DingTalkAdapter(BasePlatformAdapter):
 
         try:
             resp = await self._http_client.post(
-                session_webhook, json=payload, timeout=15.0
+                session_webhook, json=payload, timeout=15.0,
             )
             if resp.status_code < 300:
                 # Webhook path: fire Done only for final replies, same as
@@ -913,14 +913,14 @@ class DingTalkAdapter(BasePlatformAdapter):
                 return SendResult(success=True, message_id=uuid.uuid4().hex[:12])
             body = resp.text
             logger.warning(
-                "[%s] Send failed HTTP %d: %s", self.name, resp.status_code, body[:200]
+                "[%s] Send failed HTTP %d: %s", self.name, resp.status_code, body[:200],
             )
             return SendResult(
-                success=False, error=f"HTTP {resp.status_code}: {body[:200]}"
+                success=False, error=f"HTTP {resp.status_code}: {body[:200]}",
             )
         except httpx.TimeoutException:
             return SendResult(
-                success=False, error="Timeout sending message to DingTalk"
+                success=False, error="Timeout sending message to DingTalk",
             )
         except Exception as e:
             logger.error("[%s] Send error: %s", self.name, e)
@@ -1069,7 +1069,7 @@ class DingTalkAdapter(BasePlatformAdapter):
             )
 
             await self._card_sdk.create_card_with_options_async(
-                create_request, create_headers, runtime
+                create_request, create_headers, runtime,
             )
 
             # Step 2: Deliver card to the conversation
@@ -1109,7 +1109,7 @@ class DingTalkAdapter(BasePlatformAdapter):
             )
 
             await self._card_sdk.deliver_card_with_options_async(
-                deliver_request, deliver_headers, runtime
+                deliver_request, deliver_headers, runtime,
             )
 
             # Step 3: Stream initial content.  finalize=True closes the
@@ -1205,7 +1205,7 @@ class DingTalkAdapter(BasePlatformAdapter):
 
         runtime = tea_util_models.RuntimeOptions()
         await self._card_sdk.streaming_update_with_options_async(
-            stream_request, stream_headers, runtime
+            stream_request, stream_headers, runtime,
         )
 
     async def _get_access_token(self) -> str | None:
@@ -1262,7 +1262,7 @@ class DingTalkAdapter(BasePlatformAdapter):
                     x_acs_dingtalk_access_token=token,
                 )
                 await self._robot_sdk.robot_recall_emotion_with_options_async(
-                    request, sdk_headers, runtime
+                    request, sdk_headers, runtime,
                 )
             else:
                 emotion_kwargs["text_emotion"] = (
@@ -1280,7 +1280,7 @@ class DingTalkAdapter(BasePlatformAdapter):
                     x_acs_dingtalk_access_token=token,
                 )
                 await self._robot_sdk.robot_reply_emotion_with_options_async(
-                    request, sdk_headers, runtime
+                    request, sdk_headers, runtime,
                 )
             logger.info(
                 "[%s] _send_emotion: %s %s on msg=%s",
@@ -1288,7 +1288,7 @@ class DingTalkAdapter(BasePlatformAdapter):
             )
         except Exception:
             logger.debug(
-                "[%s] _send_emotion %s failed", self.name, action, exc_info=True
+                "[%s] _send_emotion %s failed", self.name, action, exc_info=True,
             )
 
     async def _resolve_media_codes(self, message: "ChatbotMessage") -> None:
@@ -1325,13 +1325,13 @@ class DingTalkAdapter(BasePlatformAdapter):
             code = getattr(obj, key, None) if hasattr(obj, key) else obj.get(key)
             if code:
                 tasks.append(
-                    self._fetch_download_url(code, robot_code, token, obj, key)
+                    self._fetch_download_url(code, robot_code, token, obj, key),
                 )
 
         await asyncio.gather(*tasks, return_exceptions=True)
 
     async def _fetch_download_url(
-        self, code: str, robot_code: str, token: str, obj, key: str
+        self, code: str, robot_code: str, token: str, obj, key: str,
     ) -> None:
         """Fetch download URL for a single code using the robot SDK."""
         if not self._robot_sdk:
@@ -1350,7 +1350,7 @@ class DingTalkAdapter(BasePlatformAdapter):
             )
             runtime = tea_util_models.RuntimeOptions()
             response = await self._robot_sdk.robot_message_file_download_with_options_async(
-                request, headers, runtime
+                request, headers, runtime,
             )
             body = response.body if response else None
             if body:
@@ -1400,7 +1400,7 @@ class DingTalkAdapter(BasePlatformAdapter):
 
 
 class _IncomingHandler(
-    dingtalk_stream.ChatbotHandler if DINGTALK_STREAM_AVAILABLE else object
+    dingtalk_stream.ChatbotHandler if DINGTALK_STREAM_AVAILABLE else object,
 ):
     """dingtalk-stream ChatbotHandler that forwards messages to the adapter.
 
@@ -1476,7 +1476,7 @@ class _IncomingHandler(
                 self._adapter._spawn_bg(
                     self._adapter._send_emotion(
                         msg_id, conversation_id, "🤔Thinking", recall=False,
-                    )
+                    ),
                 )
 
             # Fire-and-forget: return ACK immediately, process in background.
@@ -1487,7 +1487,7 @@ class _IncomingHandler(
             asyncio.create_task(self._safe_on_message(chatbot_msg))
         except Exception:
             logger.exception(
-                "[%s] Error preparing incoming message", self._adapter.name
+                "[%s] Error preparing incoming message", self._adapter.name,
             )
             return AckMessage.STATUS_SYSTEM_EXCEPTION, "error"
 
@@ -1499,5 +1499,5 @@ class _IncomingHandler(
             await self._adapter._on_message(chatbot_msg)
         except Exception:
             logger.exception(
-                "[%s] Error processing incoming message", self._adapter.name
+                "[%s] Error processing incoming message", self._adapter.name,
             )

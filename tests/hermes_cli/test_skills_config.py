@@ -20,7 +20,7 @@ class TestGetDisabledSkills:
         from hermes_cli.skills_config import get_disabled_skills
         config = {"skills": {
             "disabled": ["skill-a"],
-            "platform_disabled": {"telegram": ["skill-b"]}
+            "platform_disabled": {"telegram": ["skill-b"]},
         }}
         assert get_disabled_skills(config, platform="telegram") == {"skill-b"}
 
@@ -96,7 +96,7 @@ class TestIsSkillDisabled:
     def test_platform_disabled(self, mock_load):
         mock_load.return_value = {"skills": {
             "disabled": [],
-            "platform_disabled": {"telegram": ["tg-skill"]}
+            "platform_disabled": {"telegram": ["tg-skill"]},
         }}
         from tools.skills_tool import _is_skill_disabled
         assert _is_skill_disabled("tg-skill", platform="telegram") is True
@@ -105,7 +105,7 @@ class TestIsSkillDisabled:
     def test_platform_enabled_overrides_global(self, mock_load):
         mock_load.return_value = {"skills": {
             "disabled": ["skill-a"],
-            "platform_disabled": {"telegram": []}
+            "platform_disabled": {"telegram": []},
         }}
         from tools.skills_tool import _is_skill_disabled
         # telegram has explicit empty list -> skill-a is NOT disabled for telegram
@@ -134,7 +134,7 @@ class TestIsSkillDisabled:
     @patch.dict("os.environ", {"HERMES_PLATFORM": "discord"})
     def test_env_var_platform(self, mock_load):
         mock_load.return_value = {"skills": {
-            "platform_disabled": {"discord": ["discord-skill"]}
+            "platform_disabled": {"discord": ["discord-skill"]},
         }}
         from tools.skills_tool import _is_skill_disabled
         assert _is_skill_disabled("discord-skill") is True
@@ -156,7 +156,7 @@ class TestGetDisabledSkillNames:
             "    - global-skill\n"
             "  platform_disabled:\n"
             "    telegram:\n"
-            "      - tg-only-skill\n"
+            "      - tg-only-skill\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         monkeypatch.delenv("HERMES_PLATFORM", raising=False)
@@ -175,7 +175,7 @@ class TestGetDisabledSkillNames:
             "    - global-skill\n"
             "  platform_disabled:\n"
             "    discord:\n"
-            "      - discord-skill\n"
+            "      - discord-skill\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         monkeypatch.delenv("HERMES_PLATFORM", raising=False)
@@ -194,7 +194,7 @@ class TestGetDisabledSkillNames:
             "    telegram:\n"
             "      - tg-skill\n"
             "    discord:\n"
-            "      - discord-skill\n"
+            "      - discord-skill\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         monkeypatch.setenv("HERMES_PLATFORM", "telegram")
@@ -213,7 +213,7 @@ class TestGetDisabledSkillNames:
             "    telegram:\n"
             "      - tg-skill\n"
             "    slack:\n"
-            "      - slack-skill\n"
+            "      - slack-skill\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         monkeypatch.setenv("HERMES_PLATFORM", "telegram")
@@ -232,7 +232,7 @@ class TestGetDisabledSkillNames:
             "    - global-skill\n"
             "  platform_disabled:\n"
             "    telegram:\n"
-            "      - tg-skill\n"
+            "      - tg-skill\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         monkeypatch.delenv("HERMES_PLATFORM", raising=False)

@@ -54,7 +54,7 @@ def test_fill_first_selection_skips_recently_exhausted_entry(tmp_path, monkeypat
                         "last_status_at": None,
                         "last_error_code": None,
                     },
-                ]
+                ],
             },
         },
     )
@@ -87,8 +87,8 @@ def test_select_clears_expired_exhaustion(tmp_path, monkeypatch):
                         "last_status": "exhausted",
                         "last_status_at": time.time() - 90000,
                         "last_error_code": 402,
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -126,7 +126,7 @@ def test_round_robin_strategy_rotates_priorities(tmp_path, monkeypatch):
                         "source": "manual",
                         "access_token": "***",
                     },
-                ]
+                ],
             },
         },
     )
@@ -171,7 +171,7 @@ def test_random_strategy_uses_random_choice(tmp_path, monkeypatch):
                         "source": "manual",
                         "access_token": "***",
                     },
-                ]
+                ],
             },
         },
     )
@@ -208,8 +208,8 @@ def test_exhausted_entry_resets_after_ttl(tmp_path, monkeypatch):
                         "last_status": "exhausted",
                         "last_status_at": time.time() - 90000,
                         "last_error_code": 429,
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -244,8 +244,8 @@ def test_exhausted_402_entry_resets_after_one_hour(tmp_path, monkeypatch):
                         "last_status": "exhausted",
                         "last_status_at": time.time() - 3700,  # ~1h2m ago
                         "last_error_code": 402,
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -280,8 +280,8 @@ def test_exhausted_401_entry_resets_after_five_minutes(tmp_path, monkeypatch):
                         "last_status": "exhausted",
                         "last_status_at": time.time() - 310,
                         "last_error_code": 401,
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -321,8 +321,8 @@ def test_explicit_reset_timestamp_overrides_default_429_ttl(tmp_path, monkeypatc
                         "last_error_code": 429,
                         "last_error_reason": "device_code_exhausted",
                         "last_error_reset_at": time.time() + 7 * 24 * 60 * 60,
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -358,7 +358,7 @@ def test_mark_exhausted_and_rotate_persists_status(tmp_path, monkeypatch):
                         "source": "manual",
                         "access_token": "sk-ant-api-secondary",
                     },
-                ]
+                ],
             },
         },
     )
@@ -413,7 +413,7 @@ def test_token_invalidated_marks_credential_dead(tmp_path, monkeypatch):
                         "access_token": "healthy-at",
                         "refresh_token": "healthy-rt",
                     },
-                ]
+                ],
             },
         },
     )
@@ -485,7 +485,7 @@ def test_dead_credential_never_re_enters_rotation_after_ttl(tmp_path, monkeypatc
                         "access_token": "healthy-at",
                         "refresh_token": "healthy-rt",
                     },
-                ]
+                ],
             },
         },
     )
@@ -538,7 +538,7 @@ def test_429_rate_limit_still_uses_exhausted_not_dead(tmp_path, monkeypatch):
                         "access_token": "at-2",
                         "refresh_token": "rt-2",
                     },
-                ]
+                ],
             },
         },
     )
@@ -594,7 +594,7 @@ def test_generic_401_without_terminal_reason_still_uses_exhausted(tmp_path, monk
                         "access_token": "at-2",
                         "refresh_token": "rt-2",
                     },
-                ]
+                ],
             },
         },
     )
@@ -655,7 +655,7 @@ def test_dead_manual_entry_pruned_after_24h(tmp_path, monkeypatch):
                         "access_token": "healthy-at",
                         "refresh_token": "healthy-rt",
                     },
-                ]
+                ],
             },
         },
     )
@@ -713,7 +713,7 @@ def test_dead_manual_entry_kept_within_24h(tmp_path, monkeypatch):
                         "access_token": "healthy-at",
                         "refresh_token": "healthy-rt",
                     },
-                ]
+                ],
             },
         },
     )
@@ -769,7 +769,7 @@ def test_dead_singleton_seeded_entry_not_pruned(tmp_path, monkeypatch):
                         "last_error_code": 401,
                         "last_error_reason": "token_invalidated",
                     },
-                ]
+                ],
             },
         },
     )
@@ -880,8 +880,8 @@ def test_load_pool_sanitizes_legacy_raw_borrowed_entry_when_value_unchanged(tmp_
                         "source": "env:OPENROUTER_API_KEY",
                         "access_token": sentinel,
                         "base_url": "https://openrouter.ai/api/v1",
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -1006,8 +1006,8 @@ def test_load_pool_prunes_stale_borrowed_custom_config_entry(tmp_path, monkeypat
                         "source": "config:Foo",
                         "access_token": sentinel,
                         "base_url": "https://foo.example/v1",
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -1083,7 +1083,7 @@ def test_write_credential_pool_treats_unowned_oauth_source_as_borrowed(tmp_path,
             "source": "oauth",
             "access_token": sentinel,
             "refresh_token": f"refresh-{sentinel}",
-        }
+        },
     ])
 
     auth_text = (tmp_path / "hermes" / "auth.json").read_text()
@@ -1112,7 +1112,7 @@ def test_write_credential_pool_preserves_known_provider_owned_oauth_state(tmp_pa
             "access_token": sentinel,
             "refresh_token": f"refresh-{sentinel}",
             "agent_key": f"agent-{sentinel}",
-        }
+        },
     ])
 
     persisted = json.loads((tmp_path / "hermes" / "auth.json").read_text())["credential_pool"]["nous"][0]
@@ -1138,7 +1138,7 @@ def test_load_pool_prefers_dotenv_over_stale_os_environ(tmp_path, monkeypatch):
 
     # User edited ~/.hermes/.env with the fresh key
     (hermes_home / ".env").write_text(
-        "OPENROUTER_API_KEY=sk-or-FRESH-from-dotenv\n"
+        "OPENROUTER_API_KEY=sk-or-FRESH-from-dotenv\n",
     )
 
     _write_auth_store(tmp_path, {"version": 1, "providers": {}})
@@ -1196,8 +1196,8 @@ def test_load_pool_removes_stale_seeded_env_entry(tmp_path, monkeypatch):
                         "source": "env:OPENROUTER_API_KEY",
                         "access_token": "stale-token",
                         "base_url": "https://openrouter.ai/api/v1",
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -1231,7 +1231,7 @@ def test_load_pool_migrates_nous_provider_state(tmp_path, monkeypatch):
                     "expires_at": "2026-03-24T12:00:00+00:00",
                     "agent_key": "agent-key",
                     "agent_key_expires_at": "2026-03-24T13:30:00+00:00",
-                }
+                },
             },
         },
     )
@@ -1272,7 +1272,7 @@ def test_load_pool_mirrors_nous_invoke_jwt_agent_key_runtime_api_key(tmp_path, m
                     "expires_at": expires_at,
                     "agent_key": token,
                     "agent_key_expires_at": expires_at,
-                }
+                },
             },
         },
     )
@@ -1336,7 +1336,7 @@ def test_nous_pool_terminal_refresh_removes_device_code_entry(tmp_path, monkeypa
                     "expires_at": "2026-03-24T12:00:00+00:00",
                     "agent_key": "agent-key",
                     "agent_key_expires_at": "2026-03-24T13:30:00+00:00",
-                }
+                },
             },
         },
     )
@@ -1406,7 +1406,7 @@ def test_load_pool_removes_nous_device_code_when_singleton_quarantined(tmp_path,
                     "inference_base_url": "https://inference.example.com/v1",
                     "client_id": "hermes-cli",
                     "last_auth_error": {"code": "invalid_grant"},
-                }
+                },
             },
             "credential_pool": {
                 "nous": [
@@ -1430,7 +1430,7 @@ def test_load_pool_removes_nous_device_code_when_singleton_quarantined(tmp_path,
                         "auth_type": "api_key",
                         "access_token": "manual-nous-key",
                     },
-                ]
+                ],
             },
         },
     )
@@ -1464,8 +1464,8 @@ def test_load_pool_removes_stale_file_backed_singleton_entry(tmp_path, monkeypat
                         "access_token": "stale-access-token",
                         "refresh_token": "stale-refresh-token",
                         "expires_at_ms": int(time.time() * 1000) + 60_000,
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -1512,7 +1512,7 @@ def test_load_pool_migrates_nous_provider_state_preserves_tls(tmp_path, monkeypa
                         "insecure": True,
                         "ca_bundle": "/tmp/nous-ca.pem",
                     },
-                }
+                },
             },
         },
     )
@@ -1556,8 +1556,8 @@ def test_singleton_seed_does_not_clobber_manual_oauth_entry(tmp_path, monkeypatc
                         "access_token": "manual-token",
                         "refresh_token": "manual-refresh",
                         "expires_at_ms": 1711234567000,
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -1806,7 +1806,7 @@ def test_least_used_strategy_selects_lowest_count(tmp_path, monkeypatch):
                         "access_token": "sk-or-medium",
                         "request_count": 50,
                     },
-                ]
+                ],
             },
         },
     )
@@ -1852,7 +1852,7 @@ def test_thread_safety_concurrent_select(tmp_path, monkeypatch):
                         "access_token": f"sk-or-{i}",
                     }
                     for i in range(5)
-                ]
+                ],
             },
         },
     )
@@ -1914,7 +1914,7 @@ def test_custom_endpoint_pool_keyed_by_name(tmp_path, monkeypatch):
                         "access_token": "sk-together-yyy",
                         "base_url": "https://api.together.ai/v1",
                     },
-                ]
+                ],
             },
         },
     )
@@ -1948,8 +1948,8 @@ def test_custom_endpoint_pool_seeds_from_config(tmp_path, monkeypatch):
                 "name": "Together.ai",
                 "base_url": "https://api.together.ai/v1",
                 "api_key": "sk-config-seeded",
-            }
-        ]
+            },
+        ],
     }))
 
     from agent.credential_pool import load_pool
@@ -1974,7 +1974,7 @@ def test_custom_endpoint_pool_seeds_from_model_config(tmp_path, monkeypatch):
             {
                 "name": "Together.ai",
                 "base_url": "https://api.together.ai/v1",
-            }
+            },
         ],
         "model": {
             "provider": "custom",
@@ -2026,7 +2026,7 @@ def test_get_custom_provider_pool_key(tmp_path, monkeypatch):
                 "name": "My Local Server",
                 "base_url": "http://localhost:8080/v1",
             },
-        ]
+        ],
     }))
 
     from agent.credential_pool import get_custom_provider_pool_key
@@ -2056,7 +2056,7 @@ def test_get_custom_provider_pool_key_prefers_name_over_base_url(tmp_path, monke
                 "base_url": "http://gateway:8080/v1",
                 "api_key": "sk-bbb",
             },
-        ]
+        ],
     }))
 
     from agent.credential_pool import get_custom_provider_pool_key
@@ -2091,7 +2091,7 @@ def test_list_custom_pool_providers(tmp_path, monkeypatch):
                         "priority": 0,
                         "source": "manual",
                         "access_token": "***",
-                    }
+                    },
                 ],
                 "custom:together.ai": [
                     {
@@ -2101,7 +2101,7 @@ def test_list_custom_pool_providers(tmp_path, monkeypatch):
                         "priority": 0,
                         "source": "manual",
                         "access_token": "***",
-                    }
+                    },
                 ],
                 "custom:fireworks": [
                     {
@@ -2111,7 +2111,7 @@ def test_list_custom_pool_providers(tmp_path, monkeypatch):
                         "priority": 0,
                         "source": "manual",
                         "access_token": "***",
-                    }
+                    },
                 ],
                 "custom:empty": [],
             },
@@ -2150,7 +2150,7 @@ def test_acquire_lease_prefers_unleased_entry(tmp_path, monkeypatch):
                         "source": "manual",
                         "access_token": "***",
                     },
-                ]
+                ],
             },
         },
     )
@@ -2183,8 +2183,8 @@ def test_release_lease_decrements_counter(tmp_path, monkeypatch):
                         "priority": 0,
                         "source": "manual",
                         "access_token": "***",
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -2302,7 +2302,7 @@ def test_load_pool_does_not_seed_qwen_oauth_when_no_token(tmp_path, monkeypatch)
     monkeypatch.setattr(
         "hermes_cli.auth.resolve_qwen_runtime_credentials",
         lambda **kw: (_ for _ in ()).throw(
-            AuthError("Qwen CLI credentials not found.", provider="qwen-oauth", code="qwen_auth_missing")
+            AuthError("Qwen CLI credentials not found.", provider="qwen-oauth", code="qwen_auth_missing"),
         ),
     )
 
@@ -2434,7 +2434,7 @@ def test_sync_nous_entry_from_auth_store_adopts_newer_tokens(tmp_path, monkeypat
                     "expires_at": "2026-03-24T12:00:00+00:00",
                     "agent_key": "agent-key-OLD",
                     "agent_key_expires_at": "2026-03-24T13:30:00+00:00",
-                }
+                },
             },
         },
     )
@@ -2464,7 +2464,7 @@ def test_sync_nous_entry_from_auth_store_adopts_newer_tokens(tmp_path, monkeypat
                     "expires_at": "2026-03-24T12:30:00+00:00",
                     "agent_key": "agent-key-NEW",
                     "agent_key_expires_at": "2026-03-24T14:00:00+00:00",
-                }
+                },
             },
         },
     )
@@ -2496,7 +2496,7 @@ def test_sync_nous_entry_noop_when_tokens_match(tmp_path, monkeypatch):
                     "expires_at": "2026-03-24T12:00:00+00:00",
                     "agent_key": "agent-key",
                     "agent_key_expires_at": "2026-03-24T13:30:00+00:00",
-                }
+                },
             },
         },
     )
@@ -2533,7 +2533,7 @@ def test_nous_exhausted_entry_recovers_via_auth_store_sync(tmp_path, monkeypatch
                     "expires_at": "2026-03-24T12:00:00+00:00",
                     "agent_key": "agent-key",
                     "agent_key_expires_at": "2026-03-24T13:30:00+00:00",
-                }
+                },
             },
         },
     )
@@ -2570,7 +2570,7 @@ def test_nous_exhausted_entry_recovers_via_auth_store_sync(tmp_path, monkeypatch
                     "expires_at": "2026-03-24T12:30:00+00:00",
                     "agent_key": "agent-key-FRESH",
                     "agent_key_expires_at": "2026-03-24T14:00:00+00:00",
-                }
+                },
             },
         },
     )
@@ -2596,7 +2596,7 @@ def _codex_auth_store(access: str, refresh: str) -> dict:
                     "id_token": "id-" + access,
                 },
                 "last_refresh": "2026-04-28T00:00:00Z",
-            }
+            },
         },
     }
 
@@ -2738,7 +2738,7 @@ def _xai_auth_store(access_token: str, refresh_token: str) -> dict:
                 },
                 "discovery": {"token_endpoint": "https://accounts.x.ai/oauth2/token"},
                 "redirect_uri": "http://localhost:12345/callback",
-            }
+            },
         },
     }
 
@@ -2747,25 +2747,25 @@ def test_is_terminal_xai_oauth_refresh_error():
     from hermes_cli.auth import AuthError, _is_terminal_xai_oauth_refresh_error
 
     assert _is_terminal_xai_oauth_refresh_error(
-        AuthError("Refresh failed", provider="xai-oauth", code="xai_refresh_failed", relogin_required=True)
+        AuthError("Refresh failed", provider="xai-oauth", code="xai_refresh_failed", relogin_required=True),
     )
     assert _is_terminal_xai_oauth_refresh_error(
-        AuthError("No token", provider="xai-oauth", code="xai_auth_missing_refresh_token", relogin_required=True)
+        AuthError("No token", provider="xai-oauth", code="xai_auth_missing_refresh_token", relogin_required=True),
     )
     # transient 429/5xx: relogin_required=False → not terminal
     assert not _is_terminal_xai_oauth_refresh_error(
-        AuthError("Rate limit", provider="xai-oauth", code="xai_refresh_failed", relogin_required=False)
+        AuthError("Rate limit", provider="xai-oauth", code="xai_refresh_failed", relogin_required=False),
     )
     # Nous error does not trigger xAI check
     assert not _is_terminal_xai_oauth_refresh_error(
-        AuthError("Revoked", provider="nous", code="invalid_grant", relogin_required=True)
+        AuthError("Revoked", provider="nous", code="invalid_grant", relogin_required=True),
     )
     # Generic exception
     assert not _is_terminal_xai_oauth_refresh_error(ValueError("oops"))
 
 
 def test_xai_oauth_terminal_refresh_clears_auth_json_and_removes_pool_entries(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     monkeypatch.setenv("HERMES_HOME", str(tmp_path / "hermes"))
     monkeypatch.delenv("XAI_API_KEY", raising=False)
@@ -2874,7 +2874,7 @@ def _codex_auth_store(access_token: str, refresh_token: str) -> dict:
                     "access_token": access_token,
                     "refresh_token": refresh_token,
                 },
-            }
+            },
         },
     }
 
@@ -2883,31 +2883,31 @@ def test_is_terminal_codex_oauth_refresh_error():
     from hermes_cli.auth import AuthError, _is_terminal_codex_oauth_refresh_error
 
     assert _is_terminal_codex_oauth_refresh_error(
-        AuthError("Refresh failed", provider="openai-codex", code="codex_refresh_failed", relogin_required=True)
+        AuthError("Refresh failed", provider="openai-codex", code="codex_refresh_failed", relogin_required=True),
     )
     assert _is_terminal_codex_oauth_refresh_error(
-        AuthError("No token", provider="openai-codex", code="codex_auth_missing_refresh_token", relogin_required=True)
+        AuthError("No token", provider="openai-codex", code="codex_auth_missing_refresh_token", relogin_required=True),
     )
     assert _is_terminal_codex_oauth_refresh_error(
-        AuthError("Revoked", provider="openai-codex", code="invalid_grant", relogin_required=True)
+        AuthError("Revoked", provider="openai-codex", code="invalid_grant", relogin_required=True),
     )
     assert _is_terminal_codex_oauth_refresh_error(
-        AuthError("Reused", provider="openai-codex", code="refresh_token_reused", relogin_required=True)
+        AuthError("Reused", provider="openai-codex", code="refresh_token_reused", relogin_required=True),
     )
     # transient 429/5xx: relogin_required=False -> not terminal
     assert not _is_terminal_codex_oauth_refresh_error(
-        AuthError("Rate limit", provider="openai-codex", code="codex_refresh_failed", relogin_required=False)
+        AuthError("Rate limit", provider="openai-codex", code="codex_refresh_failed", relogin_required=False),
     )
     # xAI error does not trigger Codex check
     assert not _is_terminal_codex_oauth_refresh_error(
-        AuthError("Revoked", provider="xai-oauth", code="xai_refresh_failed", relogin_required=True)
+        AuthError("Revoked", provider="xai-oauth", code="xai_refresh_failed", relogin_required=True),
     )
     # Generic exception
     assert not _is_terminal_codex_oauth_refresh_error(ValueError("oops"))
 
 
 def test_codex_oauth_terminal_refresh_clears_auth_json_and_removes_pool_entries(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     monkeypatch.setenv("HERMES_HOME", str(tmp_path / "hermes"))
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)

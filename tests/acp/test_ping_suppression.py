@@ -159,7 +159,7 @@ async def test_bare_ping_request_produces_proper_response_and_no_stderr_noise(
 
         # Agent writes its output via this StreamWriter:
         out_transport, out_protocol = await loop.connect_write_pipe(
-            asyncio.streams.FlowControlMixin, out_write_file
+            asyncio.streams.FlowControlMixin, out_write_file,
         )
         agent_output = asyncio.StreamWriter(out_transport, out_protocol, None, loop)
 
@@ -174,7 +174,7 @@ async def test_bare_ping_request_produces_proper_response_and_no_stderr_noise(
                 input_stream=agent_output,
                 output_stream=agent_input,
                 use_unstable_protocol=True,
-            )
+            ),
         )
 
         # Send a bare `ping`

@@ -19,10 +19,10 @@ def _base_config(tmp_path):
 
 def test_command_requires_pipe_stdin_detects_gh_with_token():
     assert terminal_tool_module._command_requires_pipe_stdin(
-        "gh auth login --hostname github.com --git-protocol https --with-token"
+        "gh auth login --hostname github.com --git-protocol https --with-token",
     ) is True
     assert terminal_tool_module._command_requires_pipe_stdin(
-        "gh auth login --web"
+        "gh auth login --web",
     ) is False
 
 
@@ -48,7 +48,7 @@ def test_terminal_background_disables_pty_for_gh_with_token(monkeypatch, tmp_pat
                 command="gh auth login --hostname github.com --git-protocol https --with-token",
                 background=True,
                 pty=True,
-            )
+            ),
         )
     finally:
         terminal_tool_module._active_environments.pop("default", None)
@@ -81,7 +81,7 @@ def test_terminal_background_keeps_pty_for_regular_interactive_commands(monkeypa
                 command="python3 -c \"print(input())\"",
                 background=True,
                 pty=True,
-            )
+            ),
         )
     finally:
         terminal_tool_module._active_environments.pop("default", None)

@@ -174,7 +174,7 @@ class TestIssue6211NativeProviderPrefixNormalization:
         ("modal/zai-org/GLM-5-FP8", "custom", "modal/zai-org/GLM-5-FP8"),
     ])
     def test_native_provider_prefixes_are_only_stripped_on_matching_provider(
-        self, model, target_provider, expected
+        self, model, target_provider, expected,
     ):
         assert normalize_model_for_provider(model, target_provider) == expected
 

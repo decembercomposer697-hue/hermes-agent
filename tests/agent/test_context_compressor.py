@@ -202,7 +202,7 @@ class TestGenerateSummaryNoneContent:
         messages = [
             {"role": "user", "content": "do something"},
             {"role": "assistant", "content": None, "tool_calls": [
-                {"function": {"name": "search"}}
+                {"function": {"name": "search"}},
             ]},
             {"role": "tool", "content": "result"},
             {"role": "assistant", "content": None},
@@ -509,7 +509,7 @@ class TestSummaryFallbackToMainModel:
         # Simulate the SDK raising a raw JSONDecodeError with a realistic
         # error message ("Expecting value: line X column Y char Z").
         err_json = _json.JSONDecodeError(
-            "Expecting value", "<!DOCTYPE html><html>...</html>", 0
+            "Expecting value", "<!DOCTYPE html><html>...</html>", 0,
         )
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
@@ -862,7 +862,7 @@ class TestSummaryFailureTrackingForGatewayWarning:
                             "name": "read_file",
                             "arguments": '{"path":"/tmp/project/app.py"}',
                         },
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call-1", "content": f"read /tmp/project/app.py with token {secret}"},
@@ -1197,7 +1197,7 @@ class TestCompressWithClient:
                         "response_item_id": "fc_123",
                         "type": "function",
                         "function": {"name": "search_files", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_123", "content": "result"},
@@ -1206,7 +1206,7 @@ class TestCompressWithClient:
         sanitized = compressor._sanitize_tool_pairs(msgs)
 
         assert [m.get("tool_call_id") for m in sanitized if m.get("role") == "tool"] == [
-            "call_123"
+            "call_123",
         ]
 
     def test_user_role_summary_carries_end_marker(self):
@@ -1244,7 +1244,7 @@ class TestCompressWithClient:
         assert summary_msg["role"] == "user"
         assert "END OF CONTEXT SUMMARY" in summary_msg["content"]
         assert summary_msg["content"].rstrip().endswith(
-            "respond to the message below, not the summary above ---"
+            "respond to the message below, not the summary above ---",
         )
 
     def test_summary_role_avoids_consecutive_user_messages(self):
@@ -1958,7 +1958,7 @@ class TestTokenBudgetTailProtection:
         assert 0 <= cut <= len(messages)
 
     def test_generous_budget_protects_everything_floor_does_not_override(
-        self, budget_compressor
+        self, budget_compressor,
     ):
         """A budget that covers the whole transcript must prune nothing —
         ``protect_tail_count`` is a minimum floor, not a ceiling."""

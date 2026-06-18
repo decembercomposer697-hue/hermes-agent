@@ -89,7 +89,7 @@ class TestBuildSessionContextPromptRedaction:
                 platform=Platform.TELEGRAM,
                 chat_id="telegram:99999",
                 name="Home Chat",
-            )
+            ),
         }
         ctx = _make_context(home_channels=hc)
         prompt = build_session_context_prompt(ctx, redact_pii=True)
@@ -103,7 +103,7 @@ class TestBuildSessionContextPromptRedaction:
                 platform=Platform.TELEGRAM,
                 chat_id="telegram:99999",
                 name="Home Chat",
-            )
+            ),
         }
         ctx = _make_context(home_channels=hc)
         prompt = build_session_context_prompt(ctx, redact_pii=False)

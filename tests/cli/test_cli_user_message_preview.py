@@ -57,7 +57,7 @@ class TestSubmittedUserMessagePreview:
         cli = _make_cli()
 
         rendered = cli._format_submitted_user_message_preview(
-            "line1\nline2\nline3\nline4\nline5\nline6"
+            "line1\nline2\nline3\nline4\nline5\nline6",
         )
 
         assert "line1" in rendered
@@ -72,7 +72,7 @@ class TestSubmittedUserMessagePreview:
         cli = _make_cli({"first_lines": 2, "last_lines": 0})
 
         rendered = cli._format_submitted_user_message_preview(
-            "line1\nline2\nline3\nline4\nline5\nline6"
+            "line1\nline2\nline3\nline4\nline5\nline6",
         )
 
         assert "line1" in rendered

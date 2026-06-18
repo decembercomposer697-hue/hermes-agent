@@ -58,7 +58,7 @@ class TestSearXNGSearchProviderSearch:
             {"title": "Result A", "url": "https://a.example.com", "content": "Desc A", "score": 0.9},
             {"title": "Result B", "url": "https://b.example.com", "content": "Desc B", "score": 0.7},
             {"title": "Result C", "url": "https://c.example.com", "content": "Desc C", "score": 0.5},
-        ]
+        ],
     }
 
     def _make_mock_response(self, json_data, status_code=200):
@@ -93,7 +93,7 @@ class TestSearXNGSearchProviderSearch:
                 {"title": "Low",  "url": "https://low.example.com",  "content": "", "score": 0.1},
                 {"title": "High", "url": "https://high.example.com", "content": "", "score": 0.99},
                 {"title": "Mid",  "url": "https://mid.example.com",  "content": "", "score": 0.5},
-            ]
+            ],
         }
         mock_resp = self._make_mock_response(unordered)
 
@@ -146,7 +146,7 @@ class TestSearXNGSearchProviderSearch:
             "results": [
                 {"title": "No score", "url": "https://noscore.example.com", "content": ""},
                 {"title": "Has score", "url": "https://scored.example.com", "content": "", "score": 0.8},
-            ]
+            ],
         }
         mock_resp = self._make_mock_response(data)
 
@@ -361,7 +361,7 @@ class TestSearXNGOnlyExtractCrawlErrors:
         monkeypatch.setattr("tools.interrupt.is_interrupted", lambda: False, raising=False)
 
         result_str = asyncio.get_event_loop().run_until_complete(
-            web_tools.web_extract_tool(["https://example.com"])
+            web_tools.web_extract_tool(["https://example.com"]),
         )
         result = json.loads(result_str)
         assert result["success"] is False

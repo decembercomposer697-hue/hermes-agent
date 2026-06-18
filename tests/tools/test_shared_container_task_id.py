@@ -59,7 +59,7 @@ def test_rl_task_with_override_keeps_its_own_id():
     # must survive ``_resolve_container_task_id`` so the rollout lands in
     # its own sandbox.
     terminal_tool.register_task_env_overrides(
-        "tb2-task-fix-git", {"docker_image": "tb2:fix-git", "cwd": "/app"}
+        "tb2-task-fix-git", {"docker_image": "tb2:fix-git", "cwd": "/app"},
     )
     try:
         assert (
@@ -113,7 +113,7 @@ def test_cwd_only_override_collapses_to_default():
     container so all surfaces (TUI, gateway, dashboard) share one sandbox.
     Regression for #37361."""
     terminal_tool.register_task_env_overrides(
-        "acp-session-abc", {"cwd": "/home/user/project"}
+        "acp-session-abc", {"cwd": "/home/user/project"},
     )
     try:
         assert (
@@ -128,7 +128,7 @@ def test_cwd_plus_docker_image_keeps_own_id():
     """When overrides include both cwd AND docker_image, isolation must
     still be honoured (RL/benchmark pattern with explicit cwd)."""
     terminal_tool.register_task_env_overrides(
-        "rl-with-cwd", {"docker_image": "myimg:latest", "cwd": "/workspace"}
+        "rl-with-cwd", {"docker_image": "myimg:latest", "cwd": "/workspace"},
     )
     try:
         assert (
@@ -142,7 +142,7 @@ def test_cwd_plus_docker_image_keeps_own_id():
 def test_env_type_override_keeps_own_id():
     """env_type is an isolation key — must trigger per-task container."""
     terminal_tool.register_task_env_overrides(
-        "bench-env", {"env_type": "sandbox", "cwd": "/work"}
+        "bench-env", {"env_type": "sandbox", "cwd": "/work"},
     )
     try:
         assert (

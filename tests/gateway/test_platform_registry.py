@@ -212,7 +212,7 @@ class TestGatewayConfigPluginPlatform:
             "platforms": {
                 "telegram": {"enabled": True, "token": "test-token"},
                 "irc": {"enabled": True, "extra": {"server": "irc.libera.chat"}},
-            }
+            },
         }
         cfg = GatewayConfig.from_dict(data)
         platform_values = {p.value for p in cfg.platforms}
@@ -237,7 +237,7 @@ class TestGatewayConfigPluginPlatform:
             data = {
                 "platforms": {
                     "testplat": {"enabled": True, "extra": {"token": "abc"}},
-                }
+                },
             }
             cfg = GatewayConfig.from_dict(data)
             connected = cfg.get_connected_platforms()
@@ -251,7 +251,7 @@ class TestGatewayConfigPluginPlatform:
         data = {
             "platforms": {
                 "unknown_plugin": {"enabled": True, "extra": {"token": "abc"}},
-            }
+            },
         }
         cfg = GatewayConfig.from_dict(data)
         connected = cfg.get_connected_platforms()
@@ -275,7 +275,7 @@ class TestGatewayConfigPluginPlatform:
             data = {
                 "platforms": {
                     "badconfig": {"enabled": True, "extra": {}},
-                }
+                },
             }
             cfg = GatewayConfig.from_dict(data)
             connected = cfg.get_connected_platforms()
@@ -505,7 +505,7 @@ class TestApplyYamlConfigFnDispatch:
             reg.unregister("myextraplat")
 
     def test_hook_receives_full_yaml_and_platform_subdict(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Hook receives both the full yaml_cfg and its own platform sub-dict."""
         captured: dict = {}
@@ -582,7 +582,7 @@ class TestApplyYamlConfigFnDispatch:
             _reg.unregister("mygoodplat")
 
     def test_hook_skipped_when_platform_section_missing(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Hook is NOT called when the platform's YAML section is absent."""
         called = {"count": 0}
@@ -604,7 +604,7 @@ class TestApplyYamlConfigFnDispatch:
             reg.unregister("myabsentplat")
 
     def test_hook_skipped_when_platform_section_not_dict(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Hook is NOT called when the platform's YAML section isn't a dict."""
         called = {"count": 0}
@@ -628,7 +628,7 @@ class TestApplyYamlConfigFnDispatch:
             reg.unregister("mybadshapeplat")
 
     def test_env_var_takes_precedence_when_hook_uses_getenv_guard(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """The standard `not os.getenv(...)` guard preserves env > YAML."""
         env_var = "MYPRECPLAT_FLAG"
@@ -728,7 +728,7 @@ class TestPluginEnablementGate:
         return hermes_home
 
     def test_plugin_with_is_connected_false_is_NOT_enabled(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """check_fn=True + is_connected=False must NOT enable the platform.
 
@@ -764,7 +764,7 @@ class TestPluginEnablementGate:
             _reg.unregister("myunconfiguredplat")
 
     def test_plugin_with_is_connected_true_is_enabled(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """check_fn=True + is_connected=True still enables the platform."""
         from gateway.platform_registry import platform_registry as _reg
@@ -791,7 +791,7 @@ class TestPluginEnablementGate:
             _reg.unregister("myconfiguredplat")
 
     def test_plugin_without_is_connected_falls_back_to_check_fn(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Legacy plugins that don't register is_connected keep working.
 
@@ -856,7 +856,7 @@ class TestPluginEnablementGate:
             _reg.unregister("mybadprobeplat")
 
     def test_yaml_enabled_true_overrides_is_connected_false(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Explicit YAML ``enabled: true`` wins over is_connected=False.
 
@@ -950,7 +950,7 @@ class TestPluginEnablementGate:
             _reg.unregister("myextrasplat")
 
     def test_is_connected_failed_gate_does_not_leak_extras(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """When the gate rejects, env-seeded extras must NOT leak onto
         ``config.platforms``.  A rejected plugin should be invisible, not

@@ -758,7 +758,7 @@ mode = "observe_only"
                     id="tool-1",
                     type="function",
                     function=SimpleNamespace(name="terminal", arguments='{"command":"pwd"}'),
-                )
+                ),
             ],
             reasoning_content="need a tool",
         ),
@@ -802,7 +802,7 @@ mode = "observe_only"
                     "id": "tool-1",
                     "type": "function",
                     "function": {"name": "terminal", "arguments": '{"command":"pwd"}'},
-                }
+                },
             ],
             "reasoning_content": "need a tool",
         },
@@ -847,7 +847,7 @@ def test_nemo_relay_adaptive_llm_execution_preserves_downstream_error(tmp_path, 
 
 
 def test_nemo_relay_adaptive_llm_execution_preserves_downstream_error_with_relay_suffix(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     # Guards the startswith (vs exact ==) match in _is_relay_wrapped_callback_error:
     # Relay re-wraps the callback failure with its canonical prefix but APPENDS a
@@ -911,7 +911,7 @@ def test_nemo_relay_adaptive_llm_execution_keeps_unrelated_internal_error(tmp_pa
 
 
 def test_nemo_relay_adaptive_llm_execution_keeps_wrapped_relay_error_after_downstream_failure(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     fake = _FakeNemoRelay()
     relay_error = RuntimeError("internal error: RuntimeError: relay policy blocked after downstream")
@@ -1045,7 +1045,7 @@ def _adaptive_llm_execute_mode(tmp_path, monkeypatch, plugins_toml_text: str) ->
 
 
 def test_nemo_relay_adaptive_llm_execution_middleware_defaults_to_observe_only_when_mode_is_unset(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     mode = _adaptive_llm_execute_mode(
         tmp_path,
@@ -1220,7 +1220,7 @@ def test_nemo_relay_adaptive_tool_execution_keeps_unrelated_internal_error(tmp_p
 
 
 def test_nemo_relay_adaptive_tool_execution_keeps_wrapped_relay_error_after_downstream_failure(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     fake = _FakeNemoRelay()
     relay_error = RuntimeError("internal error: RuntimeError: relay policy blocked after downstream")

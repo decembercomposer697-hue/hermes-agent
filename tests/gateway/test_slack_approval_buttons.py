@@ -141,7 +141,7 @@ class TestSlackExecApproval:
         adapter = _make_adapter()
         adapter._app = None
         result = await adapter.send_exec_approval(
-            chat_id="C1", command="ls", session_key="s"
+            chat_id="C1", command="ls", session_key="s",
         )
         assert result.success is False
 
@@ -153,7 +153,7 @@ class TestSlackExecApproval:
 
         long_cmd = "x" * 5000
         await adapter.send_exec_approval(
-            chat_id="C1", command=long_cmd, session_key="s"
+            chat_id="C1", command=long_cmd, session_key="s",
         )
 
         kwargs = mock_client.chat_postMessage.call_args[1]
@@ -362,7 +362,7 @@ class TestSlackThreadContext:
                 {"ts": "1000.0", "user": "U1", "text": "This is the parent message"},
                 {"ts": "1000.1", "user": "U2", "text": "I think we should refactor"},
                 {"ts": "1000.2", "user": "U1", "text": "Good idea, <@U_BOT> what do you think?"},
-            ]
+            ],
         })
 
         # Mock user name resolution
@@ -411,12 +411,12 @@ class TestSlackThreadContext:
                     "text": "Deploy succeeded",
                 },
                 {"ts": "1000.2", "user": "U1", "text": "Current"},
-            ]
+            ],
         })
         adapter._user_name_cache = {"U1": "Alice", "U_OTHER_BOT": "DeployBot"}
 
         context = await adapter._fetch_thread_context(
-            channel_id="C1", thread_ts="1000.0", current_ts="1000.2", team_id="T1"
+            channel_id="C1", thread_ts="1000.0", current_ts="1000.2", team_id="T1",
         )
 
         assert "Previous bot self-reply" not in context
@@ -431,7 +431,7 @@ class TestSlackThreadContext:
         mock_client.conversations_replies = AsyncMock(return_value={"messages": []})
 
         context = await adapter._fetch_thread_context(
-            channel_id="C1", thread_ts="1000.0", current_ts="1000.1", team_id="T1"
+            channel_id="C1", thread_ts="1000.0", current_ts="1000.1", team_id="T1",
         )
         assert context == ""
 
@@ -442,7 +442,7 @@ class TestSlackThreadContext:
         mock_client.conversations_replies = AsyncMock(side_effect=Exception("API error"))
 
         context = await adapter._fetch_thread_context(
-            channel_id="C1", thread_ts="1000.0", current_ts="1000.1", team_id="T1"
+            channel_id="C1", thread_ts="1000.0", current_ts="1000.1", team_id="T1",
         )
         assert context == ""
 
@@ -464,7 +464,7 @@ class TestSlackThreadContext:
                 },
                 # User reply that triggered the fetch
                 {"ts": "1000.1", "user": "U1", "text": "詳細を教えて"},
-            ]
+            ],
         })
         adapter._user_name_cache = {"U1": "Alice"}
 
@@ -498,12 +498,12 @@ class TestSlackThreadContext:
                 {"ts": "1000.2", "user": "U1", "text": "Follow-up question"},
                 # Current trigger (excluded by current_ts match)
                 {"ts": "1000.3", "user": "U1", "text": "Current"},
-            ]
+            ],
         })
         adapter._user_name_cache = {"U1": "Alice"}
 
         context = await adapter._fetch_thread_context(
-            channel_id="C1", thread_ts="1000.0", current_ts="1000.3", team_id="T1"
+            channel_id="C1", thread_ts="1000.0", current_ts="1000.3", team_id="T1",
         )
 
         assert "Cron summary" in context
@@ -546,12 +546,12 @@ class TestSlackThreadContext:
                     "text": "Own T2 bot reply",
                 },
                 {"ts": "2000.3", "user": "U2", "text": "Current"},
-            ]
+            ],
         })
         adapter._user_name_cache = {"U2": "Bob"}
 
         context = await adapter._fetch_thread_context(
-            channel_id="C2", thread_ts="2000.0", current_ts="2000.3", team_id="T2"
+            channel_id="C2", thread_ts="2000.0", current_ts="2000.3", team_id="T2",
         )
 
         assert "Parent T2" in context
@@ -569,12 +569,12 @@ class TestSlackThreadContext:
             "messages": [
                 {"ts": "1000.0", "user": "U1", "text": "Parent"},
                 {"ts": "1000.1", "user": "U1", "text": "DO NOT INCLUDE THIS"},
-            ]
+            ],
         })
         adapter._user_name_cache = {"U1": "Alice"}
 
         context = await adapter._fetch_thread_context(
-            channel_id="C1", thread_ts="1000.0", current_ts="1000.1", team_id="T1"
+            channel_id="C1", thread_ts="1000.0", current_ts="1000.1", team_id="T1",
         )
 
         assert "Parent" in context
@@ -590,17 +590,17 @@ class TestSlackThreadContext:
             "messages": [
                 {"ts": "1000.0", "bot_id": "B123", "text": "Parent summary"},
                 {"ts": "1000.1", "user": "U1", "text": "reply"},
-            ]
+            ],
         })
 
         # Warm the cache via _fetch_thread_context
         await adapter._fetch_thread_context(
-            channel_id="C1", thread_ts="1000.0", current_ts="1000.1", team_id="T1"
+            channel_id="C1", thread_ts="1000.0", current_ts="1000.1", team_id="T1",
         )
         assert mock_client.conversations_replies.await_count == 1
 
         parent = await adapter._fetch_thread_parent_text(
-            channel_id="C1", thread_ts="1000.0", team_id="T1"
+            channel_id="C1", thread_ts="1000.0", team_id="T1",
         )
         assert parent == "Parent summary"
         # No additional API call
@@ -621,7 +621,7 @@ class TestSessionKeyFix:
         # Mock session store with a known entry
         mock_store = MagicMock()
         mock_store._entries = {
-            "agent:main:slack:group:C1:1000.0": MagicMock()
+            "agent:main:slack:group:C1:1000.0": MagicMock(),
         }
         mock_store._ensure_loaded = MagicMock()
         mock_store.config = MagicMock()
@@ -632,7 +632,7 @@ class TestSessionKeyFix:
         # With the fix, build_session_key should be called which respects
         # group_sessions_per_user=False (no user_id appended)
         result = adapter._has_active_session_for_thread(
-            channel_id="C1", thread_ts="1000.0", user_id="U123"
+            channel_id="C1", thread_ts="1000.0", user_id="U123",
         )
 
         # Should find the session because build_session_key with
@@ -650,7 +650,7 @@ class TestSessionKeyFix:
         adapter._session_store = mock_store
 
         result = adapter._has_active_session_for_thread(
-            channel_id="C1", thread_ts="1000.0", user_id="U123"
+            channel_id="C1", thread_ts="1000.0", user_id="U123",
         )
         assert result is False
 
@@ -658,7 +658,7 @@ class TestSessionKeyFix:
         adapter = _make_adapter()
         # No _session_store attribute
         result = adapter._has_active_session_for_thread(
-            channel_id="C1", thread_ts="1000.0", user_id="U123"
+            channel_id="C1", thread_ts="1000.0", user_id="U123",
         )
         assert result is False
 

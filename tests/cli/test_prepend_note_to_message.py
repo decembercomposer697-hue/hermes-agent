@@ -69,7 +69,7 @@ def test_list_message_does_not_raise_typeerror():
         {"type": "image_url", "image_url": {"url": "x"}},
     ]
     result = _prepend_note_to_message(
-        message, "Model switched to gpt-5.5 (provider: openai-codex)."
+        message, "Model switched to gpt-5.5 (provider: openai-codex).",
     )
     assert isinstance(result, list)
     assert result[0]["text"].startswith("Model switched to gpt-5.5")

@@ -45,7 +45,7 @@ def _tavily_request(endpoint: str, payload: dict[str, Any]) -> dict[str, Any]:
     if not api_key:
         raise ValueError(
             "TAVILY_API_KEY environment variable not set. "
-            "Get your API key at https://app.tavily.com/home"
+            "Get your API key at https://app.tavily.com/home",
         )
 
     base_url = os.getenv("TAVILY_BASE_URL", "https://api.tavily.com")
@@ -69,13 +69,13 @@ def _normalize_tavily_search_results(response: dict[str, Any]) -> dict[str, Any]
                 "url": result.get("url", ""),
                 "description": result.get("content", ""),
                 "position": i + 1,
-            }
+            },
         )
     return {"success": True, "data": {"web": web_results}}
 
 
 def _normalize_tavily_documents(
-    response: dict[str, Any], fallback_url: str = ""
+    response: dict[str, Any], fallback_url: str = "",
 ) -> list[dict[str, Any]]:
     """Map Tavily ``/extract`` response to standard documents.
 
@@ -97,7 +97,7 @@ def _normalize_tavily_documents(
                 "content": raw,
                 "raw_content": raw,
                 "metadata": {"sourceURL": url, "title": result.get("title", "")},
-            }
+            },
         )
     for fail in response.get("failed_results", []):
         documents.append(
@@ -108,7 +108,7 @@ def _normalize_tavily_documents(
                 "raw_content": "",
                 "error": fail.get("error", "extraction failed"),
                 "metadata": {"sourceURL": fail.get("url", fallback_url)},
-            }
+            },
         )
     for fail_url in response.get("failed_urls", []):
         url_str = fail_url if isinstance(fail_url, str) else str(fail_url)
@@ -120,7 +120,7 @@ def _normalize_tavily_documents(
                 "raw_content": "",
                 "error": "extraction failed",
                 "metadata": {"sourceURL": url_str},
-            }
+            },
         )
     return documents
 
@@ -194,7 +194,7 @@ class TavilyWebSearchProvider(WebSearchProvider):
                 },
             )
             return _normalize_tavily_documents(
-                raw, fallback_url=urls[0] if urls else ""
+                raw, fallback_url=urls[0] if urls else "",
             )
         except ValueError as exc:
             return [{"url": u, "title": "", "content": "", "error": str(exc)} for u in urls]

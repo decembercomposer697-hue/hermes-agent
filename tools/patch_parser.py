@@ -122,7 +122,7 @@ def parse_v4a_patch(patch_content: str) -> tuple[list[PatchOperation], str | Non
             
             current_op = PatchOperation(
                 operation=OperationType.UPDATE,
-                file_path=update_match.group(1).strip()
+                file_path=update_match.group(1).strip(),
             )
             current_hunk = None
             
@@ -134,7 +134,7 @@ def parse_v4a_patch(patch_content: str) -> tuple[list[PatchOperation], str | Non
             
             current_op = PatchOperation(
                 operation=OperationType.ADD,
-                file_path=add_match.group(1).strip()
+                file_path=add_match.group(1).strip(),
             )
             current_hunk = Hunk()
             
@@ -146,7 +146,7 @@ def parse_v4a_patch(patch_content: str) -> tuple[list[PatchOperation], str | Non
             
             current_op = PatchOperation(
                 operation=OperationType.DELETE,
-                file_path=delete_match.group(1).strip()
+                file_path=delete_match.group(1).strip(),
             )
             operations.append(current_op)
             current_op = None
@@ -161,7 +161,7 @@ def parse_v4a_patch(patch_content: str) -> tuple[list[PatchOperation], str | Non
             current_op = PatchOperation(
                 operation=OperationType.MOVE,
                 file_path=move_match.group(1).strip(),
-                new_path=move_match.group(2).strip()
+                new_path=move_match.group(2).strip(),
             )
             operations.append(current_op)
             current_op = None
@@ -271,13 +271,13 @@ def _validate_operations(
                         if occurrences == 0:
                             errors.append(
                                 f"{op.file_path}: addition-only hunk context hint "
-                                f"'{hunk.context_hint}' not found"
+                                f"'{hunk.context_hint}' not found",
                             )
                         elif occurrences > 1:
                             errors.append(
                                 f"{op.file_path}: addition-only hunk context hint "
                                 f"'{hunk.context_hint}' is ambiguous "
-                                f"({occurrences} occurrences)"
+                                f"({occurrences} occurrences)",
                             )
                     continue
 
@@ -286,7 +286,7 @@ def _validate_operations(
                 replacement = '\n'.join(replace_lines)
 
                 new_simulated, count, _strategy, match_error = fuzzy_find_and_replace(
-                    simulated, search_pattern, replacement, replace_all=False
+                    simulated, search_pattern, replacement, replace_all=False,
                 )
                 if count == 0:
                     label = f"'{hunk.context_hint}'" if hunk.context_hint else "(no hint)"
@@ -320,7 +320,7 @@ def _validate_operations(
             dst_result = file_ops.read_file_raw(op.new_path)
             if not dst_result.error:
                 errors.append(
-                    f"{op.new_path}: destination already exists — move would overwrite"
+                    f"{op.new_path}: destination already exists — move would overwrite",
                 )
 
         # ADD: parent directory creation handled by write_file; no pre-check needed.
@@ -550,7 +550,7 @@ def _apply_update(op: PatchOperation, file_ops: Any) -> tuple[bool, str, str | N
             replacement = '\n'.join(replace_lines)
 
             new_content, count, _strategy, error = fuzzy_find_and_replace(
-                new_content, search_pattern, replacement, replace_all=False
+                new_content, search_pattern, replacement, replace_all=False,
             )
 
             if error and count == 0:
@@ -565,7 +565,7 @@ def _apply_update(op: PatchOperation, file_ops: Any) -> tuple[bool, str, str | N
                         window = new_content[window_start:window_end]
 
                         window_new, count, _strategy, error = fuzzy_find_and_replace(
-                            window, search_pattern, replacement, replace_all=False
+                            window, search_pattern, replacement, replace_all=False,
                         )
                         
                         if count > 0:
@@ -615,7 +615,7 @@ def _apply_update(op: PatchOperation, file_ops: Any) -> tuple[bool, str, str | N
         current_content.splitlines(keepends=True),
         new_content.splitlines(keepends=True),
         fromfile=f"a/{op.file_path}",
-        tofile=f"b/{op.file_path}"
+        tofile=f"b/{op.file_path}",
     )
     diff = ''.join(diff_lines)
     

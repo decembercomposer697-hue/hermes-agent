@@ -103,7 +103,7 @@ def stub_cdp_supervisor(monkeypatch):
 
 
 def test_cache_hit_returns_same_instance_when_healthy(
-    isolated_registry, stub_cdp_supervisor
+    isolated_registry, stub_cdp_supervisor,
 ):
     """Sanity: healthy cached supervisor is returned without recreate."""
     first = isolated_registry.get_or_start(task_id="t1", cdp_url="http://h/1")
@@ -149,7 +149,7 @@ def test_stopped_loop_triggers_recreate(isolated_registry, stub_cdp_supervisor):
 
 
 def test_missing_thread_and_loop_attrs_trigger_recreate(
-    isolated_registry, stub_cdp_supervisor
+    isolated_registry, stub_cdp_supervisor,
 ):
     """Defensive: None _thread or None _loop counts as unhealthy."""
     cdp_url = "http://h/4"

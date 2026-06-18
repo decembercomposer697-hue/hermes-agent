@@ -121,7 +121,7 @@ class WebSearchProvider(abc.ABC):
         :meth:`supports_search` before calling.
         """
         raise NotImplementedError(
-            f"{self.name} does not support search (override supports_search)"
+            f"{self.name} does not support search (override supports_search)",
         )
 
     def extract(self, urls: list[str], **kwargs: Any) -> Any:
@@ -154,7 +154,7 @@ class WebSearchProvider(abc.ABC):
         ``max_chars``) — implementations should ignore unknown keys.
         """
         raise NotImplementedError(
-            f"{self.name} does not support extract (override supports_extract)"
+            f"{self.name} does not support extract (override supports_extract)",
         )
 
     def get_setup_schema(self) -> dict[str, Any]:

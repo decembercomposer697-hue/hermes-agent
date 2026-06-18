@@ -282,7 +282,7 @@ class TestDepletedFreeModelSuppression:
         assert "credits.depleted" in latch["active"]
         # Same depleted account, but now on a free model → clear, NO "restored"
         to_show, to_clear = evaluate_credits_notices(
-            CreditsState(paid_access=False), latch, model_is_free=True
+            CreditsState(paid_access=False), latch, model_is_free=True,
         )
         assert "credits.depleted" in to_clear
         assert "credits.depleted" not in latch["active"]
@@ -304,7 +304,7 @@ class TestDepletedFreeModelSuppression:
         latch = fresh_latch()
         evaluate_credits_notices(CreditsState(paid_access=False), latch, model_is_free=True)
         to_show, to_clear = evaluate_credits_notices(
-            CreditsState(paid_access=True), latch, model_is_free=True
+            CreditsState(paid_access=True), latch, model_is_free=True,
         )
         assert to_clear == []
         assert all(n.key != "credits.restored" for n in to_show)
@@ -315,7 +315,7 @@ class TestDepletedFreeModelSuppression:
         latch = fresh_latch()
         evaluate_credits_notices(CreditsState(paid_access=False), latch)
         to_show, to_clear = evaluate_credits_notices(
-            CreditsState(paid_access=True), latch, model_is_free=True
+            CreditsState(paid_access=True), latch, model_is_free=True,
         )
         assert "credits.depleted" in to_clear
         restored = [n for n in to_show if n.key == "credits.restored"]
@@ -326,7 +326,7 @@ class TestDepletedFreeModelSuppression:
         latch = fresh_latch()
         evaluate_credits_notices(state_with_fraction(0.10), latch, model_is_free=True)
         to_show, _ = evaluate_credits_notices(
-            state_with_fraction(0.95, paid_access=False), latch, model_is_free=True
+            state_with_fraction(0.95, paid_access=False), latch, model_is_free=True,
         )
         keys = [n.key for n in to_show]
         assert "credits.usage" in keys
@@ -362,7 +362,7 @@ class TestIsFreeTierModel:
                 "https://inference-api.nousresearch.com": {
                     "some/zero-priced": {"prompt": "0", "completion": "0"},
                     "some/paid": {"prompt": "0.000001", "completion": "0.000002"},
-                }
+                },
             },
         )
         # The agent holds the /v1-suffixed URL (DEFAULT_NOUS_INFERENCE_URL) —

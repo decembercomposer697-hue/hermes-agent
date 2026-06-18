@@ -231,7 +231,7 @@ class TestSessionLifecycle:
             db.close()
 
     def test_existing_fts_tables_do_not_break_without_fts5(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         db_path = tmp_path / "state.db"
         seeded = SessionDB(db_path=db_path)
@@ -297,7 +297,7 @@ class TestSessionLifecycle:
             db.close()
 
     def test_fts_runtime_restores_triggers_after_no_fts_open(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         db_path = tmp_path / "state.db"
         seeded = SessionDB(db_path=db_path)
@@ -479,7 +479,7 @@ class TestMessageStorage:
         # Peek at the raw column to confirm no encoding was applied
         with db._lock:
             row = db._conn.execute(
-                "SELECT content FROM messages WHERE session_id = ?", ("s1",)
+                "SELECT content FROM messages WHERE session_id = ?", ("s1",),
             ).fetchone()
         assert row["content"] == "plain text"
 
@@ -1487,7 +1487,7 @@ class TestPruneSessions:
         # Backdate A and B to be old; C and D stay recent
         for sid, ts in [("A", old_ts), ("B", old_ts), ("C", recent_ts), ("D", recent_ts)]:
             db._conn.execute(
-                "UPDATE sessions SET started_at = ? WHERE id = ?", (ts, sid)
+                "UPDATE sessions SET started_at = ? WHERE id = ?", (ts, sid),
             )
         db._conn.commit()
 
@@ -1517,7 +1517,7 @@ class TestPruneSessions:
 
         for sid in ("X", "Y", "Z"):
             db._conn.execute(
-                "UPDATE sessions SET started_at = ? WHERE id = ?", (old_ts, sid)
+                "UPDATE sessions SET started_at = ? WHERE id = ?", (old_ts, sid),
             )
         db._conn.commit()
 
@@ -1628,7 +1628,7 @@ class TestBulkDeleteSessions:
         :meth:`delete_session` path."""
         db.create_session(session_id="parent", source="cli")
         db.create_session(
-            session_id="child", source="cli", parent_session_id="parent"
+            session_id="child", source="cli", parent_session_id="parent",
         )
 
         deleted = db.delete_sessions(["parent"])
@@ -1752,7 +1752,7 @@ class TestDeleteEmptySessions:
         db.create_session(session_id="empty_parent", source="cli")
         db.end_session("empty_parent", end_reason="done")
         db.create_session(
-            session_id="child", source="cli", parent_session_id="empty_parent"
+            session_id="child", source="cli", parent_session_id="empty_parent",
         )
         db.append_message("child", role="user", content="something")
         db.end_session("child", end_reason="done")
@@ -1968,7 +1968,7 @@ class TestSchemaInit:
 
     def test_tables_exist(self, db):
         cursor = db._conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name",
         )
         tables = {row[0] for row in cursor.fetchall()}
         assert "sessions" in tables
@@ -2048,7 +2048,7 @@ class TestSchemaInit:
                 codex_reasoning_items TEXT,
                 codex_message_items TEXT
             );
-            """
+            """,
         )
         conn.close()
 
@@ -2115,7 +2115,7 @@ class TestSchemaInit:
                 codex_reasoning_items TEXT,
                 codex_message_items TEXT
             );
-            """
+            """,
         )
         conn.close()
 
@@ -2125,7 +2125,7 @@ class TestSchemaInit:
         tables = {
             row[0]
             for row in db._conn.execute(
-                "SELECT name FROM sqlite_master WHERE type = 'table'"
+                "SELECT name FROM sqlite_master WHERE type = 'table'",
             ).fetchall()
         }
         assert "telegram_dm_topic_mode" in tables
@@ -2286,7 +2286,7 @@ class TestSchemaInit:
 
         # Verify api_call_count column was added with default 0
         cursor = migrated_db._conn.execute(
-            "SELECT api_call_count FROM sessions WHERE id = 'existing'"
+            "SELECT api_call_count FROM sessions WHERE id = 'existing'",
         )
         assert cursor.fetchone()[0] == 0
 
@@ -2426,7 +2426,7 @@ class TestSchemaInit:
             live_cols = {
                 r[1]
                 for r in db._conn.execute(
-                    f'PRAGMA table_info("{table_name}")'
+                    f'PRAGMA table_info("{table_name}")',
                 ).fetchall()
             }
             for col_name in declared_cols:
@@ -2802,7 +2802,7 @@ class TestListSessionsRich:
         db._conn.commit()
         db.create_session("continuation", "cli", parent_session_id="root")
         db._conn.execute(
-            "UPDATE sessions SET started_at=? WHERE id=?", (t0 + 1801, "continuation")
+            "UPDATE sessions SET started_at=? WHERE id=?", (t0 + 1801, "continuation"),
         )
         db._conn.commit()
 
@@ -2943,7 +2943,7 @@ class TestCompressionChainProjection:
         import time as _time
         self._build_compression_chain(db, _time.time() - 3600)
         sessions = db.list_sessions_rich(
-            source="cli", limit=20, project_compression_tips=False
+            source="cli", limit=20, project_compression_tips=False,
         )
         ids = [s["id"] for s in sessions]
         assert "root1" in ids
@@ -3077,7 +3077,7 @@ class TestExcludeSources:
         db.append_message("s3", "user", "Golang test")
         # Include cli+tool, but exclude tool → should only return cli
         results = db.search_messages(
-            "Golang", source_filter=["cli", "tool"], exclude_sources=["tool"]
+            "Golang", source_filter=["cli", "tool"], exclude_sources=["tool"],
         )
         sources = [r["source"] for r in results]
         assert sources == ["cli"]
@@ -3275,7 +3275,7 @@ class TestAutoMaintenance:
     def test_second_call_within_interval_skips(self, db):
         self._make_old_ended(db, "old", days_old=100)
         first = db.maybe_auto_prune_and_vacuum(
-            retention_days=90, min_interval_hours=24
+            retention_days=90, min_interval_hours=24,
         )
         assert first["skipped"] is False
         assert first["pruned"] == 1
@@ -3284,7 +3284,7 @@ class TestAutoMaintenance:
         # min_interval_hours should still skip without touching it.
         self._make_old_ended(db, "old2", days_old=100)
         second = db.maybe_auto_prune_and_vacuum(
-            retention_days=90, min_interval_hours=24
+            retention_days=90, min_interval_hours=24,
         )
         assert second["skipped"] is True
         assert second["pruned"] == 0
@@ -3299,7 +3299,7 @@ class TestAutoMaintenance:
 
         self._make_old_ended(db, "old2", days_old=100)
         result = db.maybe_auto_prune_and_vacuum(
-            retention_days=90, min_interval_hours=24
+            retention_days=90, min_interval_hours=24,
         )
         assert result["skipped"] is False
         assert result["pruned"] == 1
@@ -3355,7 +3355,7 @@ class TestAutoMaintenance:
         (sessions_dir / "new.jsonl").write_text("{}\n")  # active, must survive
 
         result = db.maybe_auto_prune_and_vacuum(
-            retention_days=90, sessions_dir=sessions_dir
+            retention_days=90, sessions_dir=sessions_dir,
         )
         assert result["pruned"] == 2
 
@@ -3567,7 +3567,7 @@ class TestFTS5ToolCallMigration:
 
         # Verify the legacy FTS rows don't contain the tool tokens yet.
         legacy_hits = conn.execute(
-            "SELECT rowid FROM messages_fts WHERE messages_fts MATCH 'LEGACYTOOL'"
+            "SELECT rowid FROM messages_fts WHERE messages_fts MATCH 'LEGACYTOOL'",
         ).fetchall()
         assert legacy_hits == [], "sanity: legacy FTS must NOT contain tool_name"
         conn.close()
@@ -3582,7 +3582,7 @@ class TestFTS5ToolCallMigration:
             # schema_version bumped
             from hermes_state import SCHEMA_VERSION
             row = session_db._conn.execute(
-                "SELECT version FROM schema_version LIMIT 1"
+                "SELECT version FROM schema_version LIMIT 1",
             ).fetchone()
             version = row["version"] if hasattr(row, "keys") else row[0]
             assert version == SCHEMA_VERSION
@@ -3777,7 +3777,7 @@ class TestApplyWalProbe:
         conn = _EIOConn(str(db_path))
         try:
             with pytest.raises(
-                sqlite3.OperationalError, match="some unexpected hardware failure"
+                sqlite3.OperationalError, match="some unexpected hardware failure",
             ):
                 apply_wal_with_fallback(conn)
         finally:
@@ -3866,7 +3866,7 @@ class TestSessionIdSearch:
         self._seed(db, "20260602_111111_other99", content="other content")
 
         assert [s["id"] for s in db.search_sessions_by_id("20260603_090200_abcd12")] == [
-            "20260603_090200_abcd12"
+            "20260603_090200_abcd12",
         ]
         assert [s["id"] for s in db.search_sessions_by_id("20260603")] == ["20260603_090200_abcd12"]
         assert [s["id"] for s in db.search_sessions_by_id("ABCD12")] == ["20260603_090200_abcd12"]
@@ -3920,7 +3920,7 @@ class TestListCronJobRuns:
         db.append_message(sid, role="assistant", content="done")
         db.end_session(sid, "completed")
         db._conn.execute(
-            "UPDATE sessions SET started_at = ? WHERE id = ?", (started_at, sid)
+            "UPDATE sessions SET started_at = ? WHERE id = ?", (started_at, sid),
         )
         db._conn.commit()
         return sid

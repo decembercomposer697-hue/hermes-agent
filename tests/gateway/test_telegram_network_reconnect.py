@@ -408,7 +408,7 @@ async def test_heartbeat_probe_reenters_ladder_on_get_me_network_error():
 
     adapter._handle_polling_network_error.assert_awaited_once()
     assert isinstance(
-        adapter._handle_polling_network_error.await_args.args[0], ConnectionError
+        adapter._handle_polling_network_error.await_args.args[0], ConnectionError,
     )
 
 

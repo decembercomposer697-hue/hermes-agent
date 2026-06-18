@@ -135,12 +135,12 @@ def _simulate_note_injection(
     is_resume_pending = bool(
         resume_entry is not None
         and getattr(resume_entry, "resume_pending", False)
-        and interruption_is_fresh
+        and interruption_is_fresh,
     )
     has_fresh_tool_tail = bool(
         agent_history
         and agent_history[-1].get("role") == "tool"
-        and interruption_is_fresh
+        and interruption_is_fresh,
     )
 
     if is_resume_pending:
@@ -783,7 +783,7 @@ async def test_drain_timeout_marks_resume_pending():
     runner.session_store = session_store
 
     with patch("gateway.status.remove_pid_file"), patch(
-        "gateway.status.write_runtime_status"
+        "gateway.status.write_runtime_status",
     ):
         await runner.stop()
 
@@ -810,7 +810,7 @@ async def test_drain_timeout_uses_restart_reason_when_restarting():
     runner.session_store = session_store
 
     with patch("gateway.status.remove_pid_file"), patch(
-        "gateway.status.write_runtime_status"
+        "gateway.status.write_runtime_status",
     ):
         await runner.stop(restart=True, detached_restart=False, service_restart=True)
 
@@ -845,7 +845,7 @@ async def test_drain_timeout_skips_pending_sentinel_sessions():
     runner.session_store = session_store
 
     with patch("gateway.status.remove_pid_file"), patch(
-        "gateway.status.write_runtime_status"
+        "gateway.status.write_runtime_status",
     ):
         await runner.stop()
 
@@ -938,7 +938,7 @@ async def test_startup_auto_resume_skips_stale_entries():
     runner, adapter = make_restart_runner()
     source = make_restart_source(chat_id="stale-chat")
     stale_marker = datetime.now() - timedelta(
-        seconds=_auto_continue_freshness_window() + 60
+        seconds=_auto_continue_freshness_window() + 60,
     )
     stale_entry = SessionEntry(
         session_key="agent:main:telegram:dm:stale-chat",
@@ -1115,7 +1115,7 @@ async def test_reconnect_reschedule_is_platform_scoped():
     runner, adapter = make_restart_runner()
     tg_source = make_restart_source(chat_id="tg-chat")
     discord_source = SessionSource(
-        platform=Platform.DISCORD, chat_id="dc-chat", chat_type="dm", user_id="u1"
+        platform=Platform.DISCORD, chat_id="dc-chat", chat_type="dm", user_id="u1",
     )
     tg_entry = SessionEntry(
         session_key="agent:main:telegram:dm:tg-chat",
@@ -1224,7 +1224,7 @@ async def test_restart_notifies_home_channel_even_without_active_sessions():
 
     assert adapter.sent == [
         "⚠️ Gateway restarting — Your current task will be interrupted. "
-        "Send any message after restart and I'll try to resume where you left off."
+        "Send any message after restart and I'll try to resume where you left off.",
     ]
 
 
@@ -1256,7 +1256,7 @@ async def test_restart_home_channel_notification_not_deduped_across_threads():
             chat_type="group",
             user_id="u1",
             thread_id="topic-7",
-        )
+        ),
     )
     runner._running_agents[session_key] = MagicMock()
     runner.config.platforms[Platform.TELEGRAM].home_channel = HomeChannel(
@@ -1300,7 +1300,7 @@ class TestStuckLoopEscalation:
     path flips suspended=True which overrides resume_pending."""
 
     def test_escalation_via_stuck_loop_counter_overrides_resume_pending(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Simulate a session that keeps getting restart-interrupted and
         hits the stuck-loop threshold: next startup should force it to
@@ -1333,7 +1333,7 @@ class TestStuckLoopEscalation:
         assert second.auto_reset_reason == "suspended"
 
     def test_successful_turn_flow_clears_both_counter_and_resume_pending(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """The gateway's post-turn cleanup should clear both signals so a
         future restart-interrupt starts with a fresh counter."""
@@ -1360,7 +1360,7 @@ class TestStuckLoopEscalation:
         assert not counts_file.exists()
 
     def test_increment_restart_failure_counts_uses_atomic_json_write(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         from gateway.run import GatewayRunner
 
@@ -1383,11 +1383,11 @@ class TestStuckLoopEscalation:
                 tmp_path / ".restart_failure_counts",
                 {session_key: 1},
                 {"indent": None},
-            )
+            ),
         ]
 
     def test_clear_restart_failure_count_uses_atomic_json_write_when_entries_remain(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         import json
 
@@ -1418,5 +1418,5 @@ class TestStuckLoopEscalation:
                 tmp_path / ".restart_failure_counts",
                 {other_key: 1},
                 {"indent": None},
-            )
+            ),
         ]

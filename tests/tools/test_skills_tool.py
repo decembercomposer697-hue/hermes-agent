@@ -22,7 +22,7 @@ from tools.skills_tool import (
 
 
 def _make_skill(
-    skills_dir, name, frontmatter_extra="", body="Step 1: Do the thing.", category=None
+    skills_dir, name, frontmatter_extra="", body="Step 1: Do the thing.", category=None,
 ):
     """Helper to create a minimal skill directory."""
     if category:
@@ -133,8 +133,8 @@ class TestRequiredEnvironmentVariablesNormalization:
                     "prompt": "Tenor API key",
                     "help": "Get a key from https://developers.google.com/tenor",
                     "required_for": "full functionality",
-                }
-            ]
+                },
+            ],
         }
 
         result = _get_required_environment_variables(frontmatter)
@@ -145,7 +145,7 @@ class TestRequiredEnvironmentVariablesNormalization:
                 "prompt": "Tenor API key",
                 "help": "Get a key from https://developers.google.com/tenor",
                 "required_for": "full functionality",
-            }
+            },
         ]
 
     def test_normalizes_legacy_prerequisites_env_vars(self):
@@ -157,7 +157,7 @@ class TestRequiredEnvironmentVariablesNormalization:
             {
                 "name": "TENOR_API_KEY",
                 "prompt": "Enter value for TENOR_API_KEY",
-            }
+            },
         ]
 
     def test_empty_env_file_value_is_treated_as_missing(self, monkeypatch):
@@ -238,7 +238,7 @@ class TestFindAllSkills:
         skill_dir = tmp_path / "no-desc"
         skill_dir.mkdir()
         (skill_dir / "SKILL.md").write_text(
-            "---\nname: no-desc\n---\n\n# Heading\n\nFirst paragraph.\n"
+            "---\nname: no-desc\n---\n\n# Heading\n\nFirst paragraph.\n",
         )
         with patch("tools.skills_tool.SKILLS_DIR", tmp_path):
             skills = _find_all_skills()
@@ -249,7 +249,7 @@ class TestFindAllSkills:
         skill_dir = tmp_path / "long-desc"
         skill_dir.mkdir()
         (skill_dir / "SKILL.md").write_text(
-            f"---\nname: long\ndescription: {long_desc}\n---\n\nBody.\n"
+            f"---\nname: long\ndescription: {long_desc}\n---\n\nBody.\n",
         )
         with patch("tools.skills_tool.SKILLS_DIR", tmp_path):
             skills = _find_all_skills()
@@ -261,7 +261,7 @@ class TestFindAllSkills:
             git_dir = tmp_path / ".git" / "fake-skill"
             git_dir.mkdir(parents=True)
             (git_dir / "SKILL.md").write_text(
-                "---\nname: fake\ndescription: x\n---\n\nBody.\n"
+                "---\nname: fake\ndescription: x\n---\n\nBody.\n",
             )
             skills = _find_all_skills()
         assert len(skills) == 1
@@ -385,7 +385,7 @@ class TestSkillView:
             "description: A skill whose directory name differs from its name.\n"
             "---\n\n"
             "# real-skill-name\n\n"
-            "Step 1: Do the thing.\n"
+            "Step 1: Do the thing.\n",
         )
         with patch("tools.skills_tool.SKILLS_DIR", tmp_path):
             raw = skill_view("real-skill-name")
@@ -583,7 +583,7 @@ class TestSkillViewSecureSetupOnLoad:
                     "var_name": var_name,
                     "prompt": prompt,
                     "metadata": metadata,
-                }
+                },
             )
             os.environ[var_name] = "stored-in-test"
             return {
@@ -626,7 +626,7 @@ class TestSkillViewSecureSetupOnLoad:
                     "help": "Get a key from https://developers.google.com/tenor",
                     "required_for": "full functionality",
                 },
-            }
+            },
         ]
         assert result["required_environment_variables"][0]["name"] == "TENOR_API_KEY"
         assert result["setup_skipped"] is False
@@ -794,7 +794,7 @@ class TestFindAllSkillsPlatformFiltering:
             patch("agent.skill_utils.sys") as mock_sys,
         ):
             _make_skill(
-                tmp_path, "cross-plat", frontmatter_extra="platforms: [macos, linux]\n"
+                tmp_path, "cross-plat", frontmatter_extra="platforms: [macos, linux]\n",
             )
             mock_sys.platform = "darwin"
             skills_darwin = _find_all_skills()
@@ -828,7 +828,7 @@ class TestFindAllSkillsSecureSetup:
         assert "missing_prerequisites" not in skills[0]
 
     def test_skills_with_met_prereqs_have_same_listing_shape(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         monkeypatch.setenv("MY_PRESENT_KEY", "val")
         with patch("tools.skills_tool.SKILLS_DIR", tmp_path):
@@ -851,7 +851,7 @@ class TestFindAllSkillsSecureSetup:
         assert "readiness_status" not in skills[0]
 
     def test_skill_listing_does_not_probe_backend_for_env_vars(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         monkeypatch.setenv("TERMINAL_ENV", "docker")
 
@@ -874,7 +874,7 @@ class TestFindAllSkillsSecureSetup:
 
 class TestSkillViewPrerequisites:
     def test_legacy_prerequisites_expose_required_env_setup_metadata(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         monkeypatch.delenv("MISSING_KEY_XYZ", raising=False)
         with patch("tools.skills_tool.SKILLS_DIR", tmp_path):
@@ -892,7 +892,7 @@ class TestSkillViewPrerequisites:
             {
                 "name": "MISSING_KEY_XYZ",
                 "prompt": "Enter value for MISSING_KEY_XYZ",
-            }
+            },
         ]
 
     def test_no_setup_needed_when_legacy_prereqs_are_met(self, tmp_path, monkeypatch):
@@ -910,7 +910,7 @@ class TestSkillViewPrerequisites:
         assert result["missing_required_environment_variables"] == []
 
     def test_remote_backend_treats_persisted_env_as_available(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         monkeypatch.setenv("TERMINAL_ENV", "docker")
 
@@ -942,7 +942,7 @@ class TestSkillViewPrerequisites:
         assert result["required_environment_variables"] == []
 
     def test_skill_view_treats_backend_only_env_as_setup_needed(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         monkeypatch.setenv("TERMINAL_ENV", "docker")
 
@@ -981,7 +981,7 @@ class TestSkillViewPrerequisites:
         ["ssh", "daytona", "docker", "singularity", "modal"],
     )
     def test_remote_backend_becomes_available_after_local_secret_capture(
-        self, tmp_path, monkeypatch, backend
+        self, tmp_path, monkeypatch, backend,
     ):
         monkeypatch.setenv("TERMINAL_ENV", backend)
         monkeypatch.delenv("TENOR_API_KEY", raising=False)
@@ -1033,7 +1033,7 @@ class TestSkillViewPrerequisites:
             def fake_read_text(path_obj, *args, **kwargs):
                 if path_obj == skill_md:
                     raise UnicodeDecodeError(
-                        "utf-8", b"\xff", 0, 1, "invalid start byte"
+                        "utf-8", b"\xff", 0, 1, "invalid start byte",
                     )
                 return original_read_text(path_obj, *args, **kwargs)
 
@@ -1075,11 +1075,11 @@ Do the legacy thing.
         assert result["description"] == "Legacy flat skill."
         assert result["tags"] == ["legacy", "flat"]
         assert result["required_environment_variables"] == [
-            {"name": "LEGACY_KEY", "prompt": "Legacy key"}
+            {"name": "LEGACY_KEY", "prompt": "Legacy key"},
         ]
 
     def test_successful_secret_capture_reloads_empty_env_placeholder(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         monkeypatch.setenv("TERMINAL_ENV", "local")
         monkeypatch.delenv("TENOR_API_KEY", raising=False)

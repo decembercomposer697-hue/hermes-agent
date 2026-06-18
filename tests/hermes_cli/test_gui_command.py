@@ -347,7 +347,7 @@ def test_desktop_build_needed_detects_missing_artifact(tmp_path, monkeypatch):
     cli_main._write_desktop_build_stamp(root, source_mode=False)
     # No packaged executable exists → build needed
     assert cli_main._desktop_build_needed(
-        root / "apps" / "desktop", root, source_mode=False
+        root / "apps" / "desktop", root, source_mode=False,
     ) is True
 
 
@@ -363,7 +363,7 @@ def test_desktop_build_stamp_round_trip(tmp_path, monkeypatch):
     cli_main._write_desktop_build_stamp(root, source_mode=False)
     # Build should NOT be needed
     assert cli_main._desktop_build_needed(
-        root / "apps" / "desktop", root, source_mode=False
+        root / "apps" / "desktop", root, source_mode=False,
     ) is False
 
 

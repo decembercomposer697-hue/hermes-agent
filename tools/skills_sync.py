@@ -527,7 +527,7 @@ def sync_skills(quiet: bool = False) -> dict:
                             f"  ⚠ {skill_name}: bundled version shipped but you "
                             f"already have a local skill by this name — yours "
                             f"was kept. Run `hermes skills reset {skill_name}` "
-                            f"to replace it with the bundled version."
+                            f"to replace it with the bundled version.",
                         )
                 else:
                     dest.parent.mkdir(parents=True, exist_ok=True)

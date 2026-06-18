@@ -114,7 +114,7 @@ def test_recovery_keeps_marker_on_failure(tmp_path, monkeypatch):
         raise RuntimeError("install died")
 
     monkeypatch.setattr(
-        m, "_install_python_dependencies_with_optional_fallback", boom
+        m, "_install_python_dependencies_with_optional_fallback", boom,
     )
 
     # Must not raise.

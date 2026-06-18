@@ -29,7 +29,7 @@ async def test_model_picker_clears_controls_before_running_switch_callback():
                 kwargs["embed"].title,
                 kwargs["embed"].description,
                 kwargs["view"],
-            )
+            ),
         )
 
     async def edit_original_response(**kwargs):
@@ -48,7 +48,7 @@ async def test_model_picker_clears_controls_before_running_switch_callback():
                 "models": ["gpt-5.4"],
                 "total_models": 1,
                 "is_current": True,
-            }
+            },
         ],
         current_model="gpt-5-mini",
         current_provider="copilot",
@@ -97,7 +97,7 @@ async def test_expensive_model_requires_confirmation(monkeypatch):
                 kwargs["embed"].title,
                 kwargs["embed"].description,
                 kwargs["view"],
-            )
+            ),
         )
 
     async def edit_original_response(**kwargs):
@@ -111,7 +111,7 @@ async def test_expensive_model_requires_confirmation(monkeypatch):
     monkeypatch.setattr(
         "hermes_cli.model_cost_guard.expensive_model_warning",
         lambda *_args, **_kwargs: SimpleNamespace(
-            message="!!! EXPENSIVE MODEL WARNING !!!\ndid you mean to select openai/gpt-5.5?"
+            message="!!! EXPENSIVE MODEL WARNING !!!\ndid you mean to select openai/gpt-5.5?",
         ),
     )
 
@@ -123,7 +123,7 @@ async def test_expensive_model_requires_confirmation(monkeypatch):
                 "models": ["openai/gpt-5.5-pro"],
                 "total_models": 1,
                 "is_current": True,
-            }
+            },
         ],
         current_model="openai/gpt-5.5",
         current_provider="openrouter",

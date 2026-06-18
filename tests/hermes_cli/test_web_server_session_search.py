@@ -24,7 +24,7 @@ class _FakeSessionDB:
                 "source": "cli",
                 "model": "claude",
                 "started_at": 100,
-            }
+            },
         ]
 
     def search_messages(self, query, limit=20):
@@ -86,5 +86,5 @@ def test_desktop_session_search_merges_id_matches_before_content_matches(monkeyp
                 "model": "gpt",
                 "session_started": 200,
             },
-        ]
+        ],
     }

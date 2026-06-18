@@ -167,7 +167,7 @@ def fetch(
                                 f"https://offshoreleaks.icij.org/nodes/{node_id}" if node_id else ""
                             ),
                             "connections": "",
-                        }
+                        },
                     )
                     if len(rows) >= limit:
                         break

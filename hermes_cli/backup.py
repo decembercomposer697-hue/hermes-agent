@@ -227,7 +227,7 @@ def run_backup(args) -> None:
                     # default (/tmp) may be a small tmpfs that cannot hold
                     # large databases, causing silent backup incompleteness.
                     with tempfile.NamedTemporaryFile(
-                        suffix=".db", delete=False, dir=str(out_path.parent)
+                        suffix=".db", delete=False, dir=str(out_path.parent),
                     ) as tmp:
                         tmp_db = Path(tmp.name)
                     if _safe_copy_db(abs_path, tmp_db):
@@ -773,7 +773,7 @@ def restore_cron_jobs_if_emptied(
         shutil.copy2(snap_path, live_path)
     except (OSError, PermissionError) as exc:
         logger.error(
-            "Cron jobs were emptied during update but auto-restore failed: %s", exc
+            "Cron jobs were emptied during update but auto-restore failed: %s", exc,
         )
         return None
 
@@ -875,7 +875,7 @@ def _write_full_zip_backup(out_path: Path, hermes_root: Path) -> Path | None:
                         # default (/tmp) may be a small tmpfs that cannot hold
                         # large databases, causing silent backup incompleteness.
                         with tempfile.NamedTemporaryFile(
-                            suffix=".db", delete=False, dir=str(out_path.parent)
+                            suffix=".db", delete=False, dir=str(out_path.parent),
                         ) as tmp:
                             tmp_db = Path(tmp.name)
                         try:

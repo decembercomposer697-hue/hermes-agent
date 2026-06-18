@@ -238,7 +238,7 @@ class TestThinkingCallback:
         if (content and callback and delegate_depth > 0):
             _think_text = content.strip()
             _think_text = re.sub(
-                r'</?(?:REASONING_SCRATCHPAD|think|reasoning)>', '', _think_text
+                r'</?(?:REASONING_SCRATCHPAD|think|reasoning)>', '', _think_text,
             ).strip()
             first_line = _think_text.split('\n')[0][:80] if _think_text else ""
             if first_line:
@@ -253,7 +253,7 @@ class TestThinkingCallback:
         calls = []
         self._simulate_thinking_callback(
             "I'll research quantum computing first, then summarize.",
-            lambda name, preview=None: calls.append((name, preview))
+            lambda name, preview=None: calls.append((name, preview)),
         )
         assert len(calls) == 1
         assert calls[0][0] == "_thinking"
@@ -264,7 +264,7 @@ class TestThinkingCallback:
         calls = []
         self._simulate_thinking_callback(
             None,
-            lambda name, preview=None: calls.append((name, preview))
+            lambda name, preview=None: calls.append((name, preview)),
         )
         assert len(calls) == 0
 
@@ -273,7 +273,7 @@ class TestThinkingCallback:
         calls = []
         self._simulate_thinking_callback(
             "A" * 200 + "\nSecond line should be ignored",
-            lambda name, preview=None: calls.append((name, preview))
+            lambda name, preview=None: calls.append((name, preview)),
         )
         assert len(calls) == 1
         assert len(calls[0][1]) == 80
@@ -294,7 +294,7 @@ class TestThinkingCallback:
         calls = []
         self._simulate_thinking_callback(
             "<REASONING_SCRATCHPAD>I need to analyze this carefully</REASONING_SCRATCHPAD>",
-            lambda name, preview=None: calls.append((name, preview))
+            lambda name, preview=None: calls.append((name, preview)),
         )
         assert len(calls) == 1
         assert "<REASONING_SCRATCHPAD>" not in calls[0][1]
@@ -305,7 +305,7 @@ class TestThinkingCallback:
         calls = []
         self._simulate_thinking_callback(
             "<think>Let me think about this problem</think>",
-            lambda name, preview=None: calls.append((name, preview))
+            lambda name, preview=None: calls.append((name, preview)),
         )
         assert len(calls) == 1
         assert "<think>" not in calls[0][1]
@@ -316,7 +316,7 @@ class TestThinkingCallback:
         calls = []
         self._simulate_thinking_callback(
             "<REASONING_SCRATCHPAD></REASONING_SCRATCHPAD>",
-            lambda name, preview=None: calls.append((name, preview))
+            lambda name, preview=None: calls.append((name, preview)),
         )
         assert len(calls) == 0
 

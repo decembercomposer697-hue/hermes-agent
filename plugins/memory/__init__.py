@@ -240,7 +240,7 @@ def _load_provider_from_dir(provider_dir: Path) -> MemoryProvider | None:
                 if parent_init.exists():
                     spec = importlib.util.spec_from_file_location(
                         parent, str(parent_init),
-                        submodule_search_locations=[str(parent_path)]
+                        submodule_search_locations=[str(parent_path)],
                     )
                     if spec:
                         parent_mod = importlib.util.module_from_spec(spec)
@@ -258,7 +258,7 @@ def _load_provider_from_dir(provider_dir: Path) -> MemoryProvider | None:
         # Now load the provider module
         spec = importlib.util.spec_from_file_location(
             module_name, str(init_file),
-            submodule_search_locations=[str(provider_dir)]
+            submodule_search_locations=[str(provider_dir)],
         )
         if not spec:
             return None
@@ -275,7 +275,7 @@ def _load_provider_from_dir(provider_dir: Path) -> MemoryProvider | None:
             full_sub_name = f"{module_name}.{sub_name}"
             if full_sub_name not in sys.modules:
                 sub_spec = importlib.util.spec_from_file_location(
-                    full_sub_name, str(sub_file)
+                    full_sub_name, str(sub_file),
                 )
                 if sub_spec:
                     sub_mod = importlib.util.module_from_spec(sub_spec)
@@ -402,10 +402,10 @@ def discover_plugin_cli_commands() -> list[dict]:
                 # module later instead of reusing the shell.
                 _register_synthetic_package(_USER_NAMESPACE, [])
                 _register_synthetic_package(
-                    f"{_USER_NAMESPACE}.{active_provider}", [str(plugin_dir)]
+                    f"{_USER_NAMESPACE}.{active_provider}", [str(plugin_dir)],
                 )
             spec = importlib.util.spec_from_file_location(
-                module_name, str(cli_file)
+                module_name, str(cli_file),
             )
             if not spec or not spec.loader:
                 return results

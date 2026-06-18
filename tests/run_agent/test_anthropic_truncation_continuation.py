@@ -54,7 +54,7 @@ class TestTruncatedAnthropicResponseNormalization:
         from agent.transports import get_transport
 
         response = _make_anthropic_response(
-            [_make_anthropic_text_block("partial response that was cut off")]
+            [_make_anthropic_text_block("partial response that was cut off")],
         )
         nr = get_transport("anthropic_messages").normalize_response(response)
 
@@ -77,7 +77,7 @@ class TestTruncatedAnthropicResponseNormalization:
             [
                 _make_anthropic_text_block("thinking..."),
                 _make_anthropic_tool_use_block(),
-            ]
+            ],
         )
         nr = get_transport("anthropic_messages").normalize_response(response)
 

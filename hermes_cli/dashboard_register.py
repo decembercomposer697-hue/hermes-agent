@@ -155,20 +155,20 @@ def _register_self_hosted_client(
         if exc.code == 401:
             raise RuntimeError(
                 "Nous Portal rejected the access token (401). "
-                "Try `hermes auth login nous` to re-authenticate."
+                "Try `hermes auth login nous` to re-authenticate.",
             ) from exc
         if exc.code == 403:
             raise RuntimeError(
                 detail
-                or "Your account is not permitted to register a self-hosted dashboard."
+                or "Your account is not permitted to register a self-hosted dashboard.",
             ) from exc
         raise RuntimeError(
             f"Portal returned HTTP {exc.code}"
-            + (f": {detail}" if detail else "")
+            + (f": {detail}" if detail else ""),
         ) from exc
     except urllib.error.URLError as exc:
         raise RuntimeError(
-            f"Could not reach Nous Portal at {portal_base_url}: {exc.reason}"
+            f"Could not reach Nous Portal at {portal_base_url}: {exc.reason}",
         ) from exc
 
     if not isinstance(payload, dict) or not payload.get("client_id"):
@@ -200,7 +200,7 @@ def _print_post_register_hint(
     print(
         "  Heads up — Nous login only *engages* on a non-loopback bind. A plain\n"
         "  `hermes dashboard` (localhost) leaves the gate off and serves locally\n"
-        "  without auth, which is fine for your own machine."
+        "  without auth, which is fine for your own machine.",
     )
     print()
     if custom_redirect_uri:
@@ -220,10 +220,10 @@ def _print_post_register_hint(
         print("  …then log in at the dashboard's /login page.")
     print()
     print(
-        "  If the dashboard is already running, restart it to pick up the new env."
+        "  If the dashboard is already running, restart it to pick up the new env.",
     )
     print(
-        f"  Manage or revoke this dashboard at {portal_base_url}/local-dashboards"
+        f"  Manage or revoke this dashboard at {portal_base_url}/local-dashboards",
     )
 
 
@@ -240,7 +240,7 @@ def cmd_dashboard_register(args) -> None:
         print(
             "✗ `hermes dashboard register` is not available in a managed/hosted "
             "install.\n"
-            "  The dashboard OAuth client is provisioned by the hosting platform."
+            "  The dashboard OAuth client is provisioned by the hosting platform.",
         )
         sys.exit(1)
 
@@ -269,10 +269,10 @@ def cmd_dashboard_register(args) -> None:
     # keeps the older, more conservative write-only-if-absent behaviour so we
     # don't clutter .env for the common production case.
     portal_override = getattr(args, "portal_url", None) or os.environ.get(
-        "HERMES_DASHBOARD_PORTAL_URL"
+        "HERMES_DASHBOARD_PORTAL_URL",
     )
     custom_portal_supplied = bool(
-        isinstance(portal_override, str) and portal_override.strip()
+        isinstance(portal_override, str) and portal_override.strip(),
     )
     portal_base_url = _resolve_portal_base_url(portal_override)
 
@@ -324,7 +324,7 @@ def cmd_dashboard_register(args) -> None:
     # Distinguish create vs update for the user: the portal echoes back the
     # same client_id we sent when it updated in place.
     updated_existing = bool(
-        existing_client_id and client_id == existing_client_id
+        existing_client_id and client_id == existing_client_id,
     )
     if updated_existing:
         print(f'✓ Updated dashboard "{registered_name}"')

@@ -39,7 +39,7 @@ class _RecordingProvider(MemoryProvider):
 
     def sync_turn(self, user_content, assistant_content, *, session_id=""):
         self.sync_calls.append(
-            {"user": user_content, "asst": assistant_content, "session_id": session_id}
+            {"user": user_content, "asst": assistant_content, "session_id": session_id},
         )
 
     def queue_prefetch(self, query, *, session_id=""):
@@ -59,7 +59,7 @@ class _RecordingProvider(MemoryProvider):
                 "parent": parent_session_id,
                 "reset": reset,
                 "extra": kwargs,
-            }
+            },
         )
 
 
@@ -181,7 +181,7 @@ def test_sync_all_propagates_session_id_to_providers():
     mm.sync_all("hello", "world", session_id="sess-42")
     mm.flush_pending(timeout=5)
     assert p.sync_calls == [
-        {"user": "hello", "asst": "world", "session_id": "sess-42"}
+        {"user": "hello", "asst": "world", "session_id": "sess-42"},
     ]
 
 
@@ -268,7 +268,7 @@ def test_hindsight_on_session_switch_updates_session_id_and_mints_fresh_doc():
     old_doc = provider._document_id
 
     provider.on_session_switch(
-        "new-sid", parent_session_id="old-sid", reset=False, reason="resume"
+        "new-sid", parent_session_id="old-sid", reset=False, reason="resume",
     )
 
     assert provider._session_id == "new-sid"

@@ -133,7 +133,7 @@ _TELEGRAM_RE = re.compile(
 
 # Private key blocks: -----BEGIN RSA PRIVATE KEY----- ... -----END RSA PRIVATE KEY-----
 _PRIVATE_KEY_RE = re.compile(
-    r"-----BEGIN[A-Z ]*PRIVATE KEY-----[\s\S]*?-----END[A-Z ]*PRIVATE KEY-----"
+    r"-----BEGIN[A-Z ]*PRIVATE KEY-----[\s\S]*?-----END[A-Z ]*PRIVATE KEY-----",
 )
 
 # Database connection strings: protocol://user:PASSWORD@host
@@ -147,7 +147,7 @@ _DB_CONNSTR_RE = re.compile(
 # Matches 1-part (header only), 2-part (header.payload), and full 3-part JWTs.
 _JWT_RE = re.compile(
     r"eyJ[A-Za-z0-9_-]{10,}"           # Header (always starts with eyJ)
-    r"(?:\.[A-Za-z0-9_=-]{4,}){0,2}"   # Optional payload and/or signature
+    r"(?:\.[A-Za-z0-9_=-]{4,}){0,2}",   # Optional payload and/or signature
 )
 
 # E.164 phone numbers: +<country><number>, 7-15 digits
@@ -184,12 +184,12 @@ _HTTP_REQUEST_TARGET_QUERY_RE = re.compile(
 # Form-urlencoded body detection: conservative — only applies when the entire
 # text looks like a query string (k=v&k=v pattern with no newlines).
 _FORM_BODY_RE = re.compile(
-    r"^[A-Za-z_][A-Za-z0-9_.-]*=[^&\s]*(?:&[A-Za-z_][A-Za-z0-9_.-]*=[^&\s]*)+$"
+    r"^[A-Za-z_][A-Za-z0-9_.-]*=[^&\s]*(?:&[A-Za-z_][A-Za-z0-9_.-]*=[^&\s]*)+$",
 )
 
 # Compile known prefix patterns into one alternation
 _PREFIX_RE = re.compile(
-    r"(?<![A-Za-z0-9_-])(" + "|".join(_PREFIX_PATTERNS) + r")(?![A-Za-z0-9_-])"
+    r"(?<![A-Za-z0-9_-])(" + "|".join(_PREFIX_PATTERNS) + r")(?![A-Za-z0-9_-])",
 )
 
 

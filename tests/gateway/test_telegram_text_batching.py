@@ -127,7 +127,7 @@ class TestTextBatching:
         """DM-topic text batches should use the recovered topic lane."""
         adapter = _make_adapter()
         adapter.set_topic_recovery_fn(
-            lambda source: "222" if str(source.thread_id or "") == "1" else None
+            lambda source: "222" if str(source.thread_id or "") == "1" else None,
         )
         event = MessageEvent(
             text="hello from DM topic",

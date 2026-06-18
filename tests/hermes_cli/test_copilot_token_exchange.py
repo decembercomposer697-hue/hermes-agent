@@ -69,7 +69,7 @@ class TestExchangeCopilotToken:
         _jwt_cache[fp] = ("old_token", time.time() - 10)
 
         mock_urlopen.return_value = self._mock_urlopen(
-            token="new_token", expires_at=time.time() + 1800
+            token="new_token", expires_at=time.time() + 1800,
         )
         api_token, _ = exchange_copilot_token("gho_test123")
 

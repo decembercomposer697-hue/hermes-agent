@@ -55,7 +55,7 @@ def test_check_for_updates_invalidates_on_version_change(tmp_path, monkeypatch):
     # Fresh (within TTL) cache that says "behind", but stamped with an OLD version.
     cache_file = tmp_path / ".update_check"
     cache_file.write_text(
-        json.dumps({"ts": time.time(), "behind": 1, "rev": None, "ver": "0.0.1-old"})
+        json.dumps({"ts": time.time(), "behind": 1, "rev": None, "ver": "0.0.1-old"}),
     )
 
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))

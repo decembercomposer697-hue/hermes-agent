@@ -606,7 +606,7 @@ class HermesACPAgent(acp.Agent):
                         model_id=choice_id,
                         name=rendered_model,
                         description=" • ".join(part for part in desc_parts if part),
-                    )
+                    ),
                 )
                 seen_ids.add(choice_id)
 
@@ -726,7 +726,7 @@ class HermesACPAgent(acp.Agent):
             )
         except Exception:
             logger.debug(
-                "Could not build ACP session provenance for %s", acp_session_id, exc_info=True
+                "Could not build ACP session provenance for %s", acp_session_id, exc_info=True,
             )
             return None
 
@@ -1011,7 +1011,7 @@ class HermesACPAgent(acp.Agent):
             tool_call.get("id")
             or tool_call.get("call_id")
             or tool_call.get("tool_call_id")
-            or ""
+            or "",
         ).strip()
 
     async def _replay_session_history(self, state: SessionState) -> None:
@@ -1096,7 +1096,7 @@ class HermesACPAgent(acp.Agent):
                         tool_name,
                         result=result_text,
                         function_args=function_args,
-                    )
+                    ),
                 ):
                     return
                 if tool_name == "todo":
@@ -1120,7 +1120,7 @@ class HermesACPAgent(acp.Agent):
             models=self._build_model_state(state),
             modes=self._session_modes(state),
             field_meta=self._provenance_meta(
-                state.session_id, getattr(state.agent, "session_id", state.session_id)
+                state.session_id, getattr(state.agent, "session_id", state.session_id),
             ),
         )
 
@@ -1167,7 +1167,7 @@ class HermesACPAgent(acp.Agent):
             models=self._build_model_state(state),
             modes=self._session_modes(state),
             field_meta=self._provenance_meta(
-                session_id, getattr(state.agent, "session_id", session_id)
+                session_id, getattr(state.agent, "session_id", session_id),
             ),
         )
 
@@ -1202,7 +1202,7 @@ class HermesACPAgent(acp.Agent):
             models=self._build_model_state(state),
             modes=self._session_modes(state),
             field_meta=self._provenance_meta(
-                state.session_id, getattr(state.agent, "session_id", state.session_id)
+                state.session_id, getattr(state.agent, "session_id", state.session_id),
             ),
         )
 
@@ -1279,7 +1279,7 @@ class HermesACPAgent(acp.Agent):
                     cwd=s["cwd"],
                     title=s.get("title"),
                     updated_at=updated_at,
-                )
+                ),
             )
 
         next_cursor = sessions[-1].session_id if has_more and sessions else None
@@ -1371,7 +1371,7 @@ class HermesACPAgent(acp.Agent):
                 depth = len(state.queued_prompts)
                 if self._conn:
                     update = acp.update_agent_message_text(
-                        f"Queued for the next turn. ({depth} queued)"
+                        f"Queued for the next turn. ({depth} queued)",
                     )
                     await self._conn.session_update(session_id, update)
                 return PromptResponse(stop_reason="end_turn")
@@ -1596,7 +1596,7 @@ class HermesACPAgent(acp.Agent):
         from agent.conversation_loop import INTERRUPT_WAITING_FOR_MODEL_PREFIX
 
         suppress_interrupt_response = interrupted and final_response.startswith(
-            INTERRUPT_WAITING_FOR_MODEL_PREFIX
+            INTERRUPT_WAITING_FOR_MODEL_PREFIX,
         )
         if final_response and not suppress_interrupt_response:
             try:
@@ -1683,7 +1683,7 @@ class HermesACPAgent(acp.Agent):
                     input=UnstructuredCommandInput(hint=input_hint)
                     if input_hint
                     else None,
-                )
+                ),
             )
         return commands
 
@@ -1713,7 +1713,7 @@ class HermesACPAgent(acp.Agent):
             return
         loop = asyncio.get_running_loop()
         loop.call_soon(
-            asyncio.create_task, self._send_available_commands_update(session_id)
+            asyncio.create_task, self._send_available_commands_update(session_id),
         )
 
     def _handle_slash_command(self, text: str, state: SessionState) -> str | None:
@@ -1780,7 +1780,7 @@ class HermesACPAgent(acp.Agent):
         try:
             from model_tools import get_tool_definitions
             toolsets = _expand_acp_enabled_toolsets(
-                getattr(state.agent, "enabled_toolsets", None) or ["hermes-acp"]
+                getattr(state.agent, "enabled_toolsets", None) or ["hermes-acp"],
             )
             tools = get_tool_definitions(enabled_toolsets=toolsets, quiet_mode=True)
             if not tools:
@@ -1846,7 +1846,7 @@ class HermesACPAgent(acp.Agent):
             if context_length > 0:
                 usage_pct = (approx_tokens / context_length) * 100
                 lines.append(
-                    f"Context usage: ~{approx_tokens:,} / {context_length:,} tokens ({usage_pct:.1f}%)"
+                    f"Context usage: ~{approx_tokens:,} / {context_length:,} tokens ({usage_pct:.1f}%)",
                 )
             else:
                 lines.append(f"Context usage: ~{approx_tokens:,} tokens")
@@ -1859,14 +1859,14 @@ class HermesACPAgent(acp.Agent):
                     lines.append(
                         f"Compression: due now (threshold ~{threshold_tokens:,}"
                         + (f", {threshold_pct:.0f}%" if threshold_pct else "")
-                        + "). Run /compact."
+                        + "). Run /compact.",
                     )
                 else:
                     lines.append(
                         f"Compression: ~{remaining:,} tokens until threshold "
                         f"(~{threshold_tokens:,}"
                         + (f", {threshold_pct:.0f}%" if threshold_pct else "")
-                        + ")."
+                        + ").",
                     )
             else:
                 lines.append(f"Compression threshold: ~{threshold_tokens:,} tokens")
@@ -1901,7 +1901,7 @@ class HermesACPAgent(acp.Agent):
             _sys_prompt = getattr(agent, "_cached_system_prompt", "") or ""
             _tools = getattr(agent, "tools", None) or None
             approx_tokens = estimate_request_tokens_rough(
-                state.history, system_prompt=_sys_prompt, tools=_tools
+                state.history, system_prompt=_sys_prompt, tools=_tools,
             )
             original_session_db = getattr(agent, "_session_db", None)
 
@@ -1970,7 +1970,7 @@ class HermesACPAgent(acp.Agent):
     # ---- Model switching (ACP protocol method) -------------------------------
 
     async def set_session_model(
-        self, model_id: str, session_id: str, **kwargs: Any
+        self, model_id: str, session_id: str, **kwargs: Any,
     ) -> SetSessionModelResponse | None:
         """Switch the model for a session (called by ACP protocol)."""
         state = self.session_manager.get_session(session_id)
@@ -2004,7 +2004,7 @@ class HermesACPAgent(acp.Agent):
         return None
 
     async def set_session_mode(
-        self, mode_id: str, session_id: str, **kwargs: Any
+        self, mode_id: str, session_id: str, **kwargs: Any,
     ) -> SetSessionModeResponse | None:
         """Persist the editor-requested mode so ACP clients do not fail on mode switches."""
         state = self.session_manager.get_session(session_id)
@@ -2020,7 +2020,7 @@ class HermesACPAgent(acp.Agent):
         return SetSessionModeResponse()
 
     async def set_config_option(
-        self, config_id: str, session_id: str, value: str, **kwargs: Any
+        self, config_id: str, session_id: str, value: str, **kwargs: Any,
     ) -> SetSessionConfigOptionResponse | None:
         """Accept ACP config option updates even when Hermes has no typed ACP config surface yet."""
         state = self.session_manager.get_session(session_id)

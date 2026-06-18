@@ -386,7 +386,7 @@ def _diff_from_snapshot(snapshot: LocalEditSnapshot | None) -> str | None:
                 [] if after is None else after.splitlines(keepends=True),
                 fromfile=f"a/{display_path}",
                 tofile=f"b/{display_path}",
-            )
+            ),
         )
         if diff:
             chunks.append(diff)

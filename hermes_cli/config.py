@@ -75,7 +75,7 @@ def _backup_corrupt_config(config_path: Path) -> Path | None:
         # this corruption already and skip (the dedup cache normally prevents a
         # second call, but a process restart can clear it).
         sibling_baks = list(
-            config_path.parent.glob(f"{config_path.name}.corrupt.*.bak")
+            config_path.parent.glob(f"{config_path.name}.corrupt.*.bak"),
         )
         for existing in sibling_baks:
             try:
@@ -212,7 +212,7 @@ def _reject_denylisted_env_var(key: str) -> None:
             "PYTHONPATH, PATH, EDITOR, ...) or Hermes runtime location "
             "(HERMES_HOME, HERMES_PROFILE, ...) cannot be persisted via "
             "the env writer. If you really need this, edit "
-            "~/.hermes/.env directly."
+            "~/.hermes/.env directly.",
         )
 
 _LAST_EXPANDED_CONFIG_BY_PATH: dict[str, Any] = {}
@@ -779,14 +779,14 @@ def _ensure_hermes_home_managed(home: Path):
     if not home.is_dir():
         raise RuntimeError(
             f"HERMES_HOME {home} does not exist. "
-            "Run 'sudo nixos-rebuild switch' first."
+            "Run 'sudo nixos-rebuild switch' first.",
         )
     for subdir in ("cron", "sessions", "logs", "memories"):
         d = home / subdir
         if not d.is_dir():
             raise RuntimeError(
                 f"{d} does not exist. "
-                "Run 'sudo nixos-rebuild switch' first."
+                "Run 'sudo nixos-rebuild switch' first.",
             )
     # Curator reports dir is a sub-path of logs/; create it if missing.
     # In managed mode the activation script may not know about this subdir,
@@ -3645,7 +3645,7 @@ def _set_nested(config, dotted_key: str, value):
             except (TypeError, ValueError):
                 raise TypeError(
                     f"Cannot navigate into list at key {dotted_key!r}: "
-                    f"segment {part!r} is not a numeric index"
+                    f"segment {part!r} is not a numeric index",
                 )
             current = current[idx]
         elif isinstance(current, dict):
@@ -3656,7 +3656,7 @@ def _set_nested(config, dotted_key: str, value):
             current = current[part]
         else:
             raise TypeError(
-                f"Cannot navigate into {type(current).__name__} at key {dotted_key!r}"
+                f"Cannot navigate into {type(current).__name__} at key {dotted_key!r}",
             )
     last = parts[-1]
     if isinstance(current, list):
@@ -3713,7 +3713,7 @@ def get_missing_skill_config_vars() -> list[dict[str, Any]]:
         # post-migration nicety, not a blocker.
         import logging
         logging.getLogger(__name__).debug(
-            "discover_all_skill_config_vars failed: %s", e
+            "discover_all_skill_config_vars failed: %s", e,
         )
         return []
     if not all_vars:
@@ -4305,23 +4305,23 @@ def warn_deprecated_cwd_env_vars(config: dict[str, Any] | None = None) -> None:
     if messaging_cwd:
         lines.append(
             f"  \033[33m⚠\033[0m MESSAGING_CWD={messaging_cwd} found in .env — "
-            f"this is deprecated."
+            f"this is deprecated.",
         )
     if terminal_cwd_env and not config_has_explicit_cwd:
         # TERMINAL_CWD in env but not from config bridge — likely from .env
         lines.append(
             f"  \033[33m⚠\033[0m TERMINAL_CWD={terminal_cwd_env} found in .env — "
-            f"this is deprecated."
+            f"this is deprecated.",
         )
     if lines:
         hint_path = os.environ.get("HERMES_HOME", "~/.hermes")
         lines.insert(0, "\033[33m⚠ Deprecated .env settings detected:\033[0m")
         lines.append(
             f"  \033[2mMove to config.yaml instead:  "
-            f"terminal:\\n    cwd: /your/project/path\033[0m"
+            f"terminal:\\n    cwd: /your/project/path\033[0m",
         )
         lines.append(
-            f"  \033[2mThen remove the old entries from {hint_path}/.env\033[0m"
+            f"  \033[2mThen remove the old entries from {hint_path}/.env\033[0m",
         )
         sys.stderr.write("\n".join(lines) + "\n\n")
 
@@ -4656,18 +4656,18 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> dict[str, A
             config["plugins"] = plugins_cfg
             save_config(config)
             results["config_added"].append(
-                f"plugins.enabled (opt-in allow-list, {len(grandfathered)} grandfathered)"
+                f"plugins.enabled (opt-in allow-list, {len(grandfathered)} grandfathered)",
             )
             if not quiet:
                 if grandfathered:
                     print(
                         f"  ✓ Plugins now opt-in: grandfathered "
-                        f"{len(grandfathered)} existing plugin(s) into plugins.enabled"
+                        f"{len(grandfathered)} existing plugin(s) into plugins.enabled",
                     )
                 else:
                     print(
                         "  ✓ Plugins now opt-in: no existing plugins to grandfather. "
-                        "Use `hermes plugins enable <name>` to activate."
+                        "Use `hermes plugins enable <name>` to activate.",
                     )
 
     # ── Version 22 → 23: seed curator defaults + create logs/curator/ ──
@@ -4737,21 +4737,21 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> dict[str, A
             save_config(config)
             if added_curator:
                 results["config_added"].append(
-                    f"curator ({len(added_curator)} default key(s))"
+                    f"curator ({len(added_curator)} default key(s))",
                 )
                 if not quiet:
                     print(
                         "  ✓ Seeded curator defaults in config.yaml: "
-                        f"{', '.join(added_curator)}"
+                        f"{', '.join(added_curator)}",
                     )
             if added_aux:
                 results["config_added"].append(
-                    f"auxiliary.curator ({len(added_aux)} default key(s))"
+                    f"auxiliary.curator ({len(added_aux)} default key(s))",
                 )
                 if not quiet:
                     print(
                         "  ✓ Seeded auxiliary.curator defaults in config.yaml: "
-                        f"{', '.join(added_aux)}"
+                        f"{', '.join(added_aux)}",
                     )
 
     # ── Version 24 → 25: lower model_catalog TTL 24h → 1h ──
@@ -4791,7 +4791,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> dict[str, A
             config[subsystem] = sub
             touched = True
             results["config_added"].append(
-                f"{subsystem}.write_mode → write_approval={sub['write_approval']}"
+                f"{subsystem}.write_mode → write_approval={sub['write_approval']}",
             )
         if touched:
             save_config(config)
@@ -4868,7 +4868,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> dict[str, A
                         print(f"  {info.get('description', name)}")
                     if info.get("password"):
                         value = masked_secret_prompt(
-                            f"  {info.get('prompt', name)} (Enter to skip): "
+                            f"  {info.get('prompt', name)} (Enter to skip): ",
                         )
                     else:
                         value = input(f"  {info.get('prompt', name)} (Enter to skip): ").strip()
@@ -4940,7 +4940,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> dict[str, A
                     print(f"  ✓ Saved {var['key']} = {value}")
                 else:
                     results["warnings"].append(
-                        f"Skipped {var['key']} — skill '{var.get('skill', '?')}' may ask for it later"
+                        f"Skipped {var['key']} — skill '{var.get('skill', '?')}' may ask for it later",
                     )
                 print()
             save_config(config)
@@ -6390,7 +6390,7 @@ def _inject_profile_env_vars() -> None:
     try:
         from providers import list_providers
         for _pp in list_providers():
-            if _pp.auth_type not in {"api_key",}:
+            if _pp.auth_type not in {"api_key"}:
                 continue
             for _var in _pp.env_vars:
                 if _var in OPTIONAL_ENV_VARS:

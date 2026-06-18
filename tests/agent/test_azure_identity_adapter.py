@@ -582,7 +582,7 @@ class TestHasAzureIdentityCredentials:
         monkeypatch.setattr(_adapter, "has_azure_identity_installed", lambda: True)
         try:
             assert _adapter.has_azure_identity_credentials(
-                "https://x/.default", timeout_seconds=0.1
+                "https://x/.default", timeout_seconds=0.1,
             ) is False
         finally:
             slow_release.set()

@@ -53,7 +53,7 @@ class _PostRecorder:
     def __call__(self, url, *, headers=None, data=None, timeout=None, **kw):
         self.calls.append(
             {"url": url, "headers": headers or {}, "data": data or {},
-             "timeout": timeout, "extra": kw}
+             "timeout": timeout, "extra": kw},
         )
         return self.response
 
@@ -77,8 +77,8 @@ def post_recorder(monkeypatch):
                 "id_token": "ID",
                 "expires_in": 3600,
                 "token_type": "Bearer",
-            }
-        )
+            },
+        ),
     )
     monkeypatch.setattr("hermes_cli.auth.httpx.post", recorder)
     return recorder
@@ -239,7 +239,7 @@ def test_non_200_response_surfaces_status_and_body(monkeypatch):
     code (to tell 400 from 401 from 403 at a glance) and the response
     body (the actual server-side reason)."""
     recorder = _PostRecorder(
-        _err_response(400, '{"error":"invalid_grant","error_description":"code_challenge is required"}')
+        _err_response(400, '{"error":"invalid_grant","error_description":"code_challenge is required"}'),
     )
     monkeypatch.setattr("hermes_cli.auth.httpx.post", recorder)
     with pytest.raises(AuthError) as exc_info:

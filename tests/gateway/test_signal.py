@@ -422,7 +422,7 @@ class TestSignalSendImageFile:
         img_path.write_bytes(b"\xff\xd8" + b"\x00" * 100)
 
         result = await adapter.send_image_file(
-            chat_id="group:abc123==", image_path=str(img_path), caption="Here's the chart"
+            chat_id="group:abc123==", image_path=str(img_path), caption="Here's the chart",
         )
 
         assert result.success is True
@@ -741,7 +741,7 @@ class TestSignalMediaExtraction:
         """BasePlatformAdapter.extract_media should find MEDIA: image paths."""
         from gateway.platforms.base import BasePlatformAdapter
         media, cleaned = BasePlatformAdapter.extract_media(
-            "Here's the chart.\nMEDIA:/tmp/price_graph.png"
+            "Here's the chart.\nMEDIA:/tmp/price_graph.png",
         )
         assert len(media) == 1
         assert media[0][0] == "/tmp/price_graph.png"
@@ -751,7 +751,7 @@ class TestSignalMediaExtraction:
         """BasePlatformAdapter.extract_media should find MEDIA: audio paths."""
         from gateway.platforms.base import BasePlatformAdapter
         media, cleaned = BasePlatformAdapter.extract_media(
-            "[[audio_as_voice]]\nMEDIA:/tmp/reply.ogg"
+            "[[audio_as_voice]]\nMEDIA:/tmp/reply.ogg",
         )
         assert len(media) == 1
         assert media[0][0] == "/tmp/reply.ogg"
@@ -898,7 +898,7 @@ class TestSignalTypingBackoff:
 
     @pytest.mark.asyncio
     async def test_first_failure_logs_at_warning_subsequent_at_debug(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         adapter = _make_signal_adapter(monkeypatch)
         calls = []
@@ -918,7 +918,7 @@ class TestSignalTypingBackoff:
 
     @pytest.mark.asyncio
     async def test_three_consecutive_failures_trigger_cooldown(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         adapter = _make_signal_adapter(monkeypatch)
         call_count = {"n": 0}
@@ -967,7 +967,7 @@ class TestSignalTypingBackoff:
 
     @pytest.mark.asyncio
     async def test_success_resets_failure_counter_and_cooldown(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         adapter = _make_signal_adapter(monkeypatch)
         result_queue = [None, None, {"timestamp": 12345}]
@@ -997,7 +997,7 @@ class TestSignalTypingBackoff:
 
     @pytest.mark.asyncio
     async def test_stop_typing_indicator_clears_backoff_state(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         adapter = _make_signal_adapter(monkeypatch)
 
@@ -1048,7 +1048,7 @@ class TestSignalQuoteExtraction:
                         "author": "+15550002222",
                     },
                 },
-            }
+            },
         })
 
         event = captured["event"]
@@ -1075,7 +1075,7 @@ class TestSignalQuoteExtraction:
                 "dataMessage": {
                     "message": "plain message",
                 },
-            }
+            },
         })
 
         event = captured["event"]
@@ -1106,7 +1106,7 @@ class TestSignalQuoteExtraction:
                         "author": "+15550002222",
                     },
                 },
-            }
+            },
         })
 
         event = captured["event"]
@@ -1210,7 +1210,7 @@ class TestSignalRpcRateLimit:
                         "results": [
                             {"type": "RATE_LIMIT_FAILURE", "retryAfterSeconds": 90},
                         ],
-                    }
+                    },
                 },
             },
         })
@@ -1318,10 +1318,10 @@ def _patch_scheduler_sleep(monkeypatch, capture: list):
             await _real_sleep(0)
 
     monkeypatch.setattr(
-        "gateway.platforms.signal_rate_limit.asyncio.sleep", fake_sleep
+        "gateway.platforms.signal_rate_limit.asyncio.sleep", fake_sleep,
     )
     monkeypatch.setattr(
-        "gateway.platforms.signal_rate_limit.time.monotonic", lambda: offset[0]
+        "gateway.platforms.signal_rate_limit.time.monotonic", lambda: offset[0],
     )
 
 
@@ -1382,7 +1382,7 @@ class TestSignalSendMultipleImages:
         good = _make_image_files(tmp_path, 2, prefix="ok")
         bad = [(f"file://{tmp_path}/missing.png", "")]
         await adapter.send_multiple_images(
-            chat_id="+155****4567", images=good[:1] + bad + good[1:]
+            chat_id="+155****4567", images=good[:1] + bad + good[1:],
         )
 
         assert len(captured) == 1
@@ -1415,7 +1415,7 @@ class TestSignalSendMultipleImages:
 
     @pytest.mark.asyncio
     async def test_429_without_retry_after_uses_default_rate(
-        self, monkeypatch, tmp_path
+        self, monkeypatch, tmp_path,
     ):
         """signal-cli < v0.14.3 doesn't surface Retry-After. The
         scheduler keeps its default refill rate (1 token / 4s), so a
@@ -1443,12 +1443,12 @@ class TestSignalSendMultipleImages:
 
         assert len(captured) == 2
         assert sleep_calls == [
-            pytest.approx(3 * SIGNAL_RATE_LIMIT_DEFAULT_RETRY_AFTER, abs=1.0)
+            pytest.approx(3 * SIGNAL_RATE_LIMIT_DEFAULT_RETRY_AFTER, abs=1.0),
         ]
 
     @pytest.mark.asyncio
     async def test_rate_limit_exhaust_continues_to_next_batch(
-        self, monkeypatch, tmp_path
+        self, monkeypatch, tmp_path,
     ):
         """Both attempts on batch 0 fail; batch 1 still gets a chance.
         The scheduler's natural pacing on the next acquire stands in for
@@ -1476,7 +1476,7 @@ class TestSignalSendMultipleImages:
 
     @pytest.mark.asyncio
     async def test_full_batch_emits_pacing_notice_for_followup(
-        self, monkeypatch, tmp_path
+        self, monkeypatch, tmp_path,
     ):
         """Two full batches of 32. Batch 1 needs 14 more tokens than the
         18 remaining after batch 0, so the scheduler sleeps 56s —
@@ -1484,7 +1484,7 @@ class TestSignalSendMultipleImages:
         from gateway.platforms.signal import SIGNAL_MAX_ATTACHMENTS_PER_MSG
         from gateway.platforms.signal_rate_limit import (
             SIGNAL_RATE_LIMIT_BUCKET_CAPACITY,
-            SIGNAL_RATE_LIMIT_DEFAULT_RETRY_AFTER
+            SIGNAL_RATE_LIMIT_DEFAULT_RETRY_AFTER,
         )
 
         adapter = _make_signal_adapter(monkeypatch)
@@ -1515,7 +1515,7 @@ class TestSignalSendMultipleImages:
 
     @pytest.mark.asyncio
     async def test_short_followup_wait_skips_pacing_notice(
-        self, monkeypatch, tmp_path
+        self, monkeypatch, tmp_path,
     ):
         """Batch 1 only needs 1 token but 18 remain after batch 0
         (50 capacity − 32 batch 0). No wait, no pacing notice."""
@@ -1589,7 +1589,7 @@ class TestSignalRateLimitDetection:
                         {"type": "RATE_LIMIT_FAILURE", "retryAfterSeconds": 30},
                         {"type": "RATE_LIMIT_FAILURE", "retryAfterSeconds": 45},
                     ],
-                }
+                },
             },
         }
         assert _extract_retry_after_seconds(err) == 45.0
@@ -1680,7 +1680,7 @@ class TestSignalContentlessEnvelope:
                     # No "message" field — profile key update metadata only
                     "profileKey": "some-profile-key-data",
                 },
-            }
+            },
         })
 
         assert "event" not in captured, "Profile key update should be skipped"
@@ -1705,7 +1705,7 @@ class TestSignalContentlessEnvelope:
                 "dataMessage": {
                     "message": "",
                 },
-            }
+            },
         })
 
         assert "event" not in captured, "Empty message should be skipped"
@@ -1730,7 +1730,7 @@ class TestSignalContentlessEnvelope:
                 "dataMessage": {
                     "message": "   \n\t  ",
                 },
-            }
+            },
         })
 
         assert "event" not in captured, "Whitespace-only message should be skipped"
@@ -1762,7 +1762,7 @@ class TestSignalContentlessEnvelope:
                         "message": "",  # No text
                         "attachments": [{"id": "att-123", "size": 200}],
                     },
-                }
+                },
             })
 
         assert "event" in captured, "Message with attachment should NOT be skipped"
@@ -1788,7 +1788,7 @@ class TestSignalContentlessEnvelope:
                 "dataMessage": {
                     "message": "hello world",
                 },
-            }
+            },
         })
 
         assert "event" in captured, "Normal message should NOT be skipped"

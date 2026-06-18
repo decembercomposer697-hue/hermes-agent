@@ -408,7 +408,7 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
                     if _is_destructive_command(cmd):
                         cwd = function_args.get("workdir") or os.getenv("TERMINAL_CWD", os.getcwd())
                         agent._checkpoint_mgr.ensure_checkpoint(
-                            cwd, f"before terminal: {cmd[:60]}"
+                            cwd, f"before terminal: {cmd[:60]}",
                         )
                 except Exception:
                     pass
@@ -565,7 +565,7 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
                     # _approval_session_key) AND thread-local approval/sudo
                     # callbacks into the worker thread; clears callbacks on exit.
                     f = executor.submit(
-                        propagate_context_to_thread(_run_tool), i, tc, name, args, parsed_calls[i][3]
+                        propagate_context_to_thread(_run_tool), i, tc, name, args, parsed_calls[i][3],
                     )
                     futures.append(f)
 
@@ -613,7 +613,7 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
                         ]
                         agent._touch_activity(
                             f"concurrent tools running ({_conc_elapsed}s, "
-                            f"{len(not_done)} remaining: {', '.join(_still_running[:3])})"
+                            f"{len(not_done)} remaining: {', '.join(_still_running[:3])})",
                         )
     finally:
         if spinner:
@@ -909,7 +909,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
                 if file_path:
                     work_dir = agent._checkpoint_mgr.get_working_dir_for_path(file_path)
                     agent._checkpoint_mgr.ensure_checkpoint(
-                        work_dir, f"before {function_name}"
+                        work_dir, f"before {function_name}",
                     )
             except Exception:
                 pass  # never block tool execution
@@ -921,7 +921,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
                 if _is_destructive_command(cmd):
                     cwd = function_args.get("workdir") or os.getenv("TERMINAL_CWD", os.getcwd())
                     agent._checkpoint_mgr.ensure_checkpoint(
-                        cwd, f"before terminal: {cmd[:60]}"
+                        cwd, f"before terminal: {cmd[:60]}",
                     )
             except Exception:
                 pass  # never block tool execution

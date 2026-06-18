@@ -499,7 +499,7 @@ def save_usage(data: dict[str, dict[str, Any]]) -> None:
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         fd, tmp_path = tempfile.mkstemp(
-            dir=str(path.parent), prefix=".usage_", suffix=".tmp"
+            dir=str(path.parent), prefix=".usage_", suffix=".tmp",
         )
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:

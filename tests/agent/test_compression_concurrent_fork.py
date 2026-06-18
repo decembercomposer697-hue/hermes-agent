@@ -190,7 +190,7 @@ class _NoLockSubsystemDB:
 
     def try_acquire_compression_lock(self, *_a, **_k):
         raise AttributeError(
-            "'SessionDB' object has no attribute 'try_acquire_compression_lock'"
+            "'SessionDB' object has no attribute 'try_acquire_compression_lock'",
         )
 
     def get_compression_lock_holder(self, *_a, **_k):

@@ -61,7 +61,7 @@ class TestStripAnsiOSC:
 
     def test_hyperlink_preserves_text(self):
         assert strip_ansi(
-            "\x1b]8;;https://example.com\x1b\\click\x1b]8;;\x1b\\"
+            "\x1b]8;;https://example.com\x1b\\click\x1b]8;;\x1b\\",
         ) == "click"
 
 
@@ -126,17 +126,17 @@ class TestStripAnsiRealWorld:
     def test_colored_shebang(self):
         """The original reported bug: shebang corrupted by color codes."""
         assert strip_ansi(
-            "\x1b[32m#!/usr/bin/env python3\x1b[0m\nprint('hello')"
+            "\x1b[32m#!/usr/bin/env python3\x1b[0m\nprint('hello')",
         ) == "#!/usr/bin/env python3\nprint('hello')"
 
     def test_stacked_sgr(self):
         assert strip_ansi(
-            "\x1b[1m\x1b[31m\x1b[42mhello\x1b[0m"
+            "\x1b[1m\x1b[31m\x1b[42mhello\x1b[0m",
         ) == "hello"
 
     def test_ansi_mid_code(self):
         assert strip_ansi(
-            "def foo(\x1b[33m):\x1b[0m\n    return 42"
+            "def foo(\x1b[33m):\x1b[0m\n    return 42",
         ) == "def foo():\n    return 42"
 
 

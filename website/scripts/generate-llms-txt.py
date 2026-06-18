@@ -206,13 +206,13 @@ def emit_llms_index() -> str:
         "the gateway plus IRC and Microsoft Teams via plugins (Telegram, Discord, Slack, "
         "SMS, Matrix, ...). Runs on local, Docker, SSH, Daytona, Modal, or Singularity "
         "backends. Works with Nous Portal, OpenRouter, OpenAI, Anthropic, Google, or any "
-        "OpenAI-compatible endpoint."
+        "OpenAI-compatible endpoint.",
     )
     lines.append("")
     lines.append(
         "Install: `curl -fsSL https://raw.githubusercontent.com/NousResearch/"
         "hermes-agent/main/scripts/install.sh | bash`  "
-        "(Linux, macOS, WSL2, Termux)"
+        "(Linux, macOS, WSL2, Termux)",
     )
     lines.append("")
     lines.append("Repo: https://github.com/NousResearch/hermes-agent")

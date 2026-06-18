@@ -43,7 +43,7 @@ def register_provider(provider: ImageGenProvider) -> None:
     if not isinstance(provider, ImageGenProvider):
         raise TypeError(
             f"register_provider() expects an ImageGenProvider instance, "
-            f"got {type(provider).__name__}"
+            f"got {type(provider).__name__}",
         )
     name = provider.name
     if not isinstance(name, str) or not name.strip():

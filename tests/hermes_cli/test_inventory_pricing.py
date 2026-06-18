@@ -30,7 +30,7 @@ def test_apply_pricing_formats_per_model_prices(monkeypatch):
             "openrouter": {
                 "a/paid": {"prompt": "0.000003", "completion": "0.000015", "input_cache_read": "0.0000003"},
                 "b/free": {"prompt": "0", "completion": "0"},
-            }
+            },
         },
     )
     rows = [{"slug": "openrouter", "models": ["a/paid", "b/free"]}]
@@ -51,7 +51,7 @@ def test_apply_pricing_nous_free_tier_gates_paid_models(monkeypatch):
             "nous": {
                 "free/model": {"prompt": "0", "completion": "0"},
                 "paid/model": {"prompt": "0.000005", "completion": "0.00001"},
-            }
+            },
         },
         unavailable=["paid/model"],
     )

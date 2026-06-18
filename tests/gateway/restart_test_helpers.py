@@ -52,7 +52,7 @@ def make_restart_runner(
 ) -> tuple[GatewayRunner, BasePlatformAdapter]:
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
     runner._running = True
     runner._shutdown_event = asyncio.Event()
@@ -82,52 +82,52 @@ def make_restart_runner(
     runner._shutdown_all_gateway_honcho = lambda: None
     runner._update_runtime_status = MagicMock()
     runner._queue_or_replace_pending_event = GatewayRunner._queue_or_replace_pending_event.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._session_key_for_source = GatewayRunner._session_key_for_source.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._handle_active_session_busy_message = (
         GatewayRunner._handle_active_session_busy_message.__get__(runner, GatewayRunner)
     )
     runner._handle_restart_command = GatewayRunner._handle_restart_command.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._handle_set_home_command = GatewayRunner._handle_set_home_command.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._send_restart_notification = GatewayRunner._send_restart_notification.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._send_home_channel_startup_notifications = (
         GatewayRunner._send_home_channel_startup_notifications.__get__(runner, GatewayRunner)
     )
     runner._status_action_label = GatewayRunner._status_action_label.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._status_action_gerund = GatewayRunner._status_action_gerund.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._queue_during_drain_enabled = GatewayRunner._queue_during_drain_enabled.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._running_agent_count = GatewayRunner._running_agent_count.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._snapshot_running_agents = GatewayRunner._snapshot_running_agents.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._notify_active_sessions_of_shutdown = (
         GatewayRunner._notify_active_sessions_of_shutdown.__get__(runner, GatewayRunner)
     )
     runner._cache_session_source = GatewayRunner._cache_session_source.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._get_cached_session_source = GatewayRunner._get_cached_session_source.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner._launch_detached_restart_command = GatewayRunner._launch_detached_restart_command.__get__(
-        runner, GatewayRunner
+        runner, GatewayRunner,
     )
     runner.request_restart = GatewayRunner.request_restart.__get__(runner, GatewayRunner)
     runner._is_user_authorized = lambda _source: True

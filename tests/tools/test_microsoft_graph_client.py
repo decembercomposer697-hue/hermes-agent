@@ -136,7 +136,7 @@ class TestMicrosoftGraphClient:
         assert result["size_bytes"] == len(b"meeting-recording")
 
     async def test_download_to_file_streams_large_payload_in_chunks(
-        self, tmp_path: Path, monkeypatch
+        self, tmp_path: Path, monkeypatch,
     ):
         """Recordings can be hundreds of MB; verify the body is streamed.
 
@@ -170,7 +170,7 @@ class TestMicrosoftGraphClient:
         )
         destination = tmp_path / "big-recording.mp4"
         result = await client.download_to_file(
-            "/drive/item/content", destination, chunk_size=65536
+            "/drive/item/content", destination, chunk_size=65536,
         )
 
         assert destination.read_bytes() == payload
@@ -182,7 +182,7 @@ class TestMicrosoftGraphClient:
         assert not (tmp_path / "big-recording.mp4.part").exists()
 
     async def test_download_to_file_retries_on_transient_server_error(
-        self, tmp_path: Path
+        self, tmp_path: Path,
     ):
         calls: list[int] = []
         sleeps: list[float] = []
@@ -191,7 +191,7 @@ class TestMicrosoftGraphClient:
             calls.append(1)
             if len(calls) == 1:
                 return httpx.Response(
-                    503, json={"error": {"message": "unavailable"}}
+                    503, json={"error": {"message": "unavailable"}},
                 )
             return httpx.Response(
                 200,
@@ -218,7 +218,7 @@ class TestMicrosoftGraphClient:
         assert not (tmp_path / "artifact.bin.part").exists()
 
     async def test_download_to_file_cleans_partial_file_on_exhausted_retries(
-        self, tmp_path: Path
+        self, tmp_path: Path,
     ):
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(503, json={"error": {"message": "unavailable"}})

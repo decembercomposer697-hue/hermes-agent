@@ -47,14 +47,14 @@ class TestKimiReasoningWireShape:
     @pytest.mark.parametrize("effort", ["low", "medium", "high"])
     def test_explicit_effort_sends_effort_only(self, kimi_profile, effort):
         extra_body, top_level = kimi_profile.build_api_kwargs_extras(
-            reasoning_config={"enabled": True, "effort": effort}
+            reasoning_config={"enabled": True, "effort": effort},
         )
         assert top_level == {"reasoning_effort": effort}
         assert "thinking" not in extra_body
 
     def test_enabled_without_effort_falls_back_to_thinking(self, kimi_profile):
         extra_body, top_level = kimi_profile.build_api_kwargs_extras(
-            reasoning_config={"enabled": True}
+            reasoning_config={"enabled": True},
         )
         assert extra_body == {"thinking": {"type": "enabled"}}
         assert top_level == {}
@@ -64,21 +64,21 @@ class TestKimiReasoningWireShape:
         """Unknown/strong efforts aren't in Moonshot's low|medium|high set, so
         we drop to the thinking toggle rather than sending an invalid effort."""
         extra_body, top_level = kimi_profile.build_api_kwargs_extras(
-            reasoning_config={"enabled": True, "effort": effort}
+            reasoning_config={"enabled": True, "effort": effort},
         )
         assert extra_body == {"thinking": {"type": "enabled"}}
         assert top_level == {}
 
     def test_disabled_sends_thinking_disabled_only(self, kimi_profile):
         extra_body, top_level = kimi_profile.build_api_kwargs_extras(
-            reasoning_config={"enabled": False}
+            reasoning_config={"enabled": False},
         )
         assert extra_body == {"thinking": {"type": "disabled"}}
         assert top_level == {}
 
     def test_disabled_ignores_effort(self, kimi_profile):
         extra_body, top_level = kimi_profile.build_api_kwargs_extras(
-            reasoning_config={"enabled": False, "effort": "high"}
+            reasoning_config={"enabled": False, "effort": "high"},
         )
         assert extra_body == {"thinking": {"type": "disabled"}}
         assert top_level == {}
@@ -97,7 +97,7 @@ class TestKimiReasoningWireShape:
     def test_never_emits_both(self, kimi_profile, reasoning_config):
         """The core invariant: thinking and reasoning_effort are never both set."""
         extra_body, top_level = kimi_profile.build_api_kwargs_extras(
-            reasoning_config=reasoning_config
+            reasoning_config=reasoning_config,
         )
         assert not ("thinking" in extra_body and "reasoning_effort" in top_level)
 

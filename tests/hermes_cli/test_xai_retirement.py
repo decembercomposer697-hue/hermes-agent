@@ -121,7 +121,7 @@ class TestFindRetiredPerSlot:
                 "compression": {"model": "grok-code-fast-1"},
                 "curator":     {"model": "grok-4.3"},  # not retired
                 "approval":    {"model": "gpt-4o-mini"},  # not xAI
-            }
+            },
         }
         issues = find_retired_xai_refs(cfg)
         assert sorted(_paths(issues)) == [
@@ -150,9 +150,9 @@ class TestFindRetiredPerSlot:
         cfg = {
             "plugins": {
                 "image_gen": {
-                    "xai": {"model": "grok-imagine-image-pro"}
-                }
-            }
+                    "xai": {"model": "grok-imagine-image-pro"},
+                },
+            },
         }
         issues = find_retired_xai_refs(cfg)
         assert _paths(issues) == ["plugins.image_gen.xai.model"]

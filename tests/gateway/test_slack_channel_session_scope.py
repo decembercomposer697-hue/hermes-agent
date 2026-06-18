@@ -45,7 +45,7 @@ def adapter():
 def _redirect_cache(tmp_path, monkeypatch):
     """Point document cache to tmp_path so tests don't touch ~/.hermes."""
     monkeypatch.setattr(
-        "gateway.platforms.base.DOCUMENT_CACHE_DIR", tmp_path / "doc_cache"
+        "gateway.platforms.base.DOCUMENT_CACHE_DIR", tmp_path / "doc_cache",
     )
 
 
@@ -80,7 +80,7 @@ class TestChannelSessionScopeDefault:
 
         captured = []
         adapter.handle_message = AsyncMock(
-            side_effect=lambda e: captured.append(e)
+            side_effect=lambda e: captured.append(e),
         )
         with patch.object(
             adapter, "_resolve_user_name",
@@ -111,7 +111,7 @@ class TestChannelSessionScopeDefault:
 
         captured = []
         adapter.handle_message = AsyncMock(
-            side_effect=lambda e: captured.append(e)
+            side_effect=lambda e: captured.append(e),
         )
         with patch.object(
             adapter, "_resolve_user_name",
@@ -139,7 +139,7 @@ class TestChannelSessionScopeShared:
 
         captured = []
         adapter.handle_message = AsyncMock(
-            side_effect=lambda e: captured.append(e)
+            side_effect=lambda e: captured.append(e),
         )
         with patch.object(
             adapter, "_resolve_user_name",
@@ -179,7 +179,7 @@ class TestChannelSessionScopeShared:
 
         captured = []
         adapter.handle_message = AsyncMock(
-            side_effect=lambda e: captured.append(e)
+            side_effect=lambda e: captured.append(e),
         )
         with patch.object(
             adapter, "_resolve_user_name",
@@ -208,7 +208,7 @@ class TestChannelSessionScopeShared:
 
         captured = []
         adapter.handle_message = AsyncMock(
-            side_effect=lambda e: captured.append(e)
+            side_effect=lambda e: captured.append(e),
         )
         with patch.object(
             adapter, "_resolve_user_name",
@@ -245,7 +245,7 @@ class TestThreadReplyAlwaysScopesByThread:
 
         captured = []
         adapter.handle_message = AsyncMock(
-            side_effect=lambda e: captured.append(e)
+            side_effect=lambda e: captured.append(e),
         )
         with patch.object(
             adapter, "_resolve_user_name",

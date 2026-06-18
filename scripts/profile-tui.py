@@ -46,7 +46,7 @@ except ImportError:
 
 DEFAULT_TUI_DIR = Path(
     os.environ.get("HERMES_TUI_DIR")
-    or str(Path(__file__).resolve().parent.parent / "ui-tui")
+    or str(Path(__file__).resolve().parent.parent / "ui-tui"),
 )
 DEFAULT_LOG = Path(os.environ.get("HERMES_PERF_LOG", str(get_hermes_home() / "perf.log")))
 DEFAULT_STATE_DB = get_hermes_home() / "state.db"
@@ -66,7 +66,7 @@ def pick_longest_session(db: Path) -> str:
     conn = sqlite3.connect(db)
     row = conn.execute(
         "SELECT id FROM sessions s ORDER BY "
-        "(SELECT COUNT(*) FROM messages m WHERE m.session_id = s.id) DESC LIMIT 1"
+        "(SELECT COUNT(*) FROM messages m WHERE m.session_id = s.id) DESC LIMIT 1",
     ).fetchone()
     if not row:
         sys.exit(f"no sessions in {db}")
@@ -160,7 +160,7 @@ def format_report(data: dict[str, Any]) -> str:
         for pid, ms in sorted(by_id.items(), key=lambda kv: -pct(kv[1], 0.99)):
             out.append(
                 f"  {pid:<14} {len(ms):>6} {pct(ms,0.50):>8.2f} {pct(ms,0.95):>8.2f} "
-                f"{pct(ms,0.99):>8.2f} {max(ms):>8.2f}"
+                f"{pct(ms,0.99):>8.2f} {max(ms):>8.2f}",
             )
 
     out.append("")
@@ -173,7 +173,7 @@ def format_report(data: dict[str, Any]) -> str:
         out.append(f"  frames captured: {len(frames)}")
         out.append(
             f"  durationMs  p50={pct(dur,0.50):.2f}  p95={pct(dur,0.95):.2f}  "
-            f"p99={pct(dur,0.99):.2f}  max={max(dur):.2f}"
+            f"p99={pct(dur,0.99):.2f}  max={max(dur):.2f}",
         )
         # Effective FPS during the run: frames / elapsed seconds.
         ts = sorted(f["ts"] for f in frames)
@@ -191,7 +191,7 @@ def format_report(data: dict[str, Any]) -> str:
                 if vals:
                     out.append(
                         f"  {field:<10} {pct(vals,0.50):>8.2f} {pct(vals,0.95):>8.2f} "
-                        f"{pct(vals,0.99):>8.2f} {max(vals):>8.2f}"
+                        f"{pct(vals,0.99):>8.2f} {max(vals):>8.2f}",
                     )
             # Derived: sum of phases vs durationMs (reveals hidden time).
             sum_ps = [
@@ -203,7 +203,7 @@ def format_report(data: dict[str, Any]) -> str:
                 deltas = [d - s for d, s in zip(dur_match, sum_ps)]
                 out.append(
                     f"  {'dur-Σphases':<10} {pct(deltas,0.50):>8.2f} {pct(deltas,0.95):>8.2f} "
-                    f"{pct(deltas,0.99):>8.2f} {max(deltas):>8.2f}   (unaccounted-for time)"
+                    f"{pct(deltas,0.99):>8.2f} {max(deltas):>8.2f}   (unaccounted-for time)",
                 )
 
             # Yoga counters
@@ -227,7 +227,7 @@ def format_report(data: dict[str, Any]) -> str:
             if patches:
                 out.append(
                     f"  patches     p50={pct(patches,0.5):.0f}  p99={pct(patches,0.99):.0f}  "
-                    f"max={max(patches)}  total={sum(patches)}"
+                    f"max={max(patches)}  total={sum(patches)}",
                 )
             optimized = [
                 f["phases"].get("optimizedPatches", 0)
@@ -237,7 +237,7 @@ def format_report(data: dict[str, Any]) -> str:
                 out.append(
                     f"  optimized   p50={pct(optimized,0.5):.0f}  p99={pct(optimized,0.99):.0f}  "
                     f"max={max(optimized)}  total={sum(optimized)}"
-                    f"  (ratio: {sum(optimized)/max(1,sum(patches)):.2f})"
+                    f"  (ratio: {sum(optimized)/max(1,sum(patches)):.2f})",
                 )
 
             # Write bytes + drain telemetry — the outer-terminal bottleneck gauge.
@@ -250,7 +250,7 @@ def format_report(data: dict[str, Any]) -> str:
                 kb = total_b / 1024
                 out.append(
                     f"  writeBytes  p50={pct(bytes_written,0.5):.0f}B  p99={pct(bytes_written,0.99):.0f}B  "
-                    f"max={max(bytes_written)}B  total={kb:.1f}KB"
+                    f"max={max(bytes_written)}B  total={kb:.1f}KB",
                 )
             drains = [
                 f["phases"].get("prevFrameDrainMs", 0)
@@ -260,13 +260,13 @@ def format_report(data: dict[str, Any]) -> str:
                 nonzero = [d for d in drains if d > 0]
                 out.append(
                     f"  drainMs     p50={pct(nonzero,0.5):.2f}  p95={pct(nonzero,0.95):.2f}  "
-                    f"p99={pct(nonzero,0.99):.2f}  max={max(nonzero):.2f}   (terminal flush latency)"
+                    f"p99={pct(nonzero,0.99):.2f}  max={max(nonzero):.2f}   (terminal flush latency)",
                 )
             backpressure = sum(1 for f in frames if f.get("phases", {}).get("backpressure"))
             if backpressure:
                 out.append(
                     f"  backpressure: {backpressure}/{len(frames)} frames "
-                    f"({100*backpressure/len(frames):.0f}%)   (Node stdout buffer full — terminal slow)"
+                    f"({100*backpressure/len(frames):.0f}%)   (Node stdout buffer full — terminal slow)",
                 )
 
         # Flickers
@@ -396,7 +396,7 @@ def format_diff(before: dict[str, float], after: dict[str, float]) -> str:
 
         pct_str = "—" if pct_change == float("inf") else f"{pct_change:+6.1f}%"
         lines.append(
-            f"{k:<28} {b:>12.2f} {a:>12.2f} {d:>+12.2f}  {pct_str} {mark}"
+            f"{k:<28} {b:>12.2f} {a:>12.2f} {d:>+12.2f}  {pct_str} {mark}",
         )
 
     return "\n".join(lines)

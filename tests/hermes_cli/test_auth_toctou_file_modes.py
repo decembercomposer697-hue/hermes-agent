@@ -178,7 +178,7 @@ def test_save_auth_store_uses_os_open_with_0o600_mode(tmp_path, monkeypatch):
         from hermes_cli import auth as auth_mod
 
         auth_mod._save_auth_store(
-            {"version": auth_mod.AUTH_STORE_VERSION, "providers": {}}
+            {"version": auth_mod.AUTH_STORE_VERSION, "providers": {}},
         )
 
     auth_tmp_opens = [

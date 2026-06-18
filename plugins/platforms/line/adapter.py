@@ -154,7 +154,7 @@ _LINE_MESSAGE_TYPES = {
 _FALLBACK_PNG_PREVIEW = bytes.fromhex(
     "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4"
     "890000000d49444154789c63000100000005000100377a7ff20000000049454e"
-    "44ae426082"
+    "44ae426082",
 )
 
 
@@ -564,7 +564,7 @@ def _video_message(url: str, preview_url: str) -> dict[str, Any]:
 
 
 def build_postback_button_message(
-    text: str, button_label: str, request_id: str
+    text: str, button_label: str, request_id: str,
 ) -> dict[str, Any]:
     """Template Buttons message — the slow-LLM postback bubble.
 
@@ -587,10 +587,10 @@ def build_postback_button_message(
                     "type": "postback",
                     "label": button_label[:20] or "Get answer",
                     "data": json.dumps(
-                        {"action": "show_response", "request_id": request_id}
+                        {"action": "show_response", "request_id": request_id},
                     ),
                     "displayText": button_label[:300] or "Get answer",
-                }
+                },
             ],
         },
     }
@@ -661,7 +661,7 @@ class LineAdapter(BasePlatformAdapter):
         self.webhook_host = os.getenv("LINE_HOST") or extra.get("host", "0.0.0.0")
         try:
             self.webhook_port = int(
-                os.getenv("LINE_PORT") or extra.get("port", DEFAULT_WEBHOOK_PORT)
+                os.getenv("LINE_PORT") or extra.get("port", DEFAULT_WEBHOOK_PORT),
             )
         except (TypeError, ValueError):
             self.webhook_port = DEFAULT_WEBHOOK_PORT
@@ -677,23 +677,23 @@ class LineAdapter(BasePlatformAdapter):
 
         # Three-allowlist gating
         self.allow_all = _truthy_env(
-            "LINE_ALLOW_ALL_USERS", bool(extra.get("allow_all_users", False))
+            "LINE_ALLOW_ALL_USERS", bool(extra.get("allow_all_users", False)),
         )
         self.allowed_users = _csv_set(
-            os.getenv("LINE_ALLOWED_USERS", "")
+            os.getenv("LINE_ALLOWED_USERS", ""),
         ) | set(extra.get("allowed_users", []))
         self.allowed_groups = _csv_set(
-            os.getenv("LINE_ALLOWED_GROUPS", "")
+            os.getenv("LINE_ALLOWED_GROUPS", ""),
         ) | set(extra.get("allowed_groups", []))
         self.allowed_rooms = _csv_set(
-            os.getenv("LINE_ALLOWED_ROOMS", "")
+            os.getenv("LINE_ALLOWED_ROOMS", ""),
         ) | set(extra.get("allowed_rooms", []))
 
         # Slow-LLM postback button threshold
         try:
             self.slow_response_threshold = float(
                 os.getenv("LINE_SLOW_RESPONSE_THRESHOLD")
-                or extra.get("slow_response_threshold", DEFAULT_SLOW_RESPONSE_THRESHOLD)
+                or extra.get("slow_response_threshold", DEFAULT_SLOW_RESPONSE_THRESHOLD),
             )
         except (TypeError, ValueError):
             self.slow_response_threshold = DEFAULT_SLOW_RESPONSE_THRESHOLD
@@ -1203,7 +1203,7 @@ class LineAdapter(BasePlatformAdapter):
                 self._pending_buttons.pop(chat_id, None)
                 return
             msg = build_postback_button_message(
-                self.pending_text, self.button_label, rid
+                self.pending_text, self.button_label, rid,
             )
             try:
                 await self._client.reply(token, [msg])
@@ -1493,10 +1493,10 @@ def check_requirements() -> bool:
 def validate_config(config) -> bool:
     extra = getattr(config, "extra", {}) or {}
     has_token = bool(
-        os.getenv("LINE_CHANNEL_ACCESS_TOKEN") or extra.get("channel_access_token")
+        os.getenv("LINE_CHANNEL_ACCESS_TOKEN") or extra.get("channel_access_token"),
     )
     has_secret = bool(
-        os.getenv("LINE_CHANNEL_SECRET") or extra.get("channel_secret")
+        os.getenv("LINE_CHANNEL_SECRET") or extra.get("channel_secret"),
     )
     return has_token and has_secret
 

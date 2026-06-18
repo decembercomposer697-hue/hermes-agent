@@ -163,14 +163,14 @@ def _global_allow_private_urls() -> bool:
         # security.allow_private_urls (preferred)
         sec = cfg.get("security", {})
         if isinstance(sec, dict) and is_truthy_value(
-            sec.get("allow_private_urls"), default=False
+            sec.get("allow_private_urls"), default=False,
         ):
             _cached_allow_private = True
             return _cached_allow_private
         # browser.allow_private_urls (legacy fallback)
         browser = cfg.get("browser", {})
         if isinstance(browser, dict) and is_truthy_value(
-            browser.get("allow_private_urls"), default=False
+            browser.get("allow_private_urls"), default=False,
         ):
             _cached_allow_private = True
             return _cached_allow_private
@@ -275,7 +275,7 @@ def is_always_blocked_url(url: str) -> bool:
         # always-blocked (caller's ordinary path handles that).
         try:
             addr_info = socket.getaddrinfo(
-                hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM
+                hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM,
             )
         except socket.gaierror:
             return False

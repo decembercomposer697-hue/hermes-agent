@@ -268,7 +268,7 @@ def describe_profile(
         val = parsed.get("description")
         if not isinstance(val, str) or not val.strip():
             return DescribeOutcome(
-                canon, False, "LLM response missing 'description' field"
+                canon, False, "LLM response missing 'description' field",
             )
         description = val.strip()[:280]
 

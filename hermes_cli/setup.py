@@ -257,7 +257,7 @@ def prompt_choice(question: str, choices: list, default: int = 0, description: s
     while True:
         try:
             value = input(
-                color(f"  Select [1-{len(choices)}] ({default + 1}): ", Colors.DIM)
+                color(f"  Select [1-{len(choices)}] ({default + 1}): ", Colors.DIM),
             )
             if not value:
                 return default
@@ -419,7 +419,7 @@ def _print_setup_summary(config: dict, hermes_home):
                 "npm install -g agent-browser && agent-browser install --with-deps"
             )
         tool_status.append(
-            ("Browser Automation", False, missing_browser_hint)
+            ("Browser Automation", False, missing_browser_hint),
         )
 
     # Image generation — FAL (direct or via Nous), or any plugin-registered
@@ -563,7 +563,7 @@ def _print_setup_summary(config: dict, hermes_home):
             print(f"   {color('✓', Colors.GREEN)} {name}")
         else:
             print(
-                f"   {color('✗', Colors.RED)} {name} {color(f'(missing {missing_var})', Colors.DIM)}"
+                f"   {color('✗', Colors.RED)} {name} {color(f'(missing {missing_var})', Colors.DIM)}",
             )
 
     print()
@@ -571,7 +571,7 @@ def _print_setup_summary(config: dict, hermes_home):
     disabled_tools = [(name, var) for name, avail, var in tool_status if not avail]
     if disabled_tools:
         print_warning(
-            "Some tools are disabled. Run 'hermes setup tools' to configure them,"
+            "Some tools are disabled. Run 'hermes setup tools' to configure them,",
         )
         from hermes_constants import display_hermes_home as _dhh
         print_warning(f"or edit {_dhh()}/.env directly to add the missing API keys.")
@@ -581,18 +581,18 @@ def _print_setup_summary(config: dict, hermes_home):
     print()
     print(
         color(
-            "┌─────────────────────────────────────────────────────────┐", Colors.GREEN
-        )
+            "┌─────────────────────────────────────────────────────────┐", Colors.GREEN,
+        ),
     )
     print(
         color(
-            "│              ✓ Setup Complete!                          │", Colors.GREEN
-        )
+            "│              ✓ Setup Complete!                          │", Colors.GREEN,
+        ),
     )
     print(
         color(
-            "└─────────────────────────────────────────────────────────┘", Colors.GREEN
-        )
+            "└─────────────────────────────────────────────────────────┘", Colors.GREEN,
+        ),
     )
     print()
 
@@ -603,7 +603,7 @@ def _print_setup_summary(config: dict, hermes_home):
     print(f"   {color('Settings:', Colors.YELLOW)}  {get_config_path()}")
     print(f"   {color('API Keys:', Colors.YELLOW)}  {get_env_path()}")
     print(
-        f"   {color('Data:', Colors.YELLOW)}      {hermes_home}/cron/, sessions/, logs/"
+        f"   {color('Data:', Colors.YELLOW)}      {hermes_home}/cron/, sessions/, logs/",
     )
     print()
 
@@ -619,7 +619,7 @@ def _print_setup_summary(config: dict, hermes_home):
     print()
     print(f"   {color('hermes config', Colors.GREEN)}         View current settings")
     print(
-        f"   {color('hermes config edit', Colors.GREEN)}    Open config in your editor"
+        f"   {color('hermes config edit', Colors.GREEN)}    Open config in your editor",
     )
     print(f"   {color('hermes config set <key> <value>', Colors.GREEN)}")
     print("                          Set a specific value")
@@ -652,7 +652,7 @@ def _prompt_container_resources(config: dict):
     print_info("  Persistent filesystem keeps files between sessions.")
     print_info("  Set to 'no' for ephemeral sandboxes that reset each time.")
     persist_str = prompt(
-        "  Persist filesystem across sessions? (yes/no)", persist_label
+        "  Persist filesystem across sessions? (yes/no)", persist_label,
     )
     terminal["container_persistent"] = persist_str.lower() in {"yes", "true", "y", "1"}
 
@@ -877,7 +877,7 @@ def _run_xai_oauth_login_from_setup() -> bool:
             last_refresh=creds.get("last_refresh"),
         )
         _update_config_for_provider(
-            "xai-oauth", creds.get("base_url", DEFAULT_XAI_OAUTH_BASE_URL)
+            "xai-oauth", creds.get("base_url", DEFAULT_XAI_OAUTH_BASE_URL),
         )
         return True
     except Exception as exc:
@@ -925,7 +925,7 @@ def _setup_tts_provider(config: dict):
             "Google Gemini TTS (30 prebuilt voices, prompt-controllable, needs API key)",
             "NeuTTS (local on-device, free, ~300MB model download)",
             "KittenTTS (local on-device, free, lightweight ~25-80MB ONNX)",
-        ]
+        ],
     )
     providers.extend(["edge", "elevenlabs", "openai", "xai", "minimax", "mistral", "gemini", "neutts", "kittentts"])
     choices.append(f"Keep current ({current_label})")
@@ -942,7 +942,7 @@ def _setup_tts_provider(config: dict):
         print_info("OpenAI TTS will use the managed Nous gateway and bill to your subscription.")
         if get_env_value("VOICE_TOOLS_OPENAI_KEY") or get_env_value("OPENAI_API_KEY"):
             print_warning(
-                "Direct OpenAI credentials are still configured and may take precedence until removed from ~/.hermes/.env."
+                "Direct OpenAI credentials are still configured and may take precedence until removed from ~/.hermes/.env.",
             )
 
     if selected == "neutts":
@@ -1003,7 +1003,7 @@ def _setup_tts_provider(config: dict):
         if oauth_logged_in:
             print_success(
                 "xAI TTS will use your xAI Grok OAuth (SuperGrok / Premium+) "
-                "credentials"
+                "credentials",
             )
         elif existing_api_key:
             print_success("xAI TTS will use your existing XAI_API_KEY")
@@ -1021,12 +1021,12 @@ def _setup_tts_provider(config: dict):
             if choice_idx == 0:
                 if _run_xai_oauth_login_from_setup():
                     print_success(
-                        "Logged in — xAI TTS will use these OAuth credentials"
+                        "Logged in — xAI TTS will use these OAuth credentials",
                     )
                 else:
                     print_warning(
                         "xAI Grok OAuth login did not complete. "
-                        "Falling back to Edge TTS."
+                        "Falling back to Edge TTS.",
                     )
                     selected = "edge"
             elif choice_idx == 1:
@@ -1039,7 +1039,7 @@ def _setup_tts_provider(config: dict):
                     print_warning(
                         "No xAI API key provided for TTS. Configure XAI_API_KEY "
                         f"via hermes setup model or {_dhh()}/.env to use xAI TTS. "
-                        "Falling back to Edge TTS."
+                        "Falling back to Edge TTS.",
                     )
                     selected = "edge"
             else:
@@ -1167,7 +1167,7 @@ def setup_terminal_backend(config: dict):
     idx_to_backend[keep_current_idx] = current_backend
 
     terminal_idx = prompt_choice(
-        "Select terminal backend:", terminal_choices, keep_current_idx
+        "Select terminal backend:", terminal_choices, keep_current_idx,
     )
 
     selected_backend = idx_to_backend.get(terminal_idx)
@@ -1198,7 +1198,7 @@ def setup_terminal_backend(config: dict):
 
         # Image and resource limits use defaults; tune via `hermes setup terminal`.
         config["terminal"].setdefault(
-            "docker_image", "nikolaik/python-nodejs:python3.11-nodejs20"
+            "docker_image", "nikolaik/python-nodejs:python3.11-nodejs20",
         )
 
     elif selected_backend == "singularity":
@@ -1209,7 +1209,7 @@ def setup_terminal_backend(config: dict):
         if not sing_bin:
             print_warning("Singularity/Apptainer not found in PATH!")
             print_info(
-                "Install: https://apptainer.org/docs/admin/main/installation.html"
+                "Install: https://apptainer.org/docs/admin/main/installation.html",
             )
         else:
             print_info(f"Found: {sing_bin}")
@@ -1230,7 +1230,7 @@ def setup_terminal_backend(config: dict):
             managed_nous_tools_enabled()
             and
             get_nous_subscription_features(config).nous_auth_present
-            and is_managed_tool_gateway_ready("modal")
+            and is_managed_tool_gateway_ready("modal"),
         )
         modal_mode = normalize_modal_mode(cfg_get(config, "terminal", "modal_mode"))
         use_managed_modal = False
@@ -1257,7 +1257,7 @@ def setup_terminal_backend(config: dict):
             print_info("Modal execution will use the managed Nous gateway and bill to your subscription.")
             if get_env_value("MODAL_TOKEN_ID") or get_env_value("MODAL_TOKEN_SECRET"):
                 print_info(
-                    "Direct Modal credentials are still configured, but this backend is pinned to managed mode."
+                    "Direct Modal credentials are still configured, but this backend is pinned to managed mode.",
                 )
         else:
             config["terminal"]["modal_mode"] = "direct"
@@ -1368,7 +1368,7 @@ def setup_terminal_backend(config: dict):
 
         # Image and resource limits use defaults; tune via `hermes setup terminal`.
         config["terminal"].setdefault(
-            "daytona_image", "nikolaik/python-nodejs:python3.11-nodejs20"
+            "daytona_image", "nikolaik/python-nodejs:python3.11-nodejs20",
         )
 
     elif selected_backend == "ssh":
@@ -1477,7 +1477,7 @@ def setup_agent_settings(config: dict):
     print_info("Maximum tool-calling iterations per conversation.")
     print_info("Higher = more complex tasks, but costs more tokens.")
     print_info(
-        f"Press Enter to keep {current_max}. Use 90 for most tasks or 150+ for open exploration."
+        f"Press Enter to keep {current_max}. Use 90 for most tasks or 150+ for open exploration.",
     )
 
     max_iter_str = prompt("Max iterations", current_max)
@@ -1519,7 +1519,7 @@ def setup_agent_settings(config: dict):
     print_header("Context Compression")
     print_info("Automatically summarizes old messages when context gets too long.")
     print_info(
-        "Higher threshold = compress later (use more context). Lower = compress sooner."
+        "Higher threshold = compress later (use more context). Lower = compress sooner.",
     )
 
     config.setdefault("compression", {})["enabled"] = True
@@ -1534,26 +1534,26 @@ def setup_agent_settings(config: dict):
         pass
 
     print_success(
-        f"Context compression threshold set to {config['compression'].get('threshold', 0.50)}"
+        f"Context compression threshold set to {config['compression'].get('threshold', 0.50)}",
     )
 
     # ── Session Reset Policy ──
     print_header("Session Reset Policy")
     print_info(
-        "Messaging sessions (Telegram, Discord, etc.) accumulate context over time."
+        "Messaging sessions (Telegram, Discord, etc.) accumulate context over time.",
     )
     print_info(
-        "Each message adds to the conversation history, which means growing API costs."
+        "Each message adds to the conversation history, which means growing API costs.",
     )
     print_info("")
     print_info(
-        "To manage this, sessions can automatically reset after a period of inactivity"
+        "To manage this, sessions can automatically reset after a period of inactivity",
     )
     print_info(
-        "or at a fixed time each day. When a reset happens, the agent saves important"
+        "or at a fixed time each day. When a reset happens, the agent saves important",
     )
     print_info(
-        "things to its persistent memory first — but the conversation context is cleared."
+        "things to its persistent memory first — but the conversation context is cleared.",
     )
     print_info("")
     print_info("You can also manually reset anytime by typing /reset in chat.")
@@ -1595,7 +1595,7 @@ def setup_agent_settings(config: dict):
         except ValueError:
             pass
         print_success(
-            f"Sessions reset after {config['session_reset'].get('idle_minutes', 1440)} min idle or daily at {config['session_reset'].get('at_hour', 4)}:00"
+            f"Sessions reset after {config['session_reset'].get('idle_minutes', 1440)} min idle or daily at {config['session_reset'].get('at_hour', 4)}:00",
         )
     elif reset_idx == 1:  # Idle only
         config["session_reset"]["mode"] = "idle"
@@ -1607,7 +1607,7 @@ def setup_agent_settings(config: dict):
         except ValueError:
             pass
         print_success(
-            f"Sessions reset after {config['session_reset'].get('idle_minutes', 1440)} min of inactivity"
+            f"Sessions reset after {config['session_reset'].get('idle_minutes', 1440)} min of inactivity",
         )
     elif reset_idx == 2:  # Daily only
         config["session_reset"]["mode"] = "daily"
@@ -1619,15 +1619,15 @@ def setup_agent_settings(config: dict):
         except ValueError:
             pass
         print_success(
-            f"Sessions reset daily at {config['session_reset'].get('at_hour', 4)}:00"
+            f"Sessions reset daily at {config['session_reset'].get('at_hour', 4)}:00",
         )
     elif reset_idx == 3:  # None
         config["session_reset"]["mode"] = "none"
         print_info(
-            "Sessions will never auto-reset. Context is managed only by compression."
+            "Sessions will never auto-reset. Context is managed only by compression.",
         )
         print_warning(
-            "Long conversations will grow in cost. Use /reset manually when needed."
+            "Long conversations will grow in cost. Use /reset manually when needed.",
         )
     # else: keep current (idx == 4)
 
@@ -1679,7 +1679,7 @@ def _prompt_telegram_bot_token() -> str | None:
         if not _is_valid_telegram_bot_token(token):
             print_error(
                 "Invalid token format. Expected: <numeric_id>:<alphanumeric_hash> "
-                "(e.g., 123456789:ABCdefGHI-jklMNOpqrSTUvwxYZ)"
+                "(e.g., 123456789:ABCdefGHI-jklMNOpqrSTUvwxYZ)",
             )
             continue
         return token
@@ -1760,11 +1760,11 @@ def _setup_telegram():
             allowed_users = ",".join(ids)
         else:
             allowed_users = prompt(
-                "Allowed user IDs (comma-separated, leave empty for open access)"
+                "Allowed user IDs (comma-separated, leave empty for open access)",
             )
     else:
         allowed_users = prompt(
-            "Allowed user IDs (comma-separated, leave empty for open access)"
+            "Allowed user IDs (comma-separated, leave empty for open access)",
         )
 
     if allowed_users:
@@ -1843,7 +1843,7 @@ def _setup_slack():
     print_info("   To find a Member ID: click a user's name → View full profile → ⋮ → Copy member ID")
     print()
     allowed_users = prompt(
-        "Allowed user IDs (comma-separated, leave empty to deny everyone except paired users)"
+        "Allowed user IDs (comma-separated, leave empty to deny everyone except paired users)",
     )
     if allowed_users:
         save_env_value("SLACK_ALLOWED_USERS", allowed_users.replace(" ", ""))
@@ -1892,17 +1892,17 @@ def _write_slack_manifest_and_instruct():
         print_info(
             "   Paste it into https://api.slack.com/apps → your app → Features "
             "→ App Manifest → Edit, then Save.  Slack will prompt to "
-            "reinstall if scopes or slash commands changed."
+            "reinstall if scopes or slash commands changed.",
         )
         print_info(
             "   Re-run `hermes slack manifest --write` anytime to refresh after "
-            "Hermes adds new commands."
+            "Hermes adds new commands.",
         )
     except Exception as exc:  # pragma: no cover - best-effort UX helper
         print_warning(f"Couldn't write Slack manifest: {exc}")
         print_info(
             "   You can generate it manually later with: "
-            "hermes slack manifest --write"
+            "hermes slack manifest --write",
         )
 
 
@@ -1960,7 +1960,7 @@ def _setup_matrix():
             _missing_before = feature_missing("platform.matrix")
             if _missing_before:
                 print_info(
-                    f"Installing {matrix_pkg} (+ {len(_missing_before)} runtime deps)..."
+                    f"Installing {matrix_pkg} (+ {len(_missing_before)} runtime deps)...",
                 )
                 try:
                     _lazy_ensure("platform.matrix", prompt=False)
@@ -1969,7 +1969,7 @@ def _setup_matrix():
                     print_warning(
                         f"Install failed — run manually: pip install "
                         f"'mautrix[encryption]' asyncpg aiosqlite Markdown "
-                        f"aiohttp-socks"
+                        f"aiohttp-socks",
                     )
                     print_info(f"  Error: {exc}")
         except ImportError:
@@ -1997,7 +1997,7 @@ def _setup_matrix():
                 else:
                     print_warning(
                         f"Install failed — run manually: pip install "
-                        f"'{matrix_pkg}' asyncpg aiosqlite Markdown aiohttp-socks"
+                        f"'{matrix_pkg}' asyncpg aiosqlite Markdown aiohttp-socks",
                     )
                     if result.stderr:
                         print_info(f"  Error: {result.stderr.strip().splitlines()[-1]}")
@@ -2192,11 +2192,11 @@ def setup_gateway(config: dict):
         # Check if any home channels are missing
         missing_home = []
         if get_env_value("TELEGRAM_BOT_TOKEN") and not get_env_value(
-            "TELEGRAM_HOME_CHANNEL"
+            "TELEGRAM_HOME_CHANNEL",
         ):
             missing_home.append("Telegram")
         if get_env_value("DISCORD_BOT_TOKEN") and not get_env_value(
-            "DISCORD_HOME_CHANNEL"
+            "DISCORD_HOME_CHANNEL",
         ):
             missing_home.append("Discord")
         if get_env_value("SLACK_BOT_TOKEN") and not get_env_value("SLACK_HOME_CHANNEL"):
@@ -2216,7 +2216,7 @@ def setup_gateway(config: dict):
             print_info("   Set one later with /set-home in your chat, or:")
             for plat in missing_home:
                 print_info(
-                    f"     hermes config set {plat.upper()}_HOME_CHANNEL <channel_id>"
+                    f"     hermes config set {plat.upper()}_HOME_CHANNEL <channel_id>",
                 )
 
         # Offer to install the gateway as a system service
@@ -2524,7 +2524,7 @@ def _get_section_config_summary(config: dict, section_key: str) -> str | None:
 
 
 def _skip_configured_section(
-    config: dict, section_key: str, label: str
+    config: dict, section_key: str, label: str,
 ) -> bool:
     """Show an already-configured section summary and offer to skip.
 
@@ -2561,7 +2561,7 @@ def _load_openclaw_migration_module():
         return None
 
     spec = importlib.util.spec_from_file_location(
-        "openclaw_to_hermes", _OPENCLAW_SCRIPT
+        "openclaw_to_hermes", _OPENCLAW_SCRIPT,
     )
     if spec is None or spec.loader is None:
         return None
@@ -2683,7 +2683,7 @@ def _offer_openclaw_migration(hermes_home: Path) -> bool:
 
     if not prompt_yes_no("Would you like to see what can be imported?", default=True):
         print_info(
-            "Skipping migration. You can run it later with: hermes claw migrate --dry-run"
+            "Skipping migration. You can run it later with: hermes claw migrate --dry-run",
         )
         return False
 
@@ -2741,10 +2741,10 @@ def _offer_openclaw_migration(hermes_home: Path) -> bool:
     # ── Phase 2: Confirm and execute ──
     if not prompt_yes_no("Proceed with migration?", default=False):
         print_info(
-            "Migration cancelled. You can run it later with: hermes claw migrate"
+            "Migration cancelled. You can run it later with: hermes claw migrate",
         )
         print_info(
-            "Use --dry-run to preview again, or --preset minimal for a lighter import."
+            "Use --dry-run to preview again, or --preset minimal for a lighter import.",
         )
         return False
 
@@ -2831,14 +2831,14 @@ def _run_portal_one_shot(config: dict) -> None:
         color(
             "┌─────────────────────────────────────────────────────────┐",
             Colors.MAGENTA,
-        )
+        ),
     )
     print(color("│     ⚕ Hermes Setup — Nous Portal (one-shot)             │", Colors.MAGENTA))
     print(
         color(
             "└─────────────────────────────────────────────────────────┘",
             Colors.MAGENTA,
-        )
+        ),
     )
     print()
     print_info("  One subscription, 300+ models, plus the Tool Gateway:")
@@ -2925,7 +2925,7 @@ def run_setup_wizard(args):
     if config_path.exists():
         from datetime import datetime as _dt
         _backup_path = config_path.with_suffix(
-            f".yaml.bak.{_dt.now().strftime('%Y%m%d_%H%M%S')}"
+            f".yaml.bak.{_dt.now().strftime('%Y%m%d_%H%M%S')}",
         )
         try:
             import shutil
@@ -2942,7 +2942,7 @@ def run_setup_wizard(args):
 
     if non_interactive:
         print_noninteractive_setup_guidance(
-            "Running in a non-interactive environment (no TTY detected)."
+            "Running in a non-interactive environment (no TTY detected).",
         )
         return
 
@@ -2961,14 +2961,14 @@ def run_setup_wizard(args):
                     color(
                         "┌─────────────────────────────────────────────────────────┐",
                         Colors.MAGENTA,
-                    )
+                    ),
                 )
                 print(color(f"│     ⚕ Hermes Setup — {label:<34s} │", Colors.MAGENTA))
                 print(
                     color(
                         "└─────────────────────────────────────────────────────────┘",
                         Colors.MAGENTA,
-                    )
+                    ),
                 )
                 func(config)
                 save_config(config)
@@ -2995,34 +2995,34 @@ def run_setup_wizard(args):
         color(
             "┌─────────────────────────────────────────────────────────┐",
             Colors.MAGENTA,
-        )
+        ),
     )
     print(
         color(
-            "│             ⚕ Hermes Agent Setup Wizard                │", Colors.MAGENTA
-        )
+            "│             ⚕ Hermes Agent Setup Wizard                │", Colors.MAGENTA,
+        ),
     )
     print(
         color(
             "├─────────────────────────────────────────────────────────┤",
             Colors.MAGENTA,
-        )
+        ),
     )
     print(
         color(
-            "│  Let's configure your Hermes Agent installation.       │", Colors.MAGENTA
-        )
+            "│  Let's configure your Hermes Agent installation.       │", Colors.MAGENTA,
+        ),
     )
     print(
         color(
-            "│  Press Ctrl+C at any time to exit.                     │", Colors.MAGENTA
-        )
+            "│  Press Ctrl+C at any time to exit.                     │", Colors.MAGENTA,
+        ),
     )
     print(
         color(
             "└─────────────────────────────────────────────────────────┘",
             Colors.MAGENTA,
-        )
+        ),
     )
 
     migration_ran = False
@@ -3348,7 +3348,7 @@ def _run_quick_setup(config: dict, hermes_home):
     if missing_config:
         print()
         print_info(
-            f"Adding {len(missing_config)} new config option(s) with defaults..."
+            f"Adding {len(missing_config)} new config option(s) with defaults...",
         )
         for field in missing_config:
             print_success(f"  Added {field['key']} = {field['default']}")

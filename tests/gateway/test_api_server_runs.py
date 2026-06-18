@@ -512,7 +512,7 @@ class TestStopRun:
 
                 # Subscribe to events in background
                 events_task = asyncio.ensure_future(
-                    cli.get(f"/v1/runs/{run_id}/events")
+                    cli.get(f"/v1/runs/{run_id}/events"),
                 )
 
                 await asyncio.sleep(0.1)

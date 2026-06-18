@@ -191,7 +191,7 @@ def _detach_kwargs(system: str) -> dict:
     if system != "Windows":
         return {"start_new_session": True}
     flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(
-        subprocess, "CREATE_NEW_PROCESS_GROUP", 0
+        subprocess, "CREATE_NEW_PROCESS_GROUP", 0,
     )
     return {"creationflags": flags} if flags else {}
 

@@ -275,7 +275,7 @@ class TestResponsesMultimodalHTTP:
                                         "image_url": "https://example.com/cat.png",
                                     },
                                 ],
-                            }
+                            },
                         ],
                     },
                 )
@@ -299,7 +299,7 @@ class TestResponsesMultimodalHTTP:
                         {
                             "role": "user",
                             "content": [{"type": "input_file", "file_id": "f_1"}],
-                        }
+                        },
                     ],
                 },
             )

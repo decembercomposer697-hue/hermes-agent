@@ -50,7 +50,7 @@ class _RuntimeRetryableAdapter(BasePlatformAdapter):
 async def test_runner_requests_clean_exit_for_nonretryable_startup_conflict(monkeypatch, tmp_path):
     config = GatewayConfig(
         platforms={
-            Platform.TELEGRAM: PlatformConfig(enabled=True, token="token")
+            Platform.TELEGRAM: PlatformConfig(enabled=True, token="token"),
         },
         sessions_dir=tmp_path / "sessions",
     )
@@ -75,7 +75,7 @@ async def test_runner_queues_retryable_runtime_fatal_for_reconnection(monkeypatc
     """
     config = GatewayConfig(
         platforms={
-            Platform.WHATSAPP: PlatformConfig(enabled=True, token="token")
+            Platform.WHATSAPP: PlatformConfig(enabled=True, token="token"),
         },
         sessions_dir=tmp_path / "sessions",
     )

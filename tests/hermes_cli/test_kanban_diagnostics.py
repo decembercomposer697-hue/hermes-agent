@@ -203,13 +203,13 @@ def test_repeated_failures_derives_threshold_from_kanban_failure_limit():
                  last_failure_error="Profile 'debugger' does not exist")
     runs = [_run(outcome="spawn_failed", run_id=1)]
     assert kd.compute_task_diagnostics(
-        task, [], runs, config={"failure_limit": 4}
+        task, [], runs, config={"failure_limit": 4},
     ) == []
 
     task = _task(status="blocked", consecutive_failures=4,
                  last_failure_error="Profile 'debugger' does not exist")
     diags = kd.compute_task_diagnostics(
-        task, [], runs, config={"failure_limit": 4}
+        task, [], runs, config={"failure_limit": 4},
     )
     repeated = [d for d in diags if d.kind == "repeated_failures"]
     assert len(repeated) == 1
@@ -222,7 +222,7 @@ def test_repeated_failures_explicit_threshold_overrides_failure_limit():
                  last_failure_error="Profile 'debugger' does not exist")
     runs = [_run(outcome="spawn_failed", run_id=1)]
     diags = kd.compute_task_diagnostics(
-        task, [], runs, config={"failure_limit": 5, "failure_threshold": 3}
+        task, [], runs, config={"failure_limit": 5, "failure_threshold": 3},
     )
     repeated = [d for d in diags if d.kind == "repeated_failures"]
     assert len(repeated) == 1
@@ -591,7 +591,7 @@ def test_stranded_in_ready_works_on_real_db_row(kanban_home):
         conn.commit()
 
         task_row = conn.execute(
-            "SELECT * FROM tasks WHERE id = ?", (tid,)
+            "SELECT * FROM tasks WHERE id = ?", (tid,),
         ).fetchone()
         events = list(conn.execute(
             "SELECT * FROM task_events WHERE task_id = ? ORDER BY created_at",

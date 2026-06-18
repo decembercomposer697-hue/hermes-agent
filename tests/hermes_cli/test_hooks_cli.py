@@ -60,7 +60,7 @@ class TestHooksList:
                 "on_session_start": [
                     {"command": str(script)},
                 ],
-            }
+            },
         }
 
         # Approve one of the two so we can see both states in the output
@@ -142,7 +142,7 @@ class TestHooksTest:
                 "pre_tool_call": [
                     {"matcher": "terminal", "command": str(script)},
                 ],
-            }
+            },
         }
         with patch("hermes_cli.config.load_config", return_value=cfg):
             out = _run(SimpleNamespace(
@@ -226,8 +226,8 @@ class TestHooksDoctor:
                     "command": str(script),
                     "approved_at": "2000-01-01T00:00:00Z",
                     "script_mtime_at_approval": "2000-01-01T00:00:00Z",
-                }
-            ]
+                },
+            ],
         }))
 
         cfg = {"hooks": {"on_session_start": [{"command": str(script)}]}}

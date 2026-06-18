@@ -226,7 +226,7 @@ def build_acp_edit_tool_call(proposal: EditProposal):
                 path=proposal.path,
                 old_text=proposal.old_text,
                 new_text=proposal.new_text,
-            )
+            ),
         ],
         raw_input={"tool": proposal.tool_name, "arguments": proposal.arguments},
     )

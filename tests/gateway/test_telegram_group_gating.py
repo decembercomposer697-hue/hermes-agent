@@ -532,7 +532,7 @@ def test_exclusive_bot_mentions_can_be_disabled_for_legacy_groups():
     )
 
     assert adapter._should_process_message(
-        _group_message("@research_bot hi", reply_to_bot=True)
+        _group_message("@research_bot hi", reply_to_bot=True),
     ) is True
 
 
@@ -604,7 +604,7 @@ def test_allowed_topics_drop_other_forum_topics_before_other_gates():
     assert adapter._should_process_message(_group_message("hello", chat_id=-100, thread_id=8)) is True
     assert adapter._should_process_message(_group_message("hello", chat_id=-100, thread_id=11)) is False
     assert adapter._should_process_message(
-        _group_message("hi @hermes_bot", chat_id=-100, thread_id=11, entities=[_mention_entity("hi @hermes_bot")])
+        _group_message("hi @hermes_bot", chat_id=-100, thread_id=11, entities=[_mention_entity("hi @hermes_bot")]),
     ) is False
 
 
@@ -891,7 +891,7 @@ def _group_voice_message(
         video=None,
         audio=None,
         voice=SimpleNamespace(
-            get_file=AsyncMock(side_effect=Exception("simulated download failure"))
+            get_file=AsyncMock(side_effect=Exception("simulated download failure")),
         ),
         document=None,
     )

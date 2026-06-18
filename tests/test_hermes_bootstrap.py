@@ -291,7 +291,7 @@ class TestEntryPointsImportBootstrap:
             # hermes start even when hermes_bootstrap hasn't been
             # re-registered in the venv yet.
             if isinstance(node, ast.Try) and len(node.body) == 1 and isinstance(
-                node.body[0], (ast.Import, ast.ImportFrom)
+                node.body[0], (ast.Import, ast.ImportFrom),
             ):
                 first_import_node = node.body[0]
                 break

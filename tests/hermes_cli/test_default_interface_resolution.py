@@ -49,7 +49,7 @@ def _patch_config(monkeypatch, interface):
     import hermes_cli.config as cfg
 
     monkeypatch.setattr(
-        cfg, "load_config", lambda: {"display": {"interface": interface}}
+        cfg, "load_config", lambda: {"display": {"interface": interface}},
     )
 
 
@@ -105,7 +105,7 @@ class TestWantsTuiEarly:
     def home_with_interface(self, tmp_path, monkeypatch):
         def _make(interface):
             (tmp_path / "config.yaml").write_text(
-                f"display:\n  interface: {interface}\n"
+                f"display:\n  interface: {interface}\n",
             )
             monkeypatch.setenv("HERMES_HOME", str(tmp_path))
             monkeypatch.setattr(m, "_EARLY_INTERFACE_CACHE", None)

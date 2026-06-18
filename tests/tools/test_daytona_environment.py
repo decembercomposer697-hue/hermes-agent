@@ -366,7 +366,7 @@ class TestInterrupt:
         # is_interrupted is checked by base.py's _wait_for_process,
         # patch where it's actually referenced (base.py's local binding)
         monkeypatch.setattr(
-            "tools.environments.base.is_interrupted", lambda: True
+            "tools.environments.base.is_interrupted", lambda: True,
         )
         try:
             result = env.execute("sleep 10")

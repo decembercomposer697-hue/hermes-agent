@@ -73,10 +73,10 @@ class TestMemoryPluginCliDiscovery:
             "    subparser.add_argument('--test')\n"
             "\n"
             "def testplugin_command(args):\n"
-            "    pass\n"
+            "    pass\n",
         )
         (plugin_dir / "plugin.yaml").write_text(
-            "name: testplugin\ndescription: A test plugin\n"
+            "name: testplugin\ndescription: A test plugin\n",
         )
 
         # Also create a second plugin that should NOT be discovered
@@ -85,7 +85,7 @@ class TestMemoryPluginCliDiscovery:
         (other_dir / "__init__.py").write_text("pass\n")
         (other_dir / "cli.py").write_text(
             "def register_cli(subparser):\n"
-            "    subparser.add_argument('--other')\n"
+            "    subparser.add_argument('--other')\n",
         )
 
         import plugins.memory as pm
@@ -115,7 +115,7 @@ class TestMemoryPluginCliDiscovery:
         plugin_dir.mkdir()
         (plugin_dir / "__init__.py").write_text("pass\n")
         (plugin_dir / "cli.py").write_text(
-            "def register_cli(subparser):\n    pass\n"
+            "def register_cli(subparser):\n    pass\n",
         )
 
         import plugins.memory as pm
@@ -179,7 +179,7 @@ class TestProviderCollectorCliNoop:
 
         collector = _ProviderCollector()
         collector.register_cli_command(
-            name="test", help="test", setup_fn=lambda s: None
+            name="test", help="test", setup_fn=lambda s: None,
         )
         # Should not store anything — CLI is discovered via file convention
         assert not hasattr(collector, "_cli_commands")

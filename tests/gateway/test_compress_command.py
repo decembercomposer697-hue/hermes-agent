@@ -38,7 +38,7 @@ def _make_runner(history: list[dict[str, str]]):
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
     session_entry = SessionEntry(
         session_key=build_session_key(_make_source()),

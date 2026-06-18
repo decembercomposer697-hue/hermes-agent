@@ -72,7 +72,7 @@ def _install_fake_tools_package():
             log_call=lambda *a, **k: None,
             save=lambda: None,
             get_session_info=lambda: {},
-        )
+        ),
     )
     sys.modules["tools.managed_tool_gateway"] = _load_tool_module(
         "tools.managed_tool_gateway",
@@ -154,10 +154,10 @@ def _install_fake_openai_module(captured, transcription_response=None):
 
             self.audio = types.SimpleNamespace(
                 speech=types.SimpleNamespace(
-                    create=create_speech
+                    create=create_speech,
                 ),
                 transcriptions=types.SimpleNamespace(
-                    create=create_transcription
+                    create=create_transcription,
                 ),
             )
 

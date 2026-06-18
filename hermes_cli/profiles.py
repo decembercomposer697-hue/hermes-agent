@@ -286,13 +286,13 @@ def validate_profile_name(name: str) -> None:
     if not _PROFILE_ID_RE.match(name):
         raise ValueError(
             f"Invalid profile name {name!r}. Must match "
-            f"[a-z0-9][a-z0-9_-]{{0,63}}"
+            f"[a-z0-9][a-z0-9_-]{{0,63}}",
         )
     if name in _RESERVED_NAMES:
         raise ValueError(
             f"Profile name {name!r} is reserved — it collides with either "
             f"the Hermes installation itself or a common system binary.  "
-            f"Pick a different name."
+            f"Pick a different name.",
         )
 
 
@@ -756,14 +756,14 @@ def create_profile(
     if no_skills and (clone_config or clone_all):
         raise ValueError(
             "--no-skills is mutually exclusive with --clone / --clone-all "
-            "(cloning explicitly copies skills from the source profile)."
+            "(cloning explicitly copies skills from the source profile).",
         )
     canon = normalize_profile_name(name)
     validate_profile_name(canon)
 
     if canon == "default":
         raise ValueError(
-            "Cannot create a profile named 'default' — it is the built-in profile (~/.hermes)."
+            "Cannot create a profile named 'default' — it is the built-in profile (~/.hermes).",
         )
 
     profile_dir = get_profile_dir(canon)
@@ -783,7 +783,7 @@ def create_profile(
             source_dir = get_profile_dir(clone_from)
         if not source_dir.is_dir():
             raise FileNotFoundError(
-                f"Source profile '{clone_from or 'active'}' does not exist at {source_dir}"
+                f"Source profile '{clone_from or 'active'}' does not exist at {source_dir}",
             )
 
     if clone_all and source_dir:
@@ -941,7 +941,7 @@ def delete_profile(name: str, yes: bool = False) -> Path:
     if canon == "default":
         raise ValueError(
             "Cannot delete the default profile (~/.hermes).\n"
-            "To remove everything, use: hermes uninstall"
+            "To remove everything, use: hermes uninstall",
         )
 
     profile_dir = get_profile_dir(canon)
@@ -1272,7 +1272,7 @@ def set_active_profile(name: str) -> None:
     if canon != "default" and not profile_exists(canon):
         raise FileNotFoundError(
             f"Profile '{canon}' does not exist. "
-            f"Create it with: hermes profile create {canon}"
+            f"Create it with: hermes profile create {canon}",
         )
 
     path = _get_active_profile_path()
@@ -1421,7 +1421,7 @@ def _safe_extract_profile_archive(archive: Path, destination: Path) -> None:
 
             if not member.isfile():
                 raise ValueError(
-                    f"Unsupported archive member type: {member.name}"
+                    f"Unsupported archive member type: {member.name}",
                 )
 
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -1481,11 +1481,11 @@ def import_profile(archive_path: str, name: str | None = None) -> Path:
     if not inferred_name:
         raise ValueError(
             "Cannot determine profile name from archive. "
-            "Specify it explicitly: hermes profile import <archive> --name <name>"
+            "Specify it explicitly: hermes profile import <archive> --name <name>",
         )
     if archive_root is None:
         raise ValueError(
-            "Profile archive must contain exactly one top-level directory."
+            "Profile archive must contain exactly one top-level directory.",
         )
 
     # Archives exported from the default profile have "default/" as top-level
@@ -1496,7 +1496,7 @@ def import_profile(archive_path: str, name: str | None = None) -> Path:
     if canon == "default":
         raise ValueError(
             "Cannot import as 'default' — that is the built-in root profile (~/.hermes). "
-            "Specify a different name: hermes profile import <archive> --name <name>"
+            "Specify a different name: hermes profile import <archive> --name <name>",
         )
 
     profile_dir = get_profile_dir(canon)
@@ -1513,7 +1513,7 @@ def import_profile(archive_path: str, name: str | None = None) -> Path:
         extracted = staging_root / archive_root
         if not extracted.is_dir():
             raise ValueError(
-                f"Profile archive root is missing or invalid: {archive_root}"
+                f"Profile archive root is missing or invalid: {archive_root}",
             )
 
         final_source = extracted
@@ -1662,7 +1662,7 @@ def resolve_profile_env(profile_name: str) -> str:
     if canon != "default" and not profile_dir.is_dir():
         raise FileNotFoundError(
             f"Profile '{canon}' does not exist. "
-            f"Create it with: hermes profile create {canon}"
+            f"Create it with: hermes profile create {canon}",
         )
 
     return str(profile_dir)

@@ -204,7 +204,7 @@ def _write_manifest(dest: Path, reason: str, archive_path: Path,
         if cron_info.get("parse_warning"):
             manifest["cron_jobs"]["parse_warning"] = cron_info["parse_warning"]
     (dest / "manifest.json").write_text(
-        json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8"
+        json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8",
     )
 
 
@@ -609,7 +609,7 @@ def rollback(backup_id: str | None = None) -> tuple[bool, str, Path | None]:
                 name = member.name
                 if name.startswith("/") or ".." in Path(name).parts:
                     raise tarfile.TarError(
-                        f"refusing to extract unsafe path: {name!r}"
+                        f"refusing to extract unsafe path: {name!r}",
                     )
             try:
                 tf.extractall(str(skills), filter="data")  # type: ignore[call-arg]
@@ -690,6 +690,6 @@ def summarize_backups() -> str:
             f"{r.get('id','?'):<24}  "
             f"{(r.get('reason','?') or '?')[:40]:<40}  "
             f"{r.get('skill_files', 0):>6}  "
-            f"{format_size(int(r.get('archive_bytes', 0))):>8}"
+            f"{format_size(int(r.get('archive_bytes', 0))):>8}",
         )
     return "\n".join(lines)

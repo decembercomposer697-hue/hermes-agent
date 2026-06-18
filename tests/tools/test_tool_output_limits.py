@@ -69,7 +69,7 @@ class TestOverrides:
                 "max_bytes": 100_000,
                 "max_lines": 5000,
                 "max_line_length": 4096,
-            }
+            },
         }
         with patch("hermes_cli.config.load_config", return_value=cfg):
             limits = tol.get_tool_output_limits()
@@ -118,7 +118,7 @@ class TestShortcuts:
                 "max_bytes": 111,
                 "max_lines": 222,
                 "max_line_length": 333,
-            }
+            },
         }
         with patch("hermes_cli.config.load_config", return_value=cfg):
             assert tol.get_max_bytes() == 111

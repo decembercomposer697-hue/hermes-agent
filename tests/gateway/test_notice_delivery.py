@@ -22,8 +22,8 @@ def _make_runner(extra=None):
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
         platforms={
-            Platform.SLACK: PlatformConfig(enabled=True, token="***", extra=extra or {})
-        }
+            Platform.SLACK: PlatformConfig(enabled=True, token="***", extra=extra or {}),
+        },
     )
     adapter = MagicMock()
     adapter.send = AsyncMock(return_value=SendResult(success=True, message_id="public-1"))

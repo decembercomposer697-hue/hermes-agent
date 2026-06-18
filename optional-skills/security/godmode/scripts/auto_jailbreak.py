@@ -475,7 +475,7 @@ def auto_jailbreak(model=None, base_url=None, api_key=None,
         print("[BASELINE] Testing without jailbreak...")
     baseline_msgs = _build_messages(query=canary_query)
     baseline_content, baseline_latency, baseline_error = _test_query(
-        client, model, baseline_msgs
+        client, model, baseline_msgs,
     )
     baseline_score = score_response(baseline_content, canary_query) if baseline_content else {"score": -9999, "is_refusal": True, "hedge_count": 0}
 

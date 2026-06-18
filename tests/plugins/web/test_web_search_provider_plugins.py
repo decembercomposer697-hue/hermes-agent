@@ -208,7 +208,7 @@ class TestIsAvailable:
         assert p.is_available() is True
 
     def test_firecrawl_requires_either_key_or_url(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         _ensure_plugins_loaded()
         from agent.web_search_registry import get_provider
@@ -281,7 +281,7 @@ class TestRegistryResolution:
         assert result.is_available() is False
 
     def test_unknown_configured_name_falls_back_to_available_provider(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Typo / uninstalled plugin → walk legacy preference, pick available."""
         _ensure_plugins_loaded()
@@ -296,7 +296,7 @@ class TestRegistryResolution:
         assert result.is_available() is True
 
     def test_explicit_search_only_provider_for_extract_falls_back(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Asking for extract via a search-only backend → fall back.
 
@@ -428,7 +428,7 @@ class TestErrorResponseShapes:
         assert "error" in result
 
     def test_parallel_extract_keyless_uses_mcp_web_fetch(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Without a key, extract routes to the free MCP web_fetch tool rather
         than erroring. The MCP transport is mocked so the test stays offline."""

@@ -335,7 +335,7 @@ class TestGenerateErrors:
         resp._content = b'{"error": {"message": "Invalid API key"}}'
         resp.headers["Content-Type"] = "application/json"
         resp.raise_for_status = MagicMock(
-            side_effect=req_lib.HTTPError(response=resp)
+            side_effect=req_lib.HTTPError(response=resp),
         )
 
         with patch("plugins.image_gen.krea.requests.post", return_value=resp):
@@ -351,7 +351,7 @@ class TestGenerateErrors:
         from plugins.image_gen.krea import KreaImageGenProvider
 
         with patch(
-            "plugins.image_gen.krea.requests.post", side_effect=req_lib.Timeout()
+            "plugins.image_gen.krea.requests.post", side_effect=req_lib.Timeout(),
         ):
             result = KreaImageGenProvider().generate(prompt="test")
 
@@ -512,7 +512,7 @@ class TestPollRetryPolicy:
         resp._content = b'{"error": "boom"}'
         resp.headers["Content-Type"] = "application/json"
         resp.raise_for_status = MagicMock(
-            side_effect=req_lib.HTTPError(response=resp)
+            side_effect=req_lib.HTTPError(response=resp),
         )
         return resp
 

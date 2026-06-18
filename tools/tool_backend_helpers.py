@@ -95,7 +95,7 @@ def has_direct_modal_credentials() -> bool:
         modal_file_exists = False
     return bool(
         (os.getenv("MODAL_TOKEN_ID") and os.getenv("MODAL_TOKEN_SECRET"))
-        or modal_file_exists
+        or modal_file_exists,
     )
 
 

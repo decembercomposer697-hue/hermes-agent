@@ -22,15 +22,15 @@ def build_profile_parser(subparsers, *, cmd_profile: Callable) -> None:
 
     profile_subparsers.add_parser("list", help="List all profiles")
     profile_use = profile_subparsers.add_parser(
-        "use", help="Set sticky default profile"
+        "use", help="Set sticky default profile",
     )
     profile_use.add_argument("profile_name", help="Profile name (or 'default')")
 
     profile_create = profile_subparsers.add_parser(
-        "create", help="Create a new profile"
+        "create", help="Create a new profile",
     )
     profile_create.add_argument(
-        "profile_name", help="Profile name (lowercase, alphanumeric)"
+        "profile_name", help="Profile name (lowercase, alphanumeric)",
     )
     profile_create.add_argument(
         "--clone",
@@ -48,7 +48,7 @@ def build_profile_parser(subparsers, *, cmd_profile: Callable) -> None:
         help="Source profile to clone from (default: active)",
     )
     profile_create.add_argument(
-        "--no-alias", action="store_true", help="Skip wrapper script creation"
+        "--no-alias", action="store_true", help="Skip wrapper script creation",
     )
     profile_create.add_argument(
         "--no-skills",
@@ -66,7 +66,7 @@ def build_profile_parser(subparsers, *, cmd_profile: Callable) -> None:
     profile_delete = profile_subparsers.add_parser("delete", help="Delete a profile")
     profile_delete.add_argument("profile_name", help="Profile to delete")
     profile_delete.add_argument(
-        "-y", "--yes", action="store_true", help="Skip confirmation prompt"
+        "-y", "--yes", action="store_true", help="Skip confirmation prompt",
     )
 
     profile_describe = profile_subparsers.add_parser(
@@ -107,11 +107,11 @@ def build_profile_parser(subparsers, *, cmd_profile: Callable) -> None:
     profile_show.add_argument("profile_name", help="Profile to show")
 
     profile_alias = profile_subparsers.add_parser(
-        "alias", help="Manage wrapper scripts"
+        "alias", help="Manage wrapper scripts",
     )
     profile_alias.add_argument("profile_name", help="Profile name")
     profile_alias.add_argument(
-        "--remove", action="store_true", help="Remove the wrapper script"
+        "--remove", action="store_true", help="Remove the wrapper script",
     )
     profile_alias.add_argument(
         "--name",
@@ -125,15 +125,15 @@ def build_profile_parser(subparsers, *, cmd_profile: Callable) -> None:
     profile_rename.add_argument("new_name", help="New profile name")
 
     profile_export = profile_subparsers.add_parser(
-        "export", help="Export a profile to archive"
+        "export", help="Export a profile to archive",
     )
     profile_export.add_argument("profile_name", help="Profile to export")
     profile_export.add_argument(
-        "-o", "--output", default=None, help="Output file (default: <name>.tar.gz)"
+        "-o", "--output", default=None, help="Output file (default: <name>.tar.gz)",
     )
 
     profile_import = profile_subparsers.add_parser(
-        "import", help="Import a profile from archive"
+        "import", help="Import a profile from archive",
     )
     profile_import.add_argument("archive", help="Path to .tar.gz archive")
     profile_import.add_argument(

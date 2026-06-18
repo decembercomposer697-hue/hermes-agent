@@ -45,13 +45,13 @@ def _stuck_todo(conn, *, parents_done=True, n_parents=1):
         for i in range(n_parents)
     ]
     child_id = kb.create_task(
-        conn, title="child", parents=parent_ids, assignee="setup"
+        conn, title="child", parents=parent_ids, assignee="setup",
     )
     assert kb.get_task(conn, child_id).status == "todo"
     if parents_done:
         for pid in parent_ids:
             conn.execute(
-                "UPDATE tasks SET status='done' WHERE id=?", (pid,)
+                "UPDATE tasks SET status='done' WHERE id=?", (pid,),
             )
     return child_id, parent_ids
 
@@ -75,7 +75,7 @@ def test_promote_refuses_when_parent_not_done(conn):
 def test_promote_with_force_bypasses_dependency_check(conn):
     child, _ = _stuck_todo(conn, parents_done=False)
     ok, err = kb.promote_task(
-        conn, child, actor="tester", reason="recovery", force=True
+        conn, child, actor="tester", reason="recovery", force=True,
     )
     assert ok and err is None
     assert kb.get_task(conn, child).status == "ready"
@@ -153,7 +153,7 @@ def test_promote_blocked_task_works(conn):
     tid = kb.create_task(conn, title="t")
     conn.execute("UPDATE tasks SET status='blocked' WHERE id=?", (tid,))
     ok, err = kb.promote_task(
-        conn, tid, actor="tester", reason="ready now"
+        conn, tid, actor="tester", reason="ready now",
     )
     assert ok and err is None
     assert kb.get_task(conn, tid).status == "ready"

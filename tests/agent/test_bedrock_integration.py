@@ -222,7 +222,7 @@ class TestProvidersModule:
     def test_determine_api_mode_from_bedrock_url(self):
         from hermes_cli.providers import determine_api_mode
         assert determine_api_mode(
-            "unknown", "https://bedrock-runtime.us-east-1.amazonaws.com"
+            "unknown", "https://bedrock-runtime.us-east-1.amazonaws.com",
         ) == "bedrock_converse"
 
     def test_label_override(self):
@@ -360,7 +360,7 @@ class TestBedrockModelNameNormalization:
         """The reporter's exact model ID."""
         from agent.anthropic_adapter import normalize_model_name
         assert normalize_model_name(
-            "global.anthropic.claude-opus-4-7", preserve_dots=True
+            "global.anthropic.claude-opus-4-7", preserve_dots=True,
         ) == "global.anthropic.claude-opus-4-7"
 
     def test_us_anthropic_dated_inference_profile_preserved(self):
@@ -375,7 +375,7 @@ class TestBedrockModelNameNormalization:
         """APAC inference profile — same structural-dot shape."""
         from agent.anthropic_adapter import normalize_model_name
         assert normalize_model_name(
-            "apac.anthropic.claude-haiku-4-5", preserve_dots=True
+            "apac.anthropic.claude-haiku-4-5", preserve_dots=True,
         ) == "apac.anthropic.claude-haiku-4-5"
 
     def test_bedrock_prefix_preserved_without_preserve_dots(self):
@@ -385,7 +385,7 @@ class TestBedrockModelNameNormalization:
         separators.  Regression for #12295."""
         from agent.anthropic_adapter import normalize_model_name
         assert normalize_model_name(
-            "global.anthropic.claude-opus-4-7", preserve_dots=False
+            "global.anthropic.claude-opus-4-7", preserve_dots=False,
         ) == "global.anthropic.claude-opus-4-7"
 
     def test_bare_foundation_model_id_preserved(self):
@@ -474,7 +474,7 @@ class TestBedrockModelIdDetection:
         ``preserve_dots=True``."""
         from agent.anthropic_adapter import normalize_model_name
         assert normalize_model_name(
-            "anthropic.claude-opus-4-7", preserve_dots=False
+            "anthropic.claude-opus-4-7", preserve_dots=False,
         ) == "anthropic.claude-opus-4-7"
 
     def test_openrouter_dots_still_converted(self):
@@ -561,7 +561,7 @@ class TestAuxiliaryClientBedrockResolution:
                    return_value=MagicMock()):
             from agent.auxiliary_client import resolve_provider_client
             _, model = resolve_provider_client(
-                "bedrock", "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+                "bedrock", "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
             )
 
         assert "claude-sonnet" in model

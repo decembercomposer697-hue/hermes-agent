@@ -119,9 +119,9 @@ class TestMeetingInviteParsing(unittest.TestCase):
                         {
                             "contentType": "application/json",
                             "data": payload["event"],
-                        }
-                    ]
-                }
+                        },
+                    ],
+                },
             },
         }
         parsed = parse_meeting_invited_event(wrapped)
@@ -224,7 +224,7 @@ class TestMeetingInviteSendRouting(unittest.TestCase):
 
         adapter = FeishuAdapter(PlatformConfig())
         adapter._client = SimpleNamespace(
-            im=SimpleNamespace(v1=SimpleNamespace(message=SimpleNamespace(create=_Message.create)))
+            im=SimpleNamespace(v1=SimpleNamespace(message=SimpleNamespace(create=_Message.create))),
         )
 
         with patch.object(

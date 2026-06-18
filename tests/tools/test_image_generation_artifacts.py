@@ -27,7 +27,7 @@ def test_postprocess_adds_agent_visible_image_for_active_ssh_env(monkeypatch, tm
 
     raw = json.dumps({"success": True, "image": str(image_path)})
     result = json.loads(
-        image_generation_tool._postprocess_image_generate_result(raw, task_id="task-1")
+        image_generation_tool._postprocess_image_generate_result(raw, task_id="task-1"),
     )
 
     assert result["image"] == str(image_path)
@@ -117,7 +117,7 @@ def test_handle_image_generate_postprocesses_plugin_result(monkeypatch, tmp_path
         image_generation_tool._handle_image_generate(
             {"prompt": "draw", "aspect_ratio": "square"},
             task_id="plugin-task",
-        )
+        ),
     )
 
     assert seen_task_ids == ["plugin-task"]

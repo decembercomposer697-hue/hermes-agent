@@ -46,12 +46,12 @@ class TestGetCurrentRuntime:
 
     def test_unrecognized_falls_back_to_auto(self):
         assert crs.get_current_runtime(
-            {"model": {"openai_runtime": "garbage"}}
+            {"model": {"openai_runtime": "garbage"}},
         ) == "auto"
 
     def test_explicit_codex(self):
         assert crs.get_current_runtime(
-            {"model": {"openai_runtime": "codex_app_server"}}
+            {"model": {"openai_runtime": "codex_app_server"}},
         ) == "codex_app_server"
 
     def test_handles_non_dict_config(self):
@@ -161,7 +161,7 @@ class TestApply:
         cfg = {
             "mcp_servers": {
                 "filesystem": {"command": "npx", "args": ["-y", "fs-server"]},
-            }
+            },
         }
 
         with patch.object(crs, "check_codex_binary_ok",

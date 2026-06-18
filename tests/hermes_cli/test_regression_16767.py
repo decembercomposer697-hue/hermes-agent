@@ -11,7 +11,7 @@ def test_ensure_direct_aliases_mutates_in_place(monkeypatch):
     initial_id = id(ms.DIRECT_ALIASES)
     
     mock_data = {
-        "my-custom-alias": DirectAlias("custom-model:v1", "custom", "https://example.com/v1")
+        "my-custom-alias": DirectAlias("custom-model:v1", "custom", "https://example.com/v1"),
     }
     monkeypatch.setattr(ms, "_load_direct_aliases", lambda: mock_data)
     
@@ -45,7 +45,7 @@ def test_resolve_named_custom_runtime_honors_explicit_base_url(monkeypatch):
     result = _resolve_named_custom_runtime(
         requested_provider="custom",
         explicit_api_key="test-api-key",
-        explicit_base_url="http://example.test:1234/v1"
+        explicit_base_url="http://example.test:1234/v1",
     )
     
     assert result is not None

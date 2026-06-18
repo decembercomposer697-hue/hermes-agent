@@ -365,7 +365,7 @@ def _write_reconcile_log(
         for a in actions:
             f.write(
                 f"{ts} profile={a.profile} prior_state={a.prior_state} "
-                f"action={a.action}\n"
+                f"action={a.action}\n",
             )
 
 
@@ -387,7 +387,7 @@ def main() -> int:
     for a in actions:
         print(
             f"reconcile: profile={a.profile} "
-            f"prior_state={a.prior_state} action={a.action}"
+            f"prior_state={a.prior_state} action={a.action}",
         )
     return 0
 

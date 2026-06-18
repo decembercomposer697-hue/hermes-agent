@@ -136,7 +136,7 @@ class TestPollRegistration:
             "user_info": {"open_id": "ou_owner", "tenant_brand": "feishu"},
         })
         result = _poll_registration(
-            device_code="dc_123", interval=1, expire_in=60, domain="feishu"
+            device_code="dc_123", interval=1, expire_in=60, domain="feishu",
         )
         assert result is not None
         assert result["app_id"] == "cli_app123"
@@ -164,7 +164,7 @@ class TestPollRegistration:
         mock_urlopen_fn.side_effect = [pending_resp, success_resp]
 
         result = _poll_registration(
-            device_code="dc_123", interval=0, expire_in=60, domain="feishu"
+            device_code="dc_123", interval=0, expire_in=60, domain="feishu",
         )
         assert result is not None
         assert result["domain"] == "lark"
@@ -184,7 +184,7 @@ class TestPollRegistration:
             "user_info": {"open_id": "ou_lark_direct", "tenant_brand": "lark"},
         })
         result = _poll_registration(
-            device_code="dc_123", interval=1, expire_in=60, domain="feishu"
+            device_code="dc_123", interval=1, expire_in=60, domain="feishu",
         )
         assert result is not None
         assert result["app_id"] == "cli_lark_direct"
@@ -203,7 +203,7 @@ class TestPollRegistration:
             "error": "access_denied",
         })
         result = _poll_registration(
-            device_code="dc_123", interval=1, expire_in=60, domain="feishu"
+            device_code="dc_123", interval=1, expire_in=60, domain="feishu",
         )
         assert result is None
 
@@ -219,7 +219,7 @@ class TestPollRegistration:
             "error": "authorization_pending",
         })
         result = _poll_registration(
-            device_code="dc_123", interval=1, expire_in=1, domain="feishu"
+            device_code="dc_123", interval=1, expire_in=1, domain="feishu",
         )
         assert result is None
 
@@ -236,7 +236,7 @@ class TestPollRegistration:
             "error": "authorization_pending",
         })
         result = _poll_registration(
-            device_code="dc_123", interval=1, expire_in=1, domain="feishu"
+            device_code="dc_123", interval=1, expire_in=1, domain="feishu",
         )
 
         assert result is None
@@ -323,7 +323,7 @@ class TestQrRegister:
     @patch("gateway.platforms.feishu._begin_registration")
     @patch("gateway.platforms.feishu._init_registration")
     def test_qr_register_success_flow(
-        self, mock_init, mock_begin, mock_poll, mock_render, mock_probe
+        self, mock_init, mock_begin, mock_poll, mock_render, mock_probe,
     ):
         from gateway.platforms.feishu import qr_register
 
@@ -363,7 +363,7 @@ class TestQrRegister:
     @patch("gateway.platforms.feishu._begin_registration")
     @patch("gateway.platforms.feishu._init_registration")
     def test_qr_register_returns_none_on_poll_failure(
-        self, mock_init, mock_begin, mock_poll, mock_render
+        self, mock_init, mock_begin, mock_poll, mock_render,
     ):
         from gateway.platforms.feishu import qr_register
 
@@ -415,7 +415,7 @@ class TestQrRegister:
     @patch("gateway.platforms.feishu._begin_registration")
     @patch("gateway.platforms.feishu._init_registration")
     def test_qr_register_returns_none_when_begin_missing_device_code(
-        self, mock_init, mock_begin, mock_render
+        self, mock_init, mock_begin, mock_render,
     ):
         """Server returns begin response without device_code → RuntimeError → None."""
         from gateway.platforms.feishu import qr_register
@@ -430,7 +430,7 @@ class TestQrRegister:
     @patch("gateway.platforms.feishu._begin_registration")
     @patch("gateway.platforms.feishu._init_registration")
     def test_qr_register_succeeds_even_when_probe_fails(
-        self, mock_init, mock_begin, mock_poll, mock_render, mock_probe
+        self, mock_init, mock_begin, mock_poll, mock_render, mock_probe,
     ):
         """Registration succeeds but probe fails → result with bot_name=None."""
         from gateway.platforms.feishu import qr_register

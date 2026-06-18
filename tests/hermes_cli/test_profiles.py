@@ -382,7 +382,7 @@ class TestNoSkillsOptOut:
         def fake_run(*args, **kwargs):
             calls.append(args)
             return _sp.CompletedProcess(
-                args=args, returncode=0, stdout='{"copied": ["x"]}', stderr=""
+                args=args, returncode=0, stdout='{"copied": ["x"]}', stderr="",
             )
 
         monkeypatch.setattr("subprocess.run", fake_run)
@@ -404,7 +404,7 @@ class TestNoSkillsOptOut:
         monkeypatch.setattr(
             "subprocess.run",
             lambda *a, **kw: (called.append(a), _sp.CompletedProcess(
-                args=a, returncode=0, stdout='{"copied": []}', stderr=""
+                args=a, returncode=0, stdout='{"copied": []}', stderr="",
             ))[1],
         )
         r1 = seed_profile_skills(profile_dir, quiet=True)
@@ -814,8 +814,8 @@ class TestRenameProfile:
                     "aiPeer": "ssi_health",
                     "workspace": "hermes",
                     "enabled": True,
-                }
-            }
+                },
+            },
         }))
 
         with patch("hermes_cli.profiles.check_alias_collision", return_value="skip"):
@@ -832,8 +832,8 @@ class TestRenameProfile:
         honcho_path = tmp_path / ".hermes" / "honcho.json"
         honcho_path.write_text(json.dumps({
             "hosts": {
-                "hermes.ssi_health": {"workspace": "hermes", "enabled": True}
-            }
+                "hermes.ssi_health": {"workspace": "hermes", "enabled": True},
+            },
         }))
 
         with patch("hermes_cli.profiles.check_alias_collision", return_value="skip"):
@@ -852,7 +852,7 @@ class TestRenameProfile:
             "hosts": {
                 "hermes.ssi_health": {"aiPeer": "ssi_health"},
                 "hermes_heimdall": {"aiPeer": "heimdall"},
-            }
+            },
         }))
 
         with patch("hermes_cli.profiles.check_alias_collision", return_value="skip"):
@@ -934,7 +934,7 @@ class TestExportImport:
             import_profile(str(archive_path), name="coder")
 
     def test_import_with_explicit_name_does_not_mutate_existing_archive_root_profile(
-        self, profile_env, tmp_path
+        self, profile_env, tmp_path,
     ):
         create_profile("victim", no_alias=True)
         victim_dir = get_profile_dir("victim")
@@ -955,7 +955,7 @@ class TestExportImport:
         assert (victim_dir / "marker.txt").read_text() == "original"
 
     def test_import_rejects_archive_with_multiple_top_level_directories(
-        self, profile_env, tmp_path
+        self, profile_env, tmp_path,
     ):
         archive_path = tmp_path / "export" / "multi-root.tar.gz"
         archive_path.parent.mkdir(parents=True, exist_ok=True)

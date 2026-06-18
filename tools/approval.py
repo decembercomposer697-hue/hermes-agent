@@ -1430,7 +1430,7 @@ def check_all_command_guards(command: str, env_type: str,
                 "description": combined_desc,
             }
             decision = _await_gateway_decision(
-                session_key, notify_cb, approval_data, surface="gateway"
+                session_key, notify_cb, approval_data, surface="gateway",
             )
             if decision.get("notify_failed"):
                 return {
@@ -1698,7 +1698,7 @@ def check_execute_code_guard(code: str, env_type: str) -> dict:
         "description": description,
     }
     decision = _await_gateway_decision(
-        session_key, notify_cb, approval_data, surface="gateway"
+        session_key, notify_cb, approval_data, surface="gateway",
     )
     if decision.get("notify_failed"):
         return {

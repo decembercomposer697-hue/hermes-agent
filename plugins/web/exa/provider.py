@@ -55,7 +55,7 @@ def _get_exa_client() -> Any:
     if not api_key:
         raise ValueError(
             "EXA_API_KEY environment variable not set. "
-            "Get your API key at https://exa.ai"
+            "Get your API key at https://exa.ai",
         )
 
     try:
@@ -137,7 +137,7 @@ class ExaWebSearchProvider(WebSearchProvider):
                         "title": result.title or "",
                         "description": " ".join(highlights) if highlights else "",
                         "position": i + 1,
-                    }
+                    },
                 )
 
             return {"success": True, "data": {"web": web_results}}
@@ -180,7 +180,7 @@ class ExaWebSearchProvider(WebSearchProvider):
                         "content": content,
                         "raw_content": content,
                         "metadata": {"sourceURL": url, "title": title},
-                    }
+                    },
                 )
             return results
         except ValueError as exc:

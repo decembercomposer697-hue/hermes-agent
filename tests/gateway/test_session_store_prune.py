@@ -105,7 +105,7 @@ class TestPruneBasics:
         """/stop-suspended sessions must be kept for later resume."""
         store = _make_store(tmp_path)
         store._entries["suspended"] = _entry(
-            "suspended", age_days=1000, suspended=True
+            "suspended", age_days=1000, suspended=True,
         )
         store._entries["idle"] = _entry("idle", age_days=1000)
 
@@ -133,10 +133,10 @@ class TestPruneBasics:
 
         store = _make_store(tmp_path, has_active_processes_fn=_has_active)
         store._entries["active"] = _entry(
-            "active", age_days=1000, session_id="sid_active"
+            "active", age_days=1000, session_id="sid_active",
         )
         store._entries["idle"] = _entry(
-            "idle", age_days=1000, session_id="sid_idle"
+            "idle", age_days=1000, session_id="sid_idle",
         )
 
         removed = store.prune_old_entries(max_age_days=90)
@@ -155,7 +155,7 @@ class TestPruneBasics:
 
         store = _make_store(tmp_path, has_active_processes_fn=_recognises_only_ids)
         store._entries["active"] = _entry(
-            "active", age_days=1000, session_id="sid_active"
+            "active", age_days=1000, session_id="sid_active",
         )
 
         removed = store.prune_old_entries(max_age_days=90)

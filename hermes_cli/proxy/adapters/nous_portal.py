@@ -37,7 +37,7 @@ _ALLOWED_PATHS: frozenset[str] = frozenset(
         "/completions",
         "/embeddings",
         "/models",
-    }
+    },
 )
 
 
@@ -69,7 +69,7 @@ class NousPortalAdapter(UpstreamAdapter):
         # to recover. The refresh helper validates and refreshes as needed.
         return bool(
             state.get("agent_key")
-            or (state.get("refresh_token") and state.get("access_token"))
+            or (state.get("refresh_token") and state.get("access_token")),
         )
 
     def get_credential(self) -> UpstreamCredential:
@@ -98,7 +98,7 @@ class NousPortalAdapter(UpstreamAdapter):
             state = self._read_state()
             if state is None:
                 raise RuntimeError(
-                    "Not logged into Nous Portal. Run `hermes auth add nous` first."
+                    "Not logged into Nous Portal. Run `hermes auth add nous` first.",
                 )
 
             try:
@@ -118,18 +118,18 @@ class NousPortalAdapter(UpstreamAdapter):
                         quarantine_reason="proxy_refresh_failure",
                     )
                 raise RuntimeError(
-                    f"Failed to refresh Nous Portal credentials: {exc}"
+                    f"Failed to refresh Nous Portal credentials: {exc}",
                 ) from exc
             except Exception as exc:
                 raise RuntimeError(
-                    f"Failed to refresh Nous Portal credentials: {exc}"
+                    f"Failed to refresh Nous Portal credentials: {exc}",
                 ) from exc
 
             runtime_key = refreshed.get("api_key")
             if not runtime_key:
                 raise RuntimeError(
                     "Nous Portal refresh did not return a usable inference JWT. "
-                    "Try `hermes auth add nous` to re-authenticate."
+                    "Try `hermes auth add nous` to re-authenticate.",
                 )
 
             base_url = (

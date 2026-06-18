@@ -106,7 +106,7 @@ async def test_base_adapter_routes_voice_tagged_telegram_ogg_media_tag_to_voice_
     event = _event()
     media_file = _allowed_media_path(tmp_path, monkeypatch, "speech.ogg")
     adapter._message_handler = AsyncMock(
-        return_value=f"[[audio_as_voice]]\nMEDIA:{media_file}"
+        return_value=f"[[audio_as_voice]]\nMEDIA:{media_file}",
     )
     adapter.send_voice = AsyncMock(return_value=SendResult(success=True, message_id="voice"))
     adapter.send_document = AsyncMock(return_value=SendResult(success=True, message_id="doc"))

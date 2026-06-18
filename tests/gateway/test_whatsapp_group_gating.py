@@ -79,13 +79,13 @@ def test_group_messages_can_require_direct_trigger_via_config():
         _group_message(
             "hi there",
             mentionedIds=["15551230000@s.whatsapp.net"],
-        )
+        ),
     ) is True
     assert adapter._should_process_message(
         _group_message(
             "replying",
             quotedParticipant="15551230000@lid",
-        )
+        ),
     ) is True
     assert adapter._should_process_message(_group_message("/status")) is True
 

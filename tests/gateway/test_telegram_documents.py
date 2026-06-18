@@ -144,10 +144,10 @@ def adapter():
 def _redirect_cache(tmp_path, monkeypatch):
     """Point document/video cache to tmp_path so tests don't touch ~/.hermes."""
     monkeypatch.setattr(
-        "gateway.platforms.base.DOCUMENT_CACHE_DIR", tmp_path / "doc_cache"
+        "gateway.platforms.base.DOCUMENT_CACHE_DIR", tmp_path / "doc_cache",
     )
     monkeypatch.setattr(
-        "gateway.platforms.base.VIDEO_CACHE_DIR", tmp_path / "video_cache"
+        "gateway.platforms.base.VIDEO_CACHE_DIR", tmp_path / "video_cache",
     )
 
 
@@ -269,7 +269,7 @@ class TestDocumentDownloadBlock:
         update = _make_update(msg)
 
         with patch.object(adapter, "_photo_batch_key", return_value="batch-1"), patch.object(
-            adapter, "_enqueue_photo_event"
+            adapter, "_enqueue_photo_event",
         ) as enqueue_mock:
             await adapter._handle_media_message(update, MagicMock())
 
@@ -289,7 +289,7 @@ class TestDocumentDownloadBlock:
         update = _make_update(msg)
 
         with patch.object(adapter, "_photo_batch_key", return_value="batch-2"), patch.object(
-            adapter, "_enqueue_photo_event"
+            adapter, "_enqueue_photo_event",
         ) as enqueue_mock:
             await adapter._handle_media_message(update, MagicMock())
 
@@ -709,13 +709,13 @@ class TestSendDocument:
         test_file.write_bytes(b"data")
 
         connected_adapter._bot.send_document = AsyncMock(
-            side_effect=RuntimeError("Telegram API error")
+            side_effect=RuntimeError("Telegram API error"),
         )
 
         # The base fallback calls self.send() which is also on _bot, so mock it
         # to avoid cascading errors.
         connected_adapter.send = AsyncMock(
-            return_value=SendResult(success=True, message_id="fallback")
+            return_value=SendResult(success=True, message_id="fallback"),
         )
 
         result = await connected_adapter.send_document(

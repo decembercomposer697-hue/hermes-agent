@@ -659,7 +659,7 @@ class TestRuntimeProviderResolution:
                     "id": "gpt-5.4",
                     "supported_endpoints": ["/responses"],
                     "capabilities": {"type": "chat"},
-                }
+                },
             ],
         )
         from hermes_cli.runtime_provider import resolve_runtime_provider
@@ -1186,8 +1186,8 @@ class TestNovitaProvider:
                     "id": "x/y",
                     "input_token_price_per_m": 1000,
                     "output_token_price_per_m": 2000,
-                }
-            ]
+                },
+            ],
         }
 
         class _FakeResp:
@@ -1206,7 +1206,7 @@ class TestNovitaProvider:
             return _FakeResp()
 
         monkeypatch.setattr(
-            models_mod.urllib.request, "urlopen", fake_urlopen
+            models_mod.urllib.request, "urlopen", fake_urlopen,
         )
 
         # First call hits the network.

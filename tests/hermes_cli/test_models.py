@@ -174,13 +174,13 @@ class TestOpenRouterToolSupportHelper:
     def test_tools_in_supported_parameters(self):
         from hermes_cli.models import _openrouter_model_supports_tools
         assert _openrouter_model_supports_tools(
-            {"id": "x", "supported_parameters": ["temperature", "tools"]}
+            {"id": "x", "supported_parameters": ["temperature", "tools"]},
         ) is True
 
     def test_tools_missing_from_supported_parameters(self):
         from hermes_cli.models import _openrouter_model_supports_tools
         assert _openrouter_model_supports_tools(
-            {"id": "x", "supported_parameters": ["temperature", "response_format"]}
+            {"id": "x", "supported_parameters": ["temperature", "response_format"]},
         ) is False
 
     def test_supported_parameters_absent_is_permissive(self):
@@ -196,7 +196,7 @@ class TestOpenRouterToolSupportHelper:
         """Malformed (non-list) value → allow rather than silently drop."""
         from hermes_cli.models import _openrouter_model_supports_tools
         assert _openrouter_model_supports_tools(
-            {"id": "x", "supported_parameters": "tools,temperature"}
+            {"id": "x", "supported_parameters": "tools,temperature"},
         ) is True
 
     def test_non_dict_item_is_permissive(self):
@@ -208,7 +208,7 @@ class TestOpenRouterToolSupportHelper:
         """Explicit empty list → no tools → drop."""
         from hermes_cli.models import _openrouter_model_supports_tools
         assert _openrouter_model_supports_tools(
-            {"id": "x", "supported_parameters": []}
+            {"id": "x", "supported_parameters": []},
         ) is False
 
 
@@ -299,7 +299,7 @@ class TestDetectProviderForModel:
         with patch("hermes_cli.models.fetch_openrouter_models", return_value=LIVE_OPENROUTER_MODELS):
             result = detect_provider_for_model("claude-opus-4-6", "openai-codex")
         assert result is not None
-        assert result[0] not in {"nous",}  # nous has claude models but shouldn't be suggested
+        assert result[0] not in {"nous"}  # nous has claude models but shouldn't be suggested
 
 
 class TestIsNousFreeTier:
@@ -506,7 +506,7 @@ class TestUnionWithPortalFreeRecommendations:
                     {"displayName": "no-modelName"},
                     {"modelName": ""},
                     {"modelName": "qwen/qwen3.6-plus"},
-                ]
+                ],
             },
         ):
             ids, p = union_with_portal_free_recommendations(curated, pricing, "")
@@ -632,7 +632,7 @@ class TestUnionWithPortalPaidRecommendations:
                     {"displayName": "no-modelName"},
                     {"modelName": ""},
                     {"modelName": "openai/gpt-5.4"},
-                ]
+                ],
             },
         ):
             ids, p = union_with_portal_paid_recommendations(curated, pricing, "")

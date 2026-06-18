@@ -276,7 +276,7 @@ def test_decompose_unknown_assignee_falls_back_to_default(kanban_home):
                     "kanban": {
                         "orchestrator_profile": "orchestrator",
                         "default_assignee": "fallback",
-                    }
+                    },
                 },
             ):
             outcome = decomp.decompose_task(tid, author="me")

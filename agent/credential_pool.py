@@ -989,7 +989,7 @@ class CredentialPool:
                 synced = self._sync_xai_oauth_entry_from_auth_store(entry)
                 if synced.refresh_token != entry.refresh_token:
                     logger.debug(
-                        "xAI OAuth refresh failed but auth.json has newer tokens — adopting"
+                        "xAI OAuth refresh failed but auth.json has newer tokens — adopting",
                     )
                     updated = replace(
                         synced,
@@ -1010,7 +1010,7 @@ class CredentialPool:
                 # in-memory pool.  Mirrors the Nous quarantine path above.
                 if auth_mod._is_terminal_xai_oauth_refresh_error(exc):
                     logger.debug(
-                        "xAI OAuth refresh token is terminally invalid; clearing local token state"
+                        "xAI OAuth refresh token is terminally invalid; clearing local token state",
                     )
                     try:
                         with _auth_store_lock():
@@ -1037,7 +1037,7 @@ class CredentialPool:
                                         _save_auth_store(auth_store)
                     except Exception as clear_exc:
                         logger.debug(
-                            "Failed to clear terminal xAI OAuth state: %s", clear_exc
+                            "Failed to clear terminal xAI OAuth state: %s", clear_exc,
                         )
                     self._entries = [
                         item for item in self._entries
@@ -1055,7 +1055,7 @@ class CredentialPool:
                 synced = self._sync_codex_entry_from_auth_store(entry)
                 if synced.refresh_token != entry.refresh_token:
                     logger.debug(
-                        "Codex OAuth refresh failed but auth.json has newer tokens — adopting"
+                        "Codex OAuth refresh failed but auth.json has newer tokens — adopting",
                     )
                     updated = replace(
                         synced,
@@ -1076,7 +1076,7 @@ class CredentialPool:
                 # in-memory pool.  Mirrors the xAI and Nous quarantine paths.
                 if auth_mod._is_terminal_codex_oauth_refresh_error(exc):
                     logger.debug(
-                        "Codex OAuth refresh token is terminally invalid; clearing local token state"
+                        "Codex OAuth refresh token is terminally invalid; clearing local token state",
                     )
                     try:
                         with _auth_store_lock():
@@ -1103,7 +1103,7 @@ class CredentialPool:
                                         _save_auth_store(auth_store)
                     except Exception as clear_exc:
                         logger.debug(
-                            "Failed to clear terminal Codex OAuth state: %s", clear_exc
+                            "Failed to clear terminal Codex OAuth state: %s", clear_exc,
                         )
                     self._entries = [
                         item for item in self._entries
@@ -1492,7 +1492,7 @@ class CredentialPool:
                         last_error_reason=None,
                         last_error_message=None,
                         last_error_reset_at=None,
-                    )
+                    ),
                 )
                 count += 1
             else:
@@ -1720,7 +1720,7 @@ def _seed_from_singletons(provider: str, entries: list[PooledCredential]) -> tup
             and (
                 str(state.get("access_token") or "").strip()
                 or str(state.get("agent_key") or "").strip()
-            )
+            ),
         )
         if state and not has_runtime_material:
             retained = [
@@ -1738,7 +1738,7 @@ def _seed_from_singletons(provider: str, entries: list[PooledCredential]) -> tup
             # auto-derived token fingerprint for logins that didn't supply one.
             custom_label = str(state.get("label") or "").strip()
             seeded_label = custom_label or label_from_token(
-                state.get("access_token", ""), "device_code"
+                state.get("access_token", ""), "device_code",
             )
             changed |= _upsert_entry(
                 entries,
@@ -1867,7 +1867,7 @@ def _seed_from_singletons(provider: str, entries: list[PooledCredential]) -> tup
                             "expires_at_ms": expires_at_ms,
                             "base_url": base_url,
                             "label": state.get("label", "") or label_from_token(
-                                state.get("access_token", ""), source_name
+                                state.get("access_token", ""), source_name,
                             ),
                         },
                     )

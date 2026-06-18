@@ -481,8 +481,8 @@ async def reply_to_comment(
         "content": {
             "elements": [
                 {"type": "text_run", "text_run": {"text": text}},
-            ]
-        }
+            ],
+        },
     }
 
     code, msg, _ = await _exec_request(
@@ -669,7 +669,7 @@ import re as _re
 _FEISHU_DOC_URL_RE = _re.compile(
     r"(?:feishu\.cn|larkoffice\.com|larksuite\.com|lark\.suite\.com)"
     r"/(?P<doc_type>wiki|doc|docx|sheet|sheets|slides|mindnote|bitable|base|file)"
-    r"/(?P<token>[A-Za-z0-9_-]{10,40})"
+    r"/(?P<token>[A-Za-z0-9_-]{10,40})",
 )
 
 _WIKI_GET_NODE_URI = "/open-apis/wiki/v2/spaces/get_node"
@@ -1191,16 +1191,16 @@ async def handle_drive_comment_event(
                 file_type=file_type,
                 reply_id=reply_id,
                 reaction_type="OK",
-            )
+            ),
         )
 
     # Step 2: Parallel fetch -- doc meta + comment details
     logger.info("[Feishu-Comment] [Step 2/5] Parallel fetch: doc meta + comment batch_query")
     meta_task = asyncio.ensure_future(
-        query_document_meta(client, file_token, file_type)
+        query_document_meta(client, file_token, file_type),
     )
     comment_task = asyncio.ensure_future(
-        batch_query_comment(client, file_token, file_type, comment_id)
+        batch_query_comment(client, file_token, file_type, comment_id),
     )
     doc_meta, comment_detail = await asyncio.gather(meta_task, comment_task)
 

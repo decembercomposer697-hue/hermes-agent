@@ -678,7 +678,7 @@ def _render_command_tts_template(
     """Replace supported placeholders while preserving ``{{`` / ``}}``."""
     names = "|".join(re.escape(name) for name in placeholders)
     pattern = re.compile(
-        rf"(?<!\$)(?:\{{\{{(?P<double>{names})\}}\}}|\{{(?P<single>{names})\}})"
+        rf"(?<!\$)(?:\{{\{{(?P<double>{names})\}}\}}|\{{(?P<single>{names})\}})",
     )
     replacements: list[tuple[str, str]] = []
 
@@ -815,7 +815,7 @@ def _generate_command_tts(
     command_template = str(config.get("command") or "").strip()
     if not command_template:
         raise ValueError(
-            f"tts.providers.{provider_name}.command is not configured"
+            f"tts.providers.{provider_name}.command is not configured",
         )
 
     output = Path(output_path).expanduser()
@@ -846,7 +846,7 @@ def _generate_command_tts(
             _run_command_tts(command, timeout)
         except subprocess.TimeoutExpired as exc:
             raise RuntimeError(
-                f"TTS provider '{provider_name}' timed out after {timeout:g}s"
+                f"TTS provider '{provider_name}' timed out after {timeout:g}s",
             ) from exc
         except subprocess.CalledProcessError as exc:
             detail_parts = []
@@ -857,12 +857,12 @@ def _generate_command_tts(
             detail = "; ".join(detail_parts) or "no command output"
             raise RuntimeError(
                 f"TTS provider '{provider_name}' exited with code "
-                f"{exc.returncode}: {detail}"
+                f"{exc.returncode}: {detail}",
             ) from exc
 
     if not output.exists() or output.stat().st_size <= 0:
         raise RuntimeError(
-            f"TTS provider '{provider_name}' produced no output at {output}"
+            f"TTS provider '{provider_name}' produced no output at {output}",
         )
     return str(output)
 
@@ -1142,7 +1142,7 @@ def _generate_xai_tts(text: str, output_path: str, tts_config: dict[str, Any]) -
         xai_config.get("base_url")
         or creds.get("base_url")
         or get_env_value("XAI_BASE_URL")
-        or DEFAULT_XAI_BASE_URL
+        or DEFAULT_XAI_BASE_URL,
     ).strip().rstrip("/")
 
     # Match the documented minimal POST /v1/tts shape by default. Only send
@@ -1309,7 +1309,7 @@ def _generate_minimax_tts(text: str, output_path: str, tts_config: dict[str, Any
             response.raise_for_status()
             raise RuntimeError(
                 f"MiniMax TTS returned unexpected Content-Type '{content_type}' "
-                f"({len(response.content)} bytes)"
+                f"({len(response.content)} bytes)",
             )
 
         raise RuntimeError("MiniMax TTS returned no audio data")
@@ -1577,7 +1577,7 @@ def _generate_gemini_tts(text: str, output_path: str, tts_config: dict[str, Any]
     api_key = (get_env_value("GEMINI_API_KEY") or get_env_value("GOOGLE_API_KEY") or "").strip()
     if not api_key:
         raise ValueError(
-            "GEMINI_API_KEY not set. Get one at https://aistudio.google.com/app/apikey"
+            "GEMINI_API_KEY not set. Get one at https://aistudio.google.com/app/apikey",
         )
 
     raw_gemini_config = tts_config.get("gemini", {})
@@ -1587,7 +1587,7 @@ def _generate_gemini_tts(text: str, output_path: str, tts_config: dict[str, Any]
     base_url = str(
         gemini_config.get("base_url")
         or get_env_value("GEMINI_BASE_URL")
-        or DEFAULT_GEMINI_TTS_BASE_URL
+        or DEFAULT_GEMINI_TTS_BASE_URL,
     ).strip().rstrip("/")
     persona_prompt = _read_gemini_persona_prompt(gemini_config)
     tts_script = text
@@ -1634,7 +1634,7 @@ def _generate_gemini_tts(text: str, output_path: str, tts_config: dict[str, Any]
         except Exception:
             detail = response.text[:300]
         raise RuntimeError(
-            f"Gemini TTS API error (HTTP {response.status_code}): {detail}"
+            f"Gemini TTS API error (HTTP {response.status_code}): {detail}",
         )
 
     try:
@@ -1854,20 +1854,20 @@ def _resolve_piper_voice_path(voice: str, download_dir: Path) -> str:
         )
     except subprocess.TimeoutExpired as exc:
         raise RuntimeError(
-            f"Piper voice download timed out after 300s for '{voice}'"
+            f"Piper voice download timed out after 300s for '{voice}'",
         ) from exc
 
     if result.returncode != 0:
         stderr = (result.stderr or "").strip() or "no stderr output"
         raise RuntimeError(
-            f"Piper voice download failed for '{voice}': {stderr[:400]}"
+            f"Piper voice download failed for '{voice}': {stderr[:400]}",
         )
 
     if not cached.exists():
         raise RuntimeError(
             f"Piper voice download completed but {cached} is missing — "
             f"check voice name (see: https://github.com/OHF-Voice/piper1-gpl/"
-            f"blob/main/docs/VOICES.md)"
+            f"blob/main/docs/VOICES.md)",
         )
     return str(cached)
 
@@ -1919,7 +1919,7 @@ def _generate_piper_tts(text: str, output_path: str, tts_config: dict[str, Any])
         except ImportError:
             logger.warning(
                 "[Piper] SynthesisConfig not available in this piper-tts "
-                "version — advanced knobs ignored"
+                "version — advanced knobs ignored",
             )
 
     # Piper outputs WAV. Caller handles downstream MP3/Opus conversion.
@@ -2093,7 +2093,7 @@ def text_to_speech_tool(
             # provider's configured output_format so the command writes to a
             # path the caller actually expects.
             file_path = _configured_command_tts_output_path(
-                file_path, command_provider_config
+                file_path, command_provider_config,
             )
     else:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -2144,7 +2144,7 @@ def text_to_speech_tool(
             except ImportError:
                 return json.dumps({
                     "success": False,
-                    "error": "ElevenLabs provider selected but 'elevenlabs' package not installed. Run: pip install elevenlabs"
+                    "error": "ElevenLabs provider selected but 'elevenlabs' package not installed. Run: pip install elevenlabs",
                 }, ensure_ascii=False)
             logger.info("Generating speech with ElevenLabs...")
             _generate_elevenlabs(text, file_str, tts_config)
@@ -2155,7 +2155,7 @@ def text_to_speech_tool(
             except ImportError:
                 return json.dumps({
                     "success": False,
-                    "error": "OpenAI provider selected but 'openai' package not installed."
+                    "error": "OpenAI provider selected but 'openai' package not installed.",
                 }, ensure_ascii=False)
             logger.info("Generating speech with OpenAI TTS...")
             _generate_openai_tts(text, file_str, tts_config)
@@ -2175,7 +2175,7 @@ def text_to_speech_tool(
                 return json.dumps({
                     "success": False,
                     "error": "Mistral provider selected but 'mistralai' package not installed. "
-                             "Run: pip install 'hermes-agent[mistral]'"
+                             "Run: pip install 'hermes-agent[mistral]'",
                 }, ensure_ascii=False)
             logger.info("Generating speech with Mistral Voxtral TTS...")
             _generate_mistral_tts(text, file_str, tts_config)
@@ -2189,7 +2189,7 @@ def text_to_speech_tool(
                 return json.dumps({
                     "success": False,
                     "error": "NeuTTS provider selected but neutts is not installed. "
-                             "Run hermes setup and choose NeuTTS, or install espeak-ng and run python -m pip install -U neutts[all]."
+                             "Run hermes setup and choose NeuTTS, or install espeak-ng and run python -m pip install -U neutts[all].",
                 }, ensure_ascii=False)
             logger.info("Generating speech with NeuTTS (local)...")
             _generate_neutts(text, file_str, tts_config)
@@ -2202,7 +2202,7 @@ def text_to_speech_tool(
                     "success": False,
                     "error": "KittenTTS provider selected but 'kittentts' package not installed. "
                              "Run 'hermes setup tts' and choose KittenTTS, or install manually: "
-                             "pip install https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl"
+                             "pip install https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl",
                 }, ensure_ascii=False)
             logger.info("Generating speech with KittenTTS (local, ~25MB)...")
             _generate_kittentts(text, file_str, tts_config)
@@ -2234,7 +2234,7 @@ def text_to_speech_tool(
                     import concurrent.futures
                     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
                         pool.submit(
-                            lambda: asyncio.run(_generate_edge_tts(text, file_str, tts_config))
+                            lambda: asyncio.run(_generate_edge_tts(text, file_str, tts_config)),
                         ).result(timeout=60)
                 except RuntimeError:
                     asyncio.run(_generate_edge_tts(text, file_str, tts_config))
@@ -2246,14 +2246,14 @@ def text_to_speech_tool(
                 return json.dumps({
                     "success": False,
                     "error": "No TTS provider available. Install edge-tts (pip install edge-tts) "
-                             "or set up NeuTTS for local synthesis."
+                             "or set up NeuTTS for local synthesis.",
                 }, ensure_ascii=False)
 
         # Check the file was actually created
         if not os.path.exists(file_str) or os.path.getsize(file_str) == 0:
             return json.dumps({
                 "success": False,
-                "error": f"TTS generation produced no output (provider: {provider})"
+                "error": f"TTS generation produced no output (provider: {provider})",
             }, ensure_ascii=False)
 
         # Try Opus conversion for Telegram compatibility.
@@ -2411,7 +2411,7 @@ def _resolve_openai_audio_client_config() -> tuple[str, str]:
         raise ValueError(message)
 
     return managed_gateway.nous_user_token, urljoin(
-        f"{managed_gateway.gateway_origin.rstrip('/')}/", "v1"
+        f"{managed_gateway.gateway_origin.rstrip('/')}/", "v1",
     )
 
 
@@ -2684,7 +2684,7 @@ if __name__ == "__main__":
     print(f"  OpenAI:     {'installed' if _check(_import_openai_client, 'oai') else 'not installed'}")
     print(
         "    API Key:  "
-        f"{'set' if resolve_openai_audio_api_key() else 'not set (VOICE_TOOLS_OPENAI_KEY or OPENAI_API_KEY)'}"
+        f"{'set' if resolve_openai_audio_api_key() else 'not set (VOICE_TOOLS_OPENAI_KEY or OPENAI_API_KEY)'}",
     )
     print(f"  MiniMax:    {'API key set' if get_env_value('MINIMAX_API_KEY') else 'not set (MINIMAX_API_KEY)'}")
     print(f"  Piper:      {'installed' if _check_piper_available() else 'not installed (pip install piper-tts)'}")
@@ -2709,15 +2709,15 @@ TTS_SCHEMA = {
         "properties": {
             "text": {
                 "type": "string",
-                "description": "The text to convert to speech. Provider-specific character caps apply and are enforced automatically (OpenAI 4096, xAI 15000, MiniMax 10000, ElevenLabs 5k-40k depending on model); over-long input is truncated."
+                "description": "The text to convert to speech. Provider-specific character caps apply and are enforced automatically (OpenAI 4096, xAI 15000, MiniMax 10000, ElevenLabs 5k-40k depending on model); over-long input is truncated.",
             },
             "output_path": {
                 "type": "string",
-                "description": f"Optional custom file path to save the audio. Defaults to {display_hermes_home()}/audio_cache/<timestamp>.mp3"
-            }
+                "description": f"Optional custom file path to save the audio. Defaults to {display_hermes_home()}/audio_cache/<timestamp>.mp3",
+            },
         },
-        "required": ["text"]
-    }
+        "required": ["text"],
+    },
 }
 
 registry.register(

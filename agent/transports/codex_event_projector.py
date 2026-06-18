@@ -136,7 +136,7 @@ class CodexEventProjector:
                 elif "text" in fragment:
                     text_parts.append(str(fragment["text"]))
         return ProjectionResult(
-            messages=[{"role": "user", "content": "\n".join(text_parts)}]
+            messages=[{"role": "user", "content": "\n".join(text_parts)}],
         )
 
     def _project_command(self, item: dict, item_id: str) -> ProjectionResult:
@@ -156,7 +156,7 @@ class CodexEventProjector:
                         "name": "exec_command",
                         "arguments": _format_tool_args(args),
                     },
-                }
+                },
             ],
         }
         if self._pending_reasoning:
@@ -172,7 +172,7 @@ class CodexEventProjector:
             "content": output,
         }
         return ProjectionResult(
-            messages=[assistant_msg, tool_msg], is_tool_iteration=True
+            messages=[assistant_msg, tool_msg], is_tool_iteration=True,
         )
 
     def _project_file_change(self, item: dict, item_id: str) -> ProjectionResult:
@@ -197,7 +197,7 @@ class CodexEventProjector:
                         "name": "apply_patch",
                         "arguments": _format_tool_args(args),
                     },
-                }
+                },
             ],
         }
         if self._pending_reasoning:
@@ -211,7 +211,7 @@ class CodexEventProjector:
             "content": f"apply_patch status={status}, {n} change(s)",
         }
         return ProjectionResult(
-            messages=[assistant_msg, tool_msg], is_tool_iteration=True
+            messages=[assistant_msg, tool_msg], is_tool_iteration=True,
         )
 
     def _project_mcp_tool_call(self, item: dict, item_id: str) -> ProjectionResult:
@@ -232,7 +232,7 @@ class CodexEventProjector:
                         "name": f"mcp.{server}.{tool}",
                         "arguments": _format_tool_args(args),
                     },
-                }
+                },
             ],
         }
         if self._pending_reasoning:
@@ -252,11 +252,11 @@ class CodexEventProjector:
             "content": content,
         }
         return ProjectionResult(
-            messages=[assistant_msg, tool_msg], is_tool_iteration=True
+            messages=[assistant_msg, tool_msg], is_tool_iteration=True,
         )
 
     def _project_dynamic_tool_call(
-        self, item: dict, item_id: str
+        self, item: dict, item_id: str,
     ) -> ProjectionResult:
         tool = item.get("tool") or "unknown"
         call_id = _deterministic_call_id(f"dyn_{tool}", item_id)
@@ -274,7 +274,7 @@ class CodexEventProjector:
                         "name": tool,
                         "arguments": _format_tool_args(args),
                     },
-                }
+                },
             ],
         }
         if self._pending_reasoning:
@@ -292,7 +292,7 @@ class CodexEventProjector:
             "content": content,
         }
         return ProjectionResult(
-            messages=[assistant_msg, tool_msg], is_tool_iteration=True
+            messages=[assistant_msg, tool_msg], is_tool_iteration=True,
         )
 
     def _project_opaque(self, item: dict, item_type: str) -> ProjectionResult:
@@ -307,6 +307,6 @@ class CodexEventProjector:
                 {
                     "role": "assistant",
                     "content": f"[codex {item_type}] {payload}",
-                }
-            ]
+                },
+            ],
         )

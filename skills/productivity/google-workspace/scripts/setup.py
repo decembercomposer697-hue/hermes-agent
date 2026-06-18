@@ -139,7 +139,7 @@ def install_deps():
     print(f"ERROR: Failed to install dependencies: {pip_error}")
     print(
         "On environments without pip (e.g. Nix, or the Hermes Docker image's "
-        "uv-managed venv), install the optional extra instead:"
+        "uv-managed venv), install the optional extra instead:",
     )
     print("  pip install 'hermes-agent[google]'")
     print(f"Or manually: {sys.executable} -m pip install {' '.join(REQUIRED_PACKAGES)}")
@@ -220,7 +220,7 @@ def check_auth(quiet: bool = False):
                 json.dumps(
                     _normalize_authorized_user_payload(json.loads(creds.to_json())),
                     indent=2,
-                )
+                ),
             )
             missing_scopes = _missing_scopes_from_payload(_load_token_payload(TOKEN_PATH))
             if missing_scopes:
@@ -284,7 +284,7 @@ def _save_pending_auth(*, state: str, code_verifier: str):
                 "redirect_uri": REDIRECT_URI,
             },
             indent=2,
-        )
+        ),
     )
 
 

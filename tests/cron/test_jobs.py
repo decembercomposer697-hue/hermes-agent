@@ -213,7 +213,7 @@ class TestJobCRUD:
                 "schedule_display": None,
                 "schedule": {"kind": "interval", "minutes": 60, "display": "every 60m"},
                 "enabled": True,
-            }
+            },
         ])
 
         jobs = list_jobs()
@@ -743,7 +743,7 @@ class TestGetDueJobs:
                 "last_error": None,
                 "deliver": "local",
                 "origin": None,
-            }]
+            }],
         )
 
         due = get_due_jobs()
@@ -774,7 +774,7 @@ class TestGetDueJobs:
                 "last_error": None,
                 "deliver": "local",
                 "origin": None,
-            }]
+            }],
         )
 
         assert get_due_jobs() == []
@@ -803,7 +803,7 @@ class TestGetDueJobs:
                 "last_error": None,
                 "deliver": "local",
                 "origin": None,
-            }]
+            }],
         )
 
         assert get_due_jobs() == []
@@ -837,7 +837,7 @@ class TestGetDueJobs:
                 "last_error": None,
                 "deliver": "local",
                 "origin": None,
-            }]
+            }],
         )
 
         assert get_due_jobs() == []

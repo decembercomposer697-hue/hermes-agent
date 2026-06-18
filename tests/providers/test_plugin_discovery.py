@@ -96,13 +96,13 @@ def test_user_plugin_overrides_bundled(tmp_path, monkeypatch):
         '    base_url="https://user-override.example.com/v1",\n'
         '    auth_type="api_key",\n'
         ")\n"
-        "register_provider(custom_gmi)\n"
+        "register_provider(custom_gmi)\n",
     )
     (user_gmi / "plugin.yaml").write_text(
         "name: gmi-user-override\n"
         "kind: model-provider\n"
         "version: 0.0.1\n"
-        "description: Test user override\n"
+        "description: Test user override\n",
     )
 
     _clear_provider_caches()
@@ -134,12 +134,12 @@ def test_general_plugin_manager_skips_model_provider_kind(tmp_path, monkeypatch)
     (user_plugin / "plugin.yaml").write_text(
         "name: test-model-provider\n"
         "kind: model-provider\n"
-        "version: 0.0.1\n"
+        "version: 0.0.1\n",
     )
     (user_plugin / "__init__.py").write_text(
         # Intentionally broken import — if the general loader tries to
         # import this module, the test will fail with ImportError.
-        "raise AssertionError('model-provider plugins must not be imported by PluginManager')\n"
+        "raise AssertionError('model-provider plugins must not be imported by PluginManager')\n",
     )
 
     # Fresh manager

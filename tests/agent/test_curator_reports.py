@@ -263,7 +263,7 @@ def test_state_transitions_captured_in_report(curator_env):
     )
     payload = json.loads((run_dir / "run.json").read_text())
     assert payload["state_transitions"] == [
-        {"name": "getting-old", "from": "active", "to": "stale"}
+        {"name": "getting-old", "from": "active", "to": "stale"},
     ]
     md = (run_dir / "REPORT.md").read_text()
     assert "State transitions" in md

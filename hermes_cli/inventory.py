@@ -235,7 +235,7 @@ def _append_unconfigured_rows(rows: list[dict], ctx: ConfigContext) -> list[dict
                 "models": [],
                 "total_models": 0,
                 "source": "canonical",
-            }
+            },
         )
     return extras
 
@@ -370,12 +370,12 @@ def _apply_pricing(
             try:
                 if nous_free_tier is None:
                     nous_free_tier = check_nous_free_tier(
-                        force_fresh=force_fresh_nous_tier
+                        force_fresh=force_fresh_nous_tier,
                     )
                 row["free_tier"] = bool(nous_free_tier)
                 if nous_free_tier:
                     _selectable, unavailable = partition_nous_models_by_tier(
-                        list(models), raw_pricing, free_tier=True
+                        list(models), raw_pricing, free_tier=True,
                     )
                     row["unavailable_models"] = unavailable
                 else:

@@ -99,10 +99,10 @@ _DEFAULT_CLIENT_SECRET = f"GOCSPX-{_PUBLIC_CLIENT_SECRET_SUFFIX}"
 import re as _re
 from utils import atomic_replace
 _CLIENT_ID_PATTERN = _re.compile(
-    r"OAUTH_CLIENT_ID\s*=\s*['\"]([0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com)['\"]"
+    r"OAUTH_CLIENT_ID\s*=\s*['\"]([0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com)['\"]",
 )
 _CLIENT_SECRET_PATTERN = _re.compile(
-    r"OAUTH_CLIENT_SECRET\s*=\s*['\"](GOCSPX-[A-Za-z0-9_-]+)['\"]"
+    r"OAUTH_CLIENT_SECRET\s*=\s*['\"](GOCSPX-[A-Za-z0-9_-]+)['\"]",
 )
 _CLIENT_ID_SHAPE = _re.compile(r"([0-9]{8,}-[a-z0-9]{20,}\.apps\.googleusercontent\.com)")
 _CLIENT_SECRET_SHAPE = _re.compile(r"(GOCSPX-[A-Za-z0-9_-]{20,})")
@@ -196,7 +196,7 @@ def _credentials_lock(timeout_seconds: float = LOCK_TIMEOUT_SECONDS):
                 except BlockingIOError:
                     if time.monotonic() >= deadline:
                         raise TimeoutError(
-                            f"Timed out acquiring Google OAuth credentials lock at {lock_file_path}."
+                            f"Timed out acquiring Google OAuth credentials lock at {lock_file_path}.",
                         )
                     time.sleep(0.05)
         else:
@@ -212,7 +212,7 @@ def _credentials_lock(timeout_seconds: float = LOCK_TIMEOUT_SECONDS):
                     except OSError:
                         if time.monotonic() >= deadline:
                             raise TimeoutError(
-                                f"Timed out acquiring Google OAuth credentials lock at {lock_file_path}."
+                                f"Timed out acquiring Google OAuth credentials lock at {lock_file_path}.",
                             )
                         time.sleep(0.05)
             except ImportError:

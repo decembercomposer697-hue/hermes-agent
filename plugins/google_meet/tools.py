@@ -65,7 +65,7 @@ def _resolve_node_client(node: str | None):
     if entry is None:
         raise RuntimeError(
             f"no registered meet node matches {node!r} — "
-            "run `hermes meet node approve <name> <url> <token>` first"
+            "run `hermes meet node approve <name> <url> <token>` first",
         )
     client = NodeClient(url=entry["url"], token=entry["token"])
     return client, entry.get("name")
@@ -266,7 +266,7 @@ def handle_meet_join(args: dict[str, Any], **_kw) -> str:
         return _err(
             "google_meet plugin prerequisites missing — install with "
             "`pip install playwright && python -m playwright install "
-            "chromium`. Plugin is supported on Linux and macOS only."
+            "chromium`. Plugin is supported on Linux and macOS only.",
         )
     res = pm.start(
         url=url,

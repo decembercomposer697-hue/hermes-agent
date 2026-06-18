@@ -359,7 +359,7 @@ def auth_add_command(args) -> None:
         pool = load_pool(provider)
         entry = next((e for e in pool.entries() if getattr(e, "source", "") == "loopback_pkce"), None)
         shown_label = entry.label if entry is not None else label_from_token(
-            creds["tokens"]["access_token"], _oauth_default_label(provider, 1)
+            creds["tokens"]["access_token"], _oauth_default_label(provider, 1),
         )
         print(f'Saved {provider} OAuth credentials: "{shown_label}"')
         return

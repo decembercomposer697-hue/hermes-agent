@@ -17,7 +17,7 @@ class KimiProfile(ProviderProfile):
     """Kimi/Moonshot — temperature omitted, thinking xor reasoning_effort."""
 
     def build_api_kwargs_extras(
-        self, *, reasoning_config: dict | None = None, **context
+        self, *, reasoning_config: dict | None = None, **context,
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         """Kimi reasoning controls.
 

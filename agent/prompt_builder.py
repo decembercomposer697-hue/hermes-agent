@@ -850,7 +850,7 @@ def build_environment_hints() -> str:
                 "Note: on Windows, the machine hostname (e.g. from `hostname` "
                 "or uname) is NOT the username. Use the 'User home directory' "
                 "above to construct paths under C:\\Users\\<user>\\, never the "
-                "hostname."
+                "hostname.",
             )
         hints.append("\n".join(host_lines))
 
@@ -868,11 +868,11 @@ def build_environment_hints() -> str:
                 f"inside this {backend} environment — NOT on the machine "
                 f"where Hermes itself is running. The host OS, home, and cwd "
                 f"of the Hermes process are irrelevant; only the following "
-                f"backend state matters:\n{probe}"
+                f"backend state matters:\n{probe}",
             )
         else:
             description = _BACKEND_FALLBACK_DESCRIPTIONS.get(
-                backend, f"a {backend} environment (likely Linux)"
+                backend, f"a {backend} environment (likely Linux)",
             )
             hints.append(
                 f"Terminal backend: {backend}. Your `terminal`, `read_file`, "
@@ -882,7 +882,7 @@ def build_environment_hints() -> str:
                 f"prompt-build time, so the sandbox's current user, $HOME, "
                 f"and working directory are unknown from here. If you need "
                 f"them, probe directly with a terminal call like "
-                f"`uname -a && whoami && pwd`."
+                f"`uname -a && whoami && pwd`.",
             )
 
     # Hermes desktop GUI — any agent running under the desktop app should know
@@ -917,7 +917,7 @@ def build_environment_hints() -> str:
             from hermes_cli.config import load_config
 
             extra = str(
-                (load_config().get("agent", {}) or {}).get("environment_hint", "")
+                (load_config().get("agent", {}) or {}).get("environment_hint", ""),
             ).strip()
         except Exception as e:
             logger.debug("Could not read agent.environment_hint from config: %s", e)
@@ -1180,7 +1180,7 @@ def build_skills_system_prompt(
             ):
                 continue
             skills_by_category.setdefault(category, []).append(
-                (frontmatter_name, entry.get("description", ""))
+                (frontmatter_name, entry.get("description", "")),
             )
         category_descriptions = {
             str(k): str(v)
@@ -1205,7 +1205,7 @@ def build_skills_system_prompt(
             ):
                 continue
             skills_by_category.setdefault(entry["category"], []).append(
-                (entry["frontmatter_name"], entry["description"])
+                (entry["frontmatter_name"], entry["description"]),
             )
 
         # Read category-level DESCRIPTION.md files
@@ -1261,7 +1261,7 @@ def build_skills_system_prompt(
                     continue
                 seen_skill_names.add(frontmatter_name)
                 skills_by_category.setdefault(entry["category"], []).append(
-                    (frontmatter_name, entry["description"])
+                    (frontmatter_name, entry["description"]),
                 )
             except Exception as e:
                 logger.debug("Error reading external skill %s: %s", skill_file, e)
@@ -1422,7 +1422,7 @@ def build_nous_subscription_prompt(valid_tool_names: "set[str] | None" = None) -
             "If the user is not subscribed and asks for a capability that Nous subscription would unlock or simplify, suggest Nous subscription as one option alongside direct setup or local alternatives.",
             "Do not mention subscription unless the user asks about it or it directly solves the current missing capability.",
             "Useful commands: hermes setup, hermes setup tools, hermes setup terminal, hermes status.",
-        ]
+        ],
     )
     return "\n".join(lines)
 

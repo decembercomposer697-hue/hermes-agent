@@ -37,7 +37,7 @@ class TestClarifyToolBasics:
         result = json.loads(clarify_tool(
             "Pick a number",
             choices=["1", "2", "3"],
-            callback=mock_callback
+            callback=mock_callback,
         ))
         assert result["question"] == "Pick a number"
         assert result["choices_offered"] == ["1", "2", "3"]
@@ -106,7 +106,7 @@ class TestClarifyToolChoicesValidation:
         result = json.loads(clarify_tool(
             "Question?",
             choices="not a list",  # type: ignore
-            callback=lambda q, c: "ignored"
+            callback=lambda q, c: "ignored",
         ))
         assert "error" in result
         assert "list" in result["error"].lower()

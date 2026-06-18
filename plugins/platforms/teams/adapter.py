@@ -181,7 +181,7 @@ class TeamsSummaryWriter:
         if mode == "graph":
             return await self._write_summary_via_graph(payload, merged)
         raise ValueError(
-            "Teams delivery_mode must be 'incoming_webhook' or 'graph'."
+            "Teams delivery_mode must be 'incoming_webhook' or 'graph'.",
         )
 
     def _resolve_delivery_config(self, config: dict[str, Any] | None) -> dict[str, Any]:
@@ -256,7 +256,7 @@ class TeamsSummaryWriter:
         channel_id = str(config.get("channel_id") or "").strip()
         if not team_id or not channel_id:
             raise ValueError(
-                "Graph delivery mode requires chat_id, or both team_id and channel_id."
+                "Graph delivery mode requires chat_id, or both team_id and channel_id.",
             )
         path = (
             f"/teams/{quote(team_id, safe='')}/channels/"
@@ -631,7 +631,7 @@ class TeamsAdapter(BasePlatformAdapter):
         self._client_secret = extra.get("client_secret") or os.getenv("TEAMS_CLIENT_SECRET", "")
         self._tenant_id = extra.get("tenant_id") or os.getenv("TEAMS_TENANT_ID", "")
         self._port = _coerce_port(
-            extra.get("port") or os.getenv("TEAMS_PORT", str(_DEFAULT_PORT))
+            extra.get("port") or os.getenv("TEAMS_PORT", str(_DEFAULT_PORT)),
         )
         self._app: App | None = None
         self._runner: web.AppRunner | None = None
@@ -819,7 +819,7 @@ class TeamsAdapter(BasePlatformAdapter):
         return None
 
     async def _on_card_action(
-        self, ctx: ActivityContext[AdaptiveCardInvokeActivity]
+        self, ctx: ActivityContext[AdaptiveCardInvokeActivity],
     ) -> InvokeResponse[AdaptiveCardActionMessageResponse]:
         """Handle an Adaptive Card Action.Execute button click."""
         from tools.approval import resolve_gateway_approval, has_blocking_approval
@@ -847,12 +847,12 @@ class TeamsAdapter(BasePlatformAdapter):
             if not allowed_csv:
                 logger.warning(
                     "[teams] card action rejected: TEAMS_ALLOWED_USERS not configured "
-                    "and TEAMS_ALLOW_ALL_USERS not set — default deny"
+                    "and TEAMS_ALLOW_ALL_USERS not set — default deny",
                 )
                 return InvokeResponse(
                     status=200,
                     body=AdaptiveCardActionMessageResponse(
-                        value="⛔ Approval buttons require TEAMS_ALLOWED_USERS to be configured."
+                        value="⛔ Approval buttons require TEAMS_ALLOWED_USERS to be configured.",
                     ),
                 )
             from_account = ctx.activity.from_
@@ -884,7 +884,7 @@ class TeamsAdapter(BasePlatformAdapter):
                 body=AdaptiveCardActionCardResponse(
                     value=AdaptiveCard()
                     .with_version("1.4")
-                    .with_body([TextBlock(text="⚠️ Approval already resolved or expired.", wrap=True)])
+                    .with_body([TextBlock(text="⚠️ Approval already resolved or expired.", wrap=True)]),
                 ),
             )
 
@@ -909,7 +909,7 @@ class TeamsAdapter(BasePlatformAdapter):
         return InvokeResponse(
             status=200,
             body=AdaptiveCardActionCardResponse(
-                value=AdaptiveCard().with_version("1.4").with_body(body)
+                value=AdaptiveCard().with_version("1.4").with_body(body),
             ),
         )
 

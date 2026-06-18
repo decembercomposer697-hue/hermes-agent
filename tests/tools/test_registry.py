@@ -52,10 +52,10 @@ class TestGetDefinitions:
     def test_returns_openai_format(self):
         reg = ToolRegistry()
         reg.register(
-            name="t1", toolset="s1", schema=_make_schema("t1"), handler=_dummy_handler
+            name="t1", toolset="s1", schema=_make_schema("t1"), handler=_dummy_handler,
         )
         reg.register(
-            name="t2", toolset="s1", schema=_make_schema("t2"), handler=_dummy_handler
+            name="t2", toolset="s1", schema=_make_schema("t2"), handler=_dummy_handler,
         )
 
         defs = reg.get_definitions({"t1", "t2"})
@@ -124,7 +124,7 @@ class TestToolsetAvailability:
     def test_no_check_fn_is_available(self):
         reg = ToolRegistry()
         reg.register(
-            name="t", toolset="free", schema=_make_schema(), handler=_dummy_handler
+            name="t", toolset="free", schema=_make_schema(), handler=_dummy_handler,
         )
         assert reg.is_toolset_available("free") is True
 
@@ -163,36 +163,36 @@ class TestToolsetAvailability:
     def test_get_all_tool_names(self):
         reg = ToolRegistry()
         reg.register(
-            name="z_tool", toolset="s", schema=_make_schema(), handler=_dummy_handler
+            name="z_tool", toolset="s", schema=_make_schema(), handler=_dummy_handler,
         )
         reg.register(
-            name="a_tool", toolset="s", schema=_make_schema(), handler=_dummy_handler
+            name="a_tool", toolset="s", schema=_make_schema(), handler=_dummy_handler,
         )
         assert reg.get_all_tool_names() == ["a_tool", "z_tool"]
 
     def test_get_registered_toolset_names(self):
         reg = ToolRegistry()
         reg.register(
-            name="first", toolset="zeta", schema=_make_schema(), handler=_dummy_handler
+            name="first", toolset="zeta", schema=_make_schema(), handler=_dummy_handler,
         )
         reg.register(
-            name="second", toolset="alpha", schema=_make_schema(), handler=_dummy_handler
+            name="second", toolset="alpha", schema=_make_schema(), handler=_dummy_handler,
         )
         reg.register(
-            name="third", toolset="alpha", schema=_make_schema(), handler=_dummy_handler
+            name="third", toolset="alpha", schema=_make_schema(), handler=_dummy_handler,
         )
         assert reg.get_registered_toolset_names() == ["alpha", "zeta"]
 
     def test_get_tool_names_for_toolset(self):
         reg = ToolRegistry()
         reg.register(
-            name="z_tool", toolset="grouped", schema=_make_schema(), handler=_dummy_handler
+            name="z_tool", toolset="grouped", schema=_make_schema(), handler=_dummy_handler,
         )
         reg.register(
-            name="a_tool", toolset="grouped", schema=_make_schema(), handler=_dummy_handler
+            name="a_tool", toolset="grouped", schema=_make_schema(), handler=_dummy_handler,
         )
         reg.register(
-            name="other_tool", toolset="other", schema=_make_schema(), handler=_dummy_handler
+            name="other_tool", toolset="other", schema=_make_schema(), handler=_dummy_handler,
         )
         assert reg.get_tool_names_for_toolset("grouped") == ["a_tool", "z_tool"]
 
@@ -203,7 +203,7 @@ class TestToolsetAvailability:
             raise RuntimeError("boom")
 
         reg.register(
-            name="bad", toolset="s", schema=_make_schema(), handler=bad_handler
+            name="bad", toolset="s", schema=_make_schema(), handler=bad_handler,
         )
         result = json.loads(reg.dispatch("bad", {}))
         assert "error" in result
@@ -386,7 +386,7 @@ class TestEntryLookup:
     def test_get_entry_returns_registered_entry(self):
         reg = ToolRegistry()
         reg.register(
-            name="alpha", toolset="core", schema=_make_schema("alpha"), handler=_dummy_handler
+            name="alpha", toolset="core", schema=_make_schema("alpha"), handler=_dummy_handler,
         )
         entry = reg.get_entry("alpha")
         assert entry is not None

@@ -444,11 +444,11 @@ def _format_model_caveats(
     if "image" in modalities and "text" not in modalities:
         caveats.append(
             "this model is image-to-video only — image_url is REQUIRED; "
-            "text-only calls will be rejected"
+            "text-only calls will be rejected",
         )
     elif "text" in modalities and "image" not in modalities:
         caveats.append(
-            "this model is text-to-video only — image_url is not supported"
+            "this model is text-to-video only — image_url is not supported",
         )
 
     return caveats
@@ -470,7 +470,7 @@ def _build_dynamic_video_schema() -> dict[str, Any]:
     if not configured:
         parts.append(
             "\nNo video backend is configured. Calls will return an error "
-            "until the user picks one via `hermes tools` → Video Generation."
+            "until the user picks one via `hermes tools` → Video Generation.",
         )
         return {"description": "\n".join(parts)}
 
@@ -486,7 +486,7 @@ def _build_dynamic_video_schema() -> dict[str, Any]:
     if provider is None:
         parts.append(
             f"\nActive backend: {configured} (plugin not yet loaded — the "
-            f"tool will retry discovery on first call)."
+            f"tool will retry discovery on first call).",
         )
         return {"description": "\n".join(parts)}
 
@@ -522,7 +522,7 @@ def _build_dynamic_video_schema() -> dict[str, Any]:
     if "text" in modalities and "image" in modalities and not model_meta.get("modality"):
         parts.append(
             "- supports both text-to-video (omit image_url) and "
-            "image-to-video (pass image_url) — routes automatically"
+            "image-to-video (pass image_url) — routes automatically",
         )
 
     if caps.get("aspect_ratios"):
@@ -531,7 +531,7 @@ def _build_dynamic_video_schema() -> dict[str, Any]:
         parts.append(f"- resolution choices: {', '.join(caps['resolutions'])}")
     if caps.get("min_duration") and caps.get("max_duration"):
         parts.append(
-            f"- duration range: {caps['min_duration']}-{caps['max_duration']}s"
+            f"- duration range: {caps['min_duration']}-{caps['max_duration']}s",
         )
     if caps.get("supports_audio"):
         parts.append("- audio: pass `audio=true` to enable native audio (pricing tier)")

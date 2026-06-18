@@ -43,9 +43,9 @@ async def test_handle_model_command_lists_saved_custom_provider(tmp_path, monkey
                         "name": "Local (127.0.0.1:4141)",
                         "base_url": "http://127.0.0.1:4141/v1",
                         "model": "rotator-openrouter-coding",
-                    }
+                    },
                 ],
-            }
+            },
         ),
         encoding="utf-8",
     )

@@ -127,7 +127,7 @@ def fetch(
                     "psc_code": str(r.get("PSC Code", "") or ""),
                     "competition_extent": set_aside,
                     "description": r.get("Description", "") or "",
-                }
+                },
             )
         meta = payload.get("page_metadata", {})
         if not meta.get("hasNext"):

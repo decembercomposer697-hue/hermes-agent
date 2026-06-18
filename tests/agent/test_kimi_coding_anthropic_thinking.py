@@ -133,7 +133,7 @@ class TestKimiCodingSkipsAnthropicThinking:
         ],
     )
     def test_kimi_family_custom_endpoint_omits_thinking(
-        self, base_url: str, model: str
+        self, base_url: str, model: str,
     ) -> None:
         """Custom / proxied Kimi endpoints must also strip Anthropic thinking."""
         from agent.anthropic_adapter import build_anthropic_kwargs
@@ -189,7 +189,7 @@ class TestKimiCodingSkipsAnthropicThinking:
                         "id": "call_1",
                         "type": "function",
                         "function": {"name": "skill_view", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_1", "content": "ok"},

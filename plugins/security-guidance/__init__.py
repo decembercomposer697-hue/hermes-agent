@@ -178,7 +178,7 @@ def _format_warning_block(findings: list[tuple[str, str]]) -> str:
     lines.append(
         "Pattern matches can be false positives. If the construct is safe in this "
         "context, briefly document why in a code comment and continue. Otherwise, "
-        "fix the code before moving on."
+        "fix the code before moving on.",
     )
     return "\n".join(lines)
 

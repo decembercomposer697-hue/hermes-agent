@@ -88,7 +88,7 @@ def _sanitize_single_tool(tool: dict) -> dict:
     # endpoint at chatgpt.com/backend-api/codex) reject outright. Nested
     # combinators inside properties are preserved.
     fn["parameters"] = _strip_top_level_combinators(
-        fn["parameters"], path=fn.get("name", "<tool>")
+        fn["parameters"], path=fn.get("name", "<tool>"),
     )
     return out
 

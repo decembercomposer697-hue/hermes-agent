@@ -86,7 +86,7 @@ except ImportError:
     except Exception:
         raise SystemExit(
             "Web UI requires fastapi and uvicorn.\n"
-            f"Install with: {sys.executable} -m pip install 'fastapi' 'uvicorn[standard]'"
+            f"Install with: {sys.executable} -m pip install 'fastapi' 'uvicorn[standard]'",
         )
 
 WEB_DIST = Path(os.environ["HERMES_WEB_DIST"]) if "HERMES_WEB_DIST" in os.environ else Path(__file__).parent / "web_dist"
@@ -579,7 +579,7 @@ def _build_schema_from_config(
         full_key = f"{prefix}.{key}" if prefix else key
 
         # Skip internal / version keys
-        if full_key in {"_config_version",}:
+        if full_key in {"_config_version"}:
             continue
 
         # Category is the first path component for nested keys, or "general"
@@ -719,7 +719,7 @@ class ModelAssignment(BaseModel):
 
 
 def _apply_main_model_assignment(
-    model_cfg: "Any", provider: str, model: str, base_url: str = ""
+    model_cfg: "Any", provider: str, model: str, base_url: str = "",
 ) -> dict:
     """Apply a main-slot model assignment to a ``model`` config dict in place.
 
@@ -1207,7 +1207,7 @@ async def get_status():
     if not gateway_running and _GATEWAY_HEALTH_URL:
         loop = asyncio.get_running_loop()
         alive, remote_health_body = await loop.run_in_executor(
-            None, _probe_gateway_health
+            None, _probe_gateway_health,
         )
         if alive:
             gateway_running = True
@@ -1626,7 +1626,7 @@ def _record_completed_action(name: str, message: str, exit_code: int = 1) -> Non
     log_path = _ACTION_LOG_DIR / log_file_name
     with open(log_path, "ab", buffering=0) as log_file:
         log_file.write(
-            f"\n=== {name} completed {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n".encode()
+            f"\n=== {name} completed {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n".encode(),
         )
         log_file.write(message.encode("utf-8", errors="replace"))
         if not message.endswith("\n"):
@@ -1646,7 +1646,7 @@ def _spawn_hermes_action(subcommand: list[str], name: str) -> subprocess.Popen:
     log_path = _ACTION_LOG_DIR / log_file_name
     log_file = open(log_path, "ab", buffering=0)
     log_file.write(
-        f"\n=== {name} started {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n".encode()
+        f"\n=== {name} started {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n".encode(),
     )
 
     cmd = [sys.executable, "-m", "hermes_cli.main", *subcommand]
@@ -1813,7 +1813,7 @@ def _recent_upstream_commits(n: int = 20) -> list[dict[str, Any]]:
                     "summary": summary,
                     "author": author,
                     "at": int(at or 0),
-                }
+                },
             )
         return rows
     except Exception:
@@ -1905,7 +1905,7 @@ async def transcribe_audio_upload(payload: AudioTranscriptionRequest):
     header, encoded = data_url.split(",", 1)
     if ";base64" not in header:
         raise HTTPException(
-            status_code=400, detail="Audio payload must be base64 encoded"
+            status_code=400, detail="Audio payload must be base64 encoded",
         )
 
     mime_type = (
@@ -1917,7 +1917,7 @@ async def transcribe_audio_upload(payload: AudioTranscriptionRequest):
         or normalized_mime_type == "video/webm"
     ):
         raise HTTPException(
-            status_code=400, detail="Payload must be an audio recording"
+            status_code=400, detail="Payload must be an audio recording",
         )
 
     try:
@@ -2718,14 +2718,14 @@ def get_recommended_default_model(provider: str = ""):
 
             if free_tier:
                 model_ids, pricing = union_with_portal_free_recommendations(
-                    model_ids, pricing, portal_url
+                    model_ids, pricing, portal_url,
                 )
                 model_ids, _unavailable = partition_nous_models_by_tier(
-                    model_ids, pricing, free_tier=True
+                    model_ids, pricing, free_tier=True,
                 )
             else:
                 model_ids, pricing = union_with_portal_paid_recommendations(
-                    model_ids, pricing, portal_url
+                    model_ids, pricing, portal_url,
                 )
 
             model = model_ids[0] if model_ids else ""
@@ -2841,7 +2841,7 @@ async def set_model_assignment(body: ModelAssignment):
             if not provider or not model:
                 raise HTTPException(status_code=400, detail="provider and model required for main")
             model_cfg = _apply_main_model_assignment(
-                cfg.get("model", {}), provider, model, base_url
+                cfg.get("model", {}), provider, model, base_url,
             )
             cfg["model"] = model_cfg
 
@@ -2861,7 +2861,7 @@ async def set_model_assignment(body: ModelAssignment):
                     from hermes_cli.tools_config import _get_platform_tools
 
                     enabled = _get_platform_tools(
-                        cfg, "cli", include_default_mcp_servers=False
+                        cfg, "cli", include_default_mcp_servers=False,
                     )
                     changed = apply_nous_managed_defaults(
                         cfg,
@@ -3599,7 +3599,7 @@ def _messaging_platform_catalog() -> tuple[dict[str, Any], ...]:
 
     order = {pid: idx for idx, pid in enumerate(_PLATFORM_ORDER)}
     entries.sort(
-        key=lambda e: (order.get(e["id"], len(_PLATFORM_ORDER)), e["name"].lower())
+        key=lambda e: (order.get(e["id"], len(_PLATFORM_ORDER)), e["name"].lower()),
     )
     return tuple(entries)
 
@@ -3678,7 +3678,7 @@ def _merge_platform_env_vars(
 
 
 def _build_catalog_entry(
-    platform_id: str, plugin_entry: Any | None = None
+    platform_id: str, plugin_entry: Any | None = None,
 ) -> dict[str, Any]:
     override = _PLATFORM_OVERRIDES.get(platform_id, {})
 
@@ -3740,7 +3740,7 @@ def _gateway_platform_config(platform_id: str):
 
 
 def _messaging_platform_payload(
-    entry: dict[str, Any], env_on_disk: dict[str, str], runtime: dict | None
+    entry: dict[str, Any], env_on_disk: dict[str, str], runtime: dict | None,
 ) -> dict[str, Any]:
     platform_id = entry["id"]
     gateway_running = get_running_pid() is not None
@@ -3761,17 +3761,17 @@ def _messaging_platform_payload(
                 "is_set": bool(value),
                 "redacted_value": redact_key(value) if value else None,
                 **_messaging_env_info(key),
-            }
+            },
         )
 
     try:
         gateway_config, platform, platform_config = _gateway_platform_config(
-            platform_id
+            platform_id,
         )
         enabled = bool(platform_config and platform_config.enabled)
         configured = bool(
             platform_config
-            and gateway_config._is_platform_connected(platform, platform_config)
+            and gateway_config._is_platform_connected(platform, platform_config),
         )
         home_channel = (
             platform_config.home_channel.to_dict()
@@ -4135,7 +4135,7 @@ def _restart_gateway_after_telegram_onboarding() -> dict[str, Any]:
 
 @app.post("/api/messaging/telegram/onboarding/{pairing_id}/apply")
 async def apply_telegram_onboarding(
-    pairing_id: str, body: TelegramOnboardingApply
+    pairing_id: str, body: TelegramOnboardingApply,
 ):
     allowed_user_ids = []
     seen = set()
@@ -4213,7 +4213,7 @@ async def get_messaging_platforms():
         "platforms": [
             _messaging_platform_payload(entry, env_on_disk, runtime)
             for entry in _messaging_platform_catalog()
-        ]
+        ],
     }
 
 
@@ -4222,7 +4222,7 @@ async def update_messaging_platform(platform_id: str, body: MessagingPlatformUpd
     entry = _catalog_lookup(platform_id)
     if not entry:
         raise HTTPException(
-            status_code=404, detail=f"Unknown messaging platform: {platform_id}"
+            status_code=404, detail=f"Unknown messaging platform: {platform_id}",
         )
 
     allowed_env = set(entry["env_vars"])
@@ -4261,7 +4261,7 @@ async def test_messaging_platform(platform_id: str):
     entry = _catalog_lookup(platform_id)
     if not entry:
         raise HTTPException(
-            status_code=404, detail=f"Unknown messaging platform: {platform_id}"
+            status_code=404, detail=f"Unknown messaging platform: {platform_id}",
         )
 
     env_on_disk = load_env()
@@ -4763,7 +4763,7 @@ def _save_anthropic_oauth_creds(access_token: str, refresh_token: str, expires_a
     }
     _HERMES_OAUTH_FILE.parent.mkdir(parents=True, exist_ok=True)
     tmp_path = _HERMES_OAUTH_FILE.with_name(
-        f"{_HERMES_OAUTH_FILE.name}.tmp.{os.getpid()}.{secrets.token_hex(8)}"
+        f"{_HERMES_OAUTH_FILE.name}.tmp.{os.getpid()}.{secrets.token_hex(8)}",
     )
     try:
         with tmp_path.open("w", encoding="utf-8") as handle:
@@ -4947,7 +4947,7 @@ async def _start_device_code_flow(provider_id: str) -> dict[str, Any]:
                 )
 
         device_data, effective_scope = await asyncio.get_running_loop().run_in_executor(
-            None, _do_nous_device_request
+            None, _do_nous_device_request,
         )
         sid, sess = _new_oauth_session("nous", "device_code")
         sess["device_code"] = str(device_data["device_code"])
@@ -4957,7 +4957,7 @@ async def _start_device_code_flow(provider_id: str) -> dict[str, Any]:
         sess["client_id"] = client_id
         sess["scope"] = effective_scope
         threading.Thread(
-            target=_nous_poller, args=(sid,), daemon=True, name=f"oauth-poll-{sid[:6]}"
+            target=_nous_poller, args=(sid,), daemon=True, name=f"oauth-poll-{sid[:6]}",
         ).start()
         return {
             "session_id": sid,
@@ -5035,7 +5035,7 @@ async def _start_device_code_flow(provider_id: str) -> dict[str, Any]:
                     state=state,
                 )
         device_data = await asyncio.get_event_loop().run_in_executor(
-            None, _do_minimax_request
+            None, _do_minimax_request,
         )
         sid, sess = _new_oauth_session("minimax-oauth", "device_code")
         # The CLI flow names this `interval_ms` because MiniMax's
@@ -5252,7 +5252,7 @@ def _xai_loopback_worker(session_id: str) -> None:
 
 
 def _add_xai_oauth_pool_entry(
-    access_token: str, refresh_token: str, base_url: str, last_refresh: str
+    access_token: str, refresh_token: str, base_url: str, last_refresh: str,
 ) -> None:
     """Mirror `hermes auth add xai-oauth`'s credential-pool insert.
 
@@ -5427,7 +5427,7 @@ def _minimax_poller(session_id: str) -> None:
             "resource_url": token_data.get("resource_url"),
             "obtained_at": now.isoformat(),
             "expires_at": datetime.fromtimestamp(
-                expires_at_ts, tz=UTC
+                expires_at_ts, tz=UTC,
             ).isoformat(),
             "expires_in": expires_in_s,
         }
@@ -5587,7 +5587,7 @@ async def start_oauth_login(provider_id: str, request: Request):
             return await _start_device_code_flow(provider_id)
         if catalog_entry["flow"] == "loopback" and provider_id == "xai-oauth":
             return await asyncio.get_running_loop().run_in_executor(
-                None, _start_xai_loopback_flow
+                None, _start_xai_loopback_flow,
             )
     except HTTPException:
         raise
@@ -5715,7 +5715,7 @@ def _session_latest_descendant(session_id: str):
         rows = []
         if conn is not None:
             raw_rows = conn.execute(
-                "SELECT id, parent_session_id, started_at FROM sessions"
+                "SELECT id, parent_session_id, started_at FROM sessions",
             ).fetchall()
             for row in raw_rows:
                 rows.append({
@@ -6318,7 +6318,7 @@ async def get_cron_delivery_targets():
             "name": "Local (save only)",
             "home_target_set": True,
             "home_env_var": None,
-        }
+        },
     ]
     try:
         from cron.scheduler import cron_delivery_targets
@@ -6446,7 +6446,7 @@ async def list_mcp_servers():
     return {
         "servers": [
             _mcp_server_summary(name, cfg) for name, cfg in sorted(servers.items())
-        ]
+        ],
     }
 
 
@@ -7486,7 +7486,7 @@ async def update_skills_hub(body: SkillsUpdateRequest | None = None):
     try:
         profile = body.profile if body else None
         proc = _spawn_hermes_action(
-            _profile_cli_args(profile) + ["skills", "update"], "skills-update"
+            _profile_cli_args(profile) + ["skills", "update"], "skills-update",
         )
     except HTTPException:
         raise
@@ -7618,7 +7618,7 @@ async def list_skills_hub_sources(profile: str | None = None):
 
 @app.get("/api/skills/hub/search")
 async def search_skills_hub(
-    q: str = "", source: str = "all", limit: int = 20, profile: str | None = None
+    q: str = "", source: str = "all", limit: int = 20, profile: str | None = None,
 ):
     """Search the skill hub across all configured sources.
 
@@ -7637,7 +7637,7 @@ async def search_skills_hub(
         sources = create_source_router()
         capped = min(max(limit, 1), 50)
         all_results, source_counts, timed_out = parallel_search_sources(
-            sources, query=query, source_filter=source or "all", overall_timeout=30
+            sources, query=query, source_filter=source or "all", overall_timeout=30,
         )
 
         # Dedupe by identifier, preferring higher trust (mirrors unified_search).
@@ -8580,7 +8580,7 @@ async def toggle_toolset(name: str, body: ToolsetToggle):
     with _profile_scope(body.profile):
         config = load_config()
         enabled = set(
-            _get_platform_tools(config, "cli", include_default_mcp_servers=False)
+            _get_platform_tools(config, "cli", include_default_mcp_servers=False),
         )
         if body.enabled:
             enabled.add(name)
@@ -8774,17 +8774,17 @@ async def run_toolset_post_setup(name: str, body: ToolsetPostSetup):
 
     if body.key not in valid_post_setup_keys():
         raise HTTPException(
-            status_code=400, detail=f"Unknown post-setup key: {body.key}"
+            status_code=400, detail=f"Unknown post-setup key: {body.key}",
         )
 
     try:
         proc = _spawn_hermes_action(
-            ["tools", "post-setup", body.key], "tools-post-setup"
+            ["tools", "post-setup", body.key], "tools-post-setup",
         )
     except Exception as exc:
         _log.exception("Failed to spawn tools post-setup")
         raise HTTPException(
-            status_code=500, detail=f"Failed to run post-setup: {exc}"
+            status_code=500, detail=f"Failed to run post-setup: {exc}",
         )
     return {"ok": True, "pid": proc.pid, "name": "tools-post-setup", "key": body.key}
 
@@ -9375,7 +9375,7 @@ def _build_sidecar_url(channel: str) -> str | None:
         from hermes_cli.dashboard_auth.ws_tickets import internal_ws_credential
 
         qs = urllib.parse.urlencode(
-            {"internal": internal_ws_credential(), "channel": channel}
+            {"internal": internal_ws_credential(), "channel": channel},
         )
     else:
         qs = urllib.parse.urlencode({"token": _SESSION_TOKEN, "channel": channel})
@@ -9465,7 +9465,7 @@ async def pty_ws(ws: WebSocket) -> None:
             "\r\n\x1b[31mChat unavailable: the embedded terminal requires a "
             "POSIX PTY, which native Windows Python doesn't provide.\x1b[0m\r\n"
             "\x1b[33mInstall Hermes inside WSL2 to use the dashboard's /chat "
-            "tab — the rest of the dashboard works here.\x1b[0m\r\n"
+            "tab — the rest of the dashboard works here.\x1b[0m\r\n",
         )
         await ws.close(code=1011)
         return
@@ -9501,7 +9501,7 @@ async def pty_ws(ws: WebSocket) -> None:
     async def pump_pty_to_ws() -> None:
         while True:
             chunk = await loop.run_in_executor(
-                None, bridge.read, _PTY_READ_CHUNK_TIMEOUT
+                None, bridge.read, _PTY_READ_CHUNK_TIMEOUT,
             )
             if chunk is None:  # EOF
                 return
@@ -9758,7 +9758,7 @@ def mount_spa(application: FastAPI):
     async def serve_css(filename: str, request: Request):
         css_path = WEB_DIST / "assets" / f"{filename}.css"
         if not css_path.is_file() or not css_path.resolve().is_relative_to(
-            WEB_DIST.resolve()
+            WEB_DIST.resolve(),
         ):
             return JSONResponse({"error": "not found"}, status_code=404)
         prefix = _normalise_prefix(request.headers.get("x-forwarded-prefix"))
@@ -10782,7 +10782,7 @@ def start_server(
 
                 if _nous_plugin.LAST_SKIP_REASON:
                     skip_reasons.append(
-                        f"  • nous: {_nous_plugin.LAST_SKIP_REASON}"
+                        f"  • nous: {_nous_plugin.LAST_SKIP_REASON}",
                     )
             except Exception:
                 pass
@@ -10798,7 +10798,7 @@ def start_server(
                     + "\n"
                     f"\n"
                     f"Or pass --insecure to skip the auth gate (NOT "
-                    f"recommended on untrusted networks)."
+                    f"recommended on untrusted networks).",
                 )
             raise SystemExit(
                 f"Refusing to bind dashboard to {host} — the OAuth auth "
@@ -10807,7 +10807,7 @@ def start_server(
                 f"(was the dashboard_auth/nous plugin removed?).\n"
                 f"Install a DashboardAuthProvider plugin, or pass --insecure "
                 f"to skip the auth gate (NOT recommended on untrusted "
-                f"networks)."
+                f"networks).",
             )
         _log.info(
             "Dashboard binding to %s with OAuth auth gate enabled. "
@@ -10857,7 +10857,7 @@ def start_server(
         else:
             _log.debug(
                 "Skipping browser-open: no DISPLAY or WAYLAND_DISPLAY detected "
-                "(headless Linux). Pass --no-open to suppress this detection."
+                "(headless Linux). Pass --no-open to suppress this detection.",
             )
 
     print(f"  Hermes Web UI → http://{host}:{port}")

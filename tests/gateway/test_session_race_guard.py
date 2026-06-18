@@ -40,7 +40,7 @@ class _FakeAdapter:
 def _make_runner():
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
     runner.adapters = {Platform.TELEGRAM: _FakeAdapter()}
     runner._running_agents = {}
@@ -313,7 +313,7 @@ async def test_command_messages_do_not_leave_sentinel():
         user_id="u1",
     )
     event = MessageEvent(
-        text="/help", message_type=MessageType.TEXT, source=source
+        text="/help", message_type=MessageType.TEXT, source=source,
     )
     session_key = build_session_key(source)
 
@@ -452,7 +452,7 @@ async def test_stop_hard_kills_running_agent():
     forever — showing 'writing...' but never producing output."""
     runner = _make_runner()
     session_key = build_session_key(
-        SessionSource(platform=Platform.TELEGRAM, chat_id="12345", chat_type="dm", user_id="u1")
+        SessionSource(platform=Platform.TELEGRAM, chat_id="12345", chat_type="dm", user_id="u1"),
     )
 
     # Simulate a running (possibly hung) agent
@@ -473,7 +473,7 @@ async def test_stop_hard_kills_running_agent():
         "/stop must remove the agent from _running_agents so the session is unlocked"
     )
     assert runner.adapters[Platform.TELEGRAM].interrupted_sessions == [
-        (session_key, "12345")
+        (session_key, "12345"),
     ]
     assert runner.adapters[Platform.TELEGRAM]._active_sessions[session_key].is_set()
 
@@ -491,7 +491,7 @@ async def test_stop_clears_pending_messages():
     queued during the run must be discarded."""
     runner = _make_runner()
     session_key = build_session_key(
-        SessionSource(platform=Platform.TELEGRAM, chat_id="12345", chat_type="dm", user_id="u1")
+        SessionSource(platform=Platform.TELEGRAM, chat_id="12345", chat_type="dm", user_id="u1"),
     )
 
     fake_agent = MagicMock()

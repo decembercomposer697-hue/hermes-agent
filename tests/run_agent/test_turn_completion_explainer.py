@@ -65,7 +65,7 @@ def _make_agent(max_iterations: int = 10, config: dict | None = None) -> AIAgent
 def test_explanation_quiet_for_normal_text_response():
     """A healthy text_response exit must NOT produce any explanation."""
     out = AIAgent._format_turn_completion_explanation(
-        "text_response(finish_reason=stop)"
+        "text_response(finish_reason=stop)",
     )
     assert out == ""
 
@@ -93,14 +93,14 @@ def test_explanation_for_partial_stream_recovery():
 def test_explanation_for_max_iterations_reached_prefix_match():
     """``max_iterations_reached(...)`` carries a parenthetical suffix."""
     out = AIAgent._format_turn_completion_explanation(
-        "max_iterations_reached(10/10)"
+        "max_iterations_reached(10/10)",
     )
     assert "iteration" in out.lower()
 
 
 def test_explanation_for_all_retries_exhausted():
     out = AIAgent._format_turn_completion_explanation(
-        "all_retries_exhausted_no_response"
+        "all_retries_exhausted_no_response",
     )
     assert "retries" in out.lower()
 
@@ -119,7 +119,7 @@ def test_explainer_enabled_by_default():
 def test_explainer_disabled_via_env():
     agent = _make_agent()
     with patch.dict(
-        os.environ, {"HERMES_TURN_COMPLETION_EXPLAINER": "0"}, clear=False
+        os.environ, {"HERMES_TURN_COMPLETION_EXPLAINER": "0"}, clear=False,
     ):
         assert agent._turn_completion_explainer_enabled() is False
 

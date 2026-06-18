@@ -134,7 +134,7 @@ async def login_page(request: Request) -> HTMLResponse:
     # callback applies (defence in depth — the gate already filters,
     # but /login is reachable directly too).
     next_path = _validate_post_login_target(
-        request.query_params.get("next", "")
+        request.query_params.get("next", ""),
     )
     return HTMLResponse(
         render_login_html(next_path=next_path),
@@ -162,7 +162,7 @@ async def api_auth_providers() -> Any:
                 "name": p.name,
                 "display_name": p.display_name,
                 "supports_password": bool(
-                    getattr(p, "supports_password", False)
+                    getattr(p, "supports_password", False),
                 ),
             }
             for p in providers
@@ -486,7 +486,7 @@ async def auth_password_login(request: Request, body: _PasswordLoginBody):
 
     try:
         session = p.complete_password_login(
-            username=body.username, password=body.password
+            username=body.username, password=body.password,
         )
     except InvalidCredentialsError:
         audit_log(

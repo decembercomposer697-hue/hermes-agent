@@ -59,7 +59,7 @@ def _make_runner(session_db=None):
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
     adapter = MagicMock()
     adapter.send = AsyncMock()
@@ -147,7 +147,7 @@ def _make_runner(session_db=None):
     # Bypass the destructive-slash confirm gate — these tests focus on
     # /new topic-mode mechanics, not the confirm prompt itself.
     runner._read_user_config = lambda: {
-        "approvals": {"destructive_slash_confirm": False}
+        "approvals": {"destructive_slash_confirm": False},
     }
     runner._release_running_agent_state = MagicMock()
     runner._evict_cached_agent = MagicMock()
@@ -164,11 +164,11 @@ async def test_root_telegram_dm_prompt_is_system_lobby_when_topic_mode_enabled(m
     runner = _make_runner()
     runner._telegram_topic_mode_enabled = lambda source: True
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("root Telegram DM prompt leaked to the agent loop")
+        side_effect=AssertionError("root Telegram DM prompt leaked to the agent loop"),
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("hello from root"))
@@ -186,11 +186,11 @@ async def test_root_telegram_dm_new_shows_create_topic_instruction(monkeypatch):
     runner = _make_runner()
     runner._telegram_topic_mode_enabled = lambda source: True
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("/new in root Telegram DM must not start an agent")
+        side_effect=AssertionError("/new in root Telegram DM must not start an agent"),
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/new"))
@@ -212,7 +212,7 @@ async def test_telegram_topic_prompt_still_runs_agent_when_topic_mode_enabled(mo
     runner._handle_message_with_agent = AsyncMock(return_value="agent response")
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("hello in topic", thread_id="17585"))
@@ -223,7 +223,7 @@ async def test_telegram_topic_prompt_still_runs_agent_when_topic_mode_enabled(mo
 
 @pytest.mark.asyncio
 async def test_managed_topic_binding_reuses_restored_session_over_static_lane_session(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     import gateway.run as gateway_run
 
@@ -257,7 +257,7 @@ async def test_managed_topic_binding_reuses_restored_session_over_static_lane_se
     runner._run_agent = AsyncMock(side_effect=fake_run_agent)
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("continue restored", thread_id="17585"))
@@ -268,7 +268,7 @@ async def test_managed_topic_binding_reuses_restored_session_over_static_lane_se
 
 @pytest.mark.asyncio
 async def test_telegram_group_prompt_is_not_topic_lobby_even_when_dm_topic_mode_enabled(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     import gateway.run as gateway_run
 
@@ -278,7 +278,7 @@ async def test_telegram_group_prompt_is_not_topic_lobby_even_when_dm_topic_mode_
     runner._handle_message_with_agent = AsyncMock(return_value="group agent response")
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_group_event("hello group", thread_id="555"))
@@ -290,18 +290,18 @@ async def test_telegram_group_prompt_is_not_topic_lobby_even_when_dm_topic_mode_
 
 @pytest.mark.asyncio
 async def test_topic_command_is_private_dm_only_and_does_not_enable_group_topic_mode(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     import gateway.run as gateway_run
 
     session_db = SessionDB(db_path=tmp_path / "state.db")
     runner = _make_runner(session_db=session_db)
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("group /topic must not enter the agent loop")
+        side_effect=AssertionError("group /topic must not enter the agent loop"),
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_group_event("/topic", thread_id="555"))
@@ -313,7 +313,7 @@ async def test_topic_command_is_private_dm_only_and_does_not_enable_group_topic_
 
 @pytest.mark.asyncio
 async def test_group_new_keeps_existing_reset_semantics_when_dm_topic_mode_enabled(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     import gateway.run as gateway_run
 
@@ -334,7 +334,7 @@ async def test_group_new_keeps_existing_reset_semantics_when_dm_topic_mode_enabl
     runner.session_store.reset_session.return_value = new_entry
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_group_event("/new", thread_id="555"))
@@ -375,7 +375,7 @@ async def test_new_inside_telegram_topic_resets_current_topic_with_parallel_tip(
     runner._agent_cache_lock = None
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/new", thread_id="17585"))
@@ -436,7 +436,7 @@ async def test_new_inside_telegram_topic_rewrites_binding_to_new_session(tmp_pat
     runner._agent_cache_lock = None
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     await runner._handle_message(_make_event("/new", thread_id="17585"))
@@ -511,11 +511,11 @@ async def test_topic_binding_follows_compression_tip_on_read(tmp_path, monkeypat
             "final_response": "ok",
             "session_id": "child-session",
             "messages": [],
-        }
+        },
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     await runner._handle_message(_make_event("follow up after compression", thread_id="17585"))
@@ -538,11 +538,11 @@ async def test_topic_root_command_explicitly_migrates_and_enables_topic_mode(tmp
     session_db = SessionDB(db_path=tmp_path / "state.db")
     runner = _make_runner(session_db=session_db)
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("/topic activation must not enter the agent loop")
+        side_effect=AssertionError("/topic activation must not enter the agent loop"),
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/topic"))
@@ -594,11 +594,11 @@ async def test_topic_root_command_lists_unlinked_sessions_for_restore(tmp_path, 
     )
     runner = _make_runner(session_db=session_db)
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("root /topic status must not enter the agent loop")
+        side_effect=AssertionError("root /topic status must not enter the agent loop"),
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/topic"))
@@ -620,11 +620,11 @@ async def test_topic_root_command_handles_no_unlinked_sessions(tmp_path, monkeyp
     session_db = SessionDB(db_path=tmp_path / "state.db")
     runner = _make_runner(session_db=session_db)
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("root /topic status must not enter the agent loop")
+        side_effect=AssertionError("root /topic status must not enter the agent loop"),
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/topic"))
@@ -655,11 +655,11 @@ async def test_topic_command_inside_bound_topic_shows_current_session(tmp_path, 
     )
     runner = _make_runner(session_db=session_db)
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("/topic status must not enter the agent loop")
+        side_effect=AssertionError("/topic status must not enter the agent loop"),
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/topic", thread_id="17585"))
@@ -673,7 +673,7 @@ async def test_topic_command_inside_bound_topic_shows_current_session(tmp_path, 
 
 @pytest.mark.asyncio
 async def test_topic_restore_inside_topic_binds_old_session_and_returns_last_assistant_message(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     import gateway.run as gateway_run
 
@@ -689,11 +689,11 @@ async def test_topic_restore_inside_topic_binds_old_session_and_returns_last_ass
     session_db.append_message("old-session", "assistant", "Here is the summary.")
     runner = _make_runner(session_db=session_db)
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("/topic restore must not enter the agent loop")
+        side_effect=AssertionError("/topic restore must not enter the agent loop"),
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/topic old-session", thread_id="17585"))
@@ -723,7 +723,7 @@ async def test_topic_restore_refuses_session_owned_by_another_telegram_user(tmp_
     runner = _make_runner(session_db=session_db)
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/topic other-session", thread_id="17585"))
@@ -753,7 +753,7 @@ async def test_topic_restore_refuses_already_linked_session(tmp_path, monkeypatc
     runner = _make_runner(session_db=session_db)
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/topic linked-session", thread_id="17585"))
@@ -777,7 +777,7 @@ async def test_first_message_inside_topic_records_topic_binding(tmp_path, monkey
     runner._handle_message_with_agent = AsyncMock(return_value="agent response")
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     source = _make_source(thread_id="17585")
@@ -813,7 +813,7 @@ async def test_topic_root_command_creates_and_pins_system_topic(tmp_path, monkey
     adapter._bot = bot
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/topic"))
@@ -1091,17 +1091,17 @@ def test_migration_rebuilds_v1_binding_table_with_cascade_fk(tmp_path):
                 updated_at REAL NOT NULL,
                 PRIMARY KEY (chat_id, thread_id)
             )
-            """
+            """,
         )
         # Also rewind the version marker so migration treats this as v1.
         db._conn.execute(
-            "UPDATE state_meta SET value = '1' WHERE key = 'telegram_dm_topic_schema_version'"
+            "UPDATE state_meta SET value = '1' WHERE key = 'telegram_dm_topic_schema_version'",
         )
         db._conn.commit()
 
     # Sanity check: FK has no CASCADE action yet.
     fk_rows = db._conn.execute(
-        "PRAGMA foreign_key_list('telegram_dm_topic_bindings')"
+        "PRAGMA foreign_key_list('telegram_dm_topic_bindings')",
     ).fetchall()
     assert any(row[2] == "sessions" and (row[6] or "") != "CASCADE" for row in fk_rows)
 
@@ -1109,12 +1109,12 @@ def test_migration_rebuilds_v1_binding_table_with_cascade_fk(tmp_path):
     db.apply_telegram_topic_migration()
 
     fk_rows_after = db._conn.execute(
-        "PRAGMA foreign_key_list('telegram_dm_topic_bindings')"
+        "PRAGMA foreign_key_list('telegram_dm_topic_bindings')",
     ).fetchall()
     assert any(row[2] == "sessions" and row[6] == "CASCADE" for row in fk_rows_after)
 
     version = db._conn.execute(
-        "SELECT value FROM state_meta WHERE key = 'telegram_dm_topic_schema_version'"
+        "SELECT value FROM state_meta WHERE key = 'telegram_dm_topic_schema_version'",
     ).fetchone()
     assert version is not None and version[0] == "2"
 
@@ -1134,7 +1134,7 @@ async def test_topic_help_subcommand_returns_usage(tmp_path):
     tables = {
         row[0]
         for row in db._conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'telegram_dm%'"
+            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'telegram_dm%'",
         ).fetchall()
     }
     assert tables == set()
@@ -1158,18 +1158,18 @@ async def test_topic_off_disables_mode_and_clears_bindings(tmp_path, monkeypatch
     runner = _make_runner(session_db=db)
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_topic_command(_make_event("/topic off"))
 
     assert "OFF" in result or "off" in result
     assert db.is_telegram_topic_mode_enabled(
-        chat_id="208214988", user_id="208214988"
+        chat_id="208214988", user_id="208214988",
     ) is False
     # Bindings cleared.
     assert db.get_telegram_topic_binding(
-        chat_id="208214988", thread_id="17585"
+        chat_id="208214988", thread_id="17585",
     ) is None
 
 
@@ -1194,7 +1194,7 @@ async def test_topic_refuses_unauthorized_user(tmp_path, monkeypatch):
     runner._is_user_authorized = lambda _source: False  # Deny
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_topic_command(_make_event("/topic"))
@@ -1204,7 +1204,7 @@ async def test_topic_refuses_unauthorized_user(tmp_path, monkeypatch):
     tables = {
         row[0]
         for row in db._conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'telegram_dm%'"
+            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'telegram_dm%'",
         ).fetchall()
     }
     assert tables == set()
@@ -1331,7 +1331,7 @@ def test_list_telegram_topic_bindings_for_chat_no_table(tmp_path):
     tables = {
         row[0]
         for row in db._conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'telegram_dm%'"
+            "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'telegram_dm%'",
         ).fetchall()
     }
     assert tables == set()

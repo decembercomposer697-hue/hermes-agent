@@ -286,7 +286,7 @@ def _discover_mcp() -> list[Component]:
 def _http_post_json(url: str, payload: dict) -> dict:
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
-        url, data=data, headers={"Content-Type": "application/json"}, method="POST"
+        url, data=data, headers={"Content-Type": "application/json"}, method="POST",
     )
     with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
         return json.loads(resp.read().decode("utf-8"))
@@ -315,7 +315,7 @@ def _osv_query_batch(components: list[Component]) -> dict[Component, list[str]]:
                     "version": c.version,
                 }
                 for c in chunk
-            ]
+            ],
         }
         try:
             resp = _http_post_json(OSV_BATCH_URL, payload)
@@ -453,7 +453,7 @@ def run_audit(
             f.component.source,
             f.component.name.lower(),
             f.vuln.osv_id,
-        )
+        ),
     )
     return findings
 
@@ -468,7 +468,7 @@ def _render_human(findings: list[Finding], total_components: int) -> str:
     lines: list[str] = []
     lines.append(
         f"Found {len(findings)} known vulnerability finding(s) "
-        f"across {total_components} component(s):"
+        f"across {total_components} component(s):",
     )
     lines.append("")
     last_source = None
@@ -511,7 +511,7 @@ def _render_json(findings: list[Finding], total_components: int) -> str:
 
 
 def _count_components(
-    *, skip_venv: bool, skip_plugins: bool, skip_mcp: bool, hermes_home: Path
+    *, skip_venv: bool, skip_plugins: bool, skip_mcp: bool, hermes_home: Path,
 ) -> int:
     total = 0
     if not skip_venv:
@@ -543,7 +543,7 @@ def cmd_security_audit(args: argparse.Namespace) -> int:
         return 2
 
     total = _count_components(
-        skip_venv=skip_venv, skip_plugins=skip_plugins, skip_mcp=skip_mcp, hermes_home=home
+        skip_venv=skip_venv, skip_plugins=skip_plugins, skip_mcp=skip_mcp, hermes_home=home,
     )
     if total == 0:
         msg = "No components discovered (everything skipped, or empty environment)."

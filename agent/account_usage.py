@@ -184,7 +184,7 @@ def build_nous_credits_snapshot(account_info) -> AccountUsageSnapshot | None:
                         label="Subscription",
                         used_percent=used_pct,
                         detail=f"{_fmt_usd(sub_remaining)} of {_fmt_usd(monthly_credits)} left",
-                    )
+                    ),
                 )
 
         if access is not None:
@@ -268,7 +268,7 @@ def nous_credits_lines(*, markdown: bool = False, timeout: float = 10.0) -> list
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
             account = pool.submit(
-                get_nous_portal_account_info, force_fresh=True
+                get_nous_portal_account_info, force_fresh=True,
             ).result(timeout=timeout)
         snapshot = build_nous_credits_snapshot(account)
         return render_account_usage_lines(snapshot, markdown=markdown)
@@ -306,7 +306,7 @@ def _snapshot_from_credits_state(state) -> AccountUsageSnapshot | None:
                     label="Subscription",
                     used_percent=max(0.0, min(100.0, uf * 100.0)),
                     detail=detail,
-                )
+                ),
             )
 
         sub_usd = getattr(state, "subscription_usd", None)
@@ -376,7 +376,7 @@ def _fetch_codex_account_usage() -> AccountUsageSnapshot | None:
                 label=label,
                 used_percent=float(used),
                 reset_at=_parse_dt(window.get("reset_at")),
-            )
+            ),
         )
     details: list[str] = []
     credits = payload.get("credits") or {}
@@ -436,7 +436,7 @@ def _fetch_anthropic_account_usage() -> AccountUsageSnapshot | None:
                 label=label,
                 used_percent=used,
                 reset_at=_parse_dt(window.get("resets_at")),
-            )
+            ),
         )
     details: list[str] = []
     extra = payload.get("extra_usage") or {}
@@ -446,7 +446,7 @@ def _fetch_anthropic_account_usage() -> AccountUsageSnapshot | None:
         currency = extra.get("currency") or "USD"
         if isinstance(used_credits, (int, float)) and isinstance(monthly_limit, (int, float)):
             details.append(
-                f"Extra usage: {used_credits:.2f} / {monthly_limit:.2f} {currency}"
+                f"Extra usage: {used_credits:.2f} / {monthly_limit:.2f} {currency}",
             )
     return AccountUsageSnapshot(
         provider="anthropic",
@@ -508,7 +508,7 @@ def _fetch_openrouter_account_usage(base_url: str | None, api_key: str | None) -
                 label="API key quota",
                 used_percent=used_percent,
                 detail=" • ".join(detail_parts),
-            )
+            ),
         )
     if isinstance(usage, (int, float)):
         usage_parts = [f"API key usage: ${float(usage):.2f} total"]

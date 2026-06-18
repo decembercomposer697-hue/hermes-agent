@@ -50,7 +50,7 @@ from run_agent import AIAgent
 from toolset_distributions import (
     list_distributions, 
     sample_toolsets_from_distribution,
-    validate_distribution
+    validate_distribution,
 )
 from model_tools import TOOL_TO_TOOLSET_MAP
 
@@ -150,7 +150,7 @@ def _extract_tool_stats(messages: list[dict[str, Any]]) -> dict[str, dict[str, i
                     tool_stats[tool_name] = {
                         "count": 0,
                         "success": 0,
-                        "failure": 0
+                        "failure": 0,
                     }
                 
                 tool_stats[tool_name]["count"] += 1
@@ -245,7 +245,7 @@ def _process_single_prompt(
     prompt_index: int,
     prompt_data: dict[str, Any],
     batch_num: int,
-    config: dict[str, Any]
+    config: dict[str, Any],
 ) -> dict[str, Any]:
     """
     Process a single prompt with the agent.
@@ -358,7 +358,7 @@ def _process_single_prompt(
         trajectory = agent._convert_to_trajectory_format(
             result["messages"],
             prompt,
-            result["completed"]
+            result["completed"],
         )
         
         return {
@@ -374,8 +374,8 @@ def _process_single_prompt(
             "metadata": {
                 "batch_num": batch_num,
                 "timestamp": datetime.now().isoformat(),
-                "model": config["model"]
-            }
+                "model": config["model"],
+            },
         }
     
     except Exception as e:
@@ -392,8 +392,8 @@ def _process_single_prompt(
             "toolsets_used": [],
             "metadata": {
                 "batch_num": batch_num,
-                "timestamp": datetime.now().isoformat()
-            }
+                "timestamp": datetime.now().isoformat(),
+            },
         }
 
 
@@ -428,7 +428,7 @@ def _process_batch_worker(args: tuple) -> dict[str, Any]:
             "processed": 0,
             "skipped": len(batch_data),
             "tool_stats": {},
-            "completed_prompts": []
+            "completed_prompts": [],
         }
     
     print(f"   Processing {len(prompts_to_process)} prompts (skipping {len(batch_data) - len(prompts_to_process)} already completed)")
@@ -446,7 +446,7 @@ def _process_batch_worker(args: tuple) -> dict[str, Any]:
             prompt_index,
             prompt_data,
             batch_num,
-            config
+            config,
         )
         
         # Save trajectory if successful
@@ -479,7 +479,7 @@ def _process_batch_worker(args: tuple) -> dict[str, Any]:
                 "api_calls": result["api_calls"],
                 "toolsets_used": result["toolsets_used"],
                 "tool_stats": tool_stats,  # Full stats: {tool: {count, success, failure}} - normalized
-                "tool_error_counts": tool_error_counts  # Simple: {tool: failure_count} - normalized
+                "tool_error_counts": tool_error_counts,  # Simple: {tool: failure_count} - normalized
             }
             
             # Append to batch output file
@@ -492,7 +492,7 @@ def _process_batch_worker(args: tuple) -> dict[str, Any]:
                 batch_tool_stats[tool_name] = {
                     "count": 0,
                     "success": 0,
-                    "failure": 0
+                    "failure": 0,
                 }
             
             batch_tool_stats[tool_name]["count"] += stats["count"]
@@ -520,7 +520,7 @@ def _process_batch_worker(args: tuple) -> dict[str, Any]:
         "tool_stats": batch_tool_stats,
         "reasoning_stats": batch_reasoning_stats,
         "discarded_no_reasoning": discarded_no_reasoning,
-        "completed_prompts": completed_in_batch
+        "completed_prompts": completed_in_batch,
     }
 
 
@@ -697,7 +697,7 @@ class BatchRunner:
                 "run_name": self.run_name,
                 "completed_prompts": [],
                 "batch_stats": {},
-                "last_updated": None
+                "last_updated": None,
             }
         
         try:
@@ -709,7 +709,7 @@ class BatchRunner:
                 "run_name": self.run_name,
                 "completed_prompts": [],
                 "batch_stats": {},
-                "last_updated": None
+                "last_updated": None,
             }
     
     def _save_checkpoint(self, checkpoint_data: dict[str, Any], lock: Lock | None = None):
@@ -859,7 +859,7 @@ class BatchRunner:
                 "run_name": self.run_name,
                 "completed_prompts": [],
                 "batch_stats": {},
-                "last_updated": None
+                "last_updated": None,
             }
         
         # Prepare configuration for workers.
@@ -923,7 +923,7 @@ class BatchRunner:
                     batch_data,
                     str(self.output_dir),  # Convert Path to string for pickling
                     completed_prompts_set,
-                    config
+                    config,
                 )
                 for batch_num, batch_data in enumerate(self.batches)
             ]
@@ -994,7 +994,7 @@ class BatchRunner:
                     total_tool_stats[tool_name] = {
                         "count": 0,
                         "success": 0,
-                        "failure": 0
+                        "failure": 0,
                     }
                 
                 total_tool_stats[tool_name]["count"] += stats["count"]
@@ -1102,7 +1102,7 @@ class BatchRunner:
             sorted_tools = sorted(
                 total_tool_stats.items(),
                 key=lambda x: x[1]["count"],
-                reverse=True
+                reverse=True,
             )
             
             print(f"{'Tool Name':<25} {'Count':<10} {'Success':<10} {'Failure':<10} {'Success Rate':<12}")
@@ -1113,7 +1113,7 @@ class BatchRunner:
                     f"{stats['count']:<10} "
                     f"{stats['success']:<10} "
                     f"{stats['failure']:<10} "
-                    f"{stats['success_rate']:.1f}%"
+                    f"{stats['success_rate']:.1f}%",
                 )
         else:
             print("No tool calls were made during this run.")

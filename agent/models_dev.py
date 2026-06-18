@@ -693,7 +693,7 @@ def get_provider_info(provider_id: str) -> ProviderInfo | None:
 # ---------------------------------------------------------------------------
 
 def get_model_info(
-    provider_id: str, model_id: str
+    provider_id: str, model_id: str,
 ) -> ModelInfo | None:
     """Get full model metadata from models.dev.
 

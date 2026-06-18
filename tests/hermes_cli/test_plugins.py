@@ -55,7 +55,7 @@ def _make_plugin_dir(base: Path, name: str, *, register_body: str = "pass",
 
     (plugin_dir / "plugin.yaml").write_text(yaml.dump(manifest))
     (plugin_dir / "__init__.py").write_text(
-        f"def register(ctx):\n    {register_body}\n"
+        f"def register(ctx):\n    {register_body}\n",
     )
 
     if auto_enable:
@@ -124,10 +124,10 @@ class TestPluginDiscovery:
         assert "tool_request" in VALID_MIDDLEWARE
         assert set(mgr._plugins["mw_plugin"].middleware_registered) == {"llm_request", "tool_request"}
         assert mgr.invoke_middleware("llm_request", request={"messages": []}) == [
-            {"request": {"messages": [], "mw": True}}
+            {"request": {"messages": [], "mw": True}},
         ]
         assert mgr.invoke_middleware("tool_request", args={"path": "README.md"}) == [
-            {"args": {"path": "README.md", "mw": True}}
+            {"args": {"path": "README.md", "mw": True}},
         ]
         assert mgr.has_middleware("llm_request") is True
 
@@ -422,7 +422,7 @@ class TestPluginLoading:
         # missing-init error.
         hermes_home = tmp_path / "hermes_test"
         (hermes_home / "config.yaml").write_text(
-            yaml.safe_dump({"plugins": {"enabled": ["bad_plugin"]}})
+            yaml.safe_dump({"plugins": {"enabled": ["bad_plugin"]}}),
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 
@@ -445,7 +445,7 @@ class TestPluginLoading:
         # Explicitly enable it so the loader actually tries to import.
         hermes_home = tmp_path / "hermes_test"
         (hermes_home / "config.yaml").write_text(
-            yaml.safe_dump({"plugins": {"enabled": ["no_reg"]}})
+            yaml.safe_dump({"plugins": {"enabled": ["no_reg"]}}),
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 
@@ -492,13 +492,13 @@ class TestPluginLoading:
             "class MemPalaceProvider:\n"
             "    pass\n"
             "def register(ctx):\n"
-            "    ctx.register_memory_provider('mempalace', MemPalaceProvider)\n"
+            "    ctx.register_memory_provider('mempalace', MemPalaceProvider)\n",
         )
         # Even if the user explicitly enables it in config, the loader
         # should still treat it as exclusive and skip general loading.
         hermes_home = tmp_path / "hermes_test"
         (hermes_home / "config.yaml").write_text(
-            yaml.safe_dump({"plugins": {"enabled": ["mempalace"]}})
+            yaml.safe_dump({"plugins": {"enabled": ["mempalace"]}}),
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 
@@ -524,11 +524,11 @@ class TestPluginLoading:
         plugin_dir = plugins_dir / "not_memory"
         plugin_dir.mkdir(parents=True)
         (plugin_dir / "plugin.yaml").write_text(
-            yaml.dump({"name": "not_memory", "kind": "standalone"})
+            yaml.dump({"name": "not_memory", "kind": "standalone"}),
         )
         (plugin_dir / "__init__.py").write_text(
             "# This plugin inspects MemoryProvider docs but isn't one.\n"
-            "def register(ctx):\n    pass\n"
+            "def register(ctx):\n    pass\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path / "hermes_test"))
 
@@ -612,7 +612,7 @@ class TestPluginHooks:
         mgr.discover_and_load()
 
         assert mgr.invoke_hook("pre_tool_call", tool_name="test", args={}) == [
-            "hermes.observer.v1"
+            "hermes.observer.v1",
         ]
 
     def test_hook_exception_does_not_propagate(self, tmp_path, monkeypatch):
@@ -810,7 +810,7 @@ class TestThreadToolWhitelist:
             lambda hook_name, **kwargs: [],
         )
         set_thread_tool_whitelist(
-            {"memory"}, deny_msg_fmt="denied: {tool_name}"
+            {"memory"}, deny_msg_fmt="denied: {tool_name}",
         )
         try:
             msg = get_pre_tool_call_block_message("terminal", {})
@@ -888,11 +888,11 @@ class TestPluginContext:
             '        toolset="plugin_tool_plugin",\n'
             '        schema={"name": "plugin_echo", "description": "Echo", "parameters": {"type": "object", "properties": {}}},\n'
             '        handler=lambda args, **kw: "echo",\n'
-            '    )\n'
+            '    )\n',
         )
         hermes_home = tmp_path / "hermes_test"
         (hermes_home / "config.yaml").write_text(
-            yaml.safe_dump({"plugins": {"enabled": ["tool_plugin"]}})
+            yaml.safe_dump({"plugins": {"enabled": ["tool_plugin"]}}),
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 
@@ -928,11 +928,11 @@ class TestPluginContext:
                 '        toolset="plugin_shadow_plugin",\n'
                 '        schema={"name": "shadow_target", "description": "Plugin", "parameters": {"type": "object", "properties": {}}},\n'
                 '        handler=lambda args, **kw: "plugin",\n'
-                '    )\n'
+                '    )\n',
             )
             hermes_home = tmp_path / "hermes_test"
             (hermes_home / "config.yaml").write_text(
-                yaml.safe_dump({"plugins": {"enabled": ["shadow_plugin"]}})
+                yaml.safe_dump({"plugins": {"enabled": ["shadow_plugin"]}}),
             )
             monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 
@@ -971,11 +971,11 @@ class TestPluginContext:
                 '        schema={"name": "override_target", "description": "Plugin", "parameters": {"type": "object", "properties": {}}},\n'
                 '        handler=lambda args, **kw: "plugin",\n'
                 '        override=True,\n'
-                '    )\n'
+                '    )\n',
             )
             hermes_home = tmp_path / "hermes_test"
             (hermes_home / "config.yaml").write_text(
-                yaml.safe_dump({"plugins": {"enabled": ["override_plugin"]}})
+                yaml.safe_dump({"plugins": {"enabled": ["override_plugin"]}}),
             )
             monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 
@@ -985,7 +985,7 @@ class TestPluginContext:
 
             # Plugin handler replaced the built-in one.
             assert registry._tools["override_target"].toolset == "plugin_override_plugin"
-            assert registry._tools["override_target"].handler({}, ) == "plugin"
+            assert registry._tools["override_target"].handler({} ) == "plugin"
             # Override is audit-logged at INFO.
             assert any(
                 "overriding existing" in r.message and "override_target" in r.message
@@ -1012,11 +1012,11 @@ class TestPluginContext:
             '        schema={"name": "brand_new_override_tool", "description": "New", "parameters": {"type": "object", "properties": {}}},\n'
             '        handler=lambda args, **kw: "ok",\n'
             '        override=True,\n'
-            '    )\n'
+            '    )\n',
         )
         hermes_home = tmp_path / "hermes_test"
         (hermes_home / "config.yaml").write_text(
-            yaml.safe_dump({"plugins": {"enabled": ["new_override_plugin"]}})
+            yaml.safe_dump({"plugins": {"enabled": ["new_override_plugin"]}}),
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 
@@ -1049,11 +1049,11 @@ class TestPluginToolVisibility:
             '        toolset="plugin_vis_plugin",\n'
             '        schema={"name": "vis_tool", "description": "Visible", "parameters": {"type": "object", "properties": {}}},\n'
             '        handler=lambda args, **kw: "ok",\n'
-            '    )\n'
+            '    )\n',
         )
         hermes_home = tmp_path / "hermes_test"
         (hermes_home / "config.yaml").write_text(
-            yaml.safe_dump({"plugins": {"enabled": ["vis_plugin"]}})
+            yaml.safe_dump({"plugins": {"enabled": ["vis_plugin"]}}),
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 
@@ -1419,7 +1419,7 @@ class TestPluginCommands:
                 "name": "engine-plugin",
                 "version": "0.1.0",
                 "description": "Test engine plugin",
-            })
+            }),
         )
         (plugin_dir / "__init__.py").write_text(
             "from agent.context_engine import ContextEngine\n\n"
@@ -1434,11 +1434,11 @@ class TestPluginCommands:
             "    def compress(self, messages, current_tokens):\n"
             "        return messages\n\n"
             "def register(ctx):\n"
-            "    ctx.register_context_engine(StubEngine())\n"
+            "    ctx.register_context_engine(StubEngine())\n",
         )
         # Opt-in: plugins are opt-in by default, so enable in config.yaml
         (hermes_home / "config.yaml").write_text(
-            yaml.safe_dump({"plugins": {"enabled": ["engine-plugin"]}})
+            yaml.safe_dump({"plugins": {"enabled": ["engine-plugin"]}}),
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 

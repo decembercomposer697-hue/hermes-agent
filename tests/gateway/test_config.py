@@ -153,7 +153,7 @@ class TestSessionResetPolicy:
 
     def test_from_dict_treats_null_values_as_defaults(self):
         restored = SessionResetPolicy.from_dict(
-            {"mode": None, "at_hour": None, "idle_minutes": None}
+            {"mode": None, "at_hour": None, "idle_minutes": None},
         )
         assert restored.mode == "both"
         assert restored.at_hour == 4
@@ -182,7 +182,7 @@ class TestStreamingConfig:
                 "edit_interval": "oops",
                 "buffer_threshold": "oops",
                 "fresh_final_after_seconds": "oops",
-            }
+            },
         )
         assert restored.edit_interval == 0.8
         assert restored.buffer_threshold == 24
@@ -246,7 +246,7 @@ class TestGatewayConfigRoundtrip:
             {
                 "gateway": {"max_concurrent_sessions": 4},
                 "max_concurrent_sessions": 2,
-            }
+            },
         )
 
         assert config.max_concurrent_sessions == 2
@@ -273,7 +273,7 @@ class TestGatewayConfigRoundtrip:
 
     def test_get_notice_delivery_defaults_to_public(self):
         config = GatewayConfig(
-            platforms={Platform.SLACK: PlatformConfig(enabled=True, token="***")}
+            platforms={Platform.SLACK: PlatformConfig(enabled=True, token="***")},
         )
 
         assert config.get_notice_delivery(Platform.SLACK) == "public"
@@ -286,7 +286,7 @@ class TestGatewayConfigRoundtrip:
                     token="***",
                     extra={"notice_delivery": "private"},
                 ),
-            }
+            },
         )
 
         assert config.get_notice_delivery(Platform.SLACK) == "private"

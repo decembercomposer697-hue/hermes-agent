@@ -51,17 +51,17 @@ def _isolate_hermes_home(tmp_path, monkeypatch):
     hh.mkdir()
     monkeypatch.setenv("HERMES_HOME", str(hh))
     monkeypatch.setattr(
-        "hermes_cli.config.get_hermes_home", lambda: hh
+        "hermes_cli.config.get_hermes_home", lambda: hh,
     )
     monkeypatch.setattr(
-        "hermes_cli.config.get_config_path", lambda: hh / "config.yaml"
+        "hermes_cli.config.get_config_path", lambda: hh / "config.yaml",
     )
     monkeypatch.setattr(
-        "hermes_cli.config.get_env_path", lambda: hh / ".env"
+        "hermes_cli.config.get_env_path", lambda: hh / ".env",
     )
     # mcp_catalog grabs get_hermes_home() lazily through hermes_constants
     monkeypatch.setattr(
-        "hermes_constants.get_hermes_home", lambda: hh
+        "hermes_constants.get_hermes_home", lambda: hh,
     )
     return hh
 
@@ -130,7 +130,7 @@ class TestManifestParsing:
                     {"name": "DEMO_KEY", "prompt": "API key", "secret": True},
                     {"name": "DEMO_URL", "prompt": "Base URL", "secret": False, "required": False},
                 ],
-            }
+            },
         )
         _write_manifest(catalog_dir, "demo", body)
         from hermes_cli.mcp_catalog import list_catalog
@@ -254,7 +254,7 @@ class TestInstall:
             auth={
                 "type": "api_key",
                 "env": [{"name": "DEMO_KEY", "prompt": "key", "secret": True}],
-            }
+            },
         )
         _write_manifest(catalog_dir, "demo", body)
 
@@ -291,7 +291,7 @@ class TestInstall:
             auth={
                 "type": "api_key",
                 "env": [{"name": "MUST", "prompt": "x", "required": True, "secret": False}],
-            }
+            },
         )
         _write_manifest(catalog_dir, "demo", body)
 
@@ -412,7 +412,7 @@ class TestToolSelection:
         assert server["tools"]["include"] == ["a", "b", "c"]
 
     def test_probe_success_non_tty_with_default_filters_to_default(
-        self, catalog_dir, monkeypatch
+        self, catalog_dir, monkeypatch,
     ):
         body = _basic_manifest(
             tools={"default_enabled": ["alpha", "gamma"]},
@@ -434,7 +434,7 @@ class TestToolSelection:
         assert server["tools"]["include"] == ["alpha", "gamma"]
 
     def test_probe_success_non_tty_no_default_clears_filter(
-        self, catalog_dir, monkeypatch
+        self, catalog_dir, monkeypatch,
     ):
         _write_manifest(catalog_dir, "demo", _basic_manifest())
         import hermes_cli.mcp_catalog as mc
@@ -452,7 +452,7 @@ class TestToolSelection:
         assert "tools" not in server
 
     def test_default_enabled_filters_out_unknown_tool_names(
-        self, catalog_dir, monkeypatch
+        self, catalog_dir, monkeypatch,
     ):
         """If manifest names a tool the server doesn\'t actually expose, it
         silently drops out — never written into tools.include."""
@@ -475,7 +475,7 @@ class TestToolSelection:
         assert server["tools"]["include"] == ["real"]
 
     def test_reinstall_preserves_prior_user_selection(
-        self, catalog_dir, monkeypatch
+        self, catalog_dir, monkeypatch,
     ):
         """Second install of the same entry uses the user\'s prior
         tools.include as the pre-check, NOT the manifest default."""
@@ -735,7 +735,7 @@ class TestToolsConfigIncludeMode:
                     "command": "npx",
                     "args": ["-y", "demo-mcp"],
                     "enabled": True,
-                }
+                },
             },
         }
 

@@ -46,7 +46,7 @@ def test_status_uses_last_activity_not_only_last_used(monkeypatch, capsys):
             "last_patched_at": "2026-04-30T11:00:00+00:00",
             "last_activity_at": "2026-04-30T11:00:00+00:00",
             "activity_count": 4,
-        }
+        },
     ])
 
     assert curator_cli._cmd_status(SimpleNamespace()) == 0
@@ -89,7 +89,7 @@ def curator_status_env(tmp_path, monkeypatch):
             "  hermes:\n"
             "    agent_created: true\n"
             "---\n"
-            f"# {name}\n"
+            f"# {name}\n",
         )
 
     return {

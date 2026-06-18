@@ -37,7 +37,7 @@ def test_get_service_registers_atexit_handler_once(monkeypatch):
     fake_svc = MagicMock()
     fake_svc.is_active.return_value = True
     monkeypatch.setattr(
-        lsp_module.LSPService, "create_from_config", classmethod(lambda cls: fake_svc)
+        lsp_module.LSPService, "create_from_config", classmethod(lambda cls: fake_svc),
     )
 
     registrations = []
@@ -65,7 +65,7 @@ def test_atexit_shutdown_calls_shutdown_service(monkeypatch):
     already seen the response and a noisy traceback would be clutter."""
     called = []
     monkeypatch.setattr(
-        lsp_module, "shutdown_service", lambda: called.append("shutdown")
+        lsp_module, "shutdown_service", lambda: called.append("shutdown"),
     )
     lsp_module._atexit_shutdown()
     assert called == ["shutdown"]
@@ -87,7 +87,7 @@ def test_shutdown_service_idempotent(monkeypatch):
     fake_svc.is_active.return_value = True
     fake_svc.shutdown = MagicMock()
     monkeypatch.setattr(
-        lsp_module.LSPService, "create_from_config", classmethod(lambda cls: fake_svc)
+        lsp_module.LSPService, "create_from_config", classmethod(lambda cls: fake_svc),
     )
     monkeypatch.setattr(atexit, "register", lambda fn: None)
 
@@ -110,7 +110,7 @@ def test_shutdown_service_swallows_exception(monkeypatch):
     fake_svc.is_active.return_value = True
     fake_svc.shutdown = MagicMock(side_effect=RuntimeError("kill -9 already"))
     monkeypatch.setattr(
-        lsp_module.LSPService, "create_from_config", classmethod(lambda cls: fake_svc)
+        lsp_module.LSPService, "create_from_config", classmethod(lambda cls: fake_svc),
     )
     monkeypatch.setattr(atexit, "register", lambda fn: None)
 
@@ -124,7 +124,7 @@ def test_get_service_returns_none_for_inactive_service(monkeypatch):
     fake_svc = MagicMock()
     fake_svc.is_active.return_value = False
     monkeypatch.setattr(
-        lsp_module.LSPService, "create_from_config", classmethod(lambda cls: fake_svc)
+        lsp_module.LSPService, "create_from_config", classmethod(lambda cls: fake_svc),
     )
     monkeypatch.setattr(atexit, "register", lambda fn: None)
 
@@ -137,7 +137,7 @@ def test_get_service_returns_none_for_inactive_service(monkeypatch):
 def test_get_service_returns_none_when_create_fails(monkeypatch):
     """Service factory returning ``None`` (no config, etc.) propagates."""
     monkeypatch.setattr(
-        lsp_module.LSPService, "create_from_config", classmethod(lambda cls: None)
+        lsp_module.LSPService, "create_from_config", classmethod(lambda cls: None),
     )
     monkeypatch.setattr(atexit, "register", lambda fn: None)
 

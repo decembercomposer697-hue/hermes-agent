@@ -67,7 +67,7 @@ def main():
 
         # Warm up: start the supervisor, navigate to a page.
         supervisor = SUPERVISOR_REGISTRY.get_or_start(
-            task_id="bench-eval", cdp_url=cdp_url
+            task_id="bench-eval", cdp_url=cdp_url,
         )
         # Give it a moment to attach.
         time.sleep(1.0)

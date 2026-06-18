@@ -45,7 +45,7 @@ class TestRedirectStdoutIsProcessWide(unittest.TestCase):
         self.assertTrue(
             other_thread_saw_devnull.is_set(),
             "redirect_stdout was NOT process-wide — other thread still saw real stdout. "
-            "This test's premise is wrong."
+            "This test's premise is wrong.",
         )
         print("Confirmed: redirect_stdout IS process-wide — affects all threads")
 

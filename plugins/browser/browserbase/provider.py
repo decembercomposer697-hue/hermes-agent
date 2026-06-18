@@ -73,7 +73,7 @@ class BrowserbaseBrowserProvider(BrowserProvider):
                 "api_key": api_key,
                 "project_id": project_id,
                 "base_url": os.environ.get(
-                    "BROWSERBASE_BASE_URL", "https://api.browserbase.com"
+                    "BROWSERBASE_BASE_URL", "https://api.browserbase.com",
                 ).rstrip("/"),
             }
         return None
@@ -83,7 +83,7 @@ class BrowserbaseBrowserProvider(BrowserProvider):
         if config is None:
             raise ValueError(
                 "Browserbase requires BROWSERBASE_API_KEY and BROWSERBASE_PROJECT_ID "
-                "environment variables."
+                "environment variables.",
             )
         return config
 
@@ -124,7 +124,7 @@ class BrowserbaseBrowserProvider(BrowserProvider):
                     session_config["timeout"] = timeout_val
             except ValueError:
                 logger.warning(
-                    "Invalid BROWSERBASE_SESSION_TIMEOUT value: %s", custom_timeout_ms
+                    "Invalid BROWSERBASE_SESSION_TIMEOUT value: %s", custom_timeout_ms,
                 )
 
         if enable_proxies:
@@ -156,7 +156,7 @@ class BrowserbaseBrowserProvider(BrowserProvider):
                     keepalive_fallback = True
                     logger.warning(
                         "keepAlive may require paid plan (402), retrying without it. "
-                        "Sessions may timeout during long operations."
+                        "Sessions may timeout during long operations.",
                     )
                     session_config.pop("keepAlive", None)
                     response = requests.post(
@@ -170,7 +170,7 @@ class BrowserbaseBrowserProvider(BrowserProvider):
                     proxies_fallback = True
                     logger.warning(
                         "Proxies unavailable (402), retrying without proxies. "
-                        "Bot detection may be less effective."
+                        "Bot detection may be less effective.",
                     )
                     session_config.pop("proxies", None)
                     response = requests.post(
@@ -181,13 +181,13 @@ class BrowserbaseBrowserProvider(BrowserProvider):
                     )
         except requests.RequestException as exc:
             raise RuntimeError(
-                f"Browserbase API connection failed: {exc}"
+                f"Browserbase API connection failed: {exc}",
             ) from exc
 
         if not response.ok:
             raise RuntimeError(
                 f"Failed to create Browserbase session: "
-                f"{response.status_code} {response.text}"
+                f"{response.status_code} {response.text}",
             )
 
         session_data = response.json()
@@ -204,7 +204,7 @@ class BrowserbaseBrowserProvider(BrowserProvider):
 
         feature_str = ", ".join(k for k, v in features_enabled.items() if v)
         logger.info(
-            "Created Browserbase session %s with features: %s", session_name, feature_str
+            "Created Browserbase session %s with features: %s", session_name, feature_str,
         )
 
         return {
@@ -219,7 +219,7 @@ class BrowserbaseBrowserProvider(BrowserProvider):
             config = self._get_config()
         except ValueError:
             logger.warning(
-                "Cannot close Browserbase session %s — missing credentials", session_id
+                "Cannot close Browserbase session %s — missing credentials", session_id,
             )
             return False
 
@@ -274,7 +274,7 @@ class BrowserbaseBrowserProvider(BrowserProvider):
             )
         except Exception as e:
             logger.debug(
-                "Emergency cleanup failed for Browserbase session %s: %s", session_id, e
+                "Emergency cleanup failed for Browserbase session %s: %s", session_id, e,
             )
 
     def get_setup_schema(self) -> dict[str, Any]:

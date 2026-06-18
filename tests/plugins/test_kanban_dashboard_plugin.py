@@ -408,7 +408,7 @@ def test_reopening_parent_demotes_ready_child(client):
     assert r.status_code == 200
 
     child_after_done = client.get(
-        f"/api/plugins/kanban/tasks/{child['id']}"
+        f"/api/plugins/kanban/tasks/{child['id']}",
     ).json()["task"]
     assert child_after_done["status"] == "ready"
 
@@ -419,7 +419,7 @@ def test_reopening_parent_demotes_ready_child(client):
     assert r.status_code == 200
 
     child_after_reopen = client.get(
-        f"/api/plugins/kanban/tasks/{child['id']}"
+        f"/api/plugins/kanban/tasks/{child['id']}",
     ).json()["task"]
     assert child_after_reopen["status"] == "todo"
 
@@ -780,7 +780,7 @@ def test_ws_events_rejects_when_token_required(tmp_path, monkeypatch):
 
     # Correct token → accepted (connect then close cleanly from our side).
     with c.websocket_connect(
-        "/api/plugins/kanban/events?token=secret-xyz"
+        "/api/plugins/kanban/events?token=secret-xyz",
     ) as ws:
         assert ws is not None  # handshake succeeded
 
@@ -825,7 +825,7 @@ def test_ws_events_accepts_gated_ticket(tmp_path, monkeypatch):
 
     # A valid ticket is accepted.
     with c.websocket_connect(
-        "/api/plugins/kanban/events?ticket=good-ticket"
+        "/api/plugins/kanban/events?ticket=good-ticket",
     ) as ws:
         assert ws is not None
 
@@ -874,7 +874,7 @@ def test_ws_events_board_query_param_default_overrides_current_board_pointer(tmp
     c = TestClient(app)
 
     with c.websocket_connect(
-        "/api/plugins/kanban/events?token=secret-xyz&board=default&since=0"
+        "/api/plugins/kanban/events?token=secret-xyz&board=default&since=0",
     ) as ws:
         payload = ws.receive_json()
 
@@ -1176,7 +1176,7 @@ def test_config_reads_dashboard_kanban_section(tmp_path, monkeypatch, client):
         "    default_tenant: acme\n"
         "    lane_by_profile: false\n"
         "    include_archived_by_default: true\n"
-        "    render_markdown: false\n"
+        "    render_markdown: false\n",
     )
     r = client.get("/api/plugins/kanban/config")
     assert r.status_code == 200
@@ -2094,7 +2094,7 @@ def test_specify_happy_path(client, monkeypatch):
     _patch_specifier_response(
         monkeypatch,
         content=jsonlib.dumps(
-            {"title": "Polished", "body": "**Goal**\nDo the thing."}
+            {"title": "Polished", "body": "**Goal**\nDo the thing."},
         ),
     )
 

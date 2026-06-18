@@ -148,7 +148,7 @@ class TestPatchFailureEscalation:
         )
 
     def test_different_paths_have_independent_counters(
-        self, hermes_home, tmp_path, fresh_tracker
+        self, hermes_home, tmp_path, fresh_tracker,
     ):
         from tools.file_tools import _handle_patch
 
@@ -186,7 +186,7 @@ class TestPatchFailureEscalation:
         )
 
     def test_different_tasks_have_independent_counters(
-        self, hermes_home, tmp_path, fresh_tracker
+        self, hermes_home, tmp_path, fresh_tracker,
     ):
         from tools.file_tools import _handle_patch
 

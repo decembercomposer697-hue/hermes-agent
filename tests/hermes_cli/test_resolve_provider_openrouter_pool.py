@@ -50,7 +50,7 @@ def _seed_openrouter_pool(token: str = "sk-or-FAKEKEY123") -> None:
             source=SOURCE_MANUAL,
             access_token=token,
             base_url="https://openrouter.ai/api/v1",
-        )
+        ),
     )
 
 

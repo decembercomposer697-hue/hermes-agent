@@ -139,7 +139,7 @@ def _make_provider(rsa_keypair, *, scopes: str | None = None):
     # Patch the JWKS client to return our fixture key.
     fake_key = MagicMock()
     fake_key.key = serialization.load_pem_private_key(
-        rsa_keypair["private_pem"].encode(), password=None
+        rsa_keypair["private_pem"].encode(), password=None,
     ).public_key()
     fake_client = MagicMock()
     fake_client.get_signing_key_from_jwt.return_value = fake_key
@@ -176,7 +176,7 @@ class TestConstruction:
 
     def test_strips_trailing_slash_from_issuer(self):
         p = oidc_plugin.SelfHostedOIDCProvider(
-            issuer=_ISSUER + "/", client_id=_CLIENT_ID
+            issuer=_ISSUER + "/", client_id=_CLIENT_ID,
         )
         assert p._issuer == _ISSUER
 
@@ -191,13 +191,13 @@ class TestConstruction:
     def test_rejects_non_https_issuer(self):
         with pytest.raises(ProviderError, match="https"):
             oidc_plugin.SelfHostedOIDCProvider(
-                issuer="http://auth.example.com", client_id=_CLIENT_ID
+                issuer="http://auth.example.com", client_id=_CLIENT_ID,
             )
 
     def test_allows_http_localhost_issuer(self):
         # Local dev against a loopback IDP is allowed.
         p = oidc_plugin.SelfHostedOIDCProvider(
-            issuer="http://localhost:9000", client_id=_CLIENT_ID
+            issuer="http://localhost:9000", client_id=_CLIENT_ID,
         )
         assert p._issuer == "http://localhost:9000"
 
@@ -207,7 +207,7 @@ class TestConstruction:
 
     def test_empty_scopes_falls_back_to_default(self):
         p = oidc_plugin.SelfHostedOIDCProvider(
-            issuer=_ISSUER, client_id=_CLIENT_ID, scopes="   "
+            issuer=_ISSUER, client_id=_CLIENT_ID, scopes="   ",
         )
         assert p._scopes == "openid profile email"
 
@@ -220,7 +220,7 @@ class TestConstruction:
 class TestDiscovery:
     def _provider(self):
         return oidc_plugin.SelfHostedOIDCProvider(
-            issuer=_ISSUER, client_id=_CLIENT_ID
+            issuer=_ISSUER, client_id=_CLIENT_ID,
         )
 
     def _mock_get(self, status_code, body, *, ctype="application/json"):
@@ -241,7 +241,7 @@ class TestDiscovery:
         p = self._provider()
         mock_resp = self._mock_get(200, dict(_DISCOVERY_DOC))
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp,
         ) as mock_get:
             disco1 = p._get_discovery()
             disco2 = p._get_discovery()
@@ -257,7 +257,7 @@ class TestDiscovery:
         p = self._provider()
         mock_resp = self._mock_get(404, {})
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp,
         ):
             with pytest.raises(ProviderError, match="404"):
                 p._get_discovery()
@@ -277,7 +277,7 @@ class TestDiscovery:
         del doc["token_endpoint"]
         mock_resp = self._mock_get(200, doc)
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp,
         ):
             with pytest.raises(ProviderError, match="token_endpoint"):
                 p._get_discovery()
@@ -288,7 +288,7 @@ class TestDiscovery:
         doc["issuer"] = "https://evil.example"
         mock_resp = self._mock_get(200, doc)
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp,
         ):
             with pytest.raises(ProviderError, match="issuer mismatch"):
                 p._get_discovery()
@@ -299,7 +299,7 @@ class TestDiscovery:
         doc["issuer"] = _ISSUER + "/"  # only a trailing-slash difference
         mock_resp = self._mock_get(200, doc)
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp,
         ):
             disco = p._get_discovery()
         assert disco["token_endpoint"] == f"{_ISSUER}/token"
@@ -310,7 +310,7 @@ class TestDiscovery:
         doc["token_endpoint"] = "http://auth.example.com/token"  # not loopback
         mock_resp = self._mock_get(200, doc)
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.get", return_value=mock_resp,
         ):
             with pytest.raises(ProviderError, match="https"):
                 p._get_discovery()
@@ -328,19 +328,19 @@ class TestStartLogin:
 
     def test_returns_login_start(self, provider):
         result = provider.start_login(
-            redirect_uri="https://hermes.example/auth/callback"
+            redirect_uri="https://hermes.example/auth/callback",
         )
         assert isinstance(result, LoginStart)
 
     def test_redirect_url_targets_authorize_endpoint(self, provider):
         result = provider.start_login(
-            redirect_uri="https://hermes.example/auth/callback"
+            redirect_uri="https://hermes.example/auth/callback",
         )
         assert result.redirect_url.startswith(f"{_ISSUER}/authorize?")
 
     def test_authorize_url_has_required_params(self, provider):
         result = provider.start_login(
-            redirect_uri="https://hermes.example/auth/callback"
+            redirect_uri="https://hermes.example/auth/callback",
         )
         parsed = urllib.parse.urlparse(result.redirect_url)
         params = dict(urllib.parse.parse_qsl(parsed.query))
@@ -355,7 +355,7 @@ class TestStartLogin:
     def test_custom_scopes_used(self, rsa_keypair):
         provider = _make_provider(rsa_keypair, scopes="openid email groups")
         result = provider.start_login(
-            redirect_uri="https://hermes.example/auth/callback"
+            redirect_uri="https://hermes.example/auth/callback",
         )
         parsed = urllib.parse.urlparse(result.redirect_url)
         params = dict(urllib.parse.parse_qsl(parsed.query))
@@ -363,7 +363,7 @@ class TestStartLogin:
 
     def test_code_verifier_length(self, provider):
         result = provider.start_login(
-            redirect_uri="https://hermes.example/auth/callback"
+            redirect_uri="https://hermes.example/auth/callback",
         )
         pkce = result.cookie_payload["hermes_session_pkce"]
         parts = dict(seg.split("=", 1) for seg in pkce.split(";") if "=" in seg)
@@ -371,7 +371,7 @@ class TestStartLogin:
 
     def test_state_in_cookie_matches_url(self, provider):
         result = provider.start_login(
-            redirect_uri="https://hermes.example/auth/callback"
+            redirect_uri="https://hermes.example/auth/callback",
         )
         parsed = urllib.parse.urlparse(result.redirect_url)
         params = dict(urllib.parse.parse_qsl(parsed.query))
@@ -381,7 +381,7 @@ class TestStartLogin:
 
     def test_code_challenge_is_s256_of_verifier(self, provider):
         result = provider.start_login(
-            redirect_uri="https://hermes.example/auth/callback"
+            redirect_uri="https://hermes.example/auth/callback",
         )
         parsed = urllib.parse.urlparse(result.redirect_url)
         params = dict(urllib.parse.parse_qsl(parsed.query))
@@ -389,7 +389,7 @@ class TestStartLogin:
         parts = dict(seg.split("=", 1) for seg in pkce.split(";") if "=" in seg)
         expected = (
             base64.urlsafe_b64encode(
-                hashlib.sha256(parts["verifier"].encode("ascii")).digest()
+                hashlib.sha256(parts["verifier"].encode("ascii")).digest(),
             )
             .rstrip(b"=")
             .decode()
@@ -435,7 +435,7 @@ class TestCompleteLogin:
             },
         )
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp,
         ):
             session = provider.complete_login(
                 code="abc",
@@ -455,10 +455,10 @@ class TestCompleteLogin:
     def test_tolerates_missing_refresh_token(self, provider, rsa_keypair):
         id_token = _mint_id_token(rsa_keypair)
         mock_resp = _mock_post(
-            200, {"id_token": id_token, "token_type": "Bearer"}
+            200, {"id_token": id_token, "token_type": "Bearer"},
         )
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp,
         ):
             session = provider.complete_login(
                 code="abc",
@@ -470,10 +470,10 @@ class TestCompleteLogin:
 
     def test_missing_id_token_raises(self, provider):
         mock_resp = _mock_post(
-            200, {"access_token": "opaque", "token_type": "Bearer"}
+            200, {"access_token": "opaque", "token_type": "Bearer"},
         )
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp,
         ):
             with pytest.raises(ProviderError, match="id_token"):
                 provider.complete_login(
@@ -486,7 +486,7 @@ class TestCompleteLogin:
     def test_400_raises_invalid_code(self, provider):
         mock_resp = _mock_post(400, {"error": "invalid_grant"})
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp,
         ):
             with pytest.raises(InvalidCodeError, match="invalid_grant"):
                 provider.complete_login(
@@ -499,7 +499,7 @@ class TestCompleteLogin:
     def test_500_raises_provider_error(self, provider):
         mock_resp = _mock_post(500, "boom", ctype="text/plain")
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp,
         ):
             with pytest.raises(ProviderError, match="500"):
                 provider.complete_login(
@@ -525,10 +525,10 @@ class TestCompleteLogin:
     def test_unexpected_token_type_raises(self, provider, rsa_keypair):
         id_token = _mint_id_token(rsa_keypair)
         mock_resp = _mock_post(
-            200, {"id_token": id_token, "token_type": "DPoP"}
+            200, {"id_token": id_token, "token_type": "DPoP"},
         )
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp,
         ):
             with pytest.raises(ProviderError, match="token_type"):
                 provider.complete_login(
@@ -542,7 +542,7 @@ class TestCompleteLogin:
         id_token = _mint_id_token(rsa_keypair)
         mock_resp = _mock_post(200, {"id_token": id_token, "token_type": "Bearer"})
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp,
         ) as mock_post:
             provider.complete_login(
                 code="the-code",
@@ -603,7 +603,7 @@ class TestVerifySession:
             provider.verify_session(access_token=token)
 
     def test_display_name_falls_back_to_preferred_username(
-        self, provider, rsa_keypair
+        self, provider, rsa_keypair,
     ):
         token = _mint_id_token(
             rsa_keypair,
@@ -637,7 +637,7 @@ class TestVerifySession:
         token = _mint_id_token(rsa_keypair)
         bad_client = MagicMock()
         bad_client.get_signing_key_from_jwt.side_effect = jwt.PyJWKClientError(
-            "fetch failed"
+            "fetch failed",
         )
         provider._jwks_client = bad_client
         with pytest.raises(ProviderError, match="JWKS"):
@@ -665,7 +665,7 @@ class TestRefreshAndRevoke:
             },
         )
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp,
         ) as mock_post:
             session = provider.refresh_session(refresh_token="rt_old")
         assert isinstance(session, Session)
@@ -682,7 +682,7 @@ class TestRefreshAndRevoke:
         id_token = _mint_id_token(rsa_keypair)
         mock_resp = _mock_post(200, {"id_token": id_token, "token_type": "Bearer"})
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp,
         ):
             session = provider.refresh_session(refresh_token="rt_kept")
         assert session.refresh_token == "rt_kept"
@@ -690,7 +690,7 @@ class TestRefreshAndRevoke:
     def test_refresh_400_raises_refresh_expired(self, provider):
         mock_resp = _mock_post(400, {"error": "invalid_grant"})
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp
+            "plugins.dashboard_auth.self_hosted.httpx.post", return_value=mock_resp,
         ):
             with pytest.raises(RefreshExpiredError, match="invalid_grant"):
                 provider.refresh_session(refresh_token="rt_dead")
@@ -711,7 +711,7 @@ class TestRefreshAndRevoke:
 
     def test_revoke_posts_to_revocation_endpoint(self, provider):
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post"
+            "plugins.dashboard_auth.self_hosted.httpx.post",
         ) as mock_post:
             provider.revoke_session(refresh_token="rt_x")
         mock_post.assert_called_once()
@@ -721,7 +721,7 @@ class TestRefreshAndRevoke:
 
     def test_revoke_empty_token_noop(self, provider):
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post"
+            "plugins.dashboard_auth.self_hosted.httpx.post",
         ) as mock_post:
             assert provider.revoke_session(refresh_token="") is None
         mock_post.assert_not_called()
@@ -737,7 +737,7 @@ class TestRefreshAndRevoke:
     def test_revoke_noop_when_no_revocation_endpoint(self, provider):
         provider._discovery["revocation_endpoint"] = ""
         with patch(
-            "plugins.dashboard_auth.self_hosted.httpx.post"
+            "plugins.dashboard_auth.self_hosted.httpx.post",
         ) as mock_post:
             assert provider.revoke_session(refresh_token="rt_x") is None
         mock_post.assert_not_called()
@@ -799,7 +799,7 @@ class TestPluginRegister:
 
     def test_registers_from_config_yaml(self, patch_config):
         patch_config(
-            {"self_hosted": {"issuer": _ISSUER, "client_id": _CLIENT_ID}}
+            {"self_hosted": {"issuer": _ISSUER, "client_id": _CLIENT_ID}},
         )
         ctx = MagicMock()
         oidc_plugin.register(ctx)
@@ -814,8 +814,8 @@ class TestPluginRegister:
                 "self_hosted": {
                     "issuer": "https://config.example",
                     "client_id": "config-client",
-                }
-            }
+                },
+            },
         )
         monkeypatch.setenv("HERMES_DASHBOARD_OIDC_ISSUER", _ISSUER)
         monkeypatch.setenv("HERMES_DASHBOARD_OIDC_CLIENT_ID", _CLIENT_ID)
@@ -827,7 +827,7 @@ class TestPluginRegister:
 
     def test_empty_env_does_not_shadow_config(self, patch_config, monkeypatch):
         patch_config(
-            {"self_hosted": {"issuer": _ISSUER, "client_id": _CLIENT_ID}}
+            {"self_hosted": {"issuer": _ISSUER, "client_id": _CLIENT_ID}},
         )
         monkeypatch.setenv("HERMES_DASHBOARD_OIDC_ISSUER", "")
         monkeypatch.setenv("HERMES_DASHBOARD_OIDC_CLIENT_ID", "")
@@ -844,8 +844,8 @@ class TestPluginRegister:
                     "issuer": _ISSUER,
                     "client_id": _CLIENT_ID,
                     "scopes": "openid email",
-                }
-            }
+                },
+            },
         )
         ctx = MagicMock()
         oidc_plugin.register(ctx)
@@ -873,7 +873,7 @@ class TestPluginRegister:
     def test_non_https_issuer_skips_with_reason(self, patch_config, monkeypatch):
         patch_config(None)
         monkeypatch.setenv(
-            "HERMES_DASHBOARD_OIDC_ISSUER", "http://insecure.example"
+            "HERMES_DASHBOARD_OIDC_ISSUER", "http://insecure.example",
         )
         monkeypatch.setenv("HERMES_DASHBOARD_OIDC_CLIENT_ID", _CLIENT_ID)
         ctx = MagicMock()

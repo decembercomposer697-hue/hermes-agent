@@ -49,7 +49,7 @@ def _ra():
 
 
 AGENT_RUNTIME_POST_HOOK_TOOL_NAMES = frozenset(
-    {"todo", "session_search", "memory", "clarify", "read_terminal", "delegate_task"}
+    {"todo", "session_search", "memory", "clarify", "read_terminal", "delegate_task"},
 )
 
 
@@ -98,13 +98,13 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
     
     trajectory.append({
         "from": "system",
-        "value": system_msg
+        "value": system_msg,
     })
     
     # Add the actual user prompt (from the dataset) as the first human message
     trajectory.append({
         "from": "human",
-        "value": user_query
+        "value": user_query,
     })
     
     # Skip the first message (the user query) since we already added it above.
@@ -146,7 +146,7 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
                     
                     tool_call_json = {
                         "name": tool_call["function"]["name"],
-                        "arguments": arguments
+                        "arguments": arguments,
                     }
                     content += f"<tool_call>\n{json.dumps(tool_call_json, ensure_ascii=False)}\n</tool_call>\n"
                 
@@ -157,7 +157,7 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
                 
                 trajectory.append({
                     "from": "gpt",
-                    "value": content.rstrip()
+                    "value": content.rstrip(),
                 })
                 
                 # Collect all subsequent tool responses
@@ -185,7 +185,7 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
                     tool_response += json.dumps({
                         "tool_call_id": tool_msg.get("tool_call_id", ""),
                         "name": tool_name,
-                        "content": tool_content
+                        "content": tool_content,
                     }, ensure_ascii=False)
                     tool_response += "\n</tool_response>"
                     tool_responses.append(tool_response)
@@ -195,7 +195,7 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
                 if tool_responses:
                     trajectory.append({
                         "from": "tool",
-                        "value": "\n".join(tool_responses)
+                        "value": "\n".join(tool_responses),
                     })
                     i = j - 1  # Skip the tool messages we just processed
             
@@ -219,13 +219,13 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
                 
                 trajectory.append({
                     "from": "gpt",
-                    "value": content.strip()
+                    "value": content.strip(),
                 })
         
         elif msg["role"] == "user":
             trajectory.append({
                 "from": "human",
-                "value": msg["content"]
+                "value": msg["content"],
             })
         
         i += 1
@@ -862,7 +862,7 @@ def drop_thinking_only_and_merge_users(
             elif isinstance(prev_content, list) and isinstance(cur_content, str):
                 if cur_content:
                     prev_copy["content"] = list(prev_content) + [
-                        {"type": "text", "text": cur_content}
+                        {"type": "text", "text": cur_content},
                     ]
                 else:
                     prev_copy["content"] = list(prev_content)
@@ -2014,7 +2014,7 @@ def looks_like_codex_intermediate_ack(
         return False
 
     has_future_ack = bool(
-        re.search(r"\b(i['’]ll|i will|let me|i can do that|i can help with that)\b", assistant_text)
+        re.search(r"\b(i['’]ll|i will|let me|i can do that|i can help with that)\b", assistant_text),
     )
     if not has_future_ack:
         return False

@@ -114,7 +114,7 @@ class TestDotenvFallbackPerProvider:
             client.__enter__ = MagicMock(return_value=client)
             client.__exit__ = MagicMock(return_value=False)
             client.audio.speech.complete.return_value = MagicMock(
-                audio_data=base64.b64encode(b"data").decode()
+                audio_data=base64.b64encode(b"data").decode(),
             )
             return client
 
@@ -142,12 +142,12 @@ class TestDotenvFallbackPerProvider:
                                     "inlineData": {
                                         "data": "AAAA",
                                         "mimeType": "audio/L16;codec=pcm;rate=24000",
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                ]
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
             }
             response.raise_for_status = MagicMock()
             return response
@@ -211,7 +211,7 @@ class TestRegressionGuard:
                 return_value={"MINIMAX_API_KEY": "dotenv-secret"},
             ), patch("requests.post", side_effect=fake_post):
                 tts_tool._generate_minimax_tts(
-                    "hi", str(tmp_path / "out.mp3"), {}
+                    "hi", str(tmp_path / "out.mp3"), {},
                 )
 
             assert captured["headers"]["Authorization"] == "Bearer dotenv-secret"
@@ -251,7 +251,7 @@ class TestRegressionGuard:
 
             with patch("requests.post", side_effect=fake_post):
                 tts_tool._generate_minimax_tts(
-                    "hi", str(tmp_path / "out.mp3"), {}
+                    "hi", str(tmp_path / "out.mp3"), {},
                 )
 
             assert captured["headers"]["Authorization"] == "Bearer dotenv-secret"

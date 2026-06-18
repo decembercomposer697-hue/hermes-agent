@@ -144,9 +144,9 @@ class TestJudgeGoal:
         fake_client.chat.completions.create.return_value = MagicMock(
             choices=[
                 MagicMock(
-                    message=MagicMock(content='{"done": true, "reason": "achieved"}')
-                )
-            ]
+                    message=MagicMock(content='{"done": true, "reason": "achieved"}'),
+                ),
+            ],
         )
         with patch(
             "agent.auxiliary_client.get_text_auxiliary_client",
@@ -163,9 +163,9 @@ class TestJudgeGoal:
         fake_client.chat.completions.create.return_value = MagicMock(
             choices=[
                 MagicMock(
-                    message=MagicMock(content='{"done": false, "reason": "not yet"}')
-                )
-            ]
+                    message=MagicMock(content='{"done": false, "reason": "not yet"}'),
+                ),
+            ],
         )
         with patch(
             "agent.auxiliary_client.get_text_auxiliary_client",
@@ -380,7 +380,7 @@ class TestJudgeParseFailureAutoPause:
         from hermes_cli.goals import _parse_judge_response
 
         done, reason, parse_failed = _parse_judge_response(
-            "Let me analyze whether the goal is fully satisfied based on the agent's response..."
+            "Let me analyze whether the goal is fully satisfied based on the agent's response...",
         )
         assert done is False
         assert parse_failed is True
@@ -390,7 +390,7 @@ class TestJudgeParseFailureAutoPause:
         from hermes_cli.goals import _parse_judge_response
 
         done, _, parse_failed = _parse_judge_response(
-            '{"done": false, "reason": "more work"}'
+            '{"done": false, "reason": "more work"}',
         )
         assert done is False
         assert parse_failed is False
@@ -415,7 +415,7 @@ class TestJudgeParseFailureAutoPause:
 
         fake_client = MagicMock()
         fake_client.chat.completions.create.return_value = MagicMock(
-            choices=[MagicMock(message=MagicMock(content=""))]
+            choices=[MagicMock(message=MagicMock(content=""))],
         )
         with patch(
             "agent.auxiliary_client.get_text_auxiliary_client",
@@ -435,7 +435,7 @@ class TestJudgeParseFailureAutoPause:
         mgr.set("do a thing")
 
         with patch.object(
-            goals, "judge_goal", return_value=("continue", "judge returned empty response", True)
+            goals, "judge_goal", return_value=("continue", "judge returned empty response", True),
         ):
             d1 = mgr.evaluate_after_turn("step 1")
             assert d1["should_continue"] is True
@@ -464,7 +464,7 @@ class TestJudgeParseFailureAutoPause:
 
         # Two parse failures…
         with patch.object(
-            goals, "judge_goal", return_value=("continue", "not json", True)
+            goals, "judge_goal", return_value=("continue", "not json", True),
         ):
             mgr.evaluate_after_turn("step 1")
             mgr.evaluate_after_turn("step 2")
@@ -472,7 +472,7 @@ class TestJudgeParseFailureAutoPause:
 
         # …then one clean reply resets the counter.
         with patch.object(
-            goals, "judge_goal", return_value=("continue", "making progress", False)
+            goals, "judge_goal", return_value=("continue", "making progress", False),
         ):
             d = mgr.evaluate_after_turn("step 3")
             assert d["should_continue"] is True
@@ -487,7 +487,7 @@ class TestJudgeParseFailureAutoPause:
         mgr.set("goal")
 
         with patch.object(
-            goals, "judge_goal", return_value=("continue", "judge error: RuntimeError", False)
+            goals, "judge_goal", return_value=("continue", "judge error: RuntimeError", False),
         ):
             for _ in range(5):
                 d = mgr.evaluate_after_turn("still going")
@@ -496,7 +496,7 @@ class TestJudgeParseFailureAutoPause:
             assert mgr.state.status == "active"
 
     def test_consecutive_parse_failures_persists_across_goalmanager_reloads(
-        self, hermes_home
+        self, hermes_home,
     ):
         """The counter must be durable so cross-session resumes see it."""
         from hermes_cli import goals
@@ -506,7 +506,7 @@ class TestJudgeParseFailureAutoPause:
         mgr.set("persistent goal")
 
         with patch.object(
-            goals, "judge_goal", return_value=("continue", "empty", True)
+            goals, "judge_goal", return_value=("continue", "empty", True),
         ):
             mgr.evaluate_after_turn("r")
             mgr.evaluate_after_turn("r")

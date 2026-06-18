@@ -73,7 +73,7 @@ class TestChromeDebugLaunch:
         assert "start_new_session" not in captured["kwargs"]
         flags = captured["kwargs"].get("creationflags", 0)
         expected = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(
-            subprocess, "CREATE_NEW_PROCESS_GROUP", 0
+            subprocess, "CREATE_NEW_PROCESS_GROUP", 0,
         )
         assert flags == expected
 

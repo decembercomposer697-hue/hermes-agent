@@ -52,7 +52,7 @@ def test_write_file_rejection_does_not_mutate_existing_file(tmp_path):
             "write_file",
             {"path": str(target), "content": "after\n"},
             task_id="acp-edit-reject",
-        )
+        ),
     )
 
     assert "error" in result
@@ -76,7 +76,7 @@ def test_write_file_approval_mutates_and_request_includes_diff(tmp_path):
             "write_file",
             {"path": str(target), "content": "after\n"},
             task_id="acp-edit-approve",
-        )
+        ),
     )
 
     assert result.get("bytes_written") == len("after\n")
@@ -100,7 +100,7 @@ def test_write_file_new_file_request_has_empty_old_text(tmp_path):
             "write_file",
             {"path": str(target), "content": "created\n"},
             task_id="acp-edit-new-file",
-        )
+        ),
     )
 
     assert result.get("bytes_written") == len("created\n")
@@ -123,7 +123,7 @@ def test_requester_exception_denies_and_does_not_mutate(tmp_path):
             "write_file",
             {"path": str(target), "content": "after\n"},
             task_id="acp-edit-exception",
-        )
+        ),
     )
 
     assert "error" in result
@@ -147,7 +147,7 @@ def test_patch_replace_rejection_does_not_mutate(tmp_path):
                 "new_string": "gamma\n",
             },
             task_id="acp-patch-reject",
-        )
+        ),
     )
 
     assert "error" in result
@@ -172,7 +172,7 @@ def test_patch_replace_approval_request_includes_full_file_diff(tmp_path):
                 "new_string": "gamma\n",
             },
             task_id="acp-patch-approve",
-        )
+        ),
     )
 
     assert result.get("success") is True

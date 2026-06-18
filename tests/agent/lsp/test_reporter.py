@@ -49,7 +49,7 @@ def test_format_diagnostic_omits_missing_optional_fields():
             },
             "severity": 1,
             "message": "bare",
-        }
+        },
     )
     assert "[" not in line.split("]", 1)[1]  # no extra brackets after the position
     assert "(" not in line

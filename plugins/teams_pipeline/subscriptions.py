@@ -99,14 +99,14 @@ def is_managed_subscription(
     expected_client_state_value: str | None,
 ) -> bool:
     subscription_id = str(
-        subscription_payload.get("subscription_id") or subscription_payload.get("id") or ""
+        subscription_payload.get("subscription_id") or subscription_payload.get("id") or "",
     ).strip()
     if subscription_id and store.get_subscription(subscription_id):
         return True
 
     if expected_client_state_value:
         candidate_state = str(
-            subscription_payload.get("client_state") or subscription_payload.get("clientState") or ""
+            subscription_payload.get("client_state") or subscription_payload.get("clientState") or "",
         ).strip()
         if candidate_state and candidate_state == expected_client_state_value:
             return True
@@ -151,7 +151,7 @@ async def maintain_graph_subscriptions(
                 {
                     "subscription_id": subscription_id,
                     "reason": "not_managed_by_teams_pipeline",
-                }
+                },
             )
             continue
 
@@ -164,7 +164,7 @@ async def maintain_graph_subscriptions(
                 {
                     "subscription_id": subscription_id,
                     "reason": f"failed_to_sync_local_store: {exc}",
-                }
+                },
             )
             continue
 
@@ -187,7 +187,7 @@ async def maintain_graph_subscriptions(
                     "subscription_id": subscription_id,
                     "reason": "already_expired",
                     "expiration_datetime": expiration.isoformat().replace("+00:00", "Z"),
-                }
+                },
             )
             continue
 
@@ -197,12 +197,12 @@ async def maintain_graph_subscriptions(
                     "subscription_id": subscription_id,
                     "reason": "not_due",
                     "expires_in_seconds": seconds_until_expiry,
-                }
+                },
             )
             continue
 
         new_expiration = (max(now, expiration) + timedelta(hours=extend_hours)).replace(
-            microsecond=0
+            microsecond=0,
         ).isoformat().replace("+00:00", "Z")
         candidate = {
             "subscription_id": subscription_id,

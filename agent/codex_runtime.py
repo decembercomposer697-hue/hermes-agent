@@ -552,7 +552,7 @@ def _consume_codex_event_stream(
     # ``RuntimeError("Didn't receive a `response.completed` event.")``.
     if not saw_terminal and not output:
         raise RuntimeError(
-            "Codex Responses stream did not emit a terminal response"
+            "Codex Responses stream did not emit a terminal response",
         )
 
     assembled_text = "".join(collected_text_deltas)

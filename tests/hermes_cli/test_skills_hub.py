@@ -90,7 +90,7 @@ def _capture_update(monkeypatch, results) -> tuple[str, list[tuple[str, str, boo
 
     monkeypatch.setattr(hub, "check_for_skill_updates", lambda **_kwargs: results)
     monkeypatch.setattr(hub, "HubLockFile", lambda: type("L", (), {
-        "get_installed": lambda self, name: {"install_path": "category/" + name}
+        "get_installed": lambda self, name: {"install_path": "category/" + name},
     })())
     monkeypatch.setattr(cli_hub, "do_install", lambda identifier, category="", force=False, console=None: installs.append((identifier, category, force)))
 
@@ -318,7 +318,7 @@ def test_do_install_scans_with_resolved_identifier(monkeypatch, tmp_path, hub_en
 
 
 def test_do_install_scans_official_bundles_with_source_provenance(
-    monkeypatch, tmp_path, hub_env
+    monkeypatch, tmp_path, hub_env,
 ):
     import tools.skills_guard as guard
     import tools.skills_hub as hub
@@ -372,7 +372,7 @@ def test_do_install_scans_official_bundles_with_source_provenance(
 
 
 def test_do_install_preserves_nested_official_optional_path(
-    monkeypatch, tmp_path, hub_env
+    monkeypatch, tmp_path, hub_env,
 ):
     class _OfficialNestedSource:
         def inspect(self, identifier):

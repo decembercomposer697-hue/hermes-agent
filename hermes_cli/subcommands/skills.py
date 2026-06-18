@@ -19,13 +19,13 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
     skills_subparsers = skills_parser.add_subparsers(dest="skills_action")
 
     skills_browse = skills_subparsers.add_parser(
-        "browse", help="Browse all available skills (paginated)"
+        "browse", help="Browse all available skills (paginated)",
     )
     skills_browse.add_argument(
-        "--page", type=int, default=1, help="Page number (default: 1)"
+        "--page", type=int, default=1, help="Page number (default: 1)",
     )
     skills_browse.add_argument(
-        "--size", type=int, default=20, help="Results per page (default: 20)"
+        "--size", type=int, default=20, help="Results per page (default: 20)",
     )
     skills_browse.add_argument(
         "--source",
@@ -44,7 +44,7 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
     )
 
     skills_search = skills_subparsers.add_parser(
-        "search", help="Search skill registries"
+        "search", help="Search skill registries",
     )
     skills_search.add_argument("query", help="Search query")
     skills_search.add_argument(
@@ -74,7 +74,7 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
         help="Skill identifier (e.g. openai/skills/skill-creator) or a direct HTTP(S) URL to a SKILL.md file",
     )
     skills_install.add_argument(
-        "--category", default="", help="Category folder to install into"
+        "--category", default="", help="Category folder to install into",
     )
     skills_install.add_argument(
         "--name",
@@ -82,7 +82,7 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
         help="Override the skill name (useful when installing from a URL whose SKILL.md has no `name:` frontmatter)",
     )
     skills_install.add_argument(
-        "--force", action="store_true", help="Install despite blocked scan verdict"
+        "--force", action="store_true", help="Install despite blocked scan verdict",
     )
     skills_install.add_argument(
         "--yes",
@@ -92,13 +92,13 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
     )
 
     skills_inspect = skills_subparsers.add_parser(
-        "inspect", help="Preview a skill without installing"
+        "inspect", help="Preview a skill without installing",
     )
     skills_inspect.add_argument("identifier", help="Skill identifier")
 
     skills_list = skills_subparsers.add_parser("list", help="List installed skills")
     skills_list.add_argument(
-        "--source", default="all", choices=["all", "hub", "builtin", "local"]
+        "--source", default="all", choices=["all", "hub", "builtin", "local"],
     )
     skills_list.add_argument(
         "--enabled-only",
@@ -108,14 +108,14 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
     )
 
     skills_check = skills_subparsers.add_parser(
-        "check", help="Check installed hub skills for updates"
+        "check", help="Check installed hub skills for updates",
     )
     skills_check.add_argument(
-        "name", nargs="?", help="Specific skill to check (default: all)"
+        "name", nargs="?", help="Specific skill to check (default: all)",
     )
 
     skills_update = skills_subparsers.add_parser(
-        "update", help="Update installed hub skills"
+        "update", help="Update installed hub skills",
     )
     skills_update.add_argument(
         "name",
@@ -124,10 +124,10 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
     )
 
     skills_audit = skills_subparsers.add_parser(
-        "audit", help="Re-scan installed hub skills"
+        "audit", help="Re-scan installed hub skills",
     )
     skills_audit.add_argument(
-        "name", nargs="?", help="Specific skill to audit (default: all)"
+        "name", nargs="?", help="Specific skill to audit (default: all)",
     )
     skills_audit.add_argument(
         "--deep",
@@ -136,7 +136,7 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
     )
 
     skills_uninstall = skills_subparsers.add_parser(
-        "uninstall", help="Remove a hub-installed skill"
+        "uninstall", help="Remove a hub-installed skill",
     )
     skills_uninstall.add_argument("name", help="Skill name to remove")
 
@@ -150,7 +150,7 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
         ),
     )
     skills_reset.add_argument(
-        "name", help="Skill name to reset (e.g. google-workspace)"
+        "name", help="Skill name to reset (e.g. google-workspace)",
     )
     skills_reset.add_argument(
         "--restore",
@@ -212,7 +212,7 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
         ),
     )
     skills_repair_official.add_argument(
-        "name", help="Official optional skill folder/frontmatter name, or 'all'"
+        "name", help="Official optional skill folder/frontmatter name, or 'all'",
     )
     skills_repair_official.add_argument(
         "--restore",
@@ -227,30 +227,30 @@ def build_skills_parser(subparsers, *, cmd_skills: Callable) -> None:
     )
 
     skills_publish = skills_subparsers.add_parser(
-        "publish", help="Publish a skill to a registry"
+        "publish", help="Publish a skill to a registry",
     )
     skills_publish.add_argument("skill_path", help="Path to skill directory")
     skills_publish.add_argument(
-        "--to", default="github", choices=["github", "clawhub"], help="Target registry"
+        "--to", default="github", choices=["github", "clawhub"], help="Target registry",
     )
     skills_publish.add_argument(
-        "--repo", default="", help="Target GitHub repo (e.g. openai/skills)"
+        "--repo", default="", help="Target GitHub repo (e.g. openai/skills)",
     )
 
     skills_snapshot = skills_subparsers.add_parser(
-        "snapshot", help="Export/import skill configurations"
+        "snapshot", help="Export/import skill configurations",
     )
     snapshot_subparsers = skills_snapshot.add_subparsers(dest="snapshot_action")
     snap_export = snapshot_subparsers.add_parser(
-        "export", help="Export installed skills to a file"
+        "export", help="Export installed skills to a file",
     )
     snap_export.add_argument("output", help="Output JSON file path (use - for stdout)")
     snap_import = snapshot_subparsers.add_parser(
-        "import", help="Import and install skills from a file"
+        "import", help="Import and install skills from a file",
     )
     snap_import.add_argument("input", help="Input JSON file path")
     snap_import.add_argument(
-        "--force", action="store_true", help="Force install despite caution verdict"
+        "--force", action="store_true", help="Force install despite caution verdict",
     )
 
     skills_tap = skills_subparsers.add_parser("tap", help="Manage skill sources")

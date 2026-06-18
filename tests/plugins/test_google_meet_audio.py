@@ -230,7 +230,7 @@ def test_chrome_fake_audio_flags_linux():
     with patch("plugins.google_meet.audio_bridge.platform.system",
                return_value="Linux"):
         flags = chrome_fake_audio_flags(
-            {"platform": "linux", "device_name": "hermes_meet_src"}
+            {"platform": "linux", "device_name": "hermes_meet_src"},
         )
     assert "--use-fake-ui-for-media-stream" in flags
 
@@ -241,7 +241,7 @@ def test_chrome_fake_audio_flags_darwin():
     with patch("plugins.google_meet.audio_bridge.platform.system",
                return_value="Darwin"):
         flags = chrome_fake_audio_flags(
-            {"platform": "darwin", "device_name": "BlackHole 2ch"}
+            {"platform": "darwin", "device_name": "BlackHole 2ch"},
         )
     assert "--use-fake-ui-for-media-stream" in flags
 

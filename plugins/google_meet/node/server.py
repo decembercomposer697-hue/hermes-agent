@@ -179,7 +179,7 @@ class NodeServer:
         except ImportError as exc:
             raise RuntimeError(
                 "NodeServer.serve requires the 'websockets' package. "
-                "Install it with: pip install websockets"
+                "Install it with: pip install websockets",
             ) from exc
 
         self.ensure_token()

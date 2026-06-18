@@ -307,7 +307,7 @@ def test_setup_keyboard_interrupt_gracefully_handled(tmp_path, monkeypatch):
 
 
 def test_select_provider_and_model_warns_if_named_custom_provider_disappears(
-    tmp_path, monkeypatch, capsys
+    tmp_path, monkeypatch, capsys,
 ):
     """If a saved custom provider is deleted mid-selection, show a warning instead of silently doing nothing."""
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -339,7 +339,7 @@ def test_select_provider_and_model_warns_if_named_custom_provider_disappears(
 
 
 def test_select_provider_and_model_accepts_named_provider_from_providers_section(
-    tmp_path, monkeypatch, capsys
+    tmp_path, monkeypatch, capsys,
 ):
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     _clear_provider_env(monkeypatch)
@@ -355,7 +355,7 @@ def test_select_provider_and_model_accepts_named_provider_from_providers_section
             "base_url": "https://ark.cn-beijing.volces.com/api/coding/v3",
             "default_model": "doubao-seed-2.0-code",
             "models": {"doubao-seed-2.0-code": {}},
-        }
+        },
     }
     save_config(cfg)
 

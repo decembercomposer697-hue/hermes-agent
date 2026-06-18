@@ -86,7 +86,7 @@ description: Indentation test
         result = _patch_skill(
             "indent-skill",
             "1. First step\n2. Second step",
-            "1. Updated first\n2. Updated second"
+            "1. Updated first\n2. Updated second",
         )
         assert result["success"] is True
         content = (self.skills_dir / "indent-skill" / "SKILL.md").read_text()
@@ -143,7 +143,7 @@ word word word
             "test-skill",
             "function hello() {\nconsole.log('hi');\n}",
             "function hello() {\nconsole.log('hello world');\n}",
-            file_path="references/code.js"
+            file_path="references/code.js",
         )
         assert result["success"] is True
         content = (self.skills_dir / "test-skill" / "references" / "code.js").read_text()

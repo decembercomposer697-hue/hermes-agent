@@ -62,7 +62,7 @@ class TestIsUnsupportedParameterError:
 
     def test_empty_param_returns_false(self):
         assert _is_unsupported_parameter_error(
-            RuntimeError("HTTP 400: Unsupported parameter: temperature"), ""
+            RuntimeError("HTTP 400: Unsupported parameter: temperature"), "",
         ) is False
 
     def test_temperature_wrapper_delegates_to_generic(self):

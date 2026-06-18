@@ -94,7 +94,7 @@ def build_findings(
                 ),
                 "evidence": evidence,
                 "sources": ["cross_links.csv"],
-            }
+            },
         )
 
     # 2. Bundled-donations findings (if cross_links carries donor↔candidate pattern).
@@ -135,7 +135,7 @@ def build_findings(
                     for r in rows
                 ],
                 "sources": ["cross_links.csv"],
-            }
+            },
         )
         next_id += 1
 
@@ -165,10 +165,10 @@ def build_findings(
                             "source": "timing.json",
                             "row": None,
                             "fields": r,
-                        }
+                        },
                     ],
                     "sources": ["timing.json"],
-                }
+                },
             )
             next_id += 1
 
@@ -178,7 +178,7 @@ def build_findings(
             SEVERITY_ORDER.get(f["severity"], 3),
             CONFIDENCE_ORDER.get(f["confidence"], 3),
             f["id"],
-        )
+        ),
     )
 
     payload = {

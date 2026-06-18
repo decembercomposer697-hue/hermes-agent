@@ -497,7 +497,7 @@ def test_hydrate_bot_identity_populates_self_ids_from_bot_v3_info(monkeypatch):
         captured["uri"] = getattr(request, "uri", None)
         captured["http_method"] = getattr(request, "http_method", None)
         return SimpleNamespace(raw=SimpleNamespace(
-            content=b'{"code":0,"bot":{"app_name":"Hermes","open_id":"ou_hydrated"}}'
+            content=b'{"code":0,"bot":{"app_name":"Hermes","open_id":"ou_hydrated"}}',
         ))
 
     adapter._client = SimpleNamespace(request=_fake_request)
@@ -532,7 +532,7 @@ def test_resolve_sender_profile_uses_open_id_for_bot_name_lookup():
         adapter._resolve_sender_profile(
             SimpleNamespace(open_id="ou_peer", user_id="u_peer", union_id="on_peer"),
             is_bot=True,
-        )
+        ),
     )
 
     assert seen_ids == ["ou_peer"]
@@ -680,7 +680,7 @@ def test_allow_group_message_blacklist_is_human_scope_only(sender_type):
     # it. To block a specific bot, gate upstream via FEISHU_ALLOW_BOTS.
     adapter = make_adapter_skeleton()
     adapter._group_rules = {
-        "oc_1": _group_rule("blacklist", blacklist={"ou_peer"})
+        "oc_1": _group_rule("blacklist", blacklist={"ou_peer"}),
     }
     sender = make_sender(sender_type=sender_type, open_id="ou_peer")
     assert adapter._allow_group_message(
@@ -740,7 +740,7 @@ def test_handle_message_event_data_drops_bot_sender_by_default():
         event=SimpleNamespace(
             sender=make_sender(sender_type="bot", open_id="ou_peer"),
             message=make_message(message_id="om_bot_default", chat_type="p2p"),
-        )
+        ),
     )
 
     asyncio.run(adapter._handle_message_event_data(data))
@@ -764,7 +764,7 @@ def test_handle_message_event_data_forwards_sender_when_admitted():
         event=SimpleNamespace(
             sender=sender,
             message=make_message(message_id="om_bot_ok", chat_type="p2p"),
-        )
+        ),
     )
 
     asyncio.run(adapter._handle_message_event_data(data))

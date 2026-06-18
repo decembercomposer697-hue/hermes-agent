@@ -156,7 +156,7 @@ class TestInitialize:
                 "id": TERMINAL_SETUP_AUTH_METHOD_ID,
                 "name": "Configure Hermes provider",
                 "type": "terminal",
-            }
+            },
         ]
 
 
@@ -240,7 +240,7 @@ class TestSessionOps:
     @pytest.mark.asyncio
     async def test_new_session_returns_model_state(self):
         manager = SessionManager(
-            agent_factory=lambda: SimpleNamespace(model="gpt-5.4", provider="openai-codex")
+            agent_factory=lambda: SimpleNamespace(model="gpt-5.4", provider="openai-codex"),
         )
         acp_agent = HermesACPAgent(session_manager=manager)
 
@@ -379,7 +379,7 @@ class TestSessionOps:
                             "name": "search_files",
                             "arguments": '{"pattern":"slash commands","path":"."}',
                         },
-                    }
+                    },
                 ],
             },
             {
@@ -443,7 +443,7 @@ class TestSessionOps:
                             "name": "todo",
                             "arguments": '{"todos":[{"id":"ship","content":"Ship it","status":"in_progress"}]}',
                         },
-                    }
+                    },
                 ],
             },
             {
@@ -663,7 +663,7 @@ class TestSessionOps:
                             "name": "search_files",
                             "arguments": '{"pattern":"foo","path":"."}',
                         },
-                    }
+                    },
                 ],
             },
             {
@@ -818,7 +818,7 @@ class TestListAndFork:
                     "cwd": "/tmp/project",
                     "title": "Fix Zed session history",
                     "updated_at": 123.0,
-                }
+                },
             ],
         ):
             resp = await agent.list_sessions(cwd="/tmp/project")
@@ -963,7 +963,7 @@ class TestSessionConfiguration:
             )
 
         monkeypatch.setattr("hermes_cli.config.load_config", lambda: {
-            "model": {"provider": "openrouter", "default": "openrouter/gpt-5"}
+            "model": {"provider": "openrouter", "default": "openrouter/gpt-5"},
         })
         monkeypatch.setattr(
             "hermes_cli.runtime_provider.resolve_runtime_provider",
@@ -1665,7 +1665,7 @@ class TestSlashCommands:
             )
 
         monkeypatch.setattr("hermes_cli.config.load_config", lambda: {
-            "model": {"provider": "openrouter", "default": "openrouter/gpt-5"}
+            "model": {"provider": "openrouter", "default": "openrouter/gpt-5"},
         })
         monkeypatch.setattr(
             "hermes_cli.runtime_provider.resolve_runtime_provider",

@@ -90,5 +90,5 @@ def test_plugin_bundle_does_not_read_session_token(bundle: Path) -> None:
         f"{rel} reads {_FORBIDDEN} directly — this bypasses gated-mode auth "
         f"and 401/1008s on OAuth-gated dashboards. Use the plugin SDK instead: "
         f"SDK.fetchJSON (JSON), SDK.authedFetch (uploads/downloads), or "
-        f"SDK.buildWsUrl (WebSockets). Offending lines:\n" + "\n".join(offending)
+        f"SDK.buildWsUrl (WebSockets). Offending lines:\n" + "\n".join(offending),
     )

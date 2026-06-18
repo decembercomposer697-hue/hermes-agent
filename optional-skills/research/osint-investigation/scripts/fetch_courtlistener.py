@@ -96,7 +96,7 @@ def fetch(
                         if r.get("absolute_url", "").startswith("/")
                         else r.get("absolute_url", "")
                     ),
-                }
+                },
             )
         next_url = payload.get("next")
 

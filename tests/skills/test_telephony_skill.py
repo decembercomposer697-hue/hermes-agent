@@ -130,7 +130,7 @@ def test_twilio_inbox_marks_seen_checkpoint(tmp_path: Path):
             phone_number="+17025550123",
             friendly_name="Main",
             capabilities={"voice": True, "sms": True},
-        )
+        ),
     ]
     mod._twilio_request = lambda method, path, params=None, form=None: {
         "messages": [
@@ -154,7 +154,7 @@ def test_twilio_inbox_marks_seen_checkpoint(tmp_path: Path):
                 "body": "old message",
                 "num_media": "0",
             },
-        ]
+        ],
     }
 
     result = mod._twilio_inbox(limit=10, since_last=True, mark_seen=True, state_path=state_path)
@@ -179,7 +179,7 @@ def test_vapi_import_twilio_number_saves_phone_number_id(tmp_path: Path):
         capabilities={"voice": True, "sms": True},
     )
     mod._json_request = lambda method, url, headers=None, params=None, form=None, json_body=None: {
-        "id": "vapi-phone-xyz"
+        "id": "vapi-phone-xyz",
     }
 
     result = mod._vapi_import_twilio_number(

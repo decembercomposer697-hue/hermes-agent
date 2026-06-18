@@ -117,7 +117,7 @@ def test_codex_stream_retries_remote_protocol_error_once():
     def create_side_effect(**kwargs):
         call_count["n"] += 1
         raise httpx.RemoteProtocolError(
-            "peer closed connection without sending complete message body"
+            "peer closed connection without sending complete message body",
         )
 
     mock_client = MagicMock()
@@ -191,7 +191,7 @@ def test_summarize_api_error_decorates_xai_entitlement_403():
         "HTTP 403: Error code: 403 - {'code': 'The caller does not have permission "
         "to execute the specified operation', 'error': 'You have either run out of "
         "available resources or do not have an active Grok subscription. Manage "
-        "subscriptions at https://grok.com'}"
+        "subscriptions at https://grok.com'}",
     )
     summary = AIAgent._summarize_api_error(error)
     # The original xAI text must survive — it's still useful diagnostic info.
@@ -221,7 +221,7 @@ def test_summarize_api_error_does_not_accuse_subscribers():
     from run_agent import AIAgent
 
     error = RuntimeError(
-        "HTTP 403: do not have an active Grok subscription"
+        "HTTP 403: do not have an active Grok subscription",
     )
     summary = AIAgent._summarize_api_error(error)
     # MUST NOT contain language that flatly assumes the user is unsubscribed.
@@ -243,8 +243,8 @@ def test_summarize_api_error_decorates_xai_body_message():
                     "You have either run out of available resources or do "
                     "not have an active Grok subscription. Manage at "
                     "https://grok.com"
-                )
-            }
+                ),
+            },
         }
 
     summary = AIAgent._summarize_api_error(_XaiErr("403"))
@@ -346,7 +346,7 @@ def _assistant_msg_with_encrypted_reasoning(text="hi from grok", encrypted="enc_
                 "id": "rs_xai_001",
                 "encrypted_content": encrypted,
                 "summary": [],
-            }
+            },
         ],
     }
 
@@ -973,7 +973,7 @@ def _stamped_assistant_msg(issuer_kind, *, text="hi", encrypted="enc_blob", rs_i
                 "encrypted_content": encrypted,
                 "summary": [],
                 "_issuer_kind": issuer_kind,
-            }
+            },
         ],
     }
 
@@ -994,7 +994,7 @@ def test_cross_issuer_reasoning_is_dropped_on_replay():
 
     # Calling against codex_backend — the grok-issued blob must be dropped.
     items = _chat_messages_to_responses_input(
-        msgs, current_issuer_kind="codex_backend"
+        msgs, current_issuer_kind="codex_backend",
     )
     reasoning = [it for it in items if it.get("type") == "reasoning"]
     assert reasoning == [], (
@@ -1016,7 +1016,7 @@ def test_same_issuer_reasoning_is_still_replayed():
     ]
 
     items = _chat_messages_to_responses_input(
-        msgs, current_issuer_kind="xai_responses"
+        msgs, current_issuer_kind="xai_responses",
     )
     reasoning = [it for it in items if it.get("type") == "reasoning"]
     assert len(reasoning) == 1
@@ -1042,14 +1042,14 @@ def test_unstamped_reasoning_is_replayed_for_backwards_compat():
                     "id": "rs_legacy",
                     "encrypted_content": "legacy_blob",
                     "summary": [],
-                }
+                },
             ],
         },
         {"role": "user", "content": "next"},
     ]
 
     items = _chat_messages_to_responses_input(
-        msgs, current_issuer_kind="codex_backend"
+        msgs, current_issuer_kind="codex_backend",
     )
     reasoning = [it for it in items if it.get("type") == "reasoning"]
     assert len(reasoning) == 1

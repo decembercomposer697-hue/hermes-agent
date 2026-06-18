@@ -77,7 +77,7 @@ class TestReadLoopDetection(unittest.TestCase):
         """2nd consecutive read should NOT warn (threshold is 3)."""
         read_file_tool("/tmp/test.py", offset=1, limit=500, task_id="t1")
         result = json.loads(
-            read_file_tool("/tmp/test.py", offset=1, limit=500, task_id="t1")
+            read_file_tool("/tmp/test.py", offset=1, limit=500, task_id="t1"),
         )
         self.assertNotIn("_warning", result)
         self.assertIn("content", result)
@@ -120,7 +120,7 @@ class TestReadLoopDetection(unittest.TestCase):
         read_file_tool("/tmp/test.py", offset=1, limit=500, task_id="t1")
         # Now read a different region — this resets the consecutive counter
         result = json.loads(
-            read_file_tool("/tmp/test.py", offset=501, limit=500, task_id="t1")
+            read_file_tool("/tmp/test.py", offset=501, limit=500, task_id="t1"),
         )
         self.assertNotIn("_warning", result)
 
@@ -137,7 +137,7 @@ class TestReadLoopDetection(unittest.TestCase):
         """Different task_ids have separate consecutive counters."""
         read_file_tool("/tmp/test.py", task_id="task_a")
         result = json.loads(
-            read_file_tool("/tmp/test.py", task_id="task_b")
+            read_file_tool("/tmp/test.py", task_id="task_b"),
         )
         self.assertNotIn("_warning", result)
 

@@ -20,7 +20,7 @@ class TestResolveOrigin:
                 "chat_id": "123456",
                 "chat_name": "Test Chat",
                 "thread_id": "42",
-            }
+            },
         }
         result = _resolve_origin(job)
         assert isinstance(result, dict)
@@ -103,7 +103,7 @@ class TestResolveDeliveryTarget:
         ],
     )
     def test_origin_delivery_without_origin_falls_back_to_supported_home_channels(
-        self, monkeypatch, platform, env_var, chat_id
+        self, monkeypatch, platform, env_var, chat_id,
     ):
         for fallback_env in (
             "MATRIX_HOME_ROOM",
@@ -1224,7 +1224,7 @@ class TestRunJobSessionPersistence:
         ],
     )
     def test_run_job_treats_agent_failure_flag_as_failure(
-        self, tmp_path, agent_result, expected_err_substring
+        self, tmp_path, agent_result, expected_err_substring,
     ):
         """Issue #17855: run_conversation returns ``failed=True``/``completed=False``
         when the agent's API call exhausts retries or aborts mid-run. run_job
@@ -1431,7 +1431,7 @@ class TestRunJobSessionPersistence:
                         "platform": get_session_env("HERMES_CRON_AUTO_DELIVER_PLATFORM") or None,
                         "chat_id": get_session_env("HERMES_CRON_AUTO_DELIVER_CHAT_ID") or None,
                         "thread_id": get_session_env("HERMES_CRON_AUTO_DELIVER_THREAD_ID") or None,
-                    }
+                    },
                 )
                 return {"final_response": "ok"}
 
@@ -1618,7 +1618,7 @@ class TestRunJobConfigEnvVarExpansion:
         (tmp_path / "config.yaml").write_text(
             "fallback_providers:\n"
             "  - provider: openrouter\n"
-            "    model: ${_HERMES_TEST_CRON_FALLBACK}\n"
+            "    model: ${_HERMES_TEST_CRON_FALLBACK}\n",
         )
         monkeypatch.setenv("_HERMES_TEST_CRON_FALLBACK", "gpt-4o-fallback-test")
 
@@ -2130,7 +2130,7 @@ class TestRunJobWakeGate:
         script_output = '{"wakeAgent": true, "data": {"new": 3}}'
         agent = MagicMock()
         agent.run_conversation = MagicMock(return_value={
-            "final_response": "ok", "messages": []
+            "final_response": "ok", "messages": [],
         })
         with patch.object(scheduler, "_run_job_script",
                           return_value=(True, script_output)), \
@@ -2160,7 +2160,7 @@ class TestRunJobWakeGate:
 
         agent = MagicMock()
         agent.run_conversation = MagicMock(return_value={
-            "final_response": "ok", "messages": []
+            "final_response": "ok", "messages": [],
         })
         with patch.object(scheduler, "_run_job_script", side_effect=_script_stub), \
              patch("run_agent.AIAgent", return_value=agent):
@@ -2177,7 +2177,7 @@ class TestRunJobWakeGate:
         # gate JSON — we must NOT honor it because ran_ok is False.
         agent = MagicMock()
         agent.run_conversation = MagicMock(return_value={
-            "final_response": "ok", "messages": []
+            "final_response": "ok", "messages": [],
         })
         with patch.object(scheduler, "_run_job_script",
                           return_value=(False, '{"wakeAgent": false}')), \
@@ -2192,7 +2192,7 @@ class TestRunJobWakeGate:
 
         agent = MagicMock()
         agent.run_conversation = MagicMock(return_value={
-            "final_response": "ok", "messages": []
+            "final_response": "ok", "messages": [],
         })
         job = self._make_job(script=None)
         job.pop("script", None)
@@ -2686,7 +2686,7 @@ class TestCronDeliveryTargets:
                 return [_Platform(n) for n in names]
 
         monkeypatch.setattr(
-            gateway_config, "load_gateway_config", lambda: _GatewayConfig()
+            gateway_config, "load_gateway_config", lambda: _GatewayConfig(),
         )
 
     def test_lists_configured_platforms_flagging_missing_home_channel(self, monkeypatch):

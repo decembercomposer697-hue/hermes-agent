@@ -75,9 +75,9 @@ def test_custom_providers_invalid_context_length_warns():
             "name": "LiteLLM",
             "base_url": "http://localhost:4000/v1",
             "models": {
-                "gpt5.4": {"context_length": "256K"}
+                "gpt5.4": {"context_length": "256K"},
             },
-        }
+        },
     ]
     with patch("run_agent.logger") as mock_logger:
         agent = _build_agent(
@@ -99,9 +99,9 @@ def test_custom_providers_valid_context_length():
             "name": "LiteLLM",
             "base_url": "http://localhost:4000/v1",
             "models": {
-                "gpt5.4": {"context_length": 256000}
+                "gpt5.4": {"context_length": 256000},
             },
-        }
+        },
     ]
     with patch("run_agent.logger") as mock_logger:
         agent = _build_agent(

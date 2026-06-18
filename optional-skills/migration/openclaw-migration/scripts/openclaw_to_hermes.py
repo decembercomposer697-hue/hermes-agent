@@ -279,7 +279,7 @@ def resolve_selected_options(
             "Unknown migration preset: "
             + preset_name
             + ". Valid presets: "
-            + ", ".join(sorted(MIGRATION_PRESETS))
+            + ", ".join(sorted(MIGRATION_PRESETS)),
         )
 
     unknown = (set(include_values) - {"all"} - valid) | (set(exclude_values) - {"all"} - valid)
@@ -288,7 +288,7 @@ def resolve_selected_options(
             "Unknown migration option(s): "
             + ", ".join(sorted(unknown))
             + ". Valid options: "
-            + ", ".join(sorted(valid))
+            + ", ".join(sorted(valid)),
         )
 
     if preset_name:
@@ -776,7 +776,7 @@ class Migrator:
                 "Unknown skill conflict mode: "
                 + self.skill_conflict_mode
                 + ". Valid modes: "
-                + ", ".join(sorted(SKILL_CONFLICT_MODES))
+                + ", ".join(sorted(SKILL_CONFLICT_MODES)),
             )
 
     def is_selected(self, option_id: str) -> bool:
@@ -827,7 +827,7 @@ class Migrator:
                 reason=reason,
                 details=details,
                 sensitive=sensitive,
-            )
+            ),
         )
         # Flip the config-block flag when a conflict/error occurs on a
         # config.yaml write.  Later config-mutating options will skip rather
@@ -1042,17 +1042,17 @@ class Migrator:
         if summary.get("conflict", 0) > 0:
             warnings.append(
                 "Conflicts were found. Re-run with --overwrite to replace conflicting "
-                "targets after item-level backups."
+                "targets after item-level backups.",
             )
         if summary.get("error", 0) > 0:
             warnings.append(
                 "One or more items failed. Inspect the report and re-run after fixing "
-                "the underlying cause."
+                "the underlying cause.",
             )
         if self._config_apply_blocked and self.execute:
             warnings.append(
                 "A config.yaml write hit a conflict or error mid-apply; later config "
-                "items were skipped to avoid a partial write."
+                "items were skipped to avoid a partial write.",
             )
         # Detect whether secrets were detected but not migrated.
         provider_keys_skipped = any(
@@ -1063,7 +1063,7 @@ class Migrator:
             warnings.append(
                 "API keys and other credentials were detected but not imported. "
                 "Re-run with --migrate-secrets to copy supported keys into the "
-                "Hermes env file."
+                "Hermes env file.",
             )
         return warnings
 
@@ -1081,14 +1081,14 @@ class Migrator:
                 "Review the migration report at "
                 f"{self.output_dir}/summary.md"
                 if self.output_dir
-                else "Review the migration report."
+                else "Review the migration report.",
             )
             steps.append(
-                "Start a new Hermes session (or /reset) to pick up the imported config."
+                "Start a new Hermes session (or /reset) to pick up the imported config.",
             )
         if summary.get("conflict", 0) > 0:
             steps.append(
-                "Re-run with --overwrite to apply items that were blocked by conflicts."
+                "Re-run with --overwrite to apply items that were blocked by conflicts.",
             )
         return steps
 
@@ -2954,7 +2954,7 @@ class Migrator:
         if self.execute:
             self.output_dir.mkdir(parents=True, exist_ok=True)
             (self.output_dir / "MIGRATION_NOTES.md").write_text(
-                "\n".join(notes) + "\n", encoding="utf-8"
+                "\n".join(notes) + "\n", encoding="utf-8",
             )
 
 

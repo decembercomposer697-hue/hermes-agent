@@ -214,8 +214,8 @@ def _extract_multimodal_parts(content: Any) -> list[dict[str, Any]]:
                     "inlineData": {
                         "mimeType": mime,
                         "data": base64.b64encode(raw).decode("ascii"),
-                    }
-                }
+                    },
+                },
             )
     return parts
 
@@ -247,7 +247,7 @@ def _translate_tool_call_to_gemini(tool_call: dict[str, Any]) -> dict[str, Any]:
         "functionCall": {
             "name": str(fn.get("name") or ""),
             "args": args,
-        }
+        },
     }
     thought_signature = _tool_call_extra_signature(tool_call)
     if thought_signature:
@@ -265,7 +265,7 @@ def _translate_tool_result_to_gemini(
         message.get("name")
         or tool_name_by_call_id.get(tool_call_id)
         or tool_call_id
-        or "tool"
+        or "tool",
     )
     content = _coerce_content_to_text(message.get("content"))
     try:
@@ -277,7 +277,7 @@ def _translate_tool_result_to_gemini(
         "functionResponse": {
             "name": name,
             "response": response,
-        }
+        },
     }
 
 
@@ -303,9 +303,9 @@ def _build_gemini_contents(messages: list[dict[str, Any]]) -> tuple[list[dict[st
                         _translate_tool_result_to_gemini(
                             msg,
                             tool_name_by_call_id=tool_name_by_call_id,
-                        )
+                        ),
                     ],
-                }
+                },
             )
             continue
 
@@ -693,7 +693,7 @@ def translate_stream_event(event: dict[str, Any], model: str, tool_call_indices:
                         "arguments": emitted_arguments,
                         "extra_content": _tool_call_extra_from_part(part),
                     },
-                )
+                ),
             )
 
     finish_reason_raw = str(cand.get("finishReason") or "")
@@ -840,7 +840,7 @@ class GeminiNativeClient:
                 "Gemini native client requires an API key, but none was provided. "
                 "Set GOOGLE_API_KEY or GEMINI_API_KEY in your environment / ~/.hermes/.env "
                 "(get one at https://aistudio.google.com/app/apikey), or run `hermes setup` "
-                "to configure the Google provider."
+                "to configure the Google provider.",
             )
         self.api_key = api_key
         normalized_base = (base_url or DEFAULT_GEMINI_BASE_URL).rstrip("/")
@@ -851,7 +851,7 @@ class GeminiNativeClient:
         self.chat = _GeminiChatNamespace(self)
         self.is_closed = False
         self._http = http_client or httpx.Client(
-            timeout=timeout or httpx.Timeout(connect=15.0, read=600.0, write=30.0, pool=30.0)
+            timeout=timeout or httpx.Timeout(connect=15.0, read=600.0, write=30.0, pool=30.0),
         )
 
     def close(self) -> None:

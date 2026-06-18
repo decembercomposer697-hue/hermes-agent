@@ -14,7 +14,7 @@ from pathlib import Path
 _profile_fallback_warned: bool = False
 _UNSET = object()
 _HERMES_HOME_OVERRIDE: ContextVar[str | object] = ContextVar(
-    "_HERMES_HOME_OVERRIDE", default=_UNSET
+    "_HERMES_HOME_OVERRIDE", default=_UNSET,
 )
 
 
@@ -448,7 +448,7 @@ def apply_ipv4_preference(force: bool = False) -> None:
         if family == 0:  # AF_UNSPEC — caller didn't request a specific family
             try:
                 return _original_getaddrinfo(
-                    host, port, socket.AF_INET, type, proto, flags
+                    host, port, socket.AF_INET, type, proto, flags,
                 )
             except socket.gaierror:
                 # No A record — fall back to full resolution (pure-IPv6 hosts)

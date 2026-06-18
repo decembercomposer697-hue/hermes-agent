@@ -130,7 +130,7 @@ class TestSteerInjection:
         agent.steer("extra note")
         original_blocks = [{"type": "text", "text": "existing output"}]
         messages = [
-            {"role": "tool", "content": list(original_blocks), "tool_call_id": "1"}
+            {"role": "tool", "content": list(original_blocks), "tool_call_id": "1"},
         ]
         agent._apply_pending_steer_to_tool_results(messages, num_tool_msgs=1)
         new_content = messages[-1]["content"]
@@ -217,7 +217,7 @@ class TestPreApiCallSteerDrain:
         messages = [
             {"role": "user", "content": "do something"},
             {"role": "assistant", "content": "ok", "tool_calls": [
-                {"id": "tc1", "function": {"name": "terminal", "arguments": "{}"}}
+                {"id": "tc1", "function": {"name": "terminal", "arguments": "{}"}},
             ]},
             {"role": "tool", "content": "output here", "tool_call_id": "tc1"},
         ]
@@ -264,7 +264,7 @@ class TestPreApiCallSteerDrain:
         messages = [
             {"role": "user", "content": "do something"},
             {"role": "assistant", "content": "let me check", "tool_calls": [
-                {"id": "tc1", "function": {"name": "web_search", "arguments": "{}"}}
+                {"id": "tc1", "function": {"name": "web_search", "arguments": "{}"}},
             ]},
             {"role": "tool", "content": "search results", "tool_call_id": "tc1"},
         ]

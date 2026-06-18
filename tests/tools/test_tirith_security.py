@@ -1294,7 +1294,7 @@ class TestSpawnWarningDedup:
         _tirith_mod._reset_spawn_warning_state()
 
         with patch(
-            "tools.tirith_security._resolve_tirith_path", return_value=None
+            "tools.tirith_security._resolve_tirith_path", return_value=None,
         ):
             with caplog.at_level("WARNING", logger="tools.tirith_security"):
                 for _ in range(10):

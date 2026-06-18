@@ -81,7 +81,7 @@ class TestExplicitAuxVisionOverride:
         cfg = {
             "auxiliary": {
                 "vision": {"provider": "auto", "model": "claude-3-haiku"},
-            }
+            },
         }
         assert _explicit_aux_vision_override(cfg) is True
 
@@ -112,15 +112,15 @@ class TestRouteDecision:
                 "vision": {
                     "provider": "openrouter",
                     "model": "google/gemini-2.5-flash",
-                }
-            }
+                },
+            },
         }
         with patch.object(vision_routing, "_lookup_supports_vision", return_value=True), \
              patch.object(vision_routing,
                           "_provider_accepts_multimodal_tool_result",
                           return_value=True):
             assert vision_routing.should_route_capture_to_aux_vision(
-                "anthropic", "claude-opus-4-5", cfg
+                "anthropic", "claude-opus-4-5", cfg,
             ) is True
 
     def test_non_vision_main_model_routes_to_aux(self):
@@ -133,7 +133,7 @@ class TestRouteDecision:
                           "_provider_accepts_multimodal_tool_result",
                           return_value=True):
             assert vision_routing.should_route_capture_to_aux_vision(
-                "openrouter", "tencent/hy3-preview", cfg
+                "openrouter", "tencent/hy3-preview", cfg,
             ) is True
 
     def test_vision_main_model_no_override_keeps_multimodal(self):
@@ -145,7 +145,7 @@ class TestRouteDecision:
                           "_provider_accepts_multimodal_tool_result",
                           return_value=True):
             assert vision_routing.should_route_capture_to_aux_vision(
-                "anthropic", "claude-opus-4-5", None
+                "anthropic", "claude-opus-4-5", None,
             ) is False
 
     def test_provider_rejects_multimodal_tool_results_routes_to_aux(self):
@@ -157,7 +157,7 @@ class TestRouteDecision:
                           "_provider_accepts_multimodal_tool_result",
                           return_value=False):
             assert vision_routing.should_route_capture_to_aux_vision(
-                "some-aggregator", "some-vision-model", {}
+                "some-aggregator", "some-vision-model", {},
             ) is True
 
     def test_user_declared_vision_support_keeps_custom_provider_native(self):
@@ -169,13 +169,13 @@ class TestRouteDecision:
                 "default": "Qwen3.6-35B-A3B-local-vlm",
                 "provider": "omlx",
                 "supports_vision": True,
-            }
+            },
         }
         with patch.object(vision_routing,
                           "_provider_accepts_multimodal_tool_result",
                           return_value=False):
             assert vision_routing.should_route_capture_to_aux_vision(
-                "custom", "Qwen3.6-35B-A3B-local-vlm", cfg
+                "custom", "Qwen3.6-35B-A3B-local-vlm", cfg,
             ) is False
 
     def test_user_declared_no_vision_routes_custom_provider_to_aux(self):
@@ -187,13 +187,13 @@ class TestRouteDecision:
                 "default": "local-text-model",
                 "provider": "omlx",
                 "supports_vision": False,
-            }
+            },
         }
         with patch.object(vision_routing,
                           "_provider_accepts_multimodal_tool_result",
                           return_value=True):
             assert vision_routing.should_route_capture_to_aux_vision(
-                "custom", "local-text-model", cfg
+                "custom", "local-text-model", cfg,
             ) is True
 
     def test_unknown_provider_capabilities_fail_closed(self):
@@ -205,7 +205,7 @@ class TestRouteDecision:
                           "_provider_accepts_multimodal_tool_result",
                           return_value=None):
             assert vision_routing.should_route_capture_to_aux_vision(
-                "exotic-provider", "exotic-model", {}
+                "exotic-provider", "exotic-model", {},
             ) is True
 
     def test_unknown_vision_capability_fails_closed(self):
@@ -217,7 +217,7 @@ class TestRouteDecision:
                           "_provider_accepts_multimodal_tool_result",
                           return_value=True):
             assert vision_routing.should_route_capture_to_aux_vision(
-                "openrouter", "novel/never-seen-model", {}
+                "openrouter", "novel/never-seen-model", {},
             ) is True
 
     def test_explicit_override_wins_over_unknown_caps(self):
@@ -230,7 +230,7 @@ class TestRouteDecision:
                           "_provider_accepts_multimodal_tool_result",
                           return_value=None):
             assert vision_routing.should_route_capture_to_aux_vision(
-                "openrouter", "tencent/hy3-preview", cfg
+                "openrouter", "tencent/hy3-preview", cfg,
             ) is True
 
 

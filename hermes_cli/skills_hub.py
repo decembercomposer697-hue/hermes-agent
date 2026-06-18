@@ -201,12 +201,12 @@ def _prompt_for_skill_name(c: Console, url: str, default: str = "") -> str | Non
     c.print(
         f"[yellow]The SKILL.md at {url} doesn't declare a `name:` in its "
         f"frontmatter,[/]\n[yellow]and the URL path doesn't produce a valid "
-        f"identifier either.[/]"
+        f"identifier either.[/]",
     )
     default_hint = f" [{default}]" if default else ""
     c.print(
         f"[bold]Enter a skill name{default_hint}:[/] "
-        f"[dim](lowercase letters, digits, hyphens, underscores; starts with a letter)[/]"
+        f"[dim](lowercase letters, digits, hyphens, underscores; starts with a letter)[/]",
     )
     try:
         answer = input("Name: ").strip()
@@ -226,12 +226,12 @@ def _prompt_for_category(c: Console, existing: list[str]) -> str:
     if existing:
         c.print(
             "[bold]Pick a category[/] "
-            "[dim](reuse an existing bucket, type a new one, or press Enter to install flat)[/]"
+            "[dim](reuse an existing bucket, type a new one, or press Enter to install flat)[/]",
         )
         c.print(f"[dim]Existing: {', '.join(existing)}[/]")
     else:
         c.print(
-            "[bold]Category[/] [dim](optional — press Enter to install flat at ~/.hermes/skills/<name>/)[/]"
+            "[bold]Category[/] [dim](optional — press Enter to install flat at ~/.hermes/skills/<name>/)[/]",
         )
     try:
         answer = input("Category: ").strip()
@@ -364,7 +364,7 @@ def do_browse(page: int = 1, page_size: int = 20, source: str = "all",
             _done.append(f"{sid} ({count})")
             status.update(
                 "[bold]Fetching skills from registries...[/]  "
-                f"[dim]done: {', '.join(_done)}[/]"
+                f"[dim]done: {', '.join(_done)}[/]",
             )
 
         all_results, source_counts, timed_out = parallel_search_sources(
@@ -525,7 +525,7 @@ def do_install(identifier: str, category: str = "", force: bool = False,
                 "(unauthenticated: 60 requests/hour).\n"
                 "Set [bold]GITHUB_TOKEN[/] in your .env or install the "
                 "[bold]gh[/] CLI and run [bold]gh auth login[/] "
-                "to raise the limit to 5,000/hr.\n"
+                "to raise the limit to 5,000/hr.\n",
             )
         else:
             c.print()
@@ -544,7 +544,7 @@ def do_install(identifier: str, category: str = "", force: bool = False,
             c.print(
                 f"[bold red]Invalid --name:[/] {name_override!r}. "
                 "Must be a lowercase identifier (letters, digits, hyphens, "
-                "underscores; starts with a letter).\n"
+                "underscores; starts with a letter).\n",
             )
             return
         elif skip_confirm:
@@ -559,7 +559,7 @@ def do_install(identifier: str, category: str = "", force: bool = False,
                 f"  [bold]/skills install {url} --name <your-name>[/]\n"
                 f"  [bold]hermes skills install {url} --name <your-name>[/]\n\n"
                 "[dim]Or ask the SKILL.md's author to add a `name:` field to "
-                "its YAML frontmatter.[/]\n"
+                "its YAML frontmatter.[/]\n",
             )
             return
         else:
@@ -1474,7 +1474,7 @@ def do_snapshot_export(output_path: str, console: Console | None = None) -> None
     snapshot = {
         "hermes_version": "0.1.0",
         "exported_at": __import__("datetime").datetime.now(
-            __import__("datetime").timezone.utc
+            __import__("datetime").timezone.utc,
         ).isoformat(),
         "skills": [
             {

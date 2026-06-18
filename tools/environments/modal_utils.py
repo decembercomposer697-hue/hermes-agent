@@ -103,7 +103,7 @@ class BaseModalExecutionEnvironment(BaseEnvironment):
 
         if start.handle is None:
             return self._error_result(
-                f"{self._unexpected_error_prefix}: transport did not return an exec handle"
+                f"{self._unexpected_error_prefix}: transport did not return an exec handle",
             )
 
         deadline = None

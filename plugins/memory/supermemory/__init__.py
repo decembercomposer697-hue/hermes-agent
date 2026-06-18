@@ -37,10 +37,10 @@ _TRIVIAL_RE = re.compile(
     re.IGNORECASE,
 )
 _CONTEXT_STRIP_RE = re.compile(
-    r"<supermemory-context>[\s\S]*?</supermemory-context>\s*", re.DOTALL
+    r"<supermemory-context>[\s\S]*?</supermemory-context>\s*", re.DOTALL,
 )
 _CONTAINERS_STRIP_RE = re.compile(
-    r"<supermemory-containers>[\s\S]*?</supermemory-containers>\s*", re.DOTALL
+    r"<supermemory-containers>[\s\S]*?</supermemory-containers>\s*", re.DOTALL,
 )
 _DEFAULT_ENTITY_CONTEXT = (
     "User-assistant conversation. Format: [role: user]...[user:end] and "
@@ -741,7 +741,7 @@ class SupermemoryMemoryProvider(MemoryProvider):
         if sanitized not in self._allowed_containers:
             raise ValueError(
                 f"Container tag '{sanitized}' is not allowed. "
-                f"Allowed: {', '.join(self._allowed_containers)}"
+                f"Allowed: {', '.join(self._allowed_containers)}",
             )
         return sanitized
 

@@ -84,8 +84,8 @@ def test_openai_gpt55_pro_warns_for_nous_portal_pricing(monkeypatch):
                 "pricing": {
                     "prompt": "0.000025",
                     "completion": "0.000125",
-                }
-            }
+                },
+            },
         },
     )
 

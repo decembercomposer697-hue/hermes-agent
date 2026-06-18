@@ -859,14 +859,14 @@ def init_agent(
                         raise RuntimeError(
                             f"Provider '{_explicit}' is set in config.yaml but no API key "
                             f"was found. Set the {_env_hint} environment "
-                            f"variable, or switch to a different provider with `hermes model`."
+                            f"variable, or switch to a different provider with `hermes model`.",
                         )
                 if not getattr(agent, "_fallback_activated", False):
                     # No provider configured — reject with a clear message.
                     raise RuntimeError(
                         "No LLM provider configured. Run `hermes model` to "
                         "select a provider, or run `hermes setup` for first-time "
-                        "configuration."
+                        "configuration.",
                     )
         
         agent._client_kwargs = client_kwargs  # stored for rebuilding after interrupt
@@ -1093,8 +1093,8 @@ def init_agent(
     try:
         agent._tool_guardrails = ToolCallGuardrailController(
             ToolCallGuardrailConfig.from_mapping(
-                _agent_cfg.get("tool_loop_guardrails", {})
-            )
+                _agent_cfg.get("tool_loop_guardrails", {}),
+            ),
         )
     except Exception as _tlg_err:
         _ra().logger.warning("Tool loop guardrail config ignored: %s", _tlg_err)
@@ -1277,7 +1277,7 @@ def init_agent(
     # fires we stash a one-time notification (replayed on the first turn) that
     # tells the user what changed and how to revert.
     _codex_gpt55_autoraise = str(
-        _compression_cfg.get("codex_gpt55_autoraise", True)
+        _compression_cfg.get("codex_gpt55_autoraise", True),
     ).lower() in {"true", "1", "yes"}
     agent._compression_threshold_autoraised = None
     try:
@@ -1317,10 +1317,10 @@ def init_agent(
     # is a legitimate (and common) configuration for long-running
     # rolling-compaction sessions.
     compression_protect_first = max(
-        0, int(_compression_cfg.get("protect_first_n", 3))
+        0, int(_compression_cfg.get("protect_first_n", 3)),
     )
     compression_abort_on_summary_failure = str(
-        _compression_cfg.get("abort_on_summary_failure", False)
+        _compression_cfg.get("abort_on_summary_failure", False),
     ).lower() in {"true", "1", "yes"}
 
     # Read optional explicit context_length override for the auxiliary
@@ -1551,7 +1551,7 @@ def init_agent(
             f"which is below the minimum {MINIMUM_CONTEXT_LENGTH:,} required "
             f"by Hermes Agent.  Choose a model with at least "
             f"{MINIMUM_CONTEXT_LENGTH // 1000}K context, or set "
-            f"model.context_length in config.yaml to override."
+            f"model.context_length in config.yaml to override.",
         )
 
     # Inject context engine tool schemas (e.g. lcm_grep, lcm_describe, lcm_expand).

@@ -270,7 +270,7 @@ def _run_execution_chain(
                 raise RuntimeError(
                     f"Middleware '{kind}' callback "
                     f"{getattr(callback, '__name__', repr(callback))} called "
-                    "next_call() more than once; downstream execution is single-use"
+                    "next_call() more than once; downstream execution is single-use",
                 )
             next_called = True
             try:

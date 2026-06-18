@@ -55,7 +55,7 @@ class TestIgnoreUserConfigEnvGate:
               provider: openrouter
             agent:
               system_prompt: "from user config"
-            """
+            """,
         ).lstrip()
         (tmp_path / "config.yaml").write_text(config_yaml)
 

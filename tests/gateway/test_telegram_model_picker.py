@@ -57,7 +57,7 @@ class TestTelegramModelPicker:
         result = await adapter.send_model_picker(
             chat_id="12345",
             providers=[
-                {"slug": "provider_one", "name": "Provider One", "total_models": 1, "is_current": True}
+                {"slug": "provider_one", "name": "Provider One", "total_models": 1, "is_current": True},
             ],
             current_model="model_1",
             current_provider="provider_one",
@@ -109,7 +109,7 @@ class TestTelegramModelPicker:
         callback = AsyncMock(return_value="Switched to `gpt-5`")
         adapter._model_picker_state["12345"] = {
             "providers": [
-                {"slug": "openai", "name": "OpenAI", "total_models": 1, "is_current": True}
+                {"slug": "openai", "name": "OpenAI", "total_models": 1, "is_current": True},
             ],
             "current_model": "model_1",
             "current_provider": "openai",
@@ -211,7 +211,7 @@ class TestTelegramModelPicker:
         callback = AsyncMock(return_value="Switched to `openai/gpt-5.5-pro`")
         adapter._model_picker_state["12345"] = {
             "providers": [
-                {"slug": "openrouter", "name": "OpenRouter", "total_models": 1, "is_current": True}
+                {"slug": "openrouter", "name": "OpenRouter", "total_models": 1, "is_current": True},
             ],
             "current_model": "model_1",
             "current_provider": "openrouter",
@@ -224,7 +224,7 @@ class TestTelegramModelPicker:
         monkeypatch.setattr(
             "hermes_cli.model_cost_guard.expensive_model_warning",
             lambda *_args, **_kwargs: SimpleNamespace(
-                message="!!! EXPENSIVE MODEL WARNING !!!\ndid you mean to select openai/gpt-5.5?"
+                message="!!! EXPENSIVE MODEL WARNING !!!\ndid you mean to select openai/gpt-5.5?",
             ),
         )
 

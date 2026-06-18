@@ -86,7 +86,7 @@ def build_session_provenance(
 
     rotated = bool(
         previous_hermes_session_id
-        and previous_hermes_session_id != current_hermes_session_id
+        and previous_hermes_session_id != current_hermes_session_id,
     )
 
     provenance: dict[str, Any] = {

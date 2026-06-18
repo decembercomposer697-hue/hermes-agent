@@ -280,7 +280,7 @@ class CLIAgentSetupMixin:
                 ChatConsole().print(
                     f"[dim]Session {_escape(self.session_id)} was compressed into "
                     f"{_escape(resolved_id)}; resuming the descendant with your "
-                    f"transcript.[/dim]"
+                    f"transcript.[/dim]",
                 )
                 self.session_id = resolved_id
                 resolved_meta = self._session_db.get_session(self.session_id)
@@ -306,7 +306,7 @@ class CLIAgentSetupMixin:
                         f"[bold {_accent_hex()}]↻ Resumed session[/] "
                         f"[bold]{_escape(self.session_id)}[/]"
                         f"[bold {_accent_hex()}]{_escape(title_part)}[/] "
-                        f"({msg_count} user message{'s' if msg_count != 1 else ''}, {len(restored)} total messages)"
+                        f"({msg_count} user message{'s' if msg_count != 1 else ''}, {len(restored)} total messages)",
                     )
                 self._restore_session_cwd(session_meta, quiet=_quiet_mode)
             else:
@@ -317,7 +317,7 @@ class CLIAgentSetupMixin:
                     )
                 else:
                     ChatConsole().print(
-                        f"[bold {_accent_hex()}]Session {_escape(self.session_id)} found but has no messages. Starting fresh.[/]"
+                        f"[bold {_accent_hex()}]Session {_escape(self.session_id)} found but has no messages. Starting fresh.[/]",
                     )
             # Re-open the session (clear ended_at so it's active again)
             try:
@@ -451,11 +451,11 @@ class CLIAgentSetupMixin:
         session_meta = self._session_db.get_session(self.session_id)
         if not session_meta:
             self._console_print(
-                f"[bold red]Session not found: {self.session_id}[/]"
+                f"[bold red]Session not found: {self.session_id}[/]",
             )
             self._console_print(
                 "[dim]Use a session ID from a previous CLI run "
-                "(hermes sessions list).[/]"
+                "(hermes sessions list).[/]",
             )
             return False
 
@@ -468,7 +468,7 @@ class CLIAgentSetupMixin:
         if resolved_id and resolved_id != self.session_id:
             self._console_print(
                 f"[dim]Session {self.session_id} was compressed into "
-                f"{resolved_id}; resuming the descendant with your transcript.[/]"
+                f"{resolved_id}; resuming the descendant with your transcript.[/]",
             )
             self.session_id = resolved_id
             resolved_meta = self._session_db.get_session(self.session_id)
@@ -488,14 +488,14 @@ class CLIAgentSetupMixin:
                 f"[{accent_color}]↻ Resumed session [bold]{self.session_id}[/bold]"
                 f"{title_part} "
                 f"({msg_count} user message{'s' if msg_count != 1 else ''}, "
-                f"{len(restored)} total messages)[/]"
+                f"{len(restored)} total messages)[/]",
             )
             self._restore_session_cwd(session_meta)
         else:
             accent_color = _accent_hex()
             self._console_print(
                 f"[{accent_color}]Session {self.session_id} found but has no "
-                f"messages. Starting fresh.[/]"
+                f"messages. Starting fresh.[/]",
             )
             return False
 

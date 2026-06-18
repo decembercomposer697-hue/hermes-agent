@@ -146,7 +146,7 @@ class TestMakeToolResultMessage:
         assert msg["tool_call_id"] == "call_2"
         assert isinstance(msg["content"], str)
         assert msg["content"].startswith(
-            '<untrusted_tool_result source="web_extract">'
+            '<untrusted_tool_result source="web_extract">',
         )
         assert SAMPLE_LONG_TEXT in msg["content"]
 

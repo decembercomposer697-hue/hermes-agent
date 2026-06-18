@@ -34,7 +34,7 @@ def test_normalize_perp_markets_extracts_change_and_volume():
             "universe": [
                 {"name": "BTC", "szDecimals": 5, "maxLeverage": 50},
                 {"name": "ETH", "szDecimals": 4, "maxLeverage": 25, "isDelisted": True},
-            ]
+            ],
         },
         [
             {
@@ -75,7 +75,7 @@ def test_normalize_dexs_includes_first_perp_dex_placeholder():
                 "deployer": "0x1234567890abcdef1234567890abcdef12345678",
                 "assetToStreamingOiCap": [["COIN", "100"]],
             },
-        ]
+        ],
     )
 
     assert rows[0]["label"] == "first-perp-dex"
@@ -305,7 +305,7 @@ def test_main_export_json_writes_expected_contract(tmp_path, capsys):
                 "--output",
                 str(output_path),
                 "--json",
-            ]
+            ],
         )
 
     stdout = capsys.readouterr().out
@@ -345,7 +345,7 @@ def test_main_export_json_skips_funding_for_spot(tmp_path, capsys):
                 "--output",
                 str(output_path),
                 "--json",
-            ]
+            ],
         )
 
     stdout = capsys.readouterr().out

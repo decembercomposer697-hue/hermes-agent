@@ -59,7 +59,7 @@ class TestBedrockConvertTools:
                 "name": "terminal",
                 "description": "Run commands",
                 "parameters": {"type": "object", "properties": {"command": {"type": "string"}}},
-            }
+            },
         }]
         result = transport.convert_tools(tools)
         assert len(result) == 1
@@ -114,7 +114,7 @@ class TestBedrockNormalize:
                         "toolUseId": tc["id"],
                         "name": tc["name"],
                         "input": tc["input"],
-                    }
+                    },
                 })
         return {
             "output": {"message": {"role": "assistant", "content": content}},
@@ -149,7 +149,7 @@ class TestBedrockNormalize:
                         {"reasoningContent": {"text": "Let me think..."}},
                         {"text": "Answer."},
                     ],
-                }
+                },
             },
             "stopReason": "end_turn",
             "usage": {"inputTokens": 10, "outputTokens": 5, "totalTokens": 15},

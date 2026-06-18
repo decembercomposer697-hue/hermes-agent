@@ -39,12 +39,12 @@ def mock_gemini_response(fake_pcm_bytes):
                             "inlineData": {
                                 "mimeType": "audio/L16;codec=pcm;rate=24000",
                                 "data": base64.b64encode(fake_pcm_bytes).decode(),
-                            }
-                        }
-                    ]
-                }
-            }
-        ]
+                            },
+                        },
+                    ],
+                },
+            },
+        ],
     }
     return resp
 
@@ -195,8 +195,8 @@ class TestGenerateGeminiTts:
         resp.status_code = 200
         resp.json.return_value = {
             "candidates": [
-                {"content": {"parts": [{"inlineData": {"data": ""}}]}}
-            ]
+                {"content": {"parts": [{"inlineData": {"data": ""}}]}},
+            ],
         }
 
         with patch("requests.post", return_value=resp):
@@ -229,13 +229,13 @@ class TestGenerateGeminiTts:
                         "parts": [
                             {
                                 "inline_data": {
-                                    "data": base64.b64encode(fake_pcm_bytes).decode()
-                                }
-                            }
-                        ]
-                    }
-                }
-            ]
+                                    "data": base64.b64encode(fake_pcm_bytes).decode(),
+                                },
+                            },
+                        ],
+                    },
+                },
+            ],
         }
 
         output_path = str(tmp_path / "test.wav")
@@ -257,7 +257,7 @@ class TestGenerateGeminiTts:
         assert mock_post.call_args[0][0].startswith("https://custom-gemini.example.com/v1beta/")
 
     def test_persona_prompt_file_appends_labeled_transcript(
-        self, tmp_path, monkeypatch, mock_gemini_response
+        self, tmp_path, monkeypatch, mock_gemini_response,
     ):
         from tools.tts_tool import _generate_gemini_tts
 
@@ -279,7 +279,7 @@ class TestGenerateGeminiTts:
         assert "#### TRANSCRIPT\nHi" in prompt_text
 
     def test_persona_prompt_file_supports_transcript_placeholder(
-        self, tmp_path, monkeypatch, mock_gemini_response
+        self, tmp_path, monkeypatch, mock_gemini_response,
     ):
         from tools.tts_tool import _generate_gemini_tts
 
@@ -299,7 +299,7 @@ class TestGenerateGeminiTts:
         assert "#### TRANSCRIPT\nRead this." in prompt_text
 
     def test_missing_persona_prompt_file_warns_and_continues(
-        self, tmp_path, monkeypatch, caplog, mock_gemini_response
+        self, tmp_path, monkeypatch, caplog, mock_gemini_response,
     ):
         from tools.tts_tool import _generate_gemini_tts
 
@@ -314,7 +314,7 @@ class TestGenerateGeminiTts:
         assert "persona prompt file unavailable" in caplog.text
 
     def test_audio_tags_disabled_does_not_call_rewriter(
-        self, tmp_path, monkeypatch, mock_gemini_response
+        self, tmp_path, monkeypatch, mock_gemini_response,
     ):
         from tools.tts_tool import _generate_gemini_tts
 
@@ -322,7 +322,7 @@ class TestGenerateGeminiTts:
             "gemini": {
                 "model": "gemini-3.1-flash-tts-preview",
                 "audio_tags": False,
-            }
+            },
         }
         monkeypatch.setenv("GEMINI_API_KEY", "test-key")
 
@@ -335,7 +335,7 @@ class TestGenerateGeminiTts:
         assert prompt_text == "Hi there."
 
     def test_audio_tags_enabled_rewrites_hidden_tts_script(
-        self, tmp_path, monkeypatch, mock_gemini_response
+        self, tmp_path, monkeypatch, mock_gemini_response,
     ):
         from tools.tts_tool import _generate_gemini_tts
 
@@ -347,16 +347,16 @@ class TestGenerateGeminiTts:
         response = SimpleNamespace(
             choices=[
                 SimpleNamespace(
-                    message=SimpleNamespace(content="[warmly] Hi there. [soft laugh]")
-                )
-            ]
+                    message=SimpleNamespace(content="[warmly] Hi there. [soft laugh]"),
+                ),
+            ],
         )
         config = {
             "gemini": {
                 "model": "gemini-3.1-flash-tts-preview",
                 "audio_tags": True,
                 "persona_prompt_file": str(persona_file),
-            }
+            },
         }
         monkeypatch.setenv("GEMINI_API_KEY", "test-key")
 
@@ -377,7 +377,7 @@ class TestGenerateGeminiTts:
         assert "#### TRANSCRIPT\n[warmly] Hi there. [soft laugh]" in prompt_text
 
     def test_audio_tags_enabled_skips_non_tag_capable_model(
-        self, tmp_path, monkeypatch, mock_gemini_response, caplog
+        self, tmp_path, monkeypatch, mock_gemini_response, caplog,
     ):
         from tools.tts_tool import _generate_gemini_tts
 
@@ -385,7 +385,7 @@ class TestGenerateGeminiTts:
             "gemini": {
                 "model": "gemini-2.5-flash-preview-tts",
                 "audio_tags": True,
-            }
+            },
         }
         monkeypatch.setenv("GEMINI_API_KEY", "test-key")
 
@@ -399,7 +399,7 @@ class TestGenerateGeminiTts:
         assert "not known to support Gemini audio tags" in caplog.text
 
     def test_audio_tag_rewrite_failure_falls_back_to_original_text(
-        self, tmp_path, monkeypatch, mock_gemini_response, caplog
+        self, tmp_path, monkeypatch, mock_gemini_response, caplog,
     ):
         from tools.tts_tool import _generate_gemini_tts
 
@@ -407,7 +407,7 @@ class TestGenerateGeminiTts:
             "gemini": {
                 "model": "gemini-3.1-flash-tts-preview",
                 "audio_tags": True,
-            }
+            },
         }
         monkeypatch.setenv("GEMINI_API_KEY", "test-key")
 

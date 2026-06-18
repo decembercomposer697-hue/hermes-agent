@@ -493,7 +493,7 @@ class HonchoMemoryProvider(MemoryProvider):
 
             self._prefetch_thread_started_at = time.monotonic()
             prewarm_thread = threading.Thread(
-                target=_prewarm_dialectic, daemon=True, name="honcho-prewarm-dialectic"
+                target=_prewarm_dialectic, daemon=True, name="honcho-prewarm-dialectic",
             )
             prewarm_thread.start()
             self._prefetch_thread = prewarm_thread
@@ -719,7 +719,7 @@ class HonchoMemoryProvider(MemoryProvider):
 
             self._prefetch_thread_started_at = time.monotonic()
             first_turn_thread = threading.Thread(
-                target=_run_first_turn, daemon=True, name="honcho-prefetch-first"
+                target=_run_first_turn, daemon=True, name="honcho-prefetch-first",
             )
             first_turn_thread.start()
             self._prefetch_thread = first_turn_thread
@@ -849,7 +849,7 @@ class HonchoMemoryProvider(MemoryProvider):
 
         self._prefetch_thread_started_at = time.monotonic()
         prefetch_thread = threading.Thread(
-            target=_run, daemon=True, name="honcho-prefetch"
+            target=_run, daemon=True, name="honcho-prefetch",
         )
         prefetch_thread.start()
         self._prefetch_thread = prefetch_thread
@@ -1169,7 +1169,7 @@ class HonchoMemoryProvider(MemoryProvider):
             if not (observe_me or observe_others):
                 reasons.append(
                     f"observation is disabled for peer '{peer}' "
-                    f"(user_observe_me/ai_observe_me in config)"
+                    f"(user_observe_me/ai_observe_me in config)",
                 )
 
         cadence = getattr(self, "_dialectic_cadence", 1)
@@ -1178,14 +1178,14 @@ class HonchoMemoryProvider(MemoryProvider):
             reasons.append(
                 f"this session has only {turn} turn(s); peer cards accumulate "
                 f"as the dialectic layer reasons over conversation history "
-                f"(cadence every {cadence} turn(s))"
+                f"(cadence every {cadence} turn(s))",
             )
 
         if not reasons:
             reasons.append(
                 "peer card has no facts yet — Honcho's dialectic layer builds "
                 "this over time from observed turns; self-hosted Honcho < 3.x "
-                "does not support peer cards at all"
+                "does not support peer cards at all",
             )
 
         return {
@@ -1230,7 +1230,7 @@ class HonchoMemoryProvider(MemoryProvider):
         if self._sync_thread and self._sync_thread.is_alive():
             self._sync_thread.join(timeout=5.0)
         self._sync_thread = threading.Thread(
-            target=_sync, daemon=True, name="honcho-sync"
+            target=_sync, daemon=True, name="honcho-sync",
         )
         self._sync_thread.start()
 
@@ -1330,7 +1330,7 @@ class HonchoMemoryProvider(MemoryProvider):
                 max_tokens = min(int(args.get("max_tokens", 800)), 2000)
                 peer = args.get("peer", "user")
                 result = self._manager.search_context(
-                    self._session_key, query, max_tokens=max_tokens, peer=peer
+                    self._session_key, query, max_tokens=max_tokens, peer=peer,
                 )
                 if not result:
                     return json.dumps({"result": "No relevant context found."})

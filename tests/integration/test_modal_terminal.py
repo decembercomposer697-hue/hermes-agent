@@ -152,7 +152,7 @@ def test_pip_install():
     result = terminal_tool(
         "pip install --break-system-packages cowsay && python3 -c \"import cowsay; cowsay.cow('Modal works!')\"",
         task_id=test_task_id,
-        timeout=120
+        timeout=120,
     )
     result_json = json.loads(result)
     

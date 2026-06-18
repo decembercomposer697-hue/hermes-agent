@@ -324,7 +324,7 @@ def test_session_resume_returns_hydrated_messages(server, monkeypatch):
             "id": "r1",
             "method": "session.resume",
             "params": {"session_id": "20260409_010101_abc123", "cols": 100},
-        }
+        },
     )
 
     assert "error" not in resp
@@ -375,7 +375,7 @@ def test_session_resume_handles_multimodal_list_content(server, monkeypatch):
             "id": "r1",
             "method": "session.resume",
             "params": {"session_id": "20260502_000000_listcontent", "cols": 100},
-        }
+        },
     )
 
     assert "error" not in resp
@@ -469,7 +469,7 @@ def test_session_resume_reuses_existing_live_session(server, monkeypatch):
                     "id": "first",
                     "method": "session.resume",
                     "params": {"session_id": target, "cols": 100},
-                }
+                },
             )
 
         first_thread = threading.Thread(target=resume_first)
@@ -484,7 +484,7 @@ def test_session_resume_reuses_existing_live_session(server, monkeypatch):
                     "id": "second",
                     "method": "session.resume",
                     "params": {"session_id": target, "cols": 120},
-                }
+                },
             )
 
         second_thread = threading.Thread(target=resume_second)
@@ -548,7 +548,7 @@ def test_session_resume_live_payload_uses_current_history_with_ancestors(server,
         server,
         "_make_agent",
         lambda _sid, key, session_id=None, session_db=None: types.SimpleNamespace(
-            model="test/model", session_id=session_id or key
+            model="test/model", session_id=session_id or key,
         ),
     )
     monkeypatch.setattr(server, "_SlashWorker", lambda _key, _model: _Worker())
@@ -577,7 +577,7 @@ def test_session_resume_live_payload_uses_current_history_with_ancestors(server,
                 "id": "first",
                 "method": "session.resume",
                 "params": {"session_id": target, "cols": 100},
-            }
+            },
         )
 
         assert "error" not in first
@@ -599,7 +599,7 @@ def test_session_resume_live_payload_uses_current_history_with_ancestors(server,
                 "id": "second",
                 "method": "session.resume",
                 "params": {"session_id": target, "cols": 120},
-            }
+            },
         )
 
     assert "error" not in second
@@ -642,7 +642,7 @@ def test_session_activate_rebinds_orphaned_ws_session_to_current_transport(serve
     )
 
     resp = server.handle_request(
-        {"id": "activate", "method": "session.activate", "params": {"session_id": sid}}
+        {"id": "activate", "method": "session.activate", "params": {"session_id": sid}},
     )
 
     assert "error" not in resp
@@ -686,7 +686,7 @@ def test_session_branch_persists_branched_from_marker(server, monkeypatch):
         server,
         "_make_agent",
         lambda _sid, key, session_id=None, session_db=None: types.SimpleNamespace(
-            model="test/model", session_id=session_id or key
+            model="test/model", session_id=session_id or key,
         ),
     )
     monkeypatch.setattr(server, "_init_session", lambda *_a, **_k: None)
@@ -704,7 +704,7 @@ def test_session_branch_persists_branched_from_marker(server, monkeypatch):
     }
 
     resp = server.handle_request(
-        {"id": "b1", "method": "session.branch", "params": {"session_id": parent_sid}}
+        {"id": "b1", "method": "session.branch", "params": {"session_id": parent_sid}},
     )
 
     assert "error" not in resp, resp
@@ -734,7 +734,7 @@ def test_make_agent_accepts_list_system_prompt(server, monkeypatch):
                 "base_url": None,
                 "api_key": None,
                 "api_mode": None,
-            }
+            },
         ),
     )
     monkeypatch.setattr(server, "_load_cfg", lambda: {"agent": {"system_prompt": ["one", "two"]}})
@@ -972,7 +972,7 @@ def test_skills_manage_search_uses_tools_hub_sources(server):
 
     assert "error" not in resp
     assert resp["result"] == {
-        "results": [{"description": "Build better terminal demos", "name": "showroom"}]
+        "results": [{"description": "Build better terminal demos", "name": "showroom"}],
     }
     auth.assert_called_once_with()
     router.assert_called_once_with("auth")
@@ -1056,7 +1056,7 @@ def test_command_dispatch_retry_handles_multipart_content(server):
     history = [
         {"role": "user", "content": [
             {"type": "text", "text": "analyze this"},
-            {"type": "image_url", "image_url": {"url": "data:image/png;base64,..."}}
+            {"type": "image_url", "image_url": {"url": "data:image/png;base64,..."}},
         ]},
         {"role": "assistant", "content": "I see the image."},
     ]

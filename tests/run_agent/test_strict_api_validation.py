@@ -72,7 +72,7 @@ class TestStrictApiValidation:
                         "response_item_id": "fc_123",  # Codex-only field
                         "type": "function",
                         "function": {"name": "terminal", "arguments": '{"command":"pwd"}'},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_123", "content": "/tmp"},
@@ -108,7 +108,7 @@ class TestStrictApiValidation:
                         "response_item_id": "fc_123",
                         "type": "function",
                         "function": {"name": "terminal", "arguments": '{"command":"pwd"}'},
-                    }
+                    },
                 ],
             },
         ]
@@ -123,7 +123,7 @@ class TestStrictApiValidation:
             monkeypatch,
             "fireworks",
             api_mode="chat_completions",
-            base_url="https://api.fireworks.ai/inference/v1"
+            base_url="https://api.fireworks.ai/inference/v1",
         )
 
         # Should sanitize for Fireworks (chat_completions mode)
@@ -135,7 +135,7 @@ class TestStrictApiValidation:
             monkeypatch,
             "openai",
             api_mode="codex_responses",
-            base_url="https://api.openai.com/v1"
+            base_url="https://api.openai.com/v1",
         )
 
         # Should NOT sanitize for Codex

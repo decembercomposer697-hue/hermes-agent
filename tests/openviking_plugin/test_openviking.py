@@ -35,7 +35,7 @@ class TestOpenVikingRead:
                     "/api/v1/content/overview",
                     (("uri", "viking://user/hermes"),),
                 ): {"result": {"content": "overview text"}},
-            }
+            },
         )
 
         result = json.loads(provider._tool_read({"uri": "viking://user/hermes/.overview.md", "level": "overview"}))
@@ -57,7 +57,7 @@ class TestOpenVikingRead:
                     "/api/v1/content/read",
                     (("uri", "viking://user/hermes/memories/profile.md"),),
                 ): {"result": "full text"},
-            }
+            },
         )
 
         result = json.loads(provider._tool_read({"uri": "viking://user/hermes/memories/profile.md", "level": "full"}))
@@ -85,7 +85,7 @@ class TestOpenVikingRead:
                     "/api/v1/content/read",
                     (("uri", file_uri),),
                 ): {"result": {"content": "full content"}},
-            }
+            },
         )
 
         result = json.loads(provider._tool_read({"uri": file_uri, "level": "overview"}))
@@ -109,7 +109,7 @@ class TestOpenVikingRead:
                     "/api/v1/content/overview",
                     (("uri", "viking://user/hermes"),),
                 ): {"result": "overview"},
-            }
+            },
         )
 
         result = json.loads(provider._tool_read({"uri": "viking://user/hermes/.overview.md", "level": "overview"}))
@@ -134,7 +134,7 @@ class TestOpenVikingRead:
                     "/api/v1/content/overview",
                     (("uri", dir_uri),),
                 ): {"result": "dir overview"},
-            }
+            },
         )
 
         result = json.loads(provider._tool_read({"uri": dir_uri, "level": "overview"}))
@@ -164,7 +164,7 @@ class TestOpenVikingRead:
                     "/api/v1/content/read",
                     (("uri", file_uri),),
                 ): {"result": {"content": "fallback full content"}},
-            }
+            },
         )
 
         result = json.loads(provider._tool_read({"uri": file_uri, "level": "overview"}))
@@ -187,7 +187,7 @@ class TestOpenVikingRead:
                     "/api/v1/content/overview",
                     (("uri", "viking://user/hermes"),),
                 ): RuntimeError("500 Internal Server Error"),
-            }
+            },
         )
 
         try:
@@ -214,10 +214,10 @@ class TestOpenVikingBrowse:
                         "entries": [
                             {"name": "memories", "uri": "viking://user/hermes/memories", "type": "dir"},
                             {"rel_path": "profile.md", "uri": "viking://user/hermes/memories/profile.md", "isDir": False, "abstract": "Profile"},
-                        ]
-                    }
+                        ],
+                    },
                 },
-            }
+            },
         )
 
         result = json.loads(provider._tool_browse({"action": "list", "path": "viking://user/hermes"}))

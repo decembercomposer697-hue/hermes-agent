@@ -24,7 +24,7 @@ parent_dir = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(parent_dir))
 
 spec = importlib.util.spec_from_file_location(
-    "terminal_tool", parent_dir / "tools" / "terminal_tool.py"
+    "terminal_tool", parent_dir / "tools" / "terminal_tool.py",
 )
 terminal_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(terminal_module)

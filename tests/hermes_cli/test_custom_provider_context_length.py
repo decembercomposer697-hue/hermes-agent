@@ -18,11 +18,11 @@ class TestGetCustomProviderContextLength:
                 "name": "my-endpoint",
                 "base_url": "https://example.invalid/v1",
                 "models": {"gpt-5.5": {"context_length": 1_050_000}},
-            }
+            },
         ]
         assert (
             get_custom_provider_context_length(
-                "gpt-5.5", "https://example.invalid/v1", custom
+                "gpt-5.5", "https://example.invalid/v1", custom,
             )
             == 1_050_000
         )
@@ -32,12 +32,12 @@ class TestGetCustomProviderContextLength:
             {
                 "base_url": "https://example.invalid/v1/",
                 "models": {"m": {"context_length": 500_000}},
-            }
+            },
         ]
         # config has trailing slash, runtime doesn't — must match
         assert (
             get_custom_provider_context_length(
-                "m", "https://example.invalid/v1", custom
+                "m", "https://example.invalid/v1", custom,
             )
             == 500_000
         )
@@ -46,11 +46,11 @@ class TestGetCustomProviderContextLength:
             {
                 "base_url": "https://example.invalid/v1",
                 "models": {"m": {"context_length": 500_000}},
-            }
+            },
         ]
         assert (
             get_custom_provider_context_length(
-                "m", "https://example.invalid/v1/", custom2
+                "m", "https://example.invalid/v1/", custom2,
             )
             == 500_000
         )
@@ -60,11 +60,11 @@ class TestGetCustomProviderContextLength:
             {
                 "base_url": "https://example.invalid/v1",
                 "models": {"m": {"context_length": 400_000}},
-            }
+            },
         ]
         assert (
             get_custom_provider_context_length(
-                "m", "https://other.invalid/v1", custom
+                "m", "https://other.invalid/v1", custom,
             )
             is None
         )
@@ -74,11 +74,11 @@ class TestGetCustomProviderContextLength:
             {
                 "base_url": "https://example.invalid/v1",
                 "models": {"gpt-5.5": {"context_length": 400_000}},
-            }
+            },
         ]
         assert (
             get_custom_provider_context_length(
-                "different-model", "https://example.invalid/v1", custom
+                "different-model", "https://example.invalid/v1", custom,
             )
             is None
         )
@@ -93,11 +93,11 @@ class TestGetCustomProviderContextLength:
             {
                 "base_url": "https://example.invalid/v1",
                 "models": {"m": {"context_length": "256K"}},
-            }
+            },
         ]
         assert (
             get_custom_provider_context_length(
-                "m", "https://example.invalid/v1", custom
+                "m", "https://example.invalid/v1", custom,
             )
             is None
         )
@@ -108,11 +108,11 @@ class TestGetCustomProviderContextLength:
                 {
                     "base_url": "https://example.invalid/v1",
                     "models": {"m": {"context_length": bad}},
-                }
+                },
             ]
             assert (
                 get_custom_provider_context_length(
-                    "m", "https://example.invalid/v1", custom
+                    "m", "https://example.invalid/v1", custom,
                 )
                 is None
             ), f"value {bad!r} should be rejected"
@@ -137,7 +137,7 @@ class TestGetCustomProviderContextLength:
         ]
         assert (
             get_custom_provider_context_length(
-                "m", "https://example.invalid/v1", custom
+                "m", "https://example.invalid/v1", custom,
             )
             == 400_000
         )
@@ -166,7 +166,7 @@ class TestGetModelContextLengthHonorsOverride:
             {
                 "base_url": "https://example.invalid/v1",
                 "models": {"gpt-5.5": {"context_length": 1_050_000}},
-            }
+            },
         ]
         patches = self._mock_all_probes()
         for p in patches:
@@ -194,7 +194,7 @@ class TestGetModelContextLengthHonorsOverride:
             {
                 "base_url": "https://example.invalid/v1",
                 "models": {"m": {"context_length": 1_050_000}},
-            }
+            },
         ]
         ctx = get_model_context_length(
             "m",

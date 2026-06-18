@@ -45,7 +45,7 @@ def _fake_response(text: str, *, prompt: int = 4, completion: int = 6) -> Simple
             SimpleNamespace(
                 message=SimpleNamespace(content=text, role="assistant"),
                 finish_reason="stop",
-            )
+            ),
         ],
         usage=SimpleNamespace(
             prompt_tokens=prompt,
@@ -386,7 +386,7 @@ class TestJsonParsing:
 
     def test_parse_returns_text_when_not_json_mode(self):
         parsed, ct = _parse_structured_text(
-            text='{"a": 1}', json_mode=False, json_schema=None
+            text='{"a": 1}', json_mode=False, json_schema=None,
         )
         assert parsed is None
         assert ct == "text"
@@ -536,7 +536,7 @@ class TestPluginLlmFacade:
     def test_complete_structured_returns_parsed_json(self):
         def fake_caller(**_kwargs):
             return "openai", "gpt-4o", _fake_response(
-                '{"language": "French", "is_question": true, "confidence": 0.99}'
+                '{"language": "French", "is_question": true, "confidence": 0.99}',
             )
 
         llm = make_plugin_llm_for_test(
@@ -793,7 +793,7 @@ class TestPluginContextIntegration:
         from hermes_cli.plugins import PluginContext, PluginManifest, PluginManager
 
         manifest = PluginManifest(
-            name="bare-name", source="test", key="image_gen/openai"
+            name="bare-name", source="test", key="image_gen/openai",
         )
         manager = PluginManager()
         ctx = PluginContext(manifest, manager)

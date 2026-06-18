@@ -70,7 +70,7 @@ class TestSnapshotShutdownContext:
         assert ctx["systemd_invocation_id"] == "abc123"
 
     def test_under_systemd_false_without_invocation_id_and_normal_ppid(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         monkeypatch.delenv("INVOCATION_ID", raising=False)
         # We can't actually change ppid; skip if we happen to be reaped
@@ -103,7 +103,7 @@ class TestSnapshotShutdownContext:
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         marker = tmp_path / ".gateway-takeover.json"
         marker.write_text(
-            '{"target_pid": 1, "replacer_pid": 99999}', encoding="utf-8"
+            '{"target_pid": 1, "replacer_pid": 99999}', encoding="utf-8",
         )
         ctx = sf.snapshot_shutdown_context(signal.SIGTERM)
         assert ctx["takeover_marker_for_self"] is False
@@ -112,7 +112,7 @@ class TestSnapshotShutdownContext:
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         marker = tmp_path / ".gateway-planned-stop.json"
         marker.write_text(
-            f'{{"target_pid": {os.getpid()}}}', encoding="utf-8"
+            f'{{"target_pid": {os.getpid()}}}', encoding="utf-8",
         )
         ctx = sf.snapshot_shutdown_context(signal.SIGTERM)
         assert "planned_stop_marker" in ctx
@@ -180,7 +180,7 @@ class TestSpawnAsyncDiagnostic:
     def test_returns_none_on_windows(self, tmp_path, monkeypatch):
         monkeypatch.setattr(sf, "sys", type("M", (), {"platform": "win32"})())
         result = sf.spawn_async_diagnostic(
-            tmp_path / "diag.log", "SIGTERM", timeout_seconds=1.0
+            tmp_path / "diag.log", "SIGTERM", timeout_seconds=1.0,
         )
         assert result is None
 

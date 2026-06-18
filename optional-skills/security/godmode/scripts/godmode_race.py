@@ -358,7 +358,7 @@ def race_models(query, tier="standard", api_key=None, system_prompt=None,
             if error or not content:
                 results.append({
                     'model': model, 'content': None, 'score': -9999,
-                    'latency': latency, 'error': error, 'is_refusal': True, 'hedge_count': 0
+                    'latency': latency, 'error': error, 'is_refusal': True, 'hedge_count': 0,
                 })
             else:
                 scored = score_response(content, query)
@@ -366,7 +366,7 @@ def race_models(query, tier="standard", api_key=None, system_prompt=None,
                     'model': model, 'content': content,
                     'score': scored['score'], 'latency': latency,
                     'is_refusal': scored['is_refusal'],
-                    'hedge_count': scored['hedge_count'], 'error': None
+                    'hedge_count': scored['hedge_count'], 'error': None,
                 })
     
     # Sort by score descending
@@ -381,7 +381,7 @@ def race_models(query, tier="standard", api_key=None, system_prompt=None,
     else:
         winner = results[0] if results else {
             'model': 'none', 'content': 'All models refused.', 'score': -9999,
-            'latency': 0, 'is_refusal': True, 'hedge_count': 0
+            'latency': 0, 'is_refusal': True, 'hedge_count': 0,
         }
     
     return {
@@ -470,7 +470,7 @@ def race_godmode_classic(query, api_key=None, timeout=60):
                 results.append({
                     'model': model, 'codename': combo['codename'],
                     'content': None, 'score': -9999, 'latency': latency,
-                    'error': error, 'is_refusal': True, 'hedge_count': 0
+                    'error': error, 'is_refusal': True, 'hedge_count': 0,
                 })
             else:
                 scored = score_response(content, query)
@@ -478,7 +478,7 @@ def race_godmode_classic(query, api_key=None, timeout=60):
                     'model': model, 'codename': combo['codename'],
                     'content': content, 'score': scored['score'],
                     'latency': latency, 'is_refusal': scored['is_refusal'],
-                    'hedge_count': scored['hedge_count'], 'error': None
+                    'hedge_count': scored['hedge_count'], 'error': None,
                 })
     
     results.sort(key=lambda r: r['score'], reverse=True)

@@ -46,7 +46,7 @@ def plugin_api(tmp_path, monkeypatch):
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
     spec = importlib.util.spec_from_file_location(
-        f"plugin_api_test_{id(tmp_path)}", PLUGIN_MODULE_PATH
+        f"plugin_api_test_{id(tmp_path)}", PLUGIN_MODULE_PATH,
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

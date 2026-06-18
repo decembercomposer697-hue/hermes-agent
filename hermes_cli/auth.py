@@ -562,7 +562,7 @@ def has_usable_secret(value: Any, *, min_length: int = 4) -> bool:
 
 
 def _resolve_api_key_provider_secret(
-    provider_id: str, pconfig: ProviderConfig
+    provider_id: str, pconfig: ProviderConfig,
 ) -> tuple[str, str]:
     """Resolve an API-key provider's token and indicate where it came from."""
     if provider_id == "copilot":
@@ -870,7 +870,7 @@ def _auth_file_path() -> Path:
             raise RuntimeError(
                 f"Refusing to touch real user auth store during test run: {path}. "
                 "Set HERMES_HOME to a tmp_path in your test fixture, or run "
-                "via scripts/run_tests.sh for hermetic CI-parity env."
+                "via scripts/run_tests.sh for hermetic CI-parity env.",
             )
     return path
 
@@ -2747,7 +2747,7 @@ def _spotify_token_payload_to_state(
         "refresh_token": str(
             token_payload.get("refresh_token")
             or state.get("refresh_token")
-            or ""
+            or "",
         ).strip(),
         "obtained_at": now.isoformat(),
         "expires_at": expires_at.isoformat(),
@@ -3140,7 +3140,7 @@ _CONSOLE_BROWSER_NAMES: frozenset[str] = frozenset(
         "elinks",
         "www-browser",
         "browsh",  # TUI browser — still hijacks the terminal
-    }
+    },
 )
 
 
@@ -3176,7 +3176,7 @@ def _can_open_graphical_browser() -> bool:
 
     if sys.platform.startswith("linux"):
         has_display = bool(
-            os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")
+            os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"),
         )
         # An explicit graphical $BROWSER can work without $DISPLAY in odd
         # setups, but a console $BROWSER already returned False above, so the
@@ -3477,7 +3477,7 @@ def _sync_codex_pool_entries(
             # own distinct token material is an independent account and must
             # be left alone (#39236).
             refresh_this_entry = bool(
-                prev_at and entry.get("access_token") == prev_at
+                prev_at and entry.get("access_token") == prev_at,
             )
         else:
             # ``manual:api_key`` and any future non-device-code sources.
@@ -4473,7 +4473,7 @@ def _nous_shared_store_path() -> Path:
         if resolved == real_home_shared:
             raise RuntimeError(
                 f"Refusing to touch real user shared Nous auth store during test run: "
-                f"{path}. Set HERMES_SHARED_AUTH_DIR to a tmp_path in your test fixture."
+                f"{path}. Set HERMES_SHARED_AUTH_DIR to a tmp_path in your test fixture.",
             )
     return path
 
@@ -5157,7 +5157,7 @@ def refresh_nous_oauth_pure(
             state["obtained_at"] = now.isoformat()
             state["expires_in"] = access_ttl
             state["expires_at"] = datetime.fromtimestamp(
-                now.timestamp() + access_ttl, tz=UTC
+                now.timestamp() + access_ttl, tz=UTC,
             ).isoformat()
             if on_state_update is not None:
                 on_state_update(dict(state), "post_refresh_access_token")
@@ -5432,7 +5432,7 @@ def resolve_nous_runtime_credentials(
                         state["obtained_at"] = now.isoformat()
                         state["expires_in"] = access_ttl
                         state["expires_at"] = datetime.fromtimestamp(
-                            now.timestamp() + access_ttl, tz=UTC
+                            now.timestamp() + access_ttl, tz=UTC,
                         ).isoformat()
                         access_token = state["access_token"]
                         refresh_token = state["refresh_token"]
@@ -5649,7 +5649,7 @@ def _compute_nous_auth_status() -> dict[str, Any]:
             "has_refresh_token": bool(state.get("refresh_token")),
             "access_token": state.get("access_token"),
             "inference_credential_present": bool(
-                state.get("access_token") or state.get("agent_key")
+                state.get("access_token") or state.get("agent_key"),
             ),
             "credential_source": "auth_store",
             "source": "auth_store",
@@ -5673,7 +5673,7 @@ def _compute_nous_auth_status() -> dict[str, Any]:
                     "credential_source": "auth_store",
                     "source": f"runtime:{creds.get('source', 'portal')}",
                     "key_id": creds.get("key_id"),
-                }
+                },
             )
             return base_status
         except AuthError as exc:
@@ -7075,7 +7075,7 @@ def _minimax_pkce_pair() -> tuple:
     import secrets
     verifier = secrets.token_urlsafe(64)[:96]
     challenge = base64.urlsafe_b64encode(
-        hashlib.sha256(verifier.encode()).digest()
+        hashlib.sha256(verifier.encode()).digest(),
     ).decode().rstrip("=")
     state = secrets.token_urlsafe(16)
     return verifier, challenge, state
@@ -7617,7 +7617,7 @@ def _nous_device_code_login(
     except AuthError as exc:
         if exc.code == "subscription_required":
             portal_url = auth_state.get(
-                "portal_base_url", DEFAULT_NOUS_PORTAL_URL
+                "portal_base_url", DEFAULT_NOUS_PORTAL_URL,
             ).rstrip("/")
             message = format_auth_error(exc)
             print()

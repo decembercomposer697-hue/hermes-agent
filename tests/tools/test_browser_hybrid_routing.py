@@ -194,7 +194,7 @@ class TestCleanupHybridSessions:
             },
         )
         monkeypatch.setattr(
-            browser_tool, "_last_active_session_key", {"default": "default::local"}
+            browser_tool, "_last_active_session_key", {"default": "default::local"},
         )
 
         browser_tool.cleanup_browser("default")
@@ -238,7 +238,7 @@ class TestCleanupHybridSessions:
             },
         )
         monkeypatch.setattr(
-            browser_tool, "_last_active_session_key", {"default": "default::local"}
+            browser_tool, "_last_active_session_key", {"default": "default::local"},
         )
 
         browser_tool.cleanup_browser("default::local")

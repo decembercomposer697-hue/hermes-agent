@@ -325,7 +325,7 @@ class TestQueuedMessageAlreadyStreamed:
         _sc = self._make_mock_sc(already_sent=True, final_response_sent=False)
 
         _already_streamed = bool(
-            _sc and getattr(_sc, "final_response_sent", False)
+            _sc and getattr(_sc, "final_response_sent", False),
         )
 
         assert _already_streamed is False
@@ -337,7 +337,7 @@ class TestQueuedMessageAlreadyStreamed:
 
         _already_streamed = bool(
             (_sc and getattr(_sc, "final_response_sent", False))
-            or bool(response.get("response_previewed"))
+            or bool(response.get("response_previewed")),
         )
 
         assert _already_streamed is True
@@ -350,7 +350,7 @@ class TestQueuedMessageAlreadyStreamed:
 
         _already_streamed = bool(
             (_sc and getattr(_sc, "final_response_sent", False))
-            or bool(response.get("response_previewed"))
+            or bool(response.get("response_previewed")),
         )
 
         assert _already_streamed is True
@@ -361,7 +361,7 @@ class TestQueuedMessageAlreadyStreamed:
         _sc = self._make_mock_sc(already_sent=False, final_response_sent=False)
 
         _already_streamed = bool(
-            _sc and getattr(_sc, "final_response_sent", False)
+            _sc and getattr(_sc, "final_response_sent", False),
         )
 
         assert _already_streamed is False
@@ -371,7 +371,7 @@ class TestQueuedMessageAlreadyStreamed:
         _sc = None
 
         _already_streamed = bool(
-            _sc and getattr(_sc, "final_response_sent", False)
+            _sc and getattr(_sc, "final_response_sent", False),
         )
 
         assert _already_streamed is False

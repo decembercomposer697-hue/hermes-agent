@@ -263,7 +263,7 @@ class FileToolsIntegrationTests(unittest.TestCase):
                 old_string="hello",
                 new_string="HI",
                 task_id="agentA",
-            )
+            ),
         )
         warn = r.get("_warning", "")
         # Patch may fail (sibling changed the content so old_string may not

@@ -56,7 +56,7 @@ class TestCronCommandLifecycle:
                 skill=None,
                 skills=["maps", "blogwatcher"],
                 clear_skills=False,
-            )
+            ),
         )
         updated = get_job(job["id"])
         assert updated["skills"] == ["maps", "blogwatcher"]
@@ -76,7 +76,7 @@ class TestCronCommandLifecycle:
                 skill=None,
                 skills=None,
                 clear_skills=True,
-            )
+            ),
         )
         cleared = get_job(job["id"])
         assert cleared["skills"] == []
@@ -96,7 +96,7 @@ class TestCronCommandLifecycle:
                 repeat=None,
                 skill=None,
                 skills=["blogwatcher", "maps"],
-            )
+            ),
         )
         out = capsys.readouterr().out
         assert "Created job" in out

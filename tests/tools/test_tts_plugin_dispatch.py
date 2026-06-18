@@ -279,7 +279,7 @@ class TestPluginDispatch:
 class TestVoiceCompatibleHelper:
     def test_voice_compatible_true(self):
         tts_registry.register_provider(
-            _FakeTTSProvider(name="cartesia", voice_compat=True)
+            _FakeTTSProvider(name="cartesia", voice_compat=True),
         )
         assert tts_tool._plugin_provider_is_voice_compatible("cartesia") is True
 
@@ -305,7 +305,7 @@ class TestVoiceCompatibleHelper:
 
     def test_voice_compatible_case_insensitive(self):
         tts_registry.register_provider(
-            _FakeTTSProvider(name="cartesia", voice_compat=True)
+            _FakeTTSProvider(name="cartesia", voice_compat=True),
         )
         assert tts_tool._plugin_provider_is_voice_compatible("CARTESIA") is True
         assert tts_tool._plugin_provider_is_voice_compatible("  cartesia  ") is True

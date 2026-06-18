@@ -419,7 +419,7 @@ def start_continuous(
         rec = _continuous_recorder
 
     _debug(
-        f"start_continuous: begin (threshold={silence_threshold}, duration={silence_duration}s)"
+        f"start_continuous: begin (threshold={silence_threshold}, duration={silence_duration}s)",
     )
 
     # CLI parity: single 880 Hz beep *before* opening the stream — placing
@@ -609,7 +609,7 @@ def _continuous_on_silence() -> None:
     # for SILENCE_RMS_THRESHOLD (200) or the VAD + peak checks disagree.
     peak_rms = getattr(rec, "_peak_rms", -1)
     _debug(
-        f"_continuous_on_silence: rec.stop -> {wav_path!r} (peak_rms={peak_rms})"
+        f"_continuous_on_silence: rec.stop -> {wav_path!r} (peak_rms={peak_rms})",
     )
 
     # CLI parity: double 660 Hz beep after the stream stops (safe from the
@@ -630,7 +630,7 @@ def _continuous_on_silence() -> None:
             err = result.get("error")
             _debug(
                 f"_continuous_on_silence: transcribe -> success={success} "
-                f"text={text!r} err={err!r}"
+                f"text={text!r} err={err!r}",
             )
             if success and text and not is_whisper_hallucination(text):
                 transcript = text
@@ -838,10 +838,10 @@ def speak_text(text: str) -> None:
                 if _continuous_active and _continuous_recorder is not None:
                     try:
                         _continuous_recorder.start(
-                            on_silence_stop=_continuous_on_silence
+                            on_silence_stop=_continuous_on_silence,
                         )
                         _debug("speak_text: recording resumed after TTS")
                     except Exception as e:
                         logger.warning(
-                            "failed to resume recorder after TTS: %s", e
+                            "failed to resume recorder after TTS: %s", e,
                         )

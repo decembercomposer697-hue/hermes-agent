@@ -40,7 +40,7 @@ def _run_terminal(
     mock_env.execute.return_value = {"output": output, "returncode": returncode}
 
     monkeypatch.setattr(
-        terminal_tool_module, "_get_env_config", lambda: _make_env_config(tmp_path)
+        terminal_tool_module, "_get_env_config", lambda: _make_env_config(tmp_path),
     )
     monkeypatch.setattr(terminal_tool_module, "_start_cleanup_thread", lambda: None)
     monkeypatch.setattr(

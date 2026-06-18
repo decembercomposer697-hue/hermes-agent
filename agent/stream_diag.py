@@ -103,7 +103,7 @@ def flatten_exception_chain(error: BaseException) -> str:
             break
         seen.append(link)
         nxt = getattr(link, "__cause__", None) or getattr(
-            link, "__context__", None
+            link, "__context__", None,
         )
         if nxt is None or nxt is link:
             break
@@ -260,11 +260,11 @@ def emit_stream_drop(
     try:
         agent._buffer_status(
             f"⚠️ {provider} stream {kind} ({type(error).__name__}){_suffix} "
-            f"— reconnecting, retry {attempt}/{max_attempts}"
+            f"— reconnecting, retry {attempt}/{max_attempts}",
         )
         agent._touch_activity(
             f"stream retry {attempt}/{max_attempts} "
-            f"after {type(error).__name__}"
+            f"after {type(error).__name__}",
         )
     except Exception:
         pass

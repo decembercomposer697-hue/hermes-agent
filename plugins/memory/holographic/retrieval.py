@@ -148,7 +148,7 @@ class FactRetriever:
                 extracted = hrr.unbind(bank_vec, probe_key)
                 # Use extracted signal to score individual facts
                 return self._score_facts_by_vector(
-                    extracted, category=category, limit=limit
+                    extracted, category=category, limit=limit,
                 )
 
         # Score against individual fact vectors directly

@@ -179,7 +179,7 @@ def analyze(
                 "effect_size_sd": round(effect_size, 2),
                 "significant": p_value < p_threshold,
                 "total_donation_amount": round(sum(a for (_, a) in records), 2),
-            }
+            },
         )
 
     results.sort(key=lambda r: r["p_value"])
@@ -243,7 +243,7 @@ def main() -> int:
     print(
         f"Tested {meta['n_pairs_tested']} pairs ({meta['n_pairs_skipped']} skipped). "
         f"Significant (p<{meta['p_threshold']}): {meta['n_significant']}. "
-        f"Wrote {a.out}"
+        f"Wrote {a.out}",
     )
     return 0
 

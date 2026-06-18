@@ -52,7 +52,7 @@ async def test_cancel_background_tasks_drains_late_arrivals():
     up by the re-drain loop, not leaked as an untracked task."""
     adapter = _make_adapter()
     sk = build_session_key(
-        SessionSource(platform=Platform.TELEGRAM, chat_id="42", chat_type="dm")
+        SessionSource(platform=Platform.TELEGRAM, chat_id="42", chat_type="dm"),
     )
 
     m1_started = asyncio.Event()

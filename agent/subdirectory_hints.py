@@ -98,7 +98,7 @@ class SubdirectoryHintTracker:
         return "\n\n" + "\n\n".join(all_hints)
 
     def _extract_directories(
-        self, tool_name: str, args: dict[str, Any]
+        self, tool_name: str, args: dict[str, Any],
     ) -> list:
         """Extract directory paths from tool call arguments."""
         candidates: set[Path] = set()
@@ -259,7 +259,7 @@ class SubdirectoryHintTracker:
         sections = []
         for rel_path, content in found_hints:
             sections.append(
-                f"[Subdirectory context discovered: {rel_path}]\n{content}"
+                f"[Subdirectory context discovered: {rel_path}]\n{content}",
             )
 
         logger.debug(

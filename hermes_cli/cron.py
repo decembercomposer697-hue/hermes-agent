@@ -27,7 +27,7 @@ _GATEWAY_LIFECYCLE_PATTERNS = re.compile(
     r"(hermes\s+gateway\s+(restart|stop|start))"
     r"|(launchctl\s+(kickstart|unload|load|stop|restart)\s+.*hermes)"
     r"|(systemctl\s+(restart|stop|start)\s+.*hermes)"
-    r"|(p?kill\s+.*hermes.*gateway)"
+    r"|(p?kill\s+.*hermes.*gateway)",
 )
 
 

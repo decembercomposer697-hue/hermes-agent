@@ -168,7 +168,7 @@ class TestVoiceAttachmentSSRFProtection:
                     "http://127.0.0.1/voice.silk",
                     "audio/silk",
                     "voice.silk",
-                )
+                ),
             )
 
         assert transcript is None
@@ -722,7 +722,7 @@ class TestChunkedUploadHelpers:
                 ],
                 "concurrency": 3,
                 "retry_timeout": 90,
-            }
+            },
         }
         r = _parse_prepare_response(raw)
         assert r.upload_id == "uid-42"
@@ -1376,7 +1376,7 @@ class TestProcessQuotedContext:
                 "attachments": [
                     {"content_type": "audio/silk",
                      "url": "https://qq-cdn/x.silk",
-                     "filename": "rec.silk"}
+                     "filename": "rec.silk"},
                 ],
             }],
         }
@@ -1503,7 +1503,7 @@ class TestProcessQuotedContext:
     async def test_invalid_message_type_string_returns_empty(self):
         adapter = self._make_adapter()
         out = await adapter._process_quoted_context(
-            {"message_type": "not-a-number", "msg_elements": [{"content": "x"}]}
+            {"message_type": "not-a-number", "msg_elements": [{"content": "x"}]},
         )
         assert out["quote_block"] == ""
 
@@ -1903,7 +1903,7 @@ class TestProcessAttachmentsPathExposure:
                 "content_type": "video/mp4",
                 "url": "https://multimedia.nt.qq.com.cn/download/video123",
                 "filename": "my_video.mp4",
-            }
+            },
         ]
         result = await adapter._process_attachments(attachments)
 
@@ -1928,7 +1928,7 @@ class TestProcessAttachmentsPathExposure:
                 "content_type": "application/pdf",
                 "url": "https://multimedia.nt.qq.com.cn/download/file456",
                 "filename": "report.pdf",
-            }
+            },
         ]
         result = await adapter._process_attachments(attachments)
 
@@ -1951,7 +1951,7 @@ class TestProcessAttachmentsPathExposure:
                 "content_type": "video/mp4",
                 "url": "https://cdn.qq.com/vid",
                 "filename": "",
-            }
+            },
         ]
         result = await adapter._process_attachments(attachments)
 
@@ -1973,7 +1973,7 @@ class TestProcessAttachmentsPathExposure:
                 "content_type": "video/mp4",
                 "url": "https://cdn.qq.com/vid",
                 "filename": "vid.mp4",
-            }
+            },
         ]
         result = await adapter._process_attachments(attachments)
         assert result["attachment_info"] == ""
@@ -2001,7 +2001,7 @@ class TestProcessAttachmentsPathExposure:
                 "attachments": [
                     {"content_type": "video/mp4",
                      "url": "https://qq-cdn/clip.mp4",
-                     "filename": "clip.mp4"}
+                     "filename": "clip.mp4"},
                 ],
             }],
         }
@@ -2031,7 +2031,7 @@ class TestProcessAttachmentsPathExposure:
                 "attachments": [
                     {"content_type": "application/pdf",
                      "url": "https://qq-cdn/report.pdf",
-                     "filename": "report.pdf"}
+                     "filename": "report.pdf"},
                 ],
             }],
         }

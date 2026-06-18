@@ -240,7 +240,7 @@ def _ensure_ffmpeg():
     if shutil.which("ffmpeg") is None:
         raise RuntimeError(
             "ffmpeg not found on PATH. Install via your package manager or "
-            "download from https://ffmpeg.org/"
+            "download from https://ffmpeg.org/",
         )
 
 
@@ -269,7 +269,7 @@ def pixel_art_video(
     """
     if scene not in SCENES:
         raise ValueError(
-            f"Unknown scene {scene!r}. Choose from: {sorted(SCENES)}"
+            f"Unknown scene {scene!r}. Choose from: {sorted(SCENES)}",
         )
     _ensure_ffmpeg()
 

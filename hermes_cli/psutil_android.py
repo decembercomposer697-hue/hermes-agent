@@ -27,7 +27,7 @@ def _normalize_member_parts(member_name: str) -> tuple[str, ...]:
     parts = tuple(part for part in path.parts if part not in ("", "."))
     if path.is_absolute() or ".." in parts or not parts:
         raise PsutilAndroidInstallError(
-            f"Unsafe archive member path: {member_name!r}"
+            f"Unsafe archive member path: {member_name!r}",
         )
     return parts
 
@@ -45,14 +45,14 @@ def _safe_extract_tar_gz(archive: Path, destination: Path) -> None:
 
             if not member.isfile():
                 raise PsutilAndroidInstallError(
-                    f"Unsupported archive member type: {member.name}"
+                    f"Unsupported archive member type: {member.name}",
                 )
 
             target.parent.mkdir(parents=True, exist_ok=True)
             extracted = tf.extractfile(member)
             if extracted is None:
                 raise PsutilAndroidInstallError(
-                    f"Cannot read archive member: {member.name}"
+                    f"Cannot read archive member: {member.name}",
                 )
 
             with extracted, open(target, "wb") as dst:
@@ -77,24 +77,24 @@ def prepare_patched_psutil_sdist(archive: Path, destination: Path) -> Path:
     )
     if not src_roots:
         raise PsutilAndroidInstallError(
-            "psutil sdist did not contain a psutil-* directory"
+            "psutil sdist did not contain a psutil-* directory",
         )
 
     src_root = src_roots[0]
     common_py = src_root / "psutil" / "_common.py"
     if not common_py.is_file():
         raise PsutilAndroidInstallError(
-            f"psutil sdist did not contain {common_py.relative_to(src_root)!s}"
+            f"psutil sdist did not contain {common_py.relative_to(src_root)!s}",
         )
     try:
         content = common_py.read_text(encoding="utf-8")
     except OSError as exc:
         raise PsutilAndroidInstallError(
-            f"Failed to read {common_py.relative_to(src_root)!s}"
+            f"Failed to read {common_py.relative_to(src_root)!s}",
         ) from exc
     if MARKER not in content:
         raise PsutilAndroidInstallError(
-            "psutil Android compatibility patch marker not found"
+            "psutil Android compatibility patch marker not found",
         )
     try:
         common_py.write_text(
@@ -103,6 +103,6 @@ def prepare_patched_psutil_sdist(archive: Path, destination: Path) -> Path:
         )
     except OSError as exc:
         raise PsutilAndroidInstallError(
-            f"Failed to write {common_py.relative_to(src_root)!s}"
+            f"Failed to write {common_py.relative_to(src_root)!s}",
         ) from exc
     return src_root

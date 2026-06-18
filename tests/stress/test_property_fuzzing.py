@@ -60,7 +60,7 @@ def assert_invariants(conn, kb, ops_log):
             detail = f"closed ({row['outcome']})"
         failures.append(
             f"I1: task {row['id']} points at run {row['current_run_id']} "
-            f"which is {detail}"
+            f"which is {detail}",
         )
 
     # I2: open run → some task points at it
@@ -87,7 +87,7 @@ def assert_invariants(conn, kb, ops_log):
     """).fetchall()
     for row in bad_lock:
         failures.append(
-            f"I4: task {row['id']} status={row['status']} but claim_lock={row['claim_lock']!r}"
+            f"I4: task {row['id']} status={row['status']} but claim_lock={row['claim_lock']!r}",
         )
 
     # I5: run started_at <= ended_at
@@ -97,7 +97,7 @@ def assert_invariants(conn, kb, ops_log):
     """).fetchall()
     for row in bad_times:
         failures.append(
-            f"I5: run {row['id']} started_at={row['started_at']} > ended_at={row['ended_at']}"
+            f"I5: run {row['id']} started_at={row['started_at']} > ended_at={row['ended_at']}",
         )
 
     # I6: outcome set → ended_at set
@@ -135,7 +135,7 @@ def assert_invariants(conn, kb, ops_log):
     """).fetchall()
     for row in orphaned_todo:
         failures.append(
-            f"I9: task {row['child_id']} is todo but all {row['n_parents']} parents are done"
+            f"I9: task {row['child_id']} is todo but all {row['n_parents']} parents are done",
         )
 
     if failures:

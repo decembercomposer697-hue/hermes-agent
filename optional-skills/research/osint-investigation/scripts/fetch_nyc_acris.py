@@ -146,7 +146,7 @@ def fetch(
                 "borough": BOROUGH.get(m.get("recorded_borough", ""), m.get("recorded_borough", "")),
                 "amount": m.get("document_amt", "") or "",
                 "filing_url": _filing_url(did),
-            }
+            },
         )
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)

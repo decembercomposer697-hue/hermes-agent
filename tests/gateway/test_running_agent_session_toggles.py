@@ -50,7 +50,7 @@ def _make_runner():
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
     adapter = MagicMock()
     adapter.send = AsyncMock()
@@ -140,7 +140,7 @@ async def test_fast_rejected_mid_run():
     """/fast mid-run must hit the busy catch-all — config-only, next message."""
     runner = _make_runner()
     runner._handle_fast_command = AsyncMock(
-        side_effect=AssertionError("/fast should not dispatch mid-run")
+        side_effect=AssertionError("/fast should not dispatch mid-run"),
     )
 
     result = await runner._handle_message(_make_event("/fast"))
@@ -156,7 +156,7 @@ async def test_reasoning_rejected_mid_run():
     """/reasoning mid-run must hit the busy catch-all — config-only, next message."""
     runner = _make_runner()
     runner._handle_reasoning_command = AsyncMock(
-        side_effect=AssertionError("/reasoning should not dispatch mid-run")
+        side_effect=AssertionError("/reasoning should not dispatch mid-run"),
     )
 
     result = await runner._handle_message(_make_event("/reasoning high"))
@@ -180,7 +180,7 @@ async def test_btw_dispatches_mid_run():
     """
     runner = _make_runner()
     runner._handle_background_command = AsyncMock(
-        return_value='🚀 Background task started: "what module owns titles?"'
+        return_value='🚀 Background task started: "what module owns titles?"',
     )
 
     result = await runner._handle_message(_make_event("/btw what module owns titles?"))

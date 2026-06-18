@@ -617,7 +617,7 @@ def _live_system_guard(request, monkeypatch):
             "code path without mocking find_gateway_pids and os.kill. "
             "Mock both, or mark the test with "
             "@pytest.mark.live_system_guard_bypass if real signal "
-            "delivery is genuinely required."
+            "delivery is genuinely required.",
         )
 
     monkeypatch.setattr(_os, "kill", _guarded_kill)
@@ -637,7 +637,7 @@ def _live_system_guard(request, monkeypatch):
             raise RuntimeError(
                 f"tests/conftest.py live-system guard: blocked "
                 f"os.killpg({pgid}, {sig}) — PGID is outside the test "
-                "process group. See _live_system_guard for the why."
+                "process group. See _live_system_guard for the why.",
             )
 
         monkeypatch.setattr(_os, "killpg", _guarded_killpg)
@@ -721,7 +721,7 @@ def _live_system_guard(request, monkeypatch):
                 f"subprocess.{name}({cmd!r}) — would mutate the "
                 "live hermes-gateway systemd unit. Mock "
                 "subprocess.run / _run_systemctl in the test, or "
-                "mark with @pytest.mark.live_system_guard_bypass."
+                "mark with @pytest.mark.live_system_guard_bypass.",
             )
         if _is_process_killer(cmd):
             raise RuntimeError(
@@ -729,7 +729,7 @@ def _live_system_guard(request, monkeypatch):
                 f"subprocess.{name}({cmd!r}) — process-killer command "
                 "targeting hermes/python could hit the live gateway. "
                 "Mark with @pytest.mark.live_system_guard_bypass if "
-                "intentional."
+                "intentional.",
             )
 
     def _wrap_subprocess(name, real):
@@ -771,7 +771,7 @@ def _live_system_guard(request, monkeypatch):
     monkeypatch.setattr(_subprocess, "Popen", _wrap_popen())
     monkeypatch.setattr(_subprocess, "call", _wrap_subprocess("call", real_call))
     monkeypatch.setattr(
-        _subprocess, "check_call", _wrap_subprocess("check_call", real_check_call)
+        _subprocess, "check_call", _wrap_subprocess("check_call", real_check_call),
     )
     monkeypatch.setattr(
         _subprocess,
@@ -779,7 +779,7 @@ def _live_system_guard(request, monkeypatch):
         _wrap_subprocess("check_output", real_check_output),
     )
     monkeypatch.setattr(
-        _subprocess, "getoutput", _wrap_subprocess("getoutput", real_getoutput)
+        _subprocess, "getoutput", _wrap_subprocess("getoutput", real_getoutput),
     )
     monkeypatch.setattr(
         _subprocess,
@@ -824,7 +824,7 @@ def _live_system_guard(request, monkeypatch):
 
         async def _guarded_async_exec(program, *args, **kwargs):
             _check_subprocess_cmd(
-                "asyncio.create_subprocess_exec", [program, *args]
+                "asyncio.create_subprocess_exec", [program, *args],
             )
             return await real_async_exec(program, *args, **kwargs)
 
@@ -834,7 +834,7 @@ def _live_system_guard(request, monkeypatch):
 
         monkeypatch.setattr(_asyncio, "create_subprocess_exec", _guarded_async_exec)
         monkeypatch.setattr(
-            _asyncio, "create_subprocess_shell", _guarded_async_shell
+            _asyncio, "create_subprocess_shell", _guarded_async_shell,
         )
     except Exception:
         pass

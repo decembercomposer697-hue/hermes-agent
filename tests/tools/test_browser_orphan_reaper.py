@@ -195,7 +195,7 @@ class TestOwnerPidCrossProcess:
 
         # Use our own PID as the "owner" — guaranteed alive
         d = _make_socket_dir(
-            fake_tmpdir, "h_alive_owner", pid=12345, owner_pid=os.getpid()
+            fake_tmpdir, "h_alive_owner", pid=12345, owner_pid=os.getpid(),
         )
 
         kill_calls = []
@@ -217,7 +217,7 @@ class TestOwnerPidCrossProcess:
 
         # PID 999999999 almost certainly doesn't exist
         d = _make_socket_dir(
-            fake_tmpdir, "h_dead_owner1", pid=12345, owner_pid=999999999
+            fake_tmpdir, "h_dead_owner1", pid=12345, owner_pid=999999999,
         )
 
         kill_calls = []
@@ -272,7 +272,7 @@ class TestOwnerPidCrossProcess:
         from tools.browser_tool import _reap_orphaned_browser_sessions
 
         d = _make_socket_dir(
-            fake_tmpdir, "h_perm_owner1", pid=12345, owner_pid=22222
+            fake_tmpdir, "h_perm_owner1", pid=12345, owner_pid=22222,
         )
 
         kill_calls = []
@@ -290,7 +290,7 @@ class TestOwnerPidCrossProcess:
         assert d.exists()
 
     def test_write_owner_pid_creates_file_with_current_pid(
-        self, fake_tmpdir, monkeypatch
+        self, fake_tmpdir, monkeypatch,
     ):
         """_write_owner_pid(dir, session) writes <session>.owner_pid with os.getpid()."""
         import tools.browser_tool as bt
@@ -335,7 +335,7 @@ class TestOwnerPidCrossProcess:
         bt._write_owner_pid(str(fake_tmpdir), "h_readonly123")
 
     def test_run_browser_command_calls_write_owner_pid(
-        self, fake_tmpdir, monkeypatch
+        self, fake_tmpdir, monkeypatch,
     ):
         """_run_browser_command wires _write_owner_pid after mkdir."""
         import tools.browser_tool as bt
@@ -350,7 +350,7 @@ class TestOwnerPidCrossProcess:
         monkeypatch.setattr(bt.subprocess, "Popen", _FakePopen)
         monkeypatch.setattr(bt, "_find_agent_browser", lambda: "/bin/true")
         monkeypatch.setattr(
-            bt, "_requires_real_termux_browser_install", lambda *a: False
+            bt, "_requires_real_termux_browser_install", lambda *a: False,
         )
         monkeypatch.setattr(bt, "_chromium_installed", lambda: True)
         monkeypatch.setattr(

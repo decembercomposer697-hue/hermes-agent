@@ -30,7 +30,7 @@ from agent.image_routing import (
 # task body. extract_image_refs validates the path exists on disk, so the
 # byte content has to be a real readable file (any image bytes will do).
 _PNG = base64.b64decode(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABpfZFQAAAAABJRU5ErkJggg=="
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABpfZFQAAAAABJRU5ErkJggg==",
 )
 
 
@@ -77,7 +77,7 @@ class TestExtractFromTaskBody:
         img.write_bytes(_PNG)
         tid = _add_task_with_body(
             f"Please review the screenshot at {img} and confirm "
-            "the alignment is right."
+            "the alignment is right.",
         )
 
         body = _read_body(tid)
@@ -88,7 +88,7 @@ class TestExtractFromTaskBody:
     def test_url_in_body_round_trips(self, kanban_home):
         tid = _add_task_with_body(
             "The design lives at https://example.com/mock/v3.png — "
-            "make the implementation match it."
+            "make the implementation match it.",
         )
 
         body = _read_body(tid)
@@ -101,7 +101,7 @@ class TestExtractFromTaskBody:
         img.write_bytes(_PNG)
         tid = _add_task_with_body(
             f"Compare the current screenshot {img} against the design at "
-            "https://example.com/target.png and write a diff."
+            "https://example.com/target.png and write a diff.",
         )
 
         body = _read_body(tid)
@@ -111,7 +111,7 @@ class TestExtractFromTaskBody:
 
     def test_body_without_images_yields_nothing(self, kanban_home):
         tid = _add_task_with_body(
-            "Refactor the auth module to use the new session helper."
+            "Refactor the auth module to use the new session helper.",
         )
 
         body = _read_body(tid)
@@ -158,7 +158,7 @@ class TestBuildPartsFromTaskBody:
 
     def test_url_becomes_image_url_part(self, kanban_home):
         tid = _add_task_with_body(
-            "Reference: https://example.com/target.jpg — match it."
+            "Reference: https://example.com/target.jpg — match it.",
         )
         body = _read_body(tid)
         paths, urls = extract_image_refs(body)
@@ -182,7 +182,7 @@ class TestBuildPartsFromTaskBody:
         img = tmp_path / "local.png"
         img.write_bytes(_PNG)
         tid = _add_task_with_body(
-            f"Diff {img} vs https://example.com/target.png — explain it."
+            f"Diff {img} vs https://example.com/target.png — explain it.",
         )
         body = _read_body(tid)
         paths, urls = extract_image_refs(body)
@@ -202,7 +202,7 @@ class TestBuildPartsFromTaskBody:
 
     def test_body_with_no_images_leaves_query_untouched(self, kanban_home):
         tid = _add_task_with_body(
-            "Rewrite the README intro paragraph to focus on use cases."
+            "Rewrite the README intro paragraph to focus on use cases.",
         )
         body = _read_body(tid)
         paths, urls = extract_image_refs(body)
@@ -229,7 +229,7 @@ class TestBuildPartsFromTaskBody:
             "```\n"
             "image: /tmp/example_only.png\n"
             "url: https://example.com/example.png\n"
-            "```\n"
+            "```\n",
         )
         body = _read_body(tid)
         paths, urls = extract_image_refs(body)

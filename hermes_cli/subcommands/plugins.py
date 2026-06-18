@@ -19,7 +19,7 @@ def build_plugins_parser(subparsers, *, cmd_plugins: Callable) -> None:
     plugins_subparsers = plugins_parser.add_subparsers(dest="plugins_action")
 
     plugins_install = plugins_subparsers.add_parser(
-        "install", help="Install a plugin from a Git URL or owner/repo"
+        "install", help="Install a plugin from a Git URL or owner/repo",
     )
     plugins_install.add_argument(
         "identifier",
@@ -44,17 +44,17 @@ def build_plugins_parser(subparsers, *, cmd_plugins: Callable) -> None:
     )
 
     plugins_update = plugins_subparsers.add_parser(
-        "update", help="Pull latest changes for an installed plugin"
+        "update", help="Pull latest changes for an installed plugin",
     )
     plugins_update.add_argument("name", help="Plugin name to update")
 
     plugins_remove = plugins_subparsers.add_parser(
-        "remove", aliases=["rm", "uninstall"], help="Remove an installed plugin"
+        "remove", aliases=["rm", "uninstall"], help="Remove an installed plugin",
     )
     plugins_remove.add_argument("name", help="Plugin directory name to remove")
 
     plugins_list = plugins_subparsers.add_parser(
-        "list", aliases=["ls"], help="List installed plugins"
+        "list", aliases=["ls"], help="List installed plugins",
     )
     plugins_list.add_argument(
         "--enabled",
@@ -83,12 +83,12 @@ def build_plugins_parser(subparsers, *, cmd_plugins: Callable) -> None:
     )
 
     plugins_enable = plugins_subparsers.add_parser(
-        "enable", help="Enable a disabled plugin"
+        "enable", help="Enable a disabled plugin",
     )
     plugins_enable.add_argument("name", help="Plugin name to enable")
 
     plugins_disable = plugins_subparsers.add_parser(
-        "disable", help="Disable a plugin without removing it"
+        "disable", help="Disable a plugin without removing it",
     )
     plugins_disable.add_argument("name", help="Plugin name to disable")
     plugins_parser.set_defaults(func=cmd_plugins)

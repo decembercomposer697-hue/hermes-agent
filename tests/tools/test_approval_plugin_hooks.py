@@ -51,7 +51,7 @@ class TestCliPathFiresHooks:
     prompt_dangerous_approval() result decides the outcome."""
 
     def test_pre_and_post_fire_with_expected_kwargs(
-        self, isolated_session, monkeypatch
+        self, isolated_session, monkeypatch,
     ):
         monkeypatch.setenv("HERMES_INTERACTIVE", "1")
         monkeypatch.delenv("HERMES_GATEWAY_SESSION", raising=False)
@@ -118,7 +118,7 @@ class TestCliPathFiresHooks:
         assert post_kwargs["choice"] == "deny"
 
     def test_plugin_hook_crash_does_not_break_approval(
-        self, isolated_session, monkeypatch
+        self, isolated_session, monkeypatch,
     ):
         """A crashing plugin must never prevent the approval flow from
         reaching the user. Hooks are observer-only and safety-critical

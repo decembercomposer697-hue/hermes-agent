@@ -50,7 +50,7 @@ def _make_runner(hermes_home=None):
     # Bypass the destructive-slash confirm gate — this test exercises
     # update-prompt interception, not the confirm prompt.
     runner._read_user_config = lambda: {
-        "approvals": {"destructive_slash_confirm": False}
+        "approvals": {"destructive_slash_confirm": False},
     }
     return runner
 
@@ -164,7 +164,7 @@ class TestRestoreStashWithInputFn:
 
         with patch("subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                returncode=0, stdout="", stderr=""
+                returncode=0, stdout="", stderr="",
             )
             result = _restore_stashed_changes(
                 ["git"], tmp_path, "abc123",
@@ -379,7 +379,7 @@ class TestWatchUpdateProgress:
             await task
 
         assert mock_adapter.prompt_calls.call_args.kwargs["metadata"] == {
-            "thread_id": "777"
+            "thread_id": "777",
         }
 
     @pytest.mark.asyncio
@@ -565,7 +565,7 @@ class TestWatchUpdateProgress:
                     poll_interval=0.05,
                     stream_interval=0.1,
                     timeout=10.0,
-                )
+                ),
             )
             for _ in range(40):
                 if adapter1.send.call_count:

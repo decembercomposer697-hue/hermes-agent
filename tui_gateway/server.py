@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 _hermes_home = get_hermes_home()
 load_hermes_dotenv(
-    hermes_home=_hermes_home, project_env=Path(__file__).parent.parent / ".env"
+    hermes_home=_hermes_home, project_env=Path(__file__).parent.parent / ".env",
 )
 
 
@@ -61,7 +61,7 @@ def _panic_hook(exc_type, exc_value, exc_tb):
         os.makedirs(os.path.dirname(_CRASH_LOG), exist_ok=True)
         with open(_CRASH_LOG, "a", encoding="utf-8") as f:
             f.write(
-                f"\n=== unhandled exception · {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n"
+                f"\n=== unhandled exception · {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n",
             )
             f.write(trace)
     except Exception:
@@ -87,14 +87,14 @@ def _thread_panic_hook(args):
     import traceback
 
     trace = "".join(
-        traceback.format_exception(args.exc_type, args.exc_value, args.exc_traceback)
+        traceback.format_exception(args.exc_type, args.exc_value, args.exc_traceback),
     )
     try:
         os.makedirs(os.path.dirname(_CRASH_LOG), exist_ok=True)
         with open(_CRASH_LOG, "a", encoding="utf-8") as f:
             f.write(
                 f"\n=== thread exception · {time.strftime('%Y-%m-%d %H:%M:%S')} "
-                f"· thread={args.thread.name} ===\n"
+                f"· thread={args.thread.name} ===\n",
             )
             f.write(trace)
     except Exception:
@@ -155,7 +155,7 @@ _SLASH_WORKER_TIMEOUT_S = max(5.0, _slash_timeout)
 # Set to 0 to disable (park forever, pre-fix behaviour).
 try:
     _ws_orphan_reap_grace = float(
-        os.environ.get("HERMES_TUI_WS_ORPHAN_REAP_GRACE_S") or "20"
+        os.environ.get("HERMES_TUI_WS_ORPHAN_REAP_GRACE_S") or "20",
     )
 except (ValueError, TypeError):
     _ws_orphan_reap_grace = 20.0
@@ -183,12 +183,12 @@ _LONG_HANDLERS = frozenset(
         "shell.exec",
         "skills.manage",
         "slash.exec",
-    }
+    },
 )
 
 try:
     _rpc_pool_workers = max(
-        2, int(os.environ.get("HERMES_TUI_RPC_POOL_WORKERS") or "4")
+        2, int(os.environ.get("HERMES_TUI_RPC_POOL_WORKERS") or "4"),
     )
 except (ValueError, TypeError):
     _rpc_pool_workers = 4
@@ -296,7 +296,7 @@ class _SlashWorker:
                 return str(msg.get("output", "")).rstrip()
 
             raise RuntimeError(
-                f"slash worker closed pipe{': ' + chr(10).join(self.stderr_tail[-8:]) if self.stderr_tail else ''}"
+                f"slash worker closed pipe{': ' + chr(10).join(self.stderr_tail[-8:]) if self.stderr_tail else ''}",
             )
 
     def close(self):
@@ -537,7 +537,7 @@ def _schedule_ws_orphan_reap(sid: str) -> None:
 
 
 def _close_sessions_for_transport(
-    transport, *, end_reason: str = "ws_disconnect"
+    transport, *, end_reason: str = "ws_disconnect",
 ) -> tuple[int, int]:
     """On transport disconnect, reap the sessions that opted into
     close_on_disconnect (sidecar/dashboard) immediately via the unified
@@ -951,7 +951,7 @@ def _start_agent_build(sid: str, session: dict) -> None:
                 )
 
                 register_gateway_notify(
-                    key, lambda data: _emit("approval.request", sid, data)
+                    key, lambda data: _emit("approval.request", sid, data),
                 )
                 notify_registered = True
                 load_permanent_allowlist()
@@ -1113,7 +1113,7 @@ def _register_session_cwd(session: dict | None) -> None:
         from tools.terminal_tool import register_task_env_overrides
 
         register_task_env_overrides(
-            session["session_key"], {"cwd": _terminal_task_cwd(session)}
+            session["session_key"], {"cwd": _terminal_task_cwd(session)},
         )
     except Exception:
         pass
@@ -1468,7 +1468,7 @@ def _stored_session_runtime_overrides(row: dict | None) -> dict:
         model_config.get("provider")
         or model_config.get("billing_provider")
         or row.get("billing_provider")
-        or ""
+        or "",
     ).strip()
     base_url = str(model_config.get("base_url") or "").strip()
     api_mode = str(model_config.get("api_mode") or "").strip()
@@ -1636,7 +1636,7 @@ def _load_reasoning_config() -> dict | None:
     from hermes_constants import parse_reasoning_effort
 
     effort = str(
-        (_load_cfg().get("agent") or {}).get("reasoning_effort", "") or ""
+        (_load_cfg().get("agent") or {}).get("reasoning_effort", "") or "",
     ).strip()
     return parse_reasoning_effort(effort)
 
@@ -1799,7 +1799,7 @@ def _load_enabled_toolsets() -> list[str] | None:
         # variant at agent creation time makes MCP tools silently missing
         # from the TUI. See PR #3252 for the original design split.
         enabled = sorted(
-            _get_platform_tools(cfg, "cli", include_default_mcp_servers=True)
+            _get_platform_tools(cfg, "cli", include_default_mcp_servers=True),
         )
         if fallback_notice is not None:
             print(fallback_notice, file=sys.stderr, flush=True)
@@ -2020,7 +2020,7 @@ def _compress_session_history(
         _sys_prompt = getattr(agent, "_cached_system_prompt", "") or ""
         _tools = getattr(agent, "tools", None) or None
         approx_tokens = estimate_request_tokens_rough(
-            history, system_prompt=_sys_prompt, tools=_tools
+            history, system_prompt=_sys_prompt, tools=_tools,
         )
     # Pass system_message=None so AIAgent._compress_context rebuilds the
     # system prompt cleanly via _build_system_prompt(None). Passing the
@@ -2201,7 +2201,7 @@ def _probe_config_health(cfg: dict) -> str:
         warnings.append(
             f"config.yaml has empty section(s): {keys}. "
             f"Remove the line(s) or set them to `{{}}` — "
-            f"empty sections silently drop nested settings."
+            f"empty sections silently drop nested settings.",
         )
     display_cfg = cfg.get("display")
     agent_cfg = cfg.get("agent")
@@ -2215,7 +2215,7 @@ def _probe_config_health(cfg: dict) -> str:
         ):
             warnings.append(
                 "`display.personality` is set but `agent.personalities` is empty/null; "
-                "personality overlay will be skipped."
+                "personality overlay will be skipped.",
             )
     return " ".join(warnings).strip()
 
@@ -2307,7 +2307,7 @@ def _session_info(agent, session: dict | None = None) -> dict:
         for t in getattr(agent, "tools", []) or []:
             name = t["function"]["name"]
             info["tools"].setdefault(get_toolset_for_tool(name) or "other", []).append(
-                name
+                name,
             )
     except Exception:
         pass
@@ -2631,13 +2631,13 @@ def _on_tool_progress(
 def _agent_cbs(sid: str) -> dict:
     return {
         "tool_start_callback": lambda tc_id, name, args: _on_tool_start(
-            sid, tc_id, name, args
+            sid, tc_id, name, args,
         ),
         "tool_complete_callback": lambda tc_id, name, args, result: _on_tool_complete(
-            sid, tc_id, name, args, result
+            sid, tc_id, name, args, result,
         ),
         "tool_progress_callback": lambda event_type, name=None, preview=None, args=None, **kwargs: _on_tool_progress(
-            sid, event_type, name, preview, args, **kwargs
+            sid, event_type, name, preview, args, **kwargs,
         ),
         "tool_gen_callback": lambda name: _tool_progress_enabled(sid)
         and _emit("tool.generating", sid, {"name": name}),
@@ -2648,7 +2648,7 @@ def _agent_cbs(sid: str) -> dict:
             {"text": text, **({"verbose": True} if _session_verbose(sid) else {})},
         ),
         "status_callback": lambda kind, text=None: _status_update(
-            sid, str(kind), None if text is None else str(text)
+            sid, str(kind), None if text is None else str(text),
         ),
         # Credits/notice spine (L1): an AgentNotice fired by the agent becomes a
         # notification.show WS event; a recovery clear becomes notification.clear.
@@ -2666,10 +2666,10 @@ def _agent_cbs(sid: str) -> dict:
             },
         ),
         "notice_clear_callback": lambda key: _emit(
-            "notification.clear", sid, {"key": key}
+            "notification.clear", sid, {"key": key},
         ),
         "clarify_callback": lambda q, c: _block(
-            "clarify.request", sid, {"question": q, "choices": c}
+            "clarify.request", sid, {"question": q, "choices": c},
         ),
         # read_terminal tool (desktop GUI): same blocking bridge as clarify — the
         # renderer answers terminal.read.respond with the serialized buffer.
@@ -2770,7 +2770,7 @@ def _prompt_text(value) -> str:
 
 
 def _apply_personality_to_session(
-    sid: str, session: dict, new_prompt: str, personality: str = ""
+    sid: str, session: dict, new_prompt: str, personality: str = "",
 ) -> tuple[bool, dict | None]:
     """Apply a personality change to an existing session without resetting history.
 
@@ -2884,7 +2884,7 @@ def _background_agent_kwargs(agent, task_id: str) -> dict:
         "providers_order": getattr(agent, "providers_order", None),
         "provider_sort": getattr(agent, "provider_sort", None),
         "provider_require_parameters": getattr(
-            agent, "provider_require_parameters", False
+            agent, "provider_require_parameters", False,
         ),
         "provider_data_collection": getattr(agent, "provider_data_collection", None),
         "openrouter_min_coding_score": getattr(agent, "openrouter_min_coding_score", None),
@@ -2906,7 +2906,7 @@ def _ephemeral_preview_agent_kwargs(agent, task_id: str) -> dict:
             "enabled_toolsets": ["terminal", "file"],
             "session_db": None,
             "skip_memory": True,
-        }
+        },
     )
     return kwargs
 
@@ -3239,7 +3239,7 @@ def _init_session(sid: str, key: str, agent, history: list, cols: int = 80):
     # this callback the review would write the skill/memory change silently.
     try:
         agent.background_review_callback = lambda message, _sid=sid: _emit(
-            "review.summary", _sid, {"text": str(message)}
+            "review.summary", _sid, {"text": str(message)},
         )
     except Exception:
         # Bare AIAgents that don't expose the attribute (unlikely, but keep
@@ -3291,13 +3291,13 @@ def _enrich_with_attached_images(user_text: str, image_paths: list[str]) -> str:
         hint = f"[You can examine it with vision_analyze using image_url: {p}]"
         try:
             r = _json.loads(
-                asyncio.run(vision_analyze_tool(image_url=str(p), user_prompt=prompt))
+                asyncio.run(vision_analyze_tool(image_url=str(p), user_prompt=prompt)),
             )
             desc = r.get("analysis", "") if r.get("success") else None
             parts.append(
                 f"[The user attached an image:\n{desc}]\n{hint}"
                 if desc
-                else f"[The user attached an image but analysis failed.]\n{hint}"
+                else f"[The user attached an image but analysis failed.]\n{hint}",
             )
         except Exception:
             parts.append(f"[The user attached an image but analysis failed.]\n{hint}")
@@ -3455,7 +3455,7 @@ def _history_to_messages(history: list[dict]) -> list[dict]:
             name = (tc_info[0] if tc_info else None) or m.get("tool_name") or "tool"
             args = (tc_info[1] if tc_info else None) or {}
             messages.append(
-                {"role": "tool", "name": name, "context": _tool_ctx(name, args)}
+                {"role": "tool", "name": name, "context": _tool_ctx(name, args)},
             )
             continue
         if not content_text.strip():
@@ -3722,7 +3722,7 @@ def _(rid, params: dict) -> dict:
                         "source": s.get("source") or "",
                     }
                     for s in rows
-                ]
+                ],
             },
         )
     except Exception as e:
@@ -3836,7 +3836,7 @@ def _(rid, params: dict) -> dict:
         db.reopen_session(target)
         history = db.get_messages_as_conversation(target)
         display_history = db.get_messages_as_conversation(
-            target, include_ancestors=True
+            target, include_ancestors=True,
         )
         display_history_prefix = display_history[
             : max(0, len(display_history) - len(history))
@@ -4052,7 +4052,7 @@ def _live_session_payload(
         if touch:
             session["last_active"] = time.time()
         history = list(session.get("display_history_prefix") or []) + list(
-            session.get("history") or []
+            session.get("history") or [],
         )
         inflight = _inflight_snapshot(session)
         running = bool(session.get("running"))
@@ -4455,7 +4455,7 @@ def _(rid, params: dict) -> dict:
             f"Last Activity: {updated.strftime('%Y-%m-%d %H:%M')}",
             f"Tokens: {int(usage.get('total') or 0):,}",
             f"Agent Running: {'Yes' if session.get('running') else 'No'}",
-        ]
+        ],
     )
     return _ok(rid, {"output": "\n".join(lines)})
 
@@ -4470,7 +4470,7 @@ def _(rid, params: dict) -> dict:
     if db is not None and session.get("session_key"):
         try:
             history = db.get_messages_as_conversation(
-                session["session_key"], include_ancestors=True
+                session["session_key"], include_ancestors=True,
             )
         except Exception:
             pass
@@ -4495,7 +4495,7 @@ def _(rid, params: dict) -> dict:
     # Neither is what the user wants — make them /interrupt first.
     if session.get("running"):
         return _err(
-            rid, 4009, "session busy — /interrupt the current turn before /undo"
+            rid, 4009, "session busy — /interrupt the current turn before /undo",
         )
     removed = 0
     with session["history_lock"]:
@@ -4518,7 +4518,7 @@ def _(rid, params: dict) -> dict:
         return err
     if session.get("running"):
         return _err(
-            rid, 4009, "session busy — /interrupt the current turn before /compress"
+            rid, 4009, "session busy — /interrupt the current turn before /compress",
         )
     sid = params.get("session_id", "")
     focus_topic = str(params.get("focus_topic", "") or "").strip()
@@ -4535,7 +4535,7 @@ def _(rid, params: dict) -> dict:
         _tools = getattr(_agent, "tools", None) or None
         before_tokens = (
             estimate_request_tokens_rough(
-                before_messages, system_prompt=_sys_prompt, tools=_tools
+                before_messages, system_prompt=_sys_prompt, tools=_tools,
             )
             if before_count
             else 0
@@ -4579,7 +4579,7 @@ def _(rid, params: dict) -> dict:
             agent = session["agent"]
             _sync_session_key_after_compress(sid, session)
             summary = summarize_manual_compression(
-                before_messages, messages, before_tokens, after_tokens
+                before_messages, messages, before_tokens, after_tokens,
             )
             info = _session_info(agent, session)
             _emit("session.info", sid, info)
@@ -4734,7 +4734,7 @@ def _(rid, params: dict) -> dict:
         finally:
             _clear_session_context(tokens)
         _init_session(
-            new_sid, new_key, agent, list(history), cols=session.get("cols", 80)
+            new_sid, new_key, agent, list(history), cols=session.get("cols", 80),
         )
         if new_sid in _sessions:
             _sessions[new_sid]["active_session_lease"] = lease
@@ -4958,7 +4958,7 @@ def _(rid, params: dict) -> dict:
                         "started_at": raw.get("started_at"),
                         "label": raw.get("label") or "",
                         "count": len(subagents) if isinstance(subagents, list) else 0,
-                    }
+                    },
                 )
             except OSError:
                 continue
@@ -5076,8 +5076,8 @@ def _(rid, params: dict) -> dict:
                 sid,
                 {
                     "message": err.get("error", {}).get(
-                        "message", "agent initialization failed"
-                    )
+                        "message", "agent initialization failed",
+                    ),
                 },
             )
             with session["history_lock"]:
@@ -5153,7 +5153,7 @@ def _notification_event_dedup_key(evt: dict) -> tuple:
 
 
 def _notification_poller_loop(
-    stop_event: threading.Event, sid: str, session: dict
+    stop_event: threading.Event, sid: str, session: dict,
 ) -> None:
     """Poll completion_queue and dispatch notifications autonomously.
 
@@ -5331,7 +5331,7 @@ def _run_prompt_submit(rid, sid: str, session: dict, text: Any) -> None:
                     api_key=getattr(agent, "api_key", "") or "",
                     provider=getattr(agent, "provider", "") or "",
                     config_context_length=getattr(
-                        agent, "_config_context_length", None
+                        agent, "_config_context_length", None,
                     ),
                 )
                 ctx = preprocess_context_references(
@@ -5346,7 +5346,7 @@ def _run_prompt_submit(rid, sid: str, session: dict, text: Any) -> None:
                         sid,
                         {
                             "message": "\n".join(ctx.warnings)
-                            or "Context injection refused."
+                            or "Context injection refused.",
                         },
                     )
                     return
@@ -5606,7 +5606,7 @@ def _run_prompt_submit(rid, sid: str, session: dict, text: Any) -> None:
 
                     spoken = raw
                     threading.Thread(
-                        target=speak_text, args=(spoken,), daemon=True
+                        target=speak_text, args=(spoken,), daemon=True,
                     ).start()
                 except ImportError:
                     logger.warning("voice TTS skipped: hermes_cli.voice unavailable")
@@ -5621,13 +5621,13 @@ def _run_prompt_submit(rid, sid: str, session: dict, text: Any) -> None:
                 with open(_CRASH_LOG, "a", encoding="utf-8") as f:
                     f.write(
                         f"\n=== turn-dispatcher exception · "
-                        f"{time.strftime('%Y-%m-%d %H:%M:%S')} · sid={sid} ===\n"
+                        f"{time.strftime('%Y-%m-%d %H:%M:%S')} · sid={sid} ===\n",
                     )
                     f.write(trace)
             except Exception:
                 pass
             print(
-                f"[gateway-turn] {type(e).__name__}: {e}", file=sys.stderr, flush=True
+                f"[gateway-turn] {type(e).__name__}: {e}", file=sys.stderr, flush=True,
             )
             _emit("error", sid, {"message": str(e)})
         finally:
@@ -6227,7 +6227,7 @@ def _(rid, params: dict) -> dict:
         return _err(rid, 4015, "path or data_url required")
     try:
         stored_path, uploaded = _stage_session_file_attachment(
-            session, raw_path=raw, data_url=data_url, name=name
+            session, raw_path=raw, data_url=data_url, name=name,
         )
         ref_path = _attachment_ref_path(session, stored_path)
         return _ok(
@@ -6328,7 +6328,7 @@ def _(rid, params: dict) -> dict:
             from run_agent import AIAgent
 
             result = AIAgent(
-                **_background_agent_kwargs(session["agent"], task_id)
+                **_background_agent_kwargs(session["agent"], task_id),
             ).run_conversation(
                 user_message=text,
                 task_id=task_id,
@@ -6522,7 +6522,7 @@ def _(rid, params: dict) -> dict:
                     session["session_key"],
                     params.get("choice", "deny"),
                     resolve_all=params.get("all", False),
-                )
+                ),
             },
         )
     except Exception as e:
@@ -6569,7 +6569,7 @@ def _(rid, params: dict) -> dict:
                     session,
                     value,
                     confirm_expensive_model=bool(
-                        params.get("confirm_expensive_model", False)
+                        params.get("confirm_expensive_model", False),
                     ),
                 )
             else:
@@ -6578,7 +6578,7 @@ def _(rid, params: dict) -> dict:
                     {"agent": None},
                     value,
                     confirm_expensive_model=bool(
-                        params.get("confirm_expensive_model", False)
+                        params.get("confirm_expensive_model", False),
                     ),
                 )
             return _ok(
@@ -6881,7 +6881,7 @@ def _(rid, params: dict) -> dict:
         _write_config_key("display.thinking_mode", nv)
         # Backward compatibility bridge: keep details_mode aligned.
         _write_config_key(
-            "display.details_mode", "expanded" if nv == "full" else "collapsed"
+            "display.details_mode", "expanded" if nv == "full" else "collapsed",
         )
         return _ok(rid, {"key": key, "value": nv})
 
@@ -6986,7 +6986,7 @@ def _(rid, params: dict) -> dict:
                 _write_config_key("agent.system_prompt", new_prompt)
                 nv = str(value or "none")
                 history_reset, info = _apply_personality_to_session(
-                    sid_key, session, new_prompt, pname
+                    sid_key, session, new_prompt, pname,
                 )
             else:
                 _write_config_key(f"display.{key}", value)
@@ -7041,7 +7041,7 @@ def _(rid, params: dict) -> dict:
         return _ok(rid, {"prompt": _load_cfg().get("custom_prompt", "")})
     if key == "skin":
         return _ok(
-            rid, {"value": (_load_cfg().get("display") or {}).get("skin", "default")}
+            rid, {"value": (_load_cfg().get("display") or {}).get("skin", "default")},
         )
     if key == "indicator":
         # Normalize so a hand-edited config.yaml with stray casing or
@@ -7063,7 +7063,7 @@ def _(rid, params: dict) -> dict:
     if key == "reasoning":
         cfg = _load_cfg()
         effort = str(
-            (cfg.get("agent") or {}).get("reasoning_effort", "medium") or "medium"
+            (cfg.get("agent") or {}).get("reasoning_effort", "medium") or "medium",
         )
         display = (
             "show"
@@ -7091,7 +7091,7 @@ def _(rid, params: dict) -> dict:
         raw = (
             str(
                 (_load_cfg().get("display") or {}).get("details_mode", "collapsed")
-                or "collapsed"
+                or "collapsed",
             )
             .strip()
             .lower()
@@ -7112,7 +7112,7 @@ def _(rid, params: dict) -> dict:
             dm = (
                 str(
                     (cfg.get("display") or {}).get("details_mode", "collapsed")
-                    or "collapsed"
+                    or "collapsed",
                 )
                 .strip()
                 .lower()
@@ -7135,7 +7135,7 @@ def _(rid, params: dict) -> dict:
         cfg_path = _hermes_home / "config.yaml"
         try:
             return _ok(
-                rid, {"mtime": cfg_path.stat().st_mtime if cfg_path.exists() else 0}
+                rid, {"mtime": cfg_path.stat().st_mtime if cfg_path.exists() else 0},
             )
         except Exception:
             return _ok(rid, {"mtime": 0})
@@ -7352,7 +7352,7 @@ _TUI_HIDDEN: frozenset[str] = frozenset(
         "commands",
         "approve",
         "deny",
-    }
+    },
 )
 
 _TUI_EXTRA: list[tuple[str, str, str]] = [
@@ -7378,7 +7378,7 @@ _PENDING_INPUT_COMMANDS: frozenset[str] = frozenset(
         "plan",
         "goal",
         "undo",
-    }
+    },
 )
 
 _WORKER_BLOCKED_COMMANDS: frozenset[str] = frozenset({"snapshot", "snap"})
@@ -7521,7 +7521,7 @@ def _(rid, params: dict) -> dict:
         parts = [r.stdout or "", r.stderr or ""]
         out = "\n".join(p for p in parts if p).strip() or "(no output)"
         return _ok(
-            rid, {"blocked": False, "code": r.returncode, "output": out[:48_000]}
+            rid, {"blocked": False, "code": r.returncode, "output": out[:48_000]},
         )
     except subprocess.TimeoutExpired:
         return _err(rid, 5016, "cli.exec: timeout")
@@ -7617,7 +7617,7 @@ def _(rid, params: dict) -> dict:
         key = f"/{name}"
         if key in cmds:
             msg = build_skill_invocation_message(
-                key, arg, task_id=session.get("session_key", "") if session else ""
+                key, arg, task_id=session.get("session_key", "") if session else "",
             )
             if msg:
                 return _ok(
@@ -7645,7 +7645,7 @@ def _(rid, params: dict) -> dict:
             return _err(rid, 4001, "no active session to retry")
         if session.get("running"):
             return _err(
-                rid, 4009, "session busy — /interrupt the current turn before /retry"
+                rid, 4009, "session busy — /interrupt the current turn before /retry",
             )
         history = session.get("history", [])
         if not history:
@@ -7775,7 +7775,7 @@ def _(rid, params: dict) -> dict:
             return _err(rid, 4001, "no active session to undo")
         if session.get("running"):
             return _err(
-                rid, 4009, "session busy — /interrupt the current turn before /undo"
+                rid, 4009, "session busy — /interrupt the current turn before /undo",
             )
         db = _get_db()
         if db is None:
@@ -7912,7 +7912,7 @@ def _(rid, params: dict) -> dict:
         f"[Pasted text #{_paste_counter}: {line_count} lines \u2192 {paste_file}]"
     )
     return _ok(
-        rid, {"placeholder": placeholder, "path": str(paste_file), "lines": line_count}
+        rid, {"placeholder": placeholder, "path": str(paste_file), "lines": line_count},
     )
 
 
@@ -7937,7 +7937,7 @@ _FUZZY_FALLBACK_EXCLUDES = frozenset(
         ".mypy_cache",
         ".pytest_cache",
         ".ruff_cache",
-    }
+    },
 )
 _fuzzy_cache_lock = threading.Lock()
 _fuzzy_cache: dict[str, tuple[float, list[str]]] = {}
@@ -7993,7 +7993,7 @@ def _list_repo_files(root: str) -> list[str]:
                     if not p:
                         continue
                     rel = os.path.relpath(os.path.join(top, p), root).replace(
-                        os.sep, "/"
+                        os.sep, "/",
                     )
                     # Skip parents/siblings of cwd — keep the picker scoped
                     # to root-and-below, matching Cmd-P workspace semantics.
@@ -8154,7 +8154,7 @@ def _(rid, params: dict) -> dict:
                         "text": f"@{tag}:{rel}",
                         "display": basename,
                         "meta": os.path.dirname(rel),
-                    }
+                    },
                 )
 
             return _ok(rid, {"items": items})
@@ -8210,7 +8210,7 @@ def _(rid, params: dict) -> dict:
                     "text": text,
                     "display": entry + suffix,
                     "meta": "dir" if is_dir else "",
-                }
+                },
             )
             if len(items) >= 30:
                 break
@@ -8225,7 +8225,7 @@ def _details_completion_item(value: str, meta: str = "") -> dict:
 
 
 def _details_root_completion_item(
-    value: str, meta: str, needs_leading_space: bool
+    value: str, meta: str, needs_leading_space: bool,
 ) -> dict:
     return _details_completion_item(
         f" {value}" if needs_leading_space else value,
@@ -8253,16 +8253,16 @@ def _details_completions(text: str) -> list[dict] | None:
         return [
             *[
                 _details_root_completion_item(
-                    mode, "global mode", not has_trailing_space
+                    mode, "global mode", not has_trailing_space,
                 )
                 for mode in modes
             ],
             _details_root_completion_item(
-                "cycle", "cycle global mode", not has_trailing_space
+                "cycle", "cycle global mode", not has_trailing_space,
             ),
             *[
                 _details_root_completion_item(
-                    section, "section override", not has_trailing_space
+                    section, "section override", not has_trailing_space,
                 )
                 for section in sections
             ],
@@ -8492,7 +8492,7 @@ def _(rid, params: dict) -> dict:
             ctx, picker_hints=True, max_models=50,
         )
         provider_data = next(
-            (p for p in payload["providers"] if p["slug"] == slug), None
+            (p for p in payload["providers"] if p["slug"] == slug), None,
         )
         if provider_data is None:
             # Key was saved but provider didn't appear — still return success.
@@ -8636,7 +8636,7 @@ def _(rid, params: dict) -> dict:
 
     if _cmd_base in _PENDING_INPUT_COMMANDS:
         return _err(
-            rid, 4018, f"pending-input command: use command.dispatch for /{_cmd_base}"
+            rid, 4018, f"pending-input command: use command.dispatch for /{_cmd_base}",
         )
 
     if _cmd_base in _WORKER_BLOCKED_COMMANDS:
@@ -8654,7 +8654,7 @@ def _(rid, params: dict) -> dict:
         _cmd_key = f"/{_cmd_base}"
         if _cmd_key in get_skill_commands():
             return _err(
-                rid, 4018, f"skill command: use command.dispatch for {_cmd_key}"
+                rid, 4018, f"skill command: use command.dispatch for {_cmd_key}",
             )
     except Exception:
         pass
@@ -8914,7 +8914,7 @@ def _(rid, params: dict) -> dict:
                 on_transcript=lambda t: _voice_emit("voice.transcript", {"text": t}),
                 on_status=lambda s: _voice_emit("voice.status", {"state": s}),
                 on_silent_limit=lambda: _voice_emit(
-                    "voice.transcript", {"no_speech_limit": True}
+                    "voice.transcript", {"no_speech_limit": True},
                 ),
                 silence_threshold=safe_threshold,
                 silence_duration=safe_duration,
@@ -8934,7 +8934,7 @@ def _(rid, params: dict) -> dict:
         return _ok(rid, {"status": "stopped"})
     except ImportError:
         return _err(
-            rid, 5025, "voice module not available — install audio dependencies"
+            rid, 5025, "voice module not available — install audio dependencies",
         )
     except Exception as e:
         return _err(rid, 5025, str(e))
@@ -9216,7 +9216,7 @@ def _browser_connect(rid, params: dict) -> dict:
     raw_url = params.get("url")
     if raw_url is not None and not isinstance(raw_url, str):
         return _err(
-            rid, 4015, f"browser url must be a string, got {type(raw_url).__name__}"
+            rid, 4015, f"browser url must be a string, got {type(raw_url).__name__}",
         )
     url = (raw_url or "").strip() or DEFAULT_BROWSER_CDP_URL
 
@@ -9254,7 +9254,7 @@ def _browser_connect(rid, params: dict) -> dict:
         # providers) don't serve the HTTP discovery path; just check
         # TCP-level reachability and let browser_navigate handshake.
         if parsed.scheme in {"ws", "wss"} and parsed.path.startswith(
-            "/devtools/browser/"
+            "/devtools/browser/",
         ):
             import socket
 
@@ -9271,7 +9271,7 @@ def _browser_connect(rid, params: dict) -> dict:
                 from hermes_cli.browser_connect import try_launch_chrome_debug
 
                 announce(
-                    "Chromium-family browser isn't running with remote debugging — attempting to launch..."
+                    "Chromium-family browser isn't running with remote debugging — attempting to launch...",
                 )
 
                 if try_launch_chrome_debug(port, system):
@@ -9287,7 +9287,7 @@ def _browser_connect(rid, params: dict) -> dict:
                     for line in _failure_messages(url, port, system)[1:]:
                         announce(line, level="error")
                     return _ok(
-                        rid, {"connected": False, "url": url, "messages": messages}
+                        rid, {"connected": False, "url": url, "messages": messages},
                     )
             elif not ok:
                 return _err(rid, 5031, f"could not reach browser CDP at {url}")
@@ -9344,7 +9344,7 @@ def _(rid, params: dict) -> dict:
                         "enabled": getattr(i, "enabled", True),
                     }
                     for n, i in get_plugin_manager()._plugins.items()
-                ]
+                ],
             },
         )
     except Exception as e:
@@ -9414,7 +9414,7 @@ def _(rid, params: dict) -> dict:
                     "tool_count": info["tool_count"],
                     "enabled": name in enabled if enabled else True,
                     "tools": info["resolved_tools"],
-                }
+                },
             )
         return _ok(rid, {"toolsets": items})
     except Exception as e:
@@ -9444,7 +9444,7 @@ def _(rid, params: dict) -> dict:
                 {
                     "name": name,
                     "description": desc,
-                }
+                },
             )
 
         return _ok(
@@ -9506,7 +9506,7 @@ def _(rid, params: dict) -> dict:
             else None
         )
         enabled = sorted(
-            _get_platform_tools(load_config(), "cli", include_default_mcp_servers=False)
+            _get_platform_tools(load_config(), "cli", include_default_mcp_servers=False),
         )
         changed = [
             name
@@ -9553,7 +9553,7 @@ def _(rid, params: dict) -> dict:
                     "description": info["description"],
                     "tool_count": info["tool_count"],
                     "enabled": name in enabled if enabled else True,
-                }
+                },
             )
         return _ok(rid, {"toolsets": items})
     except Exception as e:
@@ -9577,7 +9577,7 @@ def _(rid, params: dict) -> dict:
                         "uptime": p["uptime_seconds"],
                     }
                     for p in procs
-                ]
+                ],
             },
         )
     except Exception as e:
@@ -9601,7 +9601,7 @@ def _(rid, params: dict) -> dict:
                         name=jid,
                         schedule=params.get("schedule", ""),
                         prompt=params.get("prompt", ""),
-                    )
+                    ),
                 ),
             )
         if action in {"remove", "pause", "resume"}:
@@ -9640,7 +9640,7 @@ def _(rid, params: dict) -> dict:
                 {
                     "results": [
                         {"name": r.name, "description": r.description} for r in raw
-                    ]
+                    ],
                 },
             )
         if action == "install":
@@ -9659,7 +9659,7 @@ def _(rid, params: dict) -> dict:
                 int(query) if query.isdigit() else 1
             )
             return _ok(
-                rid, browse_skills(page=pg, page_size=int(params.get("page_size", 20)))
+                rid, browse_skills(page=pg, page_size=int(params.get("page_size", 20))),
             )
         if action == "inspect":
             from hermes_cli.skills_hub import inspect_skill
@@ -9723,7 +9723,7 @@ def _(rid, params: dict) -> dict:
             disabled = _get_disabled_set()
             out = []
             for name, version, desc, source, _dir, key in sorted(
-                _discover_all_plugins()
+                _discover_all_plugins(),
             ):
                 out.append(
                     {
@@ -9732,7 +9732,7 @@ def _(rid, params: dict) -> dict:
                         "description": desc or "",
                         "source": source,
                         "status": _plugin_status(name, enabled, disabled, key=key),
-                    }
+                    },
                 )
             return out
 
@@ -9785,12 +9785,12 @@ def _(rid, params: dict) -> dict:
         is_hardline, hardline_desc = detect_hardline_command(cmd)
         if is_hardline:
             return _err(
-                rid, 4005, f"blocked (hardline): {hardline_desc}. Use the agent for dangerous commands."
+                rid, 4005, f"blocked (hardline): {hardline_desc}. Use the agent for dangerous commands.",
             )
         is_dangerous, _, desc = detect_dangerous_command(cmd)
         if is_dangerous:
             return _err(
-                rid, 4005, f"blocked: {desc}. Use the agent for dangerous commands."
+                rid, 4005, f"blocked: {desc}. Use the agent for dangerous commands.",
             )
     except ImportError:
         return _err(rid, 5001, "shell.exec unavailable: approval safety module not importable")

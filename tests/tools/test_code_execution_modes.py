@@ -135,7 +135,7 @@ class TestResolveChildPython(unittest.TestCase):
             pytest.skip(
                 "Creates symlinks and assumes POSIX venv layout (bin/python). "
                 "Windows venvs use Scripts/python.exe and symlink creation "
-                "requires elevated privileges (WinError 1314)."
+                "requires elevated privileges (WinError 1314).",
             )
         import tempfile, pathlib
         with tempfile.TemporaryDirectory() as td:
@@ -164,7 +164,7 @@ class TestResolveChildPython(unittest.TestCase):
             pytest.skip(
                 "Creates symlinks and assumes POSIX venv layout (bin/python). "
                 "Windows venvs use Scripts/python.exe and symlink creation "
-                "requires elevated privileges (WinError 1314)."
+                "requires elevated privileges (WinError 1314).",
             )
         import tempfile, pathlib
         with tempfile.TemporaryDirectory() as ve_td, tempfile.TemporaryDirectory() as conda_td:

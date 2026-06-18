@@ -20,7 +20,7 @@ class FakeRequestClient:
         self._responder = responder
         self._client = SimpleNamespace(is_closed=False)
         self.chat = SimpleNamespace(
-            completions=SimpleNamespace(create=self._create)
+            completions=SimpleNamespace(create=self._create),
         )
         self.responses = SimpleNamespace()
         self.close_calls = 0

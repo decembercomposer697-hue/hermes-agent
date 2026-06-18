@@ -20,7 +20,7 @@ from unittest.mock import patch
 
 
 def test_clamp_collision_emits_warning_naming_both_skills(
-    tmp_path: Path, caplog
+    tmp_path: Path, caplog,
 ) -> None:
     """Two skills with identical first 32 chars — warning names both."""
     from hermes_cli.commands import discord_skill_commands_by_category
@@ -82,7 +82,7 @@ def test_clamp_collision_emits_warning_naming_both_skills(
 
 
 def test_clamp_collision_with_reserved_name_emits_distinct_warning(
-    tmp_path: Path, caplog
+    tmp_path: Path, caplog,
 ) -> None:
     """A skill clashing with a reserved gateway command gets its own phrasing.
 

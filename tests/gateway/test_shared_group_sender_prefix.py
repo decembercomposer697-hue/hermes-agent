@@ -23,7 +23,7 @@ async def test_preprocess_prefixes_sender_for_shared_non_thread_group_session():
                 Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake"),
             },
             group_sessions_per_user=False,
-        )
+        ),
     )
     source = SessionSource(
         platform=Platform.TELEGRAM,
@@ -50,7 +50,7 @@ async def test_preprocess_keeps_plain_text_for_default_group_sessions():
             platforms={
                 Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake"),
             },
-        )
+        ),
     )
     source = SessionSource(
         platform=Platform.TELEGRAM,

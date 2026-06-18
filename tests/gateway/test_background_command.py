@@ -278,7 +278,7 @@ class TestRunBackgroundTask:
 
         runner = _make_runner()
         runner._resolve_session_agent_runtime = MagicMock(
-            return_value=("test-model", {"api_key": "test-key"})
+            return_value=("test-model", {"api_key": "test-key"}),
         )
         runner._resolve_session_reasoning_config = MagicMock(return_value=None)
         runner._load_service_tier = MagicMock(return_value=None)
@@ -287,10 +287,10 @@ class TestRunBackgroundTask:
                 "model": "test-model",
                 "runtime": {"api_key": "test-key"},
                 "request_overrides": None,
-            }
+            },
         )
         runner._run_in_executor_with_context = AsyncMock(
-            return_value={"final_response": "see attached", "messages": []}
+            return_value={"final_response": "see attached", "messages": []},
         )
         monkeypatch.setattr(gateway_run, "_load_gateway_config", lambda: {})
 
@@ -356,7 +356,7 @@ class TestRunBackgroundTask:
 
         runner = _make_runner()
         runner._resolve_session_agent_runtime = MagicMock(
-            return_value=("test-model", {"api_key": "test-key"})
+            return_value=("test-model", {"api_key": "test-key"}),
         )
         runner._resolve_session_reasoning_config = MagicMock(return_value=None)
         runner._load_service_tier = MagicMock(return_value=None)
@@ -365,10 +365,10 @@ class TestRunBackgroundTask:
                 "model": "test-model",
                 "runtime": {"api_key": "test-key"},
                 "request_overrides": None,
-            }
+            },
         )
         runner._run_in_executor_with_context = AsyncMock(
-            return_value={"final_response": "done", "messages": []}
+            return_value={"final_response": "done", "messages": []},
         )
         monkeypatch.setattr(gateway_run, "_load_gateway_config", lambda: {})
 

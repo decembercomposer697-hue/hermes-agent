@@ -125,7 +125,7 @@ class TestBusySessionAuthBypass:
         )
 
         result = await GatewayRunner._handle_active_session_busy_message(
-            runner, intruder_event, sk
+            runner, intruder_event, sk,
         )
 
         # Must return True (handled = dropped)
@@ -156,7 +156,7 @@ class TestBusySessionAuthBypass:
         runner.adapters[event.source.platform] = adapter
 
         result = await GatewayRunner._handle_active_session_busy_message(
-            runner, event, sk
+            runner, event, sk,
         )
 
         # Should return True (handled) but message is queued/processed
@@ -184,7 +184,7 @@ class TestBusySessionAuthBypass:
         runner.adapters.get = MagicMock(return_value=adapter)
 
         result = await GatewayRunner._handle_active_session_busy_message(
-            runner, intruder_event, sk
+            runner, intruder_event, sk,
         )
 
         # Auth check fires before drain logic — dropped
@@ -210,7 +210,7 @@ class TestBusySessionAuthBypass:
         runner.adapters[event.source.platform] = adapter
 
         result = await GatewayRunner._handle_active_session_busy_message(
-            runner, event, sk
+            runner, event, sk,
         )
 
         assert result is True

@@ -95,7 +95,7 @@ def test_run_slash_create_worktree_path_and_branch(kanban_home, tmp_path):
     target = tmp_path / ".worktrees" / "t6-wire"
     target_arg = target.as_posix()
     out = kc.run_slash(
-        f"create 'ship worktree' --workspace worktree:{target_arg} --branch wt/t6-wire"
+        f"create 'ship worktree' --workspace worktree:{target_arg} --branch wt/t6-wire",
     )
     assert "Created" in out
 
@@ -200,13 +200,13 @@ def test_run_slash_session_filter(kanban_home):
     from hermes_cli import kanban_db as kb
     with kb.connect() as conn:
         kb.create_task(
-            conn, title="from sess-1 a", assignee="alice", session_id="sess-1"
+            conn, title="from sess-1 a", assignee="alice", session_id="sess-1",
         )
         kb.create_task(
-            conn, title="from sess-1 b", assignee="alice", session_id="sess-1"
+            conn, title="from sess-1 b", assignee="alice", session_id="sess-1",
         )
         kb.create_task(
-            conn, title="from sess-2", assignee="alice", session_id="sess-2"
+            conn, title="from sess-2", assignee="alice", session_id="sess-2",
         )
         kb.create_task(conn, title="cli only", assignee="alice")
     out_1 = kc.run_slash("list --session sess-1")
@@ -225,7 +225,7 @@ def test_kanban_list_json_includes_session_id(kanban_home):
     from hermes_cli import kanban_db as kb
     with kb.connect() as conn:
         kb.create_task(
-            conn, title="acp task", assignee="alice", session_id="acp-x"
+            conn, title="acp task", assignee="alice", session_id="acp-x",
         )
     raw = kc.run_slash("list --json")
     payload = json.loads(raw)

@@ -53,7 +53,7 @@ class TestSanitizeMessagesNonAscii:
     def test_sanitizes_content_list(self):
         messages = [{
             "role": "user",
-            "content": [{"type": "text", "text": "hello 🤖"}]
+            "content": [{"type": "text", "text": "hello 🤖"}],
         }]
         assert _sanitize_messages_non_ascii(messages) is True
         assert messages[0]["content"][0]["text"] == "hello "
@@ -72,9 +72,9 @@ class TestSanitizeMessagesNonAscii:
                 "type": "function",
                 "function": {
                     "name": "read_file",
-                    "arguments": '{"path": "⚕test.txt"}'
-                }
-            }]
+                    "arguments": '{"path": "⚕test.txt"}',
+                },
+            }],
         }]
         assert _sanitize_messages_non_ascii(messages) is True
         assert messages[0]["tool_calls"][0]["function"]["arguments"] == '{"path": "test.txt"}'
@@ -119,8 +119,8 @@ class TestSurrogateVsAsciiSanitization:
                 "type": "function",
                 "function": {
                     "name": "read\ud800_file",
-                    "arguments": '{"path": "bad\ud800.txt"}'
-                }
+                    "arguments": '{"path": "bad\ud800.txt"}',
+                },
             }],
         }]
         assert _sanitize_messages_surrogates(messages) is True
@@ -185,11 +185,11 @@ class TestSanitizeToolsNonAscii:
                             "path": {
                                 "type": "string",
                                 "description": "File path │ with unicode",
-                            }
+                            },
                         },
                     },
                 },
-            }
+            },
         ]
 
         assert _sanitize_tools_non_ascii(tools) is True
@@ -209,11 +209,11 @@ class TestSanitizeToolsNonAscii:
                             "path": {
                                 "type": "string",
                                 "description": "File path",
-                            }
+                            },
                         },
                     },
                 },
-            }
+            },
         ]
 
         assert _sanitize_tools_non_ascii(tools) is False
@@ -225,7 +225,7 @@ class TestSanitizeStructureNonAscii:
             "default_headers": {
                 "X-Title": "Hermes │ Agent",
                 "User-Agent": "Hermes/1.0 🤖",
-            }
+            },
         }
         assert _sanitize_structure_non_ascii(payload) is True
         assert payload["default_headers"]["X-Title"] == "Hermes  Agent"

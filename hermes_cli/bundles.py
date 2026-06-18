@@ -45,7 +45,7 @@ def _cmd_list(args) -> None:
         c.print(
             f"[dim]No bundles installed yet. Create one with:\n"
             f"  hermes bundles create <name> --skill skill1 --skill skill2[/]\n"
-            f"Bundles directory: [bold]{_bundles_dir()}[/]"
+            f"Bundles directory: [bold]{_bundles_dir()}[/]",
         )
         return
 
@@ -96,7 +96,7 @@ def _cmd_create(args) -> None:
         # Interactive prompt for skills if none were passed on the CLI.
         c.print(
             "[dim]No skills passed via --skill. Enter one skill name per line.\n"
-            "Submit an empty line to finish.[/]"
+            "Submit an empty line to finish.[/]",
         )
         try:
             while True:
@@ -132,7 +132,7 @@ def _cmd_create(args) -> None:
     if info:
         c.print(
             f"  Invoke with: [bold cyan]/{info['slug']}[/]  "
-            f"(loads {len(info['skills'])} skills)"
+            f"(loads {len(info['skills'])} skills)",
         )
 
 
@@ -211,7 +211,7 @@ def register_cli(subparser) -> None:
     p_delete.set_defaults(_bundles_handler=_cmd_delete)
 
     p_reload = subs.add_parser(
-        "reload", help="Re-scan the bundles directory and report changes"
+        "reload", help="Re-scan the bundles directory and report changes",
     )
     p_reload.set_defaults(_bundles_handler=_cmd_reload)
 

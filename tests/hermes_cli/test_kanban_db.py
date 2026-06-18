@@ -45,7 +45,7 @@ def test_init_db_is_idempotent(kanban_home):
 def test_init_creates_expected_tables(kanban_home):
     with kb.connect() as conn:
         rows = conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name",
         ).fetchall()
     names = {r["name"] for r in rows}
     assert {"tasks", "task_links", "task_comments", "task_events"} <= names
@@ -158,7 +158,7 @@ def test_connect_migrates_legacy_db_before_optional_column_indexes(tmp_path):
     """)
     conn.execute(
         "INSERT INTO tasks (id, title, status, created_at) "
-        "VALUES ('legacy', 'old board task', 'ready', 1)"
+        "VALUES ('legacy', 'old board task', 'ready', 1)",
     )
     conn.commit()
     conn.close()
@@ -174,7 +174,7 @@ def test_connect_migrates_legacy_db_before_optional_column_indexes(tmp_path):
         indexes = {
             row["name"]
             for row in migrated.execute(
-                "SELECT name FROM sqlite_master WHERE type = 'index'"
+                "SELECT name FROM sqlite_master WHERE type = 'index'",
             )
         }
 
@@ -737,7 +737,7 @@ def test_rate_limit_exit_requeues_without_counting_failure(
             )
             conn.commit()
             _kb._record_worker_exit(
-                pid, _exited_status(_kb.KANBAN_RATE_LIMIT_EXIT_CODE)
+                pid, _exited_status(_kb.KANBAN_RATE_LIMIT_EXIT_CODE),
             )
 
             crashed = kb.detect_crashed_workers(conn)
@@ -872,7 +872,7 @@ def test_resolve_rate_limit_cooldown_handles_bad_env(monkeypatch):
 
     for bad_val in ("notanumber", "-5", ""):
         monkeypatch.setenv(
-            "HERMES_KANBAN_RATE_LIMIT_COOLDOWN_SECONDS", bad_val
+            "HERMES_KANBAN_RATE_LIMIT_COOLDOWN_SECONDS", bad_val,
         )
         assert (
             _kb._resolve_rate_limit_cooldown_seconds()
@@ -1118,7 +1118,7 @@ def test_recompute_ready_honours_dispatcher_failure_limit(kanban_home):
         assert kb.get_task(conn, t).status == "blocked"
         # Dispatcher configured a higher limit → recover, preserve counter.
         promoted = kb.recompute_ready(
-            conn, failure_limit=kb.DEFAULT_FAILURE_LIMIT + 2
+            conn, failure_limit=kb.DEFAULT_FAILURE_LIMIT + 2,
         )
         assert promoted == 1
         task = kb.get_task(conn, t)
@@ -1512,7 +1512,7 @@ def test_has_spawnable_ready_true_when_real_profile_present(kanban_home, monkeyp
     real "stuck" signal when a daily/agent task is queued."""
     from hermes_cli import profiles
     monkeypatch.setattr(
-        profiles, "profile_exists", lambda name: name == "daily"
+        profiles, "profile_exists", lambda name: name == "daily",
     )
     with kb.connect() as conn:
         kb.create_task(conn, title="terminal-task", assignee="orion-cc")
@@ -1560,7 +1560,7 @@ def test_dispatch_spawn_failure_releases_claim(kanban_home, all_assignees_spawna
 
 
 def test_dispatch_max_spawn_counts_existing_running_tasks(
-    kanban_home, all_assignees_spawnable
+    kanban_home, all_assignees_spawnable,
 ):
     """max_spawn is a live concurrency cap, not a per-tick spawn cap.
 
@@ -1588,7 +1588,7 @@ def test_dispatch_max_spawn_counts_existing_running_tasks(
 
 
 def test_dispatch_max_spawn_fills_remaining_capacity(
-    kanban_home, all_assignees_spawnable
+    kanban_home, all_assignees_spawnable,
 ):
     """When below cap, dispatch only fills available worker slots."""
     spawns = []
@@ -1738,7 +1738,7 @@ def test_respawn_guard_old_pr_comment_not_guarded(kanban_home):
 
 
 def test_dispatch_respawn_guard_defers_auth_error_without_auto_block(
-    kanban_home, all_assignees_spawnable
+    kanban_home, all_assignees_spawnable,
 ):
     """dispatch_once defers (does NOT auto-block) a ready task whose last
     error is a blocker_auth.
@@ -1783,7 +1783,7 @@ def test_dispatch_respawn_guard_defers_auth_error_without_auto_block(
 
 
 def test_dispatch_respawn_guard_skips_recent_success(
-    kanban_home, all_assignees_spawnable
+    kanban_home, all_assignees_spawnable,
 ):
     """dispatch_once skips (but does not block) a task with a recent completed run."""
     spawned_ids = []
@@ -1809,7 +1809,7 @@ def test_dispatch_respawn_guard_skips_recent_success(
 
 
 def test_dispatch_respawn_guard_skips_active_pr(
-    kanban_home, all_assignees_spawnable
+    kanban_home, all_assignees_spawnable,
 ):
     """dispatch_once skips (but does not block) a task with an active PR comment."""
     spawned_ids = []
@@ -1833,7 +1833,7 @@ def test_dispatch_respawn_guard_skips_active_pr(
 
 
 def test_dispatch_respawn_guard_dry_run_no_auto_block(
-    kanban_home, all_assignees_spawnable
+    kanban_home, all_assignees_spawnable,
 ):
     """In dry_run mode, blocker_auth tasks are recorded in respawn_guarded (not auto-blocked)."""
     with kb.connect() as conn:
@@ -1851,7 +1851,7 @@ def test_dispatch_respawn_guard_dry_run_no_auto_block(
 
 
 def test_dispatch_respawn_guard_allows_clean_task(
-    kanban_home, all_assignees_spawnable
+    kanban_home, all_assignees_spawnable,
 ):
     """A task with no guard triggers is spawned normally."""
     spawned_ids = []
@@ -1869,7 +1869,7 @@ def test_dispatch_respawn_guard_allows_clean_task(
 
 
 def test_dispatch_respawn_guard_emits_event_for_skipped_task(
-    kanban_home, all_assignees_spawnable
+    kanban_home, all_assignees_spawnable,
 ):
     """dispatch_once emits a respawn_guarded task_event so operators can diagnose stuck-ready tasks."""
     with kb.connect() as conn:
@@ -1909,7 +1909,7 @@ def test_dir_workspace_honors_given_path(kanban_home, tmp_path):
     target = tmp_path / "my-vault"
     with kb.connect() as conn:
         t = kb.create_task(
-            conn, title="biz", workspace_kind="dir", workspace_path=str(target)
+            conn, title="biz", workspace_kind="dir", workspace_path=str(target),
         )
         task = kb.get_task(conn, t)
         ws = kb.resolve_workspace(task)
@@ -1921,7 +1921,7 @@ def test_worktree_workspace_returns_intended_path(kanban_home, tmp_path):
     target = str(tmp_path / ".worktrees" / "my-task")
     with kb.connect() as conn:
         t = kb.create_task(
-            conn, title="ship", workspace_kind="worktree", workspace_path=target
+            conn, title="ship", workspace_kind="worktree", workspace_path=target,
         )
         task = kb.get_task(conn, t)
         ws = kb.resolve_workspace(task)
@@ -2218,7 +2218,7 @@ def test_tenant_propagates_to_events(kanban_home):
 def test_create_task_stamps_session_id(kanban_home):
     with kb.connect() as conn:
         tid = kb.create_task(
-            conn, title="from chat", session_id="acp-sess-123"
+            conn, title="from chat", session_id="acp-sess-123",
         )
         t = kb.get_task(conn, tid)
     assert t is not None
@@ -2255,7 +2255,7 @@ def test_session_id_index_exists(kanban_home):
     with kb.connect() as conn:
         rows = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='index' "
-            "AND tbl_name='tasks'"
+            "AND tbl_name='tasks'",
         ).fetchall()
     names = {r["name"] for r in rows}
     assert "idx_tasks_session_id" in names
@@ -2266,17 +2266,17 @@ def test_session_id_compose_with_tenant_filter(kanban_home):
     the filters must AND, not replace."""
     with kb.connect() as conn:
         kb.create_task(
-            conn, title="match", tenant="scarf:foo", session_id="acp-x"
+            conn, title="match", tenant="scarf:foo", session_id="acp-x",
         )
         kb.create_task(
-            conn, title="wrong-tenant", tenant="other", session_id="acp-x"
+            conn, title="wrong-tenant", tenant="other", session_id="acp-x",
         )
         kb.create_task(
             conn, title="wrong-session",
             tenant="scarf:foo", session_id="acp-y",
         )
         rows = kb.list_tasks(
-            conn, tenant="scarf:foo", session_id="acp-x"
+            conn, tenant="scarf:foo", session_id="acp-x",
         )
     assert [t.title for t in rows] == ["match"]
 
@@ -2301,7 +2301,7 @@ class TestSharedBoardPaths:
         monkeypatch.delenv("HERMES_KANBAN_HOME", raising=False)
 
     def test_default_install_anchors_at_home_dot_hermes(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # Standard install: HERMES_HOME == ~/.hermes, no profile active.
         default_home = tmp_path / ".hermes"
@@ -2317,7 +2317,7 @@ class TestSharedBoardPaths:
         )
 
     def test_profile_worker_resolves_to_shared_root(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # Reproduces the bug: dispatcher uses ~/.hermes/kanban.db,
         # worker spawned with -p <profile> previously resolved to
@@ -2344,7 +2344,7 @@ class TestSharedBoardPaths:
         assert kb.kanban_db_path() != profile_home / "kanban.db"
 
     def test_dispatcher_and_profile_worker_converge(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # End-to-end convergence: resolve the path under each side's
         # HERMES_HOME and confirm equality. This is the property the
@@ -2371,7 +2371,7 @@ class TestSharedBoardPaths:
         assert dispatcher_log == worker_log
 
     def test_docker_custom_hermes_home_uses_env_path_directly(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # Docker / custom deployment: HERMES_HOME points outside ~/.hermes.
         # `get_default_hermes_root()` returns env_home directly when it
@@ -2385,7 +2385,7 @@ class TestSharedBoardPaths:
         assert kb.kanban_db_path() == custom_root / "kanban.db"
 
     def test_docker_profile_layout_uses_grandparent(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # Docker profile shape: HERMES_HOME=/opt/hermes/profiles/coder;
         # `get_default_hermes_root()` walks up to /opt/hermes because
@@ -2399,7 +2399,7 @@ class TestSharedBoardPaths:
         assert kb.kanban_db_path() == custom_root / "kanban.db"
 
     def test_explicit_override_via_hermes_kanban_home(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # Explicit override: HERMES_KANBAN_HOME beats every other
         # resolution rule.
@@ -2428,7 +2428,7 @@ class TestSharedBoardPaths:
         assert kb.kanban_home() == default_home
 
     def test_dispatcher_and_worker_share_a_real_database(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # Belt-and-suspenders: round-trip a task across the two
         # HERMES_HOME perspectives via a real SQLite file. Without the
@@ -2452,7 +2452,7 @@ class TestSharedBoardPaths:
         assert task.title == "cross-profile"
 
     def test_hermes_kanban_db_pin_beats_kanban_home(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # HERMES_KANBAN_DB pins the file path directly and beats both
         # HERMES_KANBAN_HOME and the `get_default_hermes_root()` path.
@@ -2475,7 +2475,7 @@ class TestSharedBoardPaths:
         assert kb.workspaces_root() == umbrella / "kanban" / "workspaces"
 
     def test_hermes_kanban_workspaces_root_pin_beats_kanban_home(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # HERMES_KANBAN_WORKSPACES_ROOT pins the workspaces root directly.
         default_home = tmp_path / ".hermes"
@@ -2495,7 +2495,7 @@ class TestSharedBoardPaths:
         assert kb.kanban_db_path() == umbrella / "kanban.db"
 
     def test_empty_per_path_overrides_fall_through(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # Empty/whitespace pins are treated as unset, same as
         # HERMES_KANBAN_HOME.
@@ -2510,7 +2510,7 @@ class TestSharedBoardPaths:
         assert kb.workspaces_root() == default_home / "kanban" / "workspaces"
 
     def test_dispatcher_spawn_injects_kanban_db_and_workspaces_root(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         # The dispatcher's `_default_spawn` must inject HERMES_KANBAN_DB
         # and HERMES_KANBAN_WORKSPACES_ROOT into the worker env so the
@@ -2553,7 +2553,7 @@ class TestSharedBoardPaths:
         env = captured["env"]
         assert env["HERMES_KANBAN_DB"] == str(default_home / "kanban.db")
         assert env["HERMES_KANBAN_WORKSPACES_ROOT"] == str(
-            default_home / "kanban" / "workspaces"
+            default_home / "kanban" / "workspaces",
         )
         assert env["HERMES_KANBAN_TASK"] == "t_dispatch_env"
         assert env["HERMES_KANBAN_BRANCH"] == "wt/t_dispatch_env"
@@ -2679,7 +2679,7 @@ def test_connect_falls_back_to_delete_on_locking_protocol(tmp_path, monkeypatch,
 
     def wal_blocking_connect(*args, **kwargs):
         return real_connect(
-            *args, factory=_WalBlockingConnection, **kwargs
+            *args, factory=_WalBlockingConnection, **kwargs,
         )
 
     with _patch("hermes_cli.kanban_db.sqlite3.connect", side_effect=wal_blocking_connect):
@@ -2775,7 +2775,7 @@ def test_add_column_if_missing_is_idempotent_on_race(kanban_home):
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
     conn.execute(
-        "CREATE TABLE tasks (id INTEGER PRIMARY KEY, title TEXT NOT NULL)"
+        "CREATE TABLE tasks (id INTEGER PRIMARY KEY, title TEXT NOT NULL)",
     )
 
     # First call adds the column — returns True.
@@ -2787,7 +2787,7 @@ def test_add_column_if_missing_is_idempotent_on_race(kanban_home):
     # Second call on same connection — column already exists — must return
     # False without raising, simulating the race the dispatcher hits.
     added_again = kb._add_column_if_missing(
-        conn, "tasks", "extra_col", "extra_col TEXT"
+        conn, "tasks", "extra_col", "extra_col TEXT",
     )
     assert added_again is False
 
@@ -2823,7 +2823,7 @@ def test_migrate_add_optional_columns_tolerates_concurrent_migration(kanban_home
             max_retries INTEGER,
             session_id TEXT
         )
-        """
+        """,
     )
     conn.execute(
         """
@@ -2835,7 +2835,7 @@ def test_migrate_add_optional_columns_tolerates_concurrent_migration(kanban_home
             payload    TEXT,
             created_at INTEGER NOT NULL DEFAULT 0
         )
-        """
+        """,
     )
 
     # Running migration on an already-migrated schema must not raise.
@@ -3460,7 +3460,7 @@ def test_detect_stale_returns_running_task_with_no_heartbeat(kanban_home, monkey
         five_hours_ago = int(time.time()) - (5 * 3600)
         with kb.write_txn(conn):
             conn.execute(
-                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t)
+                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t),
             )
             conn.execute(
                 "UPDATE task_runs SET started_at = ? "
@@ -3556,7 +3556,7 @@ def test_detect_stale_skips_recently_started_task(kanban_home, monkeypatch):
         one_hour_ago = int(time.time()) - 3600
         with kb.write_txn(conn):
             conn.execute(
-                "UPDATE tasks SET started_at = ? WHERE id = ?", (one_hour_ago, t)
+                "UPDATE tasks SET started_at = ? WHERE id = ?", (one_hour_ago, t),
             )
             conn.execute(
                 "UPDATE task_runs SET started_at = ? "
@@ -3583,7 +3583,7 @@ def test_detect_stale_skips_when_timeout_zero(kanban_home, monkeypatch):
         five_hours_ago = int(time.time()) - (5 * 3600)
         with kb.write_txn(conn):
             conn.execute(
-                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t)
+                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t),
             )
             conn.execute(
                 "UPDATE task_runs SET started_at = ? "
@@ -3610,7 +3610,7 @@ def test_detect_stale_skips_blocked_tasks(kanban_home, monkeypatch):
         five_hours_ago = int(time.time()) - (5 * 3600)
         with kb.write_txn(conn):
             conn.execute(
-                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t)
+                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t),
             )
             conn.execute(
                 "UPDATE task_runs SET started_at = ? "
@@ -3649,7 +3649,7 @@ def test_detect_stale_does_not_tick_failure_counter(kanban_home, monkeypatch):
         five_hours_ago = int(time.time()) - (5 * 3600)
         with kb.write_txn(conn):
             conn.execute(
-                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t)
+                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t),
             )
             conn.execute(
                 "UPDATE task_runs SET started_at = ? "
@@ -3658,7 +3658,7 @@ def test_detect_stale_does_not_tick_failure_counter(kanban_home, monkeypatch):
             )
             # Counter starts at 0; assert that's our baseline.
             row = conn.execute(
-                "SELECT consecutive_failures FROM tasks WHERE id = ?", (t,)
+                "SELECT consecutive_failures FROM tasks WHERE id = ?", (t,),
             ).fetchone()
             assert row["consecutive_failures"] in (0, None)
 
@@ -3671,7 +3671,7 @@ def test_detect_stale_does_not_tick_failure_counter(kanban_home, monkeypatch):
         # Critical assertion: the failure counter MUST NOT have ticked.
         # Stale reclaim resets to ready for re-dispatch without penalty.
         row = conn.execute(
-            "SELECT consecutive_failures FROM tasks WHERE id = ?", (t,)
+            "SELECT consecutive_failures FROM tasks WHERE id = ?", (t,),
         ).fetchone()
         assert row["consecutive_failures"] in (0, None), (
             f"Stale reclaim ticked consecutive_failures to "
@@ -4063,7 +4063,7 @@ def test_write_txn_healthy_commit_no_exception(tmp_path):
     with write_txn(conn) as c:
         c.execute(
             "INSERT INTO tasks (id, title, assignee, status, priority, created_at) "
-            "VALUES ('t_test01', 'test task', 'tester', 'todo', 0, 1234567890)"
+            "VALUES ('t_test01', 'test task', 'tester', 'todo', 0, 1234567890)",
         )
     row = conn.execute("SELECT title FROM tasks WHERE id='t_test01'").fetchone()
     assert row["title"] == "test task"
@@ -4089,7 +4089,7 @@ def test_write_txn_raises_on_truncated_file(tmp_path):
             with write_txn(conn) as c:
                 c.execute(
                     "INSERT INTO tasks (id, title, assignee, status, priority, created_at) "
-                    "VALUES ('t_test02', 'test task 2', 'tester', 'todo', 0, 1234567890)"
+                    "VALUES ('t_test02', 'test task 2', 'tester', 'todo', 0, 1234567890)",
                 )
     conn.close()
 
@@ -4113,7 +4113,7 @@ def test_write_txn_post_commit_check_fires_every_call(tmp_path):
             with write_txn(conn) as c:
                 c.execute(
                     f"INSERT INTO tasks (id, title, assignee, status, priority, created_at) "
-                    f"VALUES ('t_fire{i:02d}', 'task {i}', 'tester', 'todo', 0, 1234567890)"
+                    f"VALUES ('t_fire{i:02d}', 'task {i}', 'tester', 'todo', 0, 1234567890)",
                 )
     assert call_count == 3
     conn.close()
@@ -4282,7 +4282,7 @@ def test_zombie_reaper_survives_all_boards_failing():
     for tick in range(5):
         pids = [tick * 100 + 1, tick * 100 + 2]
         with patch(
-            "hermes_cli.kanban_db.os.waitpid", side_effect=make_fake_waitpid(pids)
+            "hermes_cli.kanban_db.os.waitpid", side_effect=make_fake_waitpid(pids),
         ):
             with patch("hermes_cli.kanban_db._record_worker_exit"):
                 pids = kb.reap_worker_zombies()

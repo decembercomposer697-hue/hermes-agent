@@ -41,7 +41,7 @@ class TestParseNpmPackage:
 
     def test_scoped(self):
         assert _parse_npm_package("@modelcontextprotocol/server-filesystem") == (
-            "@modelcontextprotocol/server-filesystem", None
+            "@modelcontextprotocol/server-filesystem", None,
         )
 
     def test_scoped_with_version(self):
@@ -87,7 +87,7 @@ class TestParsePackageFromArgs:
         # `npx --package=@scope/pkg@1.0 some-bin` -> install target is the
         # --package value, NOT the executed binary `some-bin`.
         name, ver = _parse_package_from_args(
-            ["--package=@scope/pkg@1.0", "some-bin"], "npm"
+            ["--package=@scope/pkg@1.0", "some-bin"], "npm",
         )
         assert name == "@scope/pkg"
         assert ver == "1.0"
@@ -95,7 +95,7 @@ class TestParsePackageFromArgs:
     def test_package_space_form(self):
         # `npx --package @scope/pkg some-bin` (value in the next token).
         name, ver = _parse_package_from_args(
-            ["--package", "@scope/pkg@2.0", "some-bin"], "npm"
+            ["--package", "@scope/pkg@2.0", "some-bin"], "npm",
         )
         assert name == "@scope/pkg"
         assert ver == "2.0"
@@ -103,7 +103,7 @@ class TestParsePackageFromArgs:
     def test_short_p_form(self):
         # `npx -p left-pad@1.3.0 cli-cmd` -> package is left-pad, not cli-cmd.
         name, ver = _parse_package_from_args(
-            ["-p", "left-pad@1.3.0", "cli-cmd"], "npm"
+            ["-p", "left-pad@1.3.0", "cli-cmd"], "npm",
         )
         assert name == "left-pad"
         assert ver == "1.3.0"
@@ -134,7 +134,7 @@ class TestCheckPackageForMalware:
             "vulns": [
                 {"id": "MAL-2023-7938", "summary": "Malicious code in evil-pkg"},
                 {"id": "CVE-2023-1234", "summary": "Regular vulnerability"},  # should be filtered
-            ]
+            ],
         }).encode()
         mock_response.__enter__ = lambda s: s
         mock_response.__exit__ = MagicMock(return_value=False)

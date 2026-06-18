@@ -113,7 +113,7 @@ class TestProbeGeminiTier:
 class TestIsFreeTierQuotaError:
     def test_detects_free_tier_marker(self):
         assert is_free_tier_quota_error(
-            "Quota exceeded for metric: generate_content_free_tier_requests"
+            "Quota exceeded for metric: generate_content_free_tier_requests",
         )
 
     def test_case_insensitive(self):

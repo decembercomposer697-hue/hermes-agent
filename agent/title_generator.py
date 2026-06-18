@@ -114,7 +114,7 @@ def auto_title_session(
         return
 
     title = generate_title(
-        user_message, assistant_response, failure_callback=failure_callback, main_runtime=main_runtime
+        user_message, assistant_response, failure_callback=failure_callback, main_runtime=main_runtime,
     )
     if not title:
         return

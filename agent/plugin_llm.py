@@ -231,7 +231,7 @@ def _resolve_trust_policy(plugin_id: str) -> _TrustPolicy:
 
     allowed_models, allow_any_model = _coerce_allowlist(llm_cfg.get("allowed_models"))
     allowed_providers, allow_any_provider = _coerce_allowlist(
-        llm_cfg.get("allowed_providers")
+        llm_cfg.get("allowed_providers"),
     )
 
     return _TrustPolicy(
@@ -276,7 +276,7 @@ def _check_overrides(
             raise PluginLlmTrustError(
                 f"Plugin {policy.plugin_id!r} cannot override the provider "
                 f"(set plugins.entries.{policy.plugin_id}.llm.allow_provider_override "
-                f"to true to allow)."
+                f"to true to allow).",
             )
         normalized = _normalize_ref(requested_provider)
         if (
@@ -287,7 +287,7 @@ def _check_overrides(
             raise PluginLlmTrustError(
                 f"Plugin {policy.plugin_id!r} provider override "
                 f"{requested_provider!r} is not in plugins.entries."
-                f"{policy.plugin_id}.llm.allowed_providers."
+                f"{policy.plugin_id}.llm.allowed_providers.",
             )
         final_provider = requested_provider.strip()
 
@@ -296,7 +296,7 @@ def _check_overrides(
             raise PluginLlmTrustError(
                 f"Plugin {policy.plugin_id!r} cannot override the model "
                 f"(set plugins.entries.{policy.plugin_id}.llm.allow_model_override "
-                f"to true to allow)."
+                f"to true to allow).",
             )
         normalized = _normalize_ref(requested_model)
         if (
@@ -307,7 +307,7 @@ def _check_overrides(
             raise PluginLlmTrustError(
                 f"Plugin {policy.plugin_id!r} model override "
                 f"{requested_model!r} is not in plugins.entries."
-                f"{policy.plugin_id}.llm.allowed_models."
+                f"{policy.plugin_id}.llm.allowed_models.",
             )
         final_model = requested_model.strip()
 
@@ -315,7 +315,7 @@ def _check_overrides(
         raise PluginLlmTrustError(
             f"Plugin {policy.plugin_id!r} cannot run completions against a "
             f"non-default agent id (set plugins.entries.{policy.plugin_id}."
-            f"llm.allow_agent_id_override to true to allow)."
+            f"llm.allow_agent_id_override to true to allow).",
         )
 
     if requested_profile:
@@ -323,7 +323,7 @@ def _check_overrides(
             raise PluginLlmTrustError(
                 f"Plugin {policy.plugin_id!r} cannot override the auth profile "
                 f"(set plugins.entries.{policy.plugin_id}.llm.allow_profile_override "
-                f"to true to allow)."
+                f"to true to allow).",
             )
         final_profile = requested_profile.strip()
 
@@ -395,7 +395,7 @@ def _build_structured_messages(
     if json_mode or json_schema is not None:
         sys_parts.append(
             "Respond with a single JSON object that matches the requested shape. "
-            "Do not include prose or markdown fences."
+            "Do not include prose or markdown fences.",
         )
     if sys_parts:
         messages.append({"role": "system", "content": "\n\n".join(sys_parts)})
@@ -455,7 +455,7 @@ def _strip_code_fences(text: str) -> str:
 
 
 def _parse_structured_text(
-    *, text: str, json_mode: bool, json_schema: Any | None
+    *, text: str, json_mode: bool, json_schema: Any | None,
 ) -> tuple[Any | None, str]:
     """Return ``(parsed, content_type)``. ``content_type`` is ``"json"``
     when parsing succeeded and (when a schema was given) validation
@@ -479,7 +479,7 @@ def _parse_structured_text(
             logger.debug("jsonschema unavailable; skipping schema validation")
         except jsonschema.ValidationError as exc:  # type: ignore[attr-defined]
             raise ValueError(
-                f"Plugin LLM structured output did not match schema: {exc.message}"
+                f"Plugin LLM structured output did not match schema: {exc.message}",
             ) from exc
 
     return parsed, "json"
@@ -748,7 +748,7 @@ class PluginLlm:
         text = _extract_text(response)
         usage = _extract_usage(response)
         parsed, content_type = _parse_structured_text(
-            text=text, json_mode=json_mode, json_schema=json_schema
+            text=text, json_mode=json_mode, json_schema=json_schema,
         )
         result = PluginLlmStructuredResult(
             text=text,
@@ -875,7 +875,7 @@ class PluginLlm:
         text = _extract_text(response)
         usage = _extract_usage(response)
         parsed, content_type = _parse_structured_text(
-            text=text, json_mode=json_mode, json_schema=json_schema
+            text=text, json_mode=json_mode, json_schema=json_schema,
         )
         return PluginLlmStructuredResult(
             text=text,
@@ -897,7 +897,7 @@ class PluginLlm:
 
     @staticmethod
     def _json_response_format(
-        *, json_mode: bool, json_schema: Any | None
+        *, json_mode: bool, json_schema: Any | None,
     ) -> dict[str, Any] | None:
         """Build the ``extra_body.response_format`` payload for the
         provider request. Falls back to ``json_object`` when no schema
@@ -911,7 +911,7 @@ class PluginLlm:
                         "schema": json_schema,
                         "strict": False,
                     },
-                }
+                },
             }
         if json_mode:
             return {"response_format": {"type": "json_object"}}

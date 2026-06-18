@@ -29,6 +29,6 @@ def test_no_duplicate_skills_subparser():
         if "conflicting subparser" in str(e):
             raise AssertionError(
                 f"Duplicate subparser detected: {e}. "
-                "See issue #898 for details."
+                "See issue #898 for details.",
             ) from e
         raise

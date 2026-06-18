@@ -156,7 +156,7 @@ async def test_gateway_stop_launchd_service_restart_keeps_nonzero_exit(tmp_path,
     adapter.disconnect = AsyncMock()
 
     with patch("gateway.run.sys.platform", "darwin"), patch(
-        "gateway.status.remove_pid_file"
+        "gateway.status.remove_pid_file",
     ), patch("gateway.status.write_runtime_status"):
         await runner.stop(restart=True, service_restart=True)
 

@@ -35,7 +35,7 @@ class TestAutoDetection:
         history = [
             {"role": "user", "content": "deploy the app"},
             {"role": "assistant", "content": None, "tool_calls": [
-                {"id": "call_1", "function": {"name": "terminal", "arguments": "{}"}}
+                {"id": "call_1", "function": {"name": "terminal", "arguments": "{}"}},
             ]},
             {"role": "tool", "tool_call_id": "call_1", "content": "deployed successfully"},
         ]
@@ -83,7 +83,7 @@ class TestAutoDetection:
         """The user's actual message must appear after the system note."""
         history = [
             {"role": "assistant", "content": None, "tool_calls": [
-                {"id": "c1", "function": {"name": "t", "arguments": "{}"}}
+                {"id": "c1", "function": {"name": "t", "arguments": "{}"}},
             ]},
             {"role": "tool", "tool_call_id": "c1", "content": "done"},
         ]

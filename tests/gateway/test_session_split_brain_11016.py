@@ -65,14 +65,14 @@ def _make_adapter():
 
 def _make_event(text="hello", chat_id="12345"):
     source = SessionSource(
-        platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"
+        platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm",
     )
     return MessageEvent(text=text, message_type=MessageType.TEXT, source=source)
 
 
 def _session_key(chat_id="12345"):
     source = SessionSource(
-        platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"
+        platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm",
     )
     return build_session_key(source)
 
@@ -85,7 +85,7 @@ def _session_key(chat_id="12345"):
 def _make_runner():
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
     runner.adapters = {}
     runner._running_agents = {}
@@ -106,7 +106,7 @@ class TestAdapterSessionCancellation:
     @pytest.mark.asyncio
     @pytest.mark.parametrize("command_text", ["/stop", "/new", "/reset"])
     async def test_command_cancels_active_task_and_unblocks_follow_up(
-        self, command_text
+        self, command_text,
     ):
         """/stop /new /reset must cancel the adapter task and let follow-ups through."""
         adapter = _make_adapter()
@@ -153,7 +153,7 @@ class TestAdapterSessionCancellation:
 
         # Follow-up must go through normally now that the session is clean.
         await adapter.handle_message(
-            _make_event("/model xiaomi/mimo-v2-pro --provider nous")
+            _make_event("/model xiaomi/mimo-v2-pro --provider nous"),
         )
         await asyncio.sleep(0)
         await asyncio.sleep(0)

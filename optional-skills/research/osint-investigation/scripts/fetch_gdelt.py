@@ -104,7 +104,7 @@ def fetch(
                     "source_country": a.get("sourcecountry") or "",
                     "tone": str(a.get("tone") or ""),
                     "social_image": a.get("socialimage") or "",
-                }
+                },
             )
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)

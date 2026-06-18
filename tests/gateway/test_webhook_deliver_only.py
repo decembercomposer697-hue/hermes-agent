@@ -73,7 +73,7 @@ class TestDeliverOnlyBypassesAgent:
                 "deliver_only": True,
                 "deliver_extra": {"chat_id": "12345"},
                 "prompt": "{payload.user} matched with {payload.other}!",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         mock_target = _wire_mock_target(adapter)
@@ -88,7 +88,7 @@ class TestDeliverOnlyBypassesAgent:
 
         app = _create_app(adapter)
         body = json.dumps(
-            {"payload": {"user": "alice", "other": "bob"}}
+            {"payload": {"user": "alice", "other": "bob"}},
         ).encode()
 
         async with TestClient(TestServer(app)) as cli:
@@ -129,7 +129,7 @@ class TestDeliverOnlyBypassesAgent:
                 "deliver_only": True,
                 "deliver_extra": {"chat_id": "chat-1"},
                 "prompt": "Build {build.number} status: {build.status}",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         mock_target = _wire_mock_target(adapter)
@@ -157,7 +157,7 @@ class TestDeliverOnlyBypassesAgent:
                 "deliver_only": True,
                 "deliver_extra": {"chat_id": "c-1", "thread_id": "topic-42"},
                 "prompt": "hi",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         mock_target = _wire_mock_target(adapter)
@@ -172,7 +172,7 @@ class TestDeliverOnlyBypassesAgent:
             assert resp.status == 200
 
         assert mock_target.send.await_args.kwargs["metadata"] == {
-            "thread_id": "topic-42"
+            "thread_id": "topic-42",
         }
 
 
@@ -192,12 +192,12 @@ class TestDeliverOnlyStatusCodes:
                 "deliver_only": True,
                 "deliver_extra": {"chat_id": "c-1"},
                 "prompt": "hi",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         mock_target = _wire_mock_target(adapter)
         mock_target.send = AsyncMock(
-            return_value=SendResult(success=False, error="rate limited by tg")
+            return_value=SendResult(success=False, error="rate limited by tg"),
         )
 
         app = _create_app(adapter)
@@ -223,7 +223,7 @@ class TestDeliverOnlyStatusCodes:
                 "deliver_only": True,
                 "deliver_extra": {"chat_id": "c-1"},
                 "prompt": "hi",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         mock_target = _wire_mock_target(adapter)
@@ -252,7 +252,7 @@ class TestDeliverOnlyStatusCodes:
                 "deliver_only": True,
                 "deliver_extra": {"chat_id": "c-1"},
                 "prompt": "hi",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         _wire_mock_target(adapter, platform_name="telegram")  # only TG wired
@@ -282,7 +282,7 @@ class TestDeliverOnlyStartupValidation:
                 "deliver": "log",
                 "deliver_only": True,
                 "prompt": "hi",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         with pytest.raises(ValueError, match="deliver_only=true but deliver is 'log'"):
@@ -297,7 +297,7 @@ class TestDeliverOnlyStartupValidation:
                 # no deliver field
                 "deliver_only": True,
                 "prompt": "hi",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         with pytest.raises(ValueError, match="deliver_only=true"):
@@ -313,7 +313,7 @@ class TestDeliverOnlyStartupValidation:
                 "deliver_only": True,
                 "deliver_extra": {"chat_id": "c-1"},
                 "prompt": "hi",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         # connect() does more than validation (binds a socket) — we just
@@ -344,7 +344,7 @@ class TestDeliverOnlySecurityInvariants:
                 "deliver_only": True,
                 "deliver_extra": {"chat_id": "c-1"},
                 "prompt": "hi",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         mock_target = _wire_mock_target(adapter)
@@ -372,7 +372,7 @@ class TestDeliverOnlySecurityInvariants:
                 "deliver_only": True,
                 "deliver_extra": {"chat_id": "c-1"},
                 "prompt": "hi",
-            }
+            },
         }
         adapter = _make_adapter(routes)
         mock_target = _wire_mock_target(adapter)
@@ -409,7 +409,7 @@ class TestDeliverOnlySecurityInvariants:
                 "deliver_only": True,
                 "deliver_extra": {"chat_id": "c-1"},
                 "prompt": "hi",
-            }
+            },
         }
         adapter = _make_adapter(routes, rate_limit=2)
         _wire_mock_target(adapter)
@@ -450,7 +450,7 @@ class TestDirectDeliverUnit:
         )
         assert result.success is True
         mock_target.send.assert_awaited_once_with(
-            "c-1", "hello", metadata=None
+            "c-1", "hello", metadata=None,
         )
 
     @pytest.mark.asyncio

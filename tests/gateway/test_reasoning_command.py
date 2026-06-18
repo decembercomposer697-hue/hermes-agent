@@ -242,7 +242,7 @@ class TestReasoningCommand:
                 source=source,
                 session_id="session-1",
                 session_key="agent:main:local:dm",
-            )
+            ),
         )
 
         assert result["final_response"] == "ok"
@@ -292,7 +292,7 @@ class TestReasoningCommand:
                 source=source,
                 session_id="session-1",
                 session_key=session_key,
-            )
+            ),
         )
 
         assert result["final_response"] == "ok"
@@ -349,7 +349,7 @@ class TestReasoningCommand:
                 source=source,
                 session_id="session-1",
                 session_key="agent:main:local:dm",
-            )
+            ),
         )
 
         assert result["final_response"] == "ok"
@@ -401,7 +401,7 @@ class TestReasoningCommand:
                 source=source,
                 session_id="session-1",
                 session_key="agent:main:homeassistant:dm",
-            )
+            ),
         )
 
         assert result["final_response"] == "ok"

@@ -98,5 +98,5 @@ class TestBuildAuthMethods:
                 "id": TERMINAL_SETUP_AUTH_METHOD_ID,
                 "name": "Configure Hermes provider",
                 "type": "terminal",
-            }
+            },
         ]

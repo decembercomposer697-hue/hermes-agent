@@ -82,7 +82,7 @@ def _cmd_list(_args) -> None:
             matcher_part = f" matcher={spec.matcher!r}" if spec.matcher else ""
             print(
                 f"    - {spec.command}{matcher_part} "
-                f"(timeout={spec.timeout}s, {status})"
+                f"(timeout={spec.timeout}s, {status})",
             )
 
             if is_approved:
@@ -95,7 +95,7 @@ def _cmd_list(_args) -> None:
                         print(
                             f"      ⚠ script modified since approval "
                             f"(was {mtime_at}, now {mtime_now}) — "
-                            f"run `hermes hooks doctor` to re-validate"
+                            f"run `hermes hooks doctor` to re-validate",
                         )
         print()
 
@@ -282,7 +282,7 @@ def _cmd_revoke(args) -> None:
     print(f"Removed {removed} allowlist entry/entries for: {args.command}")
     print(
         "Note: currently running CLI / gateway processes keep their "
-        "already-registered callbacks until they restart."
+        "already-registered callbacks until they restart.",
     )
 
 

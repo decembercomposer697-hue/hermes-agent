@@ -626,7 +626,7 @@ def _classify_removed_skills(
                         matched = _needle_in_path_component(needle, hay)
                     else:
                         matched = bool(
-                            re.search(rf'\b{re.escape(needle)}\b', hay)
+                            re.search(rf'\b{re.escape(needle)}\b', hay),
                         )
                     if matched:
                         hit = True
@@ -1001,7 +1001,7 @@ def _build_rename_summary(
         if umbrellas:
             example = umbrellas[0]
             lines.append(
-                f"keep an umbrella stable: hermes curator pin {example}"
+                f"keep an umbrella stable: hermes curator pin {example}",
             )
     return "\n".join(lines)
 
@@ -1091,7 +1091,7 @@ def _write_run_report(
     # moment of deletion, whether each archived skill was consolidated
     # (into=<umbrella>) or pruned (into="").
     absorbed_declarations = _extract_absorbed_into_declarations(
-        llm_meta.get("tool_calls", []) or []
+        llm_meta.get("tool_calls", []) or [],
     )
     classification = _reconcile_classification(
         removed=removed,
@@ -1213,7 +1213,7 @@ def _render_report_markdown(p: dict[str, Any]) -> str:
     lines.append(
         f"Model: `{model}` via `{prov}`  ·  Duration: {dur_label}  ·  "
         f"Agent-created skills: {counts.get('before', 0)} → {counts.get('after', 0)} "
-        f"({counts.get('delta', 0):+d})\n"
+        f"({counts.get('delta', 0):+d})\n",
     )
 
     error = p.get("llm_error")
@@ -1253,7 +1253,7 @@ def _render_report_markdown(p: dict[str, Any]) -> str:
             "their content still lives, just under a different name. "
             "The original directory was moved to `~/.hermes/skills/.archive/` for "
             "safety and can be restored via `hermes curator restore <name>` if the "
-            "consolidation was wrong._\n"
+            "consolidation was wrong._\n",
         )
         SHOW = 50
         for entry in consolidated[:SHOW]:
@@ -1273,7 +1273,7 @@ def _render_report_markdown(p: dict[str, Any]) -> str:
                 lines.append(
                     f"  ⚠ The curator's summary named `{entry['model_claimed_into']}` "
                     "as the umbrella but that skill doesn't exist post-run; "
-                    "showing the tool-call audit's finding instead."
+                    "showing the tool-call audit's finding instead.",
                 )
         if len(consolidated) > SHOW:
             lines.append(f"- … and {len(consolidated) - SHOW} more (see `run.json`)")
@@ -1288,7 +1288,7 @@ def _render_report_markdown(p: dict[str, Any]) -> str:
             "_These skills were archived without being merged into an umbrella "
             "(e.g. stale, unused, or judged irrelevant). "
             "Directories live under `~/.hermes/skills/.archive/`. "
-            "Restore any via `hermes curator restore <name>`._\n"
+            "Restore any via `hermes curator restore <name>`._\n",
         )
         SHOW = 50
         for entry in pruned[:SHOW]:
@@ -1335,7 +1335,7 @@ def _render_report_markdown(p: dict[str, Any]) -> str:
         lines.append(
             "_Cron jobs that referenced a consolidated or pruned skill were "
             "updated in-place so they keep loading the right instructions "
-            "on their next run. See `cron_rewrites.json` for the full record._\n"
+            "on their next run. See `cron_rewrites.json` for the full record._\n",
         )
         SHOW = 25
         for entry in cron_rewrites_list[:SHOW]:
@@ -1345,7 +1345,7 @@ def _render_report_markdown(p: dict[str, Any]) -> str:
             mapped = entry.get("mapped") or {}
             dropped = entry.get("dropped") or []
             lines.append(
-                f"- `{job_name}`: `{', '.join(before)}` → `{', '.join(after) or '(none)'}`"
+                f"- `{job_name}`: `{', '.join(before)}` → `{', '.join(after) or '(none)'}`",
             )
             for old, new in mapped.items():
                 lines.append(f"    - `{old}` → `{new}` (consolidated)")
@@ -1354,7 +1354,7 @@ def _render_report_markdown(p: dict[str, Any]) -> str:
         if len(cron_rewrites_list) > SHOW:
             lines.append(
                 f"- … and {len(cron_rewrites_list) - SHOW} more "
-                "(see `cron_rewrites.json`)"
+                "(see `cron_rewrites.json`)",
             )
         lines.append("")
 
@@ -1400,7 +1400,7 @@ def _render_candidate_list() -> str:
             f"use={r.get('use_count', 0)}  "
             f"view={r.get('view_count', 0)}  "
             f"patches={r.get('patch_count', 0)}  "
-            f"last_activity={r.get('last_activity_at') or 'never'}"
+            f"last_activity={r.get('last_activity_at') or 'never'}",
         )
     return "\n".join(lines)
 
@@ -1642,7 +1642,7 @@ def _resolve_review_runtime(cfg: dict[str, Any]) -> _ReviewRuntimeBinding:
     if _legacy_provider and _legacy_model:
         logger.info(
             "curator: using deprecated curator.auxiliary.{provider,model} "
-            "config — please migrate to auxiliary.curator.{provider,model}"
+            "config — please migrate to auxiliary.curator.{provider,model}",
         )
         return _ReviewRuntimeBinding(
             str(_legacy_provider),

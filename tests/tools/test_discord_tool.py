@@ -233,7 +233,7 @@ class TestServerInfo:
         assert result["member_count"] == 42
         assert result["online_count"] == 10
         mock_req.assert_called_once_with(
-            "GET", "/guilds/111", "test-token", params={"with_counts": "true"}
+            "GET", "/guilds/111", "test-token", params={"with_counts": "true"},
         )
 
 

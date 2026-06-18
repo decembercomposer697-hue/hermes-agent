@@ -27,14 +27,14 @@ def test_cli_claim_active_session_respects_global_limit(tmp_path, monkeypatch):
         assert cli._claim_active_session("cli") is False
         assert printed == [
             "[bold red]Hermes is at the active session limit (1/1). "
-            "Try again when another session finishes.[/]"
+            "Try again when another session finishes.[/]",
         ]
 
         held.release()
 
         assert cli._claim_active_session("cli") is True
         assert [entry["session_id"] for entry in active_session_registry_snapshot()] == [
-            "new-cli-session"
+            "new-cli-session",
         ]
     finally:
         held.release()

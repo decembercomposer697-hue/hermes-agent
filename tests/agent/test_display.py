@@ -225,7 +225,7 @@ class TestEditDiffPreview:
             "@@ -1,2 +1,2 @@\n"
             "-old line\n"
             "+new line\n"
-            " context\n"
+            " context\n",
         )
 
         assert "a/cli.py" in rendered[0]

@@ -154,7 +154,7 @@ def detect_audio_environment() -> dict:
     has_forwarded_audio = bool(
         os.environ.get('PULSE_SERVER')
         or os.environ.get('PIPEWIRE_REMOTE')
-        or _pulse_socket_reachable()
+        or _pulse_socket_reachable(),
     )
 
     # SSH detection -- normally no audio devices, but honor a reachable
@@ -169,7 +169,7 @@ def detect_audio_environment() -> dict:
                 "  If a sound server (PulseAudio/PipeWire) is running on this host,\n"
                 "  point Hermes at it, e.g.:\n"
                 "    export XDG_RUNTIME_DIR=/run/user/$(id -u)\n"
-                "    # or: export PULSE_SERVER=unix:$XDG_RUNTIME_DIR/pulse/native"
+                "    # or: export PULSE_SERVER=unix:$XDG_RUNTIME_DIR/pulse/native",
             )
 
     # Docker/Podman container detection — honor host audio forwarding.
@@ -187,7 +187,7 @@ def detect_audio_environment() -> dict:
                 "  typically /run/user/$UID):\n"
                 "    PulseAudio:  -v $XDG_RUNTIME_DIR/pulse/native:$XDG_RUNTIME_DIR/pulse/native \\\n"
                 "                 -e PULSE_SERVER=unix:$XDG_RUNTIME_DIR/pulse/native\n"
-                "    PipeWire:    -e PIPEWIRE_REMOTE=$XDG_RUNTIME_DIR/pipewire-0"
+                "    PipeWire:    -e PIPEWIRE_REMOTE=$XDG_RUNTIME_DIR/pipewire-0",
             )
 
     # WSL detection — PulseAudio bridge makes audio work in WSL.
@@ -202,7 +202,7 @@ def detect_audio_environment() -> dict:
                         "Running in WSL -- audio requires PulseAudio bridge.\n"
                         "  1. Set PULSE_SERVER=unix:/mnt/wslg/PulseServer\n"
                         "  2. Create ~/.asoundrc pointing ALSA at PulseAudio\n"
-                        "  3. Verify with: arecord -d 3 /tmp/test.wav && aplay /tmp/test.wav"
+                        "  3. Verify with: arecord -d 3 /tmp/test.wav && aplay /tmp/test.wav",
                     )
     except (FileNotFoundError, PermissionError, OSError):
         pass
@@ -215,7 +215,7 @@ def detect_audio_environment() -> dict:
             if not devices:
                 if has_forwarded_audio:
                     notices.append(
-                        "No PortAudio devices detected but host audio forwarding is configured -- continuing"
+                        "No PortAudio devices detected but host audio forwarding is configured -- continuing",
                     )
                 elif termux_capture:
                     notices.append("No PortAudio devices detected, but Termux:API microphone capture is available")
@@ -227,7 +227,7 @@ def detect_audio_environment() -> dict:
             # forwarding is configured.
             if has_forwarded_audio:
                 notices.append(
-                    "Audio device query failed but host audio forwarding is configured -- continuing"
+                    "Audio device query failed but host audio forwarding is configured -- continuing",
                 )
             elif termux_capture:
                 notices.append("PortAudio device query failed, but Termux:API microphone capture is available")
@@ -238,7 +238,7 @@ def detect_audio_environment() -> dict:
             notices.append("Termux:API microphone recording available (sounddevice not required)")
         elif termux_mic_cmd and not termux_app_installed:
             warnings.append(
-                "Termux:API Android app is not installed. Install/update the Termux:API app to use termux-microphone-record."
+                "Termux:API Android app is not installed. Install/update the Termux:API app to use termux-microphone-record.",
             )
         else:
             warnings.append(f"Audio libraries not installed ({_voice_capture_install_hint()})")
@@ -247,20 +247,20 @@ def detect_audio_environment() -> dict:
             notices.append("Termux:API microphone recording available (PortAudio not required)")
         elif termux_mic_cmd and not termux_app_installed:
             warnings.append(
-                "Termux:API Android app is not installed. Install/update the Termux:API app to use termux-microphone-record."
+                "Termux:API Android app is not installed. Install/update the Termux:API app to use termux-microphone-record.",
             )
         elif _is_termux_environment():
             warnings.append(
                 "PortAudio system library not found -- install it first:\n"
                 "  Termux: pkg install portaudio\n"
-                "Then retry /voice on."
+                "Then retry /voice on.",
             )
         else:
             warnings.append(
                 "PortAudio system library not found -- install it first:\n"
                 "  Linux:  sudo apt-get install libportaudio2\n"
                 "  macOS:  brew install portaudio\n"
-                "Then retry /voice on."
+                "Then retry /voice on.",
             )
 
     return {
@@ -365,12 +365,12 @@ class TermuxAudioRecorder:
             raise RuntimeError(
                 "Termux voice capture requires the termux-api package and app.\n"
                 "Install with: pkg install termux-api\n"
-                "Then install/update the Termux:API Android app."
+                "Then install/update the Termux:API Android app.",
             )
         if not _termux_api_app_installed():
             raise RuntimeError(
                 "Termux voice capture requires the Termux:API Android app.\n"
-                "Install/update the Termux:API app, then retry /voice on."
+                "Install/update the Termux:API app, then retry /voice on.",
             )
 
         with self._lock:
@@ -648,7 +648,7 @@ class AudioRecorder:
                     pass
             raise RuntimeError(
                 f"Failed to open audio input stream: {e}. "
-                "Check that a microphone is connected and accessible."
+                "Check that a microphone is connected and accessible.",
             ) from e
         self._stream = stream
 
@@ -672,7 +672,7 @@ class AudioRecorder:
         except (ImportError, OSError) as e:
             raise RuntimeError(
                 "Voice mode requires sounddevice and numpy.\n"
-                f"Install with: {sys.executable} -m pip install sounddevice numpy"
+                f"Install with: {sys.executable} -m pip install sounddevice numpy",
             ) from e
 
         with self._lock:
@@ -1167,7 +1167,7 @@ def check_voice_requirements() -> dict[str, Any]:
         details_parts.append(
             "STT provider: MISSING (uv pip install faster-whisper — "
             "`pip install faster-whisper` also works if pip is on PATH, "
-            "or set GROQ_API_KEY / VOICE_TOOLS_OPENAI_KEY)"
+            "or set GROQ_API_KEY / VOICE_TOOLS_OPENAI_KEY)",
         )
 
     for warning in env_check["warnings"]:

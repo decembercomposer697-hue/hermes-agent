@@ -148,8 +148,8 @@ class TestFirecrawlClientConfig:
             "providers": {
                 "nous": {
                     "access_token": "nous-token",
-                }
-            }
+                },
+            },
         }))
 
         with patch.dict(os.environ, {
@@ -731,8 +731,8 @@ class TestCheckWebApiKey:
                     "access_token": "expired-token",
                     "refresh_token": "refresh-token",
                     "expires_at": expired_at,
-                }
-            }
+                },
+            },
         }))
         refresh_calls = []
 

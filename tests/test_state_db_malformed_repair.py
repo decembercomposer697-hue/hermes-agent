@@ -47,7 +47,7 @@ def _corrupt_duplicate_fts(db_path: Path) -> None:
     conn.execute(
         "INSERT INTO sqlite_master (type, name, tbl_name, rootpage, sql) "
         "SELECT type, name, tbl_name, rootpage, sql FROM sqlite_master "
-        "WHERE name='messages_fts'"
+        "WHERE name='messages_fts'",
     )
     conn.commit()
     conn.close()
@@ -94,7 +94,7 @@ def test_repaired_db_search_works(tmp_path):
     db = SessionDB(db_path=db_path)
     try:
         hits = db._conn.execute(
-            "SELECT COUNT(*) FROM messages_fts WHERE messages_fts MATCH 'pizza'"
+            "SELECT COUNT(*) FROM messages_fts WHERE messages_fts MATCH 'pizza'",
         ).fetchone()[0]
         assert hits == 5
         msg_count = db._conn.execute("SELECT COUNT(*) FROM messages_fts").fetchone()[0]
@@ -115,7 +115,7 @@ def test_sessiondb_auto_heals_on_open(tmp_path, monkeypatch):
     try:
         assert db._conn.execute("SELECT COUNT(*) FROM sessions").fetchone()[0] == 1
         assert db._conn.execute(
-            "SELECT id FROM sessions WHERE id=?", (sid,)
+            "SELECT id FROM sessions WHERE id=?", (sid,),
         ).fetchone() is not None
     finally:
         db.close()
@@ -149,7 +149,7 @@ def test_auto_heal_attempted_once_per_process(tmp_path, monkeypatch):
 
 def test_is_malformed_db_error_discriminates():
     assert is_malformed_db_error(
-        sqlite3.DatabaseError("malformed database schema (messages_fts) - ...")
+        sqlite3.DatabaseError("malformed database schema (messages_fts) - ..."),
     )
     assert is_malformed_db_error(sqlite3.DatabaseError("database disk image is malformed"))
     assert not is_malformed_db_error(sqlite3.OperationalError("database is locked"))
@@ -191,7 +191,7 @@ def test_strategy_b_rebuild_when_dedup_insufficient(tmp_path, monkeypatch):
     try:
         assert db._conn.execute("SELECT COUNT(*) FROM messages").fetchone()[0] == 10
         assert db._conn.execute(
-            "SELECT COUNT(*) FROM messages_fts WHERE messages_fts MATCH 'pizza'"
+            "SELECT COUNT(*) FROM messages_fts WHERE messages_fts MATCH 'pizza'",
         ).fetchone()[0] == 5
     finally:
         db.close()

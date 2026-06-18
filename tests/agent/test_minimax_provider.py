@@ -54,7 +54,7 @@ class TestMinimaxM3StaleCacheGuard:
         base = "https://api.minimaxi.com/anthropic"
         mm.save_context_length("MiniMax-M3", base, 204_800)
         ctx = mm.get_model_context_length(
-            "MiniMax-M3", base_url=base, api_key="", provider="minimax-cn"
+            "MiniMax-M3", base_url=base, api_key="", provider="minimax-cn",
         )
         # Invariant: the stale 204,800 catch-all value must be DROPPED and
         # re-resolved to M3's real, larger context. The exact value depends on
@@ -72,7 +72,7 @@ class TestMinimaxM3StaleCacheGuard:
         base = "https://api.minimaxi.com/anthropic"
         mm.save_context_length("MiniMax-M3", base, 1_000_000)
         ctx = mm.get_model_context_length(
-            "MiniMax-M3", base_url=base, api_key="", provider="minimax-cn"
+            "MiniMax-M3", base_url=base, api_key="", provider="minimax-cn",
         )
         assert ctx == 1_000_000
 
@@ -86,7 +86,7 @@ class TestMinimaxM3StaleCacheGuard:
         for slug in ("MiniMax-M2.7", "MiniMax-M2.5", "MiniMax-M2.1"):
             mm.save_context_length(slug, base, 204_800)
             ctx = mm.get_model_context_length(
-                slug, base_url=base, api_key="", provider="minimax-cn"
+                slug, base_url=base, api_key="", provider="minimax-cn",
             )
             assert ctx == 204_800, f"{slug} should stay 204800, got {ctx}"
 
@@ -201,14 +201,14 @@ class TestMinimaxBetaHeaders:
 
     def test_minimax_global_omits_tool_streaming(self):
         betas = self._build_and_get_betas(
-            "mm-key-123", base_url="https://api.minimax.io/anthropic"
+            "mm-key-123", base_url="https://api.minimax.io/anthropic",
         )
         assert self._TOOL_BETA not in betas
         assert self._THINKING_BETA in betas
 
     def test_minimax_global_trailing_slash(self):
         betas = self._build_and_get_betas(
-            "mm-key-123", base_url="https://api.minimax.io/anthropic/"
+            "mm-key-123", base_url="https://api.minimax.io/anthropic/",
         )
         assert self._TOOL_BETA not in betas
 
@@ -216,14 +216,14 @@ class TestMinimaxBetaHeaders:
 
     def test_minimax_cn_omits_tool_streaming(self):
         betas = self._build_and_get_betas(
-            "mm-cn-key-456", base_url="https://api.minimaxi.com/anthropic"
+            "mm-cn-key-456", base_url="https://api.minimaxi.com/anthropic",
         )
         assert self._TOOL_BETA not in betas
         assert self._THINKING_BETA in betas
 
     def test_minimax_cn_trailing_slash(self):
         betas = self._build_and_get_betas(
-            "mm-cn-key-456", base_url="https://api.minimaxi.com/anthropic/"
+            "mm-cn-key-456", base_url="https://api.minimaxi.com/anthropic/",
         )
         assert self._TOOL_BETA not in betas
 
@@ -236,13 +236,13 @@ class TestMinimaxBetaHeaders:
 
     def test_third_party_proxy_keeps_tool_streaming(self):
         betas = self._build_and_get_betas(
-            "custom-key", base_url="https://my-proxy.example.com/anthropic"
+            "custom-key", base_url="https://my-proxy.example.com/anthropic",
         )
         assert self._TOOL_BETA in betas
 
     def test_custom_base_url_keeps_tool_streaming(self):
         betas = self._build_and_get_betas(
-            "custom-key", base_url="https://custom.api.com"
+            "custom-key", base_url="https://custom.api.com",
         )
         assert self._TOOL_BETA in betas
 

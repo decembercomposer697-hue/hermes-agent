@@ -49,7 +49,7 @@ def _write_skill(skills_dir: Path, rel: str, frontmatter_name: str) -> Path:
 
 
 def test_frontmatter_slug_matched_even_when_dir_name_differs(
-    tmp_skills: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_skills: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Directory ``stable-diffusion`` + frontmatter ``Stable Diffusion Image Generation``.
 
@@ -93,9 +93,9 @@ def test_unknown_command_still_returns_none(
     _write_skill(tmp_skills, "creative/ascii-art", "ascii-art")
 
     with patch(
-        "tools.skills_tool._get_disabled_skill_names", return_value=set()
+        "tools.skills_tool._get_disabled_skill_names", return_value=set(),
     ), patch(
-        "agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills]
+        "agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills],
     ):
         assert gateway_run._check_unavailable_skill("no-such-skill") is None
 
@@ -109,9 +109,9 @@ def test_matched_but_not_disabled_returns_none(
     _write_skill(tmp_skills, "creative/ascii-art", "ascii-art")
 
     with patch(
-        "tools.skills_tool._get_disabled_skill_names", return_value=set()
+        "tools.skills_tool._get_disabled_skill_names", return_value=set(),
     ), patch(
-        "agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills]
+        "agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills],
     ):
         assert gateway_run._check_unavailable_skill("ascii-art") is None
 
@@ -128,7 +128,7 @@ def test_slug_normalization_strips_non_alnum(
         "tools.skills_tool._get_disabled_skill_names",
         return_value={"C++ Code Review"},
     ), patch(
-        "agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills]
+        "agent.skill_utils.get_all_skills_dirs", return_value=[tmp_skills],
     ):
         msg = gateway_run._check_unavailable_skill("c-code-review")
 
@@ -137,7 +137,7 @@ def test_slug_normalization_strips_non_alnum(
 
 
 def test_optional_skill_uses_frontmatter_slug(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Same drift bug applies to the optional-skills branch.
 
@@ -171,9 +171,9 @@ def test_optional_skill_uses_frontmatter_slug(
     empty_skills = tmp_path / "empty-skills"
     empty_skills.mkdir()
     with patch(
-        "tools.skills_tool._get_disabled_skill_names", return_value=set()
+        "tools.skills_tool._get_disabled_skill_names", return_value=set(),
     ), patch(
-        "agent.skill_utils.get_all_skills_dirs", return_value=[empty_skills]
+        "agent.skill_utils.get_all_skills_dirs", return_value=[empty_skills],
     ):
         msg = gateway_run._check_unavailable_skill("stable-diffusion-image-generation")
 

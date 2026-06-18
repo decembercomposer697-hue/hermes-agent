@@ -90,7 +90,7 @@ class TestBundledPluginsRegister:
         ],
     )
     def test_each_plugin_has_name_and_display_name(
-        self, plugin_name: str, expected_display: str
+        self, plugin_name: str, expected_display: str,
     ) -> None:
         _ensure_plugins_loaded()
         from agent.browser_registry import get_provider
@@ -149,7 +149,7 @@ class TestIsAvailable:
     """Each plugin's ``is_available()`` reflects env-var presence accurately."""
 
     def test_browserbase_requires_both_api_key_and_project_id(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         _ensure_plugins_loaded()
         from agent.browser_registry import get_provider
@@ -167,7 +167,7 @@ class TestIsAvailable:
         assert p.is_available() is True
 
     def test_browserbase_project_id_alone_insufficient(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         _ensure_plugins_loaded()
         from agent.browser_registry import get_provider
@@ -178,7 +178,7 @@ class TestIsAvailable:
         assert p.is_available() is False
 
     def test_browser_use_satisfied_by_api_key(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         _ensure_plugins_loaded()
         from agent.browser_registry import get_provider
@@ -254,7 +254,7 @@ class TestRegistryResolution:
         assert _resolve("not-a-real-provider") is None
 
     def test_legacy_walk_prefers_browser_use_over_browserbase(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Rule 3: walk order is browser-use → browserbase."""
         _ensure_plugins_loaded()
@@ -270,7 +270,7 @@ class TestRegistryResolution:
         assert provider.name == "browser-use"
 
     def test_legacy_walk_falls_through_to_browserbase(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Rule 3: browser-use unavailable → browserbase picked."""
         _ensure_plugins_loaded()
@@ -284,7 +284,7 @@ class TestRegistryResolution:
         assert provider.name == "browserbase"
 
     def test_firecrawl_not_in_legacy_walk_even_when_only_one_available(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Regression: firecrawl is NEVER auto-selected even when single-eligible.
 
@@ -332,7 +332,7 @@ class TestLegacyAbcAliases:
         ],
     )
     def test_provider_name_returns_display_name(
-        self, plugin_name: str, expected_label: str
+        self, plugin_name: str, expected_label: str,
     ) -> None:
         _ensure_plugins_loaded()
         from agent.browser_registry import get_provider

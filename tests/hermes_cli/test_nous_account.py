@@ -59,7 +59,7 @@ def _account_payload(
             "effective_at_ms": 123456789,
             "has_active_subscription": subscription is not None,
             "active_subscription_is_paid": bool(
-                subscription and subscription.get("monthly_charge", 0) > 0
+                subscription and subscription.get("monthly_charge", 0) > 0,
             ),
             "subscription_tier": subscription.get("tier") if subscription else None,
             "subscription_monthly_charge": (
@@ -90,7 +90,7 @@ def test_valid_jwt_with_paid_access_true(monkeypatch):
             "exp": int(time.time()) + 900,
             "paid_access": True,
             "subscription_tier": 2,
-        }
+        },
     )
     monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: _state(token))
 
@@ -114,7 +114,7 @@ def test_valid_jwt_with_paid_access_false(monkeypatch):
             "org_id": "org_123",
             "exp": int(time.time()) + 900,
             "paid_access": False,
-        }
+        },
     )
     monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: _state(token))
 
@@ -132,7 +132,7 @@ def test_valid_jwt_missing_paid_access_is_unknown_not_paid(monkeypatch):
             "sub": "user_123",
             "org_id": "org_123",
             "exp": int(time.time()) + 900,
-        }
+        },
     )
     monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: _state(token))
 
@@ -151,7 +151,7 @@ def test_expired_jwt_falls_back_to_fresh_account(monkeypatch):
             "org_id": "org_123",
             "exp": int(time.time()) - 60,
             "paid_access": False,
-        }
+        },
     )
     payload = _account_payload(
         allowed=True,
@@ -262,7 +262,7 @@ def test_force_fresh_uses_account_api_even_when_jwt_is_valid(monkeypatch):
             "org_id": "org_123",
             "exp": int(time.time()) + 900,
             "paid_access": False,
-        }
+        },
     )
     payload = _account_payload(
         allowed=True,
@@ -327,7 +327,7 @@ def test_pool_oauth_entry_uses_jwt_snapshot(monkeypatch):
             "client_id": "hermes-cli",
             "exp": int(time.time()) + 900,
             "paid_access": True,
-        }
+        },
     )
     monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: {})
 
@@ -376,7 +376,7 @@ def test_pool_oauth_entry_force_fresh_uses_account_api(monkeypatch):
             "org_id": "org_123",
             "exp": int(time.time()) + 900,
             "paid_access": False,
-        }
+        },
     )
     payload = _account_payload(
         allowed=True,

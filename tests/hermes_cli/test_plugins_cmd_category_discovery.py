@@ -27,7 +27,7 @@ def _make_plugin_dir(parent: Path, name: str, manifest: dict) -> Path:
 
 
 def _make_category_plugin(
-    parent: Path, category: str, name: str, manifest: dict
+    parent: Path, category: str, name: str, manifest: dict,
 ) -> Path:
     """Create a category-namespaced plugin: <parent>/<category>/<name>/plugin.yaml."""
     return _make_plugin_dir(parent / category, name, manifest)
@@ -43,7 +43,7 @@ class TestReadManifestInfo:
         from hermes_cli.plugins_cmd import _read_manifest_info
 
         d = _make_plugin_dir(tmp_path, "my-plugin", {
-            "name": "my-plugin", "version": "1.0.0", "description": "test"
+            "name": "my-plugin", "version": "1.0.0", "description": "test",
         })
         result = _read_manifest_info(d, "")
         assert result is not None
@@ -57,7 +57,7 @@ class TestReadManifestInfo:
         from hermes_cli.plugins_cmd import _read_manifest_info
 
         d = _make_category_plugin(tmp_path, "web", "tavily", {
-            "name": "web-tavily", "version": "2.0.0", "description": "search"
+            "name": "web-tavily", "version": "2.0.0", "description": "search",
         })
         result = _read_manifest_info(d, "web")
         assert result is not None
@@ -96,7 +96,7 @@ class TestDiscoverAllPlugins:
         from hermes_cli.plugins_cmd import _discover_all_plugins
 
         _make_plugin_dir(tmp_path, "disk-cleanup", {
-            "name": "disk-cleanup", "version": "1.0.0"
+            "name": "disk-cleanup", "version": "1.0.0",
         })
         mock_user_dir.return_value = tmp_path
         mock_bundled_dir.return_value = tmp_path / "nonexistent"
@@ -111,10 +111,10 @@ class TestDiscoverAllPlugins:
         from hermes_cli.plugins_cmd import _discover_all_plugins
 
         _make_category_plugin(tmp_path, "web", "tavily", {
-            "name": "web-tavily", "version": "1.0.0"
+            "name": "web-tavily", "version": "1.0.0",
         })
         _make_category_plugin(tmp_path, "image_gen", "openai", {
-            "name": "image-gen-openai", "version": "2.0.0"
+            "name": "image-gen-openai", "version": "2.0.0",
         })
         mock_user_dir.return_value = tmp_path
         mock_bundled_dir.return_value = tmp_path / "nonexistent"
@@ -130,13 +130,13 @@ class TestDiscoverAllPlugins:
         from hermes_cli.plugins_cmd import _discover_all_plugins
 
         _make_plugin_dir(tmp_path, "disk-cleanup", {
-            "name": "disk-cleanup", "version": "1.0.0"
+            "name": "disk-cleanup", "version": "1.0.0",
         })
         _make_category_plugin(tmp_path, "web", "tavily", {
-            "name": "web-tavily", "version": "1.0.0"
+            "name": "web-tavily", "version": "1.0.0",
         })
         _make_category_plugin(tmp_path, "web", "exa", {
-            "name": "web-exa", "version": "1.0.0"
+            "name": "web-exa", "version": "1.0.0",
         })
         mock_user_dir.return_value = tmp_path
         mock_bundled_dir.return_value = tmp_path / "nonexistent"
@@ -156,14 +156,14 @@ class TestDiscoverAllPlugins:
 
         # 2 levels: should be found
         _make_category_plugin(tmp_path, "web", "tavily", {
-            "name": "web-tavily", "version": "1.0.0"
+            "name": "web-tavily", "version": "1.0.0",
         })
         # 3 levels: should NOT be found
         deep = tmp_path / "a" / "b" / "c"
         deep.mkdir(parents=True)
         import yaml
         (deep / "plugin.yaml").write_text(
-            yaml.dump({"name": "too-deep"}), encoding="utf-8"
+            yaml.dump({"name": "too-deep"}), encoding="utf-8",
         )
         mock_user_dir.return_value = tmp_path
         mock_bundled_dir.return_value = tmp_path / "nonexistent"
@@ -179,7 +179,7 @@ class TestDiscoverAllPlugins:
         from hermes_cli.plugins_cmd import _discover_all_plugins
 
         _make_category_plugin(tmp_path, "web", "tavily", {
-            "name": "web-tavily", "version": "1.0.0", "description": "search"
+            "name": "web-tavily", "version": "1.0.0", "description": "search",
         })
         mock_user_dir.return_value = tmp_path
         mock_bundled_dir.return_value = tmp_path / "nonexistent"
@@ -203,11 +203,11 @@ class TestDiscoverAllPlugins:
         bundled_dir = tmp_path / "bundled"
         bundled_dir.mkdir()
         _make_plugin_dir(bundled_dir, "my-plugin", {
-            "name": "my-plugin", "version": "1.0.0"
+            "name": "my-plugin", "version": "1.0.0",
         })
         # User plugin with same key
         _make_plugin_dir(tmp_path, "my-plugin", {
-            "name": "my-plugin", "version": "2.0.0"
+            "name": "my-plugin", "version": "2.0.0",
         })
         mock_user_dir.return_value = tmp_path
         mock_bundled_dir.return_value = bundled_dir
@@ -304,10 +304,10 @@ class TestCmdListJson:
         from hermes_cli.plugins_cmd import cmd_list
 
         _make_category_plugin(tmp_path, "web", "tavily", {
-            "name": "web-tavily", "version": "1.0.0", "description": "search"
+            "name": "web-tavily", "version": "1.0.0", "description": "search",
         })
         _make_plugin_dir(tmp_path, "disk-cleanup", {
-            "name": "disk-cleanup", "version": "2.0.0", "description": "cleanup"
+            "name": "disk-cleanup", "version": "2.0.0", "description": "cleanup",
         })
         mock_user_dir.return_value = tmp_path
         mock_bundled_dir.return_value = tmp_path / "nonexistent"
@@ -332,7 +332,7 @@ class TestCmdListJson:
         from hermes_cli.plugins_cmd import cmd_list
 
         _make_category_plugin(tmp_path, "web", "tavily", {
-            "name": "web-tavily", "version": "1.0.0"
+            "name": "web-tavily", "version": "1.0.0",
         })
         mock_user_dir.return_value = tmp_path
         mock_bundled_dir.return_value = tmp_path / "nonexistent"

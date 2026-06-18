@@ -169,7 +169,7 @@ class TestCaptureResponseRoutedToAuxVision:
             captured_calls["called"] = True
             return _stub_aux_analysis(
                 "A Safari window showing a GitHub issue page with a 'Sign "
-                "in' button and a 'username' text field."
+                "in' button and a 'username' text field.",
             )
 
         # vision_analyze_tool is async; force a sync MagicMock so we can
@@ -365,7 +365,7 @@ class TestRoutingDecisionWiring:
                 "vision": {
                     "provider": "openrouter",
                     "model": "google/gemini-2.5-flash",
-                }
+                },
             },
         }
         with patch("agent.auxiliary_client._read_main_provider",
@@ -441,7 +441,7 @@ class TestBugReproductionAnchor:
         def _fake_run_async(_coro):
             return _stub_aux_analysis(
                 "Screenshot showing a GitHub.com window with a sign-in "
-                "form."
+                "form.",
             )
 
         fake_vat = MagicMock(return_value="<coro>")

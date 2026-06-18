@@ -54,7 +54,7 @@ _COMFY_CLI_FLAG = {
 def _run(cmd: list[str], timeout: int = 8) -> str:
     try:
         out = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout, check=False
+            cmd, capture_output=True, text=True, timeout=timeout, check=False,
         )
         return (out.stdout or "") + (out.stderr or "")
     except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
@@ -290,7 +290,7 @@ def classify(gpu: dict | None, ram_gb: float, free_disk_gb: float, *, wsl: bool,
         notes.append(
             "Detected Python running under Rosetta on Apple Silicon. "
             "ComfyUI MPS support requires native ARM64 Python — install via "
-            "`brew install python` or arm64 Miniforge, then re-run."
+            "`brew install python` or arm64 Miniforge, then re-run.",
         )
         return "cloud", "comfy-cloud", notes
 
@@ -300,7 +300,7 @@ def classify(gpu: dict | None, ram_gb: float, free_disk_gb: float, *, wsl: bool,
     if free_disk_gb and free_disk_gb < MIN_FREE_DISK_GB:
         notes.append(
             f"Free disk space ({free_disk_gb} GB) is below the {MIN_FREE_DISK_GB} GB recommended minimum. "
-            "ComfyUI core (~5 GB) plus one SDXL model (~6.5 GB) needs space; Flux Dev needs ~24 GB."
+            "ComfyUI core (~5 GB) plus one SDXL model (~6.5 GB) needs space; Flux Dev needs ~24 GB.",
         )
 
     # Host RAM matters even for discrete-GPU systems: ComfyUI swaps model
@@ -309,15 +309,15 @@ def classify(gpu: dict | None, ram_gb: float, free_disk_gb: float, *, wsl: bool,
     if ram_gb and ram_gb < 8 and gpu and gpu.get("vendor") != "apple":
         notes.append(
             f"System RAM ({ram_gb} GB) is low. ComfyUI swaps model weights through "
-            "host RAM; <8 GB causes severe slowdowns. 16+ GB recommended."
+            "host RAM; <8 GB causes severe slowdowns. 16+ GB recommended.",
         )
 
     if gpu is None:
         notes.append(
-            "No supported accelerator found (NVIDIA CUDA / AMD ROCm / Apple Silicon / Intel Arc)."
+            "No supported accelerator found (NVIDIA CUDA / AMD ROCm / Apple Silicon / Intel Arc).",
         )
         notes.append(
-            "CPU-only ComfyUI works but is unusably slow for modern models — use Comfy Cloud."
+            "CPU-only ComfyUI works but is unusably slow for modern models — use Comfy Cloud.",
         )
         return "cloud", "comfy-cloud", notes
 
@@ -330,13 +330,13 @@ def classify(gpu: dict | None, ram_gb: float, free_disk_gb: float, *, wsl: bool,
             gen_str += f" {variant}"
         if mem < MIN_MAC_RAM_GB:
             notes.append(
-                f"{gen_str} with {mem} GB unified memory — below the {MIN_MAC_RAM_GB} GB practical minimum."
+                f"{gen_str} with {mem} GB unified memory — below the {MIN_MAC_RAM_GB} GB practical minimum.",
             )
             notes.append("SD1.5 may work; SDXL/Flux will swap or OOM. Recommend Comfy Cloud.")
             return "cloud", "comfy-cloud", notes
         if mem < OK_MAC_RAM_GB:
             notes.append(
-                f"{gen_str} with {mem} GB — SDXL works but slow. Flux/video likely too tight."
+                f"{gen_str} with {mem} GB — SDXL works but slow. Flux/video likely too tight.",
             )
             return "marginal", "apple-silicon", notes
         notes.append(f"{gen_str} with {mem} GB unified memory — good for SDXL/Flux.")
@@ -351,13 +351,13 @@ def classify(gpu: dict | None, ram_gb: float, free_disk_gb: float, *, wsl: bool,
     name = gpu["name"]
     if vram < MIN_VRAM_GB_USABLE:
         notes.append(
-            f"{name} has only {vram} GB VRAM — below the {MIN_VRAM_GB_USABLE} GB practical minimum."
+            f"{name} has only {vram} GB VRAM — below the {MIN_VRAM_GB_USABLE} GB practical minimum.",
         )
         notes.append("Most modern models won't load. Recommend Comfy Cloud.")
         return "cloud", "comfy-cloud", notes
     if vram < OK_VRAM_GB:
         notes.append(
-            f"{name} ({vram} GB VRAM) — SD1.5 works, SDXL tight, Flux/video unlikely."
+            f"{name} ({vram} GB VRAM) — SD1.5 works, SDXL tight, Flux/video unlikely.",
         )
         return "marginal", gpu["vendor"], notes
     if vram < GREAT_VRAM_GB:

@@ -122,7 +122,7 @@ def test_setup_keep_current_custom_from_config_does_not_fall_through(tmp_path, m
 
 
 def test_setup_keep_current_config_provider_uses_provider_specific_model_menu(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     """Keeping current provider preserves the config on disk."""
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -223,7 +223,7 @@ def test_setup_copilot_acp_uses_model_picker_and_saves_provider(tmp_path, monkey
 
 
 def test_setup_switch_custom_to_codex_clears_custom_endpoint_and_updates_config(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     """Switching from custom to codex updates config correctly."""
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -347,7 +347,7 @@ def test_setup_summary_does_not_mark_incomplete_browserbase_as_available(tmp_pat
 
 
 def test_setup_summary_local_browser_unavailable_without_chromium(
-    tmp_path, monkeypatch, capsys
+    tmp_path, monkeypatch, capsys,
 ):
     """End-to-end: agent-browser present but no Chromium in local mode must
     render as unavailable with an install hint — not a false 'available'.
@@ -376,7 +376,7 @@ def test_setup_summary_local_browser_unavailable_without_chromium(
     monkeypatch.setattr("tools.browser_tool._chromium_installed", lambda: False)
     monkeypatch.setattr("tools.browser_tool._using_lightpanda_engine", lambda: False)
     monkeypatch.setattr(
-        "agent.auxiliary_client.get_available_vision_backends", lambda: []
+        "agent.auxiliary_client.get_available_vision_backends", lambda: [],
     )
 
     _print_setup_summary(load_config(), tmp_path)

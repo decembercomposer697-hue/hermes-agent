@@ -55,7 +55,7 @@ async def test_reply_prefix_injected_when_text_absent_from_history():
 
     assert result is not None
     assert result.startswith(
-        '[Replying to: "Japan is great for culture, food, and efficiency."]'
+        '[Replying to: "Japan is great for culture, food, and efficiency."]',
     )
     assert result.endswith("What's the best time to go?")
 

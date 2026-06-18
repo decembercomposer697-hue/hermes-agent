@@ -79,7 +79,7 @@ class TestKeepTypingTimeoutPerTick:
                 chat_id="123",
                 interval=1.0,
                 stop_event=stop_event,
-            )
+            ),
         )
         await asyncio.sleep(3.0)
         stop_event.set()
@@ -89,7 +89,7 @@ class TestKeepTypingTimeoutPerTick:
             task.cancel()
             pytest.fail(
                 "_keep_typing did not exit within 2s of stop_event.set() — "
-                "it is blocked on a slow send_typing call"
+                "it is blocked on a slow send_typing call",
             )
 
         # With per-tick timeout, we should see MULTIPLE send_typing starts
@@ -123,7 +123,7 @@ class TestKeepTypingTimeoutPerTick:
                 chat_id="456",
                 interval=0.5,
                 stop_event=stop_event,
-            )
+            ),
         )
         await asyncio.sleep(1.2)  # ~3 ticks
         stop_event.set()
@@ -157,7 +157,7 @@ class TestKeepTypingTimeoutPerTick:
                 chat_id="789",
                 interval=0.3,
                 stop_event=stop_event,
-            )
+            ),
         )
         await asyncio.sleep(1.0)
         stop_event.set()
@@ -189,7 +189,7 @@ class TestKeepTypingTimeoutPerTick:
                 chat_id="paused-chat",
                 interval=0.3,
                 stop_event=stop_event,
-            )
+            ),
         )
         await asyncio.sleep(1.0)
         stop_event.set()

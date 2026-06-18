@@ -70,7 +70,7 @@ def _parse_feed(xml_bytes: bytes):
         summary = (summ_el.text or "").strip() if summ_el is not None else ""
 
         entries.append(
-            {"id": guid, "title": title, "url": href, "summary": summary}
+            {"id": guid, "title": title, "url": href, "summary": summary},
         )
     return entries
 

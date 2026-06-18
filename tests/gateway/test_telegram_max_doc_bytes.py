@@ -43,7 +43,7 @@ def test_max_doc_bytes_raised_to_2gb_when_base_url_set():
             enabled=True,
             token="***",
             extra={"base_url": "http://localhost:8081/bot"},
-        )
+        ),
     )
     assert adapter._max_doc_bytes == 2 * 1024 * 1024 * 1024
 

@@ -20,15 +20,15 @@ def _isolate_config(tmp_path, monkeypatch):
     """Redirect all config I/O to a temp directory."""
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     monkeypatch.setattr(
-        "hermes_cli.config.get_hermes_home", lambda: tmp_path
+        "hermes_cli.config.get_hermes_home", lambda: tmp_path,
     )
     config_path = tmp_path / "config.yaml"
     env_path = tmp_path / ".env"
     monkeypatch.setattr(
-        "hermes_cli.config.get_config_path", lambda: config_path
+        "hermes_cli.config.get_config_path", lambda: config_path,
     )
     monkeypatch.setattr(
-        "hermes_cli.config.get_env_path", lambda: env_path
+        "hermes_cli.config.get_env_path", lambda: env_path,
     )
     return tmp_path
 
@@ -152,7 +152,7 @@ class TestMcpRemove:
         monkeypatch.setattr("builtins.input", lambda _: "y")
         # Also patch get_hermes_home in the mcp_config module namespace
         monkeypatch.setattr(
-            "hermes_cli.mcp_config.get_hermes_home", lambda: tmp_path
+            "hermes_cli.mcp_config.get_hermes_home", lambda: tmp_path,
         )
 
         # Create a fake token file
@@ -191,7 +191,7 @@ class TestMcpAdd:
             return [(t.name, t.description) for t in fake_tools]
 
         monkeypatch.setattr(
-            "hermes_cli.mcp_config._probe_single_server", mock_probe
+            "hermes_cli.mcp_config._probe_single_server", mock_probe,
         )
         # No auth, accept all tools
         inputs = iter(["n", ""])  # no auth needed, enable all
@@ -219,7 +219,7 @@ class TestMcpAdd:
             return [(t.name, t.description) for t in fake_tools]
 
         monkeypatch.setattr(
-            "hermes_cli.mcp_config._probe_single_server", mock_probe
+            "hermes_cli.mcp_config._probe_single_server", mock_probe,
         )
         inputs = iter([""])  # accept all tools
         monkeypatch.setattr("builtins.input", lambda _: next(inputs))
@@ -242,7 +242,7 @@ class TestMcpAdd:
         assert srv["args"] == ["@mcp/github"]
 
     def test_add_connection_failure_save_disabled(
-        self, tmp_path, capsys, monkeypatch
+        self, tmp_path, capsys, monkeypatch,
     ):
         """Failed connection → option to save as disabled."""
 
@@ -250,7 +250,7 @@ class TestMcpAdd:
             raise ConnectionError("Connection refused")
 
         monkeypatch.setattr(
-            "hermes_cli.mcp_config._probe_single_server", mock_probe_fail
+            "hermes_cli.mcp_config._probe_single_server", mock_probe_fail,
         )
         inputs = iter(["n", "y"])  # no auth, yes save disabled
         monkeypatch.setattr("builtins.input", lambda _: next(inputs))
@@ -278,7 +278,7 @@ class TestMcpAdd:
             return [(t.name, t.description) for t in fake_tools]
 
         monkeypatch.setattr(
-            "hermes_cli.mcp_config._probe_single_server", mock_probe
+            "hermes_cli.mcp_config._probe_single_server", mock_probe,
         )
         monkeypatch.setattr("builtins.input", lambda _: "")
 
@@ -343,7 +343,7 @@ class TestMcpAdd:
             return [(t.name, t.description) for t in fake_tools]
 
         monkeypatch.setattr(
-            "hermes_cli.mcp_config._probe_single_server", mock_probe
+            "hermes_cli.mcp_config._probe_single_server", mock_probe,
         )
         monkeypatch.setattr("builtins.input", lambda _: "")
 
@@ -375,7 +375,7 @@ class TestMcpAdd:
             return [(t.name, t.description) for t in fake_tools]
 
         monkeypatch.setattr(
-            "hermes_cli.mcp_config._probe_single_server", mock_probe
+            "hermes_cli.mcp_config._probe_single_server", mock_probe,
         )
         monkeypatch.setattr("builtins.input", lambda _: "")
 
@@ -428,7 +428,7 @@ class TestMcpTest:
             return [("create_service", "Deploy"), ("list_services", "List all")]
 
         monkeypatch.setattr(
-            "hermes_cli.mcp_config._probe_single_server", mock_probe
+            "hermes_cli.mcp_config._probe_single_server", mock_probe,
         )
         from hermes_cli.mcp_config import cmd_mcp_test
 
@@ -646,7 +646,7 @@ class TestMcpRemoveEvictsManager:
         })
         monkeypatch.setattr("builtins.input", lambda _: "y")
         monkeypatch.setattr(
-            "hermes_cli.mcp_config.get_hermes_home", lambda: tmp_path
+            "hermes_cli.mcp_config.get_hermes_home", lambda: tmp_path,
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
@@ -735,7 +735,7 @@ class TestMcpLogin:
             return [("a", "d"), ("b", "d"), ("c", "d")]
 
         monkeypatch.setattr(
-            "hermes_cli.mcp_config._probe_single_server", mock_probe
+            "hermes_cli.mcp_config._probe_single_server", mock_probe,
         )
 
         from hermes_cli.mcp_config import cmd_mcp_login

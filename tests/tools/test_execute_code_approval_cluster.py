@@ -33,7 +33,7 @@ def test_helper_propagates_contextvar_and_approval_callback():
     from tools import terminal_tool as TT
 
     probe: contextvars.ContextVar[str] = contextvars.ContextVar(
-        "cluster_probe", default="unset"
+        "cluster_probe", default="unset",
     )
     probe.set("parent-value")
     sentinel = object()
@@ -341,7 +341,7 @@ def test_execute_code_entry_blocks_before_spawn_when_guard_denies(monkeypatch, t
     monkeypatch.setattr(TT, "_get_env_config", lambda: {"env_type": "local"})
 
     result = json.loads(
-        cet.execute_code(f"open({str(marker)!r}, 'w').close()", task_id="cluster-t")
+        cet.execute_code(f"open({str(marker)!r}, 'w').close()", task_id="cluster-t"),
     )
     assert result["status"] == "error"
     assert "BLOCKED" in result["error"]

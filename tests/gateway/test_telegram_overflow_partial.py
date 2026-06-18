@@ -29,11 +29,11 @@ async def test_edit_overflow_split_reports_success_when_all_continuations_land(t
     content = "word " * 120
     telegram_adapter._bot.edit_message_text = AsyncMock(return_value=True)
     telegram_adapter._bot.send_message = AsyncMock(
-        side_effect=[_message(202), _message(203), _message(204), _message(205)]
+        side_effect=[_message(202), _message(203), _message(204), _message(205)],
     )
 
     result = await telegram_adapter._edit_overflow_split(
-        "12345", "201", content, finalize=False, metadata={"thread_id": "77"}
+        "12345", "201", content, finalize=False, metadata={"thread_id": "77"},
     )
 
     assert result.success is True
@@ -55,11 +55,11 @@ async def test_edit_overflow_split_reports_later_partial_failure_after_some_cont
             _message(202),
             RuntimeError("telegram send failed"),
             RuntimeError("telegram send failed"),
-        ]
+        ],
     )
 
     result = await telegram_adapter._edit_overflow_split(
-        "12345", "201", content, finalize=False, metadata={"thread_id": "77"}
+        "12345", "201", content, finalize=False, metadata={"thread_id": "77"},
     )
 
     assert result.success is False
@@ -76,11 +76,11 @@ async def test_edit_overflow_split_reports_partial_failure_when_continuation_fai
     content = "word " * 120
     telegram_adapter._bot.edit_message_text = AsyncMock(return_value=True)
     telegram_adapter._bot.send_message = AsyncMock(
-        side_effect=[RuntimeError("telegram send failed"), RuntimeError("telegram send failed")]
+        side_effect=[RuntimeError("telegram send failed"), RuntimeError("telegram send failed")],
     )
 
     result = await telegram_adapter._edit_overflow_split(
-        "12345", "201", content, finalize=False, metadata={"thread_id": "77"}
+        "12345", "201", content, finalize=False, metadata={"thread_id": "77"},
     )
 
     assert result.success is False
@@ -113,7 +113,7 @@ async def test_stream_consumer_fallback_sends_tail_after_partial_overflow():
                 "last_message_id": "preview-1",
                 "delivered_prefix": "hello ",
             },
-        )
+        ),
     )
     adapter.send = AsyncMock(return_value=SendResult(success=True, message_id="tail-1"))
     adapter.delete_message = AsyncMock(return_value=True)

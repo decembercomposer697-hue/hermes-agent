@@ -411,7 +411,7 @@ class TestModalPaintNow:
             cli._app.invalidate.reset_mock()
             getattr(cli, state_attr)["response_queue"].put(
                 "deny" if state_attr == "_approval_state" else
-                ("a" if state_attr == "_clarify_state" else "pw")
+                ("a" if state_attr == "_clarify_state" else "pw"),
             )
             thread.join(timeout=2)
             # clarify returns immediately on a response (no teardown repaint);

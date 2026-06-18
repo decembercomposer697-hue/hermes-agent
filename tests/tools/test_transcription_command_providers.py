@@ -478,7 +478,7 @@ class TestTranscribeAudioDispatchToCommandProvider:
     def test_command_provider_dispatches_via_transcribe_audio(self, tmp_path):
         audio = _make_silent_wav(tmp_path / "audio.wav")
         cfg = self._config_with_command_provider(
-            "fake-cli", _python_emit_command("dispatched via command")
+            "fake-cli", _python_emit_command("dispatched via command"),
         )
         with patch("tools.transcription_tools._load_stt_config", return_value=cfg):
             result = transcribe_audio(str(audio))

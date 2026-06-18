@@ -29,7 +29,7 @@ COMMAND_EXEC_COMPLETED = {
             "source": "userShell",
             "status": "completed",
             "commandActions": [
-                {"type": "listFiles", "command": "ls /tmp", "path": "tmp"}
+                {"type": "listFiles", "command": "ls /tmp", "path": "tmp"},
             ],
             "aggregatedOutput": "hello\naa_lang.json\n",
             "exitCode": 0,
@@ -207,7 +207,7 @@ class TestMcpToolCallProjection:
             "error": None,
         }
         msgs = CodexEventProjector().project(
-            {"method": "item/completed", "params": {"item": item}}
+            {"method": "item/completed", "params": {"item": item}},
         ).messages
         assert msgs[0]["tool_calls"][0]["function"]["name"] == "mcp.obsidian.search_notes"
         assert "found" in msgs[1]["content"]
@@ -220,7 +220,7 @@ class TestMcpToolCallProjection:
             "error": {"code": -1, "message": "no"},
         }
         msgs = CodexEventProjector().project(
-            {"method": "item/completed", "params": {"item": item}}
+            {"method": "item/completed", "params": {"item": item}},
         ).messages
         assert "error" in msgs[1]["content"]
 
@@ -236,7 +236,7 @@ class TestUserAndOpaqueProjection:
             ],
         }
         msgs = CodexEventProjector().project(
-            {"method": "item/completed", "params": {"item": item}}
+            {"method": "item/completed", "params": {"item": item}},
         ).messages
         assert msgs[0]["role"] == "user"
         assert "hello" in msgs[0]["content"]
@@ -245,7 +245,7 @@ class TestUserAndOpaqueProjection:
     def test_opaque_item_recorded_without_fabricated_tool_calls(self) -> None:
         item = {"type": "plan", "id": "p1", "text": "do the thing"}
         msgs = CodexEventProjector().project(
-            {"method": "item/completed", "params": {"item": item}}
+            {"method": "item/completed", "params": {"item": item}},
         ).messages
         assert len(msgs) == 1
         assert msgs[0]["role"] == "assistant"
@@ -294,7 +294,7 @@ class TestRoleAlternationInvariant:
     )
     def test_tool_items_emit_assistant_then_tool(self, item) -> None:
         msgs = CodexEventProjector().project(
-            {"method": "item/completed", "params": {"item": item}}
+            {"method": "item/completed", "params": {"item": item}},
         ).messages
         assert len(msgs) == 2
         assert msgs[0]["role"] == "assistant"

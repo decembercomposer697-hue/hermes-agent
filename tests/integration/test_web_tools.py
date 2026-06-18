@@ -93,7 +93,7 @@ class WebToolsTester:
         self.test_results = {
             "passed": [],
             "failed": [],
-            "skipped": []
+            "skipped": [],
         }
         self.start_time = None
         self.end_time = None
@@ -104,7 +104,7 @@ class WebToolsTester:
             "test": test_name,
             "status": status,
             "details": details,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
         
         if status == "passed":
@@ -145,7 +145,7 @@ class WebToolsTester:
         test_queries = [
             ("Python web scraping tutorial", 5),
             ("Firecrawl API documentation", 3),
-            ("inflammatory arthritis symptoms treatment", 8)  # Test medical query from your example
+            ("inflammatory arthritis symptoms treatment", 8),  # Test medical query from your example
         ]
         
         extracted_urls = []
@@ -216,13 +216,13 @@ class WebToolsTester:
                     self.log_result(
                         f"Search: {query[:30]}...", 
                         "passed", 
-                        f"All {valid_results} results valid"
+                        f"All {valid_results} results valid",
                     )
                 else:
                     self.log_result(
                         f"Search: {query[:30]}...", 
                         "failed", 
-                        f"Only {valid_results}/{len(web_results)} valid. Issues: {'; '.join(missing_fields[:3])}"
+                        f"Only {valid_results}/{len(web_results)} valid. Issues: {'; '.join(missing_fields[:3])}",
                     )
                     
             except Exception as e:
@@ -246,7 +246,7 @@ class WebToolsTester:
         if not urls:
             urls = [
                 "https://docs.firecrawl.dev/introduction",
-                "https://www.python.org/about/"
+                "https://www.python.org/about/",
             ]
             print("  Using default URLs for testing")
         else:
@@ -266,7 +266,7 @@ class WebToolsTester:
                 result = await web_extract_tool(
                     test_urls,
                     format="markdown",
-                    use_llm_processing=False
+                    use_llm_processing=False,
                 )
                 
                 # Parse result
@@ -324,13 +324,13 @@ class WebToolsTester:
                     self.log_result(
                         "Extract (no LLM)", 
                         "passed", 
-                        f"{valid_results}/{len(results)} pages extracted, {total_content_length} total chars"
+                        f"{valid_results}/{len(results)} pages extracted, {total_content_length} total chars",
                     )
                 else:
                     self.log_result(
                         "Extract (no LLM)", 
                         "failed", 
-                        f"No valid content. {failed_results} errors, {len(results) - failed_results} empty"
+                        f"No valid content. {failed_results} errors, {len(results) - failed_results} empty",
                     )
                     if self.verbose:
                         print("\n  Extraction details:")
@@ -361,7 +361,7 @@ class WebToolsTester:
                 [test_url],
                 format="markdown",
                 use_llm_processing=True,
-                min_length=1000  # Lower threshold for testing
+                min_length=1000,  # Lower threshold for testing
             )
             
             data = json.loads(result)
@@ -387,7 +387,7 @@ class WebToolsTester:
                     self.log_result(
                         "Extract (with LLM)", 
                         "passed", 
-                        f"Content processed: {content_len} chars"
+                        f"Content processed: {content_len} chars",
                     )
                     
                     if self.verbose:
@@ -459,7 +459,7 @@ class WebToolsTester:
             "summary": {
                 "passed": len(self.test_results["passed"]),
                 "failed": len(self.test_results["failed"]),
-                "skipped": len(self.test_results["skipped"])
+                "skipped": len(self.test_results["skipped"]),
             },
             "results": self.test_results,
             "environment": {
@@ -467,7 +467,7 @@ class WebToolsTester:
                 "firecrawl_api_key": check_firecrawl_api_key(),
                 "parallel_api_key": bool(os.getenv("PARALLEL_API_KEY")),
                 "auxiliary_model": check_auxiliary_model(),
-            }
+            },
         }
         
         try:
@@ -495,7 +495,7 @@ async def main():
     # Create tester
     tester = WebToolsTester(
         verbose=args.verbose,
-        test_llm=not args.no_llm
+        test_llm=not args.no_llm,
     )
     
     # Run tests

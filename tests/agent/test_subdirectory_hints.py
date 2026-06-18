@@ -53,14 +53,14 @@ class TestSubdirectoryHintTracker:
         """Reading backend/src/main.py discovers backend/AGENTS.md via ancestor walk."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "read_file", {"path": str(project / "backend" / "src" / "main.py")}
+            "read_file", {"path": str(project / "backend" / "src" / "main.py")},
         )
         # backend/src/ has no hints, but ancestor walk finds backend/AGENTS.md
         assert result is not None
         assert "Backend-specific instructions" in result
         # Second read in same subtree should not re-trigger
         result2 = tracker.check_tool_call(
-            "read_file", {"path": str(project / "backend" / "AGENTS.md")}
+            "read_file", {"path": str(project / "backend" / "AGENTS.md")},
         )
         assert result2 is None  # backend/ already loaded
 
@@ -68,7 +68,7 @@ class TestSubdirectoryHintTracker:
         """Frontend CLAUDE.md should be discovered."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "read_file", {"path": str(project / "frontend" / "index.ts")}
+            "read_file", {"path": str(project / "frontend" / "index.ts")},
         )
         assert result is not None
         assert "Frontend rules" in result
@@ -77,12 +77,12 @@ class TestSubdirectoryHintTracker:
         """Same directory should not be loaded twice."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result1 = tracker.check_tool_call(
-            "read_file", {"path": str(project / "frontend" / "a.ts")}
+            "read_file", {"path": str(project / "frontend" / "a.ts")},
         )
         assert result1 is not None
 
         result2 = tracker.check_tool_call(
-            "read_file", {"path": str(project / "frontend" / "b.ts")}
+            "read_file", {"path": str(project / "frontend" / "b.ts")},
         )
         assert result2 is None  # already loaded
 
@@ -90,7 +90,7 @@ class TestSubdirectoryHintTracker:
         """Directories without hint files return None."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "read_file", {"path": str(project / "docs" / "README.md")}
+            "read_file", {"path": str(project / "docs" / "README.md")},
         )
         assert result is None
 
@@ -98,7 +98,7 @@ class TestSubdirectoryHintTracker:
         """Paths extracted from terminal commands."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "terminal", {"command": f"cat {project / 'frontend' / 'index.ts'}"}
+            "terminal", {"command": f"cat {project / 'frontend' / 'index.ts'}"},
         )
         assert result is not None
         assert "Frontend rules" in result
@@ -107,7 +107,7 @@ class TestSubdirectoryHintTracker:
         """cd into a directory with hints."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "terminal", {"command": f"cd {project / 'backend'} && ls"}
+            "terminal", {"command": f"cd {project / 'backend'} && ls"},
         )
         assert result is not None
         assert "Backend-specific instructions" in result
@@ -116,7 +116,7 @@ class TestSubdirectoryHintTracker:
         """Relative paths resolved against working_dir."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "read_file", {"path": "frontend/index.ts"}
+            "read_file", {"path": "frontend/index.ts"},
         )
         assert result is not None
         assert "Frontend rules" in result
@@ -139,7 +139,7 @@ class TestSubdirectoryHintTracker:
         (other_project / "AGENTS.md").write_text("Other project rules")
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "read_file", {"path": str(other_project / "file.py")}
+            "read_file", {"path": str(other_project / "file.py")},
         )
         # Outside workspace — should NOT load hints
         assert result is None
@@ -153,7 +153,7 @@ class TestSubdirectoryHintTracker:
         (outside_dir / "AGENTS.md").write_text("Codex contamination rules")
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "read_file", {"path": str(outside_dir / "AGENTS.md")}
+            "read_file", {"path": str(outside_dir / "AGENTS.md")},
         )
         # Reading a hint file outside working_dir — should NOT load hints
         assert result is None
@@ -162,7 +162,7 @@ class TestSubdirectoryHintTracker:
         """Paths inside working_dir are still allowed."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "read_file", {"path": str(project / "backend" / "src" / "main.py")}
+            "read_file", {"path": str(project / "backend" / "src" / "main.py")},
         )
         assert result is not None
         assert "Backend-specific instructions" in result
@@ -183,7 +183,7 @@ class TestSubdirectoryHintTracker:
         (deep_dir / ".cursorrules").write_text("Deep cursorrules")
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "read_file", {"path": str(deep_dir / "file.py")}
+            "read_file", {"path": str(deep_dir / "file.py")},
         )
         # Should discover deep cursorrules from the file's own directory
         # but NOT sibling repo hints
@@ -195,7 +195,7 @@ class TestSubdirectoryHintTracker:
         """The workdir argument from terminal tool is checked."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "terminal", {"command": "ls", "workdir": str(project / "frontend")}
+            "terminal", {"command": "ls", "workdir": str(project / "frontend")},
         )
         assert result is not None
         assert "Frontend rules" in result
@@ -204,7 +204,7 @@ class TestSubdirectoryHintTracker:
         """Deeply nested .cursorrules should be discovered."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "read_file", {"path": str(project / "deep" / "nested" / "path" / "file.py")}
+            "read_file", {"path": str(project / "deep" / "nested" / "path" / "file.py")},
         )
         assert result is not None
         assert "Cursor rules for nested path" in result
@@ -213,7 +213,7 @@ class TestSubdirectoryHintTracker:
         """Discovered hints should indicate which file they came from."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "read_file", {"path": str(project / "backend" / "file.py")}
+            "read_file", {"path": str(project / "backend" / "file.py")},
         )
         assert result is not None
         assert "Subdirectory context discovered:" in result
@@ -227,7 +227,7 @@ class TestSubdirectoryHintTracker:
 
         tracker = SubdirectoryHintTracker(working_dir=str(tmp_path))
         result = tracker.check_tool_call(
-            "read_file", {"path": str(sub / "file.py")}
+            "read_file", {"path": str(sub / "file.py")},
         )
         assert result is not None
         assert "truncated" in result.lower()
@@ -244,7 +244,7 @@ class TestSubdirectoryHintTracker:
         """URLs in shell commands should not be treated as paths."""
         tracker = SubdirectoryHintTracker(working_dir=str(project))
         result = tracker.check_tool_call(
-            "terminal", {"command": "curl https://example.com/frontend/api"}
+            "terminal", {"command": "curl https://example.com/frontend/api"},
         )
         assert result is None
 
@@ -285,7 +285,7 @@ class TestPermissionErrorHandling:
         with patch.object(Path, "is_dir", patched_is_dir):
             # Should not raise — gracefully skip the inaccessible directory
             result = tracker.check_tool_call(
-                "read_file", {"path": str(project / "backend" / "src" / "main.py")}
+                "read_file", {"path": str(project / "backend" / "src" / "main.py")},
             )
             # Result may be None (backend skipped) — the key point is no crash
             assert result is None or isinstance(result, str)

@@ -418,7 +418,7 @@ async def test_require_mention_free_response_room(monkeypatch):
     """Free-response rooms bypass mention requirement."""
     monkeypatch.delenv("MATRIX_REQUIRE_MENTION", raising=False)
     monkeypatch.setenv(
-        "MATRIX_FREE_RESPONSE_ROOMS", "!room1:example.org,!room2:example.org"
+        "MATRIX_FREE_RESPONSE_ROOMS", "!room1:example.org,!room2:example.org",
     )
     monkeypatch.setenv("MATRIX_AUTO_THREAD", "false")
 
@@ -734,7 +734,7 @@ class TestMatrixConfigBridge:
                 "require_mention": False,
                 "free_response_rooms": ["!room1:example.org", "!room2:example.org"],
                 "auto_thread": False,
-            }
+            },
         }
 
         import os
@@ -749,10 +749,10 @@ class TestMatrixConfigBridge:
         matrix_cfg = yaml_cfg.get("matrix", {})
         if isinstance(matrix_cfg, dict):
             if "require_mention" in matrix_cfg and not os.getenv(
-                "MATRIX_REQUIRE_MENTION"
+                "MATRIX_REQUIRE_MENTION",
             ):
                 monkeypatch.setenv(
-                    "MATRIX_REQUIRE_MENTION", str(matrix_cfg["require_mention"]).lower()
+                    "MATRIX_REQUIRE_MENTION", str(matrix_cfg["require_mention"]).lower(),
                 )
             frc = matrix_cfg.get("free_response_rooms")
             if frc is not None and not os.getenv("MATRIX_FREE_RESPONSE_ROOMS"):
@@ -761,7 +761,7 @@ class TestMatrixConfigBridge:
                 monkeypatch.setenv("MATRIX_FREE_RESPONSE_ROOMS", str(frc))
             if "auto_thread" in matrix_cfg and not os.getenv("MATRIX_AUTO_THREAD"):
                 monkeypatch.setenv(
-                    "MATRIX_AUTO_THREAD", str(matrix_cfg["auto_thread"]).lower()
+                    "MATRIX_AUTO_THREAD", str(matrix_cfg["auto_thread"]).lower(),
                 )
 
         assert os.getenv("MATRIX_REQUIRE_MENTION") == "false"
@@ -787,7 +787,7 @@ class TestMatrixConfigBridge:
         matrix_cfg = yaml_cfg.get("matrix", {})
         if isinstance(matrix_cfg, dict):
             if "dm_mention_threads" in matrix_cfg and not os.getenv(
-                "MATRIX_DM_MENTION_THREADS"
+                "MATRIX_DM_MENTION_THREADS",
             ):
                 monkeypatch.setenv(
                     "MATRIX_DM_MENTION_THREADS",
@@ -806,7 +806,7 @@ class TestMatrixConfigBridge:
         matrix_cfg = yaml_cfg.get("matrix", {})
         if "require_mention" in matrix_cfg and not os.getenv("MATRIX_REQUIRE_MENTION"):
             monkeypatch.setenv(
-                "MATRIX_REQUIRE_MENTION", str(matrix_cfg["require_mention"]).lower()
+                "MATRIX_REQUIRE_MENTION", str(matrix_cfg["require_mention"]).lower(),
             )
 
         assert os.getenv("MATRIX_REQUIRE_MENTION") == "true"

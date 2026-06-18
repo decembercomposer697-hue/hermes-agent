@@ -198,7 +198,7 @@ def build_system_prompt_parts(agent: Any, system_message: str | None = None) -> 
             from agent.coding_context import coding_hidden_skill_categories
 
             _hidden_cats = coding_hidden_skill_categories(
-                platform=agent.platform, cwd=resolve_context_cwd()
+                platform=agent.platform, cwd=resolve_context_cwd(),
             )
         except Exception:
             _hidden_cats = frozenset()
@@ -223,7 +223,7 @@ def build_system_prompt_parts(agent: Any, system_message: str | None = None) -> 
             f"You are powered by the model named {_model_short}. "
             f"The exact model ID is {agent.model}. "
             f"When asked what model you are, always answer based on this information, "
-            f"not on any model name returned by the API."
+            f"not on any model name returned by the API.",
         )
 
     # Environment hints (WSL, Termux, etc.) — tell the agent about the
@@ -247,7 +247,7 @@ def build_system_prompt_parts(agent: Any, system_message: str | None = None) -> 
                     platform=agent.platform,
                     cwd=resolve_context_cwd(),
                     model=agent.model,
-                )
+                ),
             )
         except Exception:
             # Coding-context probing must never block prompt build.
@@ -289,7 +289,7 @@ def build_system_prompt_parts(agent: Any, system_message: str | None = None) -> 
             "skills/, plugins/, cron/, and memories/ that affect a different "
             "session than this one. Do not modify another profile's "
             "skills/plugins/cron/memories unless the user explicitly directs "
-            "you to."
+            "you to.",
         )
     else:
         stable_parts.append(
@@ -301,7 +301,7 @@ def build_system_prompt_parts(agent: Any, system_message: str | None = None) -> 
             f"another profile's skills/plugins/cron/memories unless the user "
             f"explicitly directs you to. The cross-profile write guard will "
             f"refuse such writes by default; pass cross_profile=True only "
-            f"after explicit direction."
+            f"after explicit direction.",
         )
 
     platform_key = (agent.platform or "").lower().strip()
@@ -429,7 +429,7 @@ def format_tools_for_system_message(agent: Any) -> str:
             "name": func["name"],
             "description": func.get("description", ""),
             "parameters": func.get("parameters", {}),
-            "required": None  # Match the format in the example
+            "required": None,  # Match the format in the example
         }
         formatted_tools.append(formatted_tool)
 

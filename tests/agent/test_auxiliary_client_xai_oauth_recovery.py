@@ -30,7 +30,7 @@ class TestIsAuthErrorXaiOauth403:
         exc = Exception(
             "Error code: 403 - {'code': 'The caller does not have permission "
             "to execute the specified operation', 'error': 'The OAuth2 access "
-            "token could not be validated. [WKE=unauthenticated:bad-credentials]'}"
+            "token could not be validated. [WKE=unauthenticated:bad-credentials]'}",
         )
         exc.status_code = 403  # openai.PermissionDenied sets this
         assert self.is_auth_error(exc) is True
@@ -38,7 +38,7 @@ class TestIsAuthErrorXaiOauth403:
     def test_xai_403_bad_credentials_without_status_code(self):
         """Fallback match when status_code attribute is missing."""
         exc = Exception(
-            "Error code: 403 - unauthenticated:bad-credentials"
+            "Error code: 403 - unauthenticated:bad-credentials",
         )
         # No status_code attribute — should still match via string pattern
         assert self.is_auth_error(exc) is True

@@ -452,7 +452,7 @@ def _render_command_stt_template(
 
     names = "|".join(re.escape(name) for name in placeholders)
     pattern = re.compile(
-        rf"(?<!\$)(?:\{{\{{(?P<double>{names})\}}\}}|\{{(?P<single>{names})\}})"
+        rf"(?<!\$)(?:\{{\{{(?P<double>{names})\}}\}}|\{{(?P<single>{names})\}})",
     )
     replacements: list[tuple[str, str]] = []
 
@@ -609,7 +609,7 @@ def _read_command_stt_output(output_path: Path, stdout: str, fmt: str) -> str:
         return stdout.strip()
     raise RuntimeError(
         f"Command STT provider wrote no output file at {output_path} "
-        f"and produced no stdout"
+        f"and produced no stdout",
     )
 
 
@@ -768,7 +768,7 @@ def _get_provider(stt_config: dict) -> str:
                 return "local"
             logger.warning(
                 "STT provider 'local' configured but unavailable "
-                "(install faster-whisper or set HERMES_LOCAL_STT_COMMAND)"
+                "(install faster-whisper or set HERMES_LOCAL_STT_COMMAND)",
             )
             return "none"
 
@@ -779,7 +779,7 @@ def _get_provider(stt_config: dict) -> str:
                 logger.info("Local STT command unavailable, using local faster-whisper")
                 return "local"
             logger.warning(
-                "STT provider 'local_command' configured but unavailable"
+                "STT provider 'local_command' configured but unavailable",
             )
             return "none"
 
@@ -787,7 +787,7 @@ def _get_provider(stt_config: dict) -> str:
             if _HAS_OPENAI and get_env_value("GROQ_API_KEY"):
                 return "groq"
             logger.warning(
-                "STT provider 'groq' configured but GROQ_API_KEY not set"
+                "STT provider 'groq' configured but GROQ_API_KEY not set",
             )
             return "none"
 
@@ -795,7 +795,7 @@ def _get_provider(stt_config: dict) -> str:
             if _HAS_OPENAI and _has_openai_audio_backend():
                 return "openai"
             logger.warning(
-                "STT provider 'openai' configured but no API key available"
+                "STT provider 'openai' configured but no API key available",
             )
             return "none"
 
@@ -804,7 +804,7 @@ def _get_provider(stt_config: dict) -> str:
                 return "mistral"
             logger.warning(
                 "STT provider 'mistral' configured but mistralai package "
-                "not installed or MISTRAL_API_KEY not set"
+                "not installed or MISTRAL_API_KEY not set",
             )
             return "none"
 
@@ -814,7 +814,7 @@ def _get_provider(stt_config: dict) -> str:
             if resolve_xai_http_credentials().get("api_key"):
                 return "xai"
             logger.warning(
-                "STT provider 'xai' configured but no xAI credentials are available"
+                "STT provider 'xai' configured but no xAI credentials are available",
             )
             return "none"
 
@@ -822,7 +822,7 @@ def _get_provider(stt_config: dict) -> str:
             if get_env_value("ELEVENLABS_API_KEY"):
                 return "elevenlabs"
             logger.warning(
-                "STT provider 'elevenlabs' configured but ELEVENLABS_API_KEY not set"
+                "STT provider 'elevenlabs' configured but ELEVENLABS_API_KEY not set",
             )
             return "none"
 
@@ -923,7 +923,7 @@ def _dispatch_to_plugin_provider(
     # short-circuited the caller. If a same-name command config exists,
     # bail so the command path wins.
     if stt_config is not None and _is_command_stt_provider_config(
-        _get_named_stt_provider_config(stt_config, key)
+        _get_named_stt_provider_config(stt_config, key),
     ):
         return None
     try:
@@ -1451,12 +1451,12 @@ def _transcribe_xai(file_path: str, model_name: str) -> dict[str, Any]:
         xai_config.get("base_url")
         or get_env_value("XAI_STT_BASE_URL")
         or creds.get("base_url")
-        or XAI_STT_BASE_URL
+        or XAI_STT_BASE_URL,
     ).strip().rstrip("/")
     language = str(
         xai_config.get("language")
         or os.getenv("HERMES_LOCAL_STT_LANGUAGE")
-        or DEFAULT_LOCAL_STT_LANGUAGE
+        or DEFAULT_LOCAL_STT_LANGUAGE,
     ).strip()
     # .get("format", True) already defaults to True when the key is absent;
     # is_truthy_value only normalizes truthy/falsy strings from config.
@@ -1545,7 +1545,7 @@ def _transcribe_elevenlabs(file_path: str, model_name: str) -> dict[str, Any]:
     base_url = str(
         elevenlabs_config.get("base_url")
         or get_env_value("ELEVENLABS_STT_BASE_URL")
-        or ELEVENLABS_STT_BASE_URL
+        or ELEVENLABS_STT_BASE_URL,
     ).strip().rstrip("/")
     language_code = str(elevenlabs_config.get("language_code") or "").strip()
     tag_audio_events = is_truthy_value(elevenlabs_config.get("tag_audio_events", False))
@@ -1658,14 +1658,14 @@ def transcribe_audio(file_path: str, model: str | None = None) -> dict[str, Any]
     if provider == "local":
         local_cfg = stt_config.get("local", {})
         model_name = _normalize_local_model(
-            model or local_cfg.get("model", DEFAULT_LOCAL_MODEL)
+            model or local_cfg.get("model", DEFAULT_LOCAL_MODEL),
         )
         return _transcribe_local(file_path, model_name)
 
     if provider == "local_command":
         local_cfg = stt_config.get("local", {})
         model_name = _normalize_local_command_model(
-            model or local_cfg.get("model", DEFAULT_LOCAL_MODEL)
+            model or local_cfg.get("model", DEFAULT_LOCAL_MODEL),
         )
         return _transcribe_local_command(file_path, model_name)
 
@@ -1776,7 +1776,7 @@ def _resolve_openai_audio_client_config() -> tuple[str, str]:
         raise ValueError(message)
 
     return managed_gateway.nous_user_token, urljoin(
-        f"{managed_gateway.gateway_origin.rstrip('/')}/", "v1"
+        f"{managed_gateway.gateway_origin.rstrip('/')}/", "v1",
     )
 
 

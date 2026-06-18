@@ -114,7 +114,7 @@ class TestNoPrviateDBAccess:
                 if isinstance(node.value, ast.Name) and node.value.id == "db":
                     if node.attr in ("_lock", "_conn"):
                         violations.append(
-                            f"db.{node.attr} at line {node.lineno}"
+                            f"db.{node.attr} at line {node.lineno}",
                         )
 
         assert violations == [], (

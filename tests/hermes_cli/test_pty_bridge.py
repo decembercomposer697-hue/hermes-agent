@@ -20,7 +20,7 @@ from hermes_cli.pty_bridge import PtyBridge, PtyUnavailableError
 
 
 skip_on_windows = pytest.mark.skipif(
-    sys.platform.startswith("win"), reason="PTY bridge is POSIX-only"
+    sys.platform.startswith("win"), reason="PTY bridge is POSIX-only",
 )
 
 

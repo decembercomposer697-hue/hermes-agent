@@ -209,7 +209,7 @@ def _normalize_phone(number: str) -> str:
     trimmed = number.strip()
     if not trimmed.startswith("+"):
         raise TelephonyError(
-            f"Phone number must be E.164 format (for example +15551234567), got: {number}"
+            f"Phone number must be E.164 format (for example +15551234567), got: {number}",
         )
     digits = "+" + re.sub(r"\D", "", trimmed)
     if len(digits) < 8:
@@ -286,7 +286,7 @@ def _twilio_creds() -> tuple[str, str]:
     if not sid or not token:
         raise TelephonyError(
             "Twilio credentials are not configured. Use 'save-twilio' or set "
-            f"TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN in {_env_path()}."
+            f"TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN in {_env_path()}.",
         )
     return sid, token
 
@@ -322,7 +322,7 @@ def _twilio_owned_numbers(limit: int = 50) -> list[OwnedTwilioNumber]:
                 phone_number=str(item.get("phone_number", "")),
                 friendly_name=str(item.get("friendly_name", "")),
                 capabilities=caps,
-            )
+            ),
         )
     return results
 
@@ -420,7 +420,7 @@ def _resolve_twilio_number(identifier: str | None = None) -> OwnedTwilioNumber:
 
     raise TelephonyError(
         "No default Twilio phone number is set. Use 'twilio-buy --save-env', "
-        f"'twilio-set-default', or set TWILIO_PHONE_NUMBER in {_env_path()}."
+        f"'twilio-set-default', or set TWILIO_PHONE_NUMBER in {_env_path()}.",
     )
 
 
@@ -534,7 +534,7 @@ def _twilio_buy_number(
             save_env=save_env,
             state_path=state_path,
             env_path=env_path,
-        )
+        ),
     )
     return purchased
 
@@ -571,7 +571,7 @@ def _twilio_set_default(identifier: str, *, save_env: bool = False) -> dict[str,
             phone_number=owned.phone_number,
             phone_sid=owned.sid,
             save_env=save_env,
-        )
+        ),
     )
     return result
 
@@ -756,7 +756,7 @@ def _vapi_import_twilio_number(
     api_key = _vapi_api_key()
     if not api_key:
         raise TelephonyError(
-            f"Vapi is not configured. Use 'save-vapi' or set VAPI_API_KEY in {_env_path()} first."
+            f"Vapi is not configured. Use 'save-vapi' or set VAPI_API_KEY in {_env_path()} first.",
         )
     owned = _resolve_twilio_number(phone_identifier)
     sid, token = _twilio_creds()
@@ -787,7 +787,7 @@ def _vapi_import_twilio_number(
             save_env=save_env,
             state_path=state_path,
             env_path=env_path,
-        )
+        ),
     )
     return result
 
@@ -803,7 +803,7 @@ def _bland_call(
     api_key = _bland_api_key()
     if not api_key:
         raise TelephonyError(
-            f"Bland.ai is not configured. Use 'save-bland' or set BLAND_API_KEY in {_env_path()}."
+            f"Bland.ai is not configured. Use 'save-bland' or set BLAND_API_KEY in {_env_path()}.",
         )
     normalized = _normalize_phone(phone_number)
     if voice is None:
@@ -881,13 +881,13 @@ def _vapi_call(
     api_key = _vapi_api_key()
     if not api_key:
         raise TelephonyError(
-            f"Vapi is not configured. Use 'save-vapi' or set VAPI_API_KEY in {_env_path()}."
+            f"Vapi is not configured. Use 'save-vapi' or set VAPI_API_KEY in {_env_path()}.",
         )
     phone_number_id = _vapi_phone_number_id()
     if not phone_number_id:
         raise TelephonyError(
             "No Vapi phone number id is configured. Import an owned Twilio number with "
-            f"'vapi-import-twilio --save-env' or set VAPI_PHONE_NUMBER_ID in {_env_path()}."
+            f"'vapi-import-twilio --save-env' or set VAPI_PHONE_NUMBER_ID in {_env_path()}.",
         )
     normalized = _normalize_phone(phone_number)
     voice_provider = _env_or_config(
@@ -1104,7 +1104,7 @@ def save_bland(api_key: str, voice: str = BLAND_DEFAULT_VOICE) -> dict[str, Any]
             "BLAND_API_KEY": api_key.strip(),
             "BLAND_DEFAULT_VOICE": voice.strip() or BLAND_DEFAULT_VOICE,
             "PHONE_PROVIDER": "bland",
-        }
+        },
     )
     return {
         "success": True,
@@ -1312,7 +1312,7 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
             )
         raise TelephonyError(
             f"Unsupported AI call provider '{provider}'. Use --provider bland or --provider vapi, "
-            f"or set PHONE_PROVIDER in {_env_path()}."
+            f"or set PHONE_PROVIDER in {_env_path()}.",
         )
     if cmd == "ai-status":
         provider = (args.provider or _ai_provider()).lower().strip()
@@ -1322,7 +1322,7 @@ def _dispatch(args: argparse.Namespace) -> dict[str, Any]:
             return _bland_status(args.call_id, analyze=args.analyze or None)
         raise TelephonyError(
             f"Unsupported AI call provider '{provider}'. Use --provider bland or --provider vapi, "
-            f"or set PHONE_PROVIDER in {_env_path()}."
+            f"or set PHONE_PROVIDER in {_env_path()}.",
         )
     raise TelephonyError(f"Unknown command: {cmd}")
 

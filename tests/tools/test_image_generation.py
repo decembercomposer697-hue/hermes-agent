@@ -239,7 +239,7 @@ class TestDefaults:
 
     def test_override_replaces_default(self, image_tool):
         p = image_tool._build_fal_payload(
-            "fal-ai/flux-2-pro", "hi", "square", overrides={"num_inference_steps": 25}
+            "fal-ai/flux-2-pro", "hi", "square", overrides={"num_inference_steps": 25},
         )
         assert p["num_inference_steps"] == 25
 

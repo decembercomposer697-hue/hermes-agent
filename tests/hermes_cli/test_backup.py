@@ -1327,19 +1327,19 @@ class TestQuickSnapshot:
         # Generic pairing store (new location)
         (hermes_home / "platforms" / "pairing").mkdir(parents=True)
         (hermes_home / "platforms" / "pairing" / "telegram-approved.json").write_text(
-            '{"12345": {"user_name": "alice"}}'
+            '{"12345": {"user_name": "alice"}}',
         )
         (hermes_home / "platforms" / "pairing" / "discord-approved.json").write_text(
-            '{"67890": {"user_name": "bob"}}'
+            '{"67890": {"user_name": "bob"}}',
         )
         # Legacy pairing store (old location)
         (hermes_home / "pairing").mkdir()
         (hermes_home / "pairing" / "matrix-approved.json").write_text(
-            '{"@charlie:server": {"user_name": "charlie"}}'
+            '{"@charlie:server": {"user_name": "charlie"}}',
         )
         # Feishu's separate JSON
         (hermes_home / "feishu_comment_pairing.json").write_text(
-            '{"doc_abc": {"allow_from": ["user_xyz"]}}'
+            '{"doc_abc": {"allow_from": ["user_xyz"]}}',
         )
 
         snap_id = create_quick_snapshot(hermes_home=hermes_home)
@@ -1604,7 +1604,7 @@ class TestRunPreUpdateBackup:
         out = capsys.readouterr().out
         assert out == ""
         assert not (hermes_home / "backups").exists() or not list(
-            (hermes_home / "backups").glob("pre-update-*.zip")
+            (hermes_home / "backups").glob("pre-update-*.zip"),
         )
 
     def test_no_backup_flag_skips(self, hermes_home, capsys):
@@ -1615,7 +1615,7 @@ class TestRunPreUpdateBackup:
         assert "Creating pre-update backup" not in out
         # No backup written
         assert not (hermes_home / "backups").exists() or not list(
-            (hermes_home / "backups").glob("pre-update-*.zip")
+            (hermes_home / "backups").glob("pre-update-*.zip"),
         )
 
     def test_config_enabled_creates_backup(self, hermes_home, capsys):

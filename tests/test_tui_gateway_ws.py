@@ -66,7 +66,7 @@ def test_ws_disconnect_reaps_flagged_session_and_closes_worker(monkeypatch):
                     "close_on_disconnect": True,
                     "slash_worker": FakeWorker(),
                     "session_key": "k",
-                }
+                },
             ),
         )
         assert "flagged" not in server._sessions
@@ -81,7 +81,7 @@ def test_ws_disconnect_preserves_and_repoints_reconnectable_session(monkeypatch)
         _run_disconnect(
             monkeypatch,
             lambda t: server._sessions.update(
-                plain={"transport": t, "close_on_disconnect": False, "session_key": "k"}
+                plain={"transport": t, "close_on_disconnect": False, "session_key": "k"},
             ),
         )
         assert server._sessions["plain"]["transport"] is server._detached_ws_transport

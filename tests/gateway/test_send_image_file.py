@@ -103,7 +103,7 @@ class TestTelegramSendImageFile:
         adapter._bot.send_photo = AsyncMock(return_value=mock_msg)
 
         result = _run(
-            adapter.send_image_file(chat_id="12345", image_path=str(img))
+            adapter.send_image_file(chat_id="12345", image_path=str(img)),
         )
         assert result.success
         assert result.message_id == "42"
@@ -116,7 +116,7 @@ class TestTelegramSendImageFile:
     def test_returns_error_when_file_missing(self, adapter):
         """send_image_file should return error for nonexistent file."""
         result = _run(
-            adapter.send_image_file(chat_id="12345", image_path="/nonexistent/image.png")
+            adapter.send_image_file(chat_id="12345", image_path="/nonexistent/image.png"),
         )
         assert not result.success
         assert "not found" in result.error
@@ -125,7 +125,7 @@ class TestTelegramSendImageFile:
         """send_image_file should return error when bot is None."""
         adapter._bot = None
         result = _run(
-            adapter.send_image_file(chat_id="12345", image_path="/tmp/img.png")
+            adapter.send_image_file(chat_id="12345", image_path="/tmp/img.png"),
         )
         assert not result.success
         assert "Not connected" in result.error
@@ -141,7 +141,7 @@ class TestTelegramSendImageFile:
 
         long_caption = "A" * 2000
         _run(
-            adapter.send_image_file(chat_id="12345", image_path=str(img), caption=long_caption)
+            adapter.send_image_file(chat_id="12345", image_path=str(img), caption=long_caption),
         )
 
         call_kwargs = adapter._bot.send_photo.call_args.kwargs
@@ -161,7 +161,7 @@ class TestTelegramSendImageFile:
                 chat_id="12345",
                 image_path=str(img),
                 metadata={"thread_id": "789"},
-            )
+            ),
         )
 
         call_kwargs = adapter._bot.send_photo.call_args.kwargs
@@ -213,7 +213,7 @@ class TestDiscordSendImageFile:
         adapter._client.get_channel = MagicMock(return_value=mock_channel)
 
         result = _run(
-            adapter.send_image_file(chat_id="67890", image_path=str(img))
+            adapter.send_image_file(chat_id="67890", image_path=str(img)),
         )
         assert result.success
         assert result.message_id == "99"
@@ -237,7 +237,7 @@ class TestDiscordSendImageFile:
                     file_path=str(pdf),
                     file_name="renamed.pdf",
                     metadata={"thread_id": "123"},
-                )
+                ),
             )
 
         assert result.success
@@ -262,7 +262,7 @@ class TestDiscordSendImageFile:
                     chat_id="67890",
                     video_path=str(video),
                     metadata={"thread_id": "123"},
-                )
+                ),
             )
 
         assert result.success
@@ -272,7 +272,7 @@ class TestDiscordSendImageFile:
 
     def test_returns_error_when_file_missing(self, adapter):
         result = _run(
-            adapter.send_image_file(chat_id="67890", image_path="/nonexistent.png")
+            adapter.send_image_file(chat_id="67890", image_path="/nonexistent.png"),
         )
         assert not result.success
         assert "not found" in result.error
@@ -280,7 +280,7 @@ class TestDiscordSendImageFile:
     def test_returns_error_when_not_connected(self, adapter):
         adapter._client = None
         result = _run(
-            adapter.send_image_file(chat_id="67890", image_path="/tmp/img.png")
+            adapter.send_image_file(chat_id="67890", image_path="/tmp/img.png"),
         )
         assert not result.success
         assert "Not connected" in result.error
@@ -290,7 +290,7 @@ class TestDiscordSendImageFile:
         adapter._client.fetch_channel = AsyncMock(return_value=None)
 
         result = _run(
-            adapter.send_image_file(chat_id="99999", image_path="/tmp/img.png")
+            adapter.send_image_file(chat_id="99999", image_path="/tmp/img.png"),
         )
         assert not result.success
         assert "not found" in result.error
@@ -333,7 +333,7 @@ class TestSlackSendImageFile:
         adapter._app.client.files_upload_v2 = AsyncMock(return_value=mock_result)
 
         result = _run(
-            adapter.send_image_file(chat_id="C12345", image_path=str(img))
+            adapter.send_image_file(chat_id="C12345", image_path=str(img)),
         )
         assert result.success
         adapter._app.client.files_upload_v2.assert_awaited_once()
@@ -345,7 +345,7 @@ class TestSlackSendImageFile:
 
     def test_returns_error_when_file_missing(self, adapter):
         result = _run(
-            adapter.send_image_file(chat_id="C12345", image_path="/nonexistent.png")
+            adapter.send_image_file(chat_id="C12345", image_path="/nonexistent.png"),
         )
         assert not result.success
         assert "not found" in result.error
@@ -353,7 +353,7 @@ class TestSlackSendImageFile:
     def test_returns_error_when_not_connected(self, adapter):
         adapter._app = None
         result = _run(
-            adapter.send_image_file(chat_id="C12345", image_path="/tmp/img.png")
+            adapter.send_image_file(chat_id="C12345", image_path="/tmp/img.png"),
         )
         assert not result.success
         assert "Not connected" in result.error

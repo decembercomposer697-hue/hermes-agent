@@ -318,7 +318,7 @@ def auto_setup_telegram_bot_result(
         elapsed = int(time.monotonic() - start)
         remaining = max(0, int(poll_timeout - elapsed))
         sys.stdout.write(
-            f"\r  {char} Waiting for bot creation... ({remaining}s remaining) "
+            f"\r  {char} Waiting for bot creation... ({remaining}s remaining) ",
         )
         sys.stdout.flush()
         idx += 1
@@ -327,7 +327,7 @@ def auto_setup_telegram_bot_result(
             result = poll_pairing_result_once(resolved_api_url, pairing)
             if result:
                 sys.stdout.write(
-                    "\r  ✓ Bot created successfully!                              \n"
+                    "\r  ✓ Bot created successfully!                              \n",
                 )
                 sys.stdout.flush()
                 return result

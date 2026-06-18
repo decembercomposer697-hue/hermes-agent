@@ -174,7 +174,7 @@ class TestUnicodeNormalized:
         """Em-dash in content should match ASCII '--' in pattern."""
         content = "return value\u2014fallback"
         new, count, strategy, err = fuzzy_find_and_replace(
-            content, "return value--fallback", "return value or fallback"
+            content, "return value--fallback", "return value or fallback",
         )
         assert count == 1, f"Expected match via unicode_normalized, got err={err}"
         assert strategy == "unicode_normalized"
@@ -184,7 +184,7 @@ class TestUnicodeNormalized:
         """Smart double quotes in content should match straight quotes in pattern."""
         content = 'print(\u201chello\u201d)'
         new, count, strategy, err = fuzzy_find_and_replace(
-            content, 'print("hello")', 'print("world")'
+            content, 'print("hello")', 'print("world")',
         )
         assert count == 1, f"Expected match via unicode_normalized, got err={err}"
         assert "world" in new
@@ -304,7 +304,7 @@ class TestEscapeDriftGuard:
         drift."""
         content = "hello \\'world\\'"
         new, count, strategy, err = fuzzy_find_and_replace(
-            content, "hello \\'world\\'", "hello \\'there\\'"
+            content, "hello \\'world\\'", "hello \\'there\\'",
         )
         assert err is None
         assert count == 1

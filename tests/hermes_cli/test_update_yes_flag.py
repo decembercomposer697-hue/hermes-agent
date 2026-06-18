@@ -16,7 +16,7 @@ from hermes_cli.main import cmd_update
 
 
 def _make_run_side_effect(
-    branch="main", verify_ok=True, commit_count="1", dirty=False
+    branch="main", verify_ok=True, commit_count="1", dirty=False,
 ):
     """Minimal subprocess.run side_effect for the update flow."""
 
@@ -27,11 +27,11 @@ def _make_run_side_effect(
             return subprocess.CompletedProcess(cmd, 0, stdout=f"{branch}\n", stderr="")
         if "rev-parse" in joined and "--verify" in joined:
             return subprocess.CompletedProcess(
-                cmd, 0 if verify_ok else 128, stdout="", stderr=""
+                cmd, 0 if verify_ok else 128, stdout="", stderr="",
             )
         if "rev-list" in joined:
             return subprocess.CompletedProcess(
-                cmd, 0, stdout=f"{commit_count}\n", stderr=""
+                cmd, 0, stdout=f"{commit_count}\n", stderr="",
             )
         # `git status --porcelain` for dirty-tree detection during autostash.
         if "status" in joined and "--porcelain" in joined:
@@ -67,7 +67,7 @@ class TestUpdateYesConfigMigration:
         capsys,
     ):
         mock_run.side_effect = _make_run_side_effect(
-            branch="main", verify_ok=True, commit_count="1"
+            branch="main", verify_ok=True, commit_count="1",
         )
         mock_migrate.return_value = {"env_added": [], "config_added": []}
 
@@ -107,7 +107,7 @@ class TestUpdateYesConfigMigration:
     ):
         """Regression guard: without --yes, the TTY prompt path still fires."""
         mock_run.side_effect = _make_run_side_effect(
-            branch="main", verify_ok=True, commit_count="1"
+            branch="main", verify_ok=True, commit_count="1",
         )
         mock_migrate.return_value = {"env_added": [], "config_added": []}
 
@@ -123,7 +123,7 @@ class TestUpdateYesConfigMigration:
         import sys as _sys
 
         with patch("builtins.input", return_value="n") as mock_input, patch.object(
-            _sys.stdin, "isatty", return_value=True
+            _sys.stdin, "isatty", return_value=True,
         ), patch.object(_sys.stdout, "isatty", return_value=True):
             cmd_update(args)
             # The user was actually prompted.

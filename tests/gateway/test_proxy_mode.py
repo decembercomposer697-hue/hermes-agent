@@ -239,7 +239,7 @@ class TestRunAgentViaProxy:
             sse_chunks=[
                 'data: {"choices":[{"delta":{"content":"Hello"}}]}\n\n'
                 'data: {"choices":[{"delta":{"content":" world"}}]}\n\n'
-                "data: [DONE]\n\n"
+                "data: [DONE]\n\n",
             ],
         )
         session = _FakeSession(resp)

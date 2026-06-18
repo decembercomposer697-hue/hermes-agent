@@ -73,7 +73,7 @@ async def test_setup_dm_topics_loads_persisted_thread_ids():
                 {"name": "General", "thread_id": 100},
                 {"name": "Work", "thread_id": 200},
             ],
-        }
+        },
     ])
     adapter._bot = AsyncMock()
 
@@ -95,7 +95,7 @@ async def test_setup_dm_topics_creates_when_no_thread_id():
             "topics": [
                 {"name": "NewTopic", "icon_color": 7322096},
             ],
-        }
+        },
     ])
     adapter._bot = AsyncMock()
     mock_topic = SimpleNamespace(message_thread_id=999)
@@ -126,7 +126,7 @@ async def test_setup_dm_topics_mixed_persisted_and_new():
                 {"name": "Existing", "thread_id": 50},
                 {"name": "New", "icon_color": 123},
             ],
-        }
+        },
     ])
     adapter._bot = AsyncMock()
     mock_topic = SimpleNamespace(message_thread_id=777)
@@ -221,10 +221,10 @@ async def test_ensure_dm_topic_creates_on_demand_and_persists():
     )
     assert adapter._dm_topics["111:On Demand"] == 444
     assert adapter._dm_topics_config == [
-        {"chat_id": 111, "topics": [{"name": "On Demand", "thread_id": 444}]}
+        {"chat_id": 111, "topics": [{"name": "On Demand", "thread_id": 444}]},
     ]
     adapter._persist_dm_topic_thread_id.assert_called_once_with(
-        111, "On Demand", 444, replace_existing=False
+        111, "On Demand", 444, replace_existing=False,
     )
 
 
@@ -238,7 +238,7 @@ async def test_ensure_dm_topic_force_create_replaces_persisted_thread_id():
     adapter._persist_dm_topic_thread_id = MagicMock()
     adapter._dm_topics = {"111:General": 500}
     adapter._dm_topics_config = [
-        {"chat_id": 111, "topics": [{"name": "General", "thread_id": 500}]}
+        {"chat_id": 111, "topics": [{"name": "General", "thread_id": 500}]},
     ]
 
     result = await adapter.ensure_dm_topic("111", "General", force_create=True)
@@ -248,7 +248,7 @@ async def test_ensure_dm_topic_force_create_replaces_persisted_thread_id():
     assert adapter._dm_topics["111:General"] == 777
     assert adapter._dm_topics_config[0]["topics"][0]["thread_id"] == 777
     adapter._persist_dm_topic_thread_id.assert_called_once_with(
-        111, "General", 777, replace_existing=True
+        111, "General", 777, replace_existing=True,
     )
 
 
@@ -270,11 +270,11 @@ def test_persist_dm_topic_thread_id_writes_config(tmp_path):
                                 {"name": "General", "icon_color": 123},
                                 {"name": "Work", "icon_color": 456},
                             ],
-                        }
-                    ]
-                }
-            }
-        }
+                        },
+                    ],
+                },
+            },
+        },
     }
 
     config_file = tmp_path / ".hermes" / "config.yaml"
@@ -310,11 +310,11 @@ def test_persist_dm_topic_thread_id_skips_if_already_set(tmp_path):
                             "topics": [
                                 {"name": "General", "icon_color": 123, "thread_id": 500},
                             ],
-                        }
-                    ]
-                }
-            }
-        }
+                        },
+                    ],
+                },
+            },
+        },
     }
 
     config_file = tmp_path / ".hermes" / "config.yaml"
@@ -348,11 +348,11 @@ def test_persist_dm_topic_thread_id_replaces_existing_when_requested(tmp_path):
                             "topics": [
                                 {"name": "General", "icon_color": 123, "thread_id": 500},
                             ],
-                        }
-                    ]
-                }
-            }
-        }
+                        },
+                    ],
+                },
+            },
+        },
     }
 
     config_file = tmp_path / ".hermes" / "config.yaml"
@@ -390,11 +390,11 @@ def test_persist_dm_topic_thread_id_preserves_config_on_write_failure(tmp_path):
                             "topics": [
                                 {"name": "General", "icon_color": 123},
                             ],
-                        }
-                    ]
-                }
-            }
-        }
+                        },
+                    ],
+                },
+            },
+        },
     }
 
     config_file = tmp_path / ".hermes" / "config.yaml"
@@ -426,7 +426,7 @@ def test_get_dm_topic_info_finds_cached_topic():
             "topics": [
                 {"name": "General", "skill": "my-skill"},
             ],
-        }
+        },
     ])
     adapter._dm_topics["111:General"] = 100
 
@@ -443,7 +443,7 @@ def test_get_dm_topic_info_returns_none_for_unknown():
         {
             "chat_id": 111,
             "topics": [{"name": "General"}],
-        }
+        },
     ])
     # Mock reload to avoid filesystem access
     adapter._reload_dm_topics_from_config = lambda: None
@@ -466,7 +466,7 @@ def test_get_dm_topic_info_returns_none_without_config():
 def test_get_dm_topic_info_returns_none_for_none_thread():
     """Should return None if thread_id is None."""
     adapter = _make_adapter([
-        {"chat_id": 111, "topics": [{"name": "General"}]}
+        {"chat_id": 111, "topics": [{"name": "General"}]},
     ])
 
     result = adapter._get_dm_topic_info("111", None)
@@ -480,7 +480,7 @@ def test_get_dm_topic_info_hot_reloads_from_config(tmp_path):
 
     # Start with empty topics
     adapter = _make_adapter([
-        {"chat_id": 111, "topics": []}
+        {"chat_id": 111, "topics": []},
     ])
 
     # Write config with a new topic + thread_id
@@ -494,11 +494,11 @@ def test_get_dm_topic_info_hot_reloads_from_config(tmp_path):
                             "topics": [
                                 {"name": "NewProject", "thread_id": 555},
                             ],
-                        }
-                    ]
-                }
-            }
-        }
+                        },
+                    ],
+                },
+            },
+        },
     }
     config_file = tmp_path / ".hermes" / "config.yaml"
     config_file.parent.mkdir(parents=True)
@@ -587,7 +587,7 @@ def test_build_message_event_sets_auto_skill():
             "topics": [
                 {"name": "My Project", "skill": "accessibility-auditor", "thread_id": 100},
             ],
-        }
+        },
     ])
     adapter._dm_topics["111:My Project"] = 100
 
@@ -609,7 +609,7 @@ def test_build_message_event_no_auto_skill_without_binding():
             "topics": [
                 {"name": "General", "thread_id": 200},
             ],
-        }
+        },
     ])
     adapter._dm_topics["111:General"] = 200
 
@@ -654,7 +654,7 @@ def test_build_message_event_preserves_true_dm_topic_thread_id():
             "topics": [
                 {"name": "General", "thread_id": 200},
             ],
-        }
+        },
     ])
     adapter._dm_topics["111:General"] = 200
 
@@ -685,7 +685,7 @@ def test_group_topic_skill_binding():
                 {"name": "Engineering", "thread_id": 5, "skill": "software-development"},
                 {"name": "Sales", "thread_id": 12, "skill": "sales-framework"},
             ],
-        }
+        },
     ])
 
     msg = _make_mock_message(
@@ -713,7 +713,7 @@ def test_group_topic_skill_binding_second_topic():
                 {"name": "Engineering", "thread_id": 5, "skill": "software-development"},
                 {"name": "Sales", "thread_id": 12, "skill": "sales-framework"},
             ],
-        }
+        },
     ])
 
     msg = _make_mock_message(
@@ -740,7 +740,7 @@ def test_group_topic_no_skill_binding():
             "topics": [
                 {"name": "General", "thread_id": 1},
             ],
-        }
+        },
     ])
 
     msg = _make_mock_message(
@@ -767,7 +767,7 @@ def test_group_topic_unmapped_thread_id():
             "topics": [
                 {"name": "Engineering", "thread_id": 5, "skill": "software-development"},
             ],
-        }
+        },
     ])
 
     msg = _make_mock_message(
@@ -794,7 +794,7 @@ def test_group_topic_unmapped_chat_id():
             "topics": [
                 {"name": "Engineering", "thread_id": 5, "skill": "software-development"},
             ],
-        }
+        },
     ])
 
     msg = _make_mock_message(
@@ -818,7 +818,7 @@ def test_group_topic_no_config():
     adapter = _make_adapter()  # no group_topics_config
 
     msg = _make_mock_message(
-        chat_id=-1001234567890, chat_type=_ChatType.GROUP, thread_id=5, text="hi"
+        chat_id=-1001234567890, chat_type=_ChatType.GROUP, thread_id=5, text="hi",
     )
     event = adapter._build_message_event(msg, MessageType.TEXT)
 
@@ -836,7 +836,7 @@ def test_group_topic_chat_id_int_string_coercion():
             "topics": [
                 {"name": "Dev", "thread_id": "7", "skill": "hermes-agent-dev"},
             ],
-        }
+        },
     ])
 
     msg = _make_mock_message(
@@ -879,7 +879,7 @@ def test_build_message_event_group_from_user_none_stays_none():
     adapter = _make_adapter()
     msg = _make_mock_message(
         chat_id=-1001234567890, chat_type=_ChatType.SUPERGROUP,
-        user_id=42, user_name="Alice"
+        user_id=42, user_name="Alice",
     )
     msg.from_user = None
 

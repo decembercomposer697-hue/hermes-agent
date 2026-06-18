@@ -58,8 +58,8 @@ class TestBraveFreeProviderSearch:
                 {"title": "A", "url": "https://a.example.com", "description": "desc A"},
                 {"title": "B", "url": "https://b.example.com", "description": "desc B"},
                 {"title": "C", "url": "https://c.example.com", "description": "desc C"},
-            ]
-        }
+            ],
+        },
     }
 
     @staticmethod
@@ -266,7 +266,7 @@ class TestBraveFreeSearchOnlyErrors:
         monkeypatch.setattr("tools.interrupt.is_interrupted", lambda: False, raising=False)
 
         result_str = asyncio.get_event_loop().run_until_complete(
-            web_tools.web_extract_tool(["https://example.com"])
+            web_tools.web_extract_tool(["https://example.com"]),
         )
         result = json.loads(result_str)
         assert result["success"] is False

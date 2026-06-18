@@ -416,8 +416,8 @@ def _resolve_stdio_command(command: str, env: dict) -> tuple[str, dict]:
         elif resolved_command in {"npx", "npm", "node"}:
             hermes_home = os.path.expanduser(
                 os.getenv(
-                    "HERMES_HOME", os.path.join(os.path.expanduser("~"), ".hermes")
-                )
+                    "HERMES_HOME", os.path.join(os.path.expanduser("~"), ".hermes"),
+                ),
             )
             candidates = [
                 os.path.join(hermes_home, "node", "bin", resolved_command),
@@ -553,34 +553,34 @@ def _validate_remote_mcp_url(server_name: str, url: Any) -> str:
     if not isinstance(url, str):
         raise InvalidMcpUrlError(
             f"Invalid MCP URL for '{server_name}': expected a string, got "
-            f"{type(url).__name__}"
+            f"{type(url).__name__}",
         )
     stripped = url.strip()
     if not stripped:
         raise InvalidMcpUrlError(
-            f"Invalid MCP URL for '{server_name}': empty url"
+            f"Invalid MCP URL for '{server_name}': empty url",
         )
     try:
         parsed = urlparse(stripped)
     except Exception as poll_exc:  # urlparse is very permissive — belt and braces
         raise InvalidMcpUrlError(
-            f"Invalid MCP URL for '{server_name}': {stripped!r} ({exc})"
+            f"Invalid MCP URL for '{server_name}': {stripped!r} ({exc})",
         ) from exc
     if parsed.scheme.lower() not in {"http", "https"}:
         raise InvalidMcpUrlError(
             f"Invalid MCP URL for '{server_name}': scheme must be http or "
-            f"https, got {parsed.scheme!r} ({stripped!r})"
+            f"https, got {parsed.scheme!r} ({stripped!r})",
         )
     if not parsed.netloc:
         raise InvalidMcpUrlError(
-            f"Invalid MCP URL for '{server_name}': missing host ({stripped!r})"
+            f"Invalid MCP URL for '{server_name}': missing host ({stripped!r})",
         )
     # ``urlparse`` accepts ``http://:8080`` (empty host, explicit port).
     # Reject that — we need a real host.
     if not parsed.hostname:
         raise InvalidMcpUrlError(
             f"Invalid MCP URL for '{server_name}': missing hostname "
-            f"({stripped!r})"
+            f"({stripped!r})",
         )
     return stripped
 
@@ -613,13 +613,13 @@ def _resolve_client_cert(server_name: str, config: dict):
         if not isinstance(path, str) or not path.strip():
             raise ValueError(
                 f"MCP server '{server_name}': {label} must be a non-empty "
-                f"string path (got {type(path).__name__})"
+                f"string path (got {type(path).__name__})",
             )
         expanded = os.path.expanduser(path.strip())
         if not os.path.isfile(expanded):
             raise FileNotFoundError(
                 f"MCP server '{server_name}': {label} not found at "
-                f"{expanded!r}"
+                f"{expanded!r}",
             )
         return expanded
 
@@ -628,7 +628,7 @@ def _resolve_client_cert(server_name: str, config: dict):
         if raw_key is not None:
             raise ValueError(
                 f"MCP server '{server_name}': specify either client_cert as "
-                f"a list [cert, key] OR client_cert + client_key, not both"
+                f"a list [cert, key] OR client_cert + client_key, not both",
             )
         if len(raw_cert) == 2:
             cert_path = _expand(raw_cert[0], "client_cert[0]")
@@ -641,12 +641,12 @@ def _resolve_client_cert(server_name: str, config: dict):
             if not isinstance(password, str):
                 raise ValueError(
                     f"MCP server '{server_name}': client_cert[2] (key "
-                    f"passphrase) must be a string"
+                    f"passphrase) must be a string",
                 )
             return (cert_path, key_path, password)
         raise ValueError(
             f"MCP server '{server_name}': client_cert list form must have 2 "
-            f"or 3 elements (got {len(raw_cert)})"
+            f"or 3 elements (got {len(raw_cert)})",
         )
 
     # String form for client_cert.
@@ -895,7 +895,7 @@ class SamplingHandler:
         if self.max_tool_rounds == 0:
             self._tool_loop_count = 0
             return self._error(
-                f"Tool loops disabled for server '{self.server_name}' (max_tool_rounds=0)"
+                f"Tool loops disabled for server '{self.server_name}' (max_tool_rounds=0)",
             )
 
         self._tool_loop_count += 1
@@ -903,7 +903,7 @@ class SamplingHandler:
             self._tool_loop_count = 0
             return self._error(
                 f"Tool loop limit exceeded for server '{self.server_name}' "
-                f"(max {self.max_tool_rounds} rounds)"
+                f"(max {self.max_tool_rounds} rounds)",
             )
 
         content_blocks = []
@@ -992,7 +992,7 @@ class SamplingHandler:
             self.metrics["errors"] += 1
             return self._error(
                 f"Sampling rate limit exceeded for server '{self.server_name}' "
-                f"({self.max_rpm} requests/minute)"
+                f"({self.max_rpm} requests/minute)",
             )
 
         # Resolve model
@@ -1012,7 +1012,7 @@ class SamplingHandler:
             self.metrics["errors"] += 1
             return self._error(
                 f"Model '{resolved_model}' not allowed for server "
-                f"'{self.server_name}'. Allowed: {', '.join(self.allowed_models)}"
+                f"'{self.server_name}'. Allowed: {', '.join(self.allowed_models)}",
             )
 
         # Convert messages
@@ -1037,7 +1037,7 @@ class SamplingHandler:
                         "name": getattr(t, "name", ""),
                         "description": getattr(t, "description", "") or "",
                         "parameters": _normalize_mcp_input_schema(
-                            getattr(t, "inputSchema", None)
+                            getattr(t, "inputSchema", None),
                         ),
                     },
                 }
@@ -1070,12 +1070,12 @@ class SamplingHandler:
             self.metrics["errors"] += 1
             return self._error(
                 f"Sampling LLM call timed out after {self.timeout}s "
-                f"for server '{self.server_name}'"
+                f"for server '{self.server_name}'",
             )
         except Exception as poll_exc:
             self.metrics["errors"] += 1
             return self._error(
-                f"Sampling LLM call failed: {_sanitize_error(_exc_str(exc))}"
+                f"Sampling LLM call failed: {_sanitize_error(_exc_str(exc))}",
             )
 
         # Guard against empty choices (content filtering, provider errors)
@@ -1083,7 +1083,7 @@ class SamplingHandler:
             self.metrics["errors"] += 1
             return self._error(
                 f"LLM returned empty response (no choices) for server "
-                f"'{self.server_name}'"
+                f"'{self.server_name}'",
             )
 
         # Track metrics
@@ -1265,7 +1265,7 @@ class MCPServerTask:
             # 3. Re-register with fresh tool list
             self._tools = new_mcp_tools
             self._registered_tool_names = _register_server_tools(
-                self.name, self, self._config
+                self.name, self, self._config,
             )
 
             # 5. Log what changed (user-visible notification)
@@ -1360,7 +1360,7 @@ class MCPServerTask:
                 "it is not installed. Install with:\n"
                 "  pip install 'hermes-agent[mcp]'\n"
                 "or (full install):\n"
-                "  pip install 'hermes-agent[all]'"
+                "  pip install 'hermes-agent[all]'",
             )
 
         command = config.get("command")
@@ -1369,7 +1369,7 @@ class MCPServerTask:
 
         if not command:
             raise ValueError(
-                f"MCP server '{self.name}' has no 'command' in config"
+                f"MCP server '{self.name}' has no 'command' in config",
             )
 
         safe_env = _build_safe_env(user_env)
@@ -1380,7 +1380,7 @@ class MCPServerTask:
         malware_error = check_package_for_malware(command, args)
         if malware_error:
             raise ValueError(
-                f"MCP server '{self.name}': {malware_error}"
+                f"MCP server '{self.name}': {malware_error}",
             )
 
         server_params = StdioServerParameters(
@@ -1427,7 +1427,7 @@ class MCPServerTask:
                             _stdio_pids[_pid] = self.name
                         _stdio_pgids.update(new_pgids)
                 async with ClientSession(
-                    read_stream, write_stream, **sampling_kwargs
+                    read_stream, write_stream, **sampling_kwargs,
                 ) as session:
                     self.initialize_result = await session.initialize()
                     self.session = session
@@ -1549,7 +1549,7 @@ class MCPServerTask:
             f"{', '.join(self._MCP_CONTENT_TYPES)}). The URL most likely "
             "points at a web page rather than an MCP endpoint — check it "
             "resolves to a Streamable HTTP / SSE endpoint "
-            "(e.g. https://host/mcp, not https://host/)."
+            "(e.g. https://host/mcp, not https://host/).",
         )
 
     async def _run_http(self, config: dict):
@@ -1558,7 +1558,7 @@ class MCPServerTask:
             raise ImportError(
                 f"MCP server '{self.name}' requires HTTP transport but "
                 "mcp.client.streamable_http is not available. "
-                "Upgrade the mcp package to get HTTP support."
+                "Upgrade the mcp package to get HTTP support.",
             )
 
         url = config["url"]
@@ -1602,7 +1602,7 @@ class MCPServerTask:
                 raise ImportError(
                     f"MCP server '{self.name}' requires SSE transport but "
                     "mcp.client.sse.sse_client is not available. "
-                    "Upgrade the mcp package to get SSE support."
+                    "Upgrade the mcp package to get SSE support.",
                 )
             # sse_read_timeout governs how long sse_client will wait between
             # events on the SSE stream. Using the tool_timeout (default 60s)
@@ -1656,7 +1656,7 @@ class MCPServerTask:
                 _sse_kwargs["httpx_client_factory"] = _mcp_http_client_factory
             async with sse_client(**_sse_kwargs) as (read_stream, write_stream):
                 async with ClientSession(
-                    read_stream, write_stream, **sampling_kwargs
+                    read_stream, write_stream, **sampling_kwargs,
                 ) as session:
                     self.initialize_result = await session.initialize()
                     self.session = session
@@ -2505,7 +2505,7 @@ def _run_on_mcp_loop(coro_or_factory, timeout: float = 30):
                 elapsed = time.monotonic() - start_time
                 raise TimeoutError(
                     f"MCP call timed out after {elapsed:.1f}s "
-                    f"(configured timeout: {float(timeout):.1f}s)"
+                    f"(configured timeout: {float(timeout):.1f}s)",
                 )
             wait_timeout = min(wait_timeout, remaining)
 
@@ -2518,7 +2518,7 @@ def _run_on_mcp_loop(coro_or_factory, timeout: float = 30):
 def _interrupted_call_result() -> str:
     """Standardized JSON error for a user-interrupted MCP tool call."""
     return json.dumps({
-        "error": "MCP call interrupted: user sent a new message"
+        "error": "MCP call interrupted: user sent a new message",
     }, ensure_ascii=False)
 
 
@@ -2622,7 +2622,7 @@ def _make_tool_handler(server_name: str, tool_name: str, tool_timeout: float):
                         f"failures. Auto-retry available in ~{remaining}s. "
                         f"Do NOT retry this tool yet — use alternative "
                         f"approaches or ask the user to check the MCP server."
-                    )
+                    ),
                 }, ensure_ascii=False)
             # Cooldown elapsed → fall through as a half-open probe.
 
@@ -2631,7 +2631,7 @@ def _make_tool_handler(server_name: str, tool_name: str, tool_timeout: float):
         if not server or not server.session:
             _bump_server_error(server_name)
             return json.dumps({
-                "error": f"MCP server '{server_name}' is not connected"
+                "error": f"MCP server '{server_name}' is not connected",
             }, ensure_ascii=False)
 
         async def _call():
@@ -2645,8 +2645,8 @@ def _make_tool_handler(server_name: str, tool_name: str, tool_timeout: float):
                         error_text += block.text
                 return json.dumps({
                     "error": _sanitize_error(
-                        error_text or "MCP tool returned an error"
-                    )
+                        error_text or "MCP tool returned an error",
+                    ),
                 }, ensure_ascii=False)
 
             # Collect text from content blocks. MCP tool results can also
@@ -2729,8 +2729,8 @@ def _make_tool_handler(server_name: str, tool_name: str, tool_timeout: float):
             )
             return json.dumps({
                 "error": _sanitize_error(
-                    f"MCP call failed: {type(exc).__name__}: {_exc_str(exc)}"
-                )
+                    f"MCP call failed: {type(exc).__name__}: {_exc_str(exc)}",
+                ),
             }, ensure_ascii=False)
 
     return _handler
@@ -2744,7 +2744,7 @@ def _make_list_resources_handler(server_name: str, tool_timeout: float):
             server = _servers.get(server_name)
         if not server or not server.session:
             return json.dumps({
-                "error": f"MCP server '{server_name}' is not connected"
+                "error": f"MCP server '{server_name}' is not connected",
             }, ensure_ascii=False)
 
         async def _call():
@@ -2787,8 +2787,8 @@ def _make_list_resources_handler(server_name: str, tool_timeout: float):
             )
             return json.dumps({
                 "error": _sanitize_error(
-                    f"MCP call failed: {type(exc).__name__}: {_exc_str(exc)}"
-                )
+                    f"MCP call failed: {type(exc).__name__}: {_exc_str(exc)}",
+                ),
             }, ensure_ascii=False)
 
     return _handler
@@ -2804,7 +2804,7 @@ def _make_read_resource_handler(server_name: str, tool_timeout: float):
             server = _servers.get(server_name)
         if not server or not server.session:
             return json.dumps({
-                "error": f"MCP server '{server_name}' is not connected"
+                "error": f"MCP server '{server_name}' is not connected",
             }, ensure_ascii=False)
 
         uri = args.get("uri")
@@ -2847,8 +2847,8 @@ def _make_read_resource_handler(server_name: str, tool_timeout: float):
             )
             return json.dumps({
                 "error": _sanitize_error(
-                    f"MCP call failed: {type(exc).__name__}: {_exc_str(exc)}"
-                )
+                    f"MCP call failed: {type(exc).__name__}: {_exc_str(exc)}",
+                ),
             }, ensure_ascii=False)
 
     return _handler
@@ -2862,7 +2862,7 @@ def _make_list_prompts_handler(server_name: str, tool_timeout: float):
             server = _servers.get(server_name)
         if not server or not server.session:
             return json.dumps({
-                "error": f"MCP server '{server_name}' is not connected"
+                "error": f"MCP server '{server_name}' is not connected",
             }, ensure_ascii=False)
 
         async def _call():
@@ -2910,8 +2910,8 @@ def _make_list_prompts_handler(server_name: str, tool_timeout: float):
             )
             return json.dumps({
                 "error": _sanitize_error(
-                    f"MCP call failed: {type(exc).__name__}: {_exc_str(exc)}"
-                )
+                    f"MCP call failed: {type(exc).__name__}: {_exc_str(exc)}",
+                ),
             }, ensure_ascii=False)
 
     return _handler
@@ -2927,7 +2927,7 @@ def _make_get_prompt_handler(server_name: str, tool_timeout: float):
             server = _servers.get(server_name)
         if not server or not server.session:
             return json.dumps({
-                "error": f"MCP server '{server_name}' is not connected"
+                "error": f"MCP server '{server_name}' is not connected",
             }, ensure_ascii=False)
 
         name = args.get("name")
@@ -2981,8 +2981,8 @@ def _make_get_prompt_handler(server_name: str, tool_timeout: float):
             )
             return json.dumps({
                 "error": _sanitize_error(
-                    f"MCP call failed: {type(exc).__name__}: {_exc_str(exc)}"
-                )
+                    f"MCP call failed: {type(exc).__name__}: {_exc_str(exc)}",
+                ),
             }, ensure_ascii=False)
 
     return _handler
@@ -3079,7 +3079,7 @@ def _normalize_mcp_input_schema(schema: dict | None) -> dict:
         if repaired.get("type") == "object":
             # Ensure properties exists so required can reference it safely
             if "properties" not in repaired or not isinstance(
-                repaired.get("properties"), dict
+                repaired.get("properties"), dict,
             ):
                 repaired["properties"] = repaired.get("properties", {})
                 if not isinstance(repaired.get("properties"), dict):

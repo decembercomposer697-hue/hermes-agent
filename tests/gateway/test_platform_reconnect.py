@@ -50,7 +50,7 @@ def _make_runner():
     """Create a minimal GatewayRunner via object.__new__ to skip __init__."""
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="test")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="test")},
     )
     runner._running = True
     runner._shutdown_event = asyncio.Event()
@@ -101,13 +101,13 @@ class TestStartupPlatformIsolation:
             Platform.FEISHU: StubAdapter(platform=Platform.FEISHU),
         }
         runner._create_adapter = MagicMock(
-            side_effect=lambda platform, _config: adapters[platform]
+            side_effect=lambda platform, _config: adapters[platform],
         )
         runner._connect_adapter_with_timeout = AsyncMock(
             side_effect=[
                 TimeoutError("telegram connect timed out after 30s"),
                 True,
-            ]
+            ],
         )
 
         def fake_create_task(coro):
@@ -262,7 +262,7 @@ class TestPlatformReconnectWatcher:
 
         assert Platform.TELEGRAM in runner.adapters
         runner._schedule_resume_pending_sessions.assert_called_once_with(
-            platform=Platform.TELEGRAM
+            platform=Platform.TELEGRAM,
         )
 
     @pytest.mark.asyncio
@@ -278,7 +278,7 @@ class TestPlatformReconnectWatcher:
         }
 
         fail_adapter = StubAdapter(
-            succeed=False, fatal_error="bad token", fatal_retryable=False
+            succeed=False, fatal_error="bad token", fatal_retryable=False,
         )
 
         real_sleep = asyncio.sleep
@@ -316,7 +316,7 @@ class TestPlatformReconnectWatcher:
         }
 
         fail_adapter = StubAdapter(
-            succeed=False, fatal_error="DNS failure", fatal_retryable=True
+            succeed=False, fatal_error="DNS failure", fatal_retryable=True,
         )
 
         real_sleep = asyncio.sleep
@@ -360,7 +360,7 @@ class TestPlatformReconnectWatcher:
         }
 
         fail_adapter = StubAdapter(
-            succeed=False, fatal_error="DNS failure", fatal_retryable=True
+            succeed=False, fatal_error="DNS failure", fatal_retryable=True,
         )
         real_sleep = asyncio.sleep
 
@@ -722,7 +722,7 @@ class TestPlatformSlashCommand:
             "next_retry": time.monotonic() + 30,
         }
         out = await runner._handle_platform_command(
-            self._make_event("/platform pause whatsapp")
+            self._make_event("/platform pause whatsapp"),
         )
         assert "paused" in out.lower()
         assert runner._failed_platforms[Platform.WHATSAPP]["paused"] is True
@@ -731,7 +731,7 @@ class TestPlatformSlashCommand:
     async def test_pause_rejects_unqueued_platform(self):
         runner = _make_runner()
         out = await runner._handle_platform_command(
-            self._make_event("/platform pause whatsapp")
+            self._make_event("/platform pause whatsapp"),
         )
         assert "not in the retry queue" in out
 
@@ -746,7 +746,7 @@ class TestPlatformSlashCommand:
             "pause_reason": "x",
         }
         out = await runner._handle_platform_command(
-            self._make_event("/platform resume whatsapp")
+            self._make_event("/platform resume whatsapp"),
         )
         assert "resumed" in out.lower()
         assert runner._failed_platforms[Platform.WHATSAPP]["paused"] is False
@@ -755,7 +755,7 @@ class TestPlatformSlashCommand:
     async def test_unknown_platform_name(self):
         runner = _make_runner()
         out = await runner._handle_platform_command(
-            self._make_event("/platform pause notarealplatform")
+            self._make_event("/platform pause notarealplatform"),
         )
         assert "Unknown platform" in out
 

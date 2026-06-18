@@ -278,7 +278,7 @@ def check_for_updates() -> int | None:
 
     try:
         cache_file.write_text(
-            json.dumps({"ts": now, "behind": behind, "rev": embedded_rev, "ver": VERSION})
+            json.dumps({"ts": now, "behind": behind, "rev": embedded_rev, "ver": VERSION}),
         )
     except Exception:
         pass
@@ -643,17 +643,17 @@ def build_welcome_banner(console: "Console", model: str, cwd: str,
             if srv["connected"]:
                 right_lines.append(
                     f"[dim {dim}]{srv['name']}[/] [{text}]({srv['transport']})[/] "
-                    f"[dim {dim}]—[/] [{text}]{srv['tools']} tool(s)[/]"
+                    f"[dim {dim}]—[/] [{text}]{srv['tools']} tool(s)[/]",
                 )
             elif srv.get("disabled"):
                 right_lines.append(
                     f"[dim {dim}]{srv['name']}[/] [dim]({srv['transport']})[/] "
-                    f"[dim {dim}]— disabled[/]"
+                    f"[dim {dim}]— disabled[/]",
                 )
             else:
                 right_lines.append(
                     f"[red]{srv['name']}[/] [dim]({srv['transport']})[/] "
-                    f"[red]— failed[/]"
+                    f"[red]— failed[/]",
                 )
 
     right_lines.append("")
@@ -690,7 +690,7 @@ def build_welcome_banner(console: "Console", model: str, cwd: str,
         if get_current_runtime(_load_cfg()) == "codex_app_server":
             right_lines.append(
                 f"[bold {accent}]Runtime:[/] [{text}]codex app-server[/] "
-                f"[dim {dim}](terminal/file ops/MCP run inside codex)[/]"
+                f"[dim {dim}](terminal/file ops/MCP run inside codex)[/]",
             )
     except Exception:
         pass
@@ -714,7 +714,7 @@ def build_welcome_banner(console: "Console", model: str, cwd: str,
                 commits_word = "commit" if behind == 1 else "commits"
                 right_lines.append(
                     f"[bold yellow]⚠ {behind} {commits_word} behind[/]"
-                    f"[dim yellow] — run [bold]{recommended_update_command()}[/bold] to update[/]"
+                    f"[dim yellow] — run [bold]{recommended_update_command()}[/bold] to update[/]",
                 )
             else:
                 # UPDATE_AVAILABLE_NO_COUNT: nix-built hermes; we know an update
@@ -738,7 +738,7 @@ def build_welcome_banner(console: "Console", model: str, cwd: str,
             right_lines.append(
                 "[bold yellow]⚠ pip install not officially supported[/]"
                 "[dim yellow] — exists for reasons other than user install; "
-                "expect instability and an inability to support issues[/]"
+                "expect instability and an inability to support issues[/]",
             )
     except Exception:
         pass  # Never break the banner over the install-method check

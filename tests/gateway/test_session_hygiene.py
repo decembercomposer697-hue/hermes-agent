@@ -69,7 +69,7 @@ class HygieneCaptureAdapter(BasePlatformAdapter):
                 "content": content,
                 "reply_to": reply_to,
                 "metadata": metadata,
-            }
+            },
         )
         return SendResult(success=True, message_id="hygiene-1")
 
@@ -330,7 +330,7 @@ async def test_session_hygiene_messages_stay_in_originating_topic(monkeypatch, t
     adapter = HygieneCaptureAdapter()
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake-token")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake-token")},
     )
     runner.adapters = {Platform.TELEGRAM: adapter}
     runner._voice_mode = {}
@@ -361,7 +361,7 @@ async def test_session_hygiene_messages_stay_in_originating_topic(monkeypatch, t
             "tools": [],
             "history_offset": 0,
             "last_prompt_tokens": 0,
-        }
+        },
     )
 
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
@@ -439,7 +439,7 @@ async def test_session_hygiene_warns_user_when_compression_aborts(monkeypatch, t
     adapter = HygieneCaptureAdapter()
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake-token")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake-token")},
     )
     runner.adapters = {Platform.TELEGRAM: adapter}
     runner._voice_mode = {}
@@ -470,7 +470,7 @@ async def test_session_hygiene_warns_user_when_compression_aborts(monkeypatch, t
             "tools": [],
             "history_offset": 0,
             "last_prompt_tokens": 0,
-        }
+        },
     )
 
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
@@ -559,7 +559,7 @@ async def test_session_hygiene_informs_user_when_aux_model_fails_but_recovers(mo
     adapter = HygieneCaptureAdapter()
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake-token")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake-token")},
     )
     runner.adapters = {Platform.TELEGRAM: adapter}
     runner._voice_mode = {}
@@ -590,7 +590,7 @@ async def test_session_hygiene_informs_user_when_aux_model_fails_but_recovers(mo
             "tools": [],
             "history_offset": 0,
             "last_prompt_tokens": 0,
-        }
+        },
     )
 
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
@@ -640,7 +640,7 @@ async def test_session_hygiene_informs_user_when_aux_model_fails_but_recovers(mo
 
 @pytest.mark.asyncio
 async def test_session_hygiene_honors_configurable_hard_message_limit(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     """compression.hygiene_hard_message_limit overrides the 400-message default.
 
@@ -677,7 +677,7 @@ async def test_session_hygiene_honors_configurable_hard_message_limit(
     cfg_path.write_text(
         "compression:\n"
         "  enabled: true\n"
-        "  hygiene_hard_message_limit: 10\n"
+        "  hygiene_hard_message_limit: 10\n",
     )
 
     gateway_run = importlib.import_module("gateway.run")
@@ -686,7 +686,7 @@ async def test_session_hygiene_honors_configurable_hard_message_limit(
     adapter = HygieneCaptureAdapter()
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake-token")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake-token")},
     )
     runner.adapters = {Platform.TELEGRAM: adapter}
     runner._voice_mode = {}
@@ -719,12 +719,12 @@ async def test_session_hygiene_honors_configurable_hard_message_limit(
             "tools": [],
             "history_offset": 0,
             "last_prompt_tokens": 0,
-        }
+        },
     )
 
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "fake"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "fake"},
     )
     # Pick a context length large enough that the token-based threshold
     # won't trigger for 12 short messages — hard-limit must be the ONLY
@@ -758,7 +758,7 @@ async def test_session_hygiene_honors_configurable_hard_message_limit(
 
 @pytest.mark.asyncio
 async def test_session_hygiene_default_hard_message_limit_does_not_fire_at_12_messages(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     """Sanity check for the companion test above: without config override,
     12 messages must NOT trigger the 400-message hard limit.  If this test
@@ -791,7 +791,7 @@ async def test_session_hygiene_default_hard_message_limit_does_not_fire_at_12_me
     adapter = HygieneCaptureAdapter()
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake-token")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake-token")},
     )
     runner.adapters = {Platform.TELEGRAM: adapter}
     runner._voice_mode = {}
@@ -822,12 +822,12 @@ async def test_session_hygiene_default_hard_message_limit_does_not_fire_at_12_me
             "tools": [],
             "history_offset": 0,
             "last_prompt_tokens": 0,
-        }
+        },
     )
 
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "fake"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "fake"},
     )
     monkeypatch.setattr(
         "agent.model_metadata.get_model_context_length",

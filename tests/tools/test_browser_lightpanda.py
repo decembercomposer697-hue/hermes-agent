@@ -178,7 +178,7 @@ class TestNeedsLightpandaFallback:
     def test_normal_snapshot_does_not_trigger(self):
         from tools.browser_tool import _needs_lightpanda_fallback
         result = {"success": True, "data": {
-            "snapshot": '- heading "Example Domain" [ref=e1]\n- link "Learn more" [ref=e2]'
+            "snapshot": '- heading "Example Domain" [ref=e1]\n- link "Learn more" [ref=e2]',
         }}
         assert _needs_lightpanda_fallback("lightpanda", "snapshot", result) is False
 
@@ -339,7 +339,7 @@ class TestLightpandaFallbackWarning:
         with patch("tools.browser_tool._is_local_backend", return_value=True), \
              patch("tools.browser_tool._get_cloud_provider", return_value=None), \
              patch("tools.browser_tool._get_session_info", return_value={
-                 "session_name": "test", "_first_nav": False, "features": {"local": True, "proxies": True}
+                 "session_name": "test", "_first_nav": False, "features": {"local": True, "proxies": True},
              }), \
              patch("tools.browser_tool._run_browser_command", side_effect=[
                  result,
@@ -366,7 +366,7 @@ class TestLightpandaFallbackWarning:
         with patch("tools.browser_tool._is_local_backend", return_value=True), \
              patch("tools.browser_tool._get_cloud_provider", return_value=None), \
              patch("tools.browser_tool._get_session_info", return_value={
-                 "session_name": "test", "_first_nav": False, "features": {"local": True, "proxies": True}
+                 "session_name": "test", "_first_nav": False, "features": {"local": True, "proxies": True},
              }), \
              patch("tools.browser_tool._run_browser_command", side_effect=[
                  {"success": True, "data": {"title": "Fallback OK", "url": "https://example.com/"}},
@@ -423,7 +423,7 @@ class TestLightpandaFallbackWarning:
         with patch("tools.browser_tool._get_browser_engine", return_value="lightpanda"), \
              patch("tools.browser_tool._should_inject_engine", return_value=True), \
              patch("tools.browser_tool._chrome_fallback_screenshot", return_value={
-                 "success": True, "data": {"path": str(chrome_shot)}
+                 "success": True, "data": {"path": str(chrome_shot)},
              }), \
              patch("hermes_constants.get_hermes_dir", return_value=tmp_path), \
              patch("tools.browser_tool.call_llm", side_effect=fake_call_llm):
@@ -474,7 +474,7 @@ class TestLightpandaFallbackWarning:
         with patch("tools.browser_tool._get_browser_engine", return_value="lightpanda"), \
              patch("tools.browser_tool._should_inject_engine", return_value=True), \
              patch("tools.browser_tool._chrome_fallback_screenshot", return_value={
-                 "success": True, "data": {"path": str(chrome_shot)}
+                 "success": True, "data": {"path": str(chrome_shot)},
              }), \
              patch("hermes_constants.get_hermes_dir", return_value=tmp_path), \
              patch("tools.browser_tool.call_llm", return_value=_Response()):
@@ -503,7 +503,7 @@ class TestEngineOverride:
     @patch("tools.browser_tool._get_cdp_override", return_value="")
     @patch("tools.browser_tool._is_camofox_mode", return_value=False)
     def test_override_prevents_engine_injection(
-        self, _camofox, _cdp, _cloud, _chromium, _local, _find, _session
+        self, _camofox, _cdp, _cloud, _chromium, _local, _find, _session,
     ):
         """When _engine_override='auto', --engine flag is NOT injected."""
         import tools.browser_tool as bt
@@ -550,7 +550,7 @@ class TestEngineOverride:
     @patch("tools.browser_tool._get_cdp_override", return_value="")
     @patch("tools.browser_tool._is_camofox_mode", return_value=False)
     def test_no_override_uses_cached_engine(
-        self, _camofox, _cdp, _cloud, _chromium, _local, _find, _session
+        self, _camofox, _cdp, _cloud, _chromium, _local, _find, _session,
     ):
         """Without _engine_override, the cached engine is used."""
         import tools.browser_tool as bt

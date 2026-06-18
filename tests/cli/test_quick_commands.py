@@ -237,7 +237,7 @@ class TestGatewayQuickCommands:
 
         runner = GatewayRunner.__new__(GatewayRunner)
         runner.config = GatewayConfig(
-            quick_commands={"limits": {"type": "exec", "command": "echo ok"}}
+            quick_commands={"limits": {"type": "exec", "command": "echo ok"}},
         )
         runner._running_agents = {}
         runner._pending_messages = {}

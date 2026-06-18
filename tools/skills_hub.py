@@ -643,7 +643,7 @@ class GitHubSource(SkillSource):
                 self._rate_limited = True
                 logger.warning(
                     "GitHub API rate limit exhausted (unauthenticated: 60 req/hr). "
-                    "Set GITHUB_TOKEN or install the gh CLI to raise the limit to 5,000/hr."
+                    "Set GITHUB_TOKEN or install the gh CLI to raise the limit to 5,000/hr.",
                 )
 
     def _github_get(
@@ -2088,7 +2088,7 @@ class ClawHubSource(SkillSource):
                 -self._search_score(query_norm, meta),
                 meta.name.lower(),
                 meta.identifier.lower(),
-            )
+            ),
         )
         filtered = self._dedupe_results(filtered)
 
@@ -2927,7 +2927,7 @@ class OptionalSkillSource(SkillSource):
         from hermes_constants import get_optional_skills_dir
 
         self._optional_dir = get_optional_skills_dir(
-            Path(__file__).parent.parent / "optional-skills"
+            Path(__file__).parent.parent / "optional-skills",
         )
 
     def source_id(self) -> str:
@@ -3370,7 +3370,7 @@ def install_from_quarantine(
         except ValueError:
             rel = entry
         raise ValueError(
-            f"Installed skill contains symlinks, which is not allowed: {rel}"
+            f"Installed skill contains symlinks, which is not allowed: {rel}",
         )
 
     install_dir.parent.mkdir(parents=True, exist_ok=True)
@@ -3415,7 +3415,7 @@ def uninstall_skill(skill_name: str) -> tuple[bool, str]:
     # component-by-component refusing symlink/junction redirects.
     try:
         install_path = _resolve_lock_install_path(
-            entry.get("install_path", ""), skill_name
+            entry.get("install_path", ""), skill_name,
         )
     except ValueError as exc:
         return False, f"Refusing to uninstall '{skill_name}': {exc}"
@@ -3753,7 +3753,7 @@ def create_source_router(auth: GitHubAuth | None = None) -> list[SkillSource]:
 
 
 def _search_one_source(
-    src: SkillSource, query: str, limit: int
+    src: SkillSource, query: str, limit: int,
 ) -> tuple[str, list[SkillMeta]]:
     """Search a single source.  Runs in a thread for parallelism."""
     try:

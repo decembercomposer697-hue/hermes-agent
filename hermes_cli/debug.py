@@ -38,7 +38,7 @@ _REDACTION_BANNER = (
 _EMAIL_ADDRESS_RE = re.compile(
     r"(?<![A-Za-z0-9._%+-])"
     r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
-    r"(?![A-Za-z0-9._%+-])"
+    r"(?![A-Za-z0-9._%+-])",
 )
 
 
@@ -229,7 +229,7 @@ def delete_paste(url: str) -> bool:
     paste_id = _extract_paste_id(url)
     if not paste_id:
         raise ValueError(
-            f"Cannot delete: only paste.rs URLs are supported.  Got: {url}"
+            f"Cannot delete: only paste.rs URLs are supported.  Got: {url}",
         )
 
     target = f"{_PASTE_RS_URL}{paste_id}"
@@ -334,7 +334,7 @@ def upload_to_pastebin(content: str, expiry_days: int = 7) -> str:
         errors.append(f"dpaste.com: {exc}")
 
     raise RuntimeError(
-        "Failed to upload to any paste service:\n  " + "\n  ".join(errors)
+        "Failed to upload to any paste service:\n  " + "\n  ".join(errors),
     )
 
 
@@ -485,7 +485,7 @@ def _capture_log_snapshot(
 
 
 def _capture_default_log_snapshots(
-    log_lines: int, *, redact: bool = True
+    log_lines: int, *, redact: bool = True,
 ) -> dict[str, LogSnapshot]:
     """Capture all logs used by debug-share exactly once.
 
@@ -495,16 +495,16 @@ def _capture_default_log_snapshots(
     errors_lines = min(log_lines, 100)
     return {
         "agent": _capture_log_snapshot(
-            "agent", tail_lines=log_lines, redact=redact
+            "agent", tail_lines=log_lines, redact=redact,
         ),
         "errors": _capture_log_snapshot(
-            "errors", tail_lines=errors_lines, redact=redact
+            "errors", tail_lines=errors_lines, redact=redact,
         ),
         "gateway": _capture_log_snapshot(
-            "gateway", tail_lines=errors_lines, redact=redact
+            "gateway", tail_lines=errors_lines, redact=redact,
         ),
         "desktop": _capture_log_snapshot(
-            "desktop", tail_lines=errors_lines, redact=redact
+            "desktop", tail_lines=errors_lines, redact=redact,
         ),
     }
 
@@ -629,7 +629,7 @@ def build_debug_share(
 
     if redact:
         logger.info(
-            "hermes debug share: applied force-mode redaction to log snapshots before upload"
+            "hermes debug share: applied force-mode redaction to log snapshots before upload",
         )
 
     report = collect_debug_report(

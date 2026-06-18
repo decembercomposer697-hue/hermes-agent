@@ -65,7 +65,7 @@ def _make_event(text="hi", chat_id="42"):
 
 def _sk(chat_id="42"):
     return build_session_key(
-        SessionSource(platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm")
+        SessionSource(platform=Platform.TELEGRAM, chat_id=chat_id, chat_type="dm"),
     )
 
 

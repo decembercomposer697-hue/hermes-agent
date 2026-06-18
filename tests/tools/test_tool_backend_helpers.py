@@ -292,7 +292,7 @@ class TestResolveModalBackendState:
             lambda: nous_enabled,
         )
         return resolve_modal_backend_state(
-            mode, has_direct=has_direct, managed_ready=managed_ready
+            mode, has_direct=has_direct, managed_ready=managed_ready,
         )
 
     # --- auto mode ---

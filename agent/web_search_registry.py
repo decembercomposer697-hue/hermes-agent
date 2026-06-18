@@ -55,7 +55,7 @@ def register_provider(provider: WebSearchProvider) -> None:
     if not isinstance(provider, WebSearchProvider):
         raise TypeError(
             f"register_provider() expects a WebSearchProvider instance, "
-            f"got {type(provider).__name__}"
+            f"got {type(provider).__name__}",
         )
     name = provider.name
     if not isinstance(name, str) or not name.strip():

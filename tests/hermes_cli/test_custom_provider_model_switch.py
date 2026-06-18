@@ -197,7 +197,7 @@ class TestCustomProviderModelSwitch:
             "- name: Example Provider\n"
             "  base_url: https://api.example-provider.test/v1\n"
             "  api_key: ${EXAMPLE_PROVIDER_API_KEY}\n"
-            "  model: qwen3.6-35b-fast\n"
+            "  model: qwen3.6-35b-fast\n",
         )
         monkeypatch.setenv("EXAMPLE_PROVIDER_API_KEY", "sk-live-example-provider")
 
@@ -238,7 +238,7 @@ class TestCustomProviderModelSwitch:
             "- name: Example Provider\n"
             "  base_url: https://api.example-provider.test/v1\n"
             "  key_env: EXAMPLE_PROVIDER_API_KEY\n"
-            "  model: qwen3.6-35b-fast\n"
+            "  model: qwen3.6-35b-fast\n",
         )
         monkeypatch.setenv("EXAMPLE_PROVIDER_API_KEY", "sk-live-example-provider")
 
@@ -262,7 +262,7 @@ class TestCustomProviderModelSwitch:
         assert "sk-live-example-provider" not in config_path.read_text()
 
     def test_env_ref_base_url_preserves_api_key_ref_through_picker(
-        self, config_home, monkeypatch
+        self, config_home, monkeypatch,
     ):
         """Integration regression: when BOTH ``base_url`` and ``api_key`` use
         ``${VAR}`` templates (the Discord-reported NeuralWatt case), the picker
@@ -287,7 +287,7 @@ class TestCustomProviderModelSwitch:
             "  base_url: ${NEURALWATT_API_BASE}\n"
             "  api_key: ${NEURALWATT_API_KEY}\n"
             "  model: qwen3.6-35b-fast\n"
-            "  models: []\n"
+            "  models: []\n",
         )
         monkeypatch.setenv("NEURALWATT_API_BASE", "https://api.neuralwatt.com/v1")
         monkeypatch.setenv("NEURALWATT_API_KEY", "sk-live-neuralwatt-secret")
@@ -302,7 +302,7 @@ class TestCustomProviderModelSwitch:
                 if "NeuralWatt" in label:
                     return i
             raise AssertionError(
-                f"NeuralWatt entry missing from provider menu: {labels}"
+                f"NeuralWatt entry missing from provider menu: {labels}",
             )
 
         with patch("hermes_cli.main._prompt_provider_choice",
@@ -327,7 +327,7 @@ class TestCustomProviderModelSwitch:
         assert "sk-live-neuralwatt-secret" not in saved
 
     def test_bare_custom_current_provider_matches_env_base_url_before_first_fallback(
-        self, config_home, monkeypatch
+        self, config_home, monkeypatch,
     ):
         """`hermes model` must mark the custom provider matching model.base_url
         as current instead of falling back to the first saved custom provider.
@@ -358,7 +358,7 @@ class TestCustomProviderModelSwitch:
             "  base_url: ${NEURALWATT_API_BASE}\n"
             "  api_key: ${NEURALWATT_API_KEY}\n"
             "  model: kimi-k2.6-fast\n"
-            "  models: []\n"
+            "  models: []\n",
         )
         monkeypatch.setenv("CEREBRAS_API_BASE", "https://api.cerebras.ai/v1")
         monkeypatch.setenv("CEREBRAS_API_KEY", "sk-live-cerebras-secret")
@@ -388,7 +388,7 @@ class TestCustomProviderModelSwitch:
         )
 
     def test_named_custom_provider_selection_preserves_base_url_env_ref(
-        self, config_home, monkeypatch
+        self, config_home, monkeypatch,
     ):
         """Selecting an env-backed custom provider should not expand its
         ``base_url`` template into ``model.base_url`` on disk."""
@@ -405,7 +405,7 @@ class TestCustomProviderModelSwitch:
             "  base_url: ${NEURALWATT_API_BASE}\n"
             "  api_key: ${NEURALWATT_API_KEY}\n"
             "  model: qwen3.6-35b-fast\n"
-            "  models: []\n"
+            "  models: []\n",
         )
         monkeypatch.setenv("NEURALWATT_API_BASE", "https://api.neuralwatt.com/v1")
         monkeypatch.setenv("NEURALWATT_API_KEY", "sk-live-neuralwatt-secret")
@@ -415,7 +415,7 @@ class TestCustomProviderModelSwitch:
                 if "NeuralWatt" in label:
                     return i
             raise AssertionError(
-                f"NeuralWatt entry missing from provider menu: {labels}"
+                f"NeuralWatt entry missing from provider menu: {labels}",
             )
 
         with patch("hermes_cli.main._prompt_provider_choice",
@@ -439,7 +439,7 @@ class TestCustomProviderModelSwitch:
         assert "sk-live-neuralwatt-secret" not in saved
 
     def test_key_env_providers_dict_entry_does_not_add_api_key(
-        self, config_home, monkeypatch
+        self, config_home, monkeypatch,
     ):
         """Regression for #15803: a ``providers:`` (keyed-schema) entry that
         relies on ``key_env`` must not gain an ``api_key`` field after the
@@ -465,7 +465,7 @@ class TestCustomProviderModelSwitch:
             "    transport: anthropic_messages\n"
             "    model: claude-opus-4-7\n"
             "    default_model: claude-opus-4-7\n"
-            "custom_providers: []\n"
+            "custom_providers: []\n",
         )
         monkeypatch.setenv("HERMES_CRS_HENKEE_KEY", "cr_live_secret_xyz")
 
@@ -513,7 +513,7 @@ class TestCustomProviderModelSwitch:
         assert "${HERMES_CRS_HENKEE_KEY}" not in saved_text
 
     def test_key_env_providers_dict_preserves_existing_api_key(
-        self, config_home, monkeypatch
+        self, config_home, monkeypatch,
     ):
         """A ``providers:`` entry that already has an inline ``api_key``
         template must keep it untouched. Only entries that never declared
@@ -532,7 +532,7 @@ class TestCustomProviderModelSwitch:
             "    transport: anthropic_messages\n"
             "    model: claude-opus-4-7\n"
             "    default_model: claude-opus-4-7\n"
-            "custom_providers: []\n"
+            "custom_providers: []\n",
         )
         monkeypatch.setenv("HERMES_CRS_HENKEE_KEY", "cr_live_secret_xyz")
 

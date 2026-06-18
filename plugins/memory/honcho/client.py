@@ -161,7 +161,7 @@ def _parse_string_map(host_obj: dict, root_obj: dict, key: str) -> dict[str, str
 
 
 def _parse_optional_string(
-    host_obj: dict, root_obj: dict, key: str, default: str = ""
+    host_obj: dict, root_obj: dict, key: str, default: str = "",
 ) -> str:
     """Parse a string field where host-level empty string can override root."""
     if key in host_obj:
@@ -587,7 +587,7 @@ class HonchoClientConfig:
             recall_mode=_normalize_recall_mode(
                 host_block.get("recallMode")
                 or raw.get("recallMode")
-                or "hybrid"
+                or "hybrid",
             ),
             init_on_session_start=_resolve_bool(
                 host_block.get("initOnSessionStart"),
@@ -602,13 +602,13 @@ class HonchoClientConfig:
             observation_mode=_normalize_observation_mode(
                 host_block.get("observationMode")
                 or raw.get("observationMode")
-                or ("unified" if _explicitly_configured else "directional")
+                or ("unified" if _explicitly_configured else "directional"),
             ),
             **_resolve_observation(
                 _normalize_observation_mode(
                     host_block.get("observationMode")
                     or raw.get("observationMode")
-                    or ("unified" if _explicitly_configured else "directional")
+                    or ("unified" if _explicitly_configured else "directional"),
                 ),
                 host_block.get("observation") or raw.get("observation"),
             ),
@@ -764,7 +764,7 @@ def get_honcho_client(config: HonchoClientConfig | None = None) -> Honcho:
             "Honcho API key not found. "
             "Get your API key at https://app.honcho.dev, "
             "then run 'hermes honcho setup' or set HONCHO_API_KEY. "
-            "For local instances, set HONCHO_BASE_URL instead."
+            "For local instances, set HONCHO_BASE_URL instead.",
         )
 
     # Everything below is the expensive part the issue flags: lazy SDK
@@ -794,7 +794,7 @@ def get_honcho_client(config: HonchoClientConfig | None = None) -> Honcho:
             raise ImportError(
                 "honcho-ai is required for Honcho integration. "
                 "Install it with: pip install honcho-ai  "
-                "(or run `hermes honcho setup` to configure)."
+                "(or run `hermes honcho setup` to configure).",
             )
 
         # Allow config.yaml honcho.base_url to override the SDK's environment

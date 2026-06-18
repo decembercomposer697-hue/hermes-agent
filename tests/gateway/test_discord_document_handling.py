@@ -89,7 +89,7 @@ class FakeThread:
 def _redirect_cache(tmp_path, monkeypatch):
     """Point document cache to tmp_path so tests never write to ~/.hermes."""
     monkeypatch.setattr(
-        "gateway.platforms.base.DOCUMENT_CACHE_DIR", tmp_path / "doc_cache"
+        "gateway.platforms.base.DOCUMENT_CACHE_DIR", tmp_path / "doc_cache",
     )
 
 
@@ -235,7 +235,7 @@ class TestIncomingDocumentHandling:
                 filename="huge.pdf",
                 content_type="application/pdf",
                 size=33 * 1024 * 1024,
-            )
+            ),
         ])
         await adapter._handle_message(msg)
 
@@ -252,7 +252,7 @@ class TestIncomingDocumentHandling:
                 filename="bugreport.zip",
                 content_type="application/zip",
                 size=25 * 1024 * 1024,
-            )
+            ),
         ])
 
         with _mock_aiohttp_download(b"PK\x03\x04test"):
@@ -266,7 +266,7 @@ class TestIncomingDocumentHandling:
     async def test_zip_document_cached(self, adapter):
         """A .zip file should be cached as a supported document."""
         msg = make_message([
-            make_attachment(filename="archive.zip", content_type="application/zip")
+            make_attachment(filename="archive.zip", content_type="application/zip"),
         ])
 
         with _mock_aiohttp_download(b"PK\x03\x04test"):
@@ -291,7 +291,7 @@ class TestIncomingDocumentHandling:
 
         with patch("aiohttp.ClientSession", return_value=session):
             msg = make_message([
-                make_attachment(filename="report.pdf", content_type="application/pdf")
+                make_attachment(filename="report.pdf", content_type="application/pdf"),
             ])
             await adapter._handle_message(msg)
 
@@ -376,7 +376,7 @@ class TestIncomingDocumentHandling:
             return_value="/tmp/cached_image.png",
         ):
             msg = make_message([
-                make_attachment(filename="photo.png", content_type="image/png")
+                make_attachment(filename="photo.png", content_type="image/png"),
             ])
             await adapter._handle_message(msg)
 
@@ -405,7 +405,7 @@ class TestAllowAnyAttachment:
         """
         with _mock_aiohttp_download(b"should not be cached"):
             msg = make_message([
-                make_attachment(filename="weird.xyz", content_type="application/x-custom")
+                make_attachment(filename="weird.xyz", content_type="application/x-custom"),
             ])
             await adapter._handle_message(msg)
 
@@ -420,7 +420,7 @@ class TestAllowAnyAttachment:
 
         with _mock_aiohttp_download(b"\x00\x01\x02 binary payload"):
             msg = make_message([
-                make_attachment(filename="weird.xyz", content_type="application/x-custom")
+                make_attachment(filename="weird.xyz", content_type="application/x-custom"),
             ])
             await adapter._handle_message(msg)
 
@@ -441,7 +441,7 @@ class TestAllowAnyAttachment:
 
         with _mock_aiohttp_download(b"raw bytes"):
             msg = make_message([
-                make_attachment(filename="mystery.bin", content_type=None)
+                make_attachment(filename="mystery.bin", content_type=None),
             ])
             await adapter._handle_message(msg)
 
@@ -460,7 +460,7 @@ class TestAllowAnyAttachment:
                 filename="too_big.xyz",
                 content_type="application/x-custom",
                 size=2048,
-            )
+            ),
         ])
         await adapter._handle_message(msg)
 
@@ -480,7 +480,7 @@ class TestAllowAnyAttachment:
                     filename="huge.xyz",
                     content_type="application/x-custom",
                     size=64 * 1024 * 1024,
-                )
+                ),
             ])
             await adapter._handle_message(msg)
 

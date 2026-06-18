@@ -186,7 +186,7 @@ async def _download_image(image_url: str, destination: Path, max_retries: int = 
             from tools.url_safety import async_is_safe_url
             if not await async_is_safe_url(redirect_url):
                 raise ValueError(
-                    f"Blocked redirect to private/internal address: {redirect_url}"
+                    f"Blocked redirect to private/internal address: {redirect_url}",
                 )
 
     last_error = None
@@ -217,7 +217,7 @@ async def _download_image(image_url: str, destination: Path, max_retries: int = 
                 cl = response.headers.get("content-length")
                 if cl and int(cl) > _VISION_MAX_DOWNLOAD_BYTES:
                     raise ValueError(
-                        f"Image too large ({int(cl)} bytes, max {_VISION_MAX_DOWNLOAD_BYTES})"
+                        f"Image too large ({int(cl)} bytes, max {_VISION_MAX_DOWNLOAD_BYTES})",
                     )
 
                 final_url = str(response.url)
@@ -229,7 +229,7 @@ async def _download_image(image_url: str, destination: Path, max_retries: int = 
                 body = response.content
                 if len(body) > _VISION_MAX_DOWNLOAD_BYTES:
                     raise ValueError(
-                        f"Image too large ({len(body)} bytes, max {_VISION_MAX_DOWNLOAD_BYTES})"
+                        f"Image too large ({len(body)} bytes, max {_VISION_MAX_DOWNLOAD_BYTES})",
                     )
                 destination.write_bytes(body)
             
@@ -260,7 +260,7 @@ async def _download_image(image_url: str, destination: Path, max_retries: int = 
     if last_error is not None:
         raise last_error
     raise RuntimeError(
-        f"_download_image exited retry loop without attempting (max_retries={max_retries})"
+        f"_download_image exited retry loop without attempting (max_retries={max_retries})",
     )
 
 
@@ -282,7 +282,7 @@ def _determine_mime_type(image_path: Path) -> str:
         '.gif': 'image/gif',
         '.bmp': 'image/bmp',
         '.webp': 'image/webp',
-        '.svg': 'image/svg+xml'
+        '.svg': 'image/svg+xml',
     }
     return mime_types.get(extension, 'image/jpeg')
 
@@ -842,13 +842,13 @@ async def vision_analyze_tool(
         "parameters": {
             "image_url": image_url,
             "user_prompt": user_prompt[:200] + "..." if len(user_prompt) > 200 else user_prompt,
-            "model": model
+            "model": model,
         },
         "error": None,
         "success": False,
         "analysis_length": 0,
         "model_used": model,
-        "image_size_bytes": 0
+        "image_size_bytes": 0,
     }
     
     temp_image_path = None
@@ -888,7 +888,7 @@ async def vision_analyze_tool(
             should_cleanup = True
         else:
             raise ValueError(
-                "Invalid image source. Provide an HTTP/HTTPS URL or a valid local file path."
+                "Invalid image source. Provide an HTTP/HTTPS URL or a valid local file path.",
             )
         
         # Get image file size for logging
@@ -919,7 +919,7 @@ async def vision_analyze_tool(
                     f"(limit {_MAX_BASE64_BYTES / (1024 * 1024):.0f} MB) "
                     f"even after resizing. "
                     f"Install Pillow (`pip install Pillow`) for better auto-resize, "
-                    f"or compress the image manually."
+                    f"or compress the image manually.",
                 )
 
         debug_call_data["image_size_bytes"] = image_size_bytes
@@ -934,16 +934,16 @@ async def vision_analyze_tool(
                 "content": [
                     {
                         "type": "text",
-                        "text": comprehensive_prompt
+                        "text": comprehensive_prompt,
                     },
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": image_data_url
-                        }
-                    }
-                ]
-            }
+                            "url": image_data_url,
+                        },
+                    },
+                ],
+            },
         ]
         
         logger.info("Processing image with vision model...")
@@ -1009,7 +1009,7 @@ async def vision_analyze_tool(
         # Prepare successful response
         result = {
             "success": True,
-            "analysis": analysis or "There was a problem with the request and the image could not be analyzed."
+            "analysis": analysis or "There was a problem with the request and the image could not be analyzed.",
         }
         
         debug_call_data["success"] = True
@@ -1078,7 +1078,7 @@ async def vision_analyze_tool(
                 logger.debug("Cleaned up temporary image file")
             except Exception as cleanup_error:
                 logger.warning(
-                    "Could not delete temporary file: %s", cleanup_error, exc_info=True
+                    "Could not delete temporary file: %s", cleanup_error, exc_info=True,
                 )
 
 
@@ -1183,15 +1183,15 @@ VISION_ANALYZE_SCHEMA = {
         "properties": {
             "image_url": {
                 "type": "string",
-                "description": "Image URL (http/https), local file path, or data: URL to load."
+                "description": "Image URL (http/https), local file path, or data: URL to load.",
             },
             "question": {
                 "type": "string",
-                "description": "Your specific question or request about the image. Optional context the model uses on the next turn after seeing the image."
-            }
+                "description": "Your specific question or request about the image. Optional context the model uses on the next turn after seeing the image.",
+            },
         },
-        "required": ["image_url", "question"]
-    }
+        "required": ["image_url", "question"],
+    },
 }
 
 
@@ -1274,7 +1274,7 @@ async def _download_video(video_url: str, destination: Path, max_retries: int = 
             from tools.url_safety import async_is_safe_url
             if not await async_is_safe_url(redirect_url):
                 raise ValueError(
-                    f"Blocked redirect to private/internal address: {redirect_url}"
+                    f"Blocked redirect to private/internal address: {redirect_url}",
                 )
 
     last_error = None
@@ -1301,7 +1301,7 @@ async def _download_video(video_url: str, destination: Path, max_retries: int = 
                 cl = response.headers.get("content-length")
                 if cl and int(cl) > _MAX_VIDEO_BASE64_BYTES:
                     raise ValueError(
-                        f"Video too large ({int(cl)} bytes, max {_MAX_VIDEO_BASE64_BYTES})"
+                        f"Video too large ({int(cl)} bytes, max {_MAX_VIDEO_BASE64_BYTES})",
                     )
 
                 final_url = str(response.url)
@@ -1312,7 +1312,7 @@ async def _download_video(video_url: str, destination: Path, max_retries: int = 
                 body = response.content
                 if len(body) > _MAX_VIDEO_BASE64_BYTES:
                     raise ValueError(
-                        f"Video too large ({len(body)} bytes, max {_MAX_VIDEO_BASE64_BYTES})"
+                        f"Video too large ({len(body)} bytes, max {_MAX_VIDEO_BASE64_BYTES})",
                     )
                 destination.write_bytes(body)
 
@@ -1331,7 +1331,7 @@ async def _download_video(video_url: str, destination: Path, max_retries: int = 
 
     if last_error is None:
         raise RuntimeError(
-            f"_download_video exited retry loop without attempting (max_retries={max_retries})"
+            f"_download_video exited retry loop without attempting (max_retries={max_retries})",
         )
     raise last_error
 
@@ -1388,7 +1388,7 @@ async def video_analyze_tool(
             should_cleanup = True
         else:
             raise ValueError(
-                "Invalid video source. Provide an HTTP/HTTPS URL or a valid local file path."
+                "Invalid video source. Provide an HTTP/HTTPS URL or a valid local file path.",
             )
 
         video_size_bytes = temp_video_path.stat().st_size
@@ -1399,7 +1399,7 @@ async def video_analyze_tool(
         if not detected_mime:
             raise ValueError(
                 f"Unsupported video format: '{temp_video_path.suffix}'. "
-                f"Supported: {', '.join(sorted(_VIDEO_MIME_TYPES.keys()))}"
+                f"Supported: {', '.join(sorted(_VIDEO_MIME_TYPES.keys()))}",
             )
 
         if video_size_bytes > _VIDEO_SIZE_WARN_BYTES:
@@ -1412,7 +1412,7 @@ async def video_analyze_tool(
             raise ValueError(
                 f"Video too large for API: base64 payload is {data_size_mb:.1f} MB "
                 f"(limit {_MAX_VIDEO_BASE64_BYTES / (1024 * 1024):.0f} MB). "
-                f"Compress or trim the video and retry."
+                f"Compress or trim the video and retry.",
             )
 
         debug_call_data["video_size_bytes"] = video_size_bytes
@@ -1432,7 +1432,7 @@ async def video_analyze_tool(
                         },
                     },
                 ],
-            }
+            },
         ]
 
         vision_timeout = 180.0
@@ -1539,7 +1539,7 @@ async def video_analyze_tool(
                 logger.debug("Cleaned up temporary video file")
             except Exception as cleanup_error:
                 logger.warning(
-                    "Could not delete temporary file: %s", cleanup_error, exc_info=True
+                    "Could not delete temporary file: %s", cleanup_error, exc_info=True,
                 )
 
 

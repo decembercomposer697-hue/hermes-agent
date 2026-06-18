@@ -199,7 +199,7 @@ def load_user_credentials(email: str | None = None) -> Any | None:
     except ImportError:
         logger.warning(
             "[google_chat_user_oauth] google-auth not installed; user-OAuth "
-            "attachment delivery is disabled. Install hermes-agent[google_chat]."
+            "attachment delivery is disabled. Install hermes-agent[google_chat].",
         )
         return None
 
@@ -427,10 +427,10 @@ def store_client_secret(path: str) -> None:
     if "installed" not in data and "web" not in data:
         print(
             "ERROR: Not a Google OAuth client secret file (missing "
-            "'installed' or 'web' key)."
+            "'installed' or 'web' key).",
         )
         print(
-            "Download from: https://console.cloud.google.com/apis/credentials"
+            "Download from: https://console.cloud.google.com/apis/credentials",
         )
         sys.exit(1)
 
@@ -531,7 +531,7 @@ def exchange_auth_code(code: str, email: str | None = None) -> None:
     if returned_state and returned_state != pending_auth["state"]:
         print(
             "ERROR: OAuth state mismatch. Run --auth-url again to start a "
-            "fresh session."
+            "fresh session.",
         )
         sys.exit(1)
 
@@ -628,7 +628,7 @@ def revoke(email: str | None = None) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Google Chat user-OAuth setup for Hermes (native attachment delivery)"
+        description="Google Chat user-OAuth setup for Hermes (native attachment delivery)",
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--check", action="store_true",

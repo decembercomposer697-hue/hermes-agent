@@ -21,7 +21,7 @@ def test_streams_output_and_returns_zero_on_success(tmp_path):
     script = tmp_path / "ok.py"
     script.write_text("print('line one'); print('line two')\n")
     result = _run_with_idle_timeout(
-        [_sys.executable, str(script)], cwd=tmp_path, idle_timeout_seconds=10
+        [_sys.executable, str(script)], cwd=tmp_path, idle_timeout_seconds=10,
     )
     assert result.returncode == 0
     assert "line one" in result.stdout
@@ -32,7 +32,7 @@ def test_propagates_nonzero_exit(tmp_path):
     script = tmp_path / "fail.py"
     script.write_text("import sys; print('boom', file=sys.stderr); sys.exit(7)\n")
     result = _run_with_idle_timeout(
-        [_sys.executable, str(script)], cwd=tmp_path, idle_timeout_seconds=10
+        [_sys.executable, str(script)], cwd=tmp_path, idle_timeout_seconds=10,
     )
     assert result.returncode == 7
     # stderr is merged into stdout in the helper.

@@ -380,7 +380,7 @@ def test_browser_use_managed_gateway_preserves_pending_idempotency_key_for_in_pr
                 "error": {
                     "code": "CONFLICT",
                     "message": "Managed Browser Use session creation is already in progress for this idempotency key",
-                }
+                },
             }
 
     class _SuccessResponse:

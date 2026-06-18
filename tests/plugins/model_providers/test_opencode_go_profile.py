@@ -163,7 +163,7 @@ class TestOpenCodeGoFullKwargsIntegration:
         assert kwargs["reasoning_effort"] == "high"
 
     def test_deepseek_thinking_reaches_extra_body_and_top_level(
-        self, opencode_go_profile
+        self, opencode_go_profile,
     ):
         from agent.transports.chat_completions import ChatCompletionsTransport
 

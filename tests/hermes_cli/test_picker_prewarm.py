@@ -50,7 +50,7 @@ def test_prewarm_never_raises_on_failure():
     is best-effort and must never surface errors into the session."""
     _reset_guard()
     with patch.object(
-        ms, "list_authenticated_providers", side_effect=RuntimeError("boom")
+        ms, "list_authenticated_providers", side_effect=RuntimeError("boom"),
     ):
         t = ms.prewarm_picker_cache_async()
         assert t is not None

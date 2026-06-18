@@ -14,7 +14,7 @@ def _create_hook(hooks_dir, hook_name, events, handler_code):
     (hook_dir / "HOOK.yaml").write_text(
         f"name: {hook_name}\n"
         f"description: Test hook\n"
-        f"events: {events}\n"
+        f"events: {events}\n",
     )
     (hook_dir / "handler.py").write_text(handler_code)
     return hook_dir
@@ -139,13 +139,13 @@ class TestEmit:
         hook_dir = tmp_path / "async-hook"
         hook_dir.mkdir()
         (hook_dir / "HOOK.yaml").write_text(
-            "name: async-hook\nevents: ['agent:end']\n"
+            "name: async-hook\nevents: ['agent:end']\n",
         )
         (hook_dir / "handler.py").write_text(
             "import asyncio\n"
             "results = []\n"
             "async def handle(event_type, context):\n"
-            "    results.append(event_type)\n"
+            "    results.append(event_type)\n",
         )
 
         reg = HookRegistry()

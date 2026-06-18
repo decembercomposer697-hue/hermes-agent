@@ -70,7 +70,7 @@ class TestGenerateKittenTts:
                 "voice": "Luna",
                 "speed": 1.25,
                 "clean_text": False,
-            }
+            },
         }
         _generate_kittentts("Hi there", str(tmp_path / "out.wav"), config)
 
@@ -118,7 +118,7 @@ class TestGenerateKittenTts:
         assert fake_cls.call_count == 2
 
     def test_non_wav_extension_triggers_ffmpeg_conversion(
-        self, tmp_path, mock_kittentts_module, monkeypatch
+        self, tmp_path, mock_kittentts_module, monkeypatch,
     ):
         """Non-.wav output path causes WAV → target ffmpeg conversion."""
         from tools import tts_tool as _tt
@@ -188,7 +188,7 @@ class TestDispatcherBranch:
         # Write a config telling it to use kittentts
         import yaml
         (tmp_path / "config.yaml").write_text(
-            yaml.safe_dump({"tts": {"provider": "kittentts"}})
+            yaml.safe_dump({"tts": {"provider": "kittentts"}}),
         )
 
         result = json.loads(text_to_speech_tool(text="Hello"))

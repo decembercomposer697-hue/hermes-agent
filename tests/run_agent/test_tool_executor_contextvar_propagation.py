@@ -51,7 +51,7 @@ def test_executor_submit_without_copy_context_does_not_propagate():
     should be updated accordingly.
     """
     probe: contextvars.ContextVar[str] = contextvars.ContextVar(
-        "probe_default_propagation", default="unset"
+        "probe_default_propagation", default="unset",
     )
 
     def read_in_worker() -> str:
@@ -74,7 +74,7 @@ def test_executor_submit_with_copy_context_run_propagates():
     PR adds makes parent-context ContextVar values visible in the worker.
     """
     probe: contextvars.ContextVar[str] = contextvars.ContextVar(
-        "probe_explicit_propagation", default="unset"
+        "probe_explicit_propagation", default="unset",
     )
 
     def read_in_worker() -> str:

@@ -68,7 +68,7 @@ def register_provider(provider: TranscriptionProvider) -> None:
     if not isinstance(provider, TranscriptionProvider):
         raise TypeError(
             f"register_provider() expects a TranscriptionProvider instance, "
-            f"got {type(provider).__name__}"
+            f"got {type(provider).__name__}",
         )
     name = provider.name
     if not isinstance(name, str) or not name.strip():

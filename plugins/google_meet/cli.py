@@ -62,11 +62,11 @@ def register_cli(subparser: argparse.ArgumentParser) -> None:
     join_p.add_argument("--headed", action="store_true", help="show browser")
     join_p.add_argument(
         "--mode", choices=("transcribe", "realtime"), default="transcribe",
-        help="transcribe (default, listen-only) or realtime (speak via OpenAI Realtime)"
+        help="transcribe (default, listen-only) or realtime (speak via OpenAI Realtime)",
     )
     join_p.add_argument(
         "--node", default=None,
-        help="remote node name, or 'auto' to use the sole registered node"
+        help="remote node name, or 'auto' to use the sole registered node",
     )
 
     subs.add_parser("status", help="Print current Meet bot state")
@@ -196,7 +196,7 @@ def _cmd_setup() -> int:
     auth_ok = auth_path.is_file()
     print(
         "  google auth    : "
-        + (f"ok ({auth_path})" if auth_ok else "not saved — run: hermes meet auth")
+        + (f"ok ({auth_path})" if auth_ok else "not saved — run: hermes meet auth"),
     )
 
     print()
@@ -204,7 +204,7 @@ def _cmd_setup() -> int:
     if all_ok:
         print(
             "ready. Join a meeting:  "
-            "hermes meet join https://meet.google.com/abc-defg-hij"
+            "hermes meet join https://meet.google.com/abc-defg-hij",
         )
     else:
         print("not ready yet — fix the items above.")
@@ -282,7 +282,7 @@ def _cmd_install(*, realtime: bool, assume_yes: bool) -> int:
                 print("  pulseaudio-utils already installed.")
             else:
                 if not _confirm(
-                    "  install pulseaudio-utils? this runs `sudo apt-get install -y pulseaudio-utils`"
+                    "  install pulseaudio-utils? this runs `sudo apt-get install -y pulseaudio-utils`",
                 ):
                     print("  skipped (you can run it manually later)")
                 else:
@@ -309,7 +309,7 @@ def _cmd_install(*, realtime: bool, assume_yes: bool) -> int:
             elif not _shutil.which("brew"):
                 print(
                     "  missing: " + ", ".join(needs) + "\n"
-                    "  install Homebrew first (https://brew.sh) or install the packages manually."
+                    "  install Homebrew first (https://brew.sh) or install the packages manually.",
                 )
             else:
                 if not _confirm(f"  install via brew: {' '.join(needs)}?"):
@@ -324,7 +324,7 @@ def _cmd_install(*, realtime: bool, assume_yes: bool) -> int:
                 "\n  NOTE: macOS does not auto-route audio. Open\n"
                 "    System Settings → Sound → Input\n"
                 "  and select 'BlackHole 2ch' before starting a realtime meeting.\n"
-                "  hermes will not switch your default input for you."
+                "  hermes will not switch your default input for you.",
             )
     else:
         print("\n[3/3] skipped (pass --realtime to install audio tooling too)")
@@ -340,7 +340,7 @@ def _cmd_auth() -> int:
     except ImportError:
         print(
             "playwright is not installed. run:\n"
-            "  pip install playwright && python -m playwright install chromium"
+            "  pip install playwright && python -m playwright install chromium",
         )
         return 1
 

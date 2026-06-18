@@ -113,7 +113,7 @@ def _build_server() -> Any:
         from mcp.server.fastmcp import FastMCP
     except ImportError as exc:  # pragma: no cover - install hint
         raise ImportError(
-            f"hermes-tools MCP server requires the 'mcp' package: {exc}"
+            f"hermes-tools MCP server requires the 'mcp' package: {exc}",
         ) from exc
 
     # Discover Hermes tools so dispatch works.
@@ -147,7 +147,7 @@ def _build_server() -> Any:
         spec = all_defs.get(name)
         if spec is None:
             logger.debug(
-                "skipping %s — not registered in this Hermes process", name
+                "skipping %s — not registered in this Hermes process", name,
             )
             continue
 

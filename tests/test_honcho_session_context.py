@@ -63,7 +63,7 @@ def test_session_context_user_alias_uses_assistant_observer_when_ai_can_observe_
             "summary": True,
             "peer_target": "chris",
             "peer_perspective": "hermes",
-        }
+        },
     ]
 
 
@@ -77,7 +77,7 @@ def test_session_context_explicit_user_peer_matches_user_alias():
             "summary": True,
             "peer_target": "chris",
             "peer_perspective": "hermes",
-        }
+        },
     ]
 
 
@@ -91,5 +91,5 @@ def test_session_context_user_alias_uses_user_self_observer_when_ai_cannot_obser
             "summary": True,
             "peer_target": "chris",
             "peer_perspective": "chris",
-        }
+        },
     ]

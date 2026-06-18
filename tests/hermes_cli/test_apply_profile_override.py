@@ -58,7 +58,7 @@ class TestApplyProfileOverrideHermesHomeGuard:
     """
 
     def test_hermes_home_at_root_with_active_profile_is_redirected(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """HERMES_HOME=/root/.hermes + active_profile=coder must redirect
         HERMES_HOME to .../profiles/coder.

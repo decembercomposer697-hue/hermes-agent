@@ -14,7 +14,7 @@ def external_skills_dir(tmp_path):
     skill_dir = ext_dir / "my-external-skill"
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(
-        "---\nname: my-external-skill\ndescription: A skill from an external directory\n---\n\n# My External Skill\n\nDo external things.\n"
+        "---\nname: my-external-skill\ndescription: A skill from an external directory\n---\n\n# My External Skill\n\nDo external things.\n",
     )
     return ext_dir
 
@@ -38,7 +38,7 @@ class TestGetExternalSkillsDirs:
 
     def test_nonexistent_dir_skipped(self, hermes_home):
         (hermes_home / "config.yaml").write_text(
-            "skills:\n  external_dirs:\n    - /nonexistent/path\n"
+            "skills:\n  external_dirs:\n    - /nonexistent/path\n",
         )
         with patch.dict(os.environ, {"HERMES_HOME": str(hermes_home)}):
             from agent.skill_utils import get_external_skills_dirs
@@ -47,7 +47,7 @@ class TestGetExternalSkillsDirs:
 
     def test_valid_dir_returned(self, hermes_home, external_skills_dir):
         (hermes_home / "config.yaml").write_text(
-            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n"
+            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n",
         )
         with patch.dict(os.environ, {"HERMES_HOME": str(hermes_home)}):
             from agent.skill_utils import get_external_skills_dirs
@@ -57,7 +57,7 @@ class TestGetExternalSkillsDirs:
 
     def test_duplicate_dirs_deduplicated(self, hermes_home, external_skills_dir):
         (hermes_home / "config.yaml").write_text(
-            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n    - {external_skills_dir}\n"
+            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n    - {external_skills_dir}\n",
         )
         with patch.dict(os.environ, {"HERMES_HOME": str(hermes_home)}):
             from agent.skill_utils import get_external_skills_dirs
@@ -67,7 +67,7 @@ class TestGetExternalSkillsDirs:
     def test_local_skills_dir_excluded(self, hermes_home):
         local_skills = hermes_home / "skills"
         (hermes_home / "config.yaml").write_text(
-            f"skills:\n  external_dirs:\n    - {local_skills}\n"
+            f"skills:\n  external_dirs:\n    - {local_skills}\n",
         )
         with patch.dict(os.environ, {"HERMES_HOME": str(hermes_home)}):
             from agent.skill_utils import get_external_skills_dirs
@@ -83,7 +83,7 @@ class TestGetExternalSkillsDirs:
 
     def test_string_value_converted_to_list(self, hermes_home, external_skills_dir):
         (hermes_home / "config.yaml").write_text(
-            f"skills:\n  external_dirs: {external_skills_dir}\n"
+            f"skills:\n  external_dirs: {external_skills_dir}\n",
         )
         with patch.dict(os.environ, {"HERMES_HOME": str(hermes_home)}):
             from agent.skill_utils import get_external_skills_dirs
@@ -94,7 +94,7 @@ class TestGetExternalSkillsDirs:
 class TestGetAllSkillsDirs:
     def test_local_always_first(self, hermes_home, external_skills_dir):
         (hermes_home / "config.yaml").write_text(
-            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n"
+            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n",
         )
         with patch.dict(os.environ, {"HERMES_HOME": str(hermes_home)}):
             from agent.skill_utils import get_all_skills_dirs
@@ -106,7 +106,7 @@ class TestGetAllSkillsDirs:
 class TestExternalSkillsInFindAll:
     def test_external_skills_found(self, hermes_home, external_skills_dir):
         (hermes_home / "config.yaml").write_text(
-            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n"
+            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n",
         )
         local_skills = hermes_home / "skills"
         with (
@@ -124,10 +124,10 @@ class TestExternalSkillsInFindAll:
         local_skill = local_skills / "my-external-skill"
         local_skill.mkdir(parents=True)
         (local_skill / "SKILL.md").write_text(
-            "---\nname: my-external-skill\ndescription: Local version\n---\n\nLocal.\n"
+            "---\nname: my-external-skill\ndescription: Local version\n---\n\nLocal.\n",
         )
         (hermes_home / "config.yaml").write_text(
-            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n"
+            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n",
         )
         with (
             patch.dict(os.environ, {"HERMES_HOME": str(hermes_home)}),
@@ -143,7 +143,7 @@ class TestExternalSkillsInFindAll:
 class TestExternalSkillView:
     def test_skill_view_finds_external(self, hermes_home, external_skills_dir):
         (hermes_home / "config.yaml").write_text(
-            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n"
+            f"skills:\n  external_dirs:\n    - {external_skills_dir}\n",
         )
         local_skills = hermes_home / "skills"
         with (

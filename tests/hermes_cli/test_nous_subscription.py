@@ -39,7 +39,7 @@ def test_get_nous_subscription_features_recognizes_direct_exa_backend(monkeypatc
 
     monkeypatch.setattr(ns, "get_env_value", lambda name: env.get(name, ""))
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda: _account(logged_in=False)
+        ns, "get_nous_portal_account_info", lambda: _account(logged_in=False),
     )
     monkeypatch.setattr(ns, "_toolset_enabled", lambda config, key: key == "web")
     monkeypatch.setattr(ns, "_has_agent_browser", lambda: False)
@@ -81,7 +81,7 @@ def test_get_nous_subscription_features_prefers_managed_modal_in_auto_mode(monke
     monkeypatch.setattr("tools.tool_backend_helpers.managed_nous_tools_enabled", lambda: True)
     monkeypatch.setattr(ns, "get_env_value", lambda name: "")
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda: _account(logged_in=True, paid=True)
+        ns, "get_nous_portal_account_info", lambda: _account(logged_in=True, paid=True),
     )
     monkeypatch.setattr(ns, "_toolset_enabled", lambda config, key: key == "terminal")
     monkeypatch.setattr(ns, "_has_agent_browser", lambda: False)
@@ -90,7 +90,7 @@ def test_get_nous_subscription_features_prefers_managed_modal_in_auto_mode(monke
     monkeypatch.setattr(ns, "is_managed_tool_gateway_ready", lambda vendor: vendor == "modal")
 
     features = ns.get_nous_subscription_features(
-        {"terminal": {"backend": "modal", "modal_mode": "auto"}}
+        {"terminal": {"backend": "modal", "modal_mode": "auto"}},
     )
 
     assert features.modal.available is True
@@ -102,7 +102,7 @@ def test_get_nous_subscription_features_prefers_managed_modal_in_auto_mode(monke
 def test_get_nous_subscription_features_marks_browser_use_as_managed_when_gateway_ready(monkeypatch):
     monkeypatch.setattr(ns, "get_env_value", lambda name: "")
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda: _account(logged_in=True, paid=True)
+        ns, "get_nous_portal_account_info", lambda: _account(logged_in=True, paid=True),
     )
     monkeypatch.setattr(ns, "_toolset_enabled", lambda config, key: key == "browser")
     monkeypatch.setattr(ns, "_has_agent_browser", lambda: True)
@@ -115,7 +115,7 @@ def test_get_nous_subscription_features_marks_browser_use_as_managed_when_gatewa
     )
 
     features = ns.get_nous_subscription_features(
-        {"browser": {"cloud_provider": "browser-use"}}
+        {"browser": {"cloud_provider": "browser-use"}},
     )
 
     assert features.browser.available is True
@@ -135,7 +135,7 @@ def test_get_nous_subscription_features_uses_direct_browserbase_when_no_managed_
 
     monkeypatch.setattr(ns, "get_env_value", lambda name: env.get(name, ""))
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda: _account(logged_in=True, paid=True)
+        ns, "get_nous_portal_account_info", lambda: _account(logged_in=True, paid=True),
     )
     monkeypatch.setattr(ns, "_toolset_enabled", lambda config, key: key == "browser")
     monkeypatch.setattr(ns, "_has_agent_browser", lambda: True)
@@ -161,7 +161,7 @@ def test_get_nous_subscription_features_prefers_camofox_over_managed_browser_use
 
     monkeypatch.setattr(ns, "get_env_value", lambda name: env.get(name, ""))
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda: _account(logged_in=True, paid=True)
+        ns, "get_nous_portal_account_info", lambda: _account(logged_in=True, paid=True),
     )
     monkeypatch.setattr(ns, "_toolset_enabled", lambda config, key: key == "browser")
     monkeypatch.setattr(ns, "_has_agent_browser", lambda: False)
@@ -174,7 +174,7 @@ def test_get_nous_subscription_features_prefers_camofox_over_managed_browser_use
     )
 
     features = ns.get_nous_subscription_features(
-        {"browser": {"cloud_provider": "browser-use"}}
+        {"browser": {"cloud_provider": "browser-use"}},
     )
 
     assert features.browser.available is True
@@ -192,7 +192,7 @@ def test_get_nous_subscription_features_requires_agent_browser_for_browserbase(m
 
     monkeypatch.setattr(ns, "get_env_value", lambda name: env.get(name, ""))
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda: _account(logged_in=False)
+        ns, "get_nous_portal_account_info", lambda: _account(logged_in=False),
     )
     monkeypatch.setattr(ns, "_toolset_enabled", lambda config, key: key == "browser")
     monkeypatch.setattr(ns, "_has_agent_browser", lambda: False)
@@ -201,7 +201,7 @@ def test_get_nous_subscription_features_requires_agent_browser_for_browserbase(m
     monkeypatch.setattr(ns, "is_managed_tool_gateway_ready", lambda vendor: False)
 
     features = ns.get_nous_subscription_features(
-        {"browser": {"cloud_provider": "browserbase"}}
+        {"browser": {"cloud_provider": "browserbase"}},
     )
 
     assert features.browser.available is False
@@ -215,7 +215,7 @@ def test_get_nous_subscription_features_does_not_treat_quoted_false_as_gateway_o
 
     monkeypatch.setattr(ns, "get_env_value", lambda name: env.get(name, ""))
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda: _account(logged_in=True, paid=True)
+        ns, "get_nous_portal_account_info", lambda: _account(logged_in=True, paid=True),
     )
     monkeypatch.setattr(ns, "_toolset_enabled", lambda config, key: key == "web")
     monkeypatch.setattr(ns, "_has_agent_browser", lambda: False)
@@ -224,7 +224,7 @@ def test_get_nous_subscription_features_does_not_treat_quoted_false_as_gateway_o
     monkeypatch.setattr(ns, "is_managed_tool_gateway_ready", lambda vendor: vendor == "firecrawl")
 
     features = ns.get_nous_subscription_features(
-        {"web": {"backend": "exa", "use_gateway": "false"}}
+        {"web": {"backend": "exa", "use_gateway": "false"}},
     )
 
     assert features.web.available is True
@@ -237,7 +237,7 @@ def test_get_nous_subscription_features_does_not_treat_quoted_false_as_gateway_o
 def test_get_gateway_eligible_tools_ignores_quoted_false_opt_in(monkeypatch):
     # Paid account: entitled to every category, including video.
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda **kw: _account(logged_in=True, paid=True)
+        ns, "get_nous_portal_account_info", lambda **kw: _account(logged_in=True, paid=True),
     )
     monkeypatch.setattr(
         ns,
@@ -249,7 +249,7 @@ def test_get_gateway_eligible_tools_ignores_quoted_false_opt_in(monkeypatch):
         {
             "model": {"provider": "nous"},
             "web": {"use_gateway": "false"},
-        }
+        },
     )
 
     assert "web" in has_direct
@@ -266,7 +266,7 @@ def _stub_browser_probes(monkeypatch, *, has_agent_browser, chromium, lightpanda
     """
     monkeypatch.setattr(ns, "get_env_value", lambda name: "")
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda: _account(logged_in=False)
+        ns, "get_nous_portal_account_info", lambda: _account(logged_in=False),
     )
     monkeypatch.setattr(ns, "_toolset_enabled", lambda config, key: key == "browser")
     monkeypatch.setattr(ns, "_has_agent_browser", lambda: has_agent_browser)
@@ -275,7 +275,7 @@ def _stub_browser_probes(monkeypatch, *, has_agent_browser, chromium, lightpanda
     monkeypatch.setattr(ns, "is_managed_tool_gateway_ready", lambda vendor: False)
     monkeypatch.setattr("tools.browser_tool._chromium_installed", lambda: chromium)
     monkeypatch.setattr(
-        "tools.browser_tool._using_lightpanda_engine", lambda: lightpanda
+        "tools.browser_tool._using_lightpanda_engine", lambda: lightpanda,
     )
 
 
@@ -290,7 +290,7 @@ def test_local_browser_unavailable_without_chromium(monkeypatch):
     _stub_browser_probes(monkeypatch, has_agent_browser=True, chromium=False)
 
     features = ns.get_nous_subscription_features(
-        {"browser": {"cloud_provider": "local"}}
+        {"browser": {"cloud_provider": "local"}},
     )
 
     assert features.browser.available is False
@@ -303,7 +303,7 @@ def test_local_browser_available_with_chromium(monkeypatch):
     _stub_browser_probes(monkeypatch, has_agent_browser=True, chromium=True)
 
     features = ns.get_nous_subscription_features(
-        {"browser": {"cloud_provider": "local"}}
+        {"browser": {"cloud_provider": "local"}},
     )
 
     assert features.browser.available is True
@@ -318,11 +318,11 @@ def test_local_browser_available_with_lightpanda_without_chromium(monkeypatch):
     legitimate Lightpanda-without-Chromium configuration.
     """
     _stub_browser_probes(
-        monkeypatch, has_agent_browser=True, chromium=False, lightpanda=True
+        monkeypatch, has_agent_browser=True, chromium=False, lightpanda=True,
     )
 
     features = ns.get_nous_subscription_features(
-        {"browser": {"cloud_provider": "local"}}
+        {"browser": {"cloud_provider": "local"}},
     )
 
     assert features.browser.available is True
@@ -345,7 +345,7 @@ def test_cloud_browserbase_available_without_local_chromium(monkeypatch):
     env = {"BROWSERBASE_API_KEY": "bb-key", "BROWSERBASE_PROJECT_ID": "bb-project"}
     monkeypatch.setattr(ns, "get_env_value", lambda name: env.get(name, ""))
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda: _account(logged_in=False)
+        ns, "get_nous_portal_account_info", lambda: _account(logged_in=False),
     )
     monkeypatch.setattr(ns, "_toolset_enabled", lambda config, key: key == "browser")
     monkeypatch.setattr(ns, "_has_agent_browser", lambda: True)
@@ -357,7 +357,7 @@ def test_cloud_browserbase_available_without_local_chromium(monkeypatch):
     monkeypatch.setattr("tools.browser_tool._using_lightpanda_engine", lambda: False)
 
     features = ns.get_nous_subscription_features(
-        {"browser": {"cloud_provider": "browserbase"}}
+        {"browser": {"cloud_provider": "browserbase"}},
     )
 
     assert features.browser.available is True
@@ -375,7 +375,7 @@ def test_get_gateway_eligible_tools_pool_excludes_video(monkeypatch):
     )
 
     unconfigured, has_direct, already_managed = ns.get_gateway_eligible_tools(
-        {"model": {"provider": "nous"}}
+        {"model": {"provider": "nous"}},
     )
 
     assert set(unconfigured) == {"web", "image_gen", "tts", "browser"}
@@ -387,11 +387,11 @@ def test_get_gateway_eligible_tools_pool_excludes_video(monkeypatch):
 def test_get_gateway_eligible_tools_empty_when_not_entitled(monkeypatch):
     """A logged-in free user with no pool and no paid access gets nothing."""
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda **kw: _account(logged_in=True, paid=False)
+        ns, "get_nous_portal_account_info", lambda **kw: _account(logged_in=True, paid=False),
     )
 
     unconfigured, has_direct, already_managed = ns.get_gateway_eligible_tools(
-        {"model": {"provider": "nous"}}
+        {"model": {"provider": "nous"}},
     )
 
     assert (unconfigured, has_direct, already_managed) == ([], [], [])
@@ -411,7 +411,7 @@ def _capture_checklist(monkeypatch, *, selected_idx):
 
     monkeypatch.setattr(setup_mod, "prompt_checklist", _fake_checklist, raising=False)
     monkeypatch.setattr(
-        "hermes_cli.config.save_config", lambda cfg: None, raising=False
+        "hermes_cli.config.save_config", lambda cfg: None, raising=False,
     )
     return captured
 
@@ -461,7 +461,7 @@ def test_prompt_enable_tool_gateway_writes_only_selected(monkeypatch):
 def test_prompt_enable_tool_gateway_paid_user_offers_video(monkeypatch):
     """Paid users still get video gen in the offer (regression guard)."""
     monkeypatch.setattr(
-        ns, "get_nous_portal_account_info", lambda **kw: _account(logged_in=True, paid=True)
+        ns, "get_nous_portal_account_info", lambda **kw: _account(logged_in=True, paid=True),
     )
     monkeypatch.setattr(
         ns,

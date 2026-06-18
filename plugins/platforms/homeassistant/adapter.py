@@ -115,7 +115,7 @@ class HomeAssistantAdapter(BasePlatformAdapter):
 
             # Dedicated REST session for send() calls
             self._rest_session = aiohttp.ClientSession(
-                timeout=aiohttp.ClientTimeout(total=30)
+                timeout=aiohttp.ClientTimeout(total=30),
             )
 
             # Warn if no event filters are configured
@@ -143,7 +143,7 @@ class HomeAssistantAdapter(BasePlatformAdapter):
         ws_url = f"{ws_url}/api/websocket"
 
         self._session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=30)
+            timeout=aiohttp.ClientTimeout(total=30),
         )
         self._ws = await self._session.ws_connect(ws_url, heartbeat=30, timeout=30)
 
@@ -492,7 +492,7 @@ async def _standalone_send(
             "error": (
                 "Home Assistant standalone send: HASS_URL and HASS_TOKEN "
                 "must both be set"
-            )
+            ),
         }
 
     url = f"{hass_url}/api/services/notify/notify"
@@ -504,7 +504,7 @@ async def _standalone_send(
 
     try:
         async with aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=30)
+            timeout=aiohttp.ClientTimeout(total=30),
         ) as session:
             async with session.post(url, headers=headers, json=payload) as resp:
                 if resp.status not in {200, 201}:
@@ -512,7 +512,7 @@ async def _standalone_send(
                     return {
                         "error": (
                             f"Home Assistant API error ({resp.status}): {body}"
-                        )
+                        ),
                     }
         return {
             "success": True,

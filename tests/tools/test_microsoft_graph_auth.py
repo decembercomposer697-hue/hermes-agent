@@ -34,7 +34,7 @@ class TestGraphCredentials:
                 "MSGRAPH_TENANT_ID": "tenant-123",
                 "MSGRAPH_CLIENT_ID": "client-456",
                 "MSGRAPH_CLIENT_SECRET": "secret-789",
-            }
+            },
         )
         assert creds is not None
         assert creds.scope == DEFAULT_GRAPH_SCOPE

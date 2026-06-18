@@ -286,10 +286,10 @@ class TestMemoryManager:
     def test_tool_schemas_collected(self):
         mgr = MemoryManager()
         p1 = FakeMemoryProvider("builtin", tools=[
-            {"name": "recall_builtin", "description": "Builtin recall", "parameters": {}}
+            {"name": "recall_builtin", "description": "Builtin recall", "parameters": {}},
         ])
         p2 = FakeMemoryProvider("external", tools=[
-            {"name": "recall_ext", "description": "External recall", "parameters": {}}
+            {"name": "recall_ext", "description": "External recall", "parameters": {}},
         ])
         mgr.add_provider(p1)
         mgr.add_provider(p2)
@@ -301,10 +301,10 @@ class TestMemoryManager:
     def test_tool_name_conflict_first_wins(self):
         mgr = MemoryManager()
         p1 = FakeMemoryProvider("builtin", tools=[
-            {"name": "shared_tool", "description": "From builtin", "parameters": {}}
+            {"name": "shared_tool", "description": "From builtin", "parameters": {}},
         ])
         p2 = FakeMemoryProvider("external", tools=[
-            {"name": "shared_tool", "description": "From external", "parameters": {}}
+            {"name": "shared_tool", "description": "From external", "parameters": {}},
         ])
         mgr.add_provider(p1)
         mgr.add_provider(p2)
@@ -322,10 +322,10 @@ class TestMemoryManager:
     def test_tool_routing(self):
         mgr = MemoryManager()
         p1 = FakeMemoryProvider("builtin", tools=[
-            {"name": "builtin_tool", "description": "Builtin", "parameters": {}}
+            {"name": "builtin_tool", "description": "Builtin", "parameters": {}},
         ])
         p2 = FakeMemoryProvider("external", tools=[
-            {"name": "ext_tool", "description": "External", "parameters": {}}
+            {"name": "ext_tool", "description": "External", "parameters": {}},
         ])
         mgr.add_provider(p1)
         mgr.add_provider(p2)
@@ -456,10 +456,10 @@ class TestUserInstalledProviderDiscovery:
             "    def initialize(self, **kw): pass\n"
             "    def sync_turn(self, *a, **kw): pass\n"
             "    def get_tool_schemas(self): return []\n"
-            "    def handle_tool_call(self, *a, **kw): return '{}'\n"
+            "    def handle_tool_call(self, *a, **kw): return '{}'\n",
         )
         (plugin_dir / "plugin.yaml").write_text(
-            f"name: {name}\ndescription: Test user provider\n"
+            f"name: {name}\ndescription: Test user provider\n",
         )
         return plugin_dir
 
@@ -504,7 +504,7 @@ class TestUserInstalledProviderDiscovery:
             "    def initialize(self, **kw): pass\n"
             "    def sync_turn(self, *a, **kw): pass\n"
             "    def get_tool_schemas(self): return []\n"
-            "    def handle_tool_call(self, *a, **kw): return '{}'\n"
+            "    def handle_tool_call(self, *a, **kw): return '{}'\n",
         )
         monkeypatch.setattr(
             "plugins.memory._get_user_plugins_dir",
@@ -526,7 +526,7 @@ class TestUserInstalledProviderDiscovery:
         plugin_dir = tmp_path / "plugins" / "notmemory"
         plugin_dir.mkdir(parents=True)
         (plugin_dir / "__init__.py").write_text(
-            "def register(ctx):\n    ctx.register_tool('foo', 'bar', {}, lambda: None)\n"
+            "def register(ctx):\n    ctx.register_tool('foo', 'bar', {}, lambda: None)\n",
         )
         monkeypatch.setattr(
             "plugins.memory._get_user_plugins_dir",
@@ -559,7 +559,7 @@ class TestUserInstalledProviderDiscovery:
             "    def initialize(self, **kw): pass\n"
             "    def sync_turn(self, *a, **kw): pass\n"
             "    def get_tool_schemas(self): return []\n"
-            "    def handle_tool_call(self, *a, **kw): return '{}'\n"
+            "    def handle_tool_call(self, *a, **kw): return '{}'\n",
         )
         monkeypatch.setattr(
             "plugins.memory._get_user_plugins_dir",
@@ -590,12 +590,12 @@ class TestUserInstalledProviderDiscovery:
             "    def initialize(self, **kw): pass\n"
             "    def sync_turn(self, *a, **kw): pass\n"
             "    def get_tool_schemas(self): return []\n"
-            "    def handle_tool_call(self, *a, **kw): return '{}'\n"
+            "    def handle_tool_call(self, *a, **kw): return '{}'\n",
         )
         (plugin_dir / "__init__.py").write_text(
             "from .adapters.hermes import MyProvider\n"
             "def register(ctx):\n"
-            "    ctx.register_memory_provider(MyProvider())\n"
+            "    ctx.register_memory_provider(MyProvider())\n",
         )
         monkeypatch.setattr(
             "plugins.memory._get_user_plugins_dir",
@@ -630,13 +630,13 @@ class TestUserInstalledProviderCli:
             "    def get_tool_schemas(self): return []\n"
             "    def handle_tool_call(self, *a, **kw): return '{}'\n"
             "def register(ctx):\n"
-            "    ctx.register_memory_provider(MyProvider())\n"
+            "    ctx.register_memory_provider(MyProvider())\n",
         )
         (plugin_dir / "config.py").write_text("STATUS = 'ok'\n")
         (plugin_dir / "cli.py").write_text(
             "from . import config\n"
             "def register_cli(subparser):\n"
-            "    subparser.add_argument('--status', action='store_true')\n"
+            "    subparser.add_argument('--status', action='store_true')\n",
         )
         return plugin_dir
 
@@ -651,7 +651,7 @@ class TestUserInstalledProviderCli:
         )
 
     def test_cli_discovered_for_user_plugin_with_relative_import(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """discover_plugin_cli_commands() loads a user provider's cli.py."""
         from plugins.memory import discover_plugin_cli_commands
@@ -940,7 +940,7 @@ class TestMemoryContextFencing:
     def test_build_memory_context_block_wraps_content(self):
         from agent.memory_manager import build_memory_context_block
         result = build_memory_context_block(
-            "## Holographic Memory\n- [0.8] user likes dark mode"
+            "## Holographic Memory\n- [0.8] user likes dark mode",
         )
         assert result.startswith("<memory-context>")
         assert result.rstrip().endswith("</memory-context>")
@@ -1069,7 +1069,7 @@ class TestOnMemoryWriteBridge:
                     "execution_context": "foreground",
                     "session_id": "sess-1",
                 },
-            )
+            ),
         ]
 
     def test_on_memory_write_metadata_keeps_legacy_provider_compatible(self):
@@ -1384,7 +1384,7 @@ class TestContextEngineToolsetGate:
 
     def _compressor_with(self, *tool_names):
         return self._FakeCompressor(
-            [{"name": n, "description": n, "parameters": {}} for n in tool_names]
+            [{"name": n, "description": n, "parameters": {}} for n in tool_names],
         )
 
     def test_none_toolsets_injects(self):
@@ -1397,7 +1397,7 @@ class TestContextEngineToolsetGate:
         """enabled_toolsets including 'context_engine' injects the tools."""
         c = self._compressor_with("lcm_grep")
         tools, names, engine_names = self._run_context_engine_injection(
-            ["terminal", "context_engine"], c
+            ["terminal", "context_engine"], c,
         )
         assert "lcm_grep" in engine_names
 
@@ -1412,7 +1412,7 @@ class TestContextEngineToolsetGate:
         """A toolset list that doesn't name 'context_engine' suppresses injection."""
         c = self._compressor_with("lcm_grep", "lcm_describe")
         tools, names, engine_names = self._run_context_engine_injection(
-            ["terminal", "memory"], c
+            ["terminal", "memory"], c,
         )
         assert tools == []
         assert engine_names == set()

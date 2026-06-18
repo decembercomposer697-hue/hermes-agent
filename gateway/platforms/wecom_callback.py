@@ -102,7 +102,7 @@ class WecomCallbackAdapter(BasePlatformAdapter):
                     "agent_id": str(extra.get("agent_id", "")),
                     "token": extra.get("token", ""),
                     "encoding_aes_key": extra.get("encoding_aes_key", ""),
-                }
+                },
             ]
         return []
 

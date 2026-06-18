@@ -45,7 +45,7 @@ MEET_URL_RE = re.compile(
     r"[a-z0-9]{3,}-[a-z0-9]{3,}-[a-z0-9]{3,}"
     r"|lookup/[^/?#]+"
     r"|new"
-    r")(?:[/?#].*)?$"
+    r")(?:[/?#].*)?$",
 )
 
 
@@ -461,7 +461,7 @@ def run_bot() -> int:
     if not url or not _is_safe_meet_url(url):
         sys.stderr.write(
             "google_meet bot: refusing to launch — HERMES_MEET_URL must be a "
-            "meet.google.com URL. got: %r\n" % url
+            "meet.google.com URL. got: %r\n" % url,
         )
         return 2
     if not out_dir_env:
@@ -516,7 +516,7 @@ def run_bot() -> int:
         state.set(error=f"playwright not installed: {e}", exited=True)
         sys.stderr.write(
             "google_meet bot: playwright is not installed. Run "
-            "`pip install playwright && python -m playwright install chromium`\n"
+            "`pip install playwright && python -m playwright install chromium`\n",
         )
         if rt["bridge"]:
             rt["bridge"].teardown()
@@ -616,7 +616,7 @@ def run_bot() -> int:
             #   * periodically flushing realtime counters into status.json
             deadline = (time.time() + duration_s) if duration_s else None
             lobby_deadline = time.time() + float(
-                os.environ.get("HERMES_MEET_LOBBY_TIMEOUT", "300")
+                os.environ.get("HERMES_MEET_LOBBY_TIMEOUT", "300"),
             )
             last_admission_check = 0.0
             while not stop_flag["stop"]:
@@ -692,7 +692,7 @@ def run_bot() -> int:
             try:
                 page.evaluate(
                     "() => { const b = document.querySelector('button[aria-label*=\"eave call\"]');"
-                    " if (b) b.click(); }"
+                    " if (b) b.click(); }",
                 )
             except Exception:
                 pass

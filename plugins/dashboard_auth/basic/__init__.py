@@ -229,20 +229,20 @@ class BasicAuthProvider(DashboardAuthProvider):
     def start_login(self, *, redirect_uri: str) -> LoginStart:
         raise NotImplementedError(
             "BasicAuthProvider is password-only; there is no OAuth redirect "
-            "flow. The login page POSTs to /auth/password-login instead."
+            "flow. The login page POSTs to /auth/password-login instead.",
         )
 
     def complete_login(
-        self, *, code: str, state: str, code_verifier: str, redirect_uri: str
+        self, *, code: str, state: str, code_verifier: str, redirect_uri: str,
     ) -> Session:
         raise NotImplementedError(
-            "BasicAuthProvider is password-only; use complete_password_login."
+            "BasicAuthProvider is password-only; use complete_password_login.",
         )
 
     # ---- password login ----------------------------------------------------
 
     def complete_password_login(
-        self, *, username: str, password: str
+        self, *, username: str, password: str,
     ) -> Session:
         # Constant-time-ish: always run a scrypt verify (against the real
         # hash if the username matches, else a dummy hash) so an unknown
@@ -250,7 +250,7 @@ class BasicAuthProvider(DashboardAuthProvider):
         # username with compare_digest too, to avoid a length/byte timing
         # leak on the username itself.
         username_ok = hmac.compare_digest(
-            username.encode("utf-8"), self._username.encode("utf-8")
+            username.encode("utf-8"), self._username.encode("utf-8"),
         )
         target_hash = self._password_hash if username_ok else _DUMMY_HASH
         password_ok = _verify_password(password, target_hash)
@@ -294,7 +294,7 @@ class BasicAuthProvider(DashboardAuthProvider):
         now = int(time.time())
         exp = now + self._ttl
         access_token = _sign(
-            {"sub": user_id, "kind": "access", "exp": exp}, self._secret
+            {"sub": user_id, "kind": "access", "exp": exp}, self._secret,
         )
         refresh_token = _sign(
             {"sub": user_id, "kind": "refresh", "exp": now + _REFRESH_TTL_SECONDS},
@@ -312,7 +312,7 @@ class BasicAuthProvider(DashboardAuthProvider):
         )
 
     def _session_from_payload(
-        self, access_token: str, refresh_token: str, payload: dict
+        self, access_token: str, refresh_token: str, payload: dict,
     ) -> Session:
         user_id = str(payload.get("sub", ""))
         return Session(
@@ -369,7 +369,7 @@ def _resolve_secret(cfg_section: dict) -> bytes:
     restart or span multiple workers — logged at INFO).
     """
     raw = _resolve(
-        "HERMES_DASHBOARD_BASIC_AUTH_SECRET", cfg_section, "secret"
+        "HERMES_DASHBOARD_BASIC_AUTH_SECRET", cfg_section, "secret",
     )
     if not raw:
         logger.info(
@@ -377,7 +377,7 @@ def _resolve_secret(cfg_section: dict) -> bytes:
             "random per-process signing key. Sessions will not survive a "
             "restart or span multiple workers. Set dashboard.basic_auth."
             "secret (or HERMES_DASHBOARD_BASIC_AUTH_SECRET) for stable "
-            "sessions."
+            "sessions.",
         )
         return secrets.token_bytes(32)
     # Try base64, then hex, then fall back to the raw UTF-8 bytes.
@@ -405,16 +405,16 @@ def register(ctx) -> None:
 
     section = _load_config_basic_auth_section()
     username = _resolve(
-        "HERMES_DASHBOARD_BASIC_AUTH_USERNAME", section, "username"
+        "HERMES_DASHBOARD_BASIC_AUTH_USERNAME", section, "username",
     )
     password_hash = _resolve(
-        "HERMES_DASHBOARD_BASIC_AUTH_PASSWORD_HASH", section, "password_hash"
+        "HERMES_DASHBOARD_BASIC_AUTH_PASSWORD_HASH", section, "password_hash",
     )
     plaintext = _resolve(
-        "HERMES_DASHBOARD_BASIC_AUTH_PASSWORD", section, "password"
+        "HERMES_DASHBOARD_BASIC_AUTH_PASSWORD", section, "password",
     )
     ttl_raw = _resolve(
-        "HERMES_DASHBOARD_BASIC_AUTH_TTL_SECONDS", section, "session_ttl_seconds"
+        "HERMES_DASHBOARD_BASIC_AUTH_TTL_SECONDS", section, "session_ttl_seconds",
     )
 
     if not username:
@@ -448,13 +448,13 @@ def register(ctx) -> None:
     #   * else config password_hash set → use it
     #   * else config plaintext password → hash it in-memory
     plaintext_from_env = os.environ.get(
-        "HERMES_DASHBOARD_BASIC_AUTH_PASSWORD", ""
+        "HERMES_DASHBOARD_BASIC_AUTH_PASSWORD", "",
     ).strip()
     if plaintext_from_env:
         password_hash = hash_password(plaintext_from_env)
         logger.info(
             "dashboard-auth-basic: hashed env-supplied password in-memory "
-            "(overrides any config password_hash)."
+            "(overrides any config password_hash).",
         )
     elif not password_hash:
         # config-only plaintext password.
@@ -462,7 +462,7 @@ def register(ctx) -> None:
         logger.info(
             "dashboard-auth-basic: hashed plaintext password in-memory. "
             "For production, precompute dashboard.basic_auth.password_hash "
-            "and remove the plaintext password from config."
+            "and remove the plaintext password from config.",
         )
 
     secret = _resolve_secret(section)

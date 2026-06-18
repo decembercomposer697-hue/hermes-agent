@@ -33,7 +33,7 @@ class _FakeAgent:
         self._last_flushed_db_idx = 7
         self._todo_store = TodoStore()
         self._todo_store.write(
-            [{"id": "t1", "content": "unfinished task", "status": "in_progress"}]
+            [{"id": "t1", "content": "unfinished task", "status": "in_progress"}],
         )
         self.commit_memory_session = MagicMock()
         self._invalidate_system_prompt = MagicMock()
@@ -110,13 +110,13 @@ def _make_cli(env_overrides=None, config_overrides=None, **kwargs):
         "prompt_toolkit.auto_suggest": MagicMock(),
     }
     with patch.dict(sys.modules, prompt_toolkit_stubs), patch.dict(
-        "os.environ", clean_env, clear=False
+        "os.environ", clean_env, clear=False,
     ):
         import cli as _cli_mod
 
         _cli_mod = importlib.reload(_cli_mod)
         with patch.object(_cli_mod, "get_tool_definitions", return_value=[]), patch.dict(
-            _cli_mod.__dict__, {"CLI_CONFIG": _clean_config}
+            _cli_mod.__dict__, {"CLI_CONFIG": _clean_config},
         ):
             return _cli_mod.HermesCLI(**kwargs)
 
@@ -280,7 +280,7 @@ def test_new_session_with_duplicate_title_surfaces_error(capsys):
     cli = _make_cli()
     cli._session_db = MagicMock()
     cli._session_db.set_session_title.side_effect = ValueError(
-        "Title 'Dup' is already in use by session abc-123"
+        "Title 'Dup' is already in use by session abc-123",
     )
     cli.agent = _FakeAgent("old_session_id", datetime.now())
     cli.conversation_history = []

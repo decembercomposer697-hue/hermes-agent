@@ -537,7 +537,7 @@ class TestPersistence:
             )
 
         monkeypatch.setattr("hermes_cli.config.load_config", lambda: {
-            "model": {"provider": runtime_choice["provider"], "default": "test-model"}
+            "model": {"provider": runtime_choice["provider"], "default": "test-model"},
         })
         monkeypatch.setattr(
             "hermes_cli.runtime_provider.resolve_runtime_provider",
@@ -577,7 +577,7 @@ class TestPersistence:
             return SimpleNamespace(model=kwargs.get("model"), _print_fn=None)
 
         monkeypatch.setattr("hermes_cli.config.load_config", lambda: {
-            "model": {"provider": "openrouter", "default": "test-model"}
+            "model": {"provider": "openrouter", "default": "test-model"},
         })
         monkeypatch.setattr(
             "hermes_cli.runtime_provider.resolve_runtime_provider",

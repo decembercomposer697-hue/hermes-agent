@@ -277,11 +277,11 @@ def _normalize_multimodal_content(content: Any) -> Any:
                 if not lowered.startswith("data:image/") or "," not in url_value:
                     raise ValueError(
                         "unsupported_content_type:Only image data URLs are supported. "
-                        "Non-image data payloads are not supported."
+                        "Non-image data payloads are not supported.",
                     )
             elif not (lowered.startswith("http://") or lowered.startswith("https://")):
                 raise ValueError(
-                    "invalid_image_url:Image inputs must use http(s) URLs or data:image/... URLs."
+                    "invalid_image_url:Image inputs must use http(s) URLs or data:image/... URLs.",
                 )
             image_part: dict[str, Any] = {"type": "image_url", "image_url": {"url": url_value}}
             if detail is not None:
@@ -294,14 +294,14 @@ def _normalize_multimodal_content(content: Any) -> Any:
         if part_type in _FILE_PART_TYPES:
             raise ValueError(
                 "unsupported_content_type:Inline image inputs are supported, "
-                "but uploaded files and document inputs are not supported on this endpoint."
+                "but uploaded files and document inputs are not supported on this endpoint.",
             )
 
         # Unknown part type — reject explicitly so clients get a clear error
         # instead of a silently dropped turn.
         raise ValueError(
             f"unsupported_content_type:Unsupported content part type {raw_type!r}. "
-            "Only text and image_url/input_image parts are supported."
+            "Only text and image_url/input_image parts are supported.",
         )
 
     if not normalized_parts:
@@ -399,13 +399,13 @@ class ResponseStore:
                 response_id TEXT PRIMARY KEY,
                 data TEXT NOT NULL,
                 accessed_at REAL NOT NULL
-            )"""
+            )""",
         )
         self._conn.execute(
             """CREATE TABLE IF NOT EXISTS conversations (
                 name TEXT PRIMARY KEY,
                 response_id TEXT NOT NULL
-            )"""
+            )""",
         )
         self._conn.commit()
         # response_store.db contains conversation history (tool payloads,
@@ -437,7 +437,7 @@ class ResponseStore:
     def get(self, response_id: str) -> dict[str, Any] | None:
         """Retrieve a stored response by ID (updates access time for LRU)."""
         row = self._conn.execute(
-            "SELECT data FROM responses WHERE response_id = ?", (response_id,)
+            "SELECT data FROM responses WHERE response_id = ?", (response_id,),
         ).fetchone()
         if row is None:
             return None
@@ -495,10 +495,10 @@ class ResponseStore:
         """Remove a response from the store. Returns True if found and deleted."""
         # Clear conversation mappings pointing to this response
         self._conn.execute(
-            "DELETE FROM conversations WHERE response_id = ?", (response_id,)
+            "DELETE FROM conversations WHERE response_id = ?", (response_id,),
         )
         cursor = self._conn.execute(
-            "DELETE FROM responses WHERE response_id = ?", (response_id,)
+            "DELETE FROM responses WHERE response_id = ?", (response_id,),
         )
         self._conn.commit()
         return cursor.rowcount > 0
@@ -506,7 +506,7 @@ class ResponseStore:
     def get_conversation(self, name: str) -> str | None:
         """Get the latest response_id for a conversation name."""
         row = self._conn.execute(
-            "SELECT response_id FROM conversations WHERE name = ?", (name,)
+            "SELECT response_id FROM conversations WHERE name = ?", (name,),
         ).fetchone()
         return row[0] if row else None
 
@@ -573,7 +573,7 @@ def _openai_error(message: str, err_type: str = "invalid_request_error", param: 
             "type": err_type,
             "param": param,
             "code": code,
-        }
+        },
     }
 
 
@@ -928,7 +928,7 @@ class APIServerAdapter(BasePlatformAdapter):
     _MAX_SESSION_HEADER_LEN = 256
 
     def _parse_session_key_header(
-        self, request: "web.Request"
+        self, request: "web.Request",
     ) -> tuple[str | None, Optional["web.Response"]]:
         """Extract and validate the ``X-Hermes-Session-Key`` header.
 
@@ -953,12 +953,12 @@ class APIServerAdapter(BasePlatformAdapter):
         if not self._api_key:
             logger.warning(
                 "X-Hermes-Session-Key rejected: no API key configured. "
-                "Set API_SERVER_KEY to enable long-term memory scoping."
+                "Set API_SERVER_KEY to enable long-term memory scoping.",
             )
             return None, web.json_response(
                 _openai_error(
                     "X-Hermes-Session-Key requires API key authentication. "
-                    "Configure API_SERVER_KEY to enable this feature."
+                    "Configure API_SERVER_KEY to enable this feature.",
                 ),
                 status=403,
             )
@@ -1071,7 +1071,7 @@ class APIServerAdapter(BasePlatformAdapter):
     async def _handle_health(self, request: "web.Request") -> "web.Response":
         """GET /health — simple health check."""
         return web.json_response(
-            {"status": "ok", "platform": "hermes-agent", "version": _hermes_version()}
+            {"status": "ok", "platform": "hermes-agent", "version": _hermes_version()},
         )
 
     async def _handle_health_detailed(self, request: "web.Request") -> "web.Response":
@@ -1113,7 +1113,7 @@ class APIServerAdapter(BasePlatformAdapter):
                     "permission": [],
                     "root": self._model_name,
                     "parent": None,
-                }
+                },
             ],
         })
 
@@ -1798,12 +1798,12 @@ class APIServerAdapter(BasePlatformAdapter):
                 logger.warning(
                     "Session continuation via X-Hermes-Session-Id rejected: "
                     "no API key configured.  Set API_SERVER_KEY to enable "
-                    "session continuity."
+                    "session continuity.",
                 )
                 return web.json_response(
                     _openai_error(
                         "Session continuation requires API key authentication. "
-                        "Configure API_SERVER_KEY to enable this feature."
+                        "Configure API_SERVER_KEY to enable this feature.",
                     ),
                     status=403,
                 )
@@ -2018,7 +2018,7 @@ class APIServerAdapter(BasePlatformAdapter):
                         "content": final_response,
                     },
                     "finish_reason": finish_reason,
-                }
+                },
             ],
             "usage": {
                 "prompt_tokens": usage.get("input_tokens", 0),
@@ -2098,7 +2098,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 if isinstance(item, tuple) and len(item) == 2 and item[0] == "__tool_progress__":
                     event_data = json.dumps(item[1])
                     await response.write(
-                        f"event: hermes.tool.progress\ndata: {event_data}\n\n".encode()
+                        f"event: hermes.tool.progress\ndata: {event_data}\n\n".encode(),
                     )
                 else:
                     content_chunk = {
@@ -2633,7 +2633,7 @@ class APIServerAdapter(BasePlatformAdapter):
                     "status": "completed",
                     "role": "assistant",
                     "content": [
-                        {"type": "output_text", "text": final_response_text}
+                        {"type": "output_text", "text": final_response_text},
                     ],
                 }
                 await _write_event("response.output_item.done", {
@@ -2676,7 +2676,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 "type": "message",
                 "role": "assistant",
                 "content": [
-                    {"type": "output_text", "text": final_response_text or (agent_error or "")}
+                    {"type": "output_text", "text": final_response_text or (agent_error or "")},
                 ],
             })
 
@@ -3417,7 +3417,7 @@ class APIServerAdapter(BasePlatformAdapter):
         if not isinstance(agent_messages, list) or not agent_messages:
             return []
         start = cls._response_messages_turn_start_index(
-            conversation_history, user_message, result
+            conversation_history, user_message, result,
         )
         turn = agent_messages[start:]
         out: list[dict[str, Any]] = []
@@ -3474,7 +3474,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 {
                     "type": "output_text",
                     "text": final,
-                }
+                },
             ],
         })
         return items

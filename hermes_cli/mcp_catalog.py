@@ -162,7 +162,7 @@ def _parse_manifest(path: Path) -> CatalogEntry:
     if mv != _MANIFEST_VERSION:
         raise CatalogError(
             f"{path}: manifest_version {mv!r} unsupported "
-            f"(this Hermes understands version {_MANIFEST_VERSION})"
+            f"(this Hermes understands version {_MANIFEST_VERSION})",
         )
 
     name = data.get("name") or ""
@@ -223,7 +223,7 @@ def _parse_manifest(path: Path) -> CatalogEntry:
             isinstance(t, str) for t in default_enabled
         ):
             raise CatalogError(
-                f"{path}: tools.default_enabled must be a list of strings"
+                f"{path}: tools.default_enabled must be a list of strings",
             )
     tools_spec = ToolsSpec(default_enabled=default_enabled)
 
@@ -367,7 +367,7 @@ def _run_bootstrap(cwd: Path, commands: list[str]) -> None:
         proc = subprocess.run(cmd, cwd=str(cwd), shell=True)
         if proc.returncode != 0:
             raise CatalogError(
-                f"bootstrap step failed (exit {proc.returncode}): {cmd}"
+                f"bootstrap step failed (exit {proc.returncode}): {cmd}",
             )
 
 
@@ -428,7 +428,7 @@ def _expand_install_dir(value: str, install_dir: Path | None) -> str:
         return value
     if install_dir is None:
         raise CatalogError(
-            f"manifest references {_INSTALL_DIR_VAR} but no install block exists"
+            f"manifest references {_INSTALL_DIR_VAR} but no install block exists",
         )
     return value.replace(_INSTALL_DIR_VAR, str(install_dir))
 
@@ -458,7 +458,7 @@ def _prompt_env_vars(specs: list[EnvVarSpec]) -> dict[str, str]:
 
 
 def _build_server_config(
-    entry: CatalogEntry, install_dir: Path | None
+    entry: CatalogEntry, install_dir: Path | None,
 ) -> dict:
     """Translate a manifest into the ``mcp_servers.<name>`` block format used
     by hermes_cli/mcp_config.py."""
@@ -538,7 +538,7 @@ def _write_tools_include(name: str, include: list[str] | None) -> None:
 
 
 def _apply_tool_selection(
-    entry: CatalogEntry, *, prior_selection: list[str] | None
+    entry: CatalogEntry, *, prior_selection: list[str] | None,
 ) -> None:
     """Probe the server and let the user pick which tools to enable.
 

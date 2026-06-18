@@ -116,7 +116,7 @@ def _resolve_user(user: str | None) -> str:
 
     sys.exit(
         "Missing Hyperliquid address. Pass <address> explicitly or set "
-        f"{DEFAULT_USER_ENV} in your environment or {_hermes_home() / '.env'}."
+        f"{DEFAULT_USER_ENV} in your environment or {_hermes_home() / '.env'}.",
     )
 
 
@@ -275,7 +275,7 @@ def _normalize_dexs(payload: Any) -> list[dict[str, Any]]:
                     "full_name": "First perp dex",
                     "deployer": "-",
                     "asset_caps": 0,
-                }
+                },
             )
             continue
 
@@ -291,7 +291,7 @@ def _normalize_dexs(payload: Any) -> list[dict[str, Any]]:
                 "full_name": item.get("fullName") or "-",
                 "deployer": item.get("deployer") or "-",
                 "asset_caps": len(caps) if isinstance(caps, list) else 0,
-            }
+            },
         )
     return rows
 
@@ -374,7 +374,7 @@ def _normalize_spot_markets(payload: Any) -> list[dict[str, Any]]:
                 "prev_day_px": ctx.get("prevDayPx"),
                 "change_pct": _percent_change(mark_px, ctx.get("prevDayPx")),
                 "day_ntl_vlm": ctx.get("dayNtlVlm"),
-            }
+            },
         )
     return rows
 
@@ -396,7 +396,7 @@ def _normalize_candles(payload: Any) -> list[dict[str, Any]]:
                 "close": candle.get("c"),
                 "volume": candle.get("v"),
                 "trades": candle.get("n"),
-            }
+            },
         )
 
     rows.sort(key=lambda item: int(item.get("time") or 0))
@@ -417,7 +417,7 @@ def _normalize_funding_history(payload: Any) -> list[dict[str, Any]]:
                 "funding_rate": item.get("fundingRate"),
                 "premium": item.get("premium"),
                 "time": item.get("time"),
-            }
+            },
         )
 
     rows.sort(key=lambda item: int(item.get("time") or 0))
@@ -441,7 +441,7 @@ def _normalize_book_levels(payload: Any) -> dict[str, list[dict[str, Any]]]:
                         "px": entry.get("px"),
                         "sz": entry.get("sz"),
                         "orders": entry.get("n"),
-                    }
+                    },
                 )
             elif isinstance(entry, (list, tuple)) and len(entry) >= 2:
                 converted.append(
@@ -449,7 +449,7 @@ def _normalize_book_levels(payload: Any) -> dict[str, list[dict[str, Any]]]:
                         "px": entry[0],
                         "sz": entry[1],
                         "orders": entry[2] if len(entry) > 2 else None,
-                    }
+                    },
                 )
         return converted
 
@@ -480,7 +480,7 @@ def _normalize_positions(payload: Any) -> dict[str, Any]:
                 "margin_used": position.get("marginUsed"),
                 "leverage": leverage.get("value"),
                 "leverage_type": leverage.get("type"),
-            }
+            },
         )
 
     positions.sort(
@@ -519,7 +519,7 @@ def _normalize_spot_balances(payload: Any) -> list[dict[str, Any]]:
                 "total": item.get("total"),
                 "hold": item.get("hold"),
                 "entry_ntl": item.get("entryNtl"),
-            }
+            },
         )
 
     rows.sort(key=lambda item: abs(_safe_float(item.get("entry_ntl")) or 0.0), reverse=True)
@@ -549,7 +549,7 @@ def _normalize_fills(payload: Any) -> list[dict[str, Any]]:
                 "hash": fill.get("hash"),
                 "oid": fill.get("oid"),
                 "twap_id": item.get("twapId"),
-            }
+            },
         )
 
     rows.sort(key=lambda item: int(item.get("time") or 0), reverse=True)
@@ -577,7 +577,7 @@ def _normalize_orders(payload: Any) -> list[dict[str, Any]]:
                 "status": item.get("status") or order.get("status") or "-",
                 "oid": order.get("oid"),
                 "order_type": order.get("orderType") or "-",
-            }
+            },
         )
 
     rows.sort(key=lambda item: int(item.get("timestamp") or 0), reverse=True)
@@ -630,8 +630,8 @@ def _market_context_for_coin(coin: str, interval: str, start_ms: int, end_ms: in
                     "startTime": start_ms,
                     "endTime": end_ms,
                 },
-            }
-        )
+            },
+        ),
     )
     funding_history: list[dict[str, Any]] = []
     if not _is_spot_coin(coin):
@@ -642,8 +642,8 @@ def _market_context_for_coin(coin: str, interval: str, start_ms: int, end_ms: in
                     "coin": coin,
                     "startTime": start_ms,
                     "endTime": end_ms,
-                }
-            )
+                },
+            ),
         )
 
     candle_change = None
@@ -716,11 +716,11 @@ def _review_findings(summary: dict[str, Any], coin_reviews: list[dict[str, Any]]
 
     if summary["net_after_fees"] < 0:
         findings.append(
-            f"Net realized PnL after fees was negative ({_compact_number(summary['net_after_fees'])} USDC-equivalent units in reported fill terms)."
+            f"Net realized PnL after fees was negative ({_compact_number(summary['net_after_fees'])} USDC-equivalent units in reported fill terms).",
         )
     elif summary["net_after_fees"] > 0:
         findings.append(
-            f"Net realized PnL after fees was positive ({_compact_number(summary['net_after_fees'])} USDC-equivalent units in reported fill terms)."
+            f"Net realized PnL after fees was positive ({_compact_number(summary['net_after_fees'])} USDC-equivalent units in reported fill terms).",
         )
 
     realized_abs = abs(summary["realized_pnl"])
@@ -741,11 +741,11 @@ def _review_findings(summary: dict[str, Any], coin_reviews: list[dict[str, Any]]
         best_coin = max(coin_reviews, key=lambda item: item["net_after_fees"])
         if worst_coin["net_after_fees"] < 0:
             findings.append(
-                f"The weakest coin was {worst_coin['coin']} with net after fees of {_compact_number(worst_coin['net_after_fees'])}."
+                f"The weakest coin was {worst_coin['coin']} with net after fees of {_compact_number(worst_coin['net_after_fees'])}.",
             )
         if best_coin["net_after_fees"] > 0 and best_coin["coin"] != worst_coin["coin"]:
             findings.append(
-                f"The strongest coin was {best_coin['coin']} with net after fees of {_compact_number(best_coin['net_after_fees'])}."
+                f"The strongest coin was {best_coin['coin']} with net after fees of {_compact_number(best_coin['net_after_fees'])}.",
             )
 
     for item in coin_reviews:
@@ -777,7 +777,7 @@ def _recent_fill_rows(fills: list[dict[str, Any]], limit: int) -> list[dict[str,
                 "closed_pnl": fill.get("closed_pnl"),
                 "fee": fill.get("fee"),
                 "fee_token": fill.get("fee_token"),
-            }
+            },
         )
     return rows
 
@@ -1067,8 +1067,8 @@ def run_export(args: argparse.Namespace) -> dict[str, Any]:
                     "coin": args.coin,
                     "startTime": start_ms,
                     "endTime": end_ms,
-                }
-            )
+                },
+            ),
         )
 
     output_path = Path(args.output) if args.output else _default_export_path(args.coin, args.interval, args.hours)
@@ -1124,7 +1124,7 @@ def render_dexs(data: dict[str, Any]) -> str:
                 ],
                 rows,
             ),
-        ]
+        ],
     )
 
 
@@ -1182,7 +1182,7 @@ def render_spots(data: dict[str, Any]) -> str:
                 ],
                 rows,
             ),
-        ]
+        ],
     )
 
 
@@ -1211,7 +1211,7 @@ def render_candles(data: dict[str, Any]) -> str:
                 f"Open -> Close: {_format_price(summary.get('open'))} -> {_format_price(summary.get('close'))}",
                 f"Range: {_format_price(summary.get('low'))} to {_format_price(summary.get('high'))}",
                 f"Change: {_format_percent(summary.get('change_pct'))}",
-            ]
+            ],
         )
     lines.extend(
         [
@@ -1227,7 +1227,7 @@ def render_candles(data: dict[str, Any]) -> str:
                 ],
                 rows,
             ),
-        ]
+        ],
     )
     return "\n".join(lines)
 
@@ -1324,7 +1324,7 @@ def render_state(data: dict[str, Any]) -> str:
                     ],
                     position_rows,
                 ),
-            ]
+            ],
         )
     return "\n".join(lines)
 
@@ -1353,7 +1353,7 @@ def render_spot_balances(data: dict[str, Any]) -> str:
                 ],
                 rows,
             ),
-        ]
+        ],
     )
 
 
@@ -1421,7 +1421,7 @@ def render_orders(data: dict[str, Any]) -> str:
                 ],
                 rows,
             ),
-        ]
+        ],
     )
 
 
@@ -1486,7 +1486,7 @@ def render_review(data: dict[str, Any]) -> str:
                     ],
                     coin_rows,
                 ),
-            ]
+            ],
         )
 
     if recent_rows:
@@ -1506,7 +1506,7 @@ def render_review(data: dict[str, Any]) -> str:
                     ],
                     recent_rows,
                 ),
-            ]
+            ],
         )
 
     return "\n".join(lines)
@@ -1526,7 +1526,7 @@ def render_export(data: dict[str, Any]) -> str:
             f"Window open -> close: {_format_price(summary.get('window_open'))} -> {_format_price(summary.get('window_close'))}",
             f"Price change: {_format_percent(summary.get('price_change_pct'))}",
             f"Average funding: {_format_fraction_percent(summary.get('average_funding_rate'))}",
-        ]
+        ],
     )
 
 

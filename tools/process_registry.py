@@ -777,7 +777,7 @@ class ProcessRegistry:
             self._move_to_finished(session)
 
     def _env_poller_loop(
-        self, session: ProcessSession, env: Any, log_path: str, pid_path: str, exit_path: str
+        self, session: ProcessSession, env: Any, log_path: str, pid_path: str, exit_path: str,
     ):
         """Background thread: poll a sandbox log file for non-local backends."""
         quoted_log_path = shlex.quote(log_path)
@@ -1553,33 +1553,33 @@ PROCESS_SCHEMA = {
             "action": {
                 "type": "string",
                 "enum": ["list", "poll", "log", "wait", "kill", "write", "submit", "close"],
-                "description": "Action to perform on background processes"
+                "description": "Action to perform on background processes",
             },
             "session_id": {
                 "type": "string",
-                "description": "Process session ID (from terminal background output). Required for all actions except 'list'."
+                "description": "Process session ID (from terminal background output). Required for all actions except 'list'.",
             },
             "data": {
                 "type": "string",
-                "description": "Text to send to process stdin (for 'write' and 'submit' actions)"
+                "description": "Text to send to process stdin (for 'write' and 'submit' actions)",
             },
             "timeout": {
                 "type": "integer",
                 "description": "Max seconds to block for 'wait' action. Returns partial output on timeout.",
-                "minimum": 1
+                "minimum": 1,
             },
             "offset": {
                 "type": "integer",
-                "description": "Line offset for 'log' action (default: last 200 lines)"
+                "description": "Line offset for 'log' action (default: last 200 lines)",
             },
             "limit": {
                 "type": "integer",
                 "description": "Max lines to return for 'log' action",
-                "minimum": 1
-            }
+                "minimum": 1,
+            },
         },
-        "required": ["action"]
-    }
+        "required": ["action"],
+    },
 }
 
 

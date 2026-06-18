@@ -69,11 +69,11 @@ def _make_mock_client():
             results=[
                 SimpleNamespace(text="Memory 1"),
                 SimpleNamespace(text="Memory 2"),
-            ]
-        )
+            ],
+        ),
     )
     client.areflect = AsyncMock(
-        return_value=SimpleNamespace(text="Synthesized answer")
+        return_value=SimpleNamespace(text="Synthesized answer"),
     )
     client.aretain_batch = AsyncMock()
     client.aclose = AsyncMock()
@@ -104,7 +104,7 @@ def provider(tmp_path, monkeypatch):
     config_path.write_text(json.dumps(config))
 
     monkeypatch.setattr(
-        "plugins.memory.hindsight.get_hermes_home", lambda: tmp_path
+        "plugins.memory.hindsight.get_hermes_home", lambda: tmp_path,
     )
 
     p = HindsightMemoryProvider()
@@ -131,7 +131,7 @@ def provider_with_config(tmp_path, monkeypatch):
         config_path.write_text(json.dumps(config))
 
         monkeypatch.setattr(
-            "plugins.memory.hindsight.get_hermes_home", lambda: tmp_path
+            "plugins.memory.hindsight.get_hermes_home", lambda: tmp_path,
         )
 
         p = HindsightMemoryProvider()
@@ -465,7 +465,7 @@ class TestPostSetup:
 class TestToolHandlers:
     def test_retain_success(self, provider):
         result = json.loads(provider.handle_tool_call(
-            "hindsight_retain", {"content": "user likes dark mode"}
+            "hindsight_retain", {"content": "user likes dark mode"},
         ))
         assert result["result"] == "Memory stored successfully."
         provider._client.aretain.assert_called_once()
@@ -495,13 +495,13 @@ class TestToolHandlers:
 
     def test_retain_missing_content(self, provider):
         result = json.loads(provider.handle_tool_call(
-            "hindsight_retain", {}
+            "hindsight_retain", {},
         ))
         assert "error" in result
 
     def test_recall_success(self, provider):
         result = json.loads(provider.handle_tool_call(
-            "hindsight_recall", {"query": "dark mode"}
+            "hindsight_recall", {"query": "dark mode"},
         ))
         assert "Memory 1" in result["result"]
         assert "Memory 2" in result["result"]
@@ -528,38 +528,38 @@ class TestToolHandlers:
     def test_recall_no_results(self, provider):
         provider._client.arecall.return_value = SimpleNamespace(results=[])
         result = json.loads(provider.handle_tool_call(
-            "hindsight_recall", {"query": "test"}
+            "hindsight_recall", {"query": "test"},
         ))
         assert result["result"] == "No relevant memories found."
 
     def test_recall_missing_query(self, provider):
         result = json.loads(provider.handle_tool_call(
-            "hindsight_recall", {}
+            "hindsight_recall", {},
         ))
         assert "error" in result
 
     def test_reflect_success(self, provider):
         result = json.loads(provider.handle_tool_call(
-            "hindsight_reflect", {"query": "summarize"}
+            "hindsight_reflect", {"query": "summarize"},
         ))
         assert result["result"] == "Synthesized answer"
 
     def test_reflect_missing_query(self, provider):
         result = json.loads(provider.handle_tool_call(
-            "hindsight_reflect", {}
+            "hindsight_reflect", {},
         ))
         assert "error" in result
 
     def test_unknown_tool(self, provider):
         result = json.loads(provider.handle_tool_call(
-            "hindsight_unknown", {}
+            "hindsight_unknown", {},
         ))
         assert "error" in result
 
     def test_retain_error_handling(self, provider):
         provider._client.aretain.side_effect = RuntimeError("connection failed")
         result = json.loads(provider.handle_tool_call(
-            "hindsight_retain", {"content": "test"}
+            "hindsight_retain", {"content": "test"},
         ))
         assert "error" in result
         assert "connection failed" in result["error"]
@@ -567,7 +567,7 @@ class TestToolHandlers:
     def test_recall_error_handling(self, provider):
         provider._client.arecall.side_effect = RuntimeError("timeout")
         result = json.loads(provider.handle_tool_call(
-            "hindsight_recall", {"query": "test"}
+            "hindsight_recall", {"query": "test"},
         ))
         assert "error" in result
 
@@ -576,7 +576,7 @@ class TestToolHandlers:
         first_client.arecall.side_effect = RuntimeError("Cannot connect to host 127.0.0.1:8888")
         second_client = _make_mock_client()
         second_client.arecall.return_value = SimpleNamespace(
-            results=[SimpleNamespace(text="Recovered memory")]
+            results=[SimpleNamespace(text="Recovered memory")],
         )
         clients = iter([first_client, second_client])
 
@@ -585,7 +585,7 @@ class TestToolHandlers:
         monkeypatch.setattr(provider, "_get_client", lambda: next(clients))
 
         result = json.loads(provider.handle_tool_call(
-            "hindsight_recall", {"query": "test"}
+            "hindsight_recall", {"query": "test"},
         ))
 
         assert result["result"] == "1. Recovered memory"
@@ -1087,7 +1087,7 @@ class TestSessionSwitchBufferFlush:
         assert provider._prefetch_result == ""
 
     def test_flush_serializes_behind_pending_retains_via_writer_queue(
-        self, provider_with_config
+        self, provider_with_config,
     ):
         """The flush closure must ride the same _retain_queue sync_turn
         uses, so it lands FIFO behind any still-queued old-session
@@ -1197,7 +1197,7 @@ class TestUpdateModeAppendCapability:
             return "0.5.6"
 
         monkeypatch.setattr(
-            "plugins.memory.hindsight._fetch_hindsight_api_version", _spy
+            "plugins.memory.hindsight._fetch_hindsight_api_version", _spy,
         )
         provider.sync_turn("a", "b")
         provider._retain_queue.join()
@@ -1225,7 +1225,7 @@ class TestUpdateModeAppendCapability:
         assert len(warns) == 1
 
     def test_session_switch_flush_picks_capability_against_old_session(
-        self, provider_with_config, monkeypatch
+        self, provider_with_config, monkeypatch,
     ):
         """When the API supports append, the flush on /reset must land
         in the OLD session's stable document, not a per-process id."""
@@ -1316,7 +1316,7 @@ class TestBankIdTemplate:
 
     def test_resolve_empty_template_uses_fallback(self):
         result = _resolve_bank_id_template(
-            "", fallback="hermes", profile="coder"
+            "", fallback="hermes", profile="coder",
         )
         assert result == "hermes"
 
@@ -1500,7 +1500,7 @@ class TestAvailability:
 
         def _raise(_name):
             raise RuntimeError(
-                "NumPy was built with baseline optimizations: (x86_64-v2)"
+                "NumPy was built with baseline optimizations: (x86_64-v2)",
             )
 
         monkeypatch.setattr(
@@ -1516,7 +1516,7 @@ class TestAvailability:
         config_path.parent.mkdir(parents=True, exist_ok=True)
         config_path.write_text(json.dumps(config))
         monkeypatch.setattr(
-            "plugins.memory.hindsight.get_hermes_home", lambda: tmp_path
+            "plugins.memory.hindsight.get_hermes_home", lambda: tmp_path,
         )
 
         def _raise(_name):

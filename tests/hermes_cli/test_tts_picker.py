@@ -59,7 +59,7 @@ class TestPluginTTSProviders:
                          "url": "https://play.cartesia.ai/console"},
                     ],
                 },
-            )
+            ),
         )
         rows = tools_config._plugin_tts_providers()
         assert len(rows) == 1
@@ -139,7 +139,7 @@ class TestPluginTTSProviders:
                     "post_setup": "my_post_install_hook",
                     "env_vars": [],
                 },
-            )
+            ),
         )
         rows = tools_config._plugin_tts_providers()
         assert rows[0].get("post_setup") == "my_post_install_hook"

@@ -208,7 +208,7 @@ def check_whatsapp_requirements() -> bool:
             [_node, "--version"],
             capture_output=True,
             text=True,
-            timeout=5
+            timeout=5,
         )
         return result.returncode == 0
     except Exception:
@@ -258,7 +258,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
         )
         self._session_path: Path = Path(config.extra.get(
             "session_path",
-            get_hermes_dir("platforms/whatsapp/session", "whatsapp/session")
+            get_hermes_dir("platforms/whatsapp/session", "whatsapp/session"),
         ))
         self._reply_prefix: str | None = config.extra.get("reply_prefix")
         self._dm_policy = str(config.extra.get("dm_policy") or os.getenv("WHATSAPP_DM_POLICY", "open")).strip().lower()
@@ -289,10 +289,10 @@ class WhatsAppAdapter(BasePlatformAdapter):
         # ``gateway.platforms.whatsapp.extra.text_batch_delay_seconds`` /
         # ``text_batch_split_delay_seconds``.
         self._text_batch_delay_seconds = self._coerce_float_extra(
-            "text_batch_delay_seconds", 5.0
+            "text_batch_delay_seconds", 5.0,
         )
         self._text_batch_split_delay_seconds = self._coerce_float_extra(
-            "text_batch_split_delay_seconds", 10.0
+            "text_batch_split_delay_seconds", 10.0,
         )
         self._pending_text_batches: dict[str, MessageEvent] = {}
         self._pending_text_batch_tasks: dict[str, asyncio.Task] = {}
@@ -623,7 +623,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
                 async with aiohttp.ClientSession() as session:
                     async with session.get(
                         f"http://127.0.0.1:{self._bridge_port}/health",
-                        timeout=aiohttp.ClientTimeout(total=2)
+                        timeout=aiohttp.ClientTimeout(total=2),
                     ) as resp:
                         if resp.status == 200:
                             data = await resp.json()
@@ -692,7 +692,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
                     async with aiohttp.ClientSession() as session:
                         async with session.get(
                             f"http://127.0.0.1:{self._bridge_port}/health",
-                            timeout=aiohttp.ClientTimeout(total=2)
+                            timeout=aiohttp.ClientTimeout(total=2),
                         ) as resp:
                             if resp.status == 200:
                                 http_ready = True
@@ -724,7 +724,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
                         async with aiohttp.ClientSession() as session:
                             async with session.get(
                                 f"http://127.0.0.1:{self._bridge_port}/health",
-                                timeout=aiohttp.ClientTimeout(total=2)
+                                timeout=aiohttp.ClientTimeout(total=2),
                             ) as resp:
                                 if resp.status == 200:
                                     data = await resp.json()
@@ -913,7 +913,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
         chat_id: str,
         content: str,
         reply_to: str | None = None,
-        metadata: dict[str, Any] | None = None
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Send a message via the WhatsApp bridge.
 
@@ -949,7 +949,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
                 async with self._http_session.post(
                     f"http://127.0.0.1:{self._bridge_port}/send",
                     json=payload,
-                    timeout=aiohttp.ClientTimeout(total=30)
+                    timeout=aiohttp.ClientTimeout(total=30),
                 ) as resp:
                     if resp.status == 200:
                         data = await resp.json()
@@ -992,7 +992,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
                     "messageId": message_id,
                     "message": content,
                 },
-                timeout=aiohttp.ClientTimeout(total=15)
+                timeout=aiohttp.ClientTimeout(total=15),
             ) as resp:
                 if resp.status == 200:
                     return SendResult(success=True, message_id=message_id)
@@ -1129,7 +1129,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
             async with self._http_session.post(
                 f"http://127.0.0.1:{self._bridge_port}/typing",
                 json={"chatId": chat_id},
-                timeout=aiohttp.ClientTimeout(total=5)
+                timeout=aiohttp.ClientTimeout(total=5),
             ):
                 pass
         except Exception:
@@ -1147,7 +1147,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
 
             async with self._http_session.get(
                 f"http://127.0.0.1:{self._bridge_port}/chat/{chat_id}",
-                timeout=aiohttp.ClientTimeout(total=10)
+                timeout=aiohttp.ClientTimeout(total=10),
             ) as resp:
                 if resp.status == 200:
                     data = await resp.json()
@@ -1175,7 +1175,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
             try:
                 async with self._http_session.get(
                     f"http://127.0.0.1:{self._bridge_port}/messages",
-                    timeout=aiohttp.ClientTimeout(total=30)
+                    timeout=aiohttp.ClientTimeout(total=30),
                 ) as resp:
                     if resp.status == 200:
                         messages = await resp.json()
@@ -1236,7 +1236,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
         if prior_task and not prior_task.done():
             prior_task.cancel()
         self._pending_text_batch_tasks[key] = asyncio.create_task(
-            self._flush_text_batch(key)
+            self._flush_text_batch(key),
         )
 
     async def _flush_text_batch(self, key: str) -> None:

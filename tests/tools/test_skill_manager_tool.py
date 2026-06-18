@@ -570,7 +570,7 @@ class TestSkillManageDispatcher:
         try:
             with _skill_dir(tmp_path):
                 raw = skill_manage(
-                    action="create", name="review-sediment", content=VALID_SKILL_CONTENT
+                    action="create", name="review-sediment", content=VALID_SKILL_CONTENT,
                 )
                 from tools.skill_usage import load_usage
                 usage = load_usage()
@@ -723,7 +723,7 @@ def _write_external_skill(external_dir: Path, name: str = "ext-skill") -> Path:
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(
         f"---\nname: {name}\ndescription: An external skill.\n---\n\n"
-        "# External\n\nBody with OLD_MARKER here.\n"
+        "# External\n\nBody with OLD_MARKER here.\n",
     )
     return skill_dir
 
@@ -823,7 +823,7 @@ class TestExternalSkillMutations:
         skill_dir.mkdir()
         (skill_dir / "SKILL.md").write_text(
             "---\nname: ext-skill\ndescription: An external skill.\n---\n\n"
-            "# External\n\nBody.\n"
+            "# External\n\nBody.\n",
         )
 
         with _two_roots(local, external):

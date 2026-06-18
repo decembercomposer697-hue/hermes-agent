@@ -40,7 +40,7 @@ def _save_cache(cache: dict) -> None:
     """Save the sticker cache to disk atomically."""
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp_path = tempfile.mkstemp(
-        dir=str(CACHE_PATH.parent), suffix=".tmp"
+        dir=str(CACHE_PATH.parent), suffix=".tmp",
     )
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:

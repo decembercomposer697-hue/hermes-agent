@@ -198,7 +198,7 @@ class DeliveryRouter:
         targets: list[DeliveryTarget],
         job_id: str | None = None,
         job_name: str | None = None,
-        metadata: dict[str, Any] | None = None
+        metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """
         Deliver content to all specified targets.
@@ -224,12 +224,12 @@ class DeliveryRouter:
                 
                 results[target.to_string()] = {
                     "success": True,
-                    "result": result
+                    "result": result,
                 }
             except Exception as e:
                 results[target.to_string()] = {
                     "success": False,
-                    "error": str(e)
+                    "error": str(e),
                 }
         
         return results
@@ -239,7 +239,7 @@ class DeliveryRouter:
         content: str,
         job_id: str | None,
         job_name: str | None,
-        metadata: dict[str, Any] | None
+        metadata: dict[str, Any] | None,
     ) -> dict[str, Any]:
         """Save content to local files."""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -277,7 +277,7 @@ class DeliveryRouter:
         
         return {
             "path": str(output_path),
-            "timestamp": timestamp
+            "timestamp": timestamp,
         }
     
     def _save_full_output(self, content: str, job_id: str) -> Path:
@@ -305,7 +305,7 @@ class DeliveryRouter:
         self,
         target: DeliveryTarget,
         content: str,
-        metadata: dict[str, Any] | None
+        metadata: dict[str, Any] | None,
     ) -> dict[str, Any]:
         """Deliver content to a messaging platform."""
         adapter = self.adapters.get(target.platform)
@@ -369,12 +369,12 @@ class DeliveryRouter:
                 ensure_dm_topic = getattr(adapter, "ensure_dm_topic", None)
                 if ensure_dm_topic is None:
                     raise RuntimeError(
-                        "Telegram adapter cannot create named private DM topics"
+                        "Telegram adapter cannot create named private DM topics",
                     )
                 created_thread_id = await ensure_dm_topic(target.chat_id, target_thread_id)
                 if not created_thread_id:
                     raise RuntimeError(
-                        f"Failed to create Telegram private DM topic '{target_thread_id}'"
+                        f"Failed to create Telegram private DM topic '{target_thread_id}'",
                     )
                 target_thread_id = str(created_thread_id)
                 send_metadata["thread_id"] = target_thread_id
@@ -394,7 +394,7 @@ class DeliveryRouter:
                 if reply_anchor is None:
                     raise RuntimeError(
                         "Telegram private DM topic delivery requires telegram_reply_to_message_id; "
-                        "send to the bare chat or provide a reply anchor"
+                        "send to the bare chat or provide a reply anchor",
                     )
                 send_metadata["thread_id"] = target_thread_id
                 send_metadata["telegram_dm_topic_reply_fallback"] = True
@@ -410,7 +410,7 @@ class DeliveryRouter:
                 ensure_dm_topic = getattr(adapter, "ensure_dm_topic", None)
                 if ensure_dm_topic is None:
                     raise RuntimeError(
-                        "Telegram adapter cannot refresh named private DM topics"
+                        "Telegram adapter cannot refresh named private DM topics",
                     )
                 refreshed_thread_id = await ensure_dm_topic(
                     target.chat_id,
@@ -419,7 +419,7 @@ class DeliveryRouter:
                 )
                 if not refreshed_thread_id:
                     raise RuntimeError(
-                        f"Failed to refresh Telegram private DM topic '{named_telegram_private_topic_name}'"
+                        f"Failed to refresh Telegram private DM topic '{named_telegram_private_topic_name}'",
                     )
                 send_metadata["thread_id"] = str(refreshed_thread_id)
                 send_metadata["telegram_dm_topic_created_for_send"] = True

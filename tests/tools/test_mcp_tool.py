@@ -66,7 +66,7 @@ class TestLoadMCPConfig:
                 "command": "npx",
                 "args": ["-y", "@modelcontextprotocol/server-filesystem", "/tmp"],
                 "env": {},
-            }
+            },
         }
         with patch("hermes_cli.config.load_config", return_value={"mcp_servers": servers}):
             from tools.mcp_tool import _load_mcp_config
@@ -138,7 +138,7 @@ class TestSchemaConversion:
                             "query": {"type": "string"},
                         },
                         "required": ["query"],
-                    }
+                    },
                 },
             },
         )
@@ -305,9 +305,9 @@ class TestSchemaConversion:
                                 "properties": {"field": {"type": "string"}},
                             },
                             {"type": "null"},
-                        ]
+                        ],
                     },
-                }
+                },
             },
         })
 
@@ -488,7 +488,7 @@ class TestToolHandler:
 
         mock_session = MagicMock()
         mock_session.call_tool = AsyncMock(
-            return_value=_make_call_result("hello world", is_error=False)
+            return_value=_make_call_result("hello world", is_error=False),
         )
         server = _make_mock_server("test_srv", session=mock_session)
         _servers["test_srv"] = server
@@ -507,7 +507,7 @@ class TestToolHandler:
 
         mock_session = MagicMock()
         mock_session.call_tool = AsyncMock(
-            return_value=_make_call_result("something went wrong", is_error=True)
+            return_value=_make_call_result("something went wrong", is_error=True),
         )
         server = _make_mock_server("test_srv", session=mock_session)
         _servers["test_srv"] = server
@@ -683,7 +683,7 @@ class TestDiscoverAndRegister:
         with patch("tools.mcp_tool._connect_server", side_effect=fake_connect), \
              patch("tools.registry.registry", mock_registry):
             registered = asyncio.run(
-                _discover_and_register_server("fs", {"command": "npx", "args": []})
+                _discover_and_register_server("fs", {"command": "npx", "args": []}),
             )
 
         assert "mcp_fs_read_file" in registered
@@ -712,7 +712,7 @@ class TestDiscoverAndRegister:
         with patch("tools.mcp_tool._connect_server", side_effect=fake_connect), \
              patch("tools.registry.registry", mock_registry):
             asyncio.run(
-                _discover_and_register_server("myserver", {"command": "test"})
+                _discover_and_register_server("myserver", {"command": "test"}),
             )
 
             assert validate_toolset("myserver") is True
@@ -740,7 +740,7 @@ class TestDiscoverAndRegister:
         with patch("tools.mcp_tool._connect_server", side_effect=fake_connect), \
              patch("tools.registry.registry", mock_registry):
             asyncio.run(
-                _discover_and_register_server("srv", {"command": "test"})
+                _discover_and_register_server("srv", {"command": "test"}),
             )
 
         entry = mock_registry._tools.get("mcp_srv_do_thing")
@@ -786,7 +786,7 @@ class TestMCPServerTask:
         mock_session = MagicMock()
         mock_session.initialize = AsyncMock()
         mock_session.list_tools = AsyncMock(
-            return_value=SimpleNamespace(tools=mock_tools)
+            return_value=SimpleNamespace(tools=mock_tools),
         )
 
         p_stdio, p_cs, _, _ = self._mock_stdio_and_session(mock_session)
@@ -829,7 +829,7 @@ class TestMCPServerTask:
         server._registered_tool_names = ["mcp_srv_old", "mcp_srv_keep"]
         server.session = MagicMock()
         server.session.list_tools = AsyncMock(
-            return_value=SimpleNamespace(tools=[_make_mcp_tool("keep"), _make_mcp_tool("new")])
+            return_value=SimpleNamespace(tools=[_make_mcp_tool("keep"), _make_mcp_tool("new")]),
         )
 
         with patch("tools.registry.registry", mock_registry):
@@ -924,7 +924,7 @@ class TestMCPServerTask:
         mock_session = MagicMock()
         mock_session.initialize = AsyncMock()
         mock_session.list_tools = AsyncMock(
-            return_value=SimpleNamespace(tools=[])
+            return_value=SimpleNamespace(tools=[]),
         )
 
         p_stdio, p_cs, _, _ = self._mock_stdio_and_session(mock_session)
@@ -955,7 +955,7 @@ class TestMCPServerTask:
         mock_session = MagicMock()
         mock_session.initialize = AsyncMock()
         mock_session.list_tools = AsyncMock(
-            return_value=SimpleNamespace(tools=[])
+            return_value=SimpleNamespace(tools=[]),
         )
 
         p_stdio, p_cs, _, _ = self._mock_stdio_and_session(mock_session)
@@ -1832,7 +1832,7 @@ class TestConfigurableTimeouts:
 
             with patch.object(MCPServerTask, "_run_stdio", patched_run_stdio):
                 task = asyncio.ensure_future(
-                    server.run({"command": "test", "timeout": 180})
+                    server.run({"command": "test", "timeout": 180}),
                 )
                 await server._ready.wait()
                 assert server.tool_timeout == 180
@@ -1847,7 +1847,7 @@ class TestConfigurableTimeouts:
 
         mock_session = MagicMock()
         mock_session.call_tool = AsyncMock(
-            return_value=_make_call_result("ok", is_error=False)
+            return_value=_make_call_result("ok", is_error=False),
         )
         server = _make_mock_server("test_srv", session=mock_session)
         server.tool_timeout = 180
@@ -1975,7 +1975,7 @@ class TestUtilityHandlers:
         )
         mock_session = MagicMock()
         mock_session.list_resources = AsyncMock(
-            return_value=SimpleNamespace(resources=[mock_resource])
+            return_value=SimpleNamespace(resources=[mock_resource]),
         )
         server = _make_mock_server("srv", session=mock_session)
         _servers["srv"] = server
@@ -1996,7 +1996,7 @@ class TestUtilityHandlers:
 
         mock_session = MagicMock()
         mock_session.list_resources = AsyncMock(
-            return_value=SimpleNamespace(resources=[])
+            return_value=SimpleNamespace(resources=[]),
         )
         server = _make_mock_server("srv", session=mock_session)
         _servers["srv"] = server
@@ -2025,7 +2025,7 @@ class TestUtilityHandlers:
         content_block = SimpleNamespace(text="Hello from resource")
         mock_session = MagicMock()
         mock_session.read_resource = AsyncMock(
-            return_value=SimpleNamespace(contents=[content_block])
+            return_value=SimpleNamespace(contents=[content_block]),
         )
         server = _make_mock_server("srv", session=mock_session)
         _servers["srv"] = server
@@ -2074,7 +2074,7 @@ class TestUtilityHandlers:
         )
         mock_session = MagicMock()
         mock_session.list_prompts = AsyncMock(
-            return_value=SimpleNamespace(prompts=[mock_prompt])
+            return_value=SimpleNamespace(prompts=[mock_prompt]),
         )
         server = _make_mock_server("srv", session=mock_session)
         _servers["srv"] = server
@@ -2095,7 +2095,7 @@ class TestUtilityHandlers:
 
         mock_session = MagicMock()
         mock_session.list_prompts = AsyncMock(
-            return_value=SimpleNamespace(prompts=[])
+            return_value=SimpleNamespace(prompts=[]),
         )
         server = _make_mock_server("srv", session=mock_session)
         _servers["srv"] = server
@@ -2127,7 +2127,7 @@ class TestUtilityHandlers:
         )
         mock_session = MagicMock()
         mock_session.get_prompt = AsyncMock(
-            return_value=SimpleNamespace(messages=[mock_msg], description=None)
+            return_value=SimpleNamespace(messages=[mock_msg], description=None),
         )
         server = _make_mock_server("srv", session=mock_session)
         _servers["srv"] = server
@@ -2141,7 +2141,7 @@ class TestUtilityHandlers:
             assert result["messages"][0]["role"] == "assistant"
             assert "summary" in result["messages"][0]["content"].lower()
             mock_session.get_prompt.assert_called_once_with(
-                "summarize", arguments={"text": "hello"}
+                "summarize", arguments={"text": "hello"},
             )
         finally:
             _servers.pop("srv", None)
@@ -2173,7 +2173,7 @@ class TestUtilityHandlers:
 
         mock_session = MagicMock()
         mock_session.get_prompt = AsyncMock(
-            return_value=SimpleNamespace(messages=[], description=None)
+            return_value=SimpleNamespace(messages=[], description=None),
         )
         server = _make_mock_server("srv", session=mock_session)
         _servers["srv"] = server
@@ -2184,7 +2184,7 @@ class TestUtilityHandlers:
                 handler({"name": "test_prompt"})
             # arguments defaults to {} when not provided
             mock_session.get_prompt.assert_called_once_with(
-                "test_prompt", arguments={}
+                "test_prompt", arguments={},
             )
         finally:
             _servers.pop("srv", None)
@@ -2215,7 +2215,7 @@ class TestUtilityToolRegistration:
         with patch("tools.mcp_tool._connect_server", side_effect=fake_connect), \
              patch("tools.registry.registry", mock_registry):
             registered = asyncio.run(
-                _discover_and_register_server("fs", {"command": "npx", "args": []})
+                _discover_and_register_server("fs", {"command": "npx", "args": []}),
             )
 
         # Regular tool + 4 utility tools
@@ -2250,7 +2250,7 @@ class TestUtilityToolRegistration:
         with patch("tools.mcp_tool._connect_server", side_effect=fake_connect), \
              patch("tools.registry.registry", mock_registry):
             asyncio.run(
-                _discover_and_register_server("myserv", {"command": "test"})
+                _discover_and_register_server("myserv", {"command": "test"}),
             )
 
         # Check that utility tools are in the right toolset
@@ -2279,7 +2279,7 @@ class TestUtilityToolRegistration:
         with patch("tools.mcp_tool._connect_server", side_effect=fake_connect), \
              patch("tools.registry.registry", mock_registry):
             asyncio.run(
-                _discover_and_register_server("chk", {"command": "test"})
+                _discover_and_register_server("chk", {"command": "test"}),
             )
 
         entry = mock_registry._tools.get("mcp_chk_list_resources")
@@ -2600,7 +2600,7 @@ class TestConvertMessages:
 
     def test_tool_use_message(self):
         tu_block = SimpleNamespace(
-            id="call_2", name="get_weather", input={"city": "London"}
+            id="call_2", name="get_weather", input={"city": "London"},
         )
         msg = SimpleNamespace(
             role="assistant",
@@ -2619,7 +2619,7 @@ class TestConvertMessages:
         """Assistant message with both text and tool_calls."""
         text_block = SimpleNamespace(text="Let me check the weather")
         tu_block = SimpleNamespace(
-            id="call_3", name="get_weather", input={"city": "Paris"}
+            id="call_3", name="get_weather", input={"city": "Paris"},
         )
         msg = SimpleNamespace(
             role="assistant",
@@ -2654,7 +2654,7 @@ class TestSamplingCallbackText:
         """Full flow: text response returns CreateMessageResult."""
         fake_client = MagicMock()
         fake_client.chat.completions.create.return_value = _make_llm_response(
-            content="Hello from LLM"
+            content="Hello from LLM",
         )
 
         with patch(
@@ -2718,7 +2718,7 @@ class TestSamplingCallbackText:
         """finish_reason='length' maps to stopReason='maxTokens'."""
         fake_client = MagicMock()
         fake_client.chat.completions.create.return_value = _make_llm_response(
-            finish_reason="length"
+            finish_reason="length",
         )
 
         with patch(
@@ -2769,7 +2769,7 @@ class TestSamplingCallbackToolUse:
             tool_calls_data=[
                 ("call_a", "func_a", '{"x": 1}'),
                 ("call_b", "func_b", '{"y": 2}'),
-            ]
+            ],
         )
 
         with patch(
@@ -3016,7 +3016,7 @@ class TestMalformedToolCallArgs:
         handler = SamplingHandler("mf", {})
         fake_client = MagicMock()
         fake_client.chat.completions.create.return_value = _make_llm_tool_response(
-            tool_calls_data=[("call_x", "some_tool", "not valid json {{{")]
+            tool_calls_data=[("call_x", "some_tool", "not valid json {{{")],
         )
 
         with patch(
@@ -3517,7 +3517,7 @@ class TestMCPSelectiveToolLoading:
             "ink": {
                 "url": "https://mcp.example.com",
                 "enabled": False,
-            }
+            },
         }
         fake_toolsets = {
             "hermes-cli": {"tools": [], "description": "CLI", "includes": []},
@@ -3611,7 +3611,7 @@ class TestMCPBuiltinCollisionGuard:
         with patch("tools.mcp_tool._connect_server", side_effect=fake_connect), \
              patch("tools.registry.registry", mock_registry):
             registered = asyncio.run(
-                _discover_and_register_server("abc", {"command": "test", "args": []})
+                _discover_and_register_server("abc", {"command": "test", "args": []}),
             )
 
         # The MCP tool should have been skipped — built-in preserved.
@@ -3638,7 +3638,7 @@ class TestMCPBuiltinCollisionGuard:
         with patch("tools.mcp_tool._connect_server", side_effect=fake_connect), \
              patch("tools.registry.registry", mock_registry):
             registered = asyncio.run(
-                _discover_and_register_server("minimax", {"command": "test", "args": []})
+                _discover_and_register_server("minimax", {"command": "test", "args": []}),
             )
 
         assert "mcp_minimax_web_search" in registered
@@ -3676,7 +3676,7 @@ class TestMCPBuiltinCollisionGuard:
         with patch("tools.mcp_tool._connect_server", side_effect=fake_connect), \
              patch("tools.registry.registry", mock_registry):
             registered = asyncio.run(
-                _discover_and_register_server("srv", {"command": "test", "args": []})
+                _discover_and_register_server("srv", {"command": "test", "args": []}),
             )
 
         # MCP-to-MCP collision is allowed — the new server wins.

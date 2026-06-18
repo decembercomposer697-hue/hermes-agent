@@ -113,7 +113,7 @@ def test_inherited_handoff_detected_in_resumed_protected_head():
     ]
     # Search the whole post-system range.
     idx, body = ContextCompressor._find_latest_context_summary(
-        messages, 1, len(messages)
+        messages, 1, len(messages),
     )
     assert idx == 1, "handoff in protected head must be found"
     assert "task A" in body
@@ -134,7 +134,7 @@ def test_historical_prefixed_handoff_detected_and_stripped():
         {"role": "user", "content": "Unrelated task B"},
     ]
     idx, body = ContextCompressor._find_latest_context_summary(
-        messages, 1, len(messages)
+        messages, 1, len(messages),
     )
     assert idx == 1
     assert "task A" in body

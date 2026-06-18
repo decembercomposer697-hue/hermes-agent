@@ -84,5 +84,5 @@ def test_cmd_list_json_output(monkeypatch, capsys):
             "version": "2.2.0",
             "description": "Search",
             "source": "git",
-        }
+        },
     ]

@@ -285,7 +285,7 @@ else:
                 out = cmd[5:] if cmd.startswith("echo ") else f"mock: {cmd}"
                 return json.dumps({"output": out, "exit_code": 0})
             return _mock_handle_function_call(
-                function_name, function_args, task_id=task_id, user_task=user_task
+                function_name, function_args, task_id=task_id, user_task=user_task,
             )
 
         with patch("model_tools.handle_function_call", side_effect=slow_mock):
@@ -489,7 +489,7 @@ class TestStubSchemaDrift(unittest.TestCase):
                 missing, set(),
                 f"Stub for '{tool_name}' is missing parameters that exist in "
                 f"the real schema: {missing}. Update _TOOL_STUBS in "
-                f"code_execution_tool.py to include them."
+                f"code_execution_tool.py to include them.",
             )
 
     def test_stubs_pass_all_params_to_rpc(self):
@@ -506,7 +506,7 @@ class TestStubSchemaDrift(unittest.TestCase):
                     f'"{param}"',
                     args_expr,
                     f"Stub for '{tool_name}' has parameter '{param}' in its "
-                    f"signature but doesn't pass it in the args dict: {args_expr}"
+                    f"signature but doesn't pass it in the args dict: {args_expr}",
                 )
 
     def test_search_files_target_uses_current_values(self):

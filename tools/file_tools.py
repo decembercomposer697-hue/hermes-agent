@@ -125,7 +125,7 @@ def _get_live_tracking_cwd(task_id: str = "default") -> str | None:
         cached = _file_ops_cache.get(container_key) or _file_ops_cache.get(task_id)
     if cached is not None:
         live_cwd = getattr(getattr(cached, "env", None), "cwd", None) or getattr(
-            cached, "cwd", None
+            cached, "cwd", None,
         )
         if live_cwd:
             return live_cwd
@@ -252,13 +252,13 @@ def _is_blocked_device_path(path: str) -> bool:
         return True
     # /proc/self/fd/0-2 and /proc/<pid>/fd/0-2 are Linux aliases for stdio
     if normalized.startswith("/proc/") and normalized.endswith(
-        ("/fd/0", "/fd/1", "/fd/2")
+        ("/fd/0", "/fd/1", "/fd/2"),
     ):
         return True
     # /proc/*/environ, /proc/*/cmdline, /proc/*/maps can leak secrets,
     # command-line args, and memory layout from the host process (issue #4427)
     if normalized.startswith("/proc/") and normalized.endswith(
-        ("/environ", "/cmdline", "/maps")
+        ("/environ", "/cmdline", "/maps"),
     ):
         return True
     return False
@@ -362,7 +362,7 @@ def _get_container_mirror_prefix_for_task(task_id: str = "default") -> str | Non
 
         if env is not None:
             if env.__class__.__name__ == "DockerEnvironment" and bool(
-                getattr(env, "_persistent", False)
+                getattr(env, "_persistent", False),
             ):
                 return "/root/.hermes"
             return None
@@ -1113,7 +1113,7 @@ def write_file_tool(path: str, content: str, task_id: str = "default",
     if _is_internal_file_status_text(content):
         return tool_error(
             "Refusing to write internal read_file status text as file content. "
-            "Re-read the file or reconstruct the intended file contents before writing."
+            "Re-read the file or reconstruct the intended file contents before writing.",
         )
     try:
         # Resolve once for the registry lock + stale check.  Failures here
@@ -1201,7 +1201,7 @@ def patch_tool(mode: str = "replace", path: str = None, old_string: str = None,
                 return tool_error(
                     f"V4A patch header contains '..' traversal: {v4a_path!r}. "
                     "Use the agent's cwd-relative path (no '..') or an absolute "
-                    "path in '*** Update File:' / '*** Add File:' / '*** Delete File:' headers."
+                    "path in '*** Update File:' / '*** Add File:' / '*** Delete File:' headers.",
                 )
             _paths_to_check.append(v4a_path)
     for _p in _paths_to_check:
@@ -1387,7 +1387,7 @@ def search_tool(pattern: str, target: str = "content", path: str = ".",
         file_ops = _get_file_ops(task_id)
         result = file_ops.search(
             pattern=pattern, path=path, target=target, file_glob=file_glob,
-            limit=limit, offset=offset, output_mode=output_mode, context=context
+            limit=limit, offset=offset, output_mode=output_mode, context=context,
         )
         if hasattr(result, 'matches'):
             for m in result.matches:
@@ -1433,10 +1433,10 @@ READ_FILE_SCHEMA = {
         "properties": {
             "path": {"type": "string", "description": "Path to the file to read (absolute, relative, or ~/path)"},
             "offset": {"type": "integer", "description": "Line number to start reading from (1-indexed, default: 1)", "default": 1, "minimum": 1},
-            "limit": {"type": "integer", "description": "Maximum number of lines to read (default: 500, max: 2000)", "default": 500, "maximum": 2000}
+            "limit": {"type": "integer", "description": "Maximum number of lines to read (default: 500, max: 2000)", "default": 500, "maximum": 2000},
         },
-        "required": ["path"]
-    }
+        "required": ["path"],
+    },
 }
 
 WRITE_FILE_SCHEMA = {
@@ -1453,8 +1453,8 @@ WRITE_FILE_SCHEMA = {
                 "default": False,
             },
         },
-        "required": ["path", "content"]
-    }
+        "required": ["path", "content"],
+    },
 }
 
 PATCH_SCHEMA = {
@@ -1521,10 +1521,10 @@ SEARCH_FILES_SCHEMA = {
             "limit": {"type": "integer", "description": "Maximum number of results to return (default: 50)", "default": 50},
             "offset": {"type": "integer", "description": "Skip first N results for pagination (default: 0)", "default": 0},
             "output_mode": {"type": "string", "enum": ["content", "files_only", "count"], "description": "Output format for grep mode: 'content' shows matching lines with line numbers, 'files_only' lists file paths, 'count' shows match counts per file", "default": "content"},
-            "context": {"type": "integer", "description": "Number of context lines before and after each match (grep mode only)", "default": 0}
+            "context": {"type": "integer", "description": "Number of context lines before and after each match (grep mode only)", "default": 0},
         },
-        "required": ["pattern"]
-    }
+        "required": ["pattern"],
+    },
 }
 
 
@@ -1538,7 +1538,7 @@ def _handle_write_file(args, **kw):
     if not args.get("path") or not isinstance(args.get("path"), str):
         return tool_error(
             "write_file: missing required field 'path'. Re-emit the tool call with "
-            "both 'path' and 'content' set."
+            "both 'path' and 'content' set.",
         )
     if "content" not in args:
         return tool_error(
@@ -1546,12 +1546,12 @@ def _handle_write_file(args, **kw):
             "path but no content argument — this is almost always a dropped-arg bug "
             "under context pressure. Re-emit the tool call with the full content "
             "payload, or use execute_code with hermes_tools.write_file() for very "
-            "large files."
+            "large files.",
         )
     if not isinstance(args["content"], str):
         return tool_error(
             f"write_file: 'content' must be a string, got "
-            f"{type(args['content']).__name__}."
+            f"{type(args['content']).__name__}.",
         )
     return write_file_tool(
         path=args["path"], content=args["content"], task_id=tid,

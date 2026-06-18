@@ -24,7 +24,7 @@ class FakeAdapter:
                 "content": content,
                 "reply_to": reply_to,
                 "metadata": metadata,
-            }
+            },
         )
         return SimpleNamespace(success=True)
 
@@ -66,7 +66,7 @@ async def test_goal_status_notice_uses_adapter_send_with_thread_metadata():
             "content": "✓ Goal achieved: done",
             "reply_to": None,
             "metadata": {"thread_id": "thread-123"},
-        }
+        },
     ]
 
 
@@ -106,7 +106,7 @@ async def test_goal_status_notice_defers_until_post_delivery_callback():
             "content": "✓ Goal achieved: done",
             "reply_to": None,
             "metadata": {"thread_id": "thread-123"},
-        }
+        },
     ]
 
 

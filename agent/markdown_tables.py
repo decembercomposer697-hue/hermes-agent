@@ -209,7 +209,7 @@ def _wrap_to_width(text: str, width: int) -> list[str]:
 
 
 def _render_vertical(
-    rows: list[list[str]], ncols: int, available_width: int
+    rows: list[list[str]], ncols: int, available_width: int,
 ) -> list[str]:
     """Render a too-wide table as vertical ``Header: value`` rows.
 

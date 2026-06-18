@@ -152,7 +152,7 @@ class TestPatchHandler:
         from tools.file_tools import patch_tool
         result = json.loads(patch_tool(
             mode="replace", path="/tmp/f.py",
-            old_string="foo", new_string="bar"
+            old_string="foo", new_string="bar",
         ))
         assert result["status"] == "ok"
         mock_ops.patch_replace.assert_called_once_with("/tmp/f.py", "foo", "bar", False)
@@ -314,7 +314,7 @@ class TestPatchHints:
         mock_ops = MagicMock()
         result_obj = MagicMock()
         result_obj.to_dict.return_value = {
-            "error": "Could not find match for old_string in foo.py"
+            "error": "Could not find match for old_string in foo.py",
         }
         mock_ops.patch_replace.return_value = result_obj
         mock_get.return_value = mock_ops

@@ -304,7 +304,7 @@ class TestAutoVoiceReply:
             runner.adapters[event.source.platform] = mock_adapter
 
         return runner._should_send_voice_reply(
-            event, response, agent_messages or []
+            event, response, agent_messages or [],
         )
 
     # -- Full platform x input x mode matrix --------------------------------
@@ -879,7 +879,7 @@ class TestVoiceChannelCommands:
         mock_channel.name = "General"
         mock_adapter = AsyncMock()
         mock_adapter.join_voice_channel = AsyncMock(
-            side_effect=RuntimeError("PyNaCl library needed in order to use voice")
+            side_effect=RuntimeError("PyNaCl library needed in order to use voice"),
         )
         mock_adapter.get_user_voice_channel = AsyncMock(return_value=mock_channel)
         event = self._make_discord_event()
@@ -1408,7 +1408,7 @@ class TestCallbackWiringOrder:
         mock_channel.name = "General"
         mock_adapter = AsyncMock()
         mock_adapter.join_voice_channel = AsyncMock(
-            side_effect=RuntimeError("No permission")
+            side_effect=RuntimeError("No permission"),
         )
         mock_adapter.get_user_voice_channel = AsyncMock(return_value=mock_channel)
         mock_adapter._voice_input_callback = None
@@ -1459,7 +1459,7 @@ class TestLeaveExceptionHandling:
         mock_adapter = AsyncMock()
         mock_adapter.is_in_voice_channel = MagicMock(return_value=True)
         mock_adapter.leave_voice_channel = AsyncMock(
-            side_effect=RuntimeError("Connection reset")
+            side_effect=RuntimeError("Connection reset"),
         )
         mock_adapter._voice_input_callback = MagicMock()
 
@@ -2563,7 +2563,7 @@ class TestVoiceReception:
         dave = MagicMock()
         dave.decrypt.return_value = b"\xf8\xff\xfe"
         receiver = self._make_receiver_with_nacl(
-            dave_session=dave, mapped_ssrcs={100: 42}
+            dave_session=dave, mapped_ssrcs={100: 42},
         )
         self._inject_mock_decoder(receiver, 100)
 
@@ -2593,10 +2593,10 @@ class TestVoiceReception:
         """DAVE decrypt 'Unencrypted' error → use data as-is, don't drop."""
         dave = MagicMock()
         dave.decrypt.side_effect = Exception(
-            "Failed to decrypt: DecryptionFailed(UnencryptedWhenPassthroughDisabled)"
+            "Failed to decrypt: DecryptionFailed(UnencryptedWhenPassthroughDisabled)",
         )
         receiver = self._make_receiver_with_nacl(
-            dave_session=dave, mapped_ssrcs={100: 42}
+            dave_session=dave, mapped_ssrcs={100: 42},
         )
         self._inject_mock_decoder(receiver, 100)
 
@@ -2612,7 +2612,7 @@ class TestVoiceReception:
         dave = MagicMock()
         dave.decrypt.side_effect = Exception("KeyRotationFailed")
         receiver = self._make_receiver_with_nacl(
-            dave_session=dave, mapped_ssrcs={100: 42}
+            dave_session=dave, mapped_ssrcs={100: 42},
         )
 
         with patch("nacl.secret.Aead") as mock_aead:
@@ -2787,7 +2787,7 @@ class TestVoiceTTSPlayback:
         from gateway.platforms.base import MessageType
         runner = self._make_runner()
         agent_msgs = [{"role": "assistant", "tool_calls": [
-            {"id": "1", "type": "function", "function": {"name": "text_to_speech", "arguments": "{}"}}
+            {"id": "1", "type": "function", "function": {"name": "text_to_speech", "arguments": "{}"}},
         ]}]
         assert self._call_should_reply(runner, "all", MessageType.TEXT, agent_msgs=agent_msgs) is False
 
@@ -2822,7 +2822,7 @@ class TestVoiceTTSPlayback:
         from gateway.platforms.base import MessageType
         runner = self._make_runner()
         agent_msgs = [{"role": "assistant", "tool_calls": [
-            {"id": "1", "type": "function", "function": {"name": "text_to_speech", "arguments": "{}"}}
+            {"id": "1", "type": "function", "function": {"name": "text_to_speech", "arguments": "{}"}},
         ]}]
         assert self._call_should_reply(
             runner, "all", MessageType.VOICE, agent_msgs=agent_msgs, already_sent=True,
@@ -2939,7 +2939,7 @@ class TestShouldAutoTtsForChat:
     def test_enabled_wins_over_disabled(self):
         """An explicit enable beats an explicit disable (enable takes priority)."""
         fn, adapter = self._make_adapter(
-            default=False, enabled={"chat1"}, disabled={"chat1"}
+            default=False, enabled={"chat1"}, disabled={"chat1"},
         )
         assert fn(adapter, "chat1") is True
 

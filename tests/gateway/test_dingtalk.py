@@ -94,14 +94,14 @@ class TestDingTalkRequirements:
         with patch.dict("sys.modules", {"dingtalk_stream": None}), \
              patch("tools.lazy_deps.ensure", side_effect=ImportError("dingtalk_stream unavailable")):
             monkeypatch.setattr(
-                "gateway.platforms.dingtalk.DINGTALK_STREAM_AVAILABLE", False
+                "gateway.platforms.dingtalk.DINGTALK_STREAM_AVAILABLE", False,
             )
             from gateway.platforms.dingtalk import check_dingtalk_requirements
             assert check_dingtalk_requirements() is False
 
     def test_returns_false_when_env_vars_missing(self, monkeypatch):
         monkeypatch.setattr(
-            "gateway.platforms.dingtalk.DINGTALK_STREAM_AVAILABLE", True
+            "gateway.platforms.dingtalk.DINGTALK_STREAM_AVAILABLE", True,
         )
         monkeypatch.setattr("gateway.platforms.dingtalk.HTTPX_AVAILABLE", True)
         monkeypatch.delenv("DINGTALK_CLIENT_ID", raising=False)
@@ -111,7 +111,7 @@ class TestDingTalkRequirements:
 
     def test_returns_true_when_all_available(self, monkeypatch):
         monkeypatch.setattr(
-            "gateway.platforms.dingtalk.DINGTALK_STREAM_AVAILABLE", True
+            "gateway.platforms.dingtalk.DINGTALK_STREAM_AVAILABLE", True,
         )
         monkeypatch.setattr("gateway.platforms.dingtalk.HTTPX_AVAILABLE", True)
         monkeypatch.setenv("DINGTALK_CLIENT_ID", "test-id")
@@ -241,7 +241,7 @@ class TestSend:
 
         result = await adapter.send(
             "chat-123", "Hello!",
-            metadata={"session_webhook": "https://dingtalk.example/webhook"}
+            metadata={"session_webhook": "https://dingtalk.example/webhook"},
         )
         assert result.success is True
         mock_client.post.assert_called_once()
@@ -292,7 +292,7 @@ class TestSend:
 
         result = await adapter.send(
             "chat-123", "Hello!",
-            metadata={"session_webhook": "https://example/webhook"}
+            metadata={"session_webhook": "https://example/webhook"},
         )
         assert result.success is False
         assert "400" in result.error
@@ -376,7 +376,7 @@ class TestConnect:
     @pytest.mark.asyncio
     async def test_connect_fails_without_sdk(self, monkeypatch):
         monkeypatch.setattr(
-            "gateway.platforms.dingtalk.DINGTALK_STREAM_AVAILABLE", False
+            "gateway.platforms.dingtalk.DINGTALK_STREAM_AVAILABLE", False,
         )
         from gateway.platforms.dingtalk import DingTalkAdapter
         adapter = DingTalkAdapter(PlatformConfig(enabled=True))
@@ -458,13 +458,13 @@ class TestWebhookDomainAllowlist:
     def test_api_domain_accepted(self):
         from gateway.platforms.dingtalk import _DINGTALK_WEBHOOK_RE
         assert _DINGTALK_WEBHOOK_RE.match(
-            "https://api.dingtalk.com/robot/send?access_token=x"
+            "https://api.dingtalk.com/robot/send?access_token=x",
         )
 
     def test_oapi_domain_accepted(self):
         from gateway.platforms.dingtalk import _DINGTALK_WEBHOOK_RE
         assert _DINGTALK_WEBHOOK_RE.match(
-            "https://oapi.dingtalk.com/robot/send?access_token=x"
+            "https://oapi.dingtalk.com/robot/send?access_token=x",
         )
 
     def test_http_rejected(self):
@@ -474,7 +474,7 @@ class TestWebhookDomainAllowlist:
     def test_suffix_attack_rejected(self):
         from gateway.platforms.dingtalk import _DINGTALK_WEBHOOK_RE
         assert not _DINGTALK_WEBHOOK_RE.match(
-            "https://api.dingtalk.com.evil.example/"
+            "https://api.dingtalk.com.evil.example/",
         )
 
     def test_unsanctioned_subdomain_rejected(self):
@@ -590,10 +590,10 @@ class TestExtractMedia:
         from gateway.platforms.base import MessageType
 
         msg = self._msg_with_rich_text(
-            [{"type": "voice", "downloadCode": "dl_voice_abc"}]
+            [{"type": "voice", "downloadCode": "dl_voice_abc"}],
         )
         msg_type, urls, mtypes = DingTalkAdapter._extract_media(
-            DingTalkAdapter, msg
+            DingTalkAdapter, msg,
         )
         assert msg_type == MessageType.VOICE
         assert urls == ["dl_voice_abc"]
@@ -611,10 +611,10 @@ class TestExtractMedia:
         DINGTALK_TYPE_MAPPING["audio"] = "audio"
         try:
             msg = self._msg_with_rich_text(
-                [{"type": "audio", "downloadCode": "dl_audio_xyz"}]
+                [{"type": "audio", "downloadCode": "dl_audio_xyz"}],
             )
             msg_type, urls, mtypes = DingTalkAdapter._extract_media(
-                DingTalkAdapter, msg
+                DingTalkAdapter, msg,
             )
             assert msg_type == MessageType.AUDIO
             assert urls == ["dl_audio_xyz"]
@@ -659,25 +659,25 @@ class TestAllowedUsersGate:
 
     def test_matches_sender_id_case_insensitive(self, monkeypatch):
         adapter = _make_gating_adapter(
-            monkeypatch, extra={"allowed_users": ["SenderABC"]}
+            monkeypatch, extra={"allowed_users": ["SenderABC"]},
         )
         assert adapter._is_user_allowed("senderabc", "") is True
 
     def test_matches_staff_id(self, monkeypatch):
         adapter = _make_gating_adapter(
-            monkeypatch, extra={"allowed_users": ["staff_1234"]}
+            monkeypatch, extra={"allowed_users": ["staff_1234"]},
         )
         assert adapter._is_user_allowed("", "staff_1234") is True
 
     def test_rejects_unknown_user(self, monkeypatch):
         adapter = _make_gating_adapter(
-            monkeypatch, extra={"allowed_users": ["staff_1234"]}
+            monkeypatch, extra={"allowed_users": ["staff_1234"]},
         )
         assert adapter._is_user_allowed("other-sender", "other-staff") is False
 
     def test_env_var_csv_populates_allowlist(self, monkeypatch):
         adapter = _make_gating_adapter(
-            monkeypatch, env={"DINGTALK_ALLOWED_USERS": "alice,bob,carol"}
+            monkeypatch, env={"DINGTALK_ALLOWED_USERS": "alice,bob,carol"},
         )
         assert adapter._is_user_allowed("alice", "") is True
         assert adapter._is_user_allowed("dave", "") is False
@@ -692,14 +692,14 @@ class TestMentionPatterns:
 
     def test_pattern_matches_text(self, monkeypatch):
         adapter = _make_gating_adapter(
-            monkeypatch, extra={"mention_patterns": ["^hermes"]}
+            monkeypatch, extra={"mention_patterns": ["^hermes"]},
         )
         assert adapter._message_matches_mention_patterns("hermes please help") is True
         assert adapter._message_matches_mention_patterns("please hermes help") is False
 
     def test_pattern_is_case_insensitive(self, monkeypatch):
         adapter = _make_gating_adapter(
-            monkeypatch, extra={"mention_patterns": ["^hermes"]}
+            monkeypatch, extra={"mention_patterns": ["^hermes"]},
         )
         assert adapter._message_matches_mention_patterns("HERMES help") is True
 
@@ -732,28 +732,28 @@ class TestShouldProcessMessage:
 
     def test_dm_always_accepted(self, monkeypatch):
         adapter = _make_gating_adapter(
-            monkeypatch, extra={"require_mention": True}
+            monkeypatch, extra={"require_mention": True},
         )
         msg = MagicMock(is_in_at_list=False)
         assert adapter._should_process_message(msg, "hi", is_group=False, chat_id="dm1") is True
 
     def test_group_rejected_when_require_mention_and_no_trigger(self, monkeypatch):
         adapter = _make_gating_adapter(
-            monkeypatch, extra={"require_mention": True}
+            monkeypatch, extra={"require_mention": True},
         )
         msg = MagicMock(is_in_at_list=False)
         assert adapter._should_process_message(msg, "hi", is_group=True, chat_id="grp1") is False
 
     def test_group_accepted_when_require_mention_disabled(self, monkeypatch):
         adapter = _make_gating_adapter(
-            monkeypatch, extra={"require_mention": False}
+            monkeypatch, extra={"require_mention": False},
         )
         msg = MagicMock(is_in_at_list=False)
         assert adapter._should_process_message(msg, "hi", is_group=True, chat_id="grp1") is True
 
     def test_group_accepted_when_bot_is_mentioned(self, monkeypatch):
         adapter = _make_gating_adapter(
-            monkeypatch, extra={"require_mention": True}
+            monkeypatch, extra={"require_mention": True},
         )
         msg = MagicMock(is_in_at_list=True)
         assert adapter._should_process_message(msg, "hi", is_group=True, chat_id="grp1") is True

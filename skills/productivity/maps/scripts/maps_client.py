@@ -289,7 +289,7 @@ def overpass_query(query):
             last_error = f"{url}: {exc}"
             continue
     error_exit(
-        f"All Overpass mirrors failed. Last error: {last_error or 'unknown'}"
+        f"All Overpass mirrors failed. Last error: {last_error or 'unknown'}",
     )
 
 
@@ -370,11 +370,11 @@ def build_overpass_nearby(tag_key, tag_val, lat, lon, radius, limit,
     for k, v in pairs:
         body_lines.append(
             f'  node["{k}"="{v}"]{religion_filter}'
-            f'(around:{radius},{lat},{lon});'
+            f'(around:{radius},{lat},{lon});',
         )
         body_lines.append(
             f'  way["{k}"="{v}"]{religion_filter}'
-            f'(around:{radius},{lat},{lon});'
+            f'(around:{radius},{lat},{lon});',
         )
     body = "\n".join(body_lines)
     return (
@@ -400,11 +400,11 @@ def build_overpass_bbox(tag_key, tag_val, south, west, north, east, limit,
     for k, v in pairs:
         body_lines.append(
             f'  node["{k}"="{v}"]{religion_filter}'
-            f'({south},{west},{north},{east});'
+            f'({south},{west},{north},{east});',
         )
         body_lines.append(
             f'  way["{k}"="{v}"]{religion_filter}'
-            f'({south},{west},{north},{east});'
+            f'({south},{west},{north},{east});',
         )
     body = "\n".join(body_lines)
     return (
@@ -633,7 +633,7 @@ def cmd_nearby(args):
         error_exit(
             f"Unknown categor{'ies' if len(unknown) > 1 else 'y'} "
             f"{', '.join(repr(c) for c in unknown)}. "
-            f"Valid categories: {', '.join(VALID_CATEGORIES)}"
+            f"Valid categories: {', '.join(VALID_CATEGORIES)}",
         )
 
     radius = int(args.radius)
@@ -708,7 +708,7 @@ def cmd_distance(args):
     if osrm_data.get("code") != "Ok":
         error_exit(
             f"OSRM routing failed: "
-            f"{osrm_data.get('message', osrm_data.get('code', 'unknown error'))}"
+            f"{osrm_data.get('message', osrm_data.get('code', 'unknown error'))}",
         )
 
     routes = osrm_data.get("routes", [])
@@ -795,7 +795,7 @@ def cmd_directions(args):
     if osrm_data.get("code") != "Ok":
         error_exit(
             f"OSRM routing failed: "
-            f"{osrm_data.get('message', osrm_data.get('code', 'unknown error'))}"
+            f"{osrm_data.get('message', osrm_data.get('code', 'unknown error'))}",
         )
 
     routes = osrm_data.get("routes", [])
@@ -986,7 +986,7 @@ def cmd_bbox(args):
     if category not in CATEGORY_TAGS:
         error_exit(
             f"Unknown category '{category}'. "
-            f"Valid categories: {', '.join(VALID_CATEGORIES)}"
+            f"Valid categories: {', '.join(VALID_CATEGORIES)}",
         )
 
     limit = int(args.limit)

@@ -155,7 +155,7 @@ SLOW_RESPONSE_MESSAGE = "任务有点复杂，正在努力处理中，请耐心�
 # Regex matching Yuanbao resource reference anchors in transcript text:
 #   [image|ybres:abc123]  [file:report.pdf|ybres:xyz789]  [voice|ybres:...]
 _YB_RES_REF_RE = re.compile(
-    r"\[(image|voice|video|file(?::[^|\]]*)?)\|ybres:([A-Za-z0-9_\-]+)\]"
+    r"\[(image|voice|video|file(?::[^|\]]*)?)\|ybres:([A-Za-z0-9_\-]+)\]",
 )
 
 # Patched local-media anchors once an inbound resource has been downloaded to the local cache. 
@@ -2220,7 +2220,7 @@ class QuoteContextMiddleware(InboundMiddleware):
         return quote_id, quote_text
 
     async def _extract_media_refs_from_transcript(
-        self, ctx: InboundContext
+        self, ctx: InboundContext,
     ) -> list[tuple[str, str, str]]:
         """Look up the quoted message in the transcript history and return any
         ``[kind|ybres:RID]`` anchors found in its content as
@@ -2369,7 +2369,7 @@ class MediaResolveMiddleware(InboundMiddleware):
                 code = payload.get("code")
                 if code not in {None, 0}:
                     raise RuntimeError(
-                        f"resource/v1/download failed: code={code}, msg={payload.get('msg', '')}"
+                        f"resource/v1/download failed: code={code}, msg={payload.get('msg', '')}",
                     )
                 data = payload.get("data") if isinstance(payload.get("data"), dict) else payload
                 real_url = str((data or {}).get("url") or (data or {}).get("realUrl") or "").strip()
@@ -2470,7 +2470,7 @@ class MediaResolveMiddleware(InboundMiddleware):
 
     @classmethod
     async def _resolve_media_urls(
-        cls, adapter, media_refs: list[dict[str, str]]
+        cls, adapter, media_refs: list[dict[str, str]],
     ) -> tuple[list[str], list[str]]:
         """Resolve inbound media refs: download to local cache, return (local_paths, mime_types).
 
@@ -2993,7 +2993,7 @@ class ConnectionManager:
 
         # Acquire platform-scoped lock to prevent duplicate connections
         if not adapter._acquire_platform_lock(
-            'yuanbao-app-key', adapter._app_key, 'Yuanbao app key'
+            'yuanbao-app-key', adapter._app_key, 'Yuanbao app key',
         ):
             return False
 
@@ -3032,10 +3032,10 @@ class ConnectionManager:
             adapter._mark_connected()
             adapter._loop = asyncio.get_running_loop()
             self._heartbeat_task = asyncio.create_task(
-                self._heartbeat_loop(), name=f"yuanbao-heartbeat-{self._connect_id}"
+                self._heartbeat_loop(), name=f"yuanbao-heartbeat-{self._connect_id}",
             )
             self._recv_task = asyncio.create_task(
-                self._receive_loop(), name=f"yuanbao-recv-{self._connect_id}"
+                self._receive_loop(), name=f"yuanbao-recv-{self._connect_id}",
             )
             logger.info(
                 "[%s] Connected. connectId=%s botId=%s",
@@ -3542,11 +3542,11 @@ class ConnectionManager:
                 logger.warning("[%s] Reconnect attempt %d timed out", adapter.name, attempt + 1)
             except Exception as exc:
                 logger.warning(
-                    "[%s] Reconnect attempt %d failed: %s", adapter.name, attempt + 1, exc
+                    "[%s] Reconnect attempt %d failed: %s", adapter.name, attempt + 1, exc,
                 )
 
         logger.error(
-            "[%s] Giving up after %d reconnect attempts", adapter.name, MAX_RECONNECT_ATTEMPTS
+            "[%s] Giving up after %d reconnect attempts", adapter.name, MAX_RECONNECT_ATTEMPTS,
         )
         adapter._mark_disconnected()
         return False
@@ -3882,7 +3882,7 @@ class GroupQueryService:
             return None
 
     async def get_group_member_list_raw(
-        self, group_code: str, offset: int = 0, limit: int = 200
+        self, group_code: str, offset: int = 0, limit: int = 200,
     ) -> dict | None:
         """Query group member list via WS.
 
@@ -4506,7 +4506,7 @@ class MessageSender:
 
     @staticmethod
     def validate_media(
-        file_bytes: bytes | None, filename: str, max_size_mb: int = 20
+        file_bytes: bytes | None, filename: str, max_size_mb: int = 20,
     ) -> str | None:
         """Media pre-validation: check file validity before sending/uploading.
 
@@ -4903,7 +4903,7 @@ class YuanbaoAdapter(BasePlatformAdapter):
         return await self._group_query.query_group_info_raw(group_code)
 
     async def get_group_member_list(
-        self, group_code: str, offset: int = 0, limit: int = 200
+        self, group_code: str, offset: int = 0, limit: int = 200,
     ) -> dict | None:
         """Query group member list (delegates to GroupQueryService)."""
         return await self._group_query.get_group_member_list_raw(group_code, offset=offset, limit=limit)

@@ -363,7 +363,7 @@ def render_skill_page(
                 + "/"
                 + meta["slug"]
                 + "`",
-            )
+            ),
         )
     source_dir = "skills" if meta["source_kind"] == "bundled" else "optional-skills"
     info_rows.append(("Path", f"`{source_dir}/{meta['rel_path']}`"))
@@ -499,7 +499,7 @@ def build_catalog_md_bundled(entries: list[tuple[dict[str, Any], dict[str, Any]]
             path = f"`{meta['rel_path']}`"
             desc_esc = mdx_escape_body(desc).replace("|", "\\|").replace("\n", " ")
             lines.append(
-                f"| [`{name}`]({link_target}) | {desc_esc} | {path} |"
+                f"| [`{name}`]({link_target}) | {desc_esc} | {path} |",
             )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
@@ -573,7 +573,7 @@ def build_catalog_md_optional(entries: list[tuple[dict[str, Any], dict[str, Any]
             "2. Add a `SKILL.md` with standard frontmatter (name, description, version, author)",
             "3. Include any supporting files in `references/`, `templates/`, or `scripts/` subdirectories",
             "4. Submit a pull request — the skill will appear in this catalog and get its own docs page once merged",
-        ]
+        ],
     )
     return "\n".join(lines).rstrip() + "\n"
 
@@ -617,7 +617,7 @@ def build_sidebar_items(entries: list[tuple[dict[str, Any], dict[str, Any]]]) ->
                     "key": f"skills-{source}-{category}",
                     "collapsed": True,
                     "items": [sidebar_doc_id(m) for m in items],
-                }
+                },
             )
         return result
 
@@ -750,7 +750,7 @@ def main():
         out_path = page_output_path(meta)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         content = render_skill_page(
-            meta, parsed["frontmatter"], parsed["body"], skill_index=skill_index
+            meta, parsed["frontmatter"], parsed["body"], skill_index=skill_index,
         )
         out_path.write_text(content, encoding="utf-8")
         written += 1

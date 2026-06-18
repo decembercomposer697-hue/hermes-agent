@@ -148,7 +148,7 @@ class AnthropicTransport(ProviderTransport):
                         id=block.id,
                         name=name,
                         arguments=json.dumps(block.input),
-                    )
+                    ),
                 )
 
         finish_reason = self._STOP_REASON_MAP.get(response.stop_reason, "stop")

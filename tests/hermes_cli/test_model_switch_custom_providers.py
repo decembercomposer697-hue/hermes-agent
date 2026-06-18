@@ -31,7 +31,7 @@ def test_list_authenticated_providers_includes_custom_providers(monkeypatch):
                 "name": "Local (127.0.0.1:4141)",
                 "base_url": "http://127.0.0.1:4141/v1",
                 "model": "rotator-openrouter-coding",
-            }
+            },
         ],
         max_models=50,
     )
@@ -54,7 +54,7 @@ def test_resolve_provider_full_finds_named_custom_provider():
             {
                 "name": "Local (127.0.0.1:4141)",
                 "base_url": "http://127.0.0.1:4141/v1",
-            }
+            },
         ],
     )
 
@@ -101,7 +101,7 @@ def test_switch_model_accepts_explicit_named_custom_provider(monkeypatch):
                 "name": "Local (127.0.0.1:4141)",
                 "base_url": "http://127.0.0.1:4141/v1",
                 "model": "rotator-openrouter-coding",
-            }
+            },
         ],
     )
 
@@ -135,7 +135,7 @@ def test_list_groups_same_name_custom_providers_into_one_row(monkeypatch):
     ollama_rows = [p for p in providers if p["name"] == "Ollama Cloud"]
     assert len(ollama_rows) == 1, f"Expected 1 Ollama Cloud row, got {len(ollama_rows)}"
     assert ollama_rows[0]["models"] == [
-        "qwen3-coder:480b-cloud", "glm-5.1:cloud", "kimi-k2.5", "minimax-m2.7:cloud"
+        "qwen3-coder:480b-cloud", "glm-5.1:cloud", "kimi-k2.5", "minimax-m2.7:cloud",
     ]
     assert ollama_rows[0]["total_models"] == 4
 
@@ -192,7 +192,7 @@ def test_list_enumerates_dict_format_models_alongside_default(monkeypatch):
                     "deepseek-chat": {"context_length": 128000},
                     "deepseek-reasoner": {"context_length": 128000},
                 },
-            }
+            },
         ],
         max_models=50,
     )
@@ -221,7 +221,7 @@ def test_list_enumerates_dict_format_models_without_singular_model(monkeypatch):
                     "Qwen3.5-35B-A3B-MXFP4_MOE": {"context_length": 262144},
                     "gemma-4-31B-it-Q4_K_M": {"context_length": 262144},
                 },
-            }
+            },
         ],
         max_models=50,
     )
@@ -254,7 +254,7 @@ def test_list_dedupes_dict_model_matching_singular_default(monkeypatch):
                     "deepseek-chat": {"context_length": 128000},
                     "deepseek-reasoner": {"context_length": 128000},
                 },
-            }
+            },
         ],
         max_models=50,
     )
@@ -586,7 +586,7 @@ def test_custom_providers_uses_live_models_for_multi_model_endpoint(monkeypatch)
                 "gateway-model-a": {"context_length": 128000},
                 "gateway-model-b": {"context_length": 128000},
             },
-        }
+        },
     ]
 
     providers = list_authenticated_providers(
@@ -648,7 +648,7 @@ def test_custom_providers_discover_models_false_keeps_explicit_subset(monkeypatc
                 "gateway-model-a": {"context_length": 128000},
                 "gateway-model-b": {"context_length": 128000},
             },
-        }
+        },
     ]
 
     providers = list_authenticated_providers(
@@ -701,7 +701,7 @@ def test_custom_providers_discover_models_false_string_is_normalised(monkeypatch
             "discover_models": "false",
             "model": "only-model",
             "models": {"only-model": {"context_length": 128000}},
-        }
+        },
     ]
 
     providers = list_authenticated_providers(

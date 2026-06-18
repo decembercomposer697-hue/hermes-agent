@@ -28,7 +28,7 @@ class TestCodexTransportBasic:
                 "name": "terminal",
                 "description": "Run a command",
                 "parameters": {"type": "object", "properties": {"command": {"type": "string"}}},
-            }
+            },
         }]
         result = transport.convert_tools(tools)
         assert len(result) == 1
@@ -424,7 +424,7 @@ class TestCodexNormalizeResponse:
                 "content": [{"type": "output_text", "text": "Hello world"}],
                 "id": "msg_abc",
                 "phase": "final_answer",
-            }
+            },
         ]
 
     def test_tool_call_response(self, transport):
@@ -652,5 +652,5 @@ class TestPreflightSlashEnumStrip:
         params = result["tools"][0]["parameters"]
         # The enum must survive on non-xAI providers.
         assert params["properties"]["model_id"].get("enum") == [
-            "Qwen/Qwen3.5-0.8B", "plain-id"
+            "Qwen/Qwen3.5-0.8B", "plain-id",
         ]

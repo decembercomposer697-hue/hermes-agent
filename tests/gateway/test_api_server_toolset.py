@@ -114,7 +114,7 @@ class TestApiServerAdapterToolset:
             mock_model.return_value = "test/model"
             # User overrides with just web and terminal
             mock_config.return_value = {
-                "platform_toolsets": {"api_server": ["web", "terminal"]}
+                "platform_toolsets": {"api_server": ["web", "terminal"]},
             }
             mock_agent_cls.return_value = MagicMock()
 

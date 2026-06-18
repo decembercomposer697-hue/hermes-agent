@@ -330,7 +330,7 @@ class TestWebServerEndpoints:
         """An id not in the curated catalog coerces to the theme sentinel,
         so a stale/hostile client can't inject an arbitrary font id."""
         resp = self.client.put(
-            "/api/dashboard/font", json={"font": "../../etc/passwd"}
+            "/api/dashboard/font", json={"font": "../../etc/passwd"},
         )
         assert resp.status_code == 200
         assert resp.json() == {"ok": True, "font": "theme"}
@@ -997,7 +997,7 @@ class TestWebServerEndpoints:
                 return [_Platform("matrix")]
 
         monkeypatch.setattr(
-            gateway_config, "load_gateway_config", lambda: _GatewayConfig()
+            gateway_config, "load_gateway_config", lambda: _GatewayConfig(),
         )
         monkeypatch.setenv("MATRIX_HOME_ROOM", "!room:matrix.org")
 
@@ -1313,7 +1313,7 @@ class TestWebServerEndpoints:
         assert kwargs["headers"]["User-Agent"].startswith("HermesDashboard/")
 
     def test_telegram_onboarding_worker_request_maps_unexpected_errors(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         import hermes_cli.web_server as ws
 
@@ -1368,7 +1368,7 @@ class TestWebServerEndpoints:
                 "/v1/telegram/pairings",
                 {"bot_name": "Hosted Hermes"},
                 None,
-            )
+            ),
         ]
 
     def test_telegram_onboarding_ready_and_apply_never_returns_bot_token(self, monkeypatch):
@@ -1443,7 +1443,7 @@ class TestWebServerEndpoints:
         assert load_config()["platforms"]["telegram"]["enabled"] is True
 
     def test_telegram_onboarding_apply_reports_restart_failure_after_save(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         import hermes_cli.web_server as ws
         from hermes_cli.config import load_config, load_env
@@ -1505,7 +1505,7 @@ class TestWebServerEndpoints:
         assert load_config()["platforms"]["telegram"]["enabled"] is True
 
     def test_telegram_onboarding_apply_reuses_inflight_gateway_restart(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         """A live in-flight gateway restart is reused instead of spawning a
         second racing ``hermes gateway restart`` child (e.g. when a stale
@@ -1726,7 +1726,7 @@ class TestWebServerEndpoints:
 
         # Custom + base_url → persisted; stale context_length dropped.
         out = _apply_main_model_assignment(
-            {"context_length": 8192}, "custom", "llama-3.1-8b", "http://127.0.0.1:8000/v1"
+            {"context_length": 8192}, "custom", "llama-3.1-8b", "http://127.0.0.1:8000/v1",
         )
         assert out["provider"] == "custom"
         assert out["default"] == "llama-3.1-8b"
@@ -1765,7 +1765,7 @@ class TestWebServerEndpoints:
 
         # Switching providers without a base_url → don't invent one, clear stale.
         out = _apply_main_model_assignment(
-            {"provider": "openrouter", "base_url": "http://stale:1/v1"}, "custom", "m"
+            {"provider": "openrouter", "base_url": "http://stale:1/v1"}, "custom", "m",
         )
         assert out["base_url"] == ""
 
@@ -1790,7 +1790,7 @@ class TestWebServerEndpoints:
 
         # OpenAI / vLLM / llama.cpp shape.
         assert _parse_model_ids(
-            FakeResp({"data": [{"id": "llama-3.1-8b"}, {"id": "qwen2.5-7b"}]})
+            FakeResp({"data": [{"id": "llama-3.1-8b"}, {"id": "qwen2.5-7b"}]}),
         ) == ["llama-3.1-8b", "qwen2.5-7b"]
         # Bare list of ids.
         assert _parse_model_ids(FakeResp({"data": ["m1", "m2"]})) == ["m1", "m2"]
@@ -2116,7 +2116,7 @@ class TestConfigRoundTrip:
                 "provider": "openrouter",
                 "base_url": "https://openrouter.ai/api/v1",
                 "api_mode": "openai",
-            }
+            },
         })
 
         before = load_config()
@@ -2618,7 +2618,7 @@ class TestNewEndpoints:
 
     def test_profile_description_unknown_404(self):
         resp = self.client.put(
-            "/api/profiles/nope/description", json={"description": "x"}
+            "/api/profiles/nope/description", json={"description": "x"},
         )
         assert resp.status_code == 404
 
@@ -2664,7 +2664,7 @@ class TestNewEndpoints:
             profile_describer,
             "describe_profile",
             lambda name, overwrite=False: profile_describer.DescribeOutcome(
-                name, True, "described", description="Generated blurb"
+                name, True, "described", description="Generated blurb",
             ),
         )
 
@@ -2686,7 +2686,7 @@ class TestNewEndpoints:
             profile_describer,
             "describe_profile",
             lambda name, overwrite=False: profile_describer.DescribeOutcome(
-                name, False, "no aux client", description=None
+                name, False, "no aux client", description=None,
             ),
         )
 
@@ -2843,7 +2843,7 @@ class TestNewEndpoints:
 
     def test_toggle_toolset_unknown_returns_400(self):
         resp = self.client.put(
-            "/api/tools/toolsets/not_a_real_toolset", json={"enabled": True}
+            "/api/tools/toolsets/not_a_real_toolset", json={"enabled": True},
         )
         assert resp.status_code == 400
 
@@ -3011,13 +3011,13 @@ class TestNewEndpoints:
                         "function": {
                             "name": "skill_view",
                             "arguments": '{"name":"github-pr-workflow"}',
-                        }
+                        },
                     },
                     {
                         "function": {
                             "name": "skill_manage",
                             "arguments": '{"name":"github-code-review"}',
-                        }
+                        },
                     },
                 ],
             )
@@ -3072,7 +3072,7 @@ class TestModelContextLength:
                 "default": "anthropic/claude-opus-4.6",
                 "provider": "openrouter",
                 "context_length": 200000,
-            }
+            },
         }
         result = _normalize_config_for_web(cfg)
         assert result["model"] == "anthropic/claude-opus-4.6"
@@ -3109,7 +3109,7 @@ class TestModelContextLength:
 
         # Set up disk config with model as a dict
         save_config({
-            "model": {"default": "anthropic/claude-opus-4.6", "provider": "openrouter"}
+            "model": {"default": "anthropic/claude-opus-4.6", "provider": "openrouter"},
         })
 
         result = _denormalize_config_from_web({
@@ -3130,7 +3130,7 @@ class TestModelContextLength:
                 "default": "anthropic/claude-opus-4.6",
                 "provider": "openrouter",
                 "context_length": 50000,
-            }
+            },
         })
 
         result = _denormalize_config_from_web({
@@ -3175,7 +3175,7 @@ class TestModelContextLength:
         from hermes_cli.config import save_config
 
         save_config({
-            "model": {"default": "test/model", "provider": "openrouter"}
+            "model": {"default": "test/model", "provider": "openrouter"},
         })
 
         result = _denormalize_config_from_web({
@@ -3238,7 +3238,7 @@ class TestModelInfoEndpoint:
                 "default": "anthropic/claude-opus-4.6",
                 "provider": "openrouter",
                 "context_length": 100000,
-            }
+            },
         })
 
         with patch("agent.model_metadata.get_model_context_length", return_value=200000):
@@ -3255,7 +3255,7 @@ class TestModelInfoEndpoint:
         import hermes_cli.web_server as ws
 
         monkeypatch.setattr(ws, "load_config", lambda: {
-            "model": {"default": "anthropic/claude-opus-4.6", "provider": "openrouter"}
+            "model": {"default": "anthropic/claude-opus-4.6", "provider": "openrouter"},
         })
 
         with patch("agent.model_metadata.get_model_context_length", return_value=200000):
@@ -3280,7 +3280,7 @@ class TestModelInfoEndpoint:
         import hermes_cli.web_server as ws
 
         monkeypatch.setattr(ws, "load_config", lambda: {
-            "model": "anthropic/claude-sonnet-4"
+            "model": "anthropic/claude-sonnet-4",
         })
 
         with patch("agent.model_metadata.get_model_context_length", return_value=200000):
@@ -3296,7 +3296,7 @@ class TestModelInfoEndpoint:
         import hermes_cli.web_server as ws
 
         monkeypatch.setattr(ws, "load_config", lambda: {
-            "model": {"default": "anthropic/claude-opus-4.6", "provider": "openrouter"}
+            "model": {"default": "anthropic/claude-opus-4.6", "provider": "openrouter"},
         })
 
         mock_caps = MagicMock()
@@ -3323,7 +3323,7 @@ class TestModelInfoEndpoint:
         import hermes_cli.web_server as ws
 
         monkeypatch.setattr(ws, "load_config", lambda: {
-            "model": "some/obscure-model"
+            "model": "some/obscure-model",
         })
 
         with patch("agent.model_metadata.get_model_context_length", side_effect=Exception("boom")):
@@ -3685,7 +3685,7 @@ class TestDiscoverUserThemes:
             "    hex: \"#0a1628\"\n"
             "    alpha: 1.0\n"
             "layout:\n"
-            "  density: spacious\n"
+            "  density: spacious\n",
         )
         from hermes_cli import web_server
         results = web_server._discover_user_themes()
@@ -3869,7 +3869,7 @@ class TestBulkDeleteSessionsEndpoint:
         from hermes_cli.web_server import app, _SESSION_HEADER_NAME, _SESSION_TOKEN
 
         monkeypatch.setattr(
-            hermes_state, "DEFAULT_DB_PATH", get_hermes_home() / "state.db"
+            hermes_state, "DEFAULT_DB_PATH", get_hermes_home() / "state.db",
         )
 
         self.client = TestClient(app)
@@ -3895,7 +3895,7 @@ class TestBulkDeleteSessionsEndpoint:
 
         self._seed(["a", "b", "c"])
         resp = self.auth_client.post(
-            "/api/sessions/bulk-delete", json={"ids": ["a", "b"]}
+            "/api/sessions/bulk-delete", json={"ids": ["a", "b"]},
         )
         assert resp.status_code == 200
         assert resp.json() == {"ok": True, "deleted": 2}
@@ -3924,7 +3924,7 @@ class TestBulkDeleteSessionsEndpoint:
         """``ids: []`` returns ``deleted: 0`` (200, not 400) — the UI
         treats an empty selection as a no-op rather than an error."""
         resp = self.auth_client.post(
-            "/api/sessions/bulk-delete", json={"ids": []}
+            "/api/sessions/bulk-delete", json={"ids": []},
         )
         assert resp.status_code == 200
         assert resp.json() == {"ok": True, "deleted": 0}
@@ -3951,7 +3951,7 @@ class TestBulkDeleteSessionsEndpoint:
         templated ``/api/sessions/{session_id}`` family. Concretely the
         response carries our ``ok`` + ``deleted`` keys."""
         resp = self.auth_client.post(
-            "/api/sessions/bulk-delete", json={"ids": []}
+            "/api/sessions/bulk-delete", json={"ids": []},
         )
         assert resp.status_code == 200
         body = resp.json()
@@ -3995,7 +3995,7 @@ class TestDeleteEmptySessionsEndpoint:
         # Pin the SessionDB to the isolated HERMES_HOME so each test
         # starts with a clean state.db.
         monkeypatch.setattr(
-            hermes_state, "DEFAULT_DB_PATH", get_hermes_home() / "state.db"
+            hermes_state, "DEFAULT_DB_PATH", get_hermes_home() / "state.db",
         )
 
         self.client = TestClient(app)
@@ -4212,7 +4212,7 @@ class TestPluginAPIAuth:
         # (its own _check_ws_token), NOT 401 from the HTTP middleware.
         try:
             with self.client.websocket_connect(
-                "/api/plugins/kanban/events"
+                "/api/plugins/kanban/events",
             ):
                 pass  # if we got here without disconnect, the WS accepted us
         except WebSocketDisconnect:
@@ -4352,7 +4352,7 @@ import sys
 
 
 skip_on_windows = pytest.mark.skipif(
-    sys.platform.startswith("win"), reason="PTY bridge is POSIX-only"
+    sys.platform.startswith("win"), reason="PTY bridge is POSIX-only",
 )
 
 
@@ -4396,7 +4396,7 @@ class TestPtyWebSocket:
         assert env["HERMES_TUI_DISABLE_MOUSE"] == "1"
 
     def test_resolve_chat_argv_applies_terminal_backend_config(
-        self, monkeypatch, _isolate_hermes_home
+        self, monkeypatch, _isolate_hermes_home,
     ):
         import hermes_cli.main as main_mod
 
@@ -4409,7 +4409,7 @@ class TestPtyWebSocket:
                     "  docker_image: example/hermes-tools:latest",
                     "  docker_extra_args:",
                     "    - --network=host",
-                ]
+                ],
             ),
             encoding="utf-8",
         )
@@ -4607,15 +4607,15 @@ class TestPtyWebSocket:
 
         monkeypatch.setattr(self.ws_module, "_resolve_chat_argv", fake_resolve)
         monkeypatch.setattr(
-            self.ws_module.app.state, "bound_host", "127.0.0.1", raising=False
+            self.ws_module.app.state, "bound_host", "127.0.0.1", raising=False,
         )
         monkeypatch.setattr(
-            self.ws_module.app.state, "bound_port", 9119, raising=False
+            self.ws_module.app.state, "bound_port", 9119, raising=False,
         )
 
         headers = {"host": "127.0.0.1:9119", "origin": "http://127.0.0.1:9119"}
         with self.client.websocket_connect(
-            self._url(channel="abc-123"), headers=headers
+            self._url(channel="abc-123"), headers=headers,
         ) as conn:
             try:
                 conn.receive_bytes()
@@ -4664,7 +4664,7 @@ class TestPtyWebSocket:
             # different channel, exactly as the /api/events handler does.
             async with event_lock:
                 event_channels.setdefault("broadcast-test", set()).update(
-                    {sub_a1, sub_a2}
+                    {sub_a1, sub_a2},
                 )
                 event_channels.setdefault("other-channel", set()).add(sub_other)
             try:
@@ -4689,7 +4689,7 @@ class TestPtyWebSocket:
 
         with pytest.raises(WebSocketDisconnect) as exc:
             with self.client.websocket_connect(
-                f"/api/events?token={self.token}"
+                f"/api/events?token={self.token}",
             ):
                 pass
         assert exc.value.code == 4400
@@ -4763,7 +4763,7 @@ class TestDashboardPluginStaticAssetAllowlist:
         # been imported once. Use the path the example plugin actually
         # generates during the dashboard test boot.
         resp = self.client.get(
-            "/dashboard-plugins/example/__pycache__/plugin_api.cpython-311.pyc"
+            "/dashboard-plugins/example/__pycache__/plugin_api.cpython-311.pyc",
         )
         # 404 either way (file may not exist on this CI Python version);
         # what matters is we never get a 200 with the bytes.
@@ -4782,7 +4782,7 @@ class TestDashboardPluginStaticAssetAllowlist:
     def test_unknown_plugin_is_404(self):
         """Existing behaviour preserved: nonexistent plugin name → 404."""
         resp = self.client.get(
-            "/dashboard-plugins/_definitely_not_a_plugin_/manifest.json"
+            "/dashboard-plugins/_definitely_not_a_plugin_/manifest.json",
         )
         assert resp.status_code == 404
 
@@ -4791,7 +4791,7 @@ class TestDashboardPluginStaticAssetAllowlist:
         ``is_relative_to()`` check — a ``.js`` named file at an
         out-of-base path is still rejected as traversal, not served."""
         resp = self.client.get(
-            "/dashboard-plugins/example/..%2Fplugin_api.py"
+            "/dashboard-plugins/example/..%2Fplugin_api.py",
         )
         # 403 traversal-blocked OR 404 (depending on URL decode order)
         # — never 200.

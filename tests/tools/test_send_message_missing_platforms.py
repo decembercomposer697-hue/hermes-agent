@@ -101,7 +101,7 @@ class TestSendMattermost:
 
         with patch("aiohttp.ClientSession", return_value=session_ctx):
             result = asyncio.run(_send_mattermost(
-                "tok", {"url": "https://mm.example.com"}, "ch", "hi"
+                "tok", {"url": "https://mm.example.com"}, "ch", "hi",
             ))
 
         assert "error" in result
@@ -166,7 +166,7 @@ class TestSendMatrix:
         with patch("aiohttp.ClientSession", return_value=session_ctx):
             result = asyncio.run(_send_matrix(
                 "tok", {"homeserver": "https://matrix.example.com"},
-                "!room:example.com", "hi"
+                "!room:example.com", "hi",
             ))
 
         assert "error" in result
@@ -255,7 +255,7 @@ class TestSendHomeAssistant:
         with patch("aiohttp.ClientSession", return_value=session_ctx):
             result = asyncio.run(_send_homeassistant(
                 "bad-tok", {"url": "https://hass.example.com"},
-                "target", "msg"
+                "target", "msg",
             ))
 
         assert "error" in result
@@ -325,7 +325,7 @@ class TestSendDingtalk:
         with patch("httpx.AsyncClient", return_value=client_ctx):
             result = asyncio.run(_send_dingtalk(
                 {"webhook_url": "https://oapi.dingtalk.com/robot/send?access_token=bad"},
-                "ch", "hi"
+                "ch", "hi",
             ))
 
         assert "error" in result
@@ -340,7 +340,7 @@ class TestSendDingtalk:
         with patch("httpx.AsyncClient", return_value=client_ctx):
             result = asyncio.run(_send_dingtalk(
                 {"webhook_url": "https://oapi.dingtalk.com/robot/send?access_token=tok"},
-                "ch", "hi"
+                "ch", "hi",
             ))
 
         assert "error" in result
@@ -351,8 +351,8 @@ class TestSendDingtalk:
         resp = self._make_httpx_resp(status_code=401)
         resp.raise_for_status = MagicMock(
             side_effect=Exception(
-                f"POST https://oapi.dingtalk.com/robot/send?access_token={token} returned 401"
-            )
+                f"POST https://oapi.dingtalk.com/robot/send?access_token={token} returned 401",
+            ),
         )
         client_ctx, _ = self._make_httpx_client(resp)
 
@@ -362,7 +362,7 @@ class TestSendDingtalk:
                     {"webhook_url": f"https://oapi.dingtalk.com/robot/send?access_token={token}"},
                     "ch",
                     "hi",
-                )
+                ),
             )
 
         assert "error" in result

@@ -84,7 +84,7 @@ _DURATIONS_FILE = "test_durations.json"
 
 
 def _count_tests(
-    files: list[Path], repo_root: Path, pytest_passthrough: list[str]
+    files: list[Path], repo_root: Path, pytest_passthrough: list[str],
 ) -> dict[Path, int]:
     """Run ``pytest --co -q`` once to count individual tests per file.
 
@@ -412,7 +412,7 @@ def _run_one_file(
                 sibling_hint = [n for n in names if file.stem[:12] in n]
                 forensics.append(
                     f"parent={parent} entries={len(names)} "
-                    f"similar={sibling_hint[:5]}"
+                    f"similar={sibling_hint[:5]}",
                 )
             else:
                 forensics.append(f"parent={parent} MISSING")
@@ -559,7 +559,7 @@ def _print_progress(
 
 
 def _print_inline_failure(
-    file: Path, output: str, repo_root: Path, pytest_passthrough: list[str]
+    file: Path, output: str, repo_root: Path, pytest_passthrough: list[str],
 ) -> None:
     """Print a compact failure summary immediately when a file fails.
 
@@ -716,7 +716,7 @@ def main() -> int:
         "--file-timeout",
         type=float,
         default=float(
-            os.environ.get("HERMES_TEST_FILE_TIMEOUT", _DEFAULT_FILE_TIMEOUT_SECONDS)
+            os.environ.get("HERMES_TEST_FILE_TIMEOUT", _DEFAULT_FILE_TIMEOUT_SECONDS),
         ),
         help=(
             "Per-file wall-clock cap in seconds. On timeout, the pytest "
@@ -873,7 +873,7 @@ def main() -> int:
         for file in files:
             t0 = time.monotonic()
             fut = pool.submit(
-                _run_one_file, file, pytest_passthrough, repo_root, args.file_timeout
+                _run_one_file, file, pytest_passthrough, repo_root, args.file_timeout,
             )
             fut.add_done_callback(lambda f, file=file, t0=t0: _on_done(file, t0, f))
             futures.append(fut)

@@ -1572,7 +1572,7 @@ class TestDialecticLifecycleSmoke:
         """
         from unittest.mock import patch, MagicMock
         provider, mgr, cfg = self._make_provider(
-            cfg_extra={"raw": {"dialecticCadence": 3}}
+            cfg_extra={"raw": {"dialecticCadence": 3}},
         )
 
         # Program the dialectic responses in the exact order they'll be requested.

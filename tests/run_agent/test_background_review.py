@@ -92,7 +92,7 @@ def test_background_review_summarizer_receives_captured_messages_after_close(mon
         "role": "tool",
         "tool_call_id": "call_bg",
         "content": json.dumps(
-            {"success": True, "message": "Entry added", "target": "memory"}
+            {"success": True, "message": "Entry added", "target": "memory"},
         ),
     }
     captured: dict = {}
@@ -226,9 +226,9 @@ def test_background_review_summary_is_attributed_to_self_improvement_loop(monkey
                     "role": "tool",
                     "tool_call_id": "call_bg",
                     "content": json.dumps(
-                        {"success": True, "message": "Entry added", "target": "memory"}
+                        {"success": True, "message": "Entry added", "target": "memory"},
                     ),
-                }
+                },
             ]
 
         def run_conversation(self, **kwargs):

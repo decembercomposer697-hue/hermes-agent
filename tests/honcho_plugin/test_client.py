@@ -90,7 +90,7 @@ class TestFromGlobalConfig:
     def test_missing_config_falls_back_to_env(self, tmp_path):
         with patch.dict(os.environ, {}, clear=True):
             config = HonchoClientConfig.from_global_config(
-                config_path=tmp_path / "nonexistent.json"
+                config_path=tmp_path / "nonexistent.json",
             )
         # Should fall back to from_env
         assert config.enabled is False
@@ -114,8 +114,8 @@ class TestFromGlobalConfig:
                 "hermes": {
                     "workspace": "override-ws",
                     "aiPeer": "override-ai",
-                }
-            }
+                },
+            },
         }))
         # Isolate from real ~/.hermes/honcho.json
         monkeypatch.setenv("HERMES_HOME", str(tmp_path / "isolated"))
@@ -142,8 +142,8 @@ class TestFromGlobalConfig:
                 "hermes": {
                     "workspace": "host-ws",
                     "aiPeer": "host-ai",
-                }
-            }
+                },
+            },
         }))
 
         config = HonchoClientConfig.from_global_config(config_path=config_file)
@@ -308,17 +308,17 @@ class TestResolveSessionName:
     def test_per_repo_uses_git_root(self):
         config = HonchoClientConfig(session_strategy="per-repo")
         with patch.object(
-            HonchoClientConfig, "_git_repo_name", return_value="hermes-agent"
+            HonchoClientConfig, "_git_repo_name", return_value="hermes-agent",
         ):
             result = config.resolve_session_name("/home/user/hermes-agent/subdir")
         assert result == "hermes-agent"
 
     def test_per_repo_with_peer_prefix(self):
         config = HonchoClientConfig(
-            session_strategy="per-repo", peer_name="eri", session_peer_prefix=True
+            session_strategy="per-repo", peer_name="eri", session_peer_prefix=True,
         )
         with patch.object(
-            HonchoClientConfig, "_git_repo_name", return_value="groudon"
+            HonchoClientConfig, "_git_repo_name", return_value="groudon",
         ):
             result = config.resolve_session_name("/home/user/groudon/src")
         assert result == "eri-groudon"
@@ -326,7 +326,7 @@ class TestResolveSessionName:
     def test_per_repo_falls_back_to_dirname_outside_git(self):
         config = HonchoClientConfig(session_strategy="per-repo")
         with patch.object(
-            HonchoClientConfig, "_git_repo_name", return_value=None
+            HonchoClientConfig, "_git_repo_name", return_value=None,
         ):
             result = config.resolve_session_name("/home/user/not-a-repo")
         assert result == "not-a-repo"
@@ -613,7 +613,7 @@ class TestGetHonchoClient:
 
     @pytest.mark.skipif(
         not importlib.util.find_spec("honcho"),
-        reason="honcho SDK not installed"
+        reason="honcho SDK not installed",
     )
     def test_passes_timeout_from_config(self):
         fake_honcho = MagicMock(name="Honcho")
@@ -633,7 +633,7 @@ class TestGetHonchoClient:
 
     @pytest.mark.skipif(
         not importlib.util.find_spec("honcho"),
-        reason="honcho SDK not installed"
+        reason="honcho SDK not installed",
     )
     def test_hermes_config_timeout_override_used_when_config_timeout_missing(self):
         fake_honcho = MagicMock(name="Honcho")
@@ -653,7 +653,7 @@ class TestGetHonchoClient:
 
     @pytest.mark.skipif(
         not importlib.util.find_spec("honcho"),
-        reason="honcho SDK not installed"
+        reason="honcho SDK not installed",
     )
     def test_defaults_to_30s_when_no_timeout_configured(self):
         from plugins.memory.honcho.client import _DEFAULT_HTTP_TIMEOUT
@@ -675,7 +675,7 @@ class TestGetHonchoClient:
 
     @pytest.mark.skipif(
         not importlib.util.find_spec("honcho"),
-        reason="honcho SDK not installed"
+        reason="honcho SDK not installed",
     )
     def test_hermes_request_timeout_alias_used(self):
         fake_honcho = MagicMock(name="Honcho")
@@ -927,7 +927,7 @@ class TestGetHonchoClientBaseUrlDoublePrefixFix:
 
     @pytest.mark.skipif(
         not importlib.util.find_spec("honcho"),
-        reason="honcho SDK not installed"
+        reason="honcho SDK not installed",
     )
     def test_local_base_url_with_v3_suffix_stripped(self):
         """base_url 'http://localhost:38000/v3' must become 'http://localhost:38000'
@@ -952,7 +952,7 @@ class TestGetHonchoClientBaseUrlDoublePrefixFix:
 
     @pytest.mark.skipif(
         not importlib.util.find_spec("honcho"),
-        reason="honcho SDK not installed"
+        reason="honcho SDK not installed",
     )
     def test_local_base_url_without_version_unchanged(self):
         """base_url 'http://localhost:38000' (no version) must be passed unchanged."""
@@ -976,7 +976,7 @@ class TestGetHonchoClientBaseUrlDoublePrefixFix:
 
     @pytest.mark.skipif(
         not importlib.util.find_spec("honcho"),
-        reason="honcho SDK not installed"
+        reason="honcho SDK not installed",
     )
     def test_cloud_base_url_without_version_unchanged(self):
         """A cloud base_url with no version segment must pass through untouched."""
@@ -1000,7 +1000,7 @@ class TestGetHonchoClientBaseUrlDoublePrefixFix:
 
     @pytest.mark.skipif(
         not importlib.util.find_spec("honcho"),
-        reason="honcho SDK not installed"
+        reason="honcho SDK not installed",
     )
     def test_cloud_base_url_with_version_stripped(self):
         """A version segment double-prefixes regardless of host, so a cloud
@@ -1025,7 +1025,7 @@ class TestGetHonchoClientBaseUrlDoublePrefixFix:
 
     @pytest.mark.skipif(
         not importlib.util.find_spec("honcho"),
-        reason="honcho SDK not installed"
+        reason="honcho SDK not installed",
     )
     @pytest.mark.parametrize(
         "raw_url, expected",
@@ -1068,7 +1068,7 @@ class TestGetHonchoClientBaseUrlDoublePrefixFix:
 
     @pytest.mark.skipif(
         not importlib.util.find_spec("honcho"),
-        reason="honcho SDK not installed"
+        reason="honcho SDK not installed",
     )
     def test_local_base_url_with_trailing_slash_stripped(self):
         """base_url 'http://127.0.0.1:38000/v3/' must also be cleaned up."""

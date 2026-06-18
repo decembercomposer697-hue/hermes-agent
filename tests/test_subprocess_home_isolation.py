@@ -261,7 +261,7 @@ class TestPythonProcessUnchanged:
     """Confirm the Python process's own HOME is never modified."""
 
     def test_path_home_unchanged_after_subprocess_home_resolved(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         hermes_home = tmp_path / "hermes"
         hermes_home.mkdir()

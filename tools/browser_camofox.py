@@ -236,7 +236,7 @@ def _rewrite_loopback_url_for_camofox(url: str) -> tuple[str, dict[str, str] | N
     host_part = f"[{alias}]" if ":" in alias and not alias.startswith("[") else alias
     port_part = f":{parsed.port}" if parsed.port else ""
     rewritten = urlunsplit(
-        SplitResult(parsed.scheme, f"{userinfo}{host_part}{port_part}", parsed.path, parsed.query, parsed.fragment)
+        SplitResult(parsed.scheme, f"{userinfo}{host_part}{port_part}", parsed.path, parsed.query, parsed.fragment),
     )
     return rewritten, {
         "from": parsed.hostname or "",

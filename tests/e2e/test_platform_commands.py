@@ -140,11 +140,11 @@ class TestSlashCommands:
 
     @pytest.mark.asyncio
     async def test_quick_command_alias_targets_builtin_command_with_args(
-        self, adapter, runner, platform
+        self, adapter, runner, platform,
     ):
         """Alias targets with args must reach the built-in command handler."""
         runner.config.quick_commands = {
-            "s": {"type": "alias", "target": "/status extra-arg"}
+            "s": {"type": "alias", "target": "/status extra-arg"},
         }
         async def _handle_status(event):
             assert event.get_command_args() == "extra-arg"

@@ -103,7 +103,7 @@ class TestAnthropicTransport:
                 "name": "test_tool",
                 "description": "A test",
                 "parameters": {"type": "object", "properties": {}},
-            }
+            },
         }]
         result = transport.convert_tools(tools)
         assert len(result) == 1

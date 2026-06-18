@@ -192,7 +192,7 @@ async def test_progress_suppressed_when_agent_is_interrupted(monkeypatch, tmp_pa
     is_interrupted and skip these events.
     """
     adapter, result = await _run_once(
-        monkeypatch, tmp_path, InterruptedAgent, "sess-interrupted"
+        monkeypatch, tmp_path, InterruptedAgent, "sess-interrupted",
     )
     assert result["final_response"] == "interrupted"
 

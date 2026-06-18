@@ -238,7 +238,7 @@ class TestCopyReasoningContentForApi:
 
     def test_kimi_moonshot_base_url(self) -> None:
         agent = _make_agent(
-            provider="custom", model="kimi-k2", base_url="https://api.moonshot.ai/v1"
+            provider="custom", model="kimi-k2", base_url="https://api.moonshot.ai/v1",
         )
         source = {
             "role": "assistant",
@@ -309,7 +309,7 @@ class TestBuildAssistantMessageDeepSeekReasoningContent:
                     response_item_id=None,
                     type="function",
                     function=SimpleNamespace(name="terminal", arguments="{}"),
-                )
+                ),
             ],
         )
 
@@ -336,7 +336,7 @@ class TestBuildAssistantMessageDeepSeekReasoningContent:
                     response_item_id=None,
                     type="function",
                     function=SimpleNamespace(name="terminal", arguments="{}"),
-                )
+                ),
             ],
         )
 
@@ -360,7 +360,7 @@ class TestBuildAssistantMessageDeepSeekReasoningContent:
                     response_item_id=None,
                     type="function",
                     function=SimpleNamespace(name="terminal", arguments="{}"),
-                )
+                ),
             ],
         )
 

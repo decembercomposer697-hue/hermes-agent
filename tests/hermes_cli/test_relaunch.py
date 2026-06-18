@@ -28,7 +28,7 @@ class TestResolveHermesBin:
     def test_falls_back_to_path_which(self, monkeypatch):
         monkeypatch.setattr(sys, "argv", ["-c"])  # not a real path
         monkeypatch.setattr(
-            relaunch_mod.shutil, "which", lambda name: "/usr/bin/hermes" if name == "hermes" else None
+            relaunch_mod.shutil, "which", lambda name: "/usr/bin/hermes" if name == "hermes" else None,
         )
         assert relaunch_mod.resolve_hermes_bin() == "/usr/bin/hermes"
 
@@ -132,7 +132,7 @@ class TestBuildRelaunchArgv:
         monkeypatch.setattr(relaunch_mod, "resolve_hermes_bin", lambda: "/usr/bin/hermes")
         original = ["--tui", "chat"]
         argv = relaunch_mod.build_relaunch_argv(
-            ["--resume", "abc"], preserve_inherited=False, original_argv=original
+            ["--resume", "abc"], preserve_inherited=False, original_argv=original,
         )
         assert "--tui" not in argv
         assert argv == ["/usr/bin/hermes", "--resume", "abc"]

@@ -33,7 +33,7 @@ class DummyTelegramAdapter(BasePlatformAdapter):
                 "content": content,
                 "reply_to": reply_to,
                 "metadata": metadata,
-            }
+            },
         )
         return SendResult(success=True, message_id="1")
 
@@ -135,13 +135,13 @@ class TestBasePlatformTopicSessions:
                 "content": "ack",
                 "reply_to": None,
                 "metadata": {"thread_id": "17585", "notify": True},
-            }
+            },
         ]
         assert typing_calls == [
             {
                 "chat_id": "-1001",
                 "metadata": {"thread_id": "17585"},
-            }
+            },
         ]
         assert adapter.processing_hooks == [
             ("start", "1"),
@@ -322,7 +322,7 @@ class TestTelegramAutoTtsCaptionDelivery:
                 "content": long_reply,
                 "reply_to": None,
                 "metadata": {"thread_id": "17585", "notify": True},
-            }
+            },
         ]
 
     @pytest.mark.asyncio
@@ -351,5 +351,5 @@ class TestTelegramAutoTtsCaptionDelivery:
                 "content": "Short reply",
                 "reply_to": None,
                 "metadata": {"thread_id": "17585", "notify": True},
-            }
+            },
         ]

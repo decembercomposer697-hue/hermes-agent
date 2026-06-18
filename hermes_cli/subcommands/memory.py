@@ -24,7 +24,7 @@ def build_memory_parser(subparsers, *, cmd_memory: Callable) -> None:
     )
     memory_sub = memory_parser.add_subparsers(dest="memory_command")
     _setup_parser = memory_sub.add_parser(
-        "setup", help="Interactive provider selection and configuration"
+        "setup", help="Interactive provider selection and configuration",
     )
     _setup_parser.add_argument(
         "provider",

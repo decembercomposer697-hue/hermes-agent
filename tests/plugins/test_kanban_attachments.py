@@ -115,7 +115,7 @@ def test_add_attachment_rejects_unknown_task(kanban_home):
     try:
         with pytest.raises(ValueError):
             kb.add_attachment(
-                conn, "t_doesnotexist", filename="x.txt", stored_path="/tmp/x.txt"
+                conn, "t_doesnotexist", filename="x.txt", stored_path="/tmp/x.txt",
             )
     finally:
         conn.close()
@@ -126,7 +126,7 @@ def test_add_attachment_appends_event(kanban_home):
     try:
         task_id = _make_task(conn)
         kb.add_attachment(
-            conn, task_id, filename="a.txt", stored_path="/tmp/a.txt", size=3
+            conn, task_id, filename="a.txt", stored_path="/tmp/a.txt", size=3,
         )
         kinds = [e.kind for e in kb.list_events(conn, task_id)]
         assert "attached" in kinds
@@ -244,7 +244,7 @@ def test_upload_list_download_delete_roundtrip(client):
     assert r.status_code == 200
     assert client.get(f"/api/plugins/kanban/attachments/{att_id}").status_code == 404
     assert client.get(
-        f"/api/plugins/kanban/tasks/{task_id}/attachments"
+        f"/api/plugins/kanban/tasks/{task_id}/attachments",
     ).json()["attachments"] == []
 
 
@@ -273,7 +273,7 @@ def test_upload_name_collision_gets_suffixed(client):
     names = sorted(
         a["filename"]
         for a in client.get(
-            f"/api/plugins/kanban/tasks/{task_id}/attachments"
+            f"/api/plugins/kanban/tasks/{task_id}/attachments",
         ).json()["attachments"]
     )
     assert names == ["dup (1).txt", "dup.txt"]

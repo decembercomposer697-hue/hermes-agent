@@ -63,7 +63,7 @@ def _make_staging_dir(root: Path, name: str = "src", *, manifest: DistributionMa
     (staged / "skills").mkdir(exist_ok=True)
     (staged / "skills" / "demo").mkdir(exist_ok=True)
     (staged / "skills" / "demo" / "SKILL.md").write_text(
-        "---\nname: demo\ndescription: test\n---\n# Demo skill\n"
+        "---\nname: demo\ndescription: test\n---\n# Demo skill\n",
     )
     (staged / "cron").mkdir(exist_ok=True)
     (staged / "cron" / "daily.json").write_text('{"schedule": "0 9 * * *"}')
@@ -111,7 +111,7 @@ class TestManifestParsing:
             "    default: http://127.0.0.1:8000\n"
             "distribution_owned:\n"
             "  - SOUL.md\n"
-            "  - skills/\n"
+            "  - skills/\n",
         )
         m = read_manifest(tmp_path)
         assert m.name == "telem"
@@ -132,7 +132,7 @@ class TestManifestParsing:
 
     def test_env_requires_not_list_rejected(self, tmp_path):
         (tmp_path / MANIFEST_FILENAME).write_text(
-            "name: bad\nenv_requires:\n  name: FOO\n"
+            "name: bad\nenv_requires:\n  name: FOO\n",
         )
         with pytest.raises(DistributionError, match="env_requires must be a list"):
             read_manifest(tmp_path)
@@ -389,7 +389,7 @@ class TestUpdate:
 
         # User edits config
         (plan.target_dir / "config.yaml").write_text(
-            "model:\n  model: gpt-5\n# user override\n"
+            "model:\n  model: gpt-5\n# user override\n",
         )
 
         # Bump source config
@@ -600,7 +600,7 @@ class TestInstalledAtStamp:
             def now(cls, tz=None):
                 return _dt.datetime(2099, 1, 1, 0, 0, 0, tzinfo=tz or _dt.UTC)
         monkeypatch.setattr(
-            "hermes_cli.profile_distribution.datetime", _FakeDT, raising=True
+            "hermes_cli.profile_distribution.datetime", _FakeDT, raising=True,
         )
 
         from hermes_cli.profile_distribution import update_distribution
@@ -644,7 +644,7 @@ class TestProfileInfoDistribution:
         create_profile(name="brokenmeta", no_alias=True)
         # Write a distribution.yaml that isn't a valid mapping
         (get_profile_dir("brokenmeta") / "distribution.yaml").write_text(
-            "not: [a, valid, mapping\n"  # broken YAML
+            "not: [a, valid, mapping\n",  # broken YAML
         )
         # list_profiles must NOT raise; distribution_* stay None for this row.
         rows = {p.name: p for p in list_profiles()}

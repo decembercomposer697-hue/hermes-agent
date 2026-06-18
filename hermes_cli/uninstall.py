@@ -660,7 +660,7 @@ def run_uninstall(args):
         try:
             resp = input(color(
                 f"Also stop and remove these {len(named_profiles)} profile(s)? [y/N]: ",
-                Colors.BOLD
+                Colors.BOLD,
             )).strip().lower()
         except (KeyboardInterrupt, EOFError):
             print()
@@ -677,7 +677,7 @@ def run_uninstall(args):
             print(color(
                 f"   Plus {len(named_profiles)} profile(s): " +
                 ", ".join(p.name for p in named_profiles),
-                Colors.RED
+                Colors.RED,
             ))
     else:
         print("This will remove the Hermes code but keep your configuration and data.")

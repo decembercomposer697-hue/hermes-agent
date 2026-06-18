@@ -37,13 +37,13 @@ def _make_real_cli(**kwargs):
         "prompt_toolkit.formatted_text": MagicMock(),
     }
     with patch.dict(sys.modules, prompt_toolkit_stubs), patch.dict(
-        "os.environ", clean_env, clear=False
+        "os.environ", clean_env, clear=False,
     ):
         import cli as cli_mod
 
         cli_mod = importlib.reload(cli_mod)
         with patch.object(cli_mod, "get_tool_definitions", return_value=[]), patch.dict(
-            cli_mod.__dict__, {"CLI_CONFIG": clean_config}
+            cli_mod.__dict__, {"CLI_CONFIG": clean_config},
         ):
             return cli_mod.HermesCLI(**kwargs)
 
@@ -113,7 +113,7 @@ def test_show_banner_does_not_print_skills():
     cli_obj.console = MagicMock()
 
     with patch("cli.build_welcome_banner") as mock_banner, patch(
-        "shutil.get_terminal_size", return_value=os.terminal_size((120, 40))
+        "shutil.get_terminal_size", return_value=os.terminal_size((120, 40)),
     ):
         cli_obj.show_banner()
 

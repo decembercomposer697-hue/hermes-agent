@@ -32,7 +32,7 @@ def test_bare_portal_and_login_run_one_shot(monkeypatch, sub):
         return 0
 
     monkeypatch.setattr(
-        "hermes_cli.setup._run_portal_one_shot", fake_one_shot
+        "hermes_cli.setup._run_portal_one_shot", fake_one_shot,
     )
     monkeypatch.setattr(portal_cli, "_cmd_status", fake_status)
     monkeypatch.setattr(portal_cli, "load_config", lambda: {})

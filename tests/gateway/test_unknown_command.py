@@ -35,7 +35,7 @@ def _make_runner():
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
     adapter = MagicMock()
     adapter.send = AsyncMock()
@@ -90,12 +90,12 @@ async def test_unknown_slash_command_returns_guidance(monkeypatch):
     # before _run_agent is invoked.
     runner._run_agent = AsyncMock(
         side_effect=AssertionError(
-            "unknown slash command leaked through to the agent"
-        )
+            "unknown slash command leaked through to the agent",
+        ),
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/definitely-not-a-command"))
@@ -116,12 +116,12 @@ async def test_unknown_slash_command_underscored_form_also_guarded(monkeypatch):
     runner = _make_runner()
     runner._run_agent = AsyncMock(
         side_effect=AssertionError(
-            "unknown slash command leaked through to the agent"
-        )
+            "unknown slash command leaked through to the agent",
+        ),
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/made_up_thing"))
@@ -160,7 +160,7 @@ async def test_underscored_alias_for_hyphenated_builtin_not_flagged(monkeypatch)
     runner._handle_reload_mcp_command = _noop_reload  # type: ignore[attr-defined]
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/reload_mcp"))
@@ -181,17 +181,17 @@ async def test_command_hook_can_deny_before_dispatch(monkeypatch):
 
     runner = _make_runner()
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("denied slash command leaked to the agent")
+        side_effect=AssertionError("denied slash command leaked to the agent"),
     )
     runner._handle_status_command = AsyncMock(
-        side_effect=AssertionError("denied slash command reached its handler")
+        side_effect=AssertionError("denied slash command reached its handler"),
     )
     runner.hooks.emit_collect = AsyncMock(
-        return_value=[{"decision": "deny", "message": "Blocked by ACL"}]
+        return_value=[{"decision": "deny", "message": "Blocked by ACL"}],
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/status"))
@@ -210,12 +210,12 @@ async def test_command_hook_deny_without_message_uses_default(monkeypatch):
 
     runner = _make_runner()
     runner._handle_status_command = AsyncMock(
-        side_effect=AssertionError("denied slash command reached its handler")
+        side_effect=AssertionError("denied slash command reached its handler"),
     )
     runner.hooks.emit_collect = AsyncMock(return_value=[{"decision": "deny"}])
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/status"))
@@ -231,14 +231,14 @@ async def test_command_hook_can_mark_command_as_handled(monkeypatch):
 
     runner = _make_runner()
     runner._handle_status_command = AsyncMock(
-        side_effect=AssertionError("handled slash command reached its handler")
+        side_effect=AssertionError("handled slash command reached its handler"),
     )
     runner.hooks.emit_collect = AsyncMock(
-        return_value=[{"decision": "handled", "message": "Already handled upstream"}]
+        return_value=[{"decision": "handled", "message": "Already handled upstream"}],
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/status"))
@@ -254,11 +254,11 @@ async def test_command_hook_allow_decision_is_passthrough(monkeypatch):
     runner = _make_runner()
     runner._handle_status_command = AsyncMock(return_value="status: ok")
     runner.hooks.emit_collect = AsyncMock(
-        return_value=[{"decision": "allow"}]
+        return_value=[{"decision": "allow"}],
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/status"))
@@ -275,11 +275,11 @@ async def test_command_hook_non_dict_return_values_ignored(monkeypatch):
     runner = _make_runner()
     runner._handle_status_command = AsyncMock(return_value="status: ok")
     runner.hooks.emit_collect = AsyncMock(
-        return_value=["some string", 42, None, {}]
+        return_value=["some string", 42, None, {}],
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/status"))
@@ -294,14 +294,14 @@ async def test_command_hook_fires_for_plugin_registered_command(monkeypatch):
 
     runner = _make_runner()
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("plugin command leaked to the agent")
+        side_effect=AssertionError("plugin command leaked to the agent"),
     )
     runner.hooks.emit_collect = AsyncMock(
-        return_value=[{"decision": "handled", "message": "intercepted"}]
+        return_value=[{"decision": "handled", "message": "intercepted"}],
     )
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
     # Stub plugin command lookup so is_gateway_known_command() recognizes /metricas.
     from hermes_cli import plugins as _plugins_mod
@@ -330,7 +330,7 @@ async def test_command_hook_rewrite_routes_to_plugin(monkeypatch):
 
     runner = _make_runner()
     runner._run_agent = AsyncMock(
-        side_effect=AssertionError("rewritten command leaked to the agent")
+        side_effect=AssertionError("rewritten command leaked to the agent"),
     )
 
     call_log = []
@@ -343,14 +343,14 @@ async def test_command_hook_rewrite_routes_to_plugin(monkeypatch):
                     "decision": "rewrite",
                     "command_name": "metricas",
                     "raw_args": "dias:7",
-                }
+                },
             ]
         return []
 
     runner.hooks.emit_collect = AsyncMock(side_effect=_emit_collect)
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
     from hermes_cli import plugins as _plugins_mod
 

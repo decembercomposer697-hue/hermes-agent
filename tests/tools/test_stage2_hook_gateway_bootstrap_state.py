@@ -68,7 +68,7 @@ def test_seed_block_present_and_guarded(stage2_text: str) -> None:
 
 
 def _run_seed(
-    text: str, *, env_value: str | None, preexisting: str | None
+    text: str, *, env_value: str | None, preexisting: str | None,
 ) -> str | None:
     """Run the extracted seed block in a sandbox $HERMES_HOME.
 
@@ -109,7 +109,7 @@ def _run_seed(
         script_path.write_text(script)
 
         proc = subprocess.run(
-            [bash, str(script_path)], capture_output=True, text=True
+            [bash, str(script_path)], capture_output=True, text=True,
         )
         assert proc.returncode == 0, proc.stderr
 

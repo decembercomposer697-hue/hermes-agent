@@ -151,7 +151,7 @@ def encode_fact(content: str, entities: list[str], dim: int = 1024) -> "np.ndarr
     role_entity = encode_atom("__hrr_role_entity__", dim)
 
     components: list[np.ndarray] = [
-        bind(encode_text(content, dim), role_content)
+        bind(encode_text(content, dim), role_content),
     ]
 
     for entity in entities:

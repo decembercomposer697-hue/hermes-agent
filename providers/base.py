@@ -117,7 +117,7 @@ class ProviderProfile:
         return messages
 
     def build_extra_body(
-        self, *, session_id: str | None = None, **context: Any
+        self, *, session_id: str | None = None, **context: Any,
     ) -> dict[str, Any]:
         """Provider-specific extra_body fields.
 

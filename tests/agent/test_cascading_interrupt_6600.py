@@ -83,7 +83,7 @@ def test_normal_transient_error_still_raises_when_not_cancelled():
     agent = _make_agent()
     fake_client = MagicMock()
     fake_client.chat.completions.create.side_effect = httpx.RemoteProtocolError(
-        "genuine network drop"
+        "genuine network drop",
     )
     agent._create_request_openai_client.return_value = fake_client
     agent._close_request_openai_client = MagicMock()
@@ -124,7 +124,7 @@ def test_request_cancelled_token_is_request_local():
     agent._interrupt_requested = False
     fake_client_2 = MagicMock()
     fake_client_2.chat.completions.create.side_effect = httpx.RemoteProtocolError(
-        "genuine drop turn B"
+        "genuine drop turn B",
     )
     agent._create_request_openai_client.return_value = fake_client_2
 

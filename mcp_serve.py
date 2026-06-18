@@ -102,7 +102,7 @@ def _load_channel_directory() -> dict:
         directory_file = get_hermes_home() / "channel_directory.json"
     except ImportError:
         directory_file = Path(
-            os.environ.get("HERMES_HOME", Path.home() / ".hermes")
+            os.environ.get("HERMES_HOME", Path.home() / ".hermes"),
         ) / "channel_directory.json"
 
     if not directory_file.exists():
@@ -169,7 +169,7 @@ def _extract_attachments(msg: dict) -> list[dict]:
                 url = part.get("url", part.get("source", {}).get("url", ""))
                 if url:
                     attachments.append({"type": "image", "url": url})
-            elif ptype not in {"text",}:
+            elif ptype not in {"text"}:
                 # Unknown non-text content type
                 attachments.append({"type": ptype, "data": part})
 
@@ -452,7 +452,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
     if not _MCP_SERVER_AVAILABLE:
         raise ImportError(
             "MCP server requires the 'mcp' package. "
-            f"Install with: {sys.executable} -m pip install 'mcp'"
+            f"Install with: {sys.executable} -m pip install 'mcp'",
         )
 
     mcp = FastMCP(
@@ -756,7 +756,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
         try:
             from tools.send_message_tool import send_message_tool
             result_str = send_message_tool(
-                {"action": "send", "target": target, "message": message}
+                {"action": "send", "target": target, "message": message},
             )
             return result_str
         except ImportError:
@@ -850,7 +850,7 @@ def create_mcp_server(event_bridge: EventBridge | None = None) -> FastMCP:
         if decision not in {"allow-once", "allow-always", "deny"}:
             return json.dumps({
                 "error": f"Invalid decision: {decision}. "
-                         f"Must be allow-once, allow-always, or deny"
+                         f"Must be allow-once, allow-always, or deny",
             })
 
         result = bridge.respond_to_approval(id, decision)

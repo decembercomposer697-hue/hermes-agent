@@ -1108,7 +1108,7 @@ class ContextCompressor(ContextEngine):
                     tool_names.append(name)
                 if tool_names:
                     assistant_actions.append(
-                        "Called tool(s): " + ", ".join(tool_names[:6])
+                        "Called tool(s): " + ", ".join(tool_names[:6]),
                     )
                 elif text:
                     assistant_actions.append(text)
@@ -1116,7 +1116,7 @@ class ContextCompressor(ContextEngine):
                 call_id = str(msg.get("tool_call_id") or "")
                 tool_name, tool_args = call_id_to_tool.get(call_id, ("unknown", ""))
                 tool_actions.append(
-                    _summarize_tool_result(tool_name, tool_args, text or "")
+                    _summarize_tool_result(tool_name, tool_args, text or ""),
                 )
                 if re.search(
                     r"\b(error|failed|exception|traceback|timeout|timed out|fatal)\b",
@@ -1734,7 +1734,7 @@ The user has requested that this compaction PRIORITISE preserving all informatio
     # ------------------------------------------------------------------
 
     def _find_last_user_message_idx(
-        self, messages: list[dict[str, Any]], head_end: int
+        self, messages: list[dict[str, Any]], head_end: int,
     ) -> int:
         """Return the index of the last user-role message at or after *head_end*, or -1."""
         for i in range(len(messages) - 1, head_end - 1, -1):

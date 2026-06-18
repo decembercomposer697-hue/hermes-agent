@@ -75,7 +75,7 @@ async def test_runner_stays_alive_for_retryable_startup_errors(monkeypatch, tmp_
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     config = GatewayConfig(
         platforms={
-            Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")
+            Platform.TELEGRAM: PlatformConfig(enabled=True, token="***"),
         },
         sessions_dir=tmp_path / "sessions",
     )
@@ -101,7 +101,7 @@ async def test_runner_allows_cron_only_mode_when_no_platforms_are_enabled(monkey
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     config = GatewayConfig(
         platforms={
-            Platform.TELEGRAM: PlatformConfig(enabled=False, token="***")
+            Platform.TELEGRAM: PlatformConfig(enabled=False, token="***"),
         },
         sessions_dir=tmp_path / "sessions",
     )
@@ -121,7 +121,7 @@ async def test_runner_records_connected_platform_state_on_success(monkeypatch, t
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     config = GatewayConfig(
         platforms={
-            Platform.DISCORD: PlatformConfig(enabled=True, token="***")
+            Platform.DISCORD: PlatformConfig(enabled=True, token="***"),
         },
         sessions_dir=tmp_path / "sessions",
     )
@@ -215,7 +215,7 @@ async def test_start_gateway_replace_force_uses_terminate_pid(monkeypatch, tmp_p
             _pid_state["alive"] = False
     monkeypatch.setattr("gateway.status.terminate_pid", _mock_terminate_pid)
     monkeypatch.setattr(
-        "gateway.status._pid_exists", lambda pid: _pid_state["alive"]
+        "gateway.status._pid_exists", lambda pid: _pid_state["alive"],
     )
     monkeypatch.setattr("gateway.run.os.getpid", lambda: 100)
     monkeypatch.setattr("gateway.run.os.kill", lambda pid, sig: None)
@@ -235,7 +235,7 @@ async def test_start_gateway_replace_force_uses_terminate_pid(monkeypatch, tmp_p
 
 @pytest.mark.asyncio
 async def test_start_gateway_replace_aborts_when_force_killed_pid_still_alive(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     """Regression for #19471 (duplicate-gateway half).
 
@@ -294,7 +294,7 @@ async def test_start_gateway_replace_aborts_when_force_killed_pid_still_alive(
 
 @pytest.mark.asyncio
 async def test_start_gateway_replace_writes_takeover_marker_before_sigterm(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     """--replace must write a takeover marker BEFORE sending SIGTERM.
 
@@ -313,7 +313,7 @@ async def test_start_gateway_replace_writes_takeover_marker_before_sigterm(
         events.append(f"write_marker(target_pid={target_pid})")
         # Also check that the marker file actually exists after this call
         marker_paths_seen.append(
-            (tmp_path / ".gateway-takeover.json").exists() is False  # not yet
+            (tmp_path / ".gateway-takeover.json").exists() is False,  # not yet
         )
         # Actually write the marker so we can verify cleanup later
         from gateway.status import _get_takeover_marker_path, _write_json_file
@@ -380,7 +380,7 @@ async def test_start_gateway_replace_writes_takeover_marker_before_sigterm(
 
 @pytest.mark.asyncio
 async def test_start_gateway_replace_clears_marker_on_permission_denied(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     """If we fail to kill the existing PID (permission denied), clean up the
     marker so it doesn't grief an unrelated future shutdown."""
@@ -464,7 +464,7 @@ def test_runner_warns_when_docker_gateway_lacks_explicit_output_mount(monkeypatc
     monkeypatch.setenv("TERMINAL_DOCKER_VOLUMES", '["/etc/localtime:/etc/localtime:ro"]')
     config = GatewayConfig(
         platforms={
-            Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")
+            Platform.TELEGRAM: PlatformConfig(enabled=True, token="***"),
         },
         sessions_dir=tmp_path / "sessions",
     )

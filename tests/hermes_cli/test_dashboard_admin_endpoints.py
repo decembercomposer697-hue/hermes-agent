@@ -36,7 +36,7 @@ class TestMcpEndpoints:
         assert self.client.get("/api/mcp/servers").json()["servers"] == []
 
         r = self.client.post(
-            "/api/mcp/servers", json={"name": "srv1", "url": "https://x/mcp"}
+            "/api/mcp/servers", json={"name": "srv1", "url": "https://x/mcp"},
         )
         assert r.status_code == 200
         assert r.json()["transport"] == "http"
@@ -85,7 +85,7 @@ class TestMcpEndpoints:
         assert srv["enabled"] is False
         # Toggling a missing server is a 404.
         assert self.client.put(
-            "/api/mcp/servers/nope/enabled", json={"enabled": True}
+            "/api/mcp/servers/nope/enabled", json={"enabled": True},
         ).status_code == 404
 
     def test_catalog_lists_entries(self):
@@ -135,7 +135,7 @@ class TestCredentialPoolEndpoints:
 
     def test_empty_body_rejected(self):
         r = self.client.post(
-            "/api/credentials/pool", json={"provider": "", "api_key": ""}
+            "/api/credentials/pool", json={"provider": "", "api_key": ""},
         )
         assert r.status_code == 400
 
@@ -156,7 +156,7 @@ class TestMemoryEndpoints:
         assert r.status_code == 200 and r.json()["active"] == ""
 
         r = self.client.put(
-            "/api/memory/provider", json={"provider": "no-such-provider-xyz"}
+            "/api/memory/provider", json={"provider": "no-such-provider-xyz"},
         )
         assert r.status_code == 400
 
@@ -172,7 +172,7 @@ class TestMemoryEndpoints:
         assert (mem / "MEMORY.md").exists()
 
         assert self.client.post(
-            "/api/memory/reset", json={"target": "bogus"}
+            "/api/memory/reset", json={"target": "bogus"},
         ).status_code == 400
 
 
@@ -185,7 +185,7 @@ class TestPairingEndpoints:
         data = self.client.get("/api/pairing").json()
         assert data == {"pending": [], "approved": []}
         r = self.client.post(
-            "/api/pairing/approve", json={"platform": "telegram", "code": "NOPE99"}
+            "/api/pairing/approve", json={"platform": "telegram", "code": "NOPE99"},
         )
         assert r.status_code == 404
 
@@ -298,8 +298,8 @@ class TestOpsEndpoints:
         cfg = load_config()
         cfg["hooks"] = {
             "pre_tool_call": [
-                {"matcher": "terminal", "command": "/bin/echo hi", "timeout": 5}
-            ]
+                {"matcher": "terminal", "command": "/bin/echo hi", "timeout": 5},
+            ],
         }
         save_config(cfg)
         data = self.client.get("/api/ops/hooks").json()
@@ -326,7 +326,7 @@ class TestOpsEndpoints:
 
         # Unknown event rejected.
         assert self.client.post(
-            "/api/ops/hooks", json={"event": "no_such_event", "command": "/x"}
+            "/api/ops/hooks", json={"event": "no_such_event", "command": "/x"},
         ).status_code == 400
 
         # Delete it.
@@ -427,7 +427,7 @@ class TestSessionManagementEndpoints:
         r = self.client.post("/api/sessions/prune", json={"older_than_days": 9999})
         assert r.status_code == 200 and "removed" in r.json()
         assert self.client.post(
-            "/api/sessions/prune", json={"older_than_days": 0}
+            "/api/sessions/prune", json={"older_than_days": 0},
         ).status_code == 400
 
 
@@ -510,7 +510,7 @@ class TestSkillsHubSourcesEndpoint:
             return srcs
 
         monkeypatch.setattr(
-            "tools.skills_hub.create_source_router", _fake_router
+            "tools.skills_hub.create_source_router", _fake_router,
         )
         r = self.client.get("/api/skills/hub/sources")
         assert r.status_code == 200
@@ -537,7 +537,7 @@ class TestSkillsHubPreviewEndpoint:
 
     def test_preview_returns_skill_md_text(self, monkeypatch):
         monkeypatch.setattr(
-            "tools.skills_hub.create_source_router", lambda: []
+            "tools.skills_hub.create_source_router", lambda: [],
         )
         bundle = _FakeBundle("github/owner/repo/x")
         meta = _FakeMeta("github/owner/repo/x")
@@ -546,7 +546,7 @@ class TestSkillsHubPreviewEndpoint:
             lambda ident, sources: (meta, bundle, None),
         )
         r = self.client.get(
-            "/api/skills/hub/preview?identifier=github/owner/repo/x"
+            "/api/skills/hub/preview?identifier=github/owner/repo/x",
         )
         assert r.status_code == 200
         body = r.json()
@@ -558,7 +558,7 @@ class TestSkillsHubPreviewEndpoint:
 
     def test_preview_404_when_unresolved(self, monkeypatch):
         monkeypatch.setattr(
-            "tools.skills_hub.create_source_router", lambda: []
+            "tools.skills_hub.create_source_router", lambda: [],
         )
         monkeypatch.setattr(
             "hermes_cli.skills_hub._resolve_source_meta_and_bundle",
@@ -581,7 +581,7 @@ class TestSkillsHubScanEndpoint:
         from tools.skills_guard import ScanResult, Finding
 
         monkeypatch.setattr(
-            "tools.skills_hub.create_source_router", lambda: []
+            "tools.skills_hub.create_source_router", lambda: [],
         )
         bundle = _FakeBundle("github/owner/repo/x", trust_level="community")
         monkeypatch.setattr(
@@ -592,7 +592,7 @@ class TestSkillsHubScanEndpoint:
         from pathlib import Path
 
         monkeypatch.setattr(
-            "tools.skills_hub.quarantine_bundle", lambda b: Path("/tmp/_fake_q")
+            "tools.skills_hub.quarantine_bundle", lambda b: Path("/tmp/_fake_q"),
         )
 
         fake_result = ScanResult(
@@ -609,7 +609,7 @@ class TestSkillsHubScanEndpoint:
                     line=10,
                     match="m",
                     description="leaks data",
-                )
+                ),
             ],
             summary="s",
         )
@@ -621,7 +621,7 @@ class TestSkillsHubScanEndpoint:
         monkeypatch.setattr("shutil.rmtree", lambda *a, **k: None)
 
         r = self.client.get(
-            "/api/skills/hub/scan?identifier=github/owner/repo/x"
+            "/api/skills/hub/scan?identifier=github/owner/repo/x",
         )
         assert r.status_code == 200
         body = r.json()
@@ -635,7 +635,7 @@ class TestSkillsHubScanEndpoint:
 
     def test_scan_404_when_no_bundle(self, monkeypatch):
         monkeypatch.setattr(
-            "tools.skills_hub.create_source_router", lambda: []
+            "tools.skills_hub.create_source_router", lambda: [],
         )
         monkeypatch.setattr(
             "hermes_cli.skills_hub._resolve_source_meta_and_bundle",
@@ -663,7 +663,7 @@ class TestWebhookToggleEndpoint:
 
     def test_create_toggle_disable(self):
         r = self.client.post(
-            "/api/webhooks", json={"name": "hook1", "deliver": "log", "events": ["push"]}
+            "/api/webhooks", json={"name": "hook1", "deliver": "log", "events": ["push"]},
         )
         assert r.status_code == 200 and r.json()["enabled"] is True
         r = self.client.put("/api/webhooks/hook1/enabled", json={"enabled": False})
@@ -671,7 +671,7 @@ class TestWebhookToggleEndpoint:
         subs = self.client.get("/api/webhooks").json()["subscriptions"]
         assert subs[0]["enabled"] is False
         assert self.client.put(
-            "/api/webhooks/nope/enabled", json={"enabled": True}
+            "/api/webhooks/nope/enabled", json={"enabled": True},
         ).status_code == 404
 
 
@@ -864,7 +864,7 @@ class TestDebugShareEndpoint:
         import hermes_cli.debug as dbg
 
         monkeypatch.setattr(
-            dbg, "upload_to_pastebin", lambda c, expiry_days=7: "https://paste.rs/x"
+            dbg, "upload_to_pastebin", lambda c, expiry_days=7: "https://paste.rs/x",
         )
         monkeypatch.setattr(dbg, "_schedule_auto_delete", lambda *a, **k: None)
         monkeypatch.setattr(dbg, "_best_effort_sweep_expired_pastes", lambda: None)
@@ -878,7 +878,7 @@ class TestDebugShareEndpoint:
         import hermes_cli.debug as dbg
 
         monkeypatch.setattr(
-            dbg, "upload_to_pastebin", lambda c, expiry_days=7: "https://paste.rs/x"
+            dbg, "upload_to_pastebin", lambda c, expiry_days=7: "https://paste.rs/x",
         )
         monkeypatch.setattr(dbg, "_schedule_auto_delete", lambda *a, **k: None)
         monkeypatch.setattr(dbg, "_best_effort_sweep_expired_pastes", lambda: None)
@@ -960,7 +960,7 @@ class TestToolsConfigEndpoints:
             pytest.skip("no env-var-bearing web provider in this build")
 
         r = self.client.put(
-            "/api/tools/toolsets/web/env", json={"env": {key: "test-secret-123"}}
+            "/api/tools/toolsets/web/env", json={"env": {key: "test-secret-123"}},
         )
         assert r.status_code == 200, r.text
         body = r.json()
@@ -988,14 +988,14 @@ class TestToolsConfigEndpoints:
         if not key:
             pytest.skip("no env-var-bearing web provider in this build")
         r = self.client.put(
-            "/api/tools/toolsets/web/env", json={"env": {key: "   "}}
+            "/api/tools/toolsets/web/env", json={"env": {key: "   "}},
         )
         assert r.status_code == 200
         assert key in r.json()["skipped"]
 
     def test_post_setup_unknown_key_400(self):
         r = self.client.post(
-            "/api/tools/toolsets/browser/post-setup", json={"key": "bogus"}
+            "/api/tools/toolsets/browser/post-setup", json={"key": "bogus"},
         )
         assert r.status_code == 400
 

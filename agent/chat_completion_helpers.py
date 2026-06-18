@@ -197,7 +197,7 @@ def interruptible_api_call(agent, api_kwargs: dict):
                     agent._create_request_openai_client(
                         reason="codex_stream_request",
                         api_kwargs=api_kwargs,
-                    )
+                    ),
                 )
                 result["response"] = agent._run_codex_stream(
                     api_kwargs,
@@ -234,7 +234,7 @@ def interruptible_api_call(agent, api_kwargs: dict):
                     agent._create_request_openai_client(
                         reason="chat_completion_request",
                         api_kwargs=api_kwargs,
-                    )
+                    ),
                 )
                 result["response"] = request_client.chat.completions.create(**api_kwargs)
         except Exception as e:
@@ -311,7 +311,7 @@ def interruptible_api_call(agent, api_kwargs: dict):
     elif _openai_codex_backend:
         _ttfb_disable_above = _env_float("HERMES_CODEX_TTFB_DISABLE_ABOVE_TOKENS", 25_000.0)
         _ttfb_strict = os.environ.get("HERMES_CODEX_TTFB_STRICT", "").strip().lower() in {
-            "1", "true", "yes", "on"
+            "1", "true", "yes", "on",
         }
         if (
             not _ttfb_strict
@@ -367,7 +367,7 @@ def interruptible_api_call(agent, api_kwargs: dict):
         if _poll_count % 100 == 0:  # 100 × 0.3s = 30s
             _elapsed = time.time() - _call_start
             agent._touch_activity(
-                f"waiting for non-streaming response ({int(_elapsed)}s elapsed)"
+                f"waiting for non-streaming response ({int(_elapsed)}s elapsed)",
             )
 
         _elapsed = time.time() - _call_start
@@ -400,20 +400,20 @@ def interruptible_api_call(agent, api_kwargs: dict):
                 agent._buffer_status(
                     f"⚠️ No first byte from provider in {int(_elapsed)}s "
                     f"(codex stream, model: {api_kwargs.get('model', 'unknown')}). "
-                    f"Reconnecting. {_silent_hint}"
+                    f"Reconnecting. {_silent_hint}",
                 )
             else:
                 agent._buffer_status(
                     f"⚠️ No first byte from provider in {int(_elapsed)}s "
                     f"(codex stream, model: {api_kwargs.get('model', 'unknown')}). "
-                    f"Reconnecting."
+                    f"Reconnecting.",
                 )
             try:
                 _close_request_client_once("codex_ttfb_kill")
             except Exception:
                 pass
             agent._touch_activity(
-                f"codex stream killed after {int(_elapsed)}s with no first byte"
+                f"codex stream killed after {int(_elapsed)}s with no first byte",
             )
             # Wait briefly for the worker to notice the closed connection.
             t.join(timeout=2.0)
@@ -421,12 +421,12 @@ def interruptible_api_call(agent, api_kwargs: dict):
                 if _silent_hint:
                     result["error"] = TimeoutError(
                         f"Codex stream produced no bytes within {int(_elapsed)}s "
-                        f"(TTFB threshold: {int(_ttfb_timeout)}s). {_silent_hint}"
+                        f"(TTFB threshold: {int(_ttfb_timeout)}s). {_silent_hint}",
                     )
                 else:
                     result["error"] = TimeoutError(
                         f"Codex stream produced no bytes within {int(_elapsed)}s "
-                        f"(TTFB threshold: {int(_ttfb_timeout)}s)"
+                        f"(TTFB threshold: {int(_ttfb_timeout)}s)",
                     )
             break
 
@@ -452,20 +452,20 @@ def interruptible_api_call(agent, api_kwargs: dict):
             agent._buffer_status(
                 f"⚠️ Codex stream sent no events for {int(_event_stale_elapsed)}s "
                 f"after first byte (model: {api_kwargs.get('model', 'unknown')}). "
-                f"Reconnecting."
+                f"Reconnecting.",
             )
             try:
                 _close_request_client_once("codex_stream_idle_kill")
             except Exception:
                 pass
             agent._touch_activity(
-                f"codex stream killed after {int(_event_stale_elapsed)}s with no SSE events"
+                f"codex stream killed after {int(_event_stale_elapsed)}s with no SSE events",
             )
             t.join(timeout=2.0)
             if result["error"] is None and result["response"] is None:
                 result["error"] = TimeoutError(
                     f"Codex stream produced no SSE events for {int(_event_stale_elapsed)}s "
-                    f"after first byte (threshold: {int(_codex_idle_timeout)}s)"
+                    f"after first byte (threshold: {int(_codex_idle_timeout)}s)",
                 )
             break
 
@@ -490,13 +490,13 @@ def interruptible_api_call(agent, api_kwargs: dict):
                 agent._buffer_status(
                     f"⚠️ No response from provider for {int(_elapsed)}s "
                     f"(non-streaming, model: {api_kwargs.get('model', 'unknown')}). "
-                    f"{_silent_hint}"
+                    f"{_silent_hint}",
                 )
             else:
                 agent._buffer_status(
                     f"⚠️ No response from provider for {int(_elapsed)}s "
                     f"(non-streaming, model: {api_kwargs.get('model', 'unknown')}). "
-                    f"Aborting call."
+                    f"Aborting call.",
                 )
             try:
                 if agent.api_mode == "anthropic_messages":
@@ -507,7 +507,7 @@ def interruptible_api_call(agent, api_kwargs: dict):
             except Exception:
                 pass
             agent._touch_activity(
-                f"stale non-streaming call killed after {int(_elapsed)}s"
+                f"stale non-streaming call killed after {int(_elapsed)}s",
             )
             # Wait briefly for the thread to notice the closed connection.
             t.join(timeout=2.0)
@@ -516,12 +516,12 @@ def interruptible_api_call(agent, api_kwargs: dict):
                     result["error"] = TimeoutError(
                         f"Non-streaming API call timed out after {int(_elapsed)}s "
                         f"with no response (threshold: {int(_stale_timeout)}s). "
-                        f"{_silent_hint}"
+                        f"{_silent_hint}",
                     )
                 else:
                     result["error"] = TimeoutError(
                         f"Non-streaming API call timed out after {int(_elapsed)}s "
-                        f"with no response (threshold: {int(_stale_timeout)}s)"
+                        f"with no response (threshold: {int(_stale_timeout)}s)",
                     )
             break
 
@@ -532,7 +532,7 @@ def interruptible_api_call(agent, api_kwargs: dict):
             # (in the streaming path) burning full retry cycles. (#6600)
             _request_cancelled["value"] = True
             logger.debug(
-                "Force-closing httpx client due to interrupt (not a network error)."
+                "Force-closing httpx client due to interrupt (not a network error).",
             )
             # Force-close the in-flight worker-local HTTP connection to stop
             # token generation without poisoning the shared client used to
@@ -655,7 +655,7 @@ def build_api_kwargs(agent, api_messages: list) -> dict:
             is_xai_responses=is_xai_responses,
             github_reasoning_extra=agent._github_models_reasoning_extra_body() if is_github_responses else None,
             replay_encrypted_reasoning=bool(
-                getattr(agent, "_codex_reasoning_replay_enabled", True)
+                getattr(agent, "_codex_reasoning_replay_enabled", True),
             ),
         )
 
@@ -1012,7 +1012,7 @@ def build_assistant_message(agent, assistant_message, finish_reason: str) -> dic
                 "type": tool_call.type,
                 "function": {
                     "name": tool_call.function.name,
-                    "arguments": tool_call.function.arguments
+                    "arguments": tool_call.function.arguments,
                 },
             }
             # Defence-in-depth: redact credentials from tool call arguments
@@ -1025,7 +1025,7 @@ def build_assistant_message(agent, assistant_message, finish_reason: str) -> dic
             if isinstance(tc_dict["function"]["arguments"], str):
                 from agent.redact import redact_sensitive_text
                 tc_dict["function"]["arguments"] = redact_sensitive_text(
-                    tc_dict["function"]["arguments"]
+                    tc_dict["function"]["arguments"],
                 )
             # Preserve extra_content (e.g. Gemini thought_signature) so it
             # is sent back on subsequent API calls.  Without this, Gemini 3
@@ -1289,7 +1289,7 @@ def try_activate_fallback(agent, reason: FailoverReason | None = None) -> bool:
 
         agent._buffer_status(
             f"🔄 Primary model failed — switching to fallback: "
-            f"{fb_model} via {fb_provider}"
+            f"{fb_model} via {fb_provider}",
         )
         logger.info(
             "Fallback activated: %s → %s (%s)",
@@ -1392,7 +1392,7 @@ def handle_max_iterations(agent, messages: list, api_call_count: int) -> str:
             else:
                 summary_extra_body["reasoning"] = {
                     "enabled": True,
-                    "effort": "medium"
+                    "effort": "medium",
                 }
         if _is_nous:
             from agent.portal_tags import nous_portal_tags as _portal_tags
@@ -1451,7 +1451,7 @@ def handle_max_iterations(agent, messages: list, api_call_count: int) -> str:
                     _ps = None
                 if _ps is not None and 0.0 <= _ps <= 1.0:
                     summary_extra_body["plugins"] = [
-                        {"id": "pareto-router", "min_coding_score": _ps}
+                        {"id": "pareto-router", "min_coding_score": _ps},
                     ]
 
             if summary_extra_body:
@@ -1548,7 +1548,7 @@ def cleanup_task_resources(agent, task_id: str) -> None:
             if agent.verbose_logging:
                 logging.debug(
                     f"Skipping per-turn cleanup_vm for persistent env {task_id}; "
-                    f"idle reaper will handle it."
+                    f"idle reaper will handle it.",
                 )
         else:
             _ra().cleanup_vm(task_id)
@@ -1792,7 +1792,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
             agent._create_request_openai_client(
                 reason="chat_completion_stream_request",
                 api_kwargs=stream_kwargs,
-            )
+            ),
         )
         # Reset stale-stream timer so the detector measures from this
         # attempt's start, not a previous attempt's last chunk.
@@ -2023,7 +2023,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
         ):
             raise RuntimeError(
                 "Provider returned an empty stream with no finish_reason "
-                "(possible upstream error or malformed SSE response)."
+                "(possible upstream error or malformed SSE response).",
             )
 
         # A stream that delivered a tool call but only partial/unparseable
@@ -2122,7 +2122,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
         # #31673 / sanitize_anthropic_kwargs().
         from agent.anthropic_adapter import sanitize_anthropic_kwargs
         sanitize_anthropic_kwargs(
-            api_kwargs, log_prefix=getattr(agent, "log_prefix", "")
+            api_kwargs, log_prefix=getattr(agent, "log_prefix", ""),
         )
         # Use the Anthropic SDK's streaming context manager
         with agent._anthropic_client.messages.stream(**api_kwargs) as stream:
@@ -2132,7 +2132,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
             # first event.
             try:
                 agent._stream_diag_capture_response(
-                    _diag, getattr(stream, "response", None)
+                    _diag, getattr(stream, "response", None),
                 )
             except Exception:
                 pass
@@ -2230,10 +2230,10 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
                         )
                         return
                     _is_timeout = isinstance(
-                        e, (_httpx.ReadTimeout, _httpx.ConnectTimeout, _httpx.PoolTimeout)
+                        e, (_httpx.ReadTimeout, _httpx.ConnectTimeout, _httpx.PoolTimeout),
                     )
                     _is_conn_err = isinstance(
-                        e, (_httpx.ConnectError, _httpx.RemoteProtocolError, ConnectionError)
+                        e, (_httpx.ConnectError, _httpx.RemoteProtocolError, ConnectionError),
                     )
                     _is_stream_parse_err = agent._is_provider_stream_parse_error(e)
 
@@ -2251,7 +2251,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
                     # silent retry is safe wrt side-effects.
                     if deltas_were_sent["yes"]:
                         _partial_tool_in_flight = bool(
-                            result.get("partial_tool_names")
+                            result.get("partial_tool_names"),
                         )
                         _is_sse_conn_err_preview = False
                         if not _is_timeout and not _is_conn_err:
@@ -2293,7 +2293,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
                             # error isn't transient.  Fall through to the
                             # stub path.
                             logger.warning(
-                                "Streaming failed after partial delivery, not retrying: %s", e
+                                "Streaming failed after partial delivery, not retrying: %s", e,
                             )
                             result["error"] = e
                             return
@@ -2307,7 +2307,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
                         try:
                             agent._fire_stream_delta(
                                 "\n\n⚠ Connection dropped mid tool-call; "
-                                "reconnecting…\n\n"
+                                "reconnecting…\n\n",
                             )
                         except Exception:
                             pass
@@ -2335,7 +2335,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
                         _close_request_client_once("stream_mid_tool_retry_cleanup")
                         try:
                             agent._replace_primary_openai_client(
-                                reason="stream_mid_tool_retry_pool_cleanup"
+                                reason="stream_mid_tool_retry_pool_cleanup",
                             )
                         except Exception:
                             pass
@@ -2388,7 +2388,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
                             # any dead connections from the pool.
                             try:
                                 agent._replace_primary_openai_client(
-                                    reason="stream_retry_pool_cleanup"
+                                    reason="stream_retry_pool_cleanup",
                                 )
                             except Exception:
                                 pass
@@ -2416,7 +2416,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
                             "❌ Connection to provider failed after "
                             f"{_max_stream_retries + 1} attempts. "
                             "The provider may be experiencing issues — "
-                            "try again in a moment."
+                            "try again in a moment.",
                         )
                     else:
                         _err_lower = str(e).lower()
@@ -2430,7 +2430,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
                                 "\n⚠  Streaming is not supported for this "
                                 "model/provider. Switching to non-streaming.\n"
                                 "   To avoid this delay, set display.streaming: false "
-                                "in config.yaml\n"
+                                "in config.yaml\n",
                             )
                         logger.info(
                             "Streaming failed before delivery: %s",
@@ -2499,7 +2499,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
             _last_heartbeat = _hb_now
             _waiting_secs = int(_hb_now - last_chunk_time["t"])
             agent._touch_activity(
-                f"waiting for stream response ({_waiting_secs}s, no chunks yet)"
+                f"waiting for stream response ({_waiting_secs}s, no chunks yet)",
             )
 
         # Detect stale streams: connections kept alive by SSE pings
@@ -2518,7 +2518,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
                 f"⚠️ No response from provider for {int(_stale_elapsed)}s "
                 f"(model: {api_kwargs.get('model', 'unknown')}, "
                 f"context: ~{_est_ctx:,} tokens). "
-                f"Reconnecting..."
+                f"Reconnecting...",
             )
             try:
                 _close_request_client_once("stale_stream_kill")
@@ -2534,7 +2534,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
             # the inner thread processes the closure.
             last_chunk_time["t"] = time.time()
             agent._touch_activity(
-                f"stale stream detected after {int(_stale_elapsed)}s, reconnecting"
+                f"stale stream detected after {int(_stale_elapsed)}s, reconnecting",
             )
 
         if agent._interrupt_requested:
@@ -2545,7 +2545,7 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
             _request_cancelled["value"] = True
             logger.debug(
                 "Force-closing streaming httpx client due to interrupt "
-                "(not a network error)."
+                "(not a network error).",
             )
             try:
                 if agent.api_mode == "anthropic_messages":

@@ -49,8 +49,8 @@ def test_secret_capture_callback_can_be_completed_from_cli_state_machine():
 
         thread = threading.Thread(
             target=lambda: results.append(
-                cli._secret_capture_callback("TENOR_API_KEY", "Tenor API key")
-            )
+                cli._secret_capture_callback("TENOR_API_KEY", "Tenor API key"),
+            ),
         )
         thread.start()
 
@@ -87,7 +87,7 @@ def test_secret_capture_uses_masked_prompt_without_tui():
     cli = _make_cli_stub()
 
     with patch("hermes_cli.callbacks.masked_secret_prompt", return_value="secret-value"), patch(
-        "hermes_cli.callbacks.save_env_value_secure"
+        "hermes_cli.callbacks.save_env_value_secure",
     ) as save_secret:
         save_secret.return_value = {
             "success": True,
@@ -135,7 +135,7 @@ def test_cli_chat_registers_secret_capture_callback():
     }
 
     with patch("cli.get_tool_definitions", return_value=[]), patch.dict(
-        "os.environ", {"LLM_MODEL": "", "HERMES_MAX_ITERATIONS": ""}, clear=False
+        "os.environ", {"LLM_MODEL": "", "HERMES_MAX_ITERATIONS": ""}, clear=False,
     ), patch.dict(cli_module.__dict__, {"CLI_CONFIG": clean_config}):
         cli_obj = HermesCLI()
         with patch.object(cli_obj, "_ensure_runtime_credentials", return_value=False):

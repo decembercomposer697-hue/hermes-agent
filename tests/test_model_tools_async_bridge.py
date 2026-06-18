@@ -192,7 +192,7 @@ class TestRunAsyncWithRunningLoop:
             return 42
 
         result = await asyncio.get_event_loop().run_in_executor(
-            None, _run_async, _simple()
+            None, _run_async, _simple(),
         )
         assert result == 42
 

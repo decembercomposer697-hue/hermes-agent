@@ -23,7 +23,7 @@ def test_tool_search_sorts_by_raw_score_across_buckets():
                 {"uri": "viking://skills/1", "score": 0.8999, "abstract": "skill result"},
             ],
             "total": 3,
-        }
+        },
     }
 
     result = json.loads(provider._tool_search({"query": "ranking"}))
@@ -52,7 +52,7 @@ def test_tool_search_sorts_missing_raw_score_after_negative_scores():
                 {"uri": "viking://skills/positive", "score": 0.1, "abstract": "positive score"},
             ],
             "total": 3,
-        }
+        },
     }
 
     result = json.loads(provider._tool_search({"query": "ranking"}))

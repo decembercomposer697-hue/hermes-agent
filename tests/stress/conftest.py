@@ -14,7 +14,7 @@ def pytest_collection_modifyitems(config, items):
     if config.getoption("--run-stress", default=False):
         return
     skip_stress = pytest.mark.skip(
-        reason="stress test (opt-in via --run-stress or run script directly)"
+        reason="stress test (opt-in via --run-stress or run script directly)",
     )
     for item in items:
         if "tests/stress" in str(item.fspath):

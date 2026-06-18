@@ -44,7 +44,7 @@ def create_test_dataset(num_prompts: int = 20) -> Path:
         for i in range(num_prompts):
             entry = {
                 "prompt": f"Test prompt {i}: What is 2+2? Just answer briefly.",
-                "test_id": i
+                "test_id": i,
             }
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
     
@@ -87,7 +87,7 @@ def monitor_checkpoint_during_run(checkpoint_file: Path, duration: int = 30) -> 
                         "elapsed_seconds": round(elapsed, 2),
                         "completed_count": len(checkpoint_data.get("completed_prompts", [])),
                         "completed_prompts": checkpoint_data.get("completed_prompts", [])[:5],  # First 5 for display
-                        "timestamp": checkpoint_data.get("last_updated")
+                        "timestamp": checkpoint_data.get("last_updated"),
                     }
                     
                     snapshots.append(snapshot)
@@ -157,7 +157,7 @@ def test_current_implementation():
             max_iterations=3,  # Keep it short
             model="claude-opus-4-20250514",
             num_workers=2,
-            verbose=False
+            verbose=False,
         )
         
         # Run with monitoring
@@ -250,7 +250,7 @@ def test_interruption_and_resume():
             max_iterations=3,
             model="claude-opus-4-20250514",
             num_workers=1,
-            verbose=False
+            verbose=False,
         )
         
         runner.run(resume=False)
@@ -277,7 +277,7 @@ def test_interruption_and_resume():
             max_iterations=3,
             model="claude-opus-4-20250514",
             num_workers=1,
-            verbose=False
+            verbose=False,
         )
         
         runner2.run(resume=True)
@@ -391,7 +391,7 @@ def main(
     test_resume: bool = False,
     test_crash: bool = False,
     compare: bool = False,
-    show_plan: bool = False
+    show_plan: bool = False,
 ):
     """
     Run checkpoint behavior tests.

@@ -60,7 +60,7 @@ def test_goal_mode_persists(kanban_home):
 def test_goal_mode_without_max_turns(kanban_home):
     with kb.connect() as conn:
         tid = kb.create_task(
-            conn, title="t", assignee="worker", goal_mode=True
+            conn, title="t", assignee="worker", goal_mode=True,
         )
         task = kb.get_task(conn, tid)
     assert task.goal_mode is True
@@ -96,11 +96,11 @@ def test_legacy_db_migrates_goal_columns(tmp_path, monkeypatch):
             claim_lock TEXT,
             claim_expires INTEGER
         )
-        """
+        """,
     )
     legacy.execute(
         "INSERT INTO tasks (id, title, status, priority, created_at, workspace_kind) "
-        "VALUES ('legacy1', 'old', 'ready', 0, 1, 'scratch')"
+        "VALUES ('legacy1', 'old', 'ready', 0, 1, 'scratch')",
     )
     legacy.commit()
     legacy.close()

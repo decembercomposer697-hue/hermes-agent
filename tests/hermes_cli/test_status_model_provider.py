@@ -191,7 +191,7 @@ def test_show_status_reports_empty_lmstudio_listing_as_reachable(monkeypatch, ca
                 "default": "qwen/qwen3-coder-30b",
                 "provider": "lmstudio",
                 "base_url": "http://127.0.0.1:1234/v1",
-            }
+            },
         },
         raising=False,
     )

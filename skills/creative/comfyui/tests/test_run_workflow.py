@@ -90,7 +90,7 @@ class TestInjectParams:
         schema = {
             "parameters": {
                 "prompt": {"node_id": "6", "field": "text", "type": "string", "value": ""},
-            }
+            },
         }
         wf2, warnings = inject_params(wf, schema, {"prompt": "literal value"})
         # The link should NOT have been overwritten

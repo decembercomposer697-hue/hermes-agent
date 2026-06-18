@@ -41,7 +41,7 @@ def _make_runner():
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="tok")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="tok")},
     )
     adapter = MagicMock()
     adapter.send = AsyncMock()

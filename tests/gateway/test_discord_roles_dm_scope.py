@@ -174,7 +174,7 @@ def test_guild_message_role_check_scoped_to_originating_guild(monkeypatch):
     # No author object passed → falls through to guild.get_member path
     assert (
         adapter._is_allowed_user(
-            "42", author=None, guild=trusted_guild, is_dm=False
+            "42", author=None, guild=trusted_guild, is_dm=False,
         )
         is False
     )
@@ -196,7 +196,7 @@ def test_guild_message_role_check_allows_when_role_in_same_guild(monkeypatch):
 
     assert (
         adapter._is_allowed_user(
-            "42", author=None, guild=trusted_guild, is_dm=False
+            "42", author=None, guild=trusted_guild, is_dm=False,
         )
         is True
     )
@@ -226,7 +226,7 @@ def test_guild_message_rejects_author_roles_from_different_guild(monkeypatch):
 
     assert (
         adapter._is_allowed_user(
-            "42", author=foreign_author, guild=this_guild, is_dm=False
+            "42", author=foreign_author, guild=this_guild, is_dm=False,
         )
         is False
     )
@@ -250,7 +250,7 @@ def test_user_id_allowlist_works_in_guild():
     some_guild = SimpleNamespace(id=111, get_member=lambda uid: None)
     assert (
         adapter._is_allowed_user(
-            "42", author=None, guild=some_guild, is_dm=False
+            "42", author=None, guild=some_guild, is_dm=False,
         )
         is True
     )

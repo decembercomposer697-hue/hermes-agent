@@ -98,7 +98,7 @@ def cmd_migrate_xai(args: Any) -> int:
         print(f"  {color('✓', Colors.GREEN)} Backup: {result.backup_path}")
     print(
         f"  {color('✓', Colors.GREEN)} Updated {len(result.issues_resolved)} "
-        f"slot(s) in {result.file_path}"
+        f"slot(s) in {result.file_path}",
     )
     print()
     print(color(

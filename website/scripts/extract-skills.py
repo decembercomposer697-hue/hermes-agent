@@ -632,7 +632,7 @@ def main():
         print(
             f"[extract-skills] WARNING: unified index not found at "
             f"{UNIFIED_INDEX_PATH}; falling back to {external_source}. "
-            f"Run `python3 scripts/build_skills_index.py` to refresh."
+            f"Run `python3 scripts/build_skills_index.py` to refresh.",
         )
 
     all_skills = _consolidate_small_categories(local + external)

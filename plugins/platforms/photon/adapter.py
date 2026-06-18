@@ -195,7 +195,7 @@ class PhotonAdapter(BasePlatformAdapter):
             os.getenv("PHOTON_SIDECAR_TOKEN") or secrets.token_hex(16)
         )
         self._autostart_sidecar = str(
-            os.getenv("PHOTON_SIDECAR_AUTOSTART", "true")
+            os.getenv("PHOTON_SIDECAR_AUTOSTART", "true"),
         ).lower() not in ("0", "false", "no")
         self._node_bin = os.getenv("PHOTON_NODE_BIN") or shutil.which("node") or "node"
 
@@ -221,7 +221,7 @@ class PhotonAdapter(BasePlatformAdapter):
         self._mention_patterns = self._compile_mention_patterns(
             extra["mention_patterns"]
             if "mention_patterns" in extra
-            else os.getenv("PHOTON_MENTION_PATTERNS")
+            else os.getenv("PHOTON_MENTION_PATTERNS"),
         )
 
     # -- Group-mention gating (parity with BlueBubbles) -------------------
@@ -289,7 +289,7 @@ class PhotonAdapter(BasePlatformAdapter):
     async def connect(self) -> bool:
         if not HTTPX_AVAILABLE:
             self._set_fatal_error(
-                "MISSING_DEP", "httpx not installed", retryable=False
+                "MISSING_DEP", "httpx not installed", retryable=False,
             )
             return False
         if not self._project_id or not self._project_secret:
@@ -320,13 +320,13 @@ class PhotonAdapter(BasePlatformAdapter):
                 return False
         else:
             logger.warning(
-                "[photon] sidecar autostart disabled — inbound + outbound will fail"
+                "[photon] sidecar autostart disabled — inbound + outbound will fail",
             )
 
         # Start consuming the inbound gRPC stream from the sidecar.
         self._inbound_running = True
         self._inbound_task = asyncio.get_event_loop().create_task(
-            self._inbound_loop()
+            self._inbound_loop(),
         )
 
         self._mark_connected()
@@ -489,12 +489,12 @@ class PhotonAdapter(BasePlatformAdapter):
             mime = content.get("mimeType") or ""
             mtype = MessageType.VOICE if is_voice else _attachment_message_type(mime)
             cached = _cache_inbound_attachment(
-                content, name, mime, force_audio=is_voice
+                content, name, mime, force_audio=is_voice,
             )
             if cached:
                 media_urls.append(cached)
                 media_types.append(
-                    mime or ("audio/mp4" if is_voice else "application/octet-stream")
+                    mime or ("audio/mp4" if is_voice else "application/octet-stream"),
                 )
                 # The real bytes are attached, so the agent sees the media
                 # itself — a short marker is enough text, and it keeps group
@@ -527,7 +527,7 @@ class PhotonAdapter(BasePlatformAdapter):
             if not self._message_matches_mention_patterns(text):
                 logger.debug(
                     "[photon] ignoring group message "
-                    "(require_mention=true, no mention pattern matched)"
+                    "(require_mention=true, no mention pattern matched)",
                 )
                 return
             text = self._clean_mention_text(text)
@@ -557,7 +557,7 @@ class PhotonAdapter(BasePlatformAdapter):
         if not (_SIDECAR_DIR / "node_modules").exists():
             raise RuntimeError(
                 f"Photon sidecar deps not installed. Run: "
-                f"cd {_SIDECAR_DIR} && npm install   (or `hermes photon setup`)"
+                f"cd {_SIDECAR_DIR} && npm install   (or `hermes photon setup`)",
             )
         env = os.environ.copy()
         env["PHOTON_PROJECT_ID"] = self._project_id
@@ -577,7 +577,7 @@ class PhotonAdapter(BasePlatformAdapter):
         # Pump sidecar stderr/stdout into our logger so users see crashes.
         loop = asyncio.get_event_loop()
         self._sidecar_supervisor_task = loop.create_task(
-            self._supervise_sidecar(self._sidecar_proc)
+            self._supervise_sidecar(self._sidecar_proc),
         )
 
         # Wait for /healthz to come up — give it up to 15s on cold start.
@@ -588,7 +588,7 @@ class PhotonAdapter(BasePlatformAdapter):
                 if self._sidecar_proc.poll() is not None:
                     raise RuntimeError(
                         f"Photon sidecar exited with code "
-                        f"{self._sidecar_proc.returncode} before becoming ready"
+                        f"{self._sidecar_proc.returncode} before becoming ready",
                     )
                 try:
                     resp = await client.post(
@@ -601,7 +601,7 @@ class PhotonAdapter(BasePlatformAdapter):
                     last_err = e
                 await asyncio.sleep(0.2)
         raise RuntimeError(
-            f"Photon sidecar did not become ready within 15s: {last_err}"
+            f"Photon sidecar did not become ready within 15s: {last_err}",
         )
 
     async def _supervise_sidecar(self, proc: subprocess.Popen) -> None:
@@ -761,7 +761,7 @@ class PhotonAdapter(BasePlatformAdapter):
     async def send_typing(self, chat_id: str, metadata=None) -> None:
         try:
             await self._sidecar_call(
-                "/typing", {"spaceId": chat_id, "state": "start"}
+                "/typing", {"spaceId": chat_id, "state": "start"},
             )
         except Exception as e:
             logger.debug("[photon] send_typing failed: %s", e)
@@ -769,7 +769,7 @@ class PhotonAdapter(BasePlatformAdapter):
     async def stop_typing(self, chat_id: str) -> None:
         try:
             await self._sidecar_call(
-                "/typing", {"spaceId": chat_id, "state": "stop"}
+                "/typing", {"spaceId": chat_id, "state": "stop"},
             )
         except Exception as e:
             logger.debug("[photon] stop_typing failed: %s", e)
@@ -888,7 +888,7 @@ class PhotonAdapter(BasePlatformAdapter):
         safe_path = self.validate_media_delivery_path(str(path))
         if not safe_path:
             return SendResult(
-                success=False, error=f"unsafe or missing attachment path: {path}"
+                success=False, error=f"unsafe or missing attachment path: {path}",
             )
         if not mime_type:
             import mimetypes
@@ -923,12 +923,12 @@ class PhotonAdapter(BasePlatformAdapter):
         )
         if resp.status_code != 200:
             raise RuntimeError(
-                f"Photon sidecar {path} returned {resp.status_code}: {resp.text[:200]}"
+                f"Photon sidecar {path} returned {resp.status_code}: {resp.text[:200]}",
             )
         data = resp.json() or {}
         if not data.get("ok"):
             raise RuntimeError(
-                f"Photon sidecar {path} reported error: {data.get('error')}"
+                f"Photon sidecar {path} reported error: {data.get('error')}",
             )
         return data
 
@@ -1016,7 +1016,7 @@ def _cache_inbound_attachment(
                 return cache_document_from_bytes(raw, name)
         if force_audio or mime.startswith("audio/"):
             ext = suffix or _AUDIO_EXT_BY_MIME.get(
-                mime, ".m4a" if force_audio else ".mp3"
+                mime, ".m4a" if force_audio else ".mp3",
             )
             return cache_audio_from_bytes(raw, ext)
         # Video, application/*, and everything else → document cache.
@@ -1053,7 +1053,7 @@ async def _standalone_send(
                 "Photon standalone send requires a running sidecar with "
                 "PHOTON_SIDECAR_TOKEN set in the environment. Cron processes "
                 "cannot spawn the sidecar themselves."
-            )
+            ),
         }
     base = f"http://{_DEFAULT_SIDECAR_BIND}:{port}"
     headers = {"X-Hermes-Sidecar-Token": token}

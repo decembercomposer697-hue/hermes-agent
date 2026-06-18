@@ -130,13 +130,13 @@ class PtyBridge:
             if sys.platform.startswith("win"):
                 raise PtyUnavailableError(
                     "Pseudo-terminals are unavailable on this platform. "
-                    "Hermes Agent supports Windows only via WSL."
+                    "Hermes Agent supports Windows only via WSL.",
                 )
             if ptyprocess is None:
                 raise PtyUnavailableError(
                     "The `ptyprocess` package is missing. "
                     "Install with: pip install ptyprocess "
-                    "(or pip install -e '.[pty]')."
+                    "(or pip install -e '.[pty]').",
                 )
             raise PtyUnavailableError("Pseudo-terminals are unavailable.")
         # PTY-hosted programs expect TERM to describe the terminal type.

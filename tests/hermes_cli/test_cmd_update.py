@@ -76,7 +76,7 @@ class TestCmdUpdatePip:
     @patch("shutil.which", return_value="/usr/bin/uv")
     @patch("subprocess.run")
     def test_update_pip_exports_virtualenv_from_sys_prefix(
-        self, mock_run, _mock_which, mock_args, monkeypatch
+        self, mock_run, _mock_which, mock_args, monkeypatch,
     ):
         from hermes_cli import main as hm
 
@@ -94,7 +94,7 @@ class TestCmdUpdatePip:
     @patch("shutil.which", return_value="/usr/bin/uv")
     @patch("subprocess.run")
     def test_update_pip_does_not_export_virtualenv_for_system_python(
-        self, mock_run, _mock_which, mock_args, monkeypatch
+        self, mock_run, _mock_which, mock_args, monkeypatch,
     ):
         from hermes_cli import main as hm
 
@@ -115,10 +115,10 @@ class TestCmdUpdateBranchFallback:
     @patch("shutil.which", return_value=None)
     @patch("subprocess.run")
     def test_update_falls_back_to_main_when_branch_not_on_remote(
-        self, mock_run, _mock_which, mock_args, capsys
+        self, mock_run, _mock_which, mock_args, capsys,
     ):
         mock_run.side_effect = _make_run_side_effect(
-            branch="fix/stoicneko", verify_ok=False, commit_count="3"
+            branch="fix/stoicneko", verify_ok=False, commit_count="3",
         )
 
         cmd_update(mock_args)
@@ -139,10 +139,10 @@ class TestCmdUpdateBranchFallback:
     @patch("shutil.which", return_value=None)
     @patch("subprocess.run")
     def test_update_uses_current_branch_when_on_remote(
-        self, mock_run, _mock_which, mock_args, capsys
+        self, mock_run, _mock_which, mock_args, capsys,
     ):
         mock_run.side_effect = _make_run_side_effect(
-            branch="main", verify_ok=True, commit_count="2"
+            branch="main", verify_ok=True, commit_count="2",
         )
 
         cmd_update(mock_args)
@@ -160,10 +160,10 @@ class TestCmdUpdateBranchFallback:
     @patch("shutil.which", return_value=None)
     @patch("subprocess.run")
     def test_update_already_up_to_date(
-        self, mock_run, _mock_which, mock_args, capsys
+        self, mock_run, _mock_which, mock_args, capsys,
     ):
         mock_run.side_effect = _make_run_side_effect(
-            branch="main", verify_ok=True, commit_count="0"
+            branch="main", verify_ok=True, commit_count="0",
         )
 
         cmd_update(mock_args)
@@ -179,7 +179,7 @@ class TestCmdUpdateBranchFallback:
     @patch("shutil.which", return_value=None)
     @patch("subprocess.run")
     def test_update_on_fork_checks_upstream_when_origin_up_to_date(
-        self, mock_run, _mock_which, mock_args, capsys
+        self, mock_run, _mock_which, mock_args, capsys,
     ):
         """Regression for issue #26172: forks whose local HEAD already matches
         origin/main must still consult upstream/main before printing
@@ -189,7 +189,7 @@ class TestCmdUpdateBranchFallback:
         from hermes_cli import main as hm
 
         mock_run.side_effect = _make_run_side_effect(
-            branch="main", verify_ok=True, commit_count="0"
+            branch="main", verify_ok=True, commit_count="0",
         )
 
         with patch.object(
@@ -206,13 +206,13 @@ class TestCmdUpdateBranchFallback:
     @patch("shutil.which")
     @patch("subprocess.run")
     def test_update_refreshes_repo_and_tui_node_dependencies(
-        self, mock_run, mock_which, mock_args
+        self, mock_run, mock_which, mock_args,
     ):
         from hermes_cli import main as hm
 
         mock_which.side_effect = {"uv": "/usr/bin/uv", "npm": "/usr/bin/npm"}.get
         mock_run.side_effect = _make_run_side_effect(
-            branch="main", verify_ok=True, commit_count="1"
+            branch="main", verify_ok=True, commit_count="1",
         )
         # The web UI build runs through _run_with_idle_timeout now (issue
         # #33788) so it no longer appears in subprocess.run's call list.
@@ -304,9 +304,9 @@ class TestCmdUpdateBranchFallback:
     def test_update_non_interactive_runs_safe_config_migrations(self, mock_args, capsys):
         """Dashboard/web updates apply non-interactive migrations before restart."""
         with patch("shutil.which", return_value=None), patch(
-            "subprocess.run"
+            "subprocess.run",
         ) as mock_run, patch("builtins.input") as mock_input, patch(
-            "hermes_cli.config.get_missing_env_vars", return_value=["MISSING_KEY"]
+            "hermes_cli.config.get_missing_env_vars", return_value=["MISSING_KEY"],
         ), patch(
             "hermes_cli.config.get_missing_config_fields",
             return_value=[{"key": "new.option", "default": True}],
@@ -317,7 +317,7 @@ class TestCmdUpdateBranchFallback:
             mock_sys.stdin.isatty.return_value = False
             mock_sys.stdout.isatty.return_value = False
             mock_run.side_effect = _make_run_side_effect(
-                branch="main", verify_ok=True, commit_count="1"
+                branch="main", verify_ok=True, commit_count="1",
             )
 
             cmd_update(mock_args)
@@ -342,23 +342,23 @@ class TestCmdUpdateMigrationPrompt:
     """
 
     def test_version_bump_only_applies_silently_without_prompt(
-        self, mock_args, capsys
+        self, mock_args, capsys,
     ):
         """Only the version moved → apply non-interactively, never prompt."""
         with patch("shutil.which", return_value=None), patch(
-            "subprocess.run"
+            "subprocess.run",
         ) as mock_run, patch("builtins.input") as mock_input, patch(
-            "hermes_cli.config.get_missing_env_vars", return_value=[]
+            "hermes_cli.config.get_missing_env_vars", return_value=[],
         ), patch(
-            "hermes_cli.config.get_missing_config_fields", return_value=[]
+            "hermes_cli.config.get_missing_config_fields", return_value=[],
         ), patch(
-            "hermes_cli.config.check_config_version", return_value=(5, 24)
+            "hermes_cli.config.check_config_version", return_value=(5, 24),
         ), patch(
             "hermes_cli.config.migrate_config",
             return_value={"env_added": [], "config_added": [], "warnings": []},
         ) as mock_migrate:
             mock_run.side_effect = _make_run_side_effect(
-                branch="main", verify_ok=True, commit_count="1"
+                branch="main", verify_ok=True, commit_count="1",
             )
 
             cmd_update(mock_args)
@@ -372,7 +372,7 @@ class TestCmdUpdateMigrationPrompt:
             assert "configure them now" not in out.lower()
 
     def test_new_options_are_listed_by_name_before_prompt(
-        self, mock_args, capsys
+        self, mock_args, capsys,
     ):
         """New env/config keys are printed by name so the user can decide."""
         env_items = [
@@ -382,13 +382,13 @@ class TestCmdUpdateMigrationPrompt:
             {"key": "display.new_widget", "description": "New config option: display.new_widget"},
         ]
         with patch("shutil.which", return_value=None), patch(
-            "subprocess.run"
+            "subprocess.run",
         ) as mock_run, patch("builtins.input", return_value="n"), patch(
-            "hermes_cli.config.get_missing_env_vars", return_value=env_items
+            "hermes_cli.config.get_missing_env_vars", return_value=env_items,
         ), patch(
-            "hermes_cli.config.get_missing_config_fields", return_value=cfg_items
+            "hermes_cli.config.get_missing_config_fields", return_value=cfg_items,
         ), patch(
-            "hermes_cli.config.check_config_version", return_value=(1, 24)
+            "hermes_cli.config.check_config_version", return_value=(1, 24),
         ), patch(
             "hermes_cli.config.migrate_config",
             return_value={"env_added": [], "config_added": [], "warnings": []},
@@ -396,7 +396,7 @@ class TestCmdUpdateMigrationPrompt:
             mock_sys.stdin.isatty.return_value = True
             mock_sys.stdout.isatty.return_value = True
             mock_run.side_effect = _make_run_side_effect(
-                branch="main", verify_ok=True, commit_count="1"
+                branch="main", verify_ok=True, commit_count="1",
             )
 
             cmd_update(mock_args)
@@ -418,12 +418,12 @@ class TestCmdUpdateProfileSkillSync:
     @patch("shutil.which", return_value=None)
     @patch("subprocess.run")
     def test_active_profile_included_in_skill_sync(
-        self, mock_run, _mock_which, mock_args, capsys
+        self, mock_run, _mock_which, mock_args, capsys,
     ):
         from pathlib import Path
 
         mock_run.side_effect = _make_run_side_effect(
-            branch="main", verify_ok=True, commit_count="1"
+            branch="main", verify_ok=True, commit_count="1",
         )
 
         default_p = SimpleNamespace(name="default", path=Path("/fake/.hermes"))
@@ -456,12 +456,12 @@ class TestCmdUpdateProfileSkillSync:
     @patch("shutil.which", return_value=None)
     @patch("subprocess.run")
     def test_single_profile_default_is_synced(
-        self, mock_run, _mock_which, mock_args, capsys
+        self, mock_run, _mock_which, mock_args, capsys,
     ):
         from pathlib import Path
 
         mock_run.side_effect = _make_run_side_effect(
-            branch="main", verify_ok=True, commit_count="1"
+            branch="main", verify_ok=True, commit_count="1",
         )
 
         default_p = SimpleNamespace(name="default", path=Path("/fake/.hermes"))
@@ -530,7 +530,7 @@ class TestCmdUpdateBranchFlag:
     def test_branch_flag_pulls_against_named_branch(self, mock_run, _mock_which, capsys):
         """--branch bb/gui makes rev-list and pull target origin/bb/gui."""
         mock_run.side_effect = self._branch_side_effect(
-            current_branch="bb/gui", target_branch="bb/gui", commit_count="3"
+            current_branch="bb/gui", target_branch="bb/gui", commit_count="3",
         )
         args = SimpleNamespace(branch="bb/gui")
 
@@ -552,7 +552,7 @@ class TestCmdUpdateBranchFlag:
     def test_branch_flag_defaults_to_main_when_none(self, mock_run, _mock_which, capsys):
         """No --branch (or --branch=None) preserves the historical 'main' default."""
         mock_run.side_effect = self._branch_side_effect(
-            current_branch="main", target_branch="main", commit_count="0"
+            current_branch="main", target_branch="main", commit_count="0",
         )
         args = SimpleNamespace(branch=None)
 
@@ -567,7 +567,7 @@ class TestCmdUpdateBranchFlag:
     def test_branch_flag_switches_from_different_branch(self, mock_run, _mock_which, capsys):
         """When HEAD is on main and --branch=bb/gui, switch to bb/gui first."""
         mock_run.side_effect = self._branch_side_effect(
-            current_branch="main", target_branch="bb/gui", commit_count="2"
+            current_branch="main", target_branch="bb/gui", commit_count="2",
         )
         args = SimpleNamespace(branch="bb/gui")
 
@@ -681,11 +681,11 @@ class TestCmdUpdateCheckBranchFlag:
     @patch("hermes_cli.config.detect_install_method", return_value="git")
     @patch("subprocess.run")
     def test_check_branch_compares_against_named_origin_branch(
-        self, mock_run, _mock_method, capsys
+        self, mock_run, _mock_method, capsys,
     ):
         """--check --branch bb/gui compares against origin/bb/gui, never origin/main."""
         mock_run.side_effect = self._check_side_effect(
-            target_branch="bb/gui", verify_ok=True, commit_count="2"
+            target_branch="bb/gui", verify_ok=True, commit_count="2",
         )
         args = SimpleNamespace(check=True, branch="bb/gui")
 
@@ -704,7 +704,7 @@ class TestCmdUpdateCheckBranchFlag:
     @patch("hermes_cli.config.detect_install_method", return_value="git")
     @patch("subprocess.run")
     def test_check_branch_missing_on_origin_exits_cleanly(
-        self, mock_run, _mock_method, capsys
+        self, mock_run, _mock_method, capsys,
     ):
         """If origin/<branch> doesn't exist, surface a friendly error and exit 1.
 
@@ -712,7 +712,7 @@ class TestCmdUpdateCheckBranchFlag:
         and dumped a Python traceback to stdout.
         """
         mock_run.side_effect = self._check_side_effect(
-            target_branch="ghost", verify_ok=False
+            target_branch="ghost", verify_ok=False,
         )
         args = SimpleNamespace(check=True, branch="ghost")
 
@@ -735,11 +735,11 @@ class TestCmdUpdateCheckBranchFlag:
     @patch("hermes_cli.config.detect_install_method", return_value="git")
     @patch("subprocess.run")
     def test_check_default_main_still_prefers_upstream(
-        self, mock_run, _mock_method, capsys
+        self, mock_run, _mock_method, capsys,
     ):
         """No --branch (or --branch=None) preserves the upstream-then-origin probe."""
         mock_run.side_effect = self._check_side_effect(
-            target_branch="main", verify_ok=True, commit_count="0"
+            target_branch="main", verify_ok=True, commit_count="0",
         )
         args = SimpleNamespace(check=True, branch=None)
 
@@ -756,7 +756,7 @@ class TestCmdUpdateCheckBranchFlag:
     @patch("hermes_cli.banner.check_via_pypi", return_value=0)
     @patch("subprocess.run")
     def test_check_branch_warns_on_pypi_install(
-        self, mock_run, _mock_pypi, _mock_method, capsys
+        self, mock_run, _mock_pypi, _mock_method, capsys,
     ):
         """PyPI install + --branch=<non-main> surfaces a warning instead of silent drop."""
         args = SimpleNamespace(check=True, branch="bb/gui")
@@ -819,7 +819,7 @@ all = ["x[mcp]"]
 termux-all = ["x[termux]", "x[mcp]"]
 mcp = ["mcp>=1"]
 termux = ["rich>=14"]
-""".strip()
+""".strip(),
     )
     monkeypatch.setattr(hm, "PROJECT_ROOT", tmp_path)
 

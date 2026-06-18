@@ -139,19 +139,19 @@ SEND_MESSAGE_SCHEMA = {
             "action": {
                 "type": "string",
                 "enum": ["send", "list"],
-                "description": "Action to perform. 'send' (default) sends a message. 'list' returns all available channels/contacts across connected platforms."
+                "description": "Action to perform. 'send' (default) sends a message. 'list' returns all available channels/contacts across connected platforms.",
             },
             "target": {
                 "type": "string",
-                "description": "Delivery target. Format: 'platform' (uses home channel), 'platform:#channel-name', 'platform:chat_id', or 'platform:chat_id:thread_id' for Telegram topics and Discord threads. Examples: 'telegram', 'telegram:-1001234567890:17585', 'discord:999888777:555444333', 'discord:#bot-home', 'slack:#engineering', 'signal:+155****4567', 'matrix:!roomid:server.org', 'matrix:@user:server.org', 'ntfy:alerts-channel' (explicit ntfy topic), 'yuanbao:direct:<account_id>' (DM), 'yuanbao:group:<group_code>' (group chat)"
+                "description": "Delivery target. Format: 'platform' (uses home channel), 'platform:#channel-name', 'platform:chat_id', or 'platform:chat_id:thread_id' for Telegram topics and Discord threads. Examples: 'telegram', 'telegram:-1001234567890:17585', 'discord:999888777:555444333', 'discord:#bot-home', 'slack:#engineering', 'signal:+155****4567', 'matrix:!roomid:server.org', 'matrix:@user:server.org', 'ntfy:alerts-channel' (explicit ntfy topic), 'yuanbao:direct:<account_id>' (DM), 'yuanbao:group:<group_code>' (group chat)",
             },
             "message": {
                 "type": "string",
-                "description": "The message text to send. To send an image or file, include MEDIA:<local_path> (e.g. 'MEDIA:/tmp/report.pdf') in the message — the platform will deliver it as a native media attachment."
-            }
+                "description": "The message text to send. To send an image or file, include MEDIA:<local_path> (e.g. 'MEDIA:/tmp/report.pdf') in the message — the platform will deliver it as a native media attachment.",
+            },
         },
-        "required": []
-    }
+        "required": [],
+    },
 }
 
 
@@ -202,12 +202,12 @@ def _handle_send(args):
             else:
                 return json.dumps({
                     "error": f"Could not resolve '{target_ref}' on {platform_name}. "
-                    f"Use send_message(action='list') to see available targets."
+                    f"Use send_message(action='list') to see available targets.",
                 })
         except Exception:
             return json.dumps({
                 "error": f"Could not resolve '{target_ref}' on {platform_name}. "
-                f"Try using a numeric channel ID instead."
+                f"Try using a numeric channel ID instead.",
             })
 
     from tools.interrupt import is_interrupted
@@ -275,12 +275,12 @@ def _handle_send(args):
             used_home_channel = True
         else:
             home_env = _HOME_CHANNEL_ENV_OVERRIDES.get(
-                platform_name, f"{platform_name.upper()}_HOME_CHANNEL"
+                platform_name, f"{platform_name.upper()}_HOME_CHANNEL",
             )
             return json.dumps({
                 "error": f"No home channel set for {platform_name} to determine where to send the message. "
                 f"Either specify a channel directly with '{platform_name}:CHANNEL_NAME', "
-                f"or set a home channel via: hermes config set {home_env} <channel_id>"
+                f"or set a home channel via: hermes config set {home_env} <channel_id>",
             })
 
     duplicate_skip = _maybe_skip_cron_duplicate_send(platform_name, chat_id, thread_id)
@@ -320,7 +320,7 @@ def _handle_send(args):
                 thread_id=thread_id,
                 media_files=media_files,
                 force_document=force_document_attachments,
-            )
+            ),
         )
         if used_home_channel and isinstance(result, dict) and result.get("success"):
             result["note"] = f"Sent to {platform_name} home channel (chat_id: {chat_id})"
@@ -567,7 +567,7 @@ async def _send_via_adapter(
                 f"Plugin standalone send for '{platform_name}' returned an "
                 f"invalid result: expected a dict with 'success' or 'error' "
                 f"keys, got {type(result).__name__}"
-            )
+            ),
         }
 
     return {
@@ -576,7 +576,7 @@ async def _send_via_adapter(
             f"running with this platform connected? For out-of-process delivery "
             f"(e.g. cron in a separate process), the platform plugin must "
             f"register a standalone_sender_fn on its PlatformEntry."
-        )
+        ),
     }
 
 
@@ -769,7 +769,7 @@ async def _send_to_platform(platform, pconfig, chat_id, message, thread_id=None,
             "error": (
                 f"send_message MEDIA delivery is currently only supported for telegram, discord, matrix, weixin, signal, yuanbao and feishu; "
                 f"target {platform.value} had only media attachments"
-            )
+            ),
         }
     warning = None
     if media_files:
@@ -906,7 +906,7 @@ async def _send_telegram(token, chat_id, message, media_files=None, thread_id=No
             try:
                 from gateway.platforms.telegram import TelegramAdapter
                 effective_thread_id = TelegramAdapter._message_thread_id_for_send(
-                    str(thread_id)
+                    str(thread_id),
                 )
             except Exception:
                 # Fallback: explicit mapping in case the adapter import
@@ -931,7 +931,7 @@ async def _send_telegram(token, chat_id, message, media_files=None, thread_id=No
                 last_msg = await _send_telegram_message_with_retry(
                     bot,
                     chat_id=int_chat_id, text=formatted,
-                    parse_mode=send_parse_mode, **text_kwargs
+                    parse_mode=send_parse_mode, **text_kwargs,
                 )
             except Exception as md_error:
                 # Thread not found — retry without message_thread_id so the
@@ -946,7 +946,7 @@ async def _send_telegram(token, chat_id, message, media_files=None, thread_id=No
                     last_msg = await _send_telegram_message_with_retry(
                         bot,
                         chat_id=int_chat_id, text=formatted,
-                        parse_mode=send_parse_mode, **text_kwargs
+                        parse_mode=send_parse_mode, **text_kwargs,
                     )
                 elif "parse" in str(md_error).lower() or "markdown" in str(md_error).lower() or "html" in str(md_error).lower():
                     logger.warning(
@@ -965,7 +965,7 @@ async def _send_telegram(token, chat_id, message, media_files=None, thread_id=No
                     last_msg = await _send_telegram_message_with_retry(
                         bot,
                         chat_id=int_chat_id, text=plain,
-                        parse_mode=None, **text_kwargs
+                        parse_mode=None, **text_kwargs,
                     )
                 else:
                     raise
@@ -984,23 +984,23 @@ async def _send_telegram(token, chat_id, message, media_files=None, thread_id=No
                     try:
                         if ext in _IMAGE_EXTS and not force_document:
                             last_msg = await bot.send_photo(
-                                chat_id=int_chat_id, photo=f, **media_kwargs
+                                chat_id=int_chat_id, photo=f, **media_kwargs,
                             )
                         elif ext in _VIDEO_EXTS:
                             last_msg = await bot.send_video(
-                                chat_id=int_chat_id, video=f, **media_kwargs
+                                chat_id=int_chat_id, video=f, **media_kwargs,
                             )
                         elif ext in _VOICE_EXTS and is_voice:
                             last_msg = await bot.send_voice(
-                                chat_id=int_chat_id, voice=f, **media_kwargs
+                                chat_id=int_chat_id, voice=f, **media_kwargs,
                             )
                         elif ext in _TELEGRAM_SEND_AUDIO_EXTS:
                             last_msg = await bot.send_audio(
-                                chat_id=int_chat_id, audio=f, **media_kwargs
+                                chat_id=int_chat_id, audio=f, **media_kwargs,
                             )
                         else:
                             last_msg = await bot.send_document(
-                                chat_id=int_chat_id, document=f, **media_kwargs
+                                chat_id=int_chat_id, document=f, **media_kwargs,
                             )
                     except Exception as media_err:
                         if _is_telegram_thread_not_found(media_err) and media_kwargs.get("message_thread_id"):
@@ -1015,23 +1015,23 @@ async def _send_telegram(token, chat_id, message, media_files=None, thread_id=No
                             media_kwargs.pop("message_thread_id", None)
                             if ext in _IMAGE_EXTS and not force_document:
                                 last_msg = await bot.send_photo(
-                                    chat_id=int_chat_id, photo=f, **media_kwargs
+                                    chat_id=int_chat_id, photo=f, **media_kwargs,
                                 )
                             elif ext in _VIDEO_EXTS:
                                 last_msg = await bot.send_video(
-                                    chat_id=int_chat_id, video=f, **media_kwargs
+                                    chat_id=int_chat_id, video=f, **media_kwargs,
                                 )
                             elif ext in _VOICE_EXTS and is_voice:
                                 last_msg = await bot.send_voice(
-                                    chat_id=int_chat_id, voice=f, **media_kwargs
+                                    chat_id=int_chat_id, voice=f, **media_kwargs,
                                 )
                             elif ext in _TELEGRAM_SEND_AUDIO_EXTS:
                                 last_msg = await bot.send_audio(
-                                    chat_id=int_chat_id, audio=f, **media_kwargs
+                                    chat_id=int_chat_id, audio=f, **media_kwargs,
                                 )
                             else:
                                 last_msg = await bot.send_document(
-                                    chat_id=int_chat_id, document=f, **media_kwargs
+                                    chat_id=int_chat_id, document=f, **media_kwargs,
                                 )
                         else:
                             raise
@@ -1219,7 +1219,7 @@ async def _send_signal(extra, chat_id, message, media_files=None):
                 if estimated >= SIGNAL_BATCH_PACING_NOTICE_THRESHOLD:
                     await _send_inline_notice(
                         f"(More images coming — pausing ~{_format_wait(estimated)} "
-                        f"for Signal rate limit, batch {idx + 1}/{len(att_batches)}.)"
+                        f"for Signal rate limit, batch {idx + 1}/{len(att_batches)}.)",
                     )
 
             batch_message = message if idx == 0 else ""
@@ -1264,12 +1264,12 @@ async def _send_signal(extra, chat_id, message, media_files=None):
                         failed_batches.append(idx + 1)
                         logger.error(
                             "Signal: send error on batch %d/%d after %d attempts: %s",
-                            idx + 1, len(att_batches), attempt, str(e)
+                            idx + 1, len(att_batches), attempt, str(e),
                         )
                         break
                     logger.warning(
                         "Signal: transient error on batch %d/%d (attempt %d/%d): %s; will retry",
-                        idx + 1, len(att_batches), attempt, SIGNAL_RATE_LIMIT_MAX_ATTEMPTS, str(e)
+                        idx + 1, len(att_batches), attempt, SIGNAL_RATE_LIMIT_MAX_ATTEMPTS, str(e),
                     )
 
         warnings = []
@@ -1278,13 +1278,13 @@ async def _send_signal(extra, chat_id, message, media_files=None):
         if failed_batches:
             warnings.append(
                 f"Signal rate-limited {len(failed_batches)} batch(es) "
-                f"(#{', #'.join(str(b) for b in failed_batches)})"
+                f"(#{', #'.join(str(b) for b in failed_batches)})",
             )
 
         if failed_batches and len(failed_batches) == len(att_batches):
             return _error(
                 f"Signal: every batch ({len(att_batches)}) hit rate limit; "
-                f"no attachments delivered"
+                f"no attachments delivered",
             )
 
         result = {"success": True, "platform": "signal", "chat_id": chat_id}
@@ -1769,7 +1769,7 @@ async def _send_yuanbao(chat_id, message, media_files=None):
     if adapter is None:
         return _error(
             "Yuanbao adapter is not running. "
-            "Start the gateway with yuanbao platform enabled first."
+            "Start the gateway with yuanbao platform enabled first.",
         )
 
     try:

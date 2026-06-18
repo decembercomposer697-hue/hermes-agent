@@ -48,7 +48,7 @@ def _build_messages_with_multimodal_tool_result():
 class TestMultimodalToolResultConversion:
     def test_list_content_becomes_output_array(self):
         items = _chat_messages_to_responses_input(
-            _build_messages_with_multimodal_tool_result()
+            _build_messages_with_multimodal_tool_result(),
         )
         # Find the function_call_output item
         outputs = [it for it in items if it.get("type") == "function_call_output"]
@@ -64,7 +64,7 @@ class TestMultimodalToolResultConversion:
 
     def test_input_image_preserves_data_url(self):
         items = _chat_messages_to_responses_input(
-            _build_messages_with_multimodal_tool_result()
+            _build_messages_with_multimodal_tool_result(),
         )
         out = next(it for it in items if it.get("type") == "function_call_output")
         image_parts = [p for p in out["output"] if p.get("type") == "input_image"]

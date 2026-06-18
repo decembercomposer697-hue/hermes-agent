@@ -124,7 +124,7 @@ class TestConnectBindGuard:
     async def test_allows_wildcard_with_key(self):
         """Non-loopback with a key should pass the guard."""
         adapter = APIServerAdapter(
-            PlatformConfig(enabled=True, extra={"host": "0.0.0.0", "key": "sk-test"})
+            PlatformConfig(enabled=True, extra={"host": "0.0.0.0", "key": "sk-test"}),
         )
         # The guard checks: is_network_accessible(host) AND NOT api_key
         # With a key set, the guard should not block.

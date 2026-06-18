@@ -675,7 +675,7 @@ class GatewayStreamConsumer:
                     _best_effort_ok = bool(
                         await self._send_or_edit(
                             self._accumulated, finalize=True, is_turn_final=False,
-                        )
+                        ),
                     )
                 except Exception:
                     pass
@@ -858,7 +858,7 @@ class GatewayStreamConsumer:
                     break
                 if attempt == 0 and self._is_flood_error(result):
                     logger.debug(
-                        "Flood control on fallback send, retrying in 3s"
+                        "Flood control on fallback send, retrying in 3s",
                     )
                     await asyncio.sleep(3.0)
                 else:
@@ -1322,14 +1322,14 @@ class GatewayStreamConsumer:
                             self._message_id = str(
                                 raw_response.get("last_message_id")
                                 or result.message_id
-                                or self._message_id
+                                or self._message_id,
                             )
                             delivered_prefix = raw_response.get("delivered_prefix")
                             if isinstance(delivered_prefix, str) and delivered_prefix:
                                 self._last_sent_text = delivered_prefix
                                 self._fallback_prefix = delivered_prefix
                                 self._fallback_preserve_partial_messages = text.startswith(
-                                    delivered_prefix
+                                    delivered_prefix,
                                 )
                             else:
                                 self._fallback_prefix = self._visible_prefix()

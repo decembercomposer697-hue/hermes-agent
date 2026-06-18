@@ -323,7 +323,7 @@ _IDENTITY_MAPPING_KEYS = (
 
 
 def _resolve_effective_identity_mapping(
-    cfg: dict, hermes_host: dict
+    cfg: dict, hermes_host: dict,
 ) -> tuple[bool, dict, str, bool, bool]:
     """Resolve the effective identity-mapping state for the active host.
 
@@ -485,11 +485,11 @@ def cmd_setup(args) -> None:
         )
         print(
             "\n  Local Honcho auth (JWT signed with the server's "
-            "AUTH_JWT_SECRET)."
+            "AUTH_JWT_SECRET).",
         )
         print(
             "  Leave blank if your server runs with AUTH_USE_AUTH=false. "
-            f"Current: {masked}"
+            f"Current: {masked}",
         )
         new_local_key = _prompt(
             "Local JWT / bearer token (blank to skip / keep current)",
@@ -505,11 +505,11 @@ def cmd_setup(args) -> None:
             if top_key:
                 print(
                     "\n  Top-level API key present in config (kept for "
-                    "cloud/hybrid use)."
+                    "cloud/hybrid use).",
                 )
                 print(
                     "  Local connections will skip auth automatically "
-                    "until a local JWT is set above."
+                    "until a local JWT is set above.",
                 )
             else:
                 print("\n  No local JWT set. Local no-auth ready.")
@@ -588,7 +588,7 @@ def cmd_setup(args) -> None:
         print(
             f"\n  ⚠ Switching from single to multi will orphan memory accumulated\n"
             f"    under peer '{peer_target}'.  Existing runtime users (Telegram,\n"
-            f"    Discord, etc.) will resolve to fresh, empty peers."
+            f"    Discord, etc.) will resolve to fresh, empty peers.",
         )
         print("    To keep your own continuity, choose 'hybrid' and alias your\n"
               "    runtime IDs back to peerName.")

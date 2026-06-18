@@ -147,7 +147,7 @@ class TestHandleVideoAnalyze:
         with patch("tools.vision_tools.video_analyze_tool", new_callable=AsyncMock) as mock_tool:
             mock_tool.return_value = json.dumps({"success": True, "analysis": "ok"})
             asyncio.get_event_loop().run_until_complete(
-                _handle_video_analyze({"video_url": "/tmp/test.mp4", "question": "test"})
+                _handle_video_analyze({"video_url": "/tmp/test.mp4", "question": "test"}),
             )
             args = mock_tool.call_args[0]
             assert args[2] == "google/gemini-2.5-flash"
@@ -159,7 +159,7 @@ class TestHandleVideoAnalyze:
         with patch("tools.vision_tools.video_analyze_tool", new_callable=AsyncMock) as mock_tool:
             mock_tool.return_value = json.dumps({"success": True, "analysis": "ok"})
             asyncio.get_event_loop().run_until_complete(
-                _handle_video_analyze({"video_url": "/tmp/test.mp4", "question": "test"})
+                _handle_video_analyze({"video_url": "/tmp/test.mp4", "question": "test"}),
             )
             args = mock_tool.call_args[0]
             assert args[2] == "google/gemini-flash"

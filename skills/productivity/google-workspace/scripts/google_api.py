@@ -192,7 +192,7 @@ def get_credentials():
             json.dumps(
                 _normalize_authorized_user_payload(json.loads(creds.to_json())),
                 indent=2,
-            )
+            ),
         )
     if not creds.valid:
         print("Token is invalid. Re-run setup.", file=sys.stderr)
@@ -240,14 +240,14 @@ def gmail_search(args):
                     "date": headers.get("date", ""),
                     "snippet": msg.get("snippet", ""),
                     "labels": msg.get("labelIds", []),
-                }
+                },
             )
         print(json.dumps(output, indent=2, ensure_ascii=False))
         return
 
     service = build_service("gmail", "v1")
     results = service.users().messages().list(
-        userId="me", q=args.query, maxResults=args.max
+        userId="me", q=args.query, maxResults=args.max,
     ).execute()
     messages = results.get("messages", [])
     if not messages:
@@ -297,7 +297,7 @@ def gmail_get(args):
 
     service = build_service("gmail", "v1")
     msg = service.users().messages().get(
-        userId="me", id=args.message_id, format="full"
+        userId="me", id=args.message_id, format="full",
     ).execute()
 
     headers = _headers_dict(msg)
@@ -1032,7 +1032,7 @@ def _docs_insert_text(doc_id: str, text: str, index: int) -> None:
         "insertText": {
             "location": {"index": index},
             "text": text,
-        }
+        },
     }]
     if _gws_binary():
         _run_gws(

@@ -540,7 +540,7 @@ class TestSetupWizardDeploymentShape:
         assert "pinUserPeer" not in host
 
     def test_host_pin_user_peer_false_overrides_root_pin_peer_name(
-        self, monkeypatch, tmp_path
+        self, monkeypatch, tmp_path,
     ):
         """Host ``pinUserPeer: false`` outranks host ``pinPeerName`` in the
         resolver.  Detection must agree, otherwise the wizard would offer

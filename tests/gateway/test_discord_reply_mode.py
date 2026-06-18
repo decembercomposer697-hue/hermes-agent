@@ -429,7 +429,7 @@ class TestYamlConfigLoading:
     def test_extra_reply_to_mode_off(self, tmp_path, monkeypatch):
         """discord.extra.reply_to_mode is also honoured."""
         hermes_home = self._write_config(
-            tmp_path, "discord:\n  extra:\n    reply_to_mode: \"off\"\n"
+            tmp_path, "discord:\n  extra:\n    reply_to_mode: \"off\"\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
         monkeypatch.delenv("DISCORD_REPLY_TO_MODE", raising=False)

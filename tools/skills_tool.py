@@ -103,7 +103,7 @@ _PLATFORM_MAP = {
 }
 _ENV_VAR_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _REMOTE_ENV_BACKENDS = frozenset(
-    {"docker", "singularity", "modal", "ssh", "daytona"}
+    {"docker", "singularity", "modal", "ssh", "daytona"},
 )
 _secret_capture_callback = None
 
@@ -321,7 +321,7 @@ def _get_required_environment_variables(
                 "name": item.get("env_var"),
                 "prompt": item.get("prompt"),
                 "help": item.get("provider_url") or setup.get("help"),
-            }
+            },
         )
 
     if legacy_env_vars is None:
@@ -382,7 +382,7 @@ def _capture_required_environment_variables(
             )
         except Exception:
             logger.warning(
-                f"Secret capture callback failed for {entry['name']}", exc_info=True
+                f"Secret capture callback failed for {entry['name']}", exc_info=True,
             )
             callback_result = {
                 "success": False,
@@ -392,10 +392,10 @@ def _capture_required_environment_variables(
             }
 
         success = isinstance(callback_result, dict) and bool(
-            callback_result.get("success")
+            callback_result.get("success"),
         )
         skipped = isinstance(callback_result, dict) and bool(
-            callback_result.get("skipped")
+            callback_result.get("skipped"),
         )
         if success and not skipped:
             continue
@@ -422,7 +422,7 @@ def _get_terminal_backend_name() -> str:
 
 
 def _is_env_var_persisted(
-    var_name: str, env_snapshot: dict[str, str] | None = None
+    var_name: str, env_snapshot: dict[str, str] | None = None,
 ) -> bool:
     if env_snapshot is None:
         env_snapshot = load_env()
@@ -665,7 +665,7 @@ def _find_all_skills(*, skip_disabled: bool = False) -> list[dict[str, Any]]:
                 continue
             except Exception as e:
                 logger.debug(
-                    "Skipping skill at %s: failed to parse: %s", skill_md, e, exc_info=True
+                    "Skipping skill at %s: failed to parse: %s", skill_md, e, exc_info=True,
                 )
                 continue
 
@@ -727,7 +727,7 @@ def skills_list(category: str = None, task_id: str = None) -> str:
 
         # Extract unique categories
         categories = sorted(
-            {s.get("category") for s in all_skills if s.get("category")}
+            {s.get("category") for s in all_skills if s.get("category")},
         )
 
         return json.dumps(
@@ -836,7 +836,7 @@ def _serve_plugin_skill(
             )
         except Exception:
             logger.debug(
-                "Could not preprocess plugin skill %s:%s", namespace, bare, exc_info=True
+                "Could not preprocess plugin skill %s:%s", namespace, bare, exc_info=True,
             )
 
     return json.dumps(
@@ -1295,7 +1295,7 @@ def skill_view(
                         [
                             str(f.relative_to(skill_dir))
                             for f in templates_dir.rglob(ext)
-                        ]
+                        ],
                     )
 
             # assets/ — agentskills.io standard directory for supplementary files
@@ -1309,7 +1309,7 @@ def skill_view(
             if scripts_dir.exists():
                 for ext in ["*.py", "*.sh", "*.bash", "*.js", "*.ts", "*.rb"]:
                     script_files.extend(
-                        [str(f.relative_to(skill_dir)) for f in scripts_dir.glob(ext)]
+                        [str(f.relative_to(skill_dir)) for f in scripts_dir.glob(ext)],
                     )
 
         # Read tags/related_skills with backward compat:
@@ -1321,7 +1321,7 @@ def skill_view(
 
         tags = _parse_tags(hermes_meta.get("tags") or frontmatter.get("tags", ""))
         related_skills = _parse_tags(
-            hermes_meta.get("related_skills") or frontmatter.get("related_skills", "")
+            hermes_meta.get("related_skills") or frontmatter.get("related_skills", ""),
         )
 
         # Build linked files structure for clear discovery
@@ -1341,11 +1341,11 @@ def skill_view(
             # External skill — use path relative to the skill's own parent dir
             rel_path = str(skill_md.relative_to(skill_md.parent.parent)) if skill_md.parent.parent else skill_md.name
         skill_name = frontmatter.get(
-            "name", skill_md.stem if not skill_dir else skill_dir.name
+            "name", skill_md.stem if not skill_dir else skill_dir.name,
         )
         legacy_env_vars, _ = _collect_prerequisite_values(frontmatter)
         required_env_vars = _get_required_environment_variables(
-            frontmatter, legacy_env_vars
+            frontmatter, legacy_env_vars,
         )
         backend = _get_terminal_backend_name()
         env_snapshot = load_env()
@@ -1421,7 +1421,7 @@ def skill_view(
                 )
             except Exception:
                 logger.debug(
-                    "Could not preprocess skill content for %s", skill_name, exc_info=True
+                    "Could not preprocess skill content for %s", skill_name, exc_info=True,
                 )
 
         result = {
@@ -1496,7 +1496,7 @@ if __name__ == "__main__":
     result = json.loads(skills_list())
     if result["success"]:
         print(
-            f"Found {result['count']} skills in {len(result.get('categories', []))} categories"
+            f"Found {result['count']} skills in {len(result.get('categories', []))} categories",
         )
         print(f"Categories: {result.get('categories', [])}")
         print("\nFirst 10 skills:")
@@ -1542,7 +1542,7 @@ SKILLS_LIST_SCHEMA = {
             "category": {
                 "type": "string",
                 "description": "Optional category filter to narrow results",
-            }
+            },
         },
         "required": [],
     },
@@ -1572,7 +1572,7 @@ registry.register(
     toolset="skills",
     schema=SKILLS_LIST_SCHEMA,
     handler=lambda args, **kw: skills_list(
-        category=args.get("category"), task_id=kw.get("task_id")
+        category=args.get("category"), task_id=kw.get("task_id"),
     ),
     check_fn=check_skills_requirements,
     emoji="📚",
@@ -1582,7 +1582,7 @@ def _skill_view_with_bump(args, **kw):
     telemetry failure never breaks the tool call."""
     name = args.get("name", "")
     result = skill_view(
-        name, file_path=args.get("file_path"), task_id=kw.get("task_id")
+        name, file_path=args.get("file_path"), task_id=kw.get("task_id"),
     )
     try:
         parsed = json.loads(result)

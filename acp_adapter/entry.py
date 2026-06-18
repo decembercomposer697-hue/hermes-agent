@@ -79,7 +79,7 @@ def _setup_logging() -> None:
         logging.Formatter(
             "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S",
-        )
+        ),
     )
     handler.addFilter(_BenignProbeMethodFilter())
     root = logging.getLogger()
@@ -104,7 +104,7 @@ def _load_env() -> None:
             logging.getLogger(__name__).info("Loaded env from %s", env_file)
     else:
         logging.getLogger(__name__).info(
-            "No .env found at %s, using system env", hermes_home / ".env"
+            "No .env found at %s, using system env", hermes_home / ".env",
         )
 
 
@@ -173,7 +173,7 @@ def _run_setup() -> None:
     try:
         reply = input(
             "\nInstall browser tools? Downloads agent-browser (npm) and "
-            "optionally Playwright Chromium (~400 MB). [y/N] "
+            "optionally Playwright Chromium (~400 MB). [y/N] ",
         ).strip().lower()
     except (EOFError, KeyboardInterrupt):
         return

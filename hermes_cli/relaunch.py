@@ -180,7 +180,7 @@ def relaunch(
     new hermes started" — just with two PIDs in play instead of one.
     """
     new_argv = build_relaunch_argv(
-        extra_args, preserve_inherited=preserve_inherited, original_argv=original_argv
+        extra_args, preserve_inherited=preserve_inherited, original_argv=original_argv,
     )
     if sys.platform == "win32":
         # Windows: subprocess + exit, because execvp can't swap to .cmd/.exe shims.

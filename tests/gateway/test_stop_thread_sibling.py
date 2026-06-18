@@ -78,12 +78,12 @@ def test_sibling_returns_empty_for_non_thread_source():
     # Non-thread group/channel must NOT trigger the cross-user fallback.
     runner = object.__new__(GatewayRunner)
     nonthread = SessionSource(
-        platform=Platform.DISCORD, chat_type="group", chat_id="chan1", user_id="userA"
+        platform=Platform.DISCORD, chat_type="group", chat_id="chan1", user_id="userA",
     )
     grp_b = build_session_key(
         SessionSource(
-            platform=Platform.DISCORD, chat_type="group", chat_id="chan1", user_id="userB"
-        )
+            platform=Platform.DISCORD, chat_type="group", chat_id="chan1", user_id="userB",
+        ),
     )
     runner._running_agents = {grp_b: _FakeAgent()}
     assert runner._sibling_thread_run_keys(nonthread, "agent:main:discord:group:chan1:userA") == []
@@ -124,7 +124,7 @@ async def test_stop_interrupts_sibling_thread_run_when_authorized(monkeypatch):
     runner._is_user_authorized = lambda source: True
 
     event = MessageEvent(
-        text="/stop", message_type=MessageType.TEXT, source=_thread_source("userA")
+        text="/stop", message_type=MessageType.TEXT, source=_thread_source("userA"),
     )
     result = await runner._handle_stop_command(event)
 
@@ -150,7 +150,7 @@ async def test_stop_does_not_interrupt_sibling_when_unauthorized(monkeypatch):
     runner._is_user_authorized = lambda source: False
 
     event = MessageEvent(
-        text="/stop", message_type=MessageType.TEXT, source=_thread_source("userA")
+        text="/stop", message_type=MessageType.TEXT, source=_thread_source("userA"),
     )
     result = await runner._handle_stop_command(event)
 

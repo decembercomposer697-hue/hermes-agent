@@ -497,7 +497,7 @@ class TestCaptureResponse:
         cu_tool.reset_backend_for_tests()
         with patch.object(cu_tool, "_get_backend", return_value=fake_backend):
             out = cu_tool.handle_computer_use(
-                {"action": "capture", "mode": "ax", "max_elements": 250}
+                {"action": "capture", "mode": "ax", "max_elements": 250},
             )
 
         parsed = json.loads(out)
@@ -532,7 +532,7 @@ class TestCaptureResponse:
         for bad in ("not-a-number", 0, -10):
             with patch.object(cu_tool, "_get_backend", return_value=fake_backend):
                 out = cu_tool.handle_computer_use(
-                    {"action": "capture", "mode": "ax", "max_elements": bad}
+                    {"action": "capture", "mode": "ax", "max_elements": bad},
                 )
             parsed = json.loads(out)
             assert len(parsed["elements"]) == cu_tool._DEFAULT_MAX_ELEMENTS, (
@@ -550,7 +550,7 @@ class TestCaptureResponse:
         cu_tool.reset_backend_for_tests()
         with patch.object(cu_tool, "_get_backend", return_value=fake_backend):
             out = cu_tool.handle_computer_use(
-                {"action": "capture", "mode": "ax", "max_elements": 10_000}
+                {"action": "capture", "mode": "ax", "max_elements": 10_000},
             )
         parsed = json.loads(out)
         assert len(parsed["elements"]) == cu_tool._MAX_ALLOWED_MAX_ELEMENTS
@@ -569,7 +569,7 @@ class TestCaptureResponse:
         cu_tool.reset_backend_for_tests()
         with patch.object(cu_tool, "_get_backend", return_value=fake_backend):
             out = cu_tool.handle_computer_use(
-                {"action": "capture", "mode": "ax", "max_elements": 5}
+                {"action": "capture", "mode": "ax", "max_elements": 5},
             )
         parsed = json.loads(out)
         returned_indices = {e["index"] for e in parsed["elements"]}
@@ -645,7 +645,7 @@ class TestCuaCaptureImageDimensions:
         from tools.computer_use.cua_backend import _image_dimensions_from_bytes
 
         raw_jpeg = (
-            b"\xff\xd8" +
+            b"\xff\xd8"
             b"\xff\xe0\x00\x10" + (b"0" * 14)
             + b"\xff\xc0\x00\x11\x08"
             + b"\x01\x2c"  # height: 300
@@ -802,7 +802,7 @@ class TestCompressorScreenshotPruning:
                 {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{fake_png}"}},
             ]},
             {"role": "assistant", "content": "", "tool_calls": [
-                {"id": "c2", "function": {"name": "computer_use", "arguments": "{}"}}
+                {"id": "c2", "function": {"name": "computer_use", "arguments": "{}"}},
             ]},
             {"role": "tool", "tool_call_id": "c2", "content": "text-only short"},
             {"role": "assistant", "content": "done"},
@@ -826,7 +826,7 @@ class TestCompressorScreenshotPruning:
         messages = [
             {"role": "user", "content": "go"},
             {"role": "assistant", "content": "", "tool_calls": [
-                {"id": "c1", "function": {"name": "computer_use", "arguments": "{}"}}
+                {"id": "c1", "function": {"name": "computer_use", "arguments": "{}"}},
             ]},
             {"role": "tool", "tool_call_id": "c1", "content": {
                 "_multimodal": True,
@@ -901,7 +901,7 @@ class TestRunAgentMultimodalHelpers:
     def test_is_multimodal_tool_result(self):
         from run_agent import _is_multimodal_tool_result
         assert _is_multimodal_tool_result({
-            "_multimodal": True, "content": [{"type": "text", "text": "x"}]
+            "_multimodal": True, "content": [{"type": "text", "text": "x"}],
         })
         assert not _is_multimodal_tool_result("plain string")
         assert not _is_multimodal_tool_result({"foo": "bar"})

@@ -168,12 +168,12 @@ def _resolve_system_dns() -> set[str]:
 
 
 async def _query_doh_provider(
-    client: httpx.AsyncClient, provider: dict
+    client: httpx.AsyncClient, provider: dict,
 ) -> list[str]:
     """Query one DoH provider and return A-record IPs."""
     try:
         resp = await client.get(
-            provider["url"], params=provider["params"], headers=provider["headers"]
+            provider["url"], params=provider["params"], headers=provider["headers"],
         )
         resp.raise_for_status()
         data = resp.json()

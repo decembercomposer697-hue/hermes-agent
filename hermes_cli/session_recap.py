@@ -160,7 +160,7 @@ def _latest_assistant_text(
 
 
 def _recent_window(
-    messages: Sequence[Mapping[str, Any]], window: int = _RECENT_TURN_WINDOW
+    messages: Sequence[Mapping[str, Any]], window: int = _RECENT_TURN_WINDOW,
 ) -> list[Mapping[str, Any]]:
     """Return the tail slice of ``messages`` covering at most ``window``
     user+assistant turns (tool messages ride along inside the window).

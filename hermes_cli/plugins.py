@@ -116,7 +116,7 @@ def _install_plugin_debug_handler(force: bool = False) -> None:
     logger.propagate = True
     _DEBUG_HANDLER_INSTALLED = True
     logger.debug(
-        "HERMES_PLUGINS_DEBUG=1 — verbose plugin discovery logging enabled"
+        "HERMES_PLUGINS_DEBUG=1 — verbose plugin discovery logging enabled",
     )
 
 
@@ -881,12 +881,12 @@ class PluginContext:
         if not key or not isinstance(key, str):
             raise ValueError(
                 f"Plugin '{self.manifest.name}' tried to register auxiliary task "
-                f"with invalid key {key!r}"
+                f"with invalid key {key!r}",
             )
         if not all(c.isalnum() or c == "_" for c in key):
             raise ValueError(
                 f"Plugin '{self.manifest.name}' auxiliary task key {key!r} "
-                f"must contain only alphanumeric characters and underscores"
+                f"must contain only alphanumeric characters and underscores",
             )
 
         # Lazy import to avoid circular: hermes_cli.main imports plugins indirectly
@@ -897,7 +897,7 @@ class PluginContext:
             raise ValueError(
                 f"Plugin '{self.manifest.name}' cannot register auxiliary task "
                 f"{key!r} — that key is reserved for a built-in task. "
-                f"Pick a plugin-namespaced key (e.g. '{self.manifest.name}_{key}')."
+                f"Pick a plugin-namespaced key (e.g. '{self.manifest.name}_{key}').",
             )
 
         # Reject duplicate registrations across plugins
@@ -906,7 +906,7 @@ class PluginContext:
             raise ValueError(
                 f"Plugin '{self.manifest.name}' cannot register auxiliary task "
                 f"{key!r} — already registered by plugin "
-                f"'{existing.get('plugin')}'"
+                f"'{existing.get('plugin')}'",
             )
 
         # Normalize defaults — plugin owns the schema, but we ensure routing
@@ -1001,11 +1001,11 @@ class PluginContext:
             raise ValueError(
                 f"Skill name '{name}' must not contain ':' "
                 f"(the namespace is derived from the plugin name "
-                f"'{self.manifest.name}' automatically)."
+                f"'{self.manifest.name}' automatically).",
             )
         if not name or not _NAMESPACE_RE.match(name):
             raise ValueError(
-                f"Invalid skill name '{name}'. Must match [a-zA-Z0-9_-]+."
+                f"Invalid skill name '{name}'. Must match [a-zA-Z0-9_-]+.",
             )
         if not path.exists():
             raise FileNotFoundError(f"SKILL.md not found at {path}")
@@ -1097,7 +1097,7 @@ class PluginManager:
         logger.debug("  bundled (top-level): %d manifest(s)", len(bundled))
         manifests.extend(bundled)
         bundled_platforms = self._scan_directory(
-            repo_plugins / "platforms", source="bundled"
+            repo_plugins / "platforms", source="bundled",
         )
         logger.debug("  bundled/platforms: %d manifest(s)", len(bundled_platforms))
         manifests.extend(bundled_platforms)
@@ -1118,7 +1118,7 @@ class PluginManager:
             manifests.extend(project_manifests)
         else:
             logger.debug(
-                "Project plugins disabled (set HERMES_ENABLE_PROJECT_PLUGINS=1 to enable)"
+                "Project plugins disabled (set HERMES_ENABLE_PROJECT_PLUGINS=1 to enable)",
             )
 
         # 4. Pip / entry-point plugins
@@ -1208,7 +1208,7 @@ class PluginManager:
                 )
                 self._plugins[lookup_key] = loaded
                 logger.debug(
-                    "Skipping '%s' (not in plugins.enabled)", lookup_key
+                    "Skipping '%s' (not in plugins.enabled)", lookup_key,
                 )
                 continue
             self._load_plugin(manifest)
@@ -1246,7 +1246,7 @@ class PluginManager:
         pass it now that categories are first-class).
         """
         return self._scan_directory_level(
-            path, source, skip_names=skip_names, prefix="", depth=0
+            path, source, skip_names=skip_names, prefix="", depth=0,
         )
 
     def _scan_directory_level(
@@ -1279,7 +1279,7 @@ class PluginManager:
 
             if manifest_file.exists():
                 manifest = self._parse_manifest(
-                    manifest_file, child, source, prefix
+                    manifest_file, child, source, prefix,
                 )
                 if manifest is not None:
                     manifests.append(manifest)
@@ -1300,7 +1300,7 @@ class PluginManager:
                     skip_names=None,
                     prefix=sub_prefix,
                     depth=depth + 1,
-                )
+                ),
             )
 
         return manifests
@@ -1472,7 +1472,7 @@ class PluginManager:
                         h
                         for name, p in self._plugins.items()
                         for h in p.hooks_registered
-                    }
+                    },
                 )
                 loaded.middleware_registered = list(
                     {
@@ -1484,7 +1484,7 @@ class PluginManager:
                         kind
                         for name, p in self._plugins.items()
                         for kind in p.middleware_registered
-                    }
+                    },
                 )
                 loaded.commands_registered = [
                     c for c in self._plugin_commands
@@ -1565,7 +1565,7 @@ class PluginManager:
                 return ep.load()
 
         raise ImportError(
-            f"Entry point '{manifest.name}' not found in group '{ENTRY_POINTS_GROUP}'"
+            f"Entry point '{manifest.name}' not found in group '{ENTRY_POINTS_GROUP}'",
         )
 
     # -----------------------------------------------------------------------
@@ -1662,7 +1662,7 @@ class PluginManager:
                     "middleware": len(loaded.middleware_registered),
                     "commands": len(loaded.commands_registered),
                     "error": loaded.error,
-                }
+                },
             )
         return result
 
@@ -1871,7 +1871,7 @@ def resolve_plugin_command_result(result: Any) -> Any:
     if not done.wait(timeout=_PLUGIN_COMMAND_AWAIT_TIMEOUT_SECS):
         raise TimeoutError(
             "Plugin command async handler did not complete within "
-            f"{_PLUGIN_COMMAND_AWAIT_TIMEOUT_SECS:.0f}s"
+            f"{_PLUGIN_COMMAND_AWAIT_TIMEOUT_SECS:.0f}s",
         )
     if "exc" in failure:
         raise failure["exc"]

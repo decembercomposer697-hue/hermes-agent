@@ -93,7 +93,7 @@ class TestGetActiveProvider:
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         (tmp_path / "config.yaml").write_text(
-            yaml.safe_dump({"video_gen": {"provider": "fal"}})
+            yaml.safe_dump({"video_gen": {"provider": "fal"}}),
         )
         video_gen_registry.register_provider(_FakeProvider("xai"))
         video_gen_registry.register_provider(_FakeProvider("fal"))
@@ -107,7 +107,7 @@ class TestGetActiveProvider:
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         (tmp_path / "config.yaml").write_text(
-            yaml.safe_dump({"video_gen": {"provider": "ghost"}})
+            yaml.safe_dump({"video_gen": {"provider": "ghost"}}),
         )
         video_gen_registry.register_provider(_FakeProvider("only"))
         active = video_gen_registry.get_active_provider()

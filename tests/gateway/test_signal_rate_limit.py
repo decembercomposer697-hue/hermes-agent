@@ -31,10 +31,10 @@ def _patch_sleep_and_time(monkeypatch, capture: list):
         offset += seconds
 
     monkeypatch.setattr(
-        "gateway.platforms.signal_rate_limit.asyncio.sleep", _fake_sleep
+        "gateway.platforms.signal_rate_limit.asyncio.sleep", _fake_sleep,
     )
     monkeypatch.setattr(
-        "gateway.platforms.signal_rate_limit.time.monotonic", lambda: offset
+        "gateway.platforms.signal_rate_limit.time.monotonic", lambda: offset,
     )
 
 
@@ -64,7 +64,7 @@ class TestEstimateWait:
         s.tokens = 0.0
         frozen = s.last_refill
         monkeypatch.setattr(
-            "gateway.platforms.signal_rate_limit.time.monotonic", lambda: frozen
+            "gateway.platforms.signal_rate_limit.time.monotonic", lambda: frozen,
         )
         # 32 tokens at 0.25 tokens/sec = 128s
         assert s.estimate_wait(32) == pytest.approx(32 / s.refill_rate)

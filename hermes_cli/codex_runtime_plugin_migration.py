@@ -87,7 +87,7 @@ class MigrationReport:
             lines.append("No MCP servers found in Hermes config.")
         if self.migrated_plugins:
             lines.append(
-                f"Migrated {len(self.migrated_plugins)} native Codex plugin(s):"
+                f"Migrated {len(self.migrated_plugins)} native Codex plugin(s):",
             )
             for name in self.migrated_plugins:
                 lines.append(f"  - {name}")
@@ -96,7 +96,7 @@ class MigrationReport:
         if self.wrote_permissions_default:
             lines.append(
                 f"Wrote default_permissions = "
-                f"{self.wrote_permissions_default!r}"
+                f"{self.wrote_permissions_default!r}",
             )
         for err in self.errors:
             lines.append(f"⚠ {err}")
@@ -125,7 +125,7 @@ _KEYS_DROPPED_WITH_WARNING = {
 
 
 def _translate_one_server(
-    name: str, hermes_cfg: dict
+    name: str, hermes_cfg: dict,
 ) -> tuple[dict | None, list[str]]:
     """Translate one Hermes MCP server config to the codex inline-table dict
     representation. Returns (codex_entry, skipped_keys).
@@ -469,7 +469,7 @@ def _query_codex_plugins(
 
     try:
         with CodexAppServerClient(
-            codex_home=str(codex_home) if codex_home else None
+            codex_home=str(codex_home) if codex_home else None,
         ) as client:
             client.initialize(client_name="hermes-migration")
             resp = client.request("plugin/list", {}, timeout=timeout)
@@ -649,7 +649,7 @@ def migrate(
     hermes_servers = (hermes_config or {}).get("mcp_servers") or {}
     if not isinstance(hermes_servers, dict):
         report.errors.append(
-            "mcp_servers in Hermes config is not a dict; cannot migrate."
+            "mcp_servers in Hermes config is not a dict; cannot migrate.",
         )
         return report
 
@@ -658,7 +658,7 @@ def migrate(
         out, skipped = _translate_one_server(str(name), cfg or {})
         if out is None:
             report.errors.append(
-                f"server {name!r} skipped: {', '.join(skipped) or 'no transport configured'}"
+                f"server {name!r} skipped: {', '.join(skipped) or 'no transport configured'}",
             )
             continue
         translated[str(name)] = out
@@ -736,7 +736,7 @@ def migrate(
         # codex would refuse to load if we crash mid-write.
         import tempfile
         tmp_fd, tmp_path_str = tempfile.mkstemp(
-            prefix=".config.toml.", dir=str(codex_home)
+            prefix=".config.toml.", dir=str(codex_home),
         )
         tmp_path = Path(tmp_path_str)
         try:

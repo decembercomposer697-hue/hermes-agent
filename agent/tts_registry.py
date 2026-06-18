@@ -80,7 +80,7 @@ def register_provider(provider: TTSProvider) -> None:
     if not isinstance(provider, TTSProvider):
         raise TypeError(
             f"register_provider() expects a TTSProvider instance, "
-            f"got {type(provider).__name__}"
+            f"got {type(provider).__name__}",
         )
     name = provider.name
     if not isinstance(name, str) or not name.strip():

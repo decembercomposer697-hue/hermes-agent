@@ -444,11 +444,11 @@ def _ensure_docker_available() -> None:
         logger.error(
             "Docker backend selected but no docker executable was found in PATH "
             "or known install locations. Install Docker Desktop and ensure the "
-            "CLI is available."
+            "CLI is available.",
         )
         raise RuntimeError(
             "Docker executable not found in PATH or known install locations. "
-            "Install Docker and ensure the 'docker' command is available."
+            "Install Docker and ensure the 'docker' command is available.",
         )
 
     try:
@@ -467,7 +467,7 @@ def _ensure_docker_available() -> None:
             exc_info=True,
         )
         raise RuntimeError(
-            "Docker executable could not be executed. Check your Docker installation."
+            "Docker executable could not be executed. Check your Docker installation.",
         )
     except subprocess.TimeoutExpired:
         logger.error(
@@ -477,7 +477,7 @@ def _ensure_docker_available() -> None:
             exc_info=True,
         )
         raise RuntimeError(
-            "Docker daemon is not responding. Ensure Docker is running and try again."
+            "Docker daemon is not responding. Ensure Docker is running and try again.",
         )
     except Exception:
         logger.error(
@@ -496,7 +496,7 @@ def _ensure_docker_available() -> None:
             )
             raise RuntimeError(
                 "Docker command is available but 'docker version' failed. "
-                "Check your Docker installation."
+                "Check your Docker installation.",
             )
 
 
@@ -567,7 +567,7 @@ class DockerEnvironment(BaseEnvironment):
             else:
                 logger.warning(
                     "Docker storage driver does not support per-container disk limits "
-                    "(requires overlay2 on XFS with pquota). Container will run without disk quota."
+                    "(requires overlay2 on XFS with pquota). Container will run without disk quota.",
                 )
         if not network:
             resource_args.append("--network=none")
@@ -736,7 +736,7 @@ class DockerEnvironment(BaseEnvironment):
                 logger.warning(
                     "docker_run_as_host_user is enabled but this platform does "
                     "not expose POSIX uid/gid; container will start as its "
-                    "image default user."
+                    "image default user.",
                 )
                 # Fall back to the full cap set — without --user, an image's
                 # init may still need s6-setuidgid/gosu/su to drop privileges.

@@ -189,7 +189,7 @@ class TestHandleFunctionCall:
                 task_id="task-1",
                 tool_call_id="tool-1",
                 session_id="session-1",
-            )
+            ),
         )
 
         assert seen["execution_args"] == {"q": "test", "rewritten": True}

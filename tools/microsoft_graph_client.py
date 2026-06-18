@@ -39,7 +39,7 @@ class MicrosoftGraphAPIError(MicrosoftGraphClientError):
         self.retry_after_seconds = retry_after_seconds
         self.payload = payload
         super().__init__(
-            f"Microsoft Graph API error {status_code} for {method} {url}: {message}"
+            f"Microsoft Graph API error {status_code} for {method} {url}: {message}",
         )
 
 
@@ -133,7 +133,7 @@ class MicrosoftGraphClient:
             payload = self._decode_json(response)
             if not isinstance(payload, dict):
                 raise MicrosoftGraphClientError(
-                    f"Expected paginated Graph response dict, got {type(payload).__name__}."
+                    f"Expected paginated Graph response dict, got {type(payload).__name__}.",
                 )
             yield payload
             next_url = payload.get("@odata.nextLink")
@@ -177,7 +177,7 @@ class MicrosoftGraphClient:
 
         while attempt <= self.max_retries:
             token = await self.token_provider.get_access_token(
-                force_refresh=attempt > 0 and self._should_refresh_token(last_error)
+                force_refresh=attempt > 0 and self._should_refresh_token(last_error),
             )
             request_headers = {
                 "Authorization": f"Bearer {token}",
@@ -210,7 +210,7 @@ class MicrosoftGraphClient:
                             ):
                                 self.token_provider.clear_cache()
                                 await self._sleep(
-                                    self._retry_delay(response, attempt)
+                                    self._retry_delay(response, attempt),
                                 )
                                 attempt += 1
                                 continue
@@ -220,7 +220,7 @@ class MicrosoftGraphClient:
                                 and attempt < self.max_retries
                             ):
                                 await self._sleep(
-                                    self._retry_delay(response, attempt)
+                                    self._retry_delay(response, attempt),
                                 )
                                 attempt += 1
                                 continue
@@ -230,7 +230,7 @@ class MicrosoftGraphClient:
                         content_type = response.headers.get("content-type")
                         with tmp_target.open("wb") as handle:
                             async for chunk in response.aiter_bytes(
-                                chunk_size=chunk_size
+                                chunk_size=chunk_size,
                             ):
                                 if chunk:
                                     handle.write(chunk)
@@ -239,7 +239,7 @@ class MicrosoftGraphClient:
                 tmp_target.unlink(missing_ok=True)
                 if attempt >= self.max_retries:
                     raise MicrosoftGraphClientError(
-                        f"Microsoft Graph download failed for GET {url}: {exc}"
+                        f"Microsoft Graph download failed for GET {url}: {exc}",
                     ) from exc
                 await self._sleep(self._retry_delay(None, attempt))
                 attempt += 1
@@ -254,7 +254,7 @@ class MicrosoftGraphClient:
 
         tmp_target.unlink(missing_ok=True)
         raise MicrosoftGraphClientError(
-            f"Microsoft Graph download exhausted retries for GET {url}."
+            f"Microsoft Graph download exhausted retries for GET {url}.",
         )
 
     async def _request(
@@ -272,7 +272,7 @@ class MicrosoftGraphClient:
 
         while attempt <= self.max_retries:
             token = await self.token_provider.get_access_token(
-                force_refresh=attempt > 0 and self._should_refresh_token(last_error)
+                force_refresh=attempt > 0 and self._should_refresh_token(last_error),
             )
             request_headers = {
                 "Authorization": f"Bearer {token}",
@@ -300,7 +300,7 @@ class MicrosoftGraphClient:
                 last_error = exc
                 if attempt >= self.max_retries:
                     raise MicrosoftGraphClientError(
-                        f"Microsoft Graph request failed for {method} {url}: {exc}"
+                        f"Microsoft Graph request failed for {method} {url}: {exc}",
                     ) from exc
                 await self._sleep(self._retry_delay(None, attempt))
                 attempt += 1
@@ -326,7 +326,7 @@ class MicrosoftGraphClient:
             raise api_error
 
         raise MicrosoftGraphClientError(
-            f"Microsoft Graph request exhausted retries for {method} {url}."
+            f"Microsoft Graph request exhausted retries for {method} {url}.",
         )
 
     def _resolve_url(self, path_or_url: str) -> str:
@@ -342,7 +342,7 @@ class MicrosoftGraphClient:
         except ValueError as exc:
             raise MicrosoftGraphClientError(
                 "Microsoft Graph response was not valid JSON for "
-                f"{response.request.method} {response.request.url}"
+                f"{response.request.method} {response.request.url}",
             ) from exc
 
     @staticmethod

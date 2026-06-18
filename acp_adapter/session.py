@@ -320,9 +320,9 @@ class SessionManager:
                         "history_len": history_len,
                         "title": _build_session_title(persisted.get("title"), preview, s.cwd),
                         "updated_at": _format_updated_at(
-                            persisted.get("last_active") or persisted.get("started_at") or time.time()
+                            persisted.get("last_active") or persisted.get("started_at") or time.time(),
                         ),
-                    }
+                    },
                 )
 
         # Merge any persisted sessions not currently in memory.
@@ -610,7 +610,7 @@ class SessionManager:
                     "api_key": runtime.get("api_key"),
                     "command": runtime.get("command"),
                     "args": list(runtime.get("args") or []),
-                }
+                },
             )
         except Exception:
             logger.debug("ACP session falling back to default provider resolution", exc_info=True)

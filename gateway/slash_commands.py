@@ -477,7 +477,7 @@ class GatewaySlashCommandsMixin:
                     "state": t("gateway.agents.state_starting") if is_pending else t("gateway.agents.state_running"),
                     "session_id": "" if is_pending else str(getattr(agent, "session_id", "") or ""),
                     "model": "" if is_pending else str(getattr(agent, "model", "") or ""),
-                }
+                },
             )
 
         agent_rows.sort(key=lambda row: row["elapsed"], reverse=True)
@@ -509,7 +509,7 @@ class GatewaySlashCommandsMixin:
                 model = f" · `{row['model']}`" if row["model"] else ""
                 lines.append(
                     f"{idx}. `{row['session_key']}` · {row['state']} · "
-                    f"{format_uptime_short(row['elapsed'])}{sid}{model}{current}"
+                    f"{format_uptime_short(row['elapsed'])}{sid}{model}{current}",
                 )
             if len(agent_rows) > 12:
                 lines.append(t("gateway.agents.more", count=len(agent_rows) - 12))
@@ -518,7 +518,7 @@ class GatewaySlashCommandsMixin:
             [
                 "",
                 t("gateway.agents.running_processes", count=len(running_processes)),
-            ]
+            ],
         )
         if running_processes:
             for proc in running_processes[:12]:
@@ -527,7 +527,7 @@ class GatewaySlashCommandsMixin:
                     cmd = cmd[:87] + "..."
                 lines.append(
                     f"- `{proc.get('session_id', '?')}` · "
-                    f"{format_uptime_short(int(proc.get('uptime_seconds', 0)))} · `{cmd}`"
+                    f"{format_uptime_short(int(proc.get('uptime_seconds', 0)))} · `{cmd}`",
                 )
             if len(running_processes) > 12:
                 lines.append(t("gateway.agents.more", count=len(running_processes) - 12))
@@ -536,7 +536,7 @@ class GatewaySlashCommandsMixin:
             [
                 "",
                 t("gateway.agents.async_jobs", count=len(background_tasks)),
-            ]
+            ],
         )
 
         if not agent_rows and not running_processes and not background_tasks:
@@ -648,12 +648,12 @@ class GatewaySlashCommandsMixin:
                         reason = info.get("pause_reason") or "paused"
                         lines.append(
                             f"  · {p.value} — PAUSED ({reason}). "
-                            f"Resume with `/platform resume {p.value}`."
+                            f"Resume with `/platform resume {p.value}`.",
                         )
                     else:
                         attempts = info.get("attempts", 0)
                         lines.append(
-                            f"  · {p.value} — retrying (attempt {attempts})"
+                            f"  · {p.value} — retrying (attempt {attempts})",
                         )
             else:
                 lines.append("Failed/paused: (none)")
@@ -990,7 +990,7 @@ class GatewaySlashCommandsMixin:
                     _cur_api_key = current_api_key
 
                     async def _on_model_selected(
-                        _chat_id: str, model_id: str, provider_slug: str
+                        _chat_id: str, model_id: str, provider_slug: str,
                     ) -> str:
                         """Perform the model switch and return confirmation text."""
                         result = _switch_model(
@@ -1032,14 +1032,14 @@ class GatewaySlashCommandsMixin:
                         if _sess_db is not None:
                             try:
                                 _sess_entry = _self.session_store.get_or_create_session(
-                                    event.source
+                                    event.source,
                                 )
                                 _sess_db.update_session_model(
-                                    _sess_entry.session_id, result.new_model
+                                    _sess_entry.session_id, result.new_model,
                                 )
                             except Exception as exc:
                                 logger.debug(
-                                    "Failed to persist model switch to DB: %s", exc
+                                    "Failed to persist model switch to DB: %s", exc,
                                 )
 
                         # Store model note + session override
@@ -1188,11 +1188,11 @@ class GatewaySlashCommandsMixin:
                 try:
                     _sess_entry = self.session_store.get_or_create_session(source)
                     _sess_db.update_session_model(
-                        _sess_entry.session_id, result.new_model
+                        _sess_entry.session_id, result.new_model,
                     )
                 except Exception as exc:
                     logger.debug(
-                        "Failed to persist model switch to DB: %s", exc
+                        "Failed to persist model switch to DB: %s", exc,
                     )
 
             # Store a note to prepend to the next user message so the model
@@ -1792,7 +1792,7 @@ class GatewaySlashCommandsMixin:
             # live voice-channel join/leave). The toggle result is shown
             # first via the {toggle} placeholder.
             supports_voice_channels = adapter is not None and hasattr(
-                adapter, "join_voice_channel"
+                adapter, "join_voice_channel",
             )
             channels = (
                 t("gateway.voice.help_channels") if supports_voice_channels else ""
@@ -1888,7 +1888,7 @@ class GatewaySlashCommandsMixin:
                 event_message_id=event_message_id,
                 media_urls=media_urls,
                 media_types=media_types,
-            )
+            ),
         )
         self._background_tasks.add(_task)
         _task.add_done_callback(self._background_tasks.discard)
@@ -2417,7 +2417,7 @@ class GatewaySlashCommandsMixin:
                 _sys_prompt = getattr(tmp_agent, "_cached_system_prompt", "") or ""
                 _tools = getattr(tmp_agent, "tools", None) or None
                 approx_tokens = estimate_request_tokens_rough(
-                    msgs, system_prompt=_sys_prompt, tools=_tools
+                    msgs, system_prompt=_sys_prompt, tools=_tools,
                 )
 
                 compressor = tmp_agent.context_compressor
@@ -2427,7 +2427,7 @@ class GatewaySlashCommandsMixin:
                 loop = asyncio.get_running_loop()
                 compressed, _ = await loop.run_in_executor(
                     None,
-                    lambda: tmp_agent._compress_context(head, "", approx_tokens=approx_tokens, focus_topic=focus_topic, force=True)
+                    lambda: tmp_agent._compress_context(head, "", approx_tokens=approx_tokens, focus_topic=focus_topic, force=True),
                 )
 
                 # Re-append the verbatim tail after the compressed head,
@@ -2450,10 +2450,10 @@ class GatewaySlashCommandsMixin:
                 self.session_store.rewrite_transcript(new_session_id, compressed)
                 # Reset stored token count — transcript changed, old value is stale
                 self.session_store.update_session(
-                    session_entry.session_key, last_prompt_tokens=0
+                    session_entry.session_key, last_prompt_tokens=0,
                 )
                 new_tokens = estimate_request_tokens_rough(
-                    compressed, system_prompt=_sys_prompt, tools=_tools
+                    compressed, system_prompt=_sys_prompt, tools=_tools,
                 )
                 summary = summarize_manual_compression(
                     msgs,
@@ -2491,7 +2491,7 @@ class GatewaySlashCommandsMixin:
                     t(
                         "gateway.compress.aborted",
                         error=(_summary_err or "unknown error"),
-                    )
+                    ),
                 )
             elif _aux_fail_model:
                 lines.append(
@@ -2499,7 +2499,7 @@ class GatewaySlashCommandsMixin:
                         "gateway.compress.aux_failed",
                         model=_aux_fail_model,
                         error=(_aux_fail_err or "unknown error"),
-                    )
+                    ),
                 )
             return "\n".join(lines)
         except Exception as e:
@@ -3252,7 +3252,7 @@ class GatewaySlashCommandsMixin:
             skill_count = len(info.get("skills", []))
             desc = info.get("description") or f"Load {skill_count} skills"
             lines.append(
-                f"• `/{info['slug']}` — {desc} _({skill_count} skills)_"
+                f"• `/{info['slug']}` — {desc} _({skill_count} skills)_",
             )
             for s in info.get("skills", []):
                 lines.append(f"    · {s}")
@@ -3506,7 +3506,7 @@ class GatewaySlashCommandsMixin:
                         rc = proc.wait(timeout=3600)
                     with open(exit_code_path, "w") as f:
                         f.write(str(rc))
-                    """
+                    """,
                 ).strip()
                 subprocess.Popen(
                     [

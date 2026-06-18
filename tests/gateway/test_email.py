@@ -106,21 +106,21 @@ class TestHelperFunctions(unittest.TestCase):
         from gateway.platforms.email import _extract_email_address
         self.assertEqual(
             _extract_email_address("John Doe <john@example.com>"),
-            "john@example.com"
+            "john@example.com",
         )
 
     def test_extract_email_address_bare(self):
         from gateway.platforms.email import _extract_email_address
         self.assertEqual(
             _extract_email_address("john@example.com"),
-            "john@example.com"
+            "john@example.com",
         )
 
     def test_extract_email_address_uppercase(self):
         from gateway.platforms.email import _extract_email_address
         self.assertEqual(
             _extract_email_address("John@Example.COM"),
-            "john@example.com"
+            "john@example.com",
         )
 
     def test_strip_html_basic(self):
@@ -631,7 +631,7 @@ class TestSendMethods(unittest.TestCase):
             mock_smtp.return_value = mock_server
 
             result = asyncio.run(
-                adapter.send("user@test.com", "Hello from Hermes!")
+                adapter.send("user@test.com", "Hello from Hermes!"),
             )
 
             self.assertTrue(result.success)
@@ -649,7 +649,7 @@ class TestSendMethods(unittest.TestCase):
             mock_smtp.side_effect = Exception("Connection refused")
 
             result = asyncio.run(
-                adapter.send("user@test.com", "Hello")
+                adapter.send("user@test.com", "Hello"),
             )
 
             self.assertFalse(result.success)
@@ -663,7 +663,7 @@ class TestSendMethods(unittest.TestCase):
         adapter.send = AsyncMock(return_value=SendResult(success=True))
 
         asyncio.run(
-            adapter.send_image("user@test.com", "https://img.com/photo.jpg", "My photo")
+            adapter.send_image("user@test.com", "https://img.com/photo.jpg", "My photo"),
         )
 
         call_args = adapter.send.call_args
@@ -687,7 +687,7 @@ class TestSendMethods(unittest.TestCase):
                 mock_smtp.return_value = mock_server
 
                 result = asyncio.run(
-                    adapter.send_document("user@test.com", tmp_path, "Here is the file")
+                    adapter.send_document("user@test.com", tmp_path, "Here is the file"),
                 )
 
                 self.assertTrue(result.success)
@@ -717,7 +717,7 @@ class TestSendMethods(unittest.TestCase):
         adapter._thread_context["user@test.com"] = {"subject": "Test", "message_id": "<m@t>"}
 
         info = asyncio.run(
-            adapter.get_chat_info("user@test.com")
+            adapter.get_chat_info("user@test.com"),
         )
 
         self.assertEqual(info["name"], "user@test.com")
@@ -966,7 +966,7 @@ class TestSendEmailStandalone(unittest.TestCase):
             mock_smtp.return_value = mock_server
 
             result = asyncio.run(
-                _send_email({"address": "hermes@test.com", "smtp_host": "smtp.test.com"}, "user@test.com", "Hello")
+                _send_email({"address": "hermes@test.com", "smtp_host": "smtp.test.com"}, "user@test.com", "Hello"),
             )
 
             self.assertTrue(result["success"])
@@ -991,7 +991,7 @@ class TestSendEmailStandalone(unittest.TestCase):
 
         with patch("smtplib.SMTP", side_effect=Exception("SMTP error")):
             result = asyncio.run(
-                _send_email({"address": "hermes@test.com", "smtp_host": "smtp.test.com"}, "user@test.com", "Hello")
+                _send_email({"address": "hermes@test.com", "smtp_host": "smtp.test.com"}, "user@test.com", "Hello"),
             )
 
             self.assertIn("error", result)
@@ -1004,7 +1004,7 @@ class TestSendEmailStandalone(unittest.TestCase):
         from tools.send_message_tool import _send_email
 
         result = asyncio.run(
-            _send_email({}, "user@test.com", "Hello")
+            _send_email({}, "user@test.com", "Hello"),
         )
 
         self.assertIn("error", result)

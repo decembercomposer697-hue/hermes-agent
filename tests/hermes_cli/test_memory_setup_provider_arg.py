@@ -61,7 +61,7 @@ class TestInstallDependenciesRunner:
         import sys
 
         (tmp_path / "plugin.yaml").write_text(
-            "pip_dependencies:\n  - definitely-not-installed-xyz\n", encoding="utf-8"
+            "pip_dependencies:\n  - definitely-not-installed-xyz\n", encoding="utf-8",
         )
         captured = {}
 
@@ -77,7 +77,7 @@ class TestInstallDependenciesRunner:
 
     def test_uses_uv_when_available(self, tmp_path):
         cmd, _ = self._run_with_missing_dep(
-            tmp_path, lambda b: "/usr/bin/uv" if b == "uv" else None
+            tmp_path, lambda b: "/usr/bin/uv" if b == "uv" else None,
         )
         assert cmd is not None
         assert cmd[:3] == ["/usr/bin/uv", "pip", "install"]
@@ -85,7 +85,7 @@ class TestInstallDependenciesRunner:
     def test_falls_back_to_pip_when_uv_missing(self, tmp_path, capsys):
         """The salvaged behavior (#5954): no uv but pip present -> python -m pip."""
         cmd, py = self._run_with_missing_dep(
-            tmp_path, lambda b: "/usr/bin/pip3" if b == "pip3" else None
+            tmp_path, lambda b: "/usr/bin/pip3" if b == "pip3" else None,
         )
         assert cmd is not None
         assert cmd[:4] == [py, "-m", "pip", "install"]

@@ -65,7 +65,7 @@ async def test_hermes_provider_forwards_asend_values(tmp_path, monkeypatch):
             token_type="Bearer",
             expires_in=3600,
             refresh_token="old_refresh",
-        )
+        ),
     )
     # Also seed client_info so the SDK doesn't attempt registration.
     from mcp.shared.auth import OAuthClientInformationFull
@@ -77,7 +77,7 @@ async def test_hermes_provider_forwards_asend_values(tmp_path, monkeypatch):
             grant_types=["authorization_code", "refresh_token"],
             response_types=["code"],
             token_endpoint_auth_method="none",
-        )
+        ),
     )
 
     metadata = OAuthClientMetadata(
@@ -144,7 +144,7 @@ async def test_hermes_provider_forwards_401_triggers_refresh(tmp_path, monkeypat
             token_type="Bearer",
             expires_in=3600,
             refresh_token="old_refresh",
-        )
+        ),
     )
     await storage.set_client_info(
         OAuthClientInformationFull(
@@ -153,7 +153,7 @@ async def test_hermes_provider_forwards_401_triggers_refresh(tmp_path, monkeypat
             grant_types=["authorization_code", "refresh_token"],
             response_types=["code"],
             token_endpoint_auth_method="none",
-        )
+        ),
     )
 
     metadata = OAuthClientMetadata(
@@ -206,5 +206,5 @@ async def _noop_redirect(_url: str) -> None:
 async def _noop_callback() -> tuple[str, str | None]:
     """Callback handler that won't be invoked in these tests."""
     raise AssertionError(
-        "callback handler should not be invoked in bidirectional-generator tests"
+        "callback handler should not be invoked in bidirectional-generator tests",
     )

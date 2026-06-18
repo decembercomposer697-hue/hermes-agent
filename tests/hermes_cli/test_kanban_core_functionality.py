@@ -1807,7 +1807,7 @@ def test_cli_complete_with_summary_and_metadata(kanban_home):
     # JSON metadata must round-trip through shlex + argparse.
     meta = '{"files": 3}'
     out = run_slash(
-        "complete " + tid + " --summary \"done it\" --metadata '" + meta + "'"
+        "complete " + tid + " --summary \"done it\" --metadata '" + meta + "'",
     )
     assert "Completed" in out
     conn = kb.connect()
@@ -1832,7 +1832,7 @@ def test_cli_edit_backfills_result_on_done_task(kanban_home):
         "edit " + tid
         + " --result \"DECIDED: done\""
         + " --summary \"DECIDED: done\""
-        + " --metadata '" + meta + "'"
+        + " --metadata '" + meta + "'",
     )
 
     assert "Edited" in out
@@ -2457,7 +2457,7 @@ def test_pid_alive_detects_zombie(kanban_home):
         # exercising the zombie path and not some other liveness failure
         with open(f"/proc/{pid}/status") as f:
             state_line = next(
-                (l for l in f if l.startswith("State:")), ""
+                (l for l in f if l.startswith("State:")), "",
             )
         assert "Z" in state_line, f"expected zombie, got {state_line!r}"
         # And _pid_alive must see through it.
@@ -3074,7 +3074,7 @@ def test_cli_create_skill_flag_repeatable(kanban_home):
     """`hermes kanban create --skill a --skill b` persists the list."""
     out = run_slash(
         "create 'multi-skill' --assignee linguist "
-        "--skill translation --skill github-code-review --json"
+        "--skill translation --skill github-code-review --json",
     )
     tid = json.loads(out)["id"]
     with kb.connect() as conn:
@@ -3096,7 +3096,7 @@ def test_cli_show_renders_skills(kanban_home):
     """`hermes kanban show <id>` prints a skills row when present."""
     out = run_slash(
         "create 'show-test' --assignee x "
-        "--skill translation --json"
+        "--skill translation --json",
     )
     tid = json.loads(out)["id"]
     shown = run_slash(f"show {tid}")
@@ -3135,7 +3135,7 @@ def test_legacy_db_without_skills_column_migrates(tmp_path):
     """)
     conn.execute(
         "INSERT INTO tasks (id, title, status, created_at) "
-        "VALUES ('legacy', 'old task', 'ready', 1)"
+        "VALUES ('legacy', 'old task', 'ready', 1)",
     )
     conn.commit()
 
@@ -3210,7 +3210,7 @@ def test_legacy_spawn_failure_columns_are_copied_not_renamed(tmp_path):
         "worker_pid, last_spawn_error) "
         "VALUES ('legacy', 'old task', NULL, 'default', 'ready', 0, NULL, 1, "
         "NULL, NULL, 'scratch', NULL, NULL, NULL, NULL, NULL, NULL, 4, NULL, "
-        "'missing profile')"
+        "'missing profile')",
     )
     conn.commit()
 
@@ -3270,7 +3270,7 @@ def test_legacy_migration_no_legacy_columns_at_all(tmp_path):
     """)
     conn.execute(
         "INSERT INTO tasks (id, title, status, created_at) "
-        "VALUES ('t1', 'ancient task', 'ready', 1)"
+        "VALUES ('t1', 'ancient task', 'ready', 1)",
     )
     conn.commit()
 
@@ -3331,7 +3331,7 @@ def test_legacy_migration_both_columns_already_present(tmp_path):
     conn.execute(
         "INSERT INTO tasks (id, title, status, created_at, spawn_failures, "
         "consecutive_failures, last_spawn_error, last_failure_error) "
-        "VALUES ('t2', 'partial task', 'ready', 1, 2, 3, 'old error', 'new error')"
+        "VALUES ('t2', 'partial task', 'ready', 1, 2, 3, 'old error', 'new error')",
     )
     conn.commit()
 
@@ -3567,7 +3567,7 @@ def test_gateway_dispatcher_watcher_respects_config_flag_off(monkeypatch):
         asyncio.wait_for(
             runner._kanban_dispatcher_watcher(),
             timeout=3.0,
-        )
+        ),
     )
 
 
@@ -3583,7 +3583,7 @@ def test_gateway_dispatcher_watcher_respects_env_override(monkeypatch):
         asyncio.wait_for(
             runner._kanban_dispatcher_watcher(),
             timeout=3.0,
-        )
+        ),
     )
 
 
@@ -3609,13 +3609,13 @@ def test_gateway_dispatcher_watcher_env_truthy_uses_config(monkeypatch):
         asyncio.wait_for(
             runner._kanban_dispatcher_watcher(),
             timeout=3.0,
-        )
+        ),
     )
 
 
 @pytest.mark.parametrize("corrupt_exc", ["sqlite", "guard"])
 def test_gateway_dispatcher_disables_corrupt_board_without_traceback(
-    monkeypatch, tmp_path, caplog, corrupt_exc
+    monkeypatch, tmp_path, caplog, corrupt_exc,
 ):
     """Corrupt board DBs log one actionable error and stop retrying per tick."""
     import asyncio
@@ -3638,7 +3638,7 @@ def test_gateway_dispatcher_disables_corrupt_board_without_traceback(
             "kanban": {
                 "dispatch_in_gateway": True,
                 "dispatch_interval_seconds": 1,
-            }
+            },
         },
     )
     monkeypatch.setattr(
@@ -3691,7 +3691,7 @@ def test_gateway_dispatcher_disables_corrupt_board_without_traceback(
             asyncio.wait_for(
                 runner._kanban_dispatcher_watcher(),
                 timeout=3.0,
-            )
+            ),
         )
 
     messages = [record.getMessage() for record in caplog.records]
@@ -3708,7 +3708,7 @@ def test_gateway_dispatcher_disables_corrupt_board_without_traceback(
 
 
 def test_gateway_dispatcher_retries_corrupt_board_after_quarantine(
-    monkeypatch, tmp_path, caplog
+    monkeypatch, tmp_path, caplog,
 ):
     """A corrupt-looking board is retried after the quarantine TTL expires."""
     import asyncio
@@ -3732,7 +3732,7 @@ def test_gateway_dispatcher_retries_corrupt_board_after_quarantine(
             "kanban": {
                 "dispatch_in_gateway": True,
                 "dispatch_interval_seconds": 1,
-            }
+            },
         },
     )
     monkeypatch.setattr(
@@ -3789,7 +3789,7 @@ def test_gateway_dispatcher_retries_corrupt_board_after_quarantine(
             asyncio.wait_for(
                 runner._kanban_dispatcher_watcher(),
                 timeout=3.0,
-            )
+            ),
         )
 
     messages = [record.getMessage() for record in caplog.records]
@@ -4488,7 +4488,7 @@ def test_dispatch_once_integrates_stale_detection(kanban_home, monkeypatch):
         five_hours_ago = int(time.time()) - (5 * 3600)
         with kb.write_txn(conn):
             conn.execute(
-                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t)
+                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t),
             )
             conn.execute(
                 "UPDATE task_runs SET started_at = ? "
@@ -4520,7 +4520,7 @@ def test_dispatch_once_stale_disabled_when_timeout_zero(kanban_home, monkeypatch
         five_hours_ago = int(time.time()) - (5 * 3600)
         with kb.write_txn(conn):
             conn.execute(
-                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t)
+                "UPDATE tasks SET started_at = ? WHERE id = ?", (five_hours_ago, t),
             )
             conn.execute(
                 "UPDATE task_runs SET started_at = ? "

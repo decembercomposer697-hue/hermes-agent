@@ -78,7 +78,7 @@ async def test_reconnect_storm_sets_and_heartbeat_clears_flag(monkeypatch):
     adapter._app.bot.get_me = AsyncMock(return_value=MagicMock())
     adapter._polling_error_callback_ref = AsyncMock()
     monkeypatch.setattr(
-        "gateway.platforms.telegram.Update", MagicMock(ALL_TYPES=[])
+        "gateway.platforms.telegram.Update", MagicMock(ALL_TYPES=[]),
     )
 
     await adapter._handle_polling_network_error(OSError("Bad Gateway"))

@@ -409,7 +409,7 @@ def get_board(
         # Pre-fetch link counts per task (cheap: one query).
         link_counts: dict[str, dict[str, int]] = {}
         for row in conn.execute(
-            "SELECT parent_id, child_id FROM task_links"
+            "SELECT parent_id, child_id FROM task_links",
         ).fetchall():
             link_counts.setdefault(row["parent_id"], {"parents": 0, "children": 0})[
                 "children"
@@ -422,7 +422,7 @@ def get_board(
         comment_counts: dict[str, int] = {
             r["task_id"]: r["n"]
             for r in conn.execute(
-                "SELECT task_id, COUNT(*) AS n FROM task_comments GROUP BY task_id"
+                "SELECT task_id, COUNT(*) AS n FROM task_comments GROUP BY task_id",
             )
         }
 
@@ -432,7 +432,7 @@ def get_board(
         progress: dict[str, dict[str, int]] = {}
         for row in conn.execute(
             "SELECT l.parent_id AS pid, t.status AS cstatus "
-            "FROM task_links l JOIN tasks t ON t.id = l.child_id"
+            "FROM task_links l JOIN tasks t ON t.id = l.child_id",
         ).fetchall():
             p = progress.setdefault(row["pid"], {"done": 0, "total": 0})
             p["total"] += 1
@@ -446,7 +446,7 @@ def get_board(
         diagnostics_per_task = _compute_task_diagnostics(conn, task_ids=None)
 
         latest_event_id = conn.execute(
-            "SELECT COALESCE(MAX(id), 0) AS m FROM task_events"
+            "SELECT COALESCE(MAX(id), 0) AS m FROM task_events",
         ).fetchone()["m"]
 
         columns: dict[str, list[dict]] = {c: [] for c in BOARD_COLUMNS}
@@ -485,7 +485,7 @@ def get_board(
         tenants = [
             r["tenant"]
             for r in conn.execute(
-                "SELECT DISTINCT tenant FROM tasks WHERE tenant IS NOT NULL ORDER BY tenant"
+                "SELECT DISTINCT tenant FROM tasks WHERE tenant IS NOT NULL ORDER BY tenant",
             )
         ]
         # List of distinct assignees for the lane-by-profile sub-grouping.
@@ -493,7 +493,7 @@ def get_board(
             r["assignee"]
             for r in conn.execute(
                 "SELECT DISTINCT assignee FROM tasks WHERE assignee IS NOT NULL "
-                "AND status != 'archived' ORDER BY assignee"
+                "AND status != 'archived' ORDER BY assignee",
             )
         ]
 
@@ -678,7 +678,7 @@ def list_task_attachments(task_id: str, board: str | None = Query(None)):
         return {
             "attachments": [
                 _attachment_dict(a) for a in kanban_db.list_attachments(conn, task_id)
-            ]
+            ],
         }
     finally:
         conn.close()
@@ -1068,7 +1068,7 @@ def _set_status_direct(
                                     "status": "todo",
                                     "reason": "parent_reopened",
                                     "parent": task_id,
-                                }
+                                },
                             ),
                             int(time.time()),
                         ),
@@ -2001,7 +2001,7 @@ def _board_counts(slug: str) -> dict[str, int]:
         conn = kanban_db.connect(board=slug)
         try:
             rows = conn.execute(
-                "SELECT status, COUNT(*) AS n FROM tasks GROUP BY status"
+                "SELECT status, COUNT(*) AS n FROM tasks GROUP BY status",
             ).fetchall()
             return {r["status"]: int(r["n"]) for r in rows}
         finally:

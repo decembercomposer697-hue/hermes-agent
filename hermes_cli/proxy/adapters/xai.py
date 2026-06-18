@@ -24,7 +24,7 @@ _ALLOWED_PATHS: frozenset[str] = frozenset(
         "/completions",
         "/embeddings",
         "/models",
-    }
+    },
 )
 
 
@@ -59,7 +59,7 @@ class XAIGrokAdapter(UpstreamAdapter):
             if pool is None or not pool.has_credentials():
                 raise RuntimeError(
                     "No xAI OAuth credentials found. Run "
-                    "`hermes auth add xai-oauth --type oauth` first."
+                    "`hermes auth add xai-oauth --type oauth` first.",
                 )
 
             entry = pool.select()
@@ -67,7 +67,7 @@ class XAIGrokAdapter(UpstreamAdapter):
                 raise RuntimeError(
                     "No available xAI OAuth credentials found. Run "
                     "`hermes auth reset xai-oauth` or re-authenticate with "
-                    "`hermes auth add xai-oauth --type oauth`."
+                    "`hermes auth add xai-oauth --type oauth`.",
                 )
 
             self._pool = pool
@@ -125,7 +125,7 @@ class XAIGrokAdapter(UpstreamAdapter):
         if not bearer:
             raise RuntimeError(
                 "xAI OAuth credential pool entry did not contain an access token. "
-                "Re-authenticate with `hermes auth add xai-oauth --type oauth`."
+                "Re-authenticate with `hermes auth add xai-oauth --type oauth`.",
             )
 
         base_url = (

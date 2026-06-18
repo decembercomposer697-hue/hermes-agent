@@ -162,7 +162,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
             # the provider should never be constructible with a malformed id.
             raise ValueError(
                 "client_id must match contract shape 'agent:{instance_id}', "
-                f"got {client_id!r}"
+                f"got {client_id!r}",
             )
         self._client_id = client_id
         self._agent_instance_id = client_id[len("agent:") :]
@@ -181,7 +181,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
 
         code_verifier = _b64url_no_pad(secrets.token_bytes(64))  # ~86 chars
         code_challenge = _b64url_no_pad(
-            hashlib.sha256(code_verifier.encode("ascii")).digest()
+            hashlib.sha256(code_verifier.encode("ascii")).digest(),
         )
         state = _b64url_no_pad(secrets.token_bytes(32))
 
@@ -238,7 +238,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
         # (24h session, reuse-detected) — Portal NAS PR #293. A 400 here means
         # the code/PKCE/redirect_uri failed, surfaced as InvalidCodeError.
         return self._token_response_to_session(
-            response, bad_request_exc=InvalidCodeError
+            response, bad_request_exc=InvalidCodeError,
         )
 
     def refresh_session(self, *, refresh_token: str) -> Session:
@@ -292,13 +292,13 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
             )
         except httpx.RequestError as exc:
             raise ProviderError(
-                f"Portal token endpoint unreachable: {exc}"
+                f"Portal token endpoint unreachable: {exc}",
             ) from exc
 
         # A 400 on refresh means the RT is expired / revoked / reuse-detected;
         # surface as RefreshExpiredError so middleware forces re-login.
         return self._token_response_to_session(
-            response, bad_request_exc=RefreshExpiredError
+            response, bad_request_exc=RefreshExpiredError,
         )
 
     def _token_response_to_session(
@@ -325,7 +325,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
         if response.status_code != 200:
             raise ProviderError(
                 f"Portal token endpoint returned {response.status_code}: "
-                f"{response.text[:200]!r}"
+                f"{response.text[:200]!r}",
             )
 
         payload = self._parse_json_body(response)
@@ -394,12 +394,12 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
         parsed = urllib.parse.urlparse(redirect_uri)
         if parsed.scheme not in ("https", "http"):
             raise ProviderError(
-                f"redirect_uri must be http(s), got {redirect_uri!r}"
+                f"redirect_uri must be http(s), got {redirect_uri!r}",
             )
         if not parsed.path or not parsed.path.endswith("/auth/callback"):
             raise ProviderError(
                 "redirect_uri path must end with '/auth/callback', "
-                f"got {redirect_uri!r}"
+                f"got {redirect_uri!r}",
             )
 
     def _parse_json_body(self, response: httpx.Response) -> dict[str, Any]:
@@ -430,7 +430,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
 
         try:
             signing_key = self._get_jwks_client().get_signing_key_from_jwt(
-                access_token
+                access_token,
             )
         except jwt.PyJWKClientError as exc:
             raise ProviderError(f"JWKS lookup failed: {exc}") from exc
@@ -473,7 +473,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
             except Exception:
                 pass
             raise ProviderError(
-                f"access token verification failed: {exc}{details}"
+                f"access token verification failed: {exc}{details}",
             ) from exc
 
         self._check_agent_instance_id(claims)
@@ -491,7 +491,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
         if token_instance_id != self._agent_instance_id:
             raise ProviderError(
                 f"agent_instance_id mismatch: token={token_instance_id!r} "
-                f"vs configured={self._agent_instance_id!r}"
+                f"vs configured={self._agent_instance_id!r}",
             )
 
     def _check_contract_version(self, claims: dict[str, Any]) -> None:
@@ -507,7 +507,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
         if contract_version != _EXPECTED_CONTRACT_VERSION:
             raise ProviderError(
                 f"unsupported oauth_contract_version={contract_version!r}, "
-                f"expected {_EXPECTED_CONTRACT_VERSION}"
+                f"expected {_EXPECTED_CONTRACT_VERSION}",
             )
 
     def _session_from_claims(
@@ -593,7 +593,7 @@ def _resolve_portal_url() -> str:
     if env:
         return env
     cfg_value = str(
-        _load_config_oauth_section().get("portal_url", "")
+        _load_config_oauth_section().get("portal_url", ""),
     ).strip()
     return cfg_value or _DEFAULT_PORTAL_URL
 
@@ -652,7 +652,7 @@ def register(ctx) -> None:
 
     try:
         provider = NousDashboardAuthProvider(
-            client_id=client_id, portal_url=portal_url
+            client_id=client_id, portal_url=portal_url,
         )
     except ValueError as exc:
         LAST_SKIP_REASON = f"NousDashboardAuthProvider construction failed: {exc}"

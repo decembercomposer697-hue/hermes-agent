@@ -276,7 +276,7 @@ class CLICommandsMixin:
             _cprint(
                 f"  {_DIM}Clipboard image paste is not available on Termux — "
                 f"use /image <path> or paste a local image path like "
-                f"{_termux_example_image_path()}{_RST}"
+                f"{_termux_example_image_path()}{_RST}",
             )
             return
 
@@ -670,7 +670,7 @@ class CLICommandsMixin:
         if resolved_id and resolved_id != target_id:
             _cprint(
                 f"  Session {target_id} was compressed into {resolved_id}; "
-                f"resuming the descendant with your transcript."
+                f"resuming the descendant with your transcript.",
             )
             target_id = resolved_id
             resolved_meta = self._session_db.get_session(target_id)
@@ -742,7 +742,7 @@ class CLICommandsMixin:
             _cprint(
                 f"  ↻ Resumed session {target_id}{title_part}"
                 f" ({msg_count} user message{'s' if msg_count != 1 else ''},"
-                f" {len(self.conversation_history)} total)"
+                f" {len(self.conversation_history)} total)",
             )
             self._display_resumed_history()
         else:
@@ -912,7 +912,7 @@ class CLICommandsMixin:
         msg_count = len([m for m in self.conversation_history if m.get("role") == "user"])
         _cprint(
             f"  ⑂ Branched session \"{branch_title}\""
-            f" ({msg_count} user message{'s' if msg_count != 1 else ''})"
+            f" ({msg_count} user message{'s' if msg_count != 1 else ''})",
         )
         _cprint(f"  Original session: {parent_session_id}")
         _cprint(f"  Branch session:   {new_session_id}")
@@ -1515,7 +1515,7 @@ class CLICommandsMixin:
             _cprint("  No skill bundles installed.")
             _cprint(
                 f"  {_DIM}Create one with: hermes bundles create "
-                f"<name> --skill <s1> --skill <s2>{_RST}"
+                f"<name> --skill <s1> --skill <s2>{_RST}",
             )
             _cprint(f"  {_DIM}Directory: {_bundles_dir()}{_RST}")
             return
@@ -1526,13 +1526,13 @@ class CLICommandsMixin:
             desc = info.get("description") or f"Load {skill_count} skills"
             ChatConsole().print(
                 f"    [bold {_accent_hex()}]/{info['slug']:<20}[/] "
-                f"[dim]-[/] {_escape(desc)} [dim]({skill_count} skills)[/]"
+                f"[dim]-[/] {_escape(desc)} [dim]({skill_count} skills)[/]",
             )
             for s in info.get("skills", []):
                 ChatConsole().print(f"        [dim]· {_escape(s)}[/]")
         _cprint(
             f"\n  {_DIM}Invoke a bundle with /<slug>. "
-            f"Manage with `hermes bundles`.{_RST}"
+            f"Manage with `hermes bundles`.{_RST}",
         )
 
     def _handle_browser_command(self, cmd: str):
@@ -1554,7 +1554,7 @@ class CLICommandsMixin:
                 print()
                 print(
                     f"   ⚠ Unsupported browser url scheme: {parsed_cdp.scheme or '(missing)'} "
-                    "(expected one of: http, https, ws, wss)"
+                    "(expected one of: http, https, ws, wss)",
                 )
                 print()
                 return
@@ -1654,7 +1654,7 @@ class CLICommandsMixin:
                     "just because CDP is connected. This is typically a Hermes-managed isolated debug "
                     "profile, not the user's main everyday browser. It is still user-visible and may contain "
                     "pages, logged-in sessions, or cookies in that debug profile, so avoid destructive actions, "
-                    "closing tabs, or navigating away unless the user's task calls for it.]"
+                    "closing tabs, or navigating away unless the user's task calls for it.]",
                 )
 
         elif sub == "disconnect":
@@ -1674,7 +1674,7 @@ class CLICommandsMixin:
                 if hasattr(self, '_pending_input'):
                     self._pending_input.put(
                         "[System note: The user has disconnected the browser tools from their live Chromium-family browser. "
-                        "Browser tools are back to default mode (headless local browser or cloud provider).]"
+                        "Browser tools are back to default mode (headless local browser or cloud provider).]",
                     )
             else:
                 print()
@@ -1773,7 +1773,7 @@ class CLICommandsMixin:
                 _cprint(f"  ▶ Goal resumed: {state.goal}")
                 _cprint(
                     f"  {_DIM}Send any message (or press Enter on an empty prompt "
-                    f"is a no-op; type 'continue' to kick it off).{_RST}"
+                    f"is a no-op; type 'continue' to kick it off).{_RST}",
                 )
             return
 
@@ -1797,7 +1797,7 @@ class CLICommandsMixin:
         _cprint(
             f"  {_DIM}After each turn, a judge model will check if the goal is done. "
             f"Hermes keeps working until it is, you pause/clear it, or the budget is "
-            f"exhausted. Use /goal status, /goal pause, /goal resume, /goal clear.{_RST}"
+            f"exhausted. Use /goal status, /goal pause, /goal resume, /goal clear.{_RST}",
         )
         # Kick the loop off immediately so the user doesn't have to send a
         # separate message after setting the goal.
@@ -1955,7 +1955,7 @@ class CLICommandsMixin:
             state = "ON" if current else "OFF"
             _cprint(
                 f"  {_Colors.BOLD}Runtime footer:{_Colors.RESET} {state}\n"
-                f"  Fields: {', '.join(fields)}"
+                f"  Fields: {', '.join(fields)}",
             )
             return
 

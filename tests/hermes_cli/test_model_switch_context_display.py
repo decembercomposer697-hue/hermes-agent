@@ -44,7 +44,7 @@ class TestResolveDisplayContextLength:
     def test_falls_back_to_model_info_when_resolver_returns_none(self):
         fake_mi = _FakeModelInfo(1_048_576)
         with patch(
-            "agent.model_metadata.get_model_context_length", return_value=None
+            "agent.model_metadata.get_model_context_length", return_value=None,
         ):
             ctx = resolve_display_context_length(
                 "some-model",
@@ -55,7 +55,7 @@ class TestResolveDisplayContextLength:
 
     def test_returns_none_when_both_sources_empty(self):
         with patch(
-            "agent.model_metadata.get_model_context_length", return_value=None
+            "agent.model_metadata.get_model_context_length", return_value=None,
         ):
             ctx = resolve_display_context_length(
                 "unknown-model",
@@ -71,7 +71,7 @@ class TestResolveDisplayContextLength:
             side_effect=RuntimeError("network down"),
         ):
             ctx = resolve_display_context_length(
-                "x", "y", model_info=fake_mi
+                "x", "y", model_info=fake_mi,
             )
         assert ctx == 200_000
 
@@ -80,7 +80,7 @@ class TestResolveDisplayContextLength:
         reports a bigger window."""
         fake_mi = _FakeModelInfo(2_000_000)
         with patch(
-            "agent.model_metadata.get_model_context_length", return_value=128_000
+            "agent.model_metadata.get_model_context_length", return_value=128_000,
         ):
             ctx = resolve_display_context_length(
                 "capped-model",
@@ -99,7 +99,7 @@ class TestResolveDisplayContextLength:
                 "name": "my-custom-endpoint",
                 "base_url": "https://example.invalid/v1",
                 "models": {"gpt-5.5": {"context_length": 1_050_000}},
-            }
+            },
         ]
         # Real resolver call — no mock — so the override path is exercised
         # through agent.model_metadata.get_model_context_length.
@@ -130,7 +130,7 @@ class TestResolveDisplayContextLength:
             {
                 "base_url": "https://example.invalid/v1/",
                 "models": {"m": {"context_length": 400_000}},
-            }
+            },
         ]
         from unittest.mock import patch as _p
         from agent import model_metadata as _mm

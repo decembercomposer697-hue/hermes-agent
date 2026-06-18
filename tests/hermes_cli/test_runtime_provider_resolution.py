@@ -688,8 +688,8 @@ def test_named_custom_provider_uses_saved_credentials(monkeypatch):
                     "name": "Local",
                     "base_url": "http://1.2.3.4:1234/v1",
                     "api_key": "local-provider-key",
-                }
-            ]
+                },
+            ],
         },
     )
     monkeypatch.setattr(
@@ -697,8 +697,8 @@ def test_named_custom_provider_uses_saved_credentials(monkeypatch):
         "resolve_provider",
         lambda *a, **k: (_ for _ in ()).throw(
             AssertionError(
-                "resolve_provider should not be called for named custom providers"
-            )
+                "resolve_provider should not be called for named custom providers",
+            ),
         ),
     )
 
@@ -730,8 +730,8 @@ def test_bare_custom_resolves_providers_dict_entry_named_custom(monkeypatch):
                     "api_key": "cliproxy-key",
                     "default_model": "gpt-5.4",
                     "name": "CLIProxy",
-                }
-            }
+                },
+            },
         },
     )
     # Reaching resolve_provider for bare custom with a matching entry means the
@@ -741,8 +741,8 @@ def test_bare_custom_resolves_providers_dict_entry_named_custom(monkeypatch):
         "resolve_provider",
         lambda *a, **k: (_ for _ in ()).throw(
             AssertionError(
-                "resolve_provider must not be called; providers.custom should match"
-            )
+                "resolve_provider must not be called; providers.custom should match",
+            ),
         ),
     )
 
@@ -798,8 +798,8 @@ def test_named_custom_provider_uses_providers_dict_when_list_missing(monkeypatch
                     "default_model": "gpt-5-mini",
                     "name": "OpenAI Direct (Primary)",
                     "transport": "codex_responses",
-                }
-            }
+                },
+            },
         },
     )
     monkeypatch.setattr(
@@ -807,8 +807,8 @@ def test_named_custom_provider_uses_providers_dict_when_list_missing(monkeypatch
         "resolve_provider",
         lambda *a, **k: (_ for _ in ()).throw(
             AssertionError(
-                "resolve_provider should not be called for named custom providers"
-            )
+                "resolve_provider should not be called for named custom providers",
+            ),
         ),
     )
 
@@ -838,8 +838,8 @@ def test_named_custom_provider_uses_key_env_from_providers_dict(monkeypatch):
                     "default_model": "acme-large",
                     "key_env": "MYCORP_API_KEY",
                     "name": "MyCorp Proxy",
-                }
-            }
+                },
+            },
         },
     )
     monkeypatch.setattr(
@@ -847,8 +847,8 @@ def test_named_custom_provider_uses_key_env_from_providers_dict(monkeypatch):
         "resolve_provider",
         lambda *a, **k: (_ for _ in ()).throw(
             AssertionError(
-                "resolve_provider should not be called for named custom providers"
-            )
+                "resolve_provider should not be called for named custom providers",
+            ),
         ),
     )
 
@@ -896,8 +896,8 @@ def test_named_custom_provider_same_url_uses_matching_key_env_and_api_mode(monke
         "resolve_provider",
         lambda *a, **k: (_ for _ in ()).throw(
             AssertionError(
-                "resolve_provider should not be called for named custom providers"
-            )
+                "resolve_provider should not be called for named custom providers",
+            ),
         ),
     )
 
@@ -922,8 +922,8 @@ def test_named_custom_provider_falls_back_to_openai_api_key(monkeypatch):
                 {
                     "name": "Local LLM",
                     "base_url": "http://localhost:1234/v1",
-                }
-            ]
+                },
+            ],
         },
     )
     monkeypatch.setattr(
@@ -931,8 +931,8 @@ def test_named_custom_provider_falls_back_to_openai_api_key(monkeypatch):
         "resolve_provider",
         lambda *a, **k: (_ for _ in ()).throw(
             AssertionError(
-                "resolve_provider should not be called for named custom providers"
-            )
+                "resolve_provider should not be called for named custom providers",
+            ),
         ),
     )
 
@@ -954,8 +954,8 @@ def test_named_custom_provider_does_not_shadow_builtin_provider(monkeypatch):
                     "name": "nous",
                     "base_url": "http://localhost:1234/v1",
                     "api_key": "shadow-key",
-                }
-            ]
+                },
+            ],
         },
     )
     monkeypatch.setattr(
@@ -993,8 +993,8 @@ def test_named_custom_provider_wins_over_builtin_alias(monkeypatch):
                     "name": "kimi",
                     "base_url": "https://my-custom-kimi.example.com/v1",
                     "api_key": "my-kimi-key",
-                }
-            ]
+                },
+            ],
         },
     )
 
@@ -1019,8 +1019,8 @@ def test_named_custom_provider_skipped_for_canonical_built_in(monkeypatch):
                     "name": "nous",
                     "base_url": "http://localhost:1234/v1",
                     "api_key": "shadow-key",
-                }
-            ]
+                },
+            ],
         },
     )
 
@@ -1511,7 +1511,7 @@ def test_custom_provider_runtime_preserves_provider_name(monkeypatch):
                 "provider": "custom",
                 "base_url": "http://localhost:8080/v1",
                 "api_key": "test-key-123",
-            }
+            },
         },
     )
 
@@ -1536,7 +1536,7 @@ def test_custom_provider_no_key_gets_placeholder(monkeypatch):
             "model": {
                 "provider": "custom",
                 "base_url": "http://localhost:8080/v1",
-            }
+            },
         },
     )
 
@@ -1567,7 +1567,7 @@ def test_auto_detected_nous_auth_failure_falls_through_to_openrouter(monkeypatch
         rp, "resolve_nous_runtime_credentials",
         lambda **kw: (_ for _ in ()).throw(
             AuthError("Refresh session has been revoked",
-                      provider="nous", code="invalid_grant", relogin_required=True)
+                      provider="nous", code="invalid_grant", relogin_required=True),
         ),
     )
 
@@ -1595,7 +1595,7 @@ def test_auto_detected_codex_auth_failure_falls_through_to_openrouter(monkeypatc
         rp, "resolve_codex_runtime_credentials",
         lambda **kw: (_ for _ in ()).throw(
             AuthError("Codex token refresh failed: session revoked",
-                      provider="openai-codex", code="invalid_grant", relogin_required=True)
+                      provider="openai-codex", code="invalid_grant", relogin_required=True),
         ),
     )
 
@@ -1620,7 +1620,7 @@ def test_explicit_nous_auth_failure_still_raises(monkeypatch):
         rp, "resolve_nous_runtime_credentials",
         lambda **kw: (_ for _ in ()).throw(
             AuthError("Refresh session has been revoked",
-                      provider="nous", code="invalid_grant", relogin_required=True)
+                      provider="nous", code="invalid_grant", relogin_required=True),
         ),
     )
 
@@ -1728,7 +1728,7 @@ def test_named_custom_runtime_propagates_extra_body_direct_path(monkeypatch):
         "extra_body": {
             "enable_thinking": True,
             "reasoning_effort": "high",
-        }
+        },
     }
 
 
@@ -1789,7 +1789,7 @@ def test_named_custom_runtime_propagates_extra_body_pool_path(monkeypatch):
 
     resolved = rp.resolve_runtime_provider(requested="my-gemma")
     assert resolved["request_overrides"] == {
-        "extra_body": {"enable_thinking": True}
+        "extra_body": {"enable_thinking": True},
     }
 
 
@@ -1835,7 +1835,7 @@ class TestOllamaUrlSubstringLeak:
         monkeypatch.setenv("OLLAMA_API_KEY", "ol-SECRET-should-not-leak")
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "custom")
         monkeypatch.setattr(rp, "_get_model_config", lambda: self._make_cfg(
-            "http://127.0.0.1:9000/ollama.com/v1"
+            "http://127.0.0.1:9000/ollama.com/v1",
         ))
         monkeypatch.setattr(rp, "load_pool", lambda provider: None)
         monkeypatch.setattr(rp, "_try_resolve_from_custom_pool", lambda *a, **k: None)
@@ -1856,7 +1856,7 @@ class TestOllamaUrlSubstringLeak:
         monkeypatch.setenv("OLLAMA_API_KEY", "ol-SECRET-should-not-leak")
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "custom")
         monkeypatch.setattr(rp, "_get_model_config", lambda: self._make_cfg(
-            "http://ollama.com.attacker.test:9000/v1"
+            "http://ollama.com.attacker.test:9000/v1",
         ))
         monkeypatch.setattr(rp, "load_pool", lambda provider: None)
         monkeypatch.setattr(rp, "_try_resolve_from_custom_pool", lambda *a, **k: None)
@@ -1874,7 +1874,7 @@ class TestOllamaUrlSubstringLeak:
         monkeypatch.setenv("OLLAMA_API_KEY", "ol-legit-key")
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "custom")
         monkeypatch.setattr(rp, "_get_model_config", lambda: self._make_cfg(
-            "https://ollama.com/v1"
+            "https://ollama.com/v1",
         ))
         monkeypatch.setattr(rp, "load_pool", lambda provider: None)
         monkeypatch.setattr(rp, "_try_resolve_from_custom_pool", lambda *a, **k: None)
@@ -1889,7 +1889,7 @@ class TestOllamaUrlSubstringLeak:
         monkeypatch.setenv("OLLAMA_API_KEY", "ol-legit-key")
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "custom")
         monkeypatch.setattr(rp, "_get_model_config", lambda: self._make_cfg(
-            "https://api.ollama.com/v1"
+            "https://api.ollama.com/v1",
         ))
         monkeypatch.setattr(rp, "load_pool", lambda provider: None)
         monkeypatch.setattr(rp, "_try_resolve_from_custom_pool", lambda *a, **k: None)
@@ -1970,7 +1970,7 @@ class TestAzureFoundryResolution:
         monkeypatch.setattr(cfg_mod, "get_env_value", lambda k: None)
         monkeypatch.setattr(rp, "resolve_provider", lambda *a, **k: "azure-foundry")
         monkeypatch.setattr(rp, "_get_model_config", lambda: self._make_cfg(
-            "https://my-resource.openai.azure.com/openai/v1"
+            "https://my-resource.openai.azure.com/openai/v1",
         ))
         monkeypatch.setattr(rp, "load_pool", lambda provider: None)
 
@@ -2500,7 +2500,7 @@ def test_minimax_oauth_pool_forces_anthropic_messages_despite_stale_config(monke
     ],
 )
 def test_custom_aliases_with_lan_base_url_route_to_custom_not_openrouter(
-    monkeypatch, alias, base_url
+    monkeypatch, alias, base_url,
 ):
     """provider: ollama|vllm|llamacpp + LAN IP must NOT fall through to OpenRouter."""
     monkeypatch.setattr(

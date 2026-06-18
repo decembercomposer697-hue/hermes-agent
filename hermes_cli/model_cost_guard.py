@@ -77,7 +77,7 @@ def expensive_model_warning(
             from agent.models_dev import get_model_info
 
             input_cost, output_cost, source = _pricing_from_model_info(
-                get_model_info(provider, model)
+                get_model_info(provider, model),
             )
         except Exception:
             pass

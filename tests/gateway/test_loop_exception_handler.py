@@ -163,7 +163,7 @@ def test_handler_tolerates_missing_exception_key(monkeypatch):
     try:
         forwarded: list[dict] = []
         monkeypatch.setattr(
-            loop, "default_exception_handler", lambda ctx: forwarded.append(ctx)
+            loop, "default_exception_handler", lambda ctx: forwarded.append(ctx),
         )
         ctx = {"message": "warning without exception"}
         _gateway_loop_exception_handler(loop, ctx)

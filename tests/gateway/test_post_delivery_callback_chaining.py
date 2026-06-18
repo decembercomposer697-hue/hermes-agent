@@ -52,7 +52,7 @@ class TestPostDeliveryCallbackChaining:
         fired = []
         for label in ("A", "B", "C"):
             adapter.register_post_delivery_callback(
-                "s", lambda x=label: fired.append(x)
+                "s", lambda x=label: fired.append(x),
             )
         cb = adapter.pop_post_delivery_callback("s")
         cb()
@@ -73,10 +73,10 @@ class TestPostDeliveryCallbackChaining:
     def test_same_generation_chains(self, adapter):
         fired = []
         adapter.register_post_delivery_callback(
-            "s", lambda: fired.append("A"), generation=5
+            "s", lambda: fired.append("A"), generation=5,
         )
         adapter.register_post_delivery_callback(
-            "s", lambda: fired.append("B"), generation=5
+            "s", lambda: fired.append("B"), generation=5,
         )
         cb = adapter.pop_post_delivery_callback("s", generation=5)
         cb()
@@ -87,10 +87,10 @@ class TestPostDeliveryCallbackChaining:
         entry is rejected — it doesn't clobber the newer run's slot."""
         fired = []
         adapter.register_post_delivery_callback(
-            "s", lambda: fired.append("gen7"), generation=7
+            "s", lambda: fired.append("gen7"), generation=7,
         )
         adapter.register_post_delivery_callback(
-            "s", lambda: fired.append("stale_gen3"), generation=3
+            "s", lambda: fired.append("stale_gen3"), generation=3,
         )
         cb = adapter.pop_post_delivery_callback("s", generation=7)
         cb()
@@ -98,7 +98,7 @@ class TestPostDeliveryCallbackChaining:
 
     def test_pop_at_wrong_generation_returns_none(self, adapter):
         adapter.register_post_delivery_callback(
-            "s", lambda: None, generation=5
+            "s", lambda: None, generation=5,
         )
         assert adapter.pop_post_delivery_callback("s", generation=99) is None
         # Correct generation still finds it.

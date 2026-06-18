@@ -86,7 +86,7 @@ class WinPtyBridge:
         if not _PTY_AVAILABLE:
             if PtyProcess is None:
                 raise PtyUnavailableError(
-                    "pywinpty is not installed. Install with: pip install pywinpty"
+                    "pywinpty is not installed. Install with: pip install pywinpty",
                 )
             raise PtyUnavailableError("ConPTY is unavailable on this platform.")
         spawn_env = (os.environ.copy() if env is None else dict(env))

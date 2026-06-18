@@ -504,7 +504,7 @@ class GoalManager:
 
     def status_line(self) -> str:
         s = self._state
-        if s is None or s.status in {"cleared",}:
+        if s is None or s.status in {"cleared"}:
             return "No active goal. Set one with /goal <text>."
         turns = f"{s.turns_used}/{s.max_turns} turns"
         sub = f", {len(s.subgoals)} subgoal{'s' if len(s.subgoals) != 1 else ''}" if s.subgoals else ""
@@ -592,7 +592,7 @@ class GoalManager:
         idx = int(index_1based) - 1
         if idx < 0 or idx >= len(self._state.subgoals):
             raise IndexError(
-                f"index out of range (1..{len(self._state.subgoals)})"
+                f"index out of range (1..{len(self._state.subgoals)})",
             )
         removed = self._state.subgoals.pop(idx)
         save_goal(self.session_id, self._state)
@@ -653,7 +653,7 @@ class GoalManager:
         state.last_turn_at = time.time()
 
         verdict, reason, parse_failed = judge_goal(
-            state.goal, last_response, subgoals=state.subgoals or None
+            state.goal, last_response, subgoals=state.subgoals or None,
         )
         state.last_verdict = verdict
         state.last_reason = reason
@@ -862,7 +862,7 @@ def run_kanban_goal_loop(
                 try:
                     block_fn(
                         f"Goal-mode worker's output looked complete but it never "
-                        f"called kanban_complete after a finalize nudge ({reason})."
+                        f"called kanban_complete after a finalize nudge ({reason}).",
                     )
                 except Exception as exc:
                     _log(f"kanban goal loop: block_fn failed ({exc})")
@@ -879,7 +879,7 @@ def run_kanban_goal_loop(
                 block_fn(
                     f"Goal-mode worker exhausted its turn budget "
                     f"({turns_used}/{max_turns}) without completing the task. "
-                    f"Last judge verdict: {_truncate(reason, 300)}"
+                    f"Last judge verdict: {_truncate(reason, 300)}",
                 )
             except Exception as exc:
                 _log(f"kanban goal loop: block_fn failed ({exc})")

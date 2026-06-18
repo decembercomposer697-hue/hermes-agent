@@ -30,7 +30,7 @@ def _make_legacy_db(path: Path) -> None:
             chat_id TEXT NOT NULL, thread_id TEXT NOT NULL DEFAULT '', user_id TEXT,
             created_at INTEGER NOT NULL, last_event_id TEXT,
             PRIMARY KEY (task_id, platform, chat_id, thread_id));
-        """
+        """,
     )
     conn.execute("INSERT INTO tasks (id, title, status, created_at) VALUES ('task-1', 'T', 'done', 1000)")
     conn.execute("INSERT INTO task_comments VALUES ('c-1', 'task-1', 'agent', 'hi', 1500)")
@@ -39,7 +39,7 @@ def _make_legacy_db(path: Path) -> None:
     conn.execute("INSERT INTO task_runs VALUES ('r-1', 'task-1', 'default', 'done', 1000)")
     conn.execute(
         "INSERT INTO kanban_notify_subs (task_id, platform, chat_id, created_at, last_event_id) "
-        "VALUES ('task-1', 'telegram', '123', 1000, 'e-1')"
+        "VALUES ('task-1', 'telegram', '123', 1000, 'e-1')",
     )
     conn.commit()
     conn.close()
@@ -171,7 +171,7 @@ def test_unseen_events_for_sub_survives_migrated_db(tmp_path, monkeypatch):
 
     with kb.connect(db_path) as conn:
         cursor, events = kb.unseen_events_for_sub(
-            conn, task_id="task-1", platform="telegram", chat_id="123"
+            conn, task_id="task-1", platform="telegram", chat_id="123",
         )
         assert isinstance(cursor, int)
         assert isinstance(events, list)

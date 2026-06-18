@@ -252,7 +252,7 @@ class TestRenderToml:
                 "command": "npx",
                 "args": ["-y", "filesystem"],
                 "env": {"PATH": "/usr/bin"},
-            }
+            },
         })
         assert "[mcp_servers.fs]" in out
         assert 'command = "npx"' in out
@@ -387,8 +387,8 @@ class TestMigrate:
                     # set it should still work).
                     {"name": "legacy-plugin", "installed": True,
                      "enabled": True},
-                ]
-            }]
+                ],
+            }],
         }
 
         class FakeClient:
@@ -533,7 +533,7 @@ class TestMigrate:
                     "url": "https://api.github.com/mcp",
                     "headers": {"Authorization": "Bearer x"},
                 },
-            }
+            },
         }
         report = migrate(hermes_cfg, codex_home=tmp_path, expose_hermes_tools=False)
         assert report.written
@@ -561,7 +561,7 @@ class TestMigrate:
             'profile = "default"\n'
             "\n"
             "[providers.openai]\n"
-            'api_key = "sk-test"\n'
+            'api_key = "sk-test"\n',
         )
         migrate({"mcp_servers": {"a": {"command": "x"}}}, codex_home=tmp_path, expose_hermes_tools=False)
         new_text = target.read_text()
@@ -585,7 +585,7 @@ class TestMigrate:
             'model = "gpt-5.5"\n'
             "\n"
             "[features]\n"
-            "terminal_resize_reflow = true\n"
+            "terminal_resize_reflow = true\n",
         )
         migrate({}, codex_home=tmp_path, discover_plugins=False, expose_hermes_tools=False)
         new_text = target.read_text()
@@ -603,7 +603,7 @@ class TestMigrate:
         target.write_text(
             "[mcp_servers.user-above]\n"
             'command = "/usr/bin/above-server"\n'
-            'args = ["--above"]\n'
+            'args = ["--above"]\n',
         )
         # First migrate — adds managed block below user content
         migrate({"mcp_servers": {"hermes-mcp": {"command": "npx"}}},
@@ -615,7 +615,7 @@ class TestMigrate:
 
         # Append another user entry below the managed block
         target.write_text(
-            text + "\n[mcp_servers.user-below]\ncommand = \"below-server\"\n"
+            text + "\n[mcp_servers.user-below]\ncommand = \"below-server\"\n",
         )
         # Re-migrate — both should survive
         migrate({"mcp_servers": {"hermes-mcp": {"command": "npx"}}},
@@ -633,8 +633,8 @@ class TestMigrate:
                 "x": {
                     "command": "y",
                     "sampling": {"enabled": True},  # codex has no equivalent
-                }
-            }
+                },
+            },
         }, codex_home=tmp_path, expose_hermes_tools=False)
         assert "x" in report.skipped_keys_per_server
         assert any("sampling" in s for s in report.skipped_keys_per_server["x"])
@@ -645,14 +645,14 @@ class TestMigrate:
 
     def test_server_without_transport_skipped_with_error(self, tmp_path):
         report = migrate({
-            "mcp_servers": {"broken": {"description": "no command/url"}}
+            "mcp_servers": {"broken": {"description": "no command/url"}},
         }, codex_home=tmp_path, expose_hermes_tools=False)
         assert "broken" not in report.migrated
         assert any("broken" in e for e in report.errors)
 
     def test_summary_reports_migration_count(self, tmp_path):
         report = migrate({
-            "mcp_servers": {"a": {"command": "x"}, "b": {"command": "y"}}
+            "mcp_servers": {"a": {"command": "x"}, "b": {"command": "y"}},
         }, codex_home=tmp_path, expose_hermes_tools=False)
         summary = report.summary()
         assert "Migrated 2 MCP server(s)" in summary
@@ -741,7 +741,7 @@ class TestStripUnmanagedPluginTables:
             'command = "x"\n'
             "\n"
             '[plugins."tasks@openai-curated"]\n'
-            "enabled = true\n"
+            "enabled = true\n",
         )
 
         # Simulate codex's plugin/list reporting the same plugin tasks@openai-curated.
@@ -776,7 +776,7 @@ class TestStripUnmanagedPluginTables:
         target = tmp_path / "config.toml"
         target.write_text(
             '[plugins."tasks@openai-curated"]\n'
-            "enabled = true\n"
+            "enabled = true\n",
         )
 
         def fake_query(codex_home=None, timeout=8.0):
@@ -806,13 +806,13 @@ class TestHermesHomeLeakGuard:
 
     def test_tempdir_detector_recognizes_pytest_paths(self):
         assert _looks_like_test_tempdir(
-            "/private/var/folders/abc/pytest-of-kshitij/pytest-137/popen-gw2/test_X/hermes_test"
+            "/private/var/folders/abc/pytest-of-kshitij/pytest-137/popen-gw2/test_X/hermes_test",
         )
         assert _looks_like_test_tempdir(
-            "/tmp/pytest-of-user/pytest-12/test_X/hermes"
+            "/tmp/pytest-of-user/pytest-12/test_X/hermes",
         )
         assert _looks_like_test_tempdir(
-            "/private/var/folders/zz/T/pytest-of-bob/pytest-1"
+            "/private/var/folders/zz/T/pytest-of-bob/pytest-1",
         )
 
     def test_tempdir_detector_accepts_real_hermes_home(self):

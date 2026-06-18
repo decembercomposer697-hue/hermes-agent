@@ -265,20 +265,20 @@ TODO_SCHEMA = {
                     "properties": {
                         "id": {
                             "type": "string",
-                            "description": "Unique item identifier"
+                            "description": "Unique item identifier",
                         },
                         "content": {
                             "type": "string",
-                            "description": "Task description"
+                            "description": "Task description",
                         },
                         "status": {
                             "type": "string",
                             "enum": ["pending", "in_progress", "completed", "cancelled"],
-                            "description": "Current status"
-                        }
+                            "description": "Current status",
+                        },
                     },
-                    "required": ["id", "content", "status"]
-                }
+                    "required": ["id", "content", "status"],
+                },
             },
             "merge": {
                 "type": "boolean",
@@ -286,11 +286,11 @@ TODO_SCHEMA = {
                     "true: update existing items by id, add new ones. "
                     "false (default): replace the entire list."
                 ),
-                "default": False
-            }
+                "default": False,
+            },
         },
-        "required": []
-    }
+        "required": [],
+    },
 }
 
 

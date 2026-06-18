@@ -461,7 +461,7 @@ class TestWorkingDirResolution:
         filepath.write_text("x\n")
 
         assert m.get_working_dir_for_path(
-            f"~/{project.name}/src/main.py"
+            f"~/{project.name}/src/main.py",
         ) == str(project)
 
 
@@ -743,7 +743,7 @@ class TestGpgAndGlobalConfigIsolation:
             "[user]\n    email = real@user.com\n    name = Real User\n"
             "[commit]\n    gpgsign = true\n"
             "[tag]\n    gpgSign = true\n"
-            "[gpg]\n    program = /nonexistent/fake-gpg-binary\n"
+            "[gpg]\n    program = /nonexistent/fake-gpg-binary\n",
         )
         monkeypatch.setenv("HOME", str(fake_home))
         monkeypatch.delenv("GPG_TTY", raising=False)

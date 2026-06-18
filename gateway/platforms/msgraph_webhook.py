@@ -52,7 +52,7 @@ class MSGraphWebhookAdapter(BasePlatformAdapter):
         self._host: str = str(extra.get("host", DEFAULT_HOST))
         self._port: int = int(extra.get("port", DEFAULT_PORT))
         self._webhook_path: str = self._normalize_path(
-            extra.get("webhook_path", DEFAULT_WEBHOOK_PATH)
+            extra.get("webhook_path", DEFAULT_WEBHOOK_PATH),
         )
         self._health_path: str = self._normalize_path(extra.get("health_path", "/health"))
         self._accepted_resources: list[str] = [
@@ -62,7 +62,7 @@ class MSGraphWebhookAdapter(BasePlatformAdapter):
         ]
         self._client_state: str | None = self._string_or_none(extra.get("client_state"))
         self._max_seen_receipts = max(
-            1, int(extra.get("max_seen_receipts", DEFAULT_MAX_SEEN_RECEIPTS))
+            1, int(extra.get("max_seen_receipts", DEFAULT_MAX_SEEN_RECEIPTS)),
         )
         self._allowed_source_networks: list[ipaddress._BaseNetwork] = (
             self._parse_allowed_source_cidrs(extra.get("allowed_source_cidrs"))
@@ -140,7 +140,7 @@ class MSGraphWebhookAdapter(BasePlatformAdapter):
     async def connect(self) -> bool:
         if self._client_state is None:
             logger.error(
-                "[msgraph_webhook] Refusing to start without extra.client_state configured"
+                "[msgraph_webhook] Refusing to start without extra.client_state configured",
             )
             return False
         if self._source_allowlist_required_but_missing():
@@ -200,7 +200,7 @@ class MSGraphWebhookAdapter(BasePlatformAdapter):
                 "webhook_path": self._webhook_path,
                 "accepted": self._accepted_count,
                 "duplicates": self._duplicate_count,
-            }
+            },
         )
 
     async def _handle_validation(self, request: web.Request) -> web.Response:

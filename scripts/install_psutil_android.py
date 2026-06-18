@@ -76,7 +76,7 @@ def main() -> int:
 
     print(
         "→ Termux/Android: prebuilding psutil with Linux source path "
-        "compatibility shim (see psutil#2762)..."
+        "compatibility shim (see psutil#2762)...",
     )
 
     with tempfile.TemporaryDirectory() as tmp:

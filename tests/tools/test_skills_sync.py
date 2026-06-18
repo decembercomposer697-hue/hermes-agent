@@ -159,7 +159,7 @@ class TestReadSkillName:
         skill_dir = tmp_path / "category" / "audiocraft"
         skill_dir.mkdir(parents=True)
         (skill_dir / "SKILL.md").write_text(
-            "---\nname: audiocraft-audio-generation\n---\n# Skill"
+            "---\nname: audiocraft-audio-generation\n---\n# Skill",
         )
         skills = _discover_bundled_skills(tmp_path)
         assert skills[0][0] == "audiocraft-audio-generation"
@@ -509,7 +509,7 @@ class TestSyncSkills:
         optional_skill = optional / "mlops" / "training" / "trl-fine-tuning"
         optional_skill.mkdir(parents=True)
         (optional_skill / "SKILL.md").write_text(
-            "---\nname: fine-tuning-with-trl\n---\n# TRL\n"
+            "---\nname: fine-tuning-with-trl\n---\n# TRL\n",
         )
         (optional_skill / "references").mkdir()
         (optional_skill / "references" / "api.md").write_text("api\n")
@@ -519,7 +519,7 @@ class TestSyncSkills:
         active = skills_dir / "mlops" / "training" / "trl-fine-tuning"
         active.mkdir(parents=True)
         (active / "SKILL.md").write_text(
-            "---\nname: fine-tuning-with-trl\n---\n# TRL\n"
+            "---\nname: fine-tuning-with-trl\n---\n# TRL\n",
         )
         (active / "references").mkdir()
         (active / "references" / "api.md").write_text("api\n")
@@ -563,7 +563,7 @@ class TestSyncSkills:
         optional_skill = optional / "mlops" / "training" / "trl-fine-tuning"
         optional_skill.mkdir(parents=True)
         (optional_skill / "SKILL.md").write_text(
-            "---\nname: fine-tuning-with-trl\n---\n# Official TRL\n"
+            "---\nname: fine-tuning-with-trl\n---\n# Official TRL\n",
         )
 
         skills_dir = tmp_path / "user_skills"
@@ -571,7 +571,7 @@ class TestSyncSkills:
         wrong = skills_dir / "mlops" / "trl-fine-tuning"
         wrong.mkdir(parents=True)
         (wrong / "SKILL.md").write_text(
-            "---\nname: fine-tuning-with-trl\n---\n# Curator mangled\n"
+            "---\nname: fine-tuning-with-trl\n---\n# Curator mangled\n",
         )
 
         with self._patches(bundled, skills_dir, manifest_file):
@@ -744,7 +744,7 @@ class TestResetBundledSkill:
         bundled = tmp_path / "bundled_skills"
         (bundled / "productivity" / "google-workspace").mkdir(parents=True)
         (bundled / "productivity" / "google-workspace" / "SKILL.md").write_text(
-            "---\nname: google-workspace\n---\n# GW v2 (upstream)\n"
+            "---\nname: google-workspace\n---\n# GW v2 (upstream)\n",
         )
         return bundled
 
@@ -883,7 +883,7 @@ class TestResetBundledSkill:
         (dest / "SKILL.md").write_text("# user version\n")
         (sub / "ref.md").write_text("# nested ref\n")
         manifest_file.write_text(
-            "google-workspace:STALEHASH000000000000000000000000\n"
+            "google-workspace:STALEHASH000000000000000000000000\n",
         )
 
         # Read-only files AND directories — the real Nix-store case.
@@ -926,7 +926,7 @@ class TestResetBundledSkill:
         dest.mkdir(parents=True)
         (dest / "SKILL.md").write_text("# user version\n")
         manifest_file.write_text(
-            "google-workspace:STALEHASH000000000000000000000000\n"
+            "google-workspace:STALEHASH000000000000000000000000\n",
         )
 
         # Simulate an unremovable tree (e.g. a busy mountpoint or a path even
@@ -935,7 +935,7 @@ class TestResetBundledSkill:
             raise PermissionError(13, "Permission denied")
 
         with self._patches(bundled, skills_dir, manifest_file), patch(
-            "tools.skills_sync._rmtree_writable", side_effect=_boom
+            "tools.skills_sync._rmtree_writable", side_effect=_boom,
         ):
             result = reset_bundled_skill("google-workspace", restore=True)
 

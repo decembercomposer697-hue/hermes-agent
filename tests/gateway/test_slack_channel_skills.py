@@ -26,7 +26,7 @@ class TestSlackResolveChannelSkills:
         adapter = _make_adapter({
             "channel_skill_bindings": [
                 {"id": "D0ATH9TQ0G6", "skills": ["german-flashcards"]},
-            ]
+            ],
         })
         assert _resolve(adapter, "D0ATH9TQ0G6") == ["german-flashcards"]
 
@@ -35,7 +35,7 @@ class TestSlackResolveChannelSkills:
         adapter = _make_adapter({
             "channel_skill_bindings": [
                 {"id": "C0PARENT", "skills": ["parent-skill"]},
-            ]
+            ],
         })
         assert _resolve(adapter, "thread-ts-123", parent_id="C0PARENT") == ["parent-skill"]
 
@@ -43,7 +43,7 @@ class TestSlackResolveChannelSkills:
         adapter = _make_adapter({
             "channel_skill_bindings": [
                 {"id": "D0AAA", "skills": ["skill-a"]},
-            ]
+            ],
         })
         assert _resolve(adapter, "D0BBB") is None
 
@@ -51,7 +51,7 @@ class TestSlackResolveChannelSkills:
         adapter = _make_adapter({
             "channel_skill_bindings": [
                 {"id": "D0ATH9TQ0G6", "skill": "german-flashcards"},
-            ]
+            ],
         })
         assert _resolve(adapter, "D0ATH9TQ0G6") == ["german-flashcards"]
 
@@ -59,7 +59,7 @@ class TestSlackResolveChannelSkills:
         adapter = _make_adapter({
             "channel_skill_bindings": [
                 {"id": "D0ATH9TQ0G6", "skills": ["a", "b", "a", "c", "b"]},
-            ]
+            ],
         })
         assert _resolve(adapter, "D0ATH9TQ0G6") == ["a", "b", "c"]
 
@@ -69,7 +69,7 @@ class TestSlackResolveChannelSkills:
                 {"id": "D0AAA", "skills": ["skill-a"]},
                 {"id": "D0BBB", "skills": ["skill-b"]},
                 {"id": "D0CCC", "skills": ["skill-c"]},
-            ]
+            ],
         })
         assert _resolve(adapter, "D0BBB") == ["skill-b"]
 
@@ -79,7 +79,7 @@ class TestSlackResolveChannelSkills:
             "channel_skill_bindings": [
                 "not-a-dict",
                 {"id": "D0ABC", "skills": ["good"]},
-            ]
+            ],
         })
         assert _resolve(adapter, "D0ABC") == ["good"]
 
@@ -87,7 +87,7 @@ class TestSlackResolveChannelSkills:
         adapter = _make_adapter({
             "channel_skill_bindings": [
                 {"id": "D0ABC", "skills": []},
-            ]
+            ],
         })
         assert _resolve(adapter, "D0ABC") is None
 
@@ -95,7 +95,7 @@ class TestSlackResolveChannelSkills:
         adapter = _make_adapter({
             "channel_skill_bindings": [
                 {"id": "D0ABC", "skill": ""},
-            ]
+            ],
         })
         assert _resolve(adapter, "D0ABC") is None
 
@@ -110,7 +110,7 @@ class TestSlackMessageEventAutoSkill:
         config_extra = {
             "channel_skill_bindings": [
                 {"id": "D0ATH9TQ0G6", "skills": ["german-flashcards"]},
-            ]
+            ],
         }
         auto_skill = resolve_channel_skills(config_extra, "D0ATH9TQ0G6", None)
 

@@ -51,7 +51,7 @@ _LEVEL_RE = re.compile(r"\s(DEBUG|INFO|WARNING|ERROR|CRITICAL)\s")
 _LOGGER_NAME_RE = re.compile(
     r"\s(?:DEBUG|INFO|WARNING|ERROR|CRITICAL)"  # level
     r"(?:\s+\[.*?\])?"                           # optional session tag
-    r"\s+(\S+):"                                 # logger name
+    r"\s+(\S+):",                                 # logger name
 )
 
 # Level ordering for >= filtering

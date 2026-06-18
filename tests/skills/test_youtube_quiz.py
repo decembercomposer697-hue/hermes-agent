@@ -80,7 +80,7 @@ class TestFetchWithMockedAPI:
 
     def test_successful_fetch(self, capsys):
         mock_mod = self._make_mock_module(
-            segments=[{"text": "This is a test"}, {"text": "transcript segment"}]
+            segments=[{"text": "This is a test"}, {"text": "transcript segment"}],
         )
         with mock.patch.dict("sys.modules", {"youtube_transcript_api": mock_mod}):
             result = _run(capsys, ["fetch", "abc123"])

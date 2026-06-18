@@ -320,10 +320,10 @@ def test_strip_responses_format_strips_format_keyword():
                 "type": "object",
                 "properties": {
                     "ts": {"type": "string", "format": "date-time"},
-                }
+                },
             },
-            "type": "function"
-        }
+            "type": "function",
+        },
     ]
 
     result, stripped = strip_pattern_and_format(tools)
@@ -406,13 +406,13 @@ def test_strip_responses_format_tools():
                         "type": "array",
                         "items": {
                             "type": "string",
-                            "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$"
-                        }
-                    }
-                }
+                            "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$",
+                        },
+                    },
+                },
             },
-            "type": "function"
-        }
+            "type": "function",
+        },
     ]
 
     result, stripped = strip_pattern_and_format(tools)
@@ -434,10 +434,10 @@ def test_strip_responses_idempotent():
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "pattern": {"type": "string"}  # This is a property named pattern, NOT schema keyword
-                }
-            }
-        }
+                    "pattern": {"type": "string"},  # This is a property named pattern, NOT schema keyword
+                },
+            },
+        },
     ]
 
     # Pass 1 - property named 'pattern' should NOT be stripped
@@ -463,10 +463,10 @@ def test_strip_responses_mixed_formats():
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "query": {"type": "string", "pattern": "^[a-z]+$"}
-                    }
-                }
-            }
+                        "query": {"type": "string", "pattern": "^[a-z]+$"},
+                    },
+                },
+            },
         },
         # Responses-format: {"name": "...", "parameters": {...}}
         {
@@ -474,11 +474,11 @@ def test_strip_responses_mixed_formats():
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "tz": {"type": "string", "format": "date-time"}
-                }
+                    "tz": {"type": "string", "format": "date-time"},
+                },
             },
-            "type": "function"
-        }
+            "type": "function",
+        },
     ]
 
     result, stripped = strip_pattern_and_format(tools)

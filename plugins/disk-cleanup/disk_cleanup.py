@@ -315,7 +315,7 @@ def quick() -> dict[str, Any]:
             if re_cat != "cron-output":
                 _log(
                     f"SKIP stale cron-output entry: {p} "
-                    f"(re-classified as {re_cat!r})"
+                    f"(re-classified as {re_cat!r})",
                 )
                 # Drop the stale entry — it was misclassified.
                 continue
@@ -382,7 +382,7 @@ def quick() -> dict[str, Any]:
     save_tracked(new_tracked)
     _log(
         f"QUICK_SUMMARY: {deleted} files, {empty_removed} dirs, "
-        f"{fmt_size(freed)}"
+        f"{fmt_size(freed)}",
     )
     return {
         "deleted": deleted,
@@ -451,7 +451,7 @@ def deep(
                     count += 1
                     _log(
                         f"DELETED: {p} ({item['category']}, "
-                        f"{fmt_size(item['size'])})"
+                        f"{fmt_size(item['size'])})",
                     )
                 except OSError as e:
                     _log(f"ERROR deleting {item['path']}: {e}")

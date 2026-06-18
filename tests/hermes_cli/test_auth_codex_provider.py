@@ -829,7 +829,7 @@ def test_refresh_parses_openai_nested_error_shape_refresh_token_reused(monkeypat
                 "type": "invalid_request_error",
                 "param": None,
                 "code": "refresh_token_reused",
-            }
+            },
         },
     )
     _patch_httpx(monkeypatch, response)
@@ -853,7 +853,7 @@ def test_refresh_parses_openai_nested_error_shape_generic_code(monkeypatch):
                 "message": "Invalid client credentials.",
                 "type": "invalid_request_error",
                 "code": "invalid_client",
-            }
+            },
         },
     )
     _patch_httpx(monkeypatch, response)
@@ -959,7 +959,7 @@ def test_is_rate_limited_auth_error_distinguishes_credential_errors():
     from hermes_cli.auth import CODEX_RATE_LIMITED_CODE, is_rate_limited_auth_error
 
     rate_limited = AuthError(
-        "quota", provider="openai-codex", code=CODEX_RATE_LIMITED_CODE, relogin_required=False
+        "quota", provider="openai-codex", code=CODEX_RATE_LIMITED_CODE, relogin_required=False,
     )
     missing_creds = AuthError(
         "No Codex credentials stored.",

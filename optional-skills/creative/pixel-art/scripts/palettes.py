@@ -154,7 +154,7 @@ def build_palette_image(palette_name):
     if palette_name not in PALETTES:
         raise ValueError(
             f"Unknown palette {palette_name!r}. "
-            f"Choose from: {sorted(PALETTES)}"
+            f"Choose from: {sorted(PALETTES)}",
         )
     flat = []
     for (r, g, b) in PALETTES[palette_name]:

@@ -125,7 +125,7 @@ class TestCallLlmUnsupportedTemperatureRetry:
         client = MagicMock()
         client.base_url = "https://api.openai.com/v1"
         non_temp_err = RuntimeError(
-            "HTTP 400: Invalid value: 'tool'. Supported values are: 'assistant'..."
+            "HTTP 400: Invalid value: 'tool'. Supported values are: 'assistant'...",
         )
         client.chat.completions.create.side_effect = non_temp_err
 

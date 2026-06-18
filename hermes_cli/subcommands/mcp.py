@@ -38,7 +38,7 @@ def build_mcp_parser(subparsers, *, cmd_mcp: Callable) -> None:
     add_accept_hooks_flag(mcp_serve_p)
 
     mcp_add_p = mcp_sub.add_parser(
-        "add", help="Add an MCP server (discovery-first install)"
+        "add", help="Add an MCP server (discovery-first install)",
     )
     mcp_add_p.add_argument("name", help="Server name (used as config key)")
     mcp_add_p.add_argument("--url", help="HTTP/SSE endpoint URL")
@@ -49,10 +49,10 @@ def build_mcp_parser(subparsers, *, cmd_mcp: Callable) -> None:
     # flag is omitted, causing `hermes mcp add ...` to fall through to
     # interactive chat.
     mcp_add_p.add_argument(
-        "--command", dest="mcp_command", help="Stdio command (e.g. npx)"
+        "--command", dest="mcp_command", help="Stdio command (e.g. npx)",
     )
     mcp_add_p.add_argument(
-        "--args", nargs="*", default=[], help="Arguments for stdio command"
+        "--args", nargs="*", default=[], help="Arguments for stdio command",
     )
     mcp_add_p.add_argument("--auth", choices=["oauth", "header"], help="Auth method")
     mcp_add_p.add_argument("--preset", help="Known MCP preset name")
@@ -72,7 +72,7 @@ def build_mcp_parser(subparsers, *, cmd_mcp: Callable) -> None:
     mcp_test_p.add_argument("name", help="Server name to test")
 
     mcp_cfg_p = mcp_sub.add_parser(
-        "configure", aliases=["config"], help="Toggle tool selection"
+        "configure", aliases=["config"], help="Toggle tool selection",
     )
     mcp_cfg_p.add_argument("name", help="Server name to configure")
 

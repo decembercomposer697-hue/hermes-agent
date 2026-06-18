@@ -682,13 +682,13 @@ def _check_cua_driver_asset_for_arch() -> bool:
         )
         if not has_asset:
             _print_warning(
-                f"    Latest CUA release ({tag}) has no Intel (x86_64) asset."
+                f"    Latest CUA release ({tag}) has no Intel (x86_64) asset.",
             )
             _print_info(
-                "    CUA Driver currently only ships Apple Silicon builds."
+                "    CUA Driver currently only ships Apple Silicon builds.",
             )
             _print_info(
-                "    See: https://github.com/trycua/cua/issues/1493"
+                "    See: https://github.com/trycua/cua/issues/1493",
             )
             return False
     except Exception:
@@ -850,7 +850,7 @@ def _run_post_setup(post_setup_key: str):
                 # only, avoiding the apps/* glob which would pull in
                 # apps/desktop (Electron + node-pty) unnecessarily. See #38772.
                 [npm_bin, "install", "--silent", "--workspaces=false"],
-                capture_output=True, text=True, cwd=str(PROJECT_ROOT)
+                capture_output=True, text=True, cwd=str(PROJECT_ROOT),
             )
             if result.returncode == 0:
                 _print_success("    Node.js dependencies installed")
@@ -891,19 +891,19 @@ def _run_post_setup(post_setup_key: str):
 
         if _running_in_docker():
             _print_warning(
-                "    Chromium is missing but you're running in Docker."
+                "    Chromium is missing but you're running in Docker.",
             )
             _print_info(
-                "    Pull the latest image to get the bundled Chromium:"
+                "    Pull the latest image to get the bundled Chromium:",
             )
             _print_info(
-                "      docker pull ghcr.io/nousresearch/hermes-agent:latest"
+                "      docker pull ghcr.io/nousresearch/hermes-agent:latest",
             )
             return
 
         if not npx_bin:
             _print_warning(
-                "    npx not found - install Chromium manually: npx agent-browser install --with-deps"
+                "    npx not found - install Chromium manually: npx agent-browser install --with-deps",
             )
             return
 
@@ -956,7 +956,7 @@ def _run_post_setup(post_setup_key: str):
             result = subprocess.run(
                 # --workspaces=false avoids resolving apps/desktop. See #38772.
                 [_npm_bin, "install", "--silent", "--workspaces=false"],
-                capture_output=True, text=True, cwd=str(PROJECT_ROOT)
+                capture_output=True, text=True, cwd=str(PROJECT_ROOT),
             )
             if result.returncode == 0:
                 _print_success("    Camofox installed")
@@ -1120,7 +1120,7 @@ def _run_post_setup(post_setup_key: str):
 
         if oauth_logged_in:
             _print_success(
-                "    xAI will use your xAI Grok OAuth (SuperGrok / Premium+) credentials"
+                "    xAI will use your xAI Grok OAuth (SuperGrok / Premium+) credentials",
             )
             return
         if existing_api_key:
@@ -1152,12 +1152,12 @@ def _run_post_setup(post_setup_key: str):
         if idx == 0:
             if _run_xai_oauth_login_from_setup():
                 _print_success(
-                    "    Logged in — xAI will use these OAuth credentials"
+                    "    Logged in — xAI will use these OAuth credentials",
                 )
             else:
                 _print_warning(
                     "    xAI Grok OAuth login did not complete. "
-                    "Run later: hermes auth add xai-oauth"
+                    "Run later: hermes auth add xai-oauth",
                 )
         elif idx == 1:
             api_key = _setup_prompt("    xAI API key", password=True)
@@ -1166,7 +1166,7 @@ def _run_post_setup(post_setup_key: str):
                 _print_success("    XAI_API_KEY saved")
             else:
                 _print_warning(
-                    "    No API key provided. Run later: hermes auth add xai-oauth"
+                    "    No API key provided. Run later: hermes auth add xai-oauth",
                 )
         else:
             _print_info("    xAI will remain inactive until credentials are configured.")
@@ -1221,7 +1221,7 @@ def run_post_setup_command(args) -> int:
     if key not in valid:
         _print_error(
             f"Unknown post-setup key: {key!r}. "
-            f"Valid keys: {', '.join(sorted(valid)) or '(none)'}"
+            f"Valid keys: {', '.join(sorted(valid)) or '(none)'}",
         )
         return 2
     _print_info(f"Running post-setup hook: {key}")
@@ -2049,7 +2049,7 @@ def _visible_providers(
         acct
         and acct.logged_in
         and acct.paid_service_access is not True
-        and acct.tool_gateway_entitled
+        and acct.tool_gateway_entitled,
     )
     visible = []
     for provider in cat.get("providers", []):
@@ -2295,7 +2295,7 @@ def _configure_tool_category(
                 get_nous_subscription_features(
                     config,
                     force_fresh=force_fresh,
-                ).nous_auth_present
+                ).nous_auth_present,
             )
         except Exception:
             _nous_logged_in = False
@@ -2859,7 +2859,7 @@ def _configure_provider(
             coverage_category=MANAGED_FEATURE_COVERAGE_CATEGORY.get(managed_feature),
         ):
             _print_warning(
-                "  Not enabled — Nous Portal access is required for this backend."
+                "  Not enabled — Nous Portal access is required for this backend.",
             )
             return
 
@@ -2869,7 +2869,7 @@ def _configure_provider(
     if provider.get("requires_nous_auth") and not managed_feature:
         features = get_nous_subscription_features(config, force_fresh=force_fresh)
         entitled = bool(
-            features.account_info and features.account_info.paid_service_access is True
+            features.account_info and features.account_info.paid_service_access is True,
         )
         if not features.nous_auth_present or not entitled:
             message = format_nous_portal_entitlement_message(
@@ -2877,7 +2877,7 @@ def _configure_provider(
                 capability=f"{provider.get('name', 'Nous Subscription')}",
             )
             _print_warning(
-                f"  {message or 'Nous Subscription is only available after logging into Nous Portal.'}"
+                f"  {message or 'Nous Subscription is only available after logging into Nous Portal.'}",
             )
             return
 
@@ -3227,7 +3227,7 @@ def _reconfigure_provider(
             coverage_category=MANAGED_FEATURE_COVERAGE_CATEGORY.get(managed_feature),
         ):
             _print_warning(
-                "  Not enabled — Nous Portal access is required for this backend."
+                "  Not enabled — Nous Portal access is required for this backend.",
             )
             return
 
@@ -3236,7 +3236,7 @@ def _reconfigure_provider(
     if provider.get("requires_nous_auth") and not managed_feature:
         features = get_nous_subscription_features(config, force_fresh=force_fresh)
         entitled = bool(
-            features.account_info and features.account_info.paid_service_access is True
+            features.account_info and features.account_info.paid_service_access is True,
         )
         if not features.nous_auth_present or not entitled:
             message = format_nous_portal_entitlement_message(
@@ -3244,7 +3244,7 @@ def _reconfigure_provider(
                 capability=f"{provider.get('name', 'Nous Subscription')}",
             )
             _print_warning(
-                f"  {message or 'Nous Subscription is only available after logging into Nous Portal.'}"
+                f"  {message or 'Nous Subscription is only available after logging into Nous Portal.'}",
             )
             return
 
@@ -3770,7 +3770,7 @@ def _configure_mcp_tools_interactive(config: dict):
         enabled_count = len(chosen)
         disabled_count = len(tools) - enabled_count
         _print_success(
-            f"  {server_name}: {enabled_count} enabled, {disabled_count} disabled"
+            f"  {server_name}: {enabled_count} enabled, {disabled_count} disabled",
         )
         any_changes = True
 
@@ -3902,7 +3902,7 @@ def tools_disable_enable_command(args):
             allowed = sorted(_TOOLSET_PLATFORM_RESTRICTIONS.get(name) or set())
             _print_error(
                 f"Toolset '{name}' is not available on platform '{platform}' "
-                f"(only: {', '.join(allowed)})"
+                f"(only: {', '.join(allowed)})",
             )
         toolset_targets = [t for t in toolset_targets if t not in restricted_targets]
 

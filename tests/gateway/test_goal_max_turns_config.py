@@ -33,7 +33,7 @@ async def test_gateway_goal_uses_goals_max_turns_from_full_config(tmp_path, monk
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.DISCORD: PlatformConfig(enabled=True, token="token")}
+        platforms={Platform.DISCORD: PlatformConfig(enabled=True, token="token")},
     )
     runner.session_store = _FakeSessionStore()
     runner.adapters = {}

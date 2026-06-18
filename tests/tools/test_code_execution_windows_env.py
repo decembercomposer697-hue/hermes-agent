@@ -461,7 +461,7 @@ class TestSandboxWritesUtf8:
         # ``encoding="utf-8"`` within a short window.
         import re
         pattern = re.compile(
-            r'open\(\s*os\.path\.join\(\s*tmpdir\s*,\s*"[^"]+\.py"\s*\)\s*,\s*"w"[^)]*\)'
+            r'open\(\s*os\.path\.join\(\s*tmpdir\s*,\s*"[^"]+\.py"\s*\)\s*,\s*"w"[^)]*\)',
         )
         for match in pattern.finditer(src):
             line = match.group(0)
@@ -490,7 +490,7 @@ class TestSandboxWritesUtf8:
         from tools.code_execution_tool import generate_hermes_tools_module
         import tempfile, ast
         stub = generate_hermes_tools_module(
-            ["terminal", "read_file", "write_file"], transport="uds"
+            ["terminal", "read_file", "write_file"], transport="uds",
         )
         # Sanity: stub actually contains a non-ASCII character, otherwise
         # this test wouldn't prove anything meaningful.
@@ -503,7 +503,7 @@ class TestSandboxWritesUtf8:
         )
 
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".py", delete=False, encoding="utf-8"
+            mode="w", suffix=".py", delete=False, encoding="utf-8",
         ) as f:
             f.write(stub)
             tmp_path = f.name
@@ -538,7 +538,7 @@ class TestSandboxWritesUtf8:
 
         # Write with default encoding (simulating the old buggy code).
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".py", delete=False
+            mode="w", suffix=".py", delete=False,
         ) as f:
             try:
                 f.write(stub)
@@ -567,7 +567,7 @@ class TestSandboxWritesUtf8:
                         "Default text-file encoding is UTF-8-compatible on "
                         "this Windows build — explicit encoding= is no "
                         "longer load-bearing, but keep it for belt-and-"
-                        "suspenders."
+                        "suspenders.",
                     )
                 except UnicodeDecodeError:
                     # Exactly the failure mode that motivated the fix.
@@ -703,7 +703,7 @@ class TestChildStdioIsUtf8:
                 "This Python/Windows build handles non-ASCII stdout even "
                 "without PYTHONIOENCODING/PYTHONUTF8 — fix is defensive "
                 "but no longer strictly load-bearing.  Keep the env vars "
-                "for older Python builds and C.ASCII-locale containers."
+                "for older Python builds and C.ASCII-locale containers.",
             )
         # Otherwise: crash OR garbled output — both count as proving the
         # bug is real on this system.

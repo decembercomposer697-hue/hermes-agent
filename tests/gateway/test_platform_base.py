@@ -366,7 +366,7 @@ class TestExtractMedia:
     def test_media_tag_windows_backslash_path(self):
         """extract_media should recognise Windows backslash paths."""
         media, cleaned = BasePlatformAdapter.extract_media(
-            r"MEDIA:C:\Users\kotsu\file.pdf"
+            r"MEDIA:C:\Users\kotsu\file.pdf",
         )
         assert len(media) == 1
         assert media[0][0].endswith("file.pdf")
@@ -374,7 +374,7 @@ class TestExtractMedia:
     def test_media_tag_windows_forward_slash_path(self):
         """extract_media should recognise Windows forward-slash paths."""
         media, cleaned = BasePlatformAdapter.extract_media(
-            "MEDIA:C:/Users/kotsu/file.pdf"
+            "MEDIA:C:/Users/kotsu/file.pdf",
         )
         assert len(media) == 1
         assert media[0][0].endswith("file.pdf")
@@ -382,7 +382,7 @@ class TestExtractMedia:
     def test_media_tag_windows_drive_root(self):
         """extract_media should recognise a path at the drive root."""
         media, cleaned = BasePlatformAdapter.extract_media(
-            r"MEDIA:D:\report.md"
+            r"MEDIA:D:\report.md",
         )
         assert len(media) == 1
         assert media[0][0].endswith("report.md")
@@ -396,7 +396,7 @@ class TestExtractMedia:
     def test_relative_path_still_ignored(self):
         """Relative Windows-style paths (no drive letter) must not match."""
         media, _ = BasePlatformAdapter.extract_media(
-            r"MEDIA:Users\kotsu\file.pdf"
+            r"MEDIA:Users\kotsu\file.pdf",
         )
         assert media == []
 
@@ -503,7 +503,7 @@ class TestMediaInsideSerializedJson:
 
     def test_media_after_prose_same_line_still_extracted(self):
         media, _ = BasePlatformAdapter.extract_media(
-            "Here is your file: MEDIA:/out/report.pdf"
+            "Here is your file: MEDIA:/out/report.pdf",
         )
         assert len(media) == 1 and media[0][0] == "/out/report.pdf"
 
@@ -514,13 +514,13 @@ class TestMediaInsideSerializedJson:
     def test_quoted_path_media_still_extracted(self):
         """MEDIA:"..." quoted-path form (a real LLM output) is not JSON-masked."""
         media, _ = BasePlatformAdapter.extract_media(
-            'MEDIA:"/path/with space/file.png"'
+            'MEDIA:"/path/with space/file.png"',
         )
         assert len(media) == 1 and media[0][0] == "/path/with space/file.png"
 
     def test_tts_two_line_still_extracted(self):
         media, _ = BasePlatformAdapter.extract_media(
-            "[[audio_as_voice]]\nMEDIA:/tmp/v.ogg"
+            "[[audio_as_voice]]\nMEDIA:/tmp/v.ogg",
         )
         assert len(media) == 1 and media[0][0] == "/tmp/v.ogg"
         assert media[0][1] is True  # voice flag

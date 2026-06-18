@@ -197,5 +197,5 @@ class TestEnvVarOrder:
         from hermes_cli.auth import PROVIDER_REGISTRY
         copilot = PROVIDER_REGISTRY["copilot"]
         assert copilot.api_key_env_vars == (
-            "COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"
+            "COPILOT_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN",
         )

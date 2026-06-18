@@ -145,7 +145,7 @@ class TestResetTerminalInputModes(unittest.TestCase):
                 cli_mod._reset_terminal_input_modes_on_exit()
             self.assertIn("\x1b[?1004l", "".join(fake.written))
             self.assertFalse(
-                cli_mod._tui_input_modes_active, "flag must clear after reset"
+                cli_mod._tui_input_modes_active, "flag must clear after reset",
             )
         finally:
             cli_mod._tui_input_modes_active = original
@@ -167,13 +167,13 @@ class TestRunCleanupWiring(unittest.TestCase):
         try:
             with (
                 patch.object(
-                    cli_mod, "_reset_terminal_input_modes_on_exit"
+                    cli_mod, "_reset_terminal_input_modes_on_exit",
                 ) as mock_reset,
                 patch.object(
-                    cli_mod, "_cleanup_all_terminals", patches["_cleanup_all_terminals"]
+                    cli_mod, "_cleanup_all_terminals", patches["_cleanup_all_terminals"],
                 ),
                 patch.object(
-                    cli_mod, "_cleanup_all_browsers", patches["_cleanup_all_browsers"]
+                    cli_mod, "_cleanup_all_browsers", patches["_cleanup_all_browsers"],
                 ),
                 patch("tools.mcp_tool.shutdown_mcp_servers", lambda *a, **k: None),
                 patch(

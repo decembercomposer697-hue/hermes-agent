@@ -36,7 +36,7 @@ def _find_singularity_executable() -> str:
     raise RuntimeError(
         "Neither 'apptainer' nor 'singularity' was found in PATH. "
         "Install Apptainer (https://apptainer.org/docs/admin/main/installation.html) "
-        "or Singularity and ensure the CLI is available."
+        "or Singularity and ensure the CLI is available.",
     )
 
 
@@ -50,7 +50,7 @@ def _ensure_singularity_available() -> str:
         )
     except FileNotFoundError:
         raise RuntimeError(
-            f"Singularity backend selected but '{exe}' could not be executed."
+            f"Singularity backend selected but '{exe}' could not be executed.",
         )
     except subprocess.TimeoutExpired:
         raise RuntimeError(f"'{exe} version' timed out.")

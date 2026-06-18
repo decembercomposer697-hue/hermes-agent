@@ -65,8 +65,8 @@ def test_runtime_config_uses_existing_teams_platform_settings():
                         "notion": {"enabled": True, "database_id": "db-1"},
                     },
                 },
-            )
-        }
+            ),
+        },
     )
 
     runtime_config = build_pipeline_runtime_config(gateway_config)
@@ -101,9 +101,9 @@ def test_build_pipeline_runtime_reuses_existing_teams_adapter_surface(monkeypatc
                         "delivery_mode": "incoming_webhook",
                         "incoming_webhook_url": "https://example.com/hook",
                     },
-                )
-            }
-        )
+                ),
+            },
+        ),
     )
 
     runtime = runtime_module.build_pipeline_runtime(gateway)
@@ -279,7 +279,7 @@ class TestTeamsMeetingPipeline:
                 "changeType": "updated",
                 "resource": "communications/onlineMeetings/meeting-123",
                 "resourceData": {"id": "meeting-123"},
-            }
+            },
         )
 
         assert job.status == "completed"
@@ -305,7 +305,7 @@ class TestTeamsMeetingPipeline:
                     artifact_id="rec-1",
                     display_name="recording.mp4",
                     download_url="https://files.example/recording.mp4",
-                )
+                ),
             ]
 
         async def _download(client, meeting_ref, recording, destination):
@@ -368,7 +368,7 @@ class TestTeamsMeetingPipeline:
                 "changeType": "updated",
                 "resource": "communications/onlineMeetings/meeting-456",
                 "resourceData": {"id": "meeting-456"},
-            }
+            },
         )
 
         assert job.status == "completed"
@@ -403,7 +403,7 @@ class TestTeamsMeetingPipeline:
                 "changeType": "updated",
                 "resource": "communications/onlineMeetings/meeting-789",
                 "resourceData": {"id": "meeting-789"},
-            }
+            },
         )
 
         assert job.status == "retry_scheduled"

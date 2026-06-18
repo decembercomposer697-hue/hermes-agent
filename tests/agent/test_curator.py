@@ -123,7 +123,7 @@ def test_old_run_eligible(curator_env):
     default — bumping DEFAULT_INTERVAL_HOURS shouldn't break it."""
     c = curator_env["curator"]
     long_ago = datetime.now(UTC) - timedelta(
-        hours=c.get_interval_hours() * 2
+        hours=c.get_interval_hours() * 2,
     )
     c.save_state({"last_run_at": long_ago.isoformat(), "paused": False})
     assert c.should_run_now() is True

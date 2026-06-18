@@ -50,13 +50,13 @@ class TestDeepSeekAnthropicPreservesThinking:
                         "id": "call_1",
                         "type": "function",
                         "function": {"name": "skill_view", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_1", "content": "ok"},
         ]
         _system, converted = convert_messages_to_anthropic(
-            messages, base_url=base_url
+            messages, base_url=base_url,
         )
 
         assistant_msg = next(m for m in converted if m["role"] == "assistant")
@@ -87,7 +87,7 @@ class TestDeepSeekAnthropicPreservesThinking:
                         "id": "call_1",
                         "type": "function",
                         "function": {"name": "f", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_1", "content": "ok"},
@@ -100,13 +100,13 @@ class TestDeepSeekAnthropicPreservesThinking:
                         "id": "call_2",
                         "type": "function",
                         "function": {"name": "f", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_2", "content": "ok"},
         ]
         _system, converted = convert_messages_to_anthropic(
-            messages, base_url="https://api.deepseek.com/anthropic"
+            messages, base_url="https://api.deepseek.com/anthropic",
         )
 
         assistants = [m for m in converted if m["role"] == "assistant"]
@@ -143,7 +143,7 @@ class TestDeepSeekAnthropicPreservesThinking:
             {"role": "user", "content": "again"},
         ]
         _system, converted = convert_messages_to_anthropic(
-            messages, base_url="https://api.deepseek.com/anthropic"
+            messages, base_url="https://api.deepseek.com/anthropic",
         )
 
         assistant_msg = next(m for m in converted if m["role"] == "assistant")
@@ -175,7 +175,7 @@ class TestDeepSeekAnthropicPreservesThinking:
                         "id": "call_1",
                         "type": "function",
                         "function": {"name": "f", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_1", "content": "ok"},
@@ -185,7 +185,7 @@ class TestDeepSeekAnthropicPreservesThinking:
         # indirect.  Instead check the simpler invariant: no thinking block in
         # the converted output carries cache_control.
         _system, converted = convert_messages_to_anthropic(
-            messages, base_url="https://api.deepseek.com/anthropic"
+            messages, base_url="https://api.deepseek.com/anthropic",
         )
         for m in converted:
             if not isinstance(m.get("content"), list):
@@ -223,13 +223,13 @@ class TestDeepSeekAnthropicPreservesThinking:
                         "id": "call_1",
                         "type": "function",
                         "function": {"name": "f", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_1", "content": "ok"},
         ]
         _system, converted = convert_messages_to_anthropic(
-            messages, base_url="https://api.minimax.io/anthropic"
+            messages, base_url="https://api.minimax.io/anthropic",
         )
         assistant_msg = next(m for m in converted if m["role"] == "assistant")
         thinking_blocks = [

@@ -104,7 +104,7 @@ class TestIsUvToolInstall:
         from hermes_cli import config
 
         with patch.object(
-            config.sys, "prefix", "/HOME/USER/.local/share/UV/Tools/hermes-agent"
+            config.sys, "prefix", "/HOME/USER/.local/share/UV/Tools/hermes-agent",
         ):
             assert config.is_uv_tool_install() is True
 
@@ -283,7 +283,7 @@ class TestCmdUpdatePipInstallLayouts:
 
     @patch("subprocess.run")
     def test_pipx_layout_without_pipx_binary_treated_as_venv(
-        self, mock_run, monkeypatch
+        self, mock_run, monkeypatch,
     ):
         from hermes_cli import main as hm
 

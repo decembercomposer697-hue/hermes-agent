@@ -124,7 +124,7 @@ class TestWaitForSuccess:
         with patch("hermes_cli.dingtalk_auth.poll_registration", side_effect=responses), \
              patch("hermes_cli.dingtalk_auth.time.sleep"):
             cid, secret = wait_for_registration_success(
-                device_code="dev", interval=0, expires_in=60
+                device_code="dev", interval=0, expires_in=60,
             )
             assert cid == "cid-1"
             assert secret == "sec-1"
@@ -137,7 +137,7 @@ class TestWaitForSuccess:
              patch("hermes_cli.dingtalk_auth.time.sleep"):
             with pytest.raises(RegistrationError, match="credentials are missing"):
                 wait_for_registration_success(
-                    device_code="dev", interval=0, expires_in=60
+                    device_code="dev", interval=0, expires_in=60,
                 )
 
     def test_invokes_waiting_callback(self):
@@ -152,7 +152,7 @@ class TestWaitForSuccess:
         with patch("hermes_cli.dingtalk_auth.poll_registration", side_effect=responses), \
              patch("hermes_cli.dingtalk_auth.time.sleep"):
             wait_for_registration_success(
-                device_code="dev", interval=0, expires_in=60, on_waiting=callback
+                device_code="dev", interval=0, expires_in=60, on_waiting=callback,
             )
         assert callback.call_count == 2
 

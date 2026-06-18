@@ -161,7 +161,7 @@ def test_probe_config_health_flags_null_personalities_with_active_personality():
             "agent": {"personalities": None},
             "display": {"personality": "kawaii"},
             "model": {},
-        }
+        },
     )
     assert "display.personality" in msg
     assert "agent.personalities" in msg
@@ -294,7 +294,7 @@ def test_make_agent_honors_per_session_model_override():
         from tui_gateway.server import _make_agent
 
         _make_agent(
-            "sid-override", "key-override", model_override=override
+            "sid-override", "key-override", model_override=override,
         )
 
         kwargs = mock_agent.call_args.kwargs

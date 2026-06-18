@@ -11,7 +11,7 @@ class NousProfile(ProviderProfile):
     """Nous Portal — product tags, reasoning with Nous-specific omission."""
 
     def build_extra_body(
-        self, *, session_id: str | None = None, **context
+        self, *, session_id: str | None = None, **context,
     ) -> dict[str, Any]:
         return {"tags": nous_portal_tags()}
 

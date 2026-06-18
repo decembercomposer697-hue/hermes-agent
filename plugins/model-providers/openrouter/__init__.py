@@ -73,7 +73,7 @@ class OpenRouterProfile(ProviderProfile):
             return None
 
     def build_extra_body(
-        self, *, session_id: str | None = None, **context: Any
+        self, *, session_id: str | None = None, **context: Any,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {}
         if session_id:
@@ -96,7 +96,7 @@ class OpenRouterProfile(ProviderProfile):
                     score_f = None
                 if score_f is not None and 0.0 <= score_f <= 1.0:
                     body["plugins"] = [
-                        {"id": "pareto-router", "min_coding_score": score_f}
+                        {"id": "pareto-router", "min_coding_score": score_f},
                     ]
         return body
 

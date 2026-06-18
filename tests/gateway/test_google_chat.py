@@ -46,7 +46,7 @@ class _FakeHttpError(Exception):
 def _ensure_google_mocks():
     """Install mock google-* modules so GoogleChatAdapter can be imported."""
     if "google.cloud.pubsub_v1" in sys.modules and hasattr(
-        sys.modules["google.cloud.pubsub_v1"], "__file__"
+        sys.modules["google.cloud.pubsub_v1"], "__file__",
     ):
         return  # Real libraries installed, use them.
 
@@ -176,7 +176,7 @@ def adapter(tmp_path):
     # Replace the production store (which would write to ~/.hermes/...)
     # with a tmp-path one so tests can roundtrip without side effects.
     a._thread_count_store = _ThreadCountStore(
-        tmp_path / "google_chat_thread_counts.json"
+        tmp_path / "google_chat_thread_counts.json",
     )
     yield a
     try:
@@ -222,8 +222,8 @@ def _make_chat_envelope(text="hello", sender_email="u@example.com", sender_type=
             "messagePayload": {
                 "space": msg["space"],
                 "message": msg,
-            }
-        }
+            },
+        },
     }
 
 
@@ -455,8 +455,8 @@ class TestOnPubsubMessage:
                 "membershipPayload": {
                     "space": {"name": "spaces/S"},
                     "membership": {"member": {"name": "users/BOT_ID", "type": "BOT"}},
-                }
-            }
+                },
+            },
         }
         msg = _make_pubsub_message(
             envelope,
@@ -472,8 +472,8 @@ class TestOnPubsubMessage:
                 "membershipPayload": {
                     "space": {"name": "spaces/S"},
                     "membership": {"member": {"name": "users/BOT_ID", "type": "BOT"}},
-                }
-            }
+                },
+            },
         }
         msg = _make_pubsub_message(
             envelope,
@@ -555,7 +555,7 @@ class TestOnPubsubMessage:
         env = _make_chat_envelope(text="hola")
         msg = _make_pubsub_message(env)
         with patch.object(
-            adapter, "_submit_on_loop", side_effect=RuntimeError("boom")
+            adapter, "_submit_on_loop", side_effect=RuntimeError("boom"),
         ):
             # Must not re-raise (would trigger Pub/Sub infinite redelivery).
             adapter._on_pubsub_message(msg)
@@ -760,7 +760,7 @@ class TestBuildMessageEvent:
         assert "spaces/S" not in adapter._last_inbound_thread
         # Counter populated for next-time decision (persisted store).
         assert adapter._thread_count_store.get(
-            "spaces/S", "spaces/S/threads/T1"
+            "spaces/S", "spaces/S/threads/T1",
         ) == 1
 
     @pytest.mark.asyncio
@@ -794,14 +794,14 @@ class TestBuildMessageEvent:
         # First message → main flow (cache stays clear).
         env1 = _make_chat_envelope(text="primera", thread_name="spaces/S/threads/SIDE")
         await adapter._build_message_event(
-            env1["chat"]["messagePayload"]["message"], env1
+            env1["chat"]["messagePayload"]["message"], env1,
         )
         assert "spaces/S" not in adapter._last_inbound_thread
 
         # Second message in same thread → side thread → cache populated.
         env2 = _make_chat_envelope(text="segunda", thread_name="spaces/S/threads/SIDE")
         await adapter._build_message_event(
-            env2["chat"]["messagePayload"]["message"], env2
+            env2["chat"]["messagePayload"]["message"], env2,
         )
         assert adapter._last_inbound_thread["spaces/S"] == "spaces/S/threads/SIDE"
 
@@ -814,14 +814,14 @@ class TestBuildMessageEvent:
         for _ in range(2):
             env = _make_chat_envelope(text="x", thread_name="spaces/S/threads/T_side")
             await adapter._build_message_event(
-                env["chat"]["messagePayload"]["message"], env
+                env["chat"]["messagePayload"]["message"], env,
             )
         assert adapter._last_inbound_thread["spaces/S"] == "spaces/S/threads/T_side"
 
         # User types in input box: NEW thread T_new (count goes 0→1, main flow).
         env_main = _make_chat_envelope(text="back to top", thread_name="spaces/S/threads/T_new")
         await adapter._build_message_event(
-            env_main["chat"]["messagePayload"]["message"], env_main
+            env_main["chat"]["messagePayload"]["message"], env_main,
         )
         # Cache cleared so outbound reply lands top-level.
         assert "spaces/S" not in adapter._last_inbound_thread
@@ -895,7 +895,7 @@ class TestSend:
     async def test_text_send_creates_message(self, adapter):
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m/1",
-                                        "error": None})()
+                                        "error": None})(),
         )
         result = await adapter.send("spaces/S", "hola")
         adapter._create_message.assert_called()
@@ -920,7 +920,7 @@ class TestSend:
         # create(**kwargs) -> .execute(...).
         create_call = MagicMock()
         create_call.return_value.execute = MagicMock(
-            return_value={"name": "spaces/S/messages/M"}
+            return_value={"name": "spaces/S/messages/M"},
         )
         adapter._chat_api.spaces.return_value.messages.return_value.create = create_call
 
@@ -940,7 +940,7 @@ class TestSend:
         Sending it would imply a thread intent we don't have."""
         create_call = MagicMock()
         create_call.return_value.execute = MagicMock(
-            return_value={"name": "spaces/S/messages/M"}
+            return_value={"name": "spaces/S/messages/M"},
         )
         adapter._chat_api.spaces.return_value.messages.return_value.create = create_call
 
@@ -954,7 +954,7 @@ class TestSend:
         adapter._patch_message = AsyncMock(
             return_value=type("R", (), {"success": True,
                                         "message_id": "spaces/S/messages/THINK",
-                                        "error": None})()
+                                        "error": None})(),
         )
         adapter._create_message = AsyncMock()
         result = await adapter.send(
@@ -974,7 +974,7 @@ class TestSend:
     async def test_long_text_splits_and_sends_multiple(self, adapter):
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
         long_text = "x" * 9000
         await adapter.send("spaces/S", long_text)
@@ -1016,7 +1016,7 @@ class TestTypingLifecycle:
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True,
                                         "message_id": "spaces/S/messages/THINK",
-                                        "error": None})()
+                                        "error": None})(),
         )
         await adapter.send_typing("spaces/S")
         adapter._create_message.assert_awaited_once()
@@ -1041,7 +1041,7 @@ class TestTypingLifecycle:
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True,
                                         "message_id": "spaces/S/messages/THINK",
-                                        "error": None})()
+                                        "error": None})(),
         )
         await adapter.send_typing("spaces/S")
         # Verify the body sent to _create_message included the thread.
@@ -1056,7 +1056,7 @@ class TestTypingLifecycle:
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True,
                                         "message_id": "spaces/S/messages/THINK",
-                                        "error": None})()
+                                        "error": None})(),
         )
         await adapter.send_typing("spaces/S")
         sent_body = adapter._create_message.call_args.args[1]
@@ -1158,7 +1158,7 @@ class TestTypingLifecycle:
         adapter._patch_message = AsyncMock(
             return_value=type("R", (), {"success": True,
                                         "message_id": "x",
-                                        "error": None})()
+                                        "error": None})(),
         )
         event = MagicMock()
         event.source = MagicMock()
@@ -1225,7 +1225,7 @@ class TestTypingLifecycle:
         adapter._patch_message = AsyncMock(
             return_value=type("R", (), {"success": True,
                                         "message_id": "spaces/S/messages/THINK",
-                                        "error": None})()
+                                        "error": None})(),
         )
         event = MagicMock()
         event.source = MagicMock()
@@ -1249,7 +1249,7 @@ class TestEditMessage:
         adapter._patch_message = AsyncMock(
             return_value=type("R", (), {"success": True,
                                         "message_id": "spaces/S/messages/M",
-                                        "error": None})()
+                                        "error": None})(),
         )
         result = await adapter.edit_message(
             "spaces/S", "spaces/S/messages/M", "edited content",
@@ -1263,7 +1263,7 @@ class TestEditMessage:
     async def test_edit_message_truncates_overlong_text(self, adapter):
         adapter._patch_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
         long_text = "x" * 9000
         await adapter.edit_message("spaces/S", "spaces/S/messages/M", long_text)
@@ -1347,7 +1347,7 @@ class TestNativeAttachmentDelivery:
         adapter._user_credentials = None
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m/notice",
-                                        "error": None})()
+                                        "error": None})(),
         )
 
         result = await adapter._send_file(
@@ -1370,11 +1370,11 @@ class TestNativeAttachmentDelivery:
 
         upload_call = MagicMock()
         upload_call.return_value.execute = MagicMock(
-            return_value={"attachmentDataRef": {"resourceName": "ref-abc"}}
+            return_value={"attachmentDataRef": {"resourceName": "ref-abc"}},
         )
         create_call = MagicMock()
         create_call.return_value.execute = MagicMock(
-            return_value={"name": "spaces/S/messages/MID"}
+            return_value={"name": "spaces/S/messages/MID"},
         )
         adapter._user_chat_api = MagicMock()
         adapter._user_chat_api.media.return_value.upload = upload_call
@@ -1394,7 +1394,7 @@ class TestNativeAttachmentDelivery:
         # Verify the messages.create body referenced the attachment ref.
         body_passed = create_call.call_args.kwargs["body"]
         assert body_passed["attachment"][0]["attachmentDataRef"] == {
-            "resourceName": "ref-abc"
+            "resourceName": "ref-abc",
         }
 
     @pytest.mark.asyncio
@@ -1405,7 +1405,7 @@ class TestNativeAttachmentDelivery:
         f.write_bytes(b"%PDF-fake")
         upload_call = MagicMock()
         upload_call.return_value.execute = MagicMock(
-            side_effect=_FakeHttpError(status=401, reason="Unauthorized")
+            side_effect=_FakeHttpError(status=401, reason="Unauthorized"),
         )
         adapter._user_chat_api = MagicMock()
         adapter._user_chat_api.media.return_value.upload = upload_call
@@ -1413,7 +1413,7 @@ class TestNativeAttachmentDelivery:
         adapter._consume_typing_card_with_text = AsyncMock(return_value=None)
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
 
         result = await adapter._send_file(
@@ -1436,7 +1436,7 @@ class TestNativeAttachmentDelivery:
         f.write_bytes(b"%PDF-fake")
         upload_call = MagicMock()
         upload_call.return_value.execute = MagicMock(
-            side_effect=_FakeHttpError(status=500, reason="Server error")
+            side_effect=_FakeHttpError(status=500, reason="Server error"),
         )
         adapter._user_chat_api = MagicMock()
         adapter._user_chat_api.media.return_value.upload = upload_call
@@ -1473,7 +1473,7 @@ class TestSetupFilesSlashCommand:
                 ),
                 raw_message={},
                 message_id="spaces/S/messages/M",
-            )
+            ),
         )
         await adapter._dispatch_message({}, {})
         adapter._handle_setup_files_command.assert_awaited_once()
@@ -1486,7 +1486,7 @@ class TestSetupFilesSlashCommand:
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
         handled = await adapter._handle_setup_files_command(
             chat_id="spaces/S",
@@ -1504,7 +1504,7 @@ class TestSetupFilesSlashCommand:
         adapter._user_credentials = MagicMock(valid=True)
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
         await adapter._handle_setup_files_command(
             chat_id="spaces/S",
@@ -1569,7 +1569,7 @@ class TestUserOAuthHelper:
         assert per_user.name == "alice@example.com.json"
 
     def test_load_user_credentials_per_email_returns_none_when_missing(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """A user who has not authorized has no token file; load returns
         ``None`` and never throws — same contract as the legacy path."""
@@ -1578,7 +1578,7 @@ class TestUserOAuthHelper:
         assert load_user_credentials("nobody@example.com") is None
 
     def test_list_authorized_emails_lists_per_user_files(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """``list_authorized_emails`` enumerates the per-user dir; the
         legacy file is intentionally excluded (its owner is unknown)."""
@@ -1596,14 +1596,14 @@ class TestUserOAuthHelper:
         ]
 
     def test_list_authorized_emails_empty_when_dir_missing(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         from plugins.platforms.google_chat.oauth import list_authorized_emails
         assert list_authorized_emails() == []
 
     def test_pending_auth_path_is_per_user_when_email_given(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Two users running /setup-files start in parallel must not
         clobber each other's PKCE verifier — the pending state file
@@ -1631,8 +1631,8 @@ class TestUserOAuthHelper:
                         "client_secret": "secret",
                         "refresh_token": "rtok",
                         "token": "atok",
-                    }
-                )
+                    },
+                ),
             },
         )()
 
@@ -1711,7 +1711,7 @@ class TestPerUserAttachmentRouting:
 
     @pytest.mark.asyncio
     async def test_send_file_uses_per_user_token_when_sender_known(
-        self, adapter, tmp_path, monkeypatch
+        self, adapter, tmp_path, monkeypatch,
     ):
         """sender_email maps to a per-user file → that user's API client
         is built and used for the upload, NOT the legacy fallback."""
@@ -1727,7 +1727,7 @@ class TestPerUserAttachmentRouting:
 
         per_user_api = MagicMock()
         per_user_api.media.return_value.upload.return_value.execute.return_value = {
-            "attachmentDataRef": {"resourceName": "ref-alice"}
+            "attachmentDataRef": {"resourceName": "ref-alice"},
         }
         per_user_api.spaces.return_value.messages.return_value.create.return_value.execute.return_value = {
             "name": "spaces/S/messages/MID",
@@ -1761,7 +1761,7 @@ class TestPerUserAttachmentRouting:
 
     @pytest.mark.asyncio
     async def test_send_file_falls_back_to_legacy_when_per_user_missing(
-        self, adapter, tmp_path, monkeypatch
+        self, adapter, tmp_path, monkeypatch,
     ):
         """sender known but no per-user token → legacy creds fill in.
         This is the migration window: legacy keeps working until each
@@ -1771,7 +1771,7 @@ class TestPerUserAttachmentRouting:
 
         legacy_api = MagicMock()
         legacy_api.media.return_value.upload.return_value.execute.return_value = {
-            "attachmentDataRef": {"resourceName": "ref-legacy"}
+            "attachmentDataRef": {"resourceName": "ref-legacy"},
         }
         legacy_api.spaces.return_value.messages.return_value.create.return_value.execute.return_value = {
             "name": "spaces/S/messages/MID",
@@ -1796,7 +1796,7 @@ class TestPerUserAttachmentRouting:
 
     @pytest.mark.asyncio
     async def test_send_file_no_creds_anywhere_posts_setup_notice(
-        self, adapter, tmp_path
+        self, adapter, tmp_path,
     ):
         """Sender unknown AND no legacy fallback → setup-instructions
         notice. Same shape as the existing single-user path; the test
@@ -1806,7 +1806,7 @@ class TestPerUserAttachmentRouting:
         adapter._user_credentials = None
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
 
         f = tmp_path / "x.pdf"
@@ -1824,7 +1824,7 @@ class TestPerUserAttachmentRouting:
 
     @pytest.mark.asyncio
     async def test_send_file_per_user_401_evicts_only_that_user(
-        self, adapter, tmp_path, monkeypatch
+        self, adapter, tmp_path, monkeypatch,
     ):
         """A 401 from one user's token must NOT clobber another user's
         cache nor the legacy slot. The eviction is scoped."""
@@ -1846,7 +1846,7 @@ class TestPerUserAttachmentRouting:
         adapter._consume_typing_card_with_text = AsyncMock(return_value=None)
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
 
         f = tmp_path / "x.pdf"
@@ -1865,14 +1865,14 @@ class TestPerUserAttachmentRouting:
 
     @pytest.mark.asyncio
     async def test_setup_files_writes_to_per_user_path(
-        self, adapter, tmp_path, monkeypatch
+        self, adapter, tmp_path, monkeypatch,
     ):
         """``/setup-files <code>`` from sender alice writes to alice's
         token slot; bob's slot stays untouched."""
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
         from plugins.platforms.google_chat import oauth as helper
         # Stub the costly bits; we're verifying routing, not OAuth I/O.
@@ -1898,7 +1898,7 @@ class TestPerUserAttachmentRouting:
 
     @pytest.mark.asyncio
     async def test_setup_files_revoke_drops_only_that_user(
-        self, adapter, tmp_path, monkeypatch
+        self, adapter, tmp_path, monkeypatch,
     ):
         """Per-user revoke clears alice's slot; bob and the legacy
         fallback both keep working. Alice's choice to revoke must not
@@ -1914,7 +1914,7 @@ class TestPerUserAttachmentRouting:
         adapter._user_credentials = legacy_creds
         adapter._create_message = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
 
         from plugins.platforms.google_chat import oauth as helper
@@ -2034,7 +2034,7 @@ class TestThreadCountStore:
             return_value={
                 "name": "spaces/S/messages/BOT_REPLY",
                 "thread": {"name": "spaces/S/threads/BOT_THREAD"},
-            }
+            },
         )
         adapter._chat_api.spaces.return_value.messages.return_value.create = create_call
 
@@ -2043,13 +2043,13 @@ class TestThreadCountStore:
 
         # Outbound thread must now be in the store with count >= 1.
         assert adapter._thread_count_store.get(
-            "spaces/S", "spaces/S/threads/BOT_THREAD"
+            "spaces/S", "spaces/S/threads/BOT_THREAD",
         ) == 1
 
         # Now user clicks "Reply in thread" on the bot's message →
         # inbound arrives in spaces/S/threads/BOT_THREAD.
         env = _make_chat_envelope(
-            text="follow-up", thread_name="spaces/S/threads/BOT_THREAD"
+            text="follow-up", thread_name="spaces/S/threads/BOT_THREAD",
         )
         msg = env["chat"]["messagePayload"]["message"]
         event = await adapter._build_message_event(msg, env)
@@ -2081,7 +2081,7 @@ class TestThreadCountStore:
         # After two turns, this is a known side-thread. The store on disk
         # has count >= 2.
         assert adapter._thread_count_store.get(
-            "spaces/S", "spaces/S/threads/T_existing"
+            "spaces/S", "spaces/S/threads/T_existing",
         ) == 2
 
         # Simulate restart: build a fresh adapter pointing at the SAME
@@ -2101,7 +2101,7 @@ class TestThreadCountStore:
         # Turn 3 (post-restart, same thread).
         env3 = _make_chat_envelope(text="third", thread_name="spaces/S/threads/T_existing")
         event3 = await fresh._build_message_event(
-            env3["chat"]["messagePayload"]["message"], env3
+            env3["chat"]["messagePayload"]["message"], env3,
         )
         # MUST be classified as side thread (isolated session).
         assert event3.source.thread_id == "spaces/S/threads/T_existing"
@@ -2238,7 +2238,7 @@ class TestMediaDelegation:
         f.write_bytes(b"audio-bytes")
         adapter._send_file = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
         await adapter.send_voice("spaces/S", str(f))
         _, kwargs = adapter._send_file.await_args
@@ -2250,7 +2250,7 @@ class TestMediaDelegation:
         f.write_bytes(b"video-bytes")
         adapter._send_file = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
         await adapter.send_video("spaces/S", str(f))
         _, kwargs = adapter._send_file.await_args
@@ -2263,10 +2263,10 @@ class TestMediaDelegation:
         share the same render path on Chat so we just delegate."""
         adapter.send_image = AsyncMock(
             return_value=type("R", (), {"success": True, "message_id": "m",
-                                        "error": None})()
+                                        "error": None})(),
         )
         await adapter.send_animation(
-            "spaces/S", "https://example.com/dance.gif", caption="hop"
+            "spaces/S", "https://example.com/dance.gif", caption="hop",
         )
         adapter.send_image.assert_awaited_once()
         args, kwargs = adapter.send_image.await_args
@@ -2532,7 +2532,7 @@ class TestADCFallback:
         fake_default.assert_called_once()
 
     def test_load_credentials_raises_when_no_sa_and_adc_unavailable(
-        self, adapter, monkeypatch
+        self, adapter, monkeypatch,
     ):
         """ADC failure surfaces a useful error pointing at the two fixes."""
         adapter.config.extra.pop("service_account_json", None)
@@ -2585,16 +2585,16 @@ class TestGoogleChatInteractiveSetup:
         monkeypatch.setattr("hermes_cli.config.save_env_value", fake_save_env_value)
         monkeypatch.setattr("hermes_cli.cli_output.prompt", fake_prompt)
         monkeypatch.setattr(
-            "hermes_cli.cli_output.prompt_yes_no", lambda *_a, **_kw: True
+            "hermes_cli.cli_output.prompt_yes_no", lambda *_a, **_kw: True,
         )
         monkeypatch.setattr(
-            "hermes_cli.cli_output.print_info", lambda *_a, **_kw: None
+            "hermes_cli.cli_output.print_info", lambda *_a, **_kw: None,
         )
         monkeypatch.setattr(
-            "hermes_cli.cli_output.print_success", lambda *_a, **_kw: None
+            "hermes_cli.cli_output.print_success", lambda *_a, **_kw: None,
         )
         monkeypatch.setattr(
-            "hermes_cli.cli_output.print_warning", lambda *_a, **_kw: None
+            "hermes_cli.cli_output.print_warning", lambda *_a, **_kw: None,
         )
 
         gc_mod.interactive_setup()
@@ -2622,7 +2622,7 @@ class TestSupervisorReconnect:
         async def _instant(*args, **kwargs):
             return None
         monkeypatch.setattr(
-            "plugins.platforms.google_chat.adapter.asyncio.sleep", _instant
+            "plugins.platforms.google_chat.adapter.asyncio.sleep", _instant,
         )
 
         def _fail(*args, **kwargs):
@@ -2698,7 +2698,7 @@ class TestAuthorizationEmailMatch:
         assert runner._is_user_authorized(source) is False
 
     def test_allowlist_falls_back_to_resource_name_when_no_email(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         """If sender has no email, ``user_id`` falls back to the resource
         name. Operators who allowlist by ``users/{id}`` still match.
@@ -2840,7 +2840,7 @@ class TestGoogleChatStandaloneSend:
 
     @pytest.mark.asyncio
     async def test_standalone_send_refreshes_token_and_posts_message(
-        self, monkeypatch, tmp_path
+        self, monkeypatch, tmp_path,
     ):
         sa_file = tmp_path / "sa.json"
         sa_file.write_text(json.dumps({
@@ -2857,7 +2857,7 @@ class TestGoogleChatStandaloneSend:
 
         original = _gc_mod.service_account.Credentials.from_service_account_info
         _gc_mod.service_account.Credentials.from_service_account_info = MagicMock(
-            return_value=fake_creds
+            return_value=fake_creds,
         )
         try:
             _install_fake_google_auth_transport(monkeypatch)
@@ -2912,7 +2912,7 @@ class TestGoogleChatStandaloneSend:
 
         original = _gc_mod.service_account.Credentials.from_service_account_info
         _gc_mod.service_account.Credentials.from_service_account_info = MagicMock(
-            return_value=fake_creds
+            return_value=fake_creds,
         )
         try:
             _install_fake_google_auth_transport(monkeypatch)

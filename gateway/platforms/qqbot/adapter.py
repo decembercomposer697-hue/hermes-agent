@@ -204,18 +204,18 @@ class QQAdapter(BasePlatformAdapter):
         extra = config.extra or {}
         self._app_id = str(extra.get("app_id") or os.getenv("QQ_APP_ID", "")).strip()
         self._client_secret = str(
-            extra.get("client_secret") or os.getenv("QQ_CLIENT_SECRET", "")
+            extra.get("client_secret") or os.getenv("QQ_CLIENT_SECRET", ""),
         ).strip()
         self._markdown_support = bool(extra.get("markdown_support", True))
 
         # Auth/ACL policies
         self._dm_policy = str(extra.get("dm_policy", "open")).strip().lower()
         self._allow_from = _coerce_list(
-            extra.get("allow_from") or extra.get("allowFrom")
+            extra.get("allow_from") or extra.get("allowFrom"),
         )
         self._group_policy = str(extra.get("group_policy", "open")).strip().lower()
         self._group_allow_from = _coerce_list(
-            extra.get("group_allow_from") or extra.get("groupAllowFrom")
+            extra.get("group_allow_from") or extra.get("groupAllowFrom"),
         )
 
         # Connection state
@@ -407,14 +407,14 @@ class QQAdapter(BasePlatformAdapter):
             token = data.get("access_token")
             if not token:
                 raise RuntimeError(
-                    f"QQ Bot token response missing access_token: {data}"
+                    f"QQ Bot token response missing access_token: {data}",
                 )
 
             expires_in = int(data.get("expires_in", 7200))
             self._access_token = token
             self._token_expires_at = time.time() + expires_in
             logger.info(
-                "[%s] Access token refreshed, expires in %ds", self._log_tag, expires_in
+                "[%s] Access token refreshed, expires in %ds", self._log_tag, expires_in,
             )
             return self._access_token
 
@@ -562,10 +562,10 @@ class QQAdapter(BasePlatformAdapter):
                     }
                     desc = fatal_descriptions.get(code, f"fatal error (code={code})")
                     logger.error(
-                        "[%s] Bot is %s. Check QQ Open Platform.", self._log_tag, desc
+                        "[%s] Bot is %s. Check QQ Open Platform.", self._log_tag, desc,
                     )
                     self._set_fatal_error(
-                        f"qq_{desc}", f"Bot is {desc}", retryable=False
+                        f"qq_{desc}", f"Bot is {desc}", retryable=False,
                     )
                     return
 
@@ -693,7 +693,7 @@ class QQAdapter(BasePlatformAdapter):
                 payload = self._parse_json(msg.data)
                 if payload:
                     self._dispatch_payload(payload)
-            elif msg.type in {aiohttp.WSMsgType.PING,}:
+            elif msg.type in {aiohttp.WSMsgType.PING}:
                 # aiohttp auto-replies with PONG
                 pass
             elif msg.type == aiohttp.WSMsgType.CLOSE:
@@ -752,7 +752,7 @@ class QQAdapter(BasePlatformAdapter):
                 logger.info("[%s] Identify sent", self._log_tag)
             else:
                 logger.warning(
-                    "[%s] Cannot send Identify: WebSocket not connected", self._log_tag
+                    "[%s] Cannot send Identify: WebSocket not connected", self._log_tag,
                 )
         except Exception as exc:
             logger.error("[%s] Failed to send Identify: %s", self._log_tag, exc)
@@ -782,7 +782,7 @@ class QQAdapter(BasePlatformAdapter):
                 )
             else:
                 logger.warning(
-                    "[%s] Cannot send Resume: WebSocket not connected", self._log_tag
+                    "[%s] Cannot send Resume: WebSocket not connected", self._log_tag,
                 )
         except Exception as exc:
             logger.error("[%s] Failed to send Resume: %s", self._log_tag, exc)
@@ -929,7 +929,7 @@ class QQAdapter(BasePlatformAdapter):
         msg_id = str(d.get("id", ""))
         if not msg_id or self._is_duplicate(msg_id):
             logger.debug(
-                "[%s] Duplicate or missing message id: %s", self._log_tag, msg_id
+                "[%s] Duplicate or missing message id: %s", self._log_tag, msg_id,
             )
             return
 
@@ -940,7 +940,7 @@ class QQAdapter(BasePlatformAdapter):
         # Route by event type
         if event_type == "C2C_MESSAGE_CREATE":
             await self._handle_c2c_message(d, msg_id, content, author, timestamp)
-        elif event_type in {"GROUP_AT_MESSAGE_CREATE",}:
+        elif event_type in {"GROUP_AT_MESSAGE_CREATE"}:
             await self._handle_group_message(d, msg_id, content, author, timestamp)
         elif event_type in {"GUILD_MESSAGE_CREATE", "GUILD_AT_MESSAGE_CREATE"}:
             await self._handle_guild_message(d, msg_id, content, author, timestamp)
@@ -980,13 +980,13 @@ class QQAdapter(BasePlatformAdapter):
             event = parse_interaction_event(d)
         except Exception as exc:
             logger.warning(
-                "[%s] Failed to parse INTERACTION_CREATE: %s", self._log_tag, exc
+                "[%s] Failed to parse INTERACTION_CREATE: %s", self._log_tag, exc,
             )
             return
 
         if not event.id:
             logger.warning(
-                "[%s] INTERACTION_CREATE missing id, skipping ACK", self._log_tag
+                "[%s] INTERACTION_CREATE missing id, skipping ACK", self._log_tag,
             )
             return
 
@@ -1049,7 +1049,7 @@ class QQAdapter(BasePlatformAdapter):
         if resp.status_code >= 400:
             raise RuntimeError(
                 f"Interaction ACK failed [{resp.status_code}]: "
-                f"{resp.text[:200]}"
+                f"{resp.text[:200]}",
             )
 
     # Mapping from QQ keyboard button decisions → the ``choice`` vocabulary
@@ -1309,7 +1309,7 @@ class QQAdapter(BasePlatformAdapter):
         if not group_openid:
             return
         if not self._is_group_allowed(
-                group_openid, str(author.get("member_openid", ""))
+                group_openid, str(author.get("member_openid", "")),
         ):
             return
 
@@ -1776,7 +1776,7 @@ class QQAdapter(BasePlatformAdapter):
             data = resp.content
         except Exception as exc:
             logger.debug(
-                "[%s] Download failed for %s: %s", self._log_tag, url[:80], exc
+                "[%s] Download failed for %s: %s", self._log_tag, url[:80], exc,
             )
             return None
 
@@ -1849,7 +1849,7 @@ class QQAdapter(BasePlatformAdapter):
         # 1. Use QQ's built-in ASR text if available
         if asr_refer_text:
             logger.debug(
-                "[%s] STT: using QQ asr_refer_text: %r", self._log_tag, asr_refer_text[:100]
+                "[%s] STT: using QQ asr_refer_text: %r", self._log_tag, asr_refer_text[:100],
             )
             return asr_refer_text
 
@@ -1919,12 +1919,12 @@ class QQAdapter(BasePlatformAdapter):
                 )
             else:
                 logger.debug(
-                    "[%s] STT: converting to wav, filename=%r", self._log_tag, filename
+                    "[%s] STT: converting to wav, filename=%r", self._log_tag, filename,
                 )
                 wav_path = await self._convert_audio_to_wav_file(audio_data, filename)
                 if not wav_path or not Path(wav_path).exists():
                     logger.warning(
-                        "[%s] STT: ffmpeg conversion produced no output", self._log_tag
+                        "[%s] STT: ffmpeg conversion produced no output", self._log_tag,
                     )
                     return None
 
@@ -1953,7 +1953,7 @@ class QQAdapter(BasePlatformAdapter):
             return None
 
     async def _convert_audio_to_wav_file(
-            self, audio_data: bytes, filename: str
+            self, audio_data: bytes, filename: str,
     ) -> str | None:
         """Convert audio bytes to a temp .wav file using pilk (SILK) or ffmpeg.
 
@@ -2253,7 +2253,7 @@ class QQAdapter(BasePlatformAdapter):
             return None
 
     async def _convert_audio_to_wav(
-            self, audio_data: bytes, source_url: str
+            self, audio_data: bytes, source_url: str,
     ) -> str | None:
         """Convert audio bytes to .wav using pilk (SILK) or ffmpeg, caching the result."""
         import tempfile
@@ -2347,7 +2347,7 @@ class QQAdapter(BasePlatformAdapter):
             if resp.status_code >= 400:
                 raise RuntimeError(
                     f"QQ Bot API error [{resp.status_code}] {path}: "
-                    f"{data.get('message', data)}"
+                    f"{data.get('message', data)}",
                 )
             return data
         except httpx.TimeoutException as exc:
@@ -2385,7 +2385,7 @@ class QQAdapter(BasePlatformAdapter):
         for attempt in range(3):
             try:
                 return await self._api_request(
-                    "POST", path, body, timeout=FILE_UPLOAD_TIMEOUT
+                    "POST", path, body, timeout=FILE_UPLOAD_TIMEOUT,
                 )
             except RuntimeError as exc:
                 err_msg = str(exc)
@@ -2479,7 +2479,7 @@ class QQAdapter(BasePlatformAdapter):
                     return await self._send_guild_text(chat_id, content, reply_to)
                 else:
                     return SendResult(
-                        success=False, error=f"Unknown chat type for {chat_id}"
+                        success=False, error=f"Unknown chat type for {chat_id}",
                     )
             except Exception as exc:
                 last_exc = exc
@@ -2550,13 +2550,13 @@ class QQAdapter(BasePlatformAdapter):
             body["keyboard"] = keyboard.to_dict()
 
         data = await self._api_request(
-            "POST", f"/v2/groups/{group_openid}/messages", body
+            "POST", f"/v2/groups/{group_openid}/messages", body,
         )
         msg_id = str(data.get("id", uuid.uuid4().hex[:12]))
         return SendResult(success=True, message_id=msg_id, raw_response=data)
 
     async def _send_guild_text(
-            self, channel_id: str, content: str, reply_to: str | None = None
+            self, channel_id: str, content: str, reply_to: str | None = None,
     ) -> SendResult:
         """Send text to a guild channel via REST API."""
         body: dict[str, Any] = {"content": content[: self.MAX_MESSAGE_LENGTH]}
@@ -2591,7 +2591,7 @@ class QQAdapter(BasePlatformAdapter):
         if not self.is_connected:
             if not await self._wait_for_reconnection():
                 return SendResult(
-                    success=False, error="Not connected", retryable=True
+                    success=False, error="Not connected", retryable=True,
                 )
 
         chat_type = self._guess_chat_type(chat_id)
@@ -2616,7 +2616,7 @@ class QQAdapter(BasePlatformAdapter):
             )
         except Exception as exc:
             logger.error(
-                "[%s] send_with_keyboard failed: %s", self._log_tag, exc
+                "[%s] send_with_keyboard failed: %s", self._log_tag, exc,
             )
             return SendResult(success=False, error=str(exc))
 
@@ -2718,7 +2718,7 @@ class QQAdapter(BasePlatformAdapter):
         )
 
     def _build_text_body(
-            self, content: str, reply_to: str | None = None
+            self, content: str, reply_to: str | None = None,
     ) -> dict[str, Any]:
         """Build the message body for C2C/group text sending."""
         msg_seq = self._next_msg_seq(reply_to or "default")
@@ -2759,7 +2759,7 @@ class QQAdapter(BasePlatformAdapter):
         del metadata
 
         result = await self._send_media(
-            chat_id, image_url, MEDIA_TYPE_IMAGE, "image", caption, reply_to
+            chat_id, image_url, MEDIA_TYPE_IMAGE, "image", caption, reply_to,
         )
         if result.success or not self._is_url(image_url):
             return result
@@ -2784,7 +2784,7 @@ class QQAdapter(BasePlatformAdapter):
         """Send a local image file natively."""
         del kwargs
         return await self._send_media(
-            chat_id, image_path, MEDIA_TYPE_IMAGE, "image", caption, reply_to
+            chat_id, image_path, MEDIA_TYPE_IMAGE, "image", caption, reply_to,
         )
 
     async def send_voice(
@@ -2798,7 +2798,7 @@ class QQAdapter(BasePlatformAdapter):
         """Send a voice message natively."""
         del kwargs
         return await self._send_media(
-            chat_id, audio_path, MEDIA_TYPE_VOICE, "voice", caption, reply_to
+            chat_id, audio_path, MEDIA_TYPE_VOICE, "voice", caption, reply_to,
         )
 
     async def send_video(
@@ -2812,7 +2812,7 @@ class QQAdapter(BasePlatformAdapter):
         """Send a video natively."""
         del kwargs
         return await self._send_media(
-            chat_id, video_path, MEDIA_TYPE_VIDEO, "video", caption, reply_to
+            chat_id, video_path, MEDIA_TYPE_VIDEO, "video", caption, reply_to,
         )
 
     async def send_document(
@@ -2991,7 +2991,7 @@ class QQAdapter(BasePlatformAdapter):
         if not local_path.exists() or not local_path.is_file():
             if media_source.startswith("<") or len(media_source) < 3:
                 raise ValueError(
-                    f"Invalid media source (looks like a placeholder): {media_source!r}"
+                    f"Invalid media source (looks like a placeholder): {media_source!r}",
                 )
             raise FileNotFoundError(f"Media file not found: {local_path}")
 
@@ -3011,7 +3011,7 @@ class QQAdapter(BasePlatformAdapter):
         return resolved_name, complete
 
     async def _load_media(
-            self, source: str, file_name: str | None = None
+            self, source: str, file_name: str | None = None,
     ) -> tuple[str, str, str]:
         """Load media from URL or local path. Returns (base64_or_url, content_type, filename)."""
         source = str(source).strip()
@@ -3036,7 +3036,7 @@ class QQAdapter(BasePlatformAdapter):
             # sometimes emits instead of real file paths.
             if source.startswith("<") or len(source) < 3:
                 raise ValueError(
-                    f"Invalid media source (looks like a placeholder): {source!r}"
+                    f"Invalid media source (looks like a placeholder): {source!r}",
                 )
             raise FileNotFoundError(f"Media file not found: {local_path}")
 

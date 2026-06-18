@@ -301,7 +301,7 @@ class Mem0MemoryProvider(MemoryProvider):
     def handle_tool_call(self, tool_name: str, args: dict, **kwargs) -> str:
         if self._is_breaker_open():
             return json.dumps({
-                "error": "Mem0 API temporarily unavailable (multiple consecutive failures). Will retry automatically."
+                "error": "Mem0 API temporarily unavailable (multiple consecutive failures). Will retry automatically.",
             })
 
         try:

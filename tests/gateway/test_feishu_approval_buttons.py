@@ -125,7 +125,7 @@ class TestFeishuExecApproval:
         assert len(actions) == 4
         action_names = [a["value"]["hermes_action"] for a in actions]
         assert action_names == [
-            "approve_once", "approve_session", "approve_always", "deny"
+            "approve_once", "approve_session", "approve_always", "deny",
         ]
 
     @pytest.mark.asyncio
@@ -158,7 +158,7 @@ class TestFeishuExecApproval:
         adapter = _make_adapter()
         adapter._client = None
         result = await adapter.send_exec_approval(
-            chat_id="oc_12345", command="ls", session_key="s"
+            chat_id="oc_12345", command="ls", session_key="s",
         )
         assert result.success is False
 
@@ -176,7 +176,7 @@ class TestFeishuExecApproval:
         ) as mock_send:
             long_cmd = "x" * 5000
             await adapter.send_exec_approval(
-                chat_id="oc_12345", command=long_cmd, session_key="s"
+                chat_id="oc_12345", command=long_cmd, session_key="s",
             )
 
         card = json.loads(mock_send.call_args[1]["payload"])
@@ -197,10 +197,10 @@ class TestFeishuExecApproval:
             return_value=mock_response,
         ):
             await adapter.send_exec_approval(
-                chat_id="oc_1", command="cmd1", session_key="s1"
+                chat_id="oc_1", command="cmd1", session_key="s1",
             )
             await adapter.send_exec_approval(
-                chat_id="oc_2", command="cmd2", session_key="s2"
+                chat_id="oc_2", command="cmd2", session_key="s2",
             )
 
         assert len(adapter._approval_state) == 2

@@ -271,7 +271,7 @@ class TestHTTP413Compression:
         """After context-overflow compression, _persist_session must receive None history."""
         err_400 = Exception(
             "Error code: 400 - This endpoint's maximum context length is 128000 tokens. "
-            "However, you requested about 270460 tokens."
+            "However, you requested about 270460 tokens.",
         )
         err_400.status_code = 400
         ok_resp = _mock_response(content="OK", finish_reason="stop")
@@ -311,7 +311,7 @@ class TestHTTP413Compression:
         err_400 = Exception(
             "Error code: 400 - {'error': {'message': "
             "\"This endpoint's maximum context length is 204800 tokens. "
-            "However, you requested about 270460 tokens.\", 'code': 400}}"
+            "However, you requested about 270460 tokens.\", 'code': 400}}",
         )
         err_400.status_code = 400
         ok_resp = _mock_response(content="Recovered after compression", finish_reason="stop")
@@ -343,7 +343,7 @@ class TestHTTP413Compression:
     def test_400_reduce_length_triggers_compression(self, agent):
         """A 400 with 'reduce the length' should trigger compression."""
         err_400 = Exception(
-            "Error code: 400 - Please reduce the length of the messages"
+            "Error code: 400 - Please reduce the length of the messages",
         )
         err_400.status_code = 400
         ok_resp = _mock_response(content="OK", finish_reason="stop")
@@ -374,7 +374,7 @@ class TestHTTP413Compression:
         err_400 = Exception(
             "Error code: 400 - {'error': {'message': "
             "\"This endpoint's maximum context length is 128000 tokens. "
-            "Please reduce the length of the messages.\"}}"
+            "Please reduce the length of the messages.\"}}",
         )
         err_400.status_code = 400
         ok_resp = _mock_response(content="Recovered after real compression", finish_reason="stop")
@@ -821,7 +821,7 @@ class TestToolResultPreflightCompression:
         """Anthropic 'prompt is too long' error triggers compression as safety net."""
         err_400 = Exception(
             "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', "
-            "'message': 'prompt is too long: 233153 tokens > 200000 maximum'}}"
+            "'message': 'prompt is too long: 233153 tokens > 200000 maximum'}}",
         )
         err_400.status_code = 400
         ok_resp = _mock_response(content="Recovered", finish_reason="stop")
@@ -895,7 +895,7 @@ class TestOverflowWithCompactionDisabled:
         err_400 = Exception(
             "Error code: 400 - {'type': 'error', 'error': {'type': "
             "'invalid_request_error', 'message': 'prompt is too long: "
-            "233153 tokens > 200000 maximum'}}"
+            "233153 tokens > 200000 maximum'}}",
         )
         err_400.status_code = 400
         agent.client.chat.completions.create.side_effect = [err_400, _mock_response()]

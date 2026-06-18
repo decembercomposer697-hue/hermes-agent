@@ -28,7 +28,7 @@ def build_gateway_parser(subparsers, *, cmd_gateway: Callable, cmd_proxy: Callab
 
     # gateway run (default)
     gateway_run = gateway_subparsers.add_parser(
-        "run", help="Run gateway in foreground (recommended for WSL, Docker, Termux)"
+        "run", help="Run gateway in foreground (recommended for WSL, Docker, Termux)",
     )
     gateway_run.add_argument(
         "-v",
@@ -38,7 +38,7 @@ def build_gateway_parser(subparsers, *, cmd_gateway: Callable, cmd_proxy: Callab
         help="Increase stderr log verbosity (-v=INFO, -vv=DEBUG)",
     )
     gateway_run.add_argument(
-        "-q", "--quiet", action="store_true", help="Suppress all stderr log output"
+        "-q", "--quiet", action="store_true", help="Suppress all stderr log output",
     )
     gateway_run.add_argument(
         "--replace",
@@ -63,7 +63,7 @@ def build_gateway_parser(subparsers, *, cmd_gateway: Callable, cmd_proxy: Callab
 
     # gateway start
     gateway_start = gateway_subparsers.add_parser(
-        "start", help="Start the installed systemd/launchd background service"
+        "start", help="Start the installed systemd/launchd background service",
     )
     gateway_start.add_argument(
         "--system",
@@ -91,7 +91,7 @@ def build_gateway_parser(subparsers, *, cmd_gateway: Callable, cmd_proxy: Callab
 
     # gateway restart
     gateway_restart = gateway_subparsers.add_parser(
-        "restart", help="Restart gateway service"
+        "restart", help="Restart gateway service",
     )
     gateway_restart.add_argument(
         "--system",
@@ -121,7 +121,7 @@ def build_gateway_parser(subparsers, *, cmd_gateway: Callable, cmd_proxy: Callab
 
     # gateway install
     gateway_install = gateway_subparsers.add_parser(
-        "install", help="Install gateway as a systemd/launchd background service"
+        "install", help="Install gateway as a systemd/launchd background service",
     )
     gateway_install.add_argument("--force", action="store_true", help="Force reinstall")
     gateway_install.add_argument(
@@ -169,7 +169,7 @@ def build_gateway_parser(subparsers, *, cmd_gateway: Callable, cmd_proxy: Callab
 
     # gateway uninstall
     gateway_uninstall = gateway_subparsers.add_parser(
-        "uninstall", help="Uninstall gateway service"
+        "uninstall", help="Uninstall gateway service",
     )
     gateway_uninstall.add_argument(
         "--system",
@@ -227,7 +227,7 @@ def build_gateway_parser(subparsers, *, cmd_gateway: Callable, cmd_proxy: Callab
     proxy_subparsers = proxy_parser.add_subparsers(dest="proxy_command")
 
     proxy_start = proxy_subparsers.add_parser(
-        "start", help="Run the proxy in the foreground"
+        "start", help="Run the proxy in the foreground",
     )
     proxy_start.add_argument(
         "--provider",
@@ -247,10 +247,10 @@ def build_gateway_parser(subparsers, *, cmd_gateway: Callable, cmd_proxy: Callab
     )
 
     proxy_subparsers.add_parser(
-        "status", help="Show which proxy upstreams are ready"
+        "status", help="Show which proxy upstreams are ready",
     )
     proxy_subparsers.add_parser(
-        "providers", help="List available proxy upstream providers"
+        "providers", help="List available proxy upstream providers",
     )
     proxy_parser.set_defaults(func=cmd_proxy)
     gateway_parser.set_defaults(func=cmd_gateway)

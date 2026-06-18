@@ -32,7 +32,7 @@ def register_subparser(subparsers: argparse._SubParsersAction) -> None:
 
     sub_status = sub.add_parser("status", help="Show LSP service status")
     sub_status.add_argument(
-        "--json", action="store_true", help="Emit machine-readable JSON"
+        "--json", action="store_true", help="Emit machine-readable JSON",
     )
 
     sub_list = sub.add_parser("list", help="List supported language servers")
@@ -127,7 +127,7 @@ def _cmd_status(emit_json: bool) -> int:
             out.append(f"  active clients:  {len(clients)}")
             for c in clients:
                 out.append(
-                    f"    - {c['server_id']:20s} state={c['state']:10s} root={c['workspace_root']}"
+                    f"    - {c['server_id']:20s} state={c['state']:10s} root={c['workspace_root']}",
                 )
         else:
             out.append("  active clients:  none")
@@ -165,7 +165,7 @@ def _cmd_status(emit_json: bool) -> int:
         if len(s.extensions) > 5:
             ext_summary += f", … (+{len(s.extensions) - 5})"
         out.append(
-            f"  {marker} {s.server_id:24s} [{status:11s}] {ext_summary}"
+            f"  {marker} {s.server_id:24s} [{status:11s}] {ext_summary}",
         )
         if s.description:
             out.append(f"      {s.description}")
@@ -183,7 +183,7 @@ def _cmd_list(installed_only: bool) -> int:
         if installed_only and status != "installed":
             continue
         sys.stdout.write(
-            f"{s.server_id:24s} [{status:11s}] {','.join(s.extensions)}\n"
+            f"{s.server_id:24s} [{status:11s}] {','.join(s.extensions)}\n",
         )
     return 0
 
@@ -203,7 +203,7 @@ def _cmd_install(server_id: str) -> int:
         if recipe and recipe.get("strategy") == "manual":
             sys.stderr.write(
                 f"{server_id}: this server requires a manual install. "
-                f"See documentation.\n"
+                f"See documentation.\n",
             )
         else:
             sys.stderr.write(f"{server_id}: install failed (see logs).\n")
@@ -294,6 +294,6 @@ def _backend_warnings() -> list:
         notes.append(
             "bash-language-server is installed but shellcheck is missing — "
             "diagnostics will be empty (apt: shellcheck, brew: shellcheck, "
-            "scoop: shellcheck)."
+            "scoop: shellcheck).",
         )
     return notes

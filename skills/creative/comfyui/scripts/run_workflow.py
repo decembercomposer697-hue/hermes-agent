@@ -204,7 +204,7 @@ class ComfyRunner:
                     s = data.get("status")
                     if s == "completed":
                         return {"status": "success", "data": data}
-                    if s in {"failed",}:
+                    if s in {"failed"}:
                         return {"status": "error", "data": data}
                     if s == "cancelled":
                         return {"status": "cancelled", "data": data}
@@ -491,7 +491,7 @@ def inject_params(
         if is_link(cur):
             warnings.append(
                 f"parameter '{name}' targets {nid}.{field} which is currently a link; "
-                f"refusing to overwrite (set the schema to point at the source node instead)"
+                f"refusing to overwrite (set the schema to point at the source node instead)",
             )
             continue
         node["inputs"][field] = value

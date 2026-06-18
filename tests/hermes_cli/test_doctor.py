@@ -57,7 +57,7 @@ class TestDoctorEnvFileEncoding:
     defaults to the system locale encoding, not UTF-8."""
 
     def test_doctor_reads_env_as_utf8_even_when_locale_is_not_utf8(
-        self, monkeypatch, tmp_path
+        self, monkeypatch, tmp_path,
     ):
         import pathlib
 
@@ -82,7 +82,7 @@ class TestDoctorEnvFileEncoding:
             # .env unless the caller pins encoding="utf-8".
             if self == env_path and encoding != "utf-8":
                 raise UnicodeDecodeError(
-                    "gbk", b"\x94", 0, 1, "illegal multibyte sequence"
+                    "gbk", b"\x94", 0, 1, "illegal multibyte sequence",
                 )
             return orig_read_text(self, encoding=encoding, errors=errors, **kwargs)
 
@@ -235,7 +235,7 @@ def test_check_gateway_service_linger_warns_when_disabled(monkeypatch, tmp_path,
     assert "Systemd linger disabled" in out
     assert "loginctl enable-linger" in out
     assert issues == [
-        "Enable linger for the gateway user service: sudo loginctl enable-linger $USER"
+        "Enable linger for the gateway user service: sudo loginctl enable-linger $USER",
     ]
 
 
@@ -309,7 +309,7 @@ class TestDoctorMemoryProviderSection:
     def test_honcho_provider_not_installed_shows_fail(self, monkeypatch, tmp_path):
         # Make honcho import fail
         monkeypatch.setitem(
-            sys.modules, "plugins.memory.honcho.client", None
+            sys.modules, "plugins.memory.honcho.client", None,
         )
         out = self._run_doctor_and_capture(monkeypatch, tmp_path, provider="honcho")
         assert "Memory Provider" in out
@@ -374,10 +374,10 @@ def test_run_doctor_accepts_named_provider_from_providers_section(monkeypatch, t
                         "base_url": "https://ark.cn-beijing.volces.com/api/coding/v3",
                         "default_model": "doubao-seed-2.0-code",
                         "models": {"doubao-seed-2.0-code": {}},
-                    }
+                    },
                 },
-            }
-        )
+            },
+        ),
     )
 
     monkeypatch.setattr(doctor_mod, "HERMES_HOME", home)
@@ -496,7 +496,7 @@ def test_run_doctor_flags_missing_credentials_for_active_openrouter_provider(mon
     ],
 )
 def test_run_doctor_accepts_hermes_provider_ids_that_catalog_aliases(
-    monkeypatch, tmp_path, provider, default_model
+    monkeypatch, tmp_path, provider, default_model,
 ):
     home = tmp_path / ".hermes"
     home.mkdir(parents=True, exist_ok=True)
@@ -1344,7 +1344,7 @@ class TestDoctorStaleMaxIterationsDrift:
         hermes_home = tmp_path / ".hermes"
         hermes_home.mkdir(parents=True)
         (hermes_home / "config.yaml").write_text(
-            f"agent:\n  max_turns: {cfg_turns}\n", encoding="utf-8"
+            f"agent:\n  max_turns: {cfg_turns}\n", encoding="utf-8",
         )
         env_lines = ["OPENAI_API_KEY=sk-test\n"]
         if ghost is not None:

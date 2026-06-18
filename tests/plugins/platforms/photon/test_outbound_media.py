@@ -56,14 +56,14 @@ def _patch_safe_path(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.mark.asyncio
 async def test_send_image_file_hits_attachment_endpoint(
-    monkeypatch: pytest.MonkeyPatch, real_file: str
+    monkeypatch: pytest.MonkeyPatch, real_file: str,
 ) -> None:
     _patch_safe_path(monkeypatch)
     adapter = _make_adapter(monkeypatch)
     calls = _capture_sidecar(adapter)
 
     result = await adapter.send_image_file(
-        "any;-;+15551234567", real_file, caption="look"
+        "any;-;+15551234567", real_file, caption="look",
     )
 
     assert result.success is True
@@ -80,7 +80,7 @@ async def test_send_image_file_hits_attachment_endpoint(
 
 @pytest.mark.asyncio
 async def test_send_voice_marks_kind_voice(
-    monkeypatch: pytest.MonkeyPatch, tmp_path
+    monkeypatch: pytest.MonkeyPatch, tmp_path,
 ) -> None:
     _patch_safe_path(monkeypatch)
     audio = tmp_path / "note.m4a"
@@ -98,7 +98,7 @@ async def test_send_voice_marks_kind_voice(
 
 @pytest.mark.asyncio
 async def test_send_document_passes_filename(
-    monkeypatch: pytest.MonkeyPatch, tmp_path
+    monkeypatch: pytest.MonkeyPatch, tmp_path,
 ) -> None:
     _patch_safe_path(monkeypatch)
     doc = tmp_path / "report.pdf"
@@ -116,7 +116,7 @@ async def test_send_document_passes_filename(
 
 @pytest.mark.asyncio
 async def test_send_video_passes_through(
-    monkeypatch: pytest.MonkeyPatch, tmp_path
+    monkeypatch: pytest.MonkeyPatch, tmp_path,
 ) -> None:
     _patch_safe_path(monkeypatch)
     vid = tmp_path / "clip.mp4"
@@ -133,7 +133,7 @@ async def test_send_video_passes_through(
 
 @pytest.mark.asyncio
 async def test_send_image_url_caches_then_sends_attachment(
-    monkeypatch: pytest.MonkeyPatch, real_file: str
+    monkeypatch: pytest.MonkeyPatch, real_file: str,
 ) -> None:
     _patch_safe_path(monkeypatch)
     adapter = _make_adapter(monkeypatch)
@@ -148,7 +148,7 @@ async def test_send_image_url_caches_then_sends_attachment(
     monkeypatch.setattr(base_mod, "cache_image_from_url", _fake_cache)
 
     result = await adapter.send_image(
-        "any;-;+1", "https://example.com/cat.jpg", caption="cat"
+        "any;-;+1", "https://example.com/cat.jpg", caption="cat",
     )
 
     assert result.success is True
@@ -160,7 +160,7 @@ async def test_send_image_url_caches_then_sends_attachment(
 
 @pytest.mark.asyncio
 async def test_send_image_url_fetch_failure_falls_back_to_text(
-    monkeypatch: pytest.MonkeyPatch
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     adapter = _make_adapter(monkeypatch)
     calls = _capture_sidecar(adapter)
@@ -173,7 +173,7 @@ async def test_send_image_url_fetch_failure_falls_back_to_text(
     monkeypatch.setattr(base_mod, "cache_image_from_url", _boom)
 
     result = await adapter.send_image(
-        "any;-;+1", "https://example.com/cat.jpg", caption="cat"
+        "any;-;+1", "https://example.com/cat.jpg", caption="cat",
     )
 
     # Fallback path: base send_image() routes to send() → /send (text).
@@ -184,7 +184,7 @@ async def test_send_image_url_fetch_failure_falls_back_to_text(
 
 @pytest.mark.asyncio
 async def test_send_attachment_rejects_unsafe_path(
-    monkeypatch: pytest.MonkeyPatch
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # Default validation (no passthrough patch) should reject a nonexistent /
     # traversal path, returning a failed SendResult without calling the sidecar.
@@ -205,7 +205,7 @@ async def test_send_attachment_rejects_unsafe_path(
 
 @pytest.mark.asyncio
 async def test_standalone_send_text_then_attachments(
-    monkeypatch: pytest.MonkeyPatch, tmp_path
+    monkeypatch: pytest.MonkeyPatch, tmp_path,
 ) -> None:
     _patch_safe_path(monkeypatch)
     img = tmp_path / "a.png"

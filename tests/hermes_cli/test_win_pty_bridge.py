@@ -231,7 +231,7 @@ class TestClampDimension:
 class TestWinPtyBridgeClose:
     def test_close_is_idempotent(self):
         bridge = WinPtyBridge.spawn(
-            [sys.executable, "-c", "import time; time.sleep(30)"]
+            [sys.executable, "-c", "import time; time.sleep(30)"],
         )
         bridge.close()
         bridge.close()  # must not raise
@@ -239,7 +239,7 @@ class TestWinPtyBridgeClose:
 
     def test_close_terminates_long_running_child(self):
         bridge = WinPtyBridge.spawn(
-            [sys.executable, "-c", "import time; time.sleep(30)"]
+            [sys.executable, "-c", "import time; time.sleep(30)"],
         )
         pid = bridge.pid
         assert bridge.is_alive(), f"child pid {pid} not alive before close"

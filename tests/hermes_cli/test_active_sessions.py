@@ -17,13 +17,13 @@ def test_resolve_max_concurrent_sessions_values(caplog):
     assert active_sessions.resolve_max_concurrent_sessions({"max_concurrent_sessions": "3"}) == 3
     assert (
         active_sessions.resolve_max_concurrent_sessions(
-            {"gateway": {"max_concurrent_sessions": 4}}
+            {"gateway": {"max_concurrent_sessions": 4}},
         )
         == 4
     )
     assert (
         active_sessions.resolve_max_concurrent_sessions(
-            {"max_concurrent_sessions": 2, "gateway": {"max_concurrent_sessions": 4}}
+            {"max_concurrent_sessions": 2, "gateway": {"max_concurrent_sessions": 4}},
         )
         == 2
     )
@@ -95,7 +95,7 @@ def test_active_session_registry_prunes_dead_pids(tmp_path, monkeypatch):
                 "pid": 99999999,
                 "started_at": 1,
                 "updated_at": 1,
-            }
+            },
         ],
     )
 
@@ -108,7 +108,7 @@ def test_active_session_registry_prunes_dead_pids(tmp_path, monkeypatch):
     assert message is None
     assert lease is not None
     assert [entry["session_id"] for entry in active_sessions.active_session_registry_snapshot()] == [
-        "session-1"
+        "session-1",
     ]
     lease.release()
 
@@ -170,7 +170,7 @@ def test_active_session_hard_exit_is_reclaimed(tmp_path, monkeypatch):
     assert message is None
     assert lease is not None
     assert [entry["session_id"] for entry in active_sessions.active_session_registry_snapshot()] == [
-        "next-session"
+        "next-session",
     ]
     lease.release()
 
@@ -251,7 +251,7 @@ def test_cross_process_acquire_claims_only_one_last_slot(tmp_path, monkeypatch):
                     text=True,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
-                )
+                ),
             )
 
         deadline = time.time() + 10
@@ -295,7 +295,7 @@ def test_pid_start_time_mismatch_prunes_reused_pid(tmp_path, monkeypatch):
                 "process_start_time": 100.0,
                 "started_at": 1,
                 "updated_at": 1,
-            }
+            },
         ],
     )
 
@@ -308,6 +308,6 @@ def test_pid_start_time_mismatch_prunes_reused_pid(tmp_path, monkeypatch):
     assert message is None
     assert lease is not None
     assert [entry["session_id"] for entry in active_sessions.active_session_registry_snapshot()] == [
-        "new-session"
+        "new-session",
     ]
     lease.release()

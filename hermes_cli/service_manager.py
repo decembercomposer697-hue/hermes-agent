@@ -42,11 +42,11 @@ def validate_profile_name(name: str) -> None:
         raise ValueError("profile name must not be empty")
     if len(name) > _MAX_PROFILE_LEN:
         raise ValueError(
-            f"profile name too long ({len(name)} > {_MAX_PROFILE_LEN})"
+            f"profile name too long ({len(name)} > {_MAX_PROFILE_LEN})",
         )
     if not _VALID_PROFILE_RE.match(name):
         raise ValueError(
-            f"profile name must match [a-z0-9][a-z0-9_-]*, got {name!r}"
+            f"profile name must match [a-z0-9][a-z0-9_-]*, got {name!r}",
         )
 
 
@@ -178,13 +178,13 @@ class _RegistrationUnsupportedMixin:
     ) -> None:
         raise NotImplementedError(
             f"{type(self).__name__} does not support runtime profile "
-            "gateway registration (container-only feature)"
+            "gateway registration (container-only feature)",
         )
 
     def unregister_profile_gateway(self, profile: str) -> None:
         raise NotImplementedError(
             f"{type(self).__name__} does not support runtime profile "
-            "gateway unregistration (container-only feature)"
+            "gateway unregistration (container-only feature)",
         )
 
     def list_profile_gateways(self) -> list[str]:
@@ -839,7 +839,7 @@ class S6ServiceManager:
         svc_dir = self._service_dir(profile)
         if svc_dir.exists():
             raise ValueError(
-                f"profile gateway {profile!r} already registered at {svc_dir}"
+                f"profile gateway {profile!r} already registered at {svc_dir}",
             )
 
         # Build the service directory atomically: write to a sibling
@@ -889,7 +889,7 @@ class S6ServiceManager:
             # be confusing (no supervisor watching it).
             shutil.rmtree(svc_dir, ignore_errors=True)
             raise RuntimeError(
-                f"s6-svscanctl failed: {result.stderr or result.stdout}"
+                f"s6-svscanctl failed: {result.stderr or result.stdout}",
             )
 
     def unregister_profile_gateway(self, profile: str) -> None:

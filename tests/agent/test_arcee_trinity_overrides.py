@@ -142,7 +142,7 @@ def test_compression_threshold_codex_gpt55_opt_out() -> None:
     # allow_codex_gpt55_autoraise=False reverts to the global default (None).
     assert (
         _compression_threshold_for_model(
-            "gpt-5.5", "openai-codex", allow_codex_gpt55_autoraise=False
+            "gpt-5.5", "openai-codex", allow_codex_gpt55_autoraise=False,
         )
         is None
     )
@@ -153,7 +153,7 @@ def test_compression_threshold_opt_out_does_not_disable_trinity() -> None:
     # Trinity override must still apply when the flag is False.
     assert (
         _compression_threshold_for_model(
-            "trinity-large-thinking", "openrouter", allow_codex_gpt55_autoraise=False
+            "trinity-large-thinking", "openrouter", allow_codex_gpt55_autoraise=False,
         )
         == 0.75
     )

@@ -59,7 +59,7 @@ def register_provider(provider: BrowserProvider) -> None:
     if not isinstance(provider, BrowserProvider):
         raise TypeError(
             f"register_provider() expects a BrowserProvider instance, "
-            f"got {type(provider).__name__}"
+            f"got {type(provider).__name__}",
         )
     name = provider.name
     if not isinstance(name, str) or not name.strip():

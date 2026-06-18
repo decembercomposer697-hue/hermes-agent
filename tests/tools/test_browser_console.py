@@ -25,7 +25,7 @@ class TestBrowserConsole:
                 "messages": [
                     {"text": "hello", "type": "log", "timestamp": 1},
                     {"text": "oops", "type": "error", "timestamp": 2},
-                ]
+                ],
             },
         }
         errors_response = {
@@ -33,7 +33,7 @@ class TestBrowserConsole:
             "data": {
                 "errors": [
                     {"message": "Uncaught TypeError", "timestamp": 3},
-                ]
+                ],
             },
         }
 
@@ -374,7 +374,7 @@ class TestDogfoodSkill:
     def _skill_dir(self):
         # Use the actual repo skills dir (not temp)
         self.skill_dir = os.path.join(
-            os.path.dirname(__file__), "..", "..", "skills", "dogfood"
+            os.path.dirname(__file__), "..", "..", "skills", "dogfood",
         )
 
     def test_skill_md_exists(self):
@@ -382,12 +382,12 @@ class TestDogfoodSkill:
 
     def test_taxonomy_exists(self):
         assert os.path.exists(
-            os.path.join(self.skill_dir, "references", "issue-taxonomy.md")
+            os.path.join(self.skill_dir, "references", "issue-taxonomy.md"),
         )
 
     def test_report_template_exists(self):
         assert os.path.exists(
-            os.path.join(self.skill_dir, "templates", "dogfood-report-template.md")
+            os.path.join(self.skill_dir, "templates", "dogfood-report-template.md"),
         )
 
     def test_skill_md_has_frontmatter(self):
@@ -409,7 +409,7 @@ class TestDogfoodSkill:
 
     def test_taxonomy_has_severity_levels(self):
         with open(
-            os.path.join(self.skill_dir, "references", "issue-taxonomy.md")
+            os.path.join(self.skill_dir, "references", "issue-taxonomy.md"),
         ) as f:
             content = f.read()
         assert "Critical" in content
@@ -419,7 +419,7 @@ class TestDogfoodSkill:
 
     def test_taxonomy_has_categories(self):
         with open(
-            os.path.join(self.skill_dir, "references", "issue-taxonomy.md")
+            os.path.join(self.skill_dir, "references", "issue-taxonomy.md"),
         ) as f:
             content = f.read()
         assert "Functional" in content

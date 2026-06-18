@@ -317,7 +317,7 @@ def test_fetch_auth_failure(monkeypatch, tmp_path):
         bw.subprocess,
         "run",
         lambda *a, **kw: mock.Mock(
-            returncode=1, stdout="", stderr="Error: invalid access token"
+            returncode=1, stdout="", stderr="Error: invalid access token",
         ),
     )
 
@@ -356,7 +356,7 @@ def test_fetch_non_json(monkeypatch, tmp_path):
         bw.subprocess,
         "run",
         lambda *a, **kw: mock.Mock(
-            returncode=0, stdout="not json at all", stderr=""
+            returncode=0, stdout="not json at all", stderr="",
         ),
     )
 
@@ -503,7 +503,7 @@ def test_apply_disabled_returns_empty():
 def test_apply_missing_token(monkeypatch):
     monkeypatch.delenv("BWS_ACCESS_TOKEN", raising=False)
     result = bw.apply_bitwarden_secrets(
-        enabled=True, project_id="p", auto_install=False
+        enabled=True, project_id="p", auto_install=False,
     )
     assert not result.ok
     assert "BWS_ACCESS_TOKEN" in result.error
@@ -512,7 +512,7 @@ def test_apply_missing_token(monkeypatch):
 def test_apply_missing_project_id(monkeypatch):
     monkeypatch.setenv("BWS_ACCESS_TOKEN", "0.t")
     result = bw.apply_bitwarden_secrets(
-        enabled=True, project_id="", auto_install=False
+        enabled=True, project_id="", auto_install=False,
     )
     assert not result.ok
     assert "project_id" in result.error
@@ -632,7 +632,7 @@ def test_env_loader_calls_bsm_when_enabled(tmp_path, monkeypatch):
         "    access_token_env: 'BWS_ACCESS_TOKEN'\n"
         "    cache_ttl_seconds: 0\n"
         "    override_existing: false\n"
-        "    auto_install: false\n"
+        "    auto_install: false\n",
     )
     monkeypatch.setenv("HERMES_HOME", str(home))
     monkeypatch.setenv("BWS_ACCESS_TOKEN", "0.t")

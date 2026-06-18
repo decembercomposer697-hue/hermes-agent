@@ -110,7 +110,7 @@ def test_prepare_agent_startup_skips_mcp_bootstrap_for_tui_chat(monkeypatch):
         sys.modules,
         "tools.mcp_tool",
         types.SimpleNamespace(
-            discover_mcp_tools=lambda: calls.__setitem__("mcp", calls["mcp"] + 1)
+            discover_mcp_tools=lambda: calls.__setitem__("mcp", calls["mcp"] + 1),
         ),
     )
 

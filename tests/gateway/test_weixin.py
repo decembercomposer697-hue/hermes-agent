@@ -23,7 +23,7 @@ def _make_adapter() -> WeixinAdapter:
             enabled=True,
             token="test-token",
             extra={"account_id": "test-account"},
-        )
+        ),
     )
 
 
@@ -95,7 +95,7 @@ class TestWeixinChunking:
         adapter = _make_adapter()
 
         content = adapter.format_message(
-            "- Setting: Timeout\n  Value: 30s\n- Setting: Retries\n  Value: 3"
+            "- Setting: Timeout\n  Value: 30s\n- Setting: Retries\n  Value: 3",
         )
         chunks = adapter._split_text(content)
 
@@ -108,7 +108,7 @@ class TestWeixinChunking:
             "今天结论：\n"
             "- 留存下降 3%\n"
             "- 转化上涨 8%\n"
-            "- 主要问题在首日激活"
+            "- 主要问题在首日激活",
         )
         chunks = adapter._split_text(content)
 
@@ -129,7 +129,7 @@ class TestWeixinChunking:
             "| Setting | Value |\n"
             "| --- | --- |\n"
             "| Timeout | 30s |\n"
-            "| Retries | 3 |\n"
+            "| Retries | 3 |\n",
         )
         chunks = adapter._split_text(content)
 
@@ -140,7 +140,7 @@ class TestWeixinChunking:
         adapter.MAX_MESSAGE_LENGTH = 80
 
         content = adapter.format_message(
-            "## Intro\n\nShort paragraph.\n\n```python\nprint('hello world')\nprint('again')\n```\n\nTail paragraph."
+            "## Intro\n\nShort paragraph.\n\n```python\nprint('hello world')\nprint('again')\n```\n\nTail paragraph.",
         )
         chunks = adapter._split_text(content)
 
@@ -172,7 +172,7 @@ class TestWeixinChunking:
                     "token": "***",
                     "split_multiline_messages": True,
                 },
-            )
+            ),
         )
 
         content = adapter.format_message("第一行\n第二行\n第三行")
@@ -220,8 +220,8 @@ class TestWeixinConfig:
                     enabled=True,
                     token="bot-token",
                     extra={"account_id": "bot-account"},
-                )
-            }
+                ),
+            },
         )
 
         assert config.get_connected_platforms() == [Platform.WEIXIN]
@@ -232,8 +232,8 @@ class TestWeixinConfig:
                 Platform.WEIXIN: PlatformConfig(
                     enabled=True,
                     token="bot-token",
-                )
-            }
+                ),
+            },
         )
 
         assert config.get_connected_platforms() == []
@@ -350,7 +350,7 @@ class TestWeixinSendMessageIntegration:
                 "wxid_test123",
                 "hello",
                 media_files=[("/tmp/demo.png", False)],
-            )
+            ),
         )
 
         assert result["success"] is True
@@ -490,7 +490,7 @@ class TestWeixinChunkDelivery:
         async def run_burst():
             with patch("gateway.platforms.weixin._send_message", side_effect=rate_limited_send) as send_message_mock:
                 results = await asyncio.gather(
-                    *(adapter.send("wxid_test123", f"message {idx}") for idx in range(20))
+                    *(adapter.send("wxid_test123", f"message {idx}") for idx in range(20)),
                 )
                 return results, send_message_mock
 
@@ -517,7 +517,7 @@ class TestWeixinOutboundMedia:
                 caption="截图说明",
                 reply_to="reply-1",
                 metadata={"thread_id": "t-1"},
-            )
+            ),
         )
 
         assert result == expected
@@ -543,7 +543,7 @@ class TestWeixinOutboundMedia:
                 file_name="renamed.pdf",
                 reply_to="reply-1",
                 metadata={"thread_id": "t-1"},
-            )
+            ),
         )
 
         assert result.success is True
@@ -671,7 +671,7 @@ class TestWeixinBlankMessagePrevention:
                     "token": "test-tok",
                     "split_multiline_messages": True,
                 },
-            )
+            ),
         )
         assert adapter._split_text("") == []
 
@@ -702,7 +702,7 @@ class TestWeixinBlankMessagePrevention:
                     text="",
                     context_token=None,
                     client_id="cid",
-                )
+                ),
             )
 
 
@@ -797,7 +797,7 @@ class TestWeixinSendImageFileParameterName:
                 image_path="/tmp/test_image.png",
                 caption="Test caption",
                 metadata={"thread_id": "thread-123"},
-            )
+            ),
         )
 
         assert result.success is True
@@ -822,7 +822,7 @@ class TestWeixinSendImageFileParameterName:
             adapter.send_image_file(
                 chat_id="wxid_test123",
                 image_path="/tmp/test_image.jpg",
-            )
+            ),
         )
 
         assert result.success is True
@@ -1010,7 +1010,7 @@ class TestWeixinTextDebounce:
                     "text_batch_delay_seconds": "0.5",
                     "text_batch_split_delay_seconds": 1.5,
                 },
-            )
+            ),
         )
         assert adapter._text_batch_delay_seconds == 0.5
         assert adapter._text_batch_split_delay_seconds == 1.5
@@ -1025,7 +1025,7 @@ class TestWeixinTextDebounce:
                     "text_batch_delay_seconds": "not-a-number",
                     "text_batch_split_delay_seconds": -4,
                 },
-            )
+            ),
         )
         assert adapter._text_batch_delay_seconds == 3.0
         assert adapter._text_batch_split_delay_seconds == 5.0
@@ -1114,7 +1114,7 @@ class TestWeixinApiTimeout:
                 payload={"k": "v"},
                 token="tok",
                 timeout_ms=5000,
-            )
+            ),
         )
         assert result == {"ret": 0}
         # The fix enforces the timeout via asyncio.wait_for, so ClientTimeout is
@@ -1130,7 +1130,7 @@ class TestWeixinApiTimeout:
                 base_url="https://weixin.example.com",
                 endpoint="ep",
                 timeout_ms=5000,
-            )
+            ),
         )
         assert result == {"ret": 0}
         [(_url, kwargs)] = session.get_calls
@@ -1148,7 +1148,7 @@ class TestWeixinApiTimeout:
                     payload={"k": "v"},
                     token="tok",
                     timeout_ms=1,
-                )
+                ),
             )
 
     def test_api_get_raises_timeout_when_response_is_slow(self):
@@ -1160,7 +1160,7 @@ class TestWeixinApiTimeout:
                     base_url="https://weixin.example.com",
                     endpoint="ep",
                     timeout_ms=1,
-                )
+                ),
             )
 
     def test_api_post_raises_runtime_error_on_non_ok_status(self):
@@ -1176,7 +1176,7 @@ class TestWeixinApiTimeout:
                     payload={"k": "v"},
                     token="tok",
                     timeout_ms=5000,
-                )
+                ),
             )
 
     def test_api_get_raises_runtime_error_on_non_ok_status(self):
@@ -1188,7 +1188,7 @@ class TestWeixinApiTimeout:
                     base_url="https://weixin.example.com",
                     endpoint="ep",
                     timeout_ms=5000,
-                )
+                ),
             )
 
     def test_get_updates_returns_empty_sentinel_on_timeout(self):
@@ -1202,6 +1202,6 @@ class TestWeixinApiTimeout:
                 token="tok",
                 sync_buf="buf-123",
                 timeout_ms=1,
-            )
+            ),
         )
         assert result == {"ret": 0, "msgs": [], "get_updates_buf": "buf-123"}

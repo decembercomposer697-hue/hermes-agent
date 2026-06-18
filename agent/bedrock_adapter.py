@@ -67,7 +67,7 @@ def _require_boto3():
         raise ImportError(
             "The 'boto3' package is required for the AWS Bedrock provider. "
             "Install it with: pip install boto3\n"
-            "Or install Hermes with Bedrock support: pip install -e '.[bedrock]'"
+            "Or install Hermes with Bedrock support: pip install -e '.[bedrock]'",
         )
 
 
@@ -433,7 +433,7 @@ def convert_tools_to_converse(tools: list[dict]) -> list[dict]:
                 "name": name,
                 "description": description,
                 "inputSchema": {"json": parameters},
-            }
+            },
         })
     return result
 
@@ -480,7 +480,7 @@ def _convert_content_to_converse(content) -> list[dict]:
                         "image": {
                             "format": media_type.split("/")[-1] if "/" in media_type else "jpeg",
                             "source": {"bytes": data},
-                        }
+                        },
                     })
                 else:
                     # Remote URL — Converse doesn't support URLs directly,
@@ -536,7 +536,7 @@ def convert_messages_to_converse(
                 "toolResult": {
                     "toolUseId": tool_call_id,
                     "content": [{"text": result_content}],
-                }
+                },
             }
             # In Converse, tool results go in a "user" role message
             if converse_msgs and converse_msgs[-1]["role"] == "user":
@@ -570,7 +570,7 @@ def convert_messages_to_converse(
                         "toolUseId": tc.get("id", ""),
                         "name": fn.get("name", ""),
                         "input": args_dict,
-                    }
+                    },
                 })
 
             if not content_blocks:
@@ -922,7 +922,7 @@ def build_converse_kwargs(
             else:
                 logger.warning(
                     "Model %s does not support tool calling — tools stripped. "
-                    "The agent will operate in text-only mode.", model
+                    "The agent will operate in text-only mode.", model,
                 )
 
     if guardrail_config:

@@ -32,7 +32,7 @@ DEFAULT_DATASETS = [
     "NousResearch/hermes-agent-megascience-sft1",
     "NousResearch/Hermes-Agent-Thinking-GLM-4.7-SFT2",
     "NousResearch/Hermes-Agent-Thinking-GLM-4.7-SFT1",
-    "NousResearch/terminal-tasks-glm-hermes-agent"
+    "NousResearch/terminal-tasks-glm-hermes-agent",
 ]
 
 
@@ -120,7 +120,7 @@ def sample_from_datasets(
     min_tokens: int = 16000,
     tokenizer_name: str = "moonshotai/Kimi-K2-Thinking",
     seed: int = 42,
-    num_proc: int = 8
+    num_proc: int = 8,
 ) -> list[dict[str, Any]]:
     """
     Load all datasets, filter by token count, then randomly sample from combined pool.
@@ -173,7 +173,7 @@ def sample_from_datasets(
     with Pool(
         processes=num_proc,
         initializer=_init_tokenizer_worker,
-        initargs=(tokenizer_name,)
+        initargs=(tokenizer_name,),
     ) as pool:
         # Process in chunks and show progress
         chunk_size = 1000
@@ -224,7 +224,7 @@ def sample_from_datasets(
 def save_samples_for_compression(
     samples: list[dict[str, Any]],
     output_dir: Path,
-    batch_size: int = 100
+    batch_size: int = 100,
 ):
     """
     Save samples to JSONL files for trajectory compression.
@@ -372,7 +372,7 @@ def main(
             total_samples, 
             min_tokens=min_tokens,
             seed=seed,
-            num_proc=num_proc
+            num_proc=num_proc,
         )
         
         if not samples:

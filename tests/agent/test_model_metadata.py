@@ -100,7 +100,7 @@ class TestEstimateMessagesTokensRough:
         """
         msg = {"role": "user", "content": [
             {"type": "text", "text": "describe"},
-            {"type": "image_url", "image_url": {"url": "data:image/png;base64,AAAA"}}
+            {"type": "image_url", "image_url": {"url": "data:image/png;base64,AAAA"}},
         ]}
         result = estimate_messages_tokens_rough([msg])
         # Flat cost = 1500 per image plus the small text overhead. Allow
@@ -246,12 +246,12 @@ class TestDefaultContextLengths:
              mock_patch("agent.models_dev.lookup_models_dev_context", return_value=None):
             # The bug: would have returned 200_000 via the "claude" catch-all.
             assert get_model_context_length(
-                "anthropic/claude-fable-5", base_url=or_url, provider="openrouter"
+                "anthropic/claude-fable-5", base_url=or_url, provider="openrouter",
             ) == 1_000_000
             # A genuinely-200k model still resolves to its real OR value — the
             # fix reads per-model context, it does not blanket-bump to 1M.
             assert get_model_context_length(
-                "anthropic/claude-haiku-4.5", base_url=or_url, provider="openrouter"
+                "anthropic/claude-haiku-4.5", base_url=or_url, provider="openrouter",
             ) == 200_000
 
     def test_openrouter_kimi_32k_underreport_still_guarded(self):
@@ -269,7 +269,7 @@ class TestDefaultContextLengths:
              mock_patch("agent.model_metadata.get_cached_context_length", return_value=None), \
              mock_patch("agent.models_dev.lookup_models_dev_context", return_value=None):
             ctx = get_model_context_length(
-                "moonshotai/kimi-k2.6", base_url=or_url, provider="openrouter"
+                "moonshotai/kimi-k2.6", base_url=or_url, provider="openrouter",
             )
             assert ctx != 32768, "Kimi 32k OR underreport must not be accepted"
 
@@ -333,7 +333,7 @@ class TestCodexOAuthContextLength:
             "models": [
                 {"slug": "gpt-5.5", "context_window": 300_000},
                 {"slug": "gpt-5.4", "context_window": 400_000},
-            ]
+            ],
         }
 
         with patch("agent.model_metadata.requests.get", return_value=fake_response), \
@@ -424,7 +424,7 @@ class TestCodexOAuthContextLength:
         fake_response = MagicMock()
         fake_response.status_code = 200
         fake_response.json.return_value = {
-            "models": [{"slug": "gpt-5.5", "context_window": 272_000}]
+            "models": [{"slug": "gpt-5.5", "context_window": 272_000}],
         }
 
         with patch("agent.model_metadata.requests.get", return_value=fake_response), \
@@ -520,7 +520,7 @@ class TestNousPortalContextResolution:
     @patch("agent.model_metadata.fetch_endpoint_model_metadata")
     @patch("agent.model_metadata.fetch_model_metadata")
     def test_portal_value_wins_over_openrouter_catalog(
-        self, mock_or, mock_portal, tmp_path, monkeypatch
+        self, mock_or, mock_portal, tmp_path, monkeypatch,
     ):
         """The motivating case: OR catalog says 1M for qwen3.6-plus, but
         the Nous portal correctly enforces 262144.  Portal must win."""
@@ -548,7 +548,7 @@ class TestNousPortalContextResolution:
     @patch("agent.model_metadata.fetch_endpoint_model_metadata")
     @patch("agent.model_metadata.fetch_model_metadata")
     def test_portal_value_is_persisted_to_disk(
-        self, mock_or, mock_portal, tmp_path, monkeypatch
+        self, mock_or, mock_portal, tmp_path, monkeypatch,
     ):
         """Portal-derived value should land in the persistent cache so
         cross-process callers (e.g. child agents) see the same value."""
@@ -577,7 +577,7 @@ class TestNousPortalContextResolution:
     @patch("agent.model_metadata.fetch_endpoint_model_metadata")
     @patch("agent.model_metadata.fetch_model_metadata")
     def test_openrouter_fallback_is_not_persisted(
-        self, mock_or, mock_portal, tmp_path, monkeypatch
+        self, mock_or, mock_portal, tmp_path, monkeypatch,
     ):
         """When the portal can't resolve a model (network blip, auth glitch,
         model not yet listed) we fall back to the OR catalog so the agent
@@ -602,7 +602,7 @@ class TestNousPortalContextResolution:
         )
         assert ctx == 1_000_000, "OR fallback should still serve the request"
         assert not cache_file.exists() or not yaml.safe_load(
-            cache_file.read_text()
+            cache_file.read_text(),
         ).get("context_lengths", {}), (
             "OR-fallback values must NOT be persisted — a single portal blip "
             "would otherwise freeze the wrong value in via step-1 cache hit"
@@ -611,7 +611,7 @@ class TestNousPortalContextResolution:
     @patch("agent.model_metadata.fetch_endpoint_model_metadata")
     @patch("agent.model_metadata.fetch_model_metadata")
     def test_stale_cache_is_bypassed_and_overwritten_by_portal(
-        self, mock_or, mock_portal, tmp_path, monkeypatch
+        self, mock_or, mock_portal, tmp_path, monkeypatch,
     ):
         """Users upgrading from pre-fix builds have ``qwen3.6-plus@…nous… =
         1000000`` (OR-derived) sitting in their cache file.  Step 1 must
@@ -655,7 +655,7 @@ class TestNousPortalContextResolution:
     @patch("agent.model_metadata.fetch_endpoint_model_metadata")
     @patch("agent.model_metadata.fetch_model_metadata")
     def test_stale_cache_survives_when_portal_unreachable(
-        self, mock_or, mock_portal, tmp_path, monkeypatch
+        self, mock_or, mock_portal, tmp_path, monkeypatch,
     ):
         """When the portal is unreachable AND we have a (potentially stale)
         on-disk cache entry, the entry must survive untouched — we don't
@@ -691,7 +691,7 @@ class TestNousPortalContextResolution:
     @patch("agent.model_metadata.fetch_endpoint_model_metadata")
     @patch("agent.model_metadata.fetch_model_metadata")
     def test_bypass_keyed_on_url_not_provider_string(
-        self, mock_or, mock_portal, tmp_path, monkeypatch
+        self, mock_or, mock_portal, tmp_path, monkeypatch,
     ):
         """Some call sites pass ``provider=""`` or ``provider="openrouter"``
         when the user is really on Nous Portal (e.g. cred-pool fallback).
@@ -734,7 +734,7 @@ class TestGetModelContextLength:
     @patch("agent.model_metadata.fetch_model_metadata")
     def test_known_model_from_api(self, mock_fetch):
         mock_fetch.return_value = {
-            "test/model": {"context_length": 32000}
+            "test/model": {"context_length": 32000},
         }
         assert get_model_context_length("test/model") == 32000
 
@@ -814,7 +814,7 @@ class TestGetModelContextLength:
     def test_custom_endpoint_metadata_beats_fuzzy_default(self, mock_endpoint_fetch, mock_fetch):
         mock_fetch.return_value = {}
         mock_endpoint_fetch.return_value = {
-            "zai-org/GLM-5-TEE": {"context_length": 65536}
+            "zai-org/GLM-5-TEE": {"context_length": 65536},
         }
 
         result = get_model_context_length(
@@ -852,7 +852,7 @@ class TestGetModelContextLength:
         """Single-model servers: use the only model even if name doesn't match."""
         mock_fetch.return_value = {}
         mock_endpoint_fetch.return_value = {
-            "Qwen3.5-9B-Q4_K_M.gguf": {"context_length": 131072}
+            "Qwen3.5-9B-Q4_K_M.gguf": {"context_length": 131072},
         }
 
         result = get_model_context_length(
@@ -885,7 +885,7 @@ class TestGetModelContextLength:
     def test_config_context_length_overrides_all(self, mock_fetch):
         """Explicit config_context_length takes priority over everything."""
         mock_fetch.return_value = {
-            "test/model": {"context_length": 200000}
+            "test/model": {"context_length": 200000},
         }
 
         result = get_model_context_length(
@@ -1088,7 +1088,7 @@ class TestFetchModelMetadata:
         self._reset_cache()
         mock_response = MagicMock()
         mock_response.json.return_value = {
-            "data": [{"id": "test/model", "context_length": 99999, "name": "Test"}]
+            "data": [{"id": "test/model", "context_length": 99999, "name": "Test"}],
         }
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
@@ -1130,8 +1130,8 @@ class TestFetchModelMetadata:
                 "id": "anthropic/claude-3.5-sonnet:beta",
                 "canonical_slug": "anthropic/claude-3.5-sonnet",
                 "context_length": 200000,
-                "name": "Claude 3.5 Sonnet"
-            }]
+                "name": "Claude 3.5 Sonnet",
+            }],
         }
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
@@ -1151,7 +1151,7 @@ class TestFetchModelMetadata:
                 "id": "provider/test-model",
                 "context_length": 123456,
                 "name": "Provider: Test Model",
-            }]
+            }],
         }
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
@@ -1169,7 +1169,7 @@ class TestFetchModelMetadata:
 
         mock_response = MagicMock()
         mock_response.json.return_value = {
-            "data": [{"id": "m1", "context_length": 1000, "name": "M1"}]
+            "data": [{"id": "m1", "context_length": 1000, "name": "M1"}],
         }
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
@@ -1393,7 +1393,7 @@ class TestGrok43StaleCacheGuard:
         base = "https://api.x.ai/v1"
         mm.save_context_length("grok-4.3", base, 256_000)
         ctx = mm.get_model_context_length(
-            "grok-4.3", base_url=base, api_key="", provider="xai"
+            "grok-4.3", base_url=base, api_key="", provider="xai",
         )
         assert ctx == 1_000_000
 
@@ -1405,7 +1405,7 @@ class TestGrok43StaleCacheGuard:
         base = "https://api.x.ai/v1"
         mm.save_context_length("grok-4.3", base, 1_000_000)
         ctx = mm.get_model_context_length(
-            "grok-4.3", base_url=base, api_key="", provider="xai"
+            "grok-4.3", base_url=base, api_key="", provider="xai",
         )
         assert ctx == 1_000_000
 
@@ -1419,6 +1419,6 @@ class TestGrok43StaleCacheGuard:
         for slug in ("grok-4", "grok-4-0709"):
             mm.save_context_length(slug, base, 256_000)
             ctx = mm.get_model_context_length(
-                slug, base_url=base, api_key="", provider="xai"
+                slug, base_url=base, api_key="", provider="xai",
             )
             assert ctx == 256_000, f"{slug} should stay 256000, got {ctx}"

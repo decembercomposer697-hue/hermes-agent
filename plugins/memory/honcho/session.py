@@ -176,7 +176,7 @@ class HonchoSessionManager:
         return peer
 
     def _get_or_create_honcho_session(
-        self, session_id: str, user_peer: Any, assistant_peer: Any
+        self, session_id: str, user_peer: Any, assistant_peer: Any,
     ) -> tuple[Any, list]:
         """
         Get or create a Honcho session with peers configured.
@@ -382,7 +382,7 @@ class HonchoSessionManager:
         user_peer_id = self._resolve_user_peer_id(key)
 
         assistant_peer_id = self._sanitize_id(
-            self._config.ai_peer if self._config else "hermes-assistant"
+            self._config.ai_peer if self._config else "hermes-assistant",
         )
 
         # All expensive I/O outside the lock — Honcho's persistence is source of truth
@@ -390,7 +390,7 @@ class HonchoSessionManager:
         user_peer = self._get_or_create_peer(user_peer_id)
         assistant_peer = self._get_or_create_peer(assistant_peer_id)
         honcho_session, existing_messages = self._get_or_create_honcho_session(
-            honcho_session_id, user_peer, assistant_peer
+            honcho_session_id, user_peer, assistant_peer,
         )
 
         local_messages = []
@@ -427,7 +427,7 @@ class HonchoSessionManager:
 
         if not honcho_session:
             honcho_session, _ = self._get_or_create_honcho_session(
-                session.honcho_session_id, user_peer, assistant_peer
+                session.honcho_session_id, user_peer, assistant_peer,
             )
 
         new_messages = [m for m in session.messages if not m.get("_synced")]

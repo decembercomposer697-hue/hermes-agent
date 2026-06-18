@@ -128,12 +128,12 @@ class TestEmbeddingDeps:
             "6": {"class_type": "CLIPTextEncode",
                   "inputs": {
                       "text": "a cat, embedding:goodvibes, embedding:art:1.2",
-                      "clip": ["1", 1]
+                      "clip": ["1", 1],
                   }},
             "7": {"class_type": "CLIPTextEncode",
                   "inputs": {
                       "text": "ugly, embedding:badhands",
-                      "clip": ["1", 1]
+                      "clip": ["1", 1],
                   }},
             "3": {"class_type": "KSampler",
                   "inputs": {

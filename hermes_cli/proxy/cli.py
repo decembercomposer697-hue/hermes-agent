@@ -88,13 +88,13 @@ def cmd_proxy_status(args: Any) -> int:
         except Exception as exc:
             print(
                 f"  [{name:8s}] {adapter.display_name} — credentials need attention "
-                f"({exc})"
+                f"({exc})",
             )
             continue
         expires = f" (bearer expires {cred.expires_at})" if cred.expires_at else ""
         print(f"  [{name:8s}] {adapter.display_name} — ready{expires}")
     print(
-        "\nStart the proxy with: hermes proxy start [--provider <name>]"
+        "\nStart the proxy with: hermes proxy start [--provider <name>]",
     )
     return 0
 

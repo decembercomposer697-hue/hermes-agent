@@ -83,7 +83,7 @@ def test_cjk_table_pipes_align_across_rows():
         | Vicuna (report) | dense | 79.30 | 未完成 | - | × |
         | ChatGLM | chat | 37.60 | 37.82 | +0.22 | ✓ |
         | 通义千问 | qwen | (无) | 报错 | - | × |
-        """
+        """,
     )
 
     out = realign_markdown_tables(src).rstrip("\n").split("\n")
@@ -107,7 +107,7 @@ def test_emoji_with_cjk_table_aligns():
         | 千问 | ✅ | 通过 |
         | Claude | ✅ | 推理强 |
         | 文心一言 | ❌ | 报错 |
-        """
+        """,
     )
 
     out = realign_markdown_tables(src).rstrip("\n").split("\n")
@@ -127,7 +127,7 @@ def test_already_aligned_ascii_table_remains_aligned():
         |-----|-----|
         | 1   | 2   |
         | foo | bar |
-        """
+        """,
     )
     out = realign_markdown_tables(src).rstrip("\n").split("\n")
     offsets = [_column_offsets(row) for row in out]
@@ -144,7 +144,7 @@ def test_passes_non_table_lines_through_around_a_table():
         | 千问 | 通过 |
 
         And some prose after.
-        """
+        """,
     )
 
     out = realign_markdown_tables(src)
@@ -173,7 +173,7 @@ def test_overflow_falls_back_to_vertical_when_table_wider_than_terminal():
         | a | short | ok |
         | b | this is a much longer description that stretches the column wider than the others by a lot | fine |
         | c | tiny | - |
-        """
+        """,
     )
 
     out = realign_markdown_tables(src, available_width=100)
@@ -203,7 +203,7 @@ def test_horizontal_kept_when_table_fits():
         |------|-----|
         | Alice | 30 |
         | Bob | 25 |
-        """
+        """,
     )
 
     out = realign_markdown_tables(src, available_width=100)
@@ -221,7 +221,7 @@ def test_vertical_fallback_wraps_long_cell_text_with_indent():
         | Key | Value |
         |-----|-------|
         | x | this value is long enough that wrapping the value to fit a narrow terminal width is required even in vertical mode |
-        """
+        """,
     )
 
     out = realign_markdown_tables(src, available_width=60)
@@ -246,7 +246,7 @@ def test_overflow_falls_back_to_vertical_for_cjk_too():
         |------|------|------|
         | 千问 | 一个相当长的描述用于把列宽撑得超过可用终端宽度从而触发竖排回退 | 通过 |
         | 文心 | 短 | × |
-        """
+        """,
     )
 
     out = realign_markdown_tables(src, available_width=50)
@@ -265,7 +265,7 @@ def test_handles_ragged_rows_by_padding_short_rows():
         |---|---|---|
         | 1 | 2 |
         | x | y | z |
-        """
+        """,
     )
     out = realign_markdown_tables(src).rstrip("\n").split("\n")
     offsets = [_column_offsets(row) for row in out]
@@ -289,7 +289,7 @@ def test_multiple_tables_in_one_text():
         | model | n |
         |-------|---|
         | gpt   | 2 |
-        """
+        """,
     )
     out = realign_markdown_tables(src)
     # Each table block individually aligns.

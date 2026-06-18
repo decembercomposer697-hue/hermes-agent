@@ -208,7 +208,7 @@ def _strip_mdv2(text: str) -> str:
 # by '|'.  Requires at least one internal '|' so lone '---' horizontal rules
 # are NOT matched.
 _TABLE_SEPARATOR_RE = re.compile(
-    r'^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*){1,}\|?\s*$'
+    r'^\s*\|?\s*:?-+:?\s*(?:\|\s*:?-+:?\s*){1,}\|?\s*$',
 )
 
 
@@ -496,7 +496,7 @@ class TelegramAdapter(BasePlatformAdapter):
         self._status_message_ids: dict[tuple, str] = {}
 
     def _notification_kwargs(
-        self, metadata: dict[str, Any] | None
+        self, metadata: dict[str, Any] | None,
     ) -> dict[str, Any]:
         """Return disable_notification kwargs when the adapter is in silent mode.
 
@@ -601,7 +601,7 @@ class TelegramAdapter(BasePlatformAdapter):
             return bool(
                 metadata
                 and metadata.get("telegram_dm_topic_reply_fallback")
-                and cls._metadata_reply_to_message_id(metadata) is not None
+                and cls._metadata_reply_to_message_id(metadata) is not None,
             )
         if metadata and metadata.get("telegram_dm_topic_created_for_send"):
             return False
@@ -610,7 +610,7 @@ class TelegramAdapter(BasePlatformAdapter):
             and (
                 metadata and metadata.get("telegram_dm_topic_reply_fallback")
                 or cls._looks_like_private_chat_id(chat_id)
-            )
+            ),
         )
 
     @staticmethod
@@ -937,7 +937,7 @@ class TelegramAdapter(BasePlatformAdapter):
         try:
             await polling_req.initialize()
             logger.debug(
-                "[%s] Polling request pool drained before reconnect", self.name
+                "[%s] Polling request pool drained before reconnect", self.name,
             )
         except Exception:
             logger.debug(
@@ -1021,7 +1021,7 @@ class TelegramAdapter(BasePlatformAdapter):
             # callbacks will fire, so schedule the next retry ourselves.
             if not self.has_fatal_error:
                 task = asyncio.ensure_future(
-                    self._handle_polling_network_error(retry_err)
+                    self._handle_polling_network_error(retry_err),
                 )
                 self._background_tasks.add(task)
                 task.add_done_callback(self._background_tasks.discard)
@@ -1057,7 +1057,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 self.name, HEARTBEAT_PROBE_DELAY,
             )
             await self._handle_polling_network_error(
-                RuntimeError("Updater not running after reconnect heartbeat")
+                RuntimeError("Updater not running after reconnect heartbeat"),
             )
             return
 
@@ -1153,7 +1153,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     # dispatches this error callback). Use get_running_loop().
                     loop = asyncio.get_running_loop()
                     self._polling_error_task = loop.create_task(
-                        self._handle_polling_conflict(retry_err)
+                        self._handle_polling_conflict(retry_err),
                     )
                     return
                 # Fall through to fatal on the last retry.
@@ -1374,7 +1374,7 @@ class TelegramAdapter(BasePlatformAdapter):
                         break
                 else:
                     chat_entry.setdefault("topics", []).append(
-                        {"name": topic_name, "thread_id": thread_id}
+                        {"name": topic_name, "thread_id": thread_id},
                     )
                     changed = True
                 break
@@ -1530,7 +1530,7 @@ class TelegramAdapter(BasePlatformAdapter):
             if custom_base_url:
                 builder = builder.base_url(custom_base_url)
                 builder = builder.base_file_url(
-                    self.config.extra.get("base_file_url", custom_base_url)
+                    self.config.extra.get("base_file_url", custom_base_url),
                 )
                 logger.info(
                     "[%s] Using custom Telegram base_url: %s",
@@ -1613,19 +1613,19 @@ class TelegramAdapter(BasePlatformAdapter):
             # Register handlers
             self._app.add_handler(TelegramMessageHandler(
                 filters.TEXT & ~filters.COMMAND,
-                self._handle_text_message
+                self._handle_text_message,
             ))
             self._app.add_handler(TelegramMessageHandler(
                 filters.COMMAND,
-                self._handle_command
+                self._handle_command,
             ))
             self._app.add_handler(TelegramMessageHandler(
                 filters.LOCATION | getattr(filters, "VENUE", filters.LOCATION),
-                self._handle_location_message
+                self._handle_location_message,
             ))
             self._app.add_handler(TelegramMessageHandler(
                 filters.PHOTO | filters.VIDEO | filters.AUDIO | filters.VOICE | filters.Document.ALL | filters.Sticker.ALL,
-                self._handle_media_message
+                self._handle_media_message,
             ))
             # Handle inline keyboard button callbacks (update prompts)
             self._app.add_handler(CallbackQueryHandler(self._handle_callback_query))
@@ -1680,7 +1680,7 @@ class TelegramAdapter(BasePlatformAdapter):
                         "Generate a secret and set it in your .env:\n"
                         "  export TELEGRAM_WEBHOOK_SECRET=\"$(openssl rand -hex 32)\"\n\n"
                         "Then register it with Telegram when setting the "
-                        "webhook via setWebhook's secret_token parameter."
+                        "webhook via setWebhook's secret_token parameter.",
                     )
                 from urllib.parse import urlparse
                 webhook_path = urlparse(webhook_url).path or "/telegram"
@@ -1854,7 +1854,7 @@ class TelegramAdapter(BasePlatformAdapter):
         chat_id: str,
         content: str,
         reply_to: str | None = None,
-        metadata: dict[str, Any] | None = None
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Send a message to a Telegram chat."""
         if not self._bot:
@@ -2425,7 +2425,7 @@ class TelegramAdapter(BasePlatformAdapter):
                             {}
                             if metadata and metadata.get("telegram_dm_topic_reply_fallback")
                             else self._thread_kwargs_for_send(
-                                chat_id, thread_id, metadata, reply_to_message_id=None
+                                chat_id, thread_id, metadata, reply_to_message_id=None,
                             )
                         )
                         try:
@@ -2670,7 +2670,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 [
                     InlineKeyboardButton("✓ Yes", callback_data="update_prompt:y"),
                     InlineKeyboardButton("✗ No", callback_data="update_prompt:n"),
-                ]
+                ],
             ])
             thread_id = self._metadata_thread_id(metadata)
             reply_to_id = self._reply_to_message_id_for_send(None, metadata, reply_to_mode=self._reply_to_mode)
@@ -2685,7 +2685,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     thread_id,
                     metadata,
                     reply_to_message_id=reply_to_id,
-                    reply_to_mode=self._reply_to_mode
+                    reply_to_mode=self._reply_to_mode,
                 ),
                 **self._link_preview_kwargs(),
             )
@@ -2752,8 +2752,8 @@ class TelegramAdapter(BasePlatformAdapter):
                     thread_id,
                     metadata,
                     reply_to_message_id=reply_to_id,
-                    reply_to_mode=self._reply_to_mode
-                )
+                    reply_to_mode=self._reply_to_mode,
+                ),
             )
 
             msg = await self._send_message_with_thread_fallback(**kwargs)
@@ -2803,8 +2803,8 @@ class TelegramAdapter(BasePlatformAdapter):
                     thread_id,
                     metadata,
                     reply_to_message_id=reply_to_id,
-                    reply_to_mode=self._reply_to_mode
-                )
+                    reply_to_mode=self._reply_to_mode,
+                ),
             )
 
             msg = await self._send_message_with_thread_fallback(**kwargs)
@@ -2868,13 +2868,13 @@ class TelegramAdapter(BasePlatformAdapter):
                         InlineKeyboardButton(
                             str(idx + 1),
                             callback_data=f"cl:{clarify_id}:{idx}",
-                        )
+                        ),
                     ])
                 rows.append([
                     InlineKeyboardButton(
                         "✏️ Other (type answer)",
                         callback_data=f"cl:{clarify_id}:other",
-                    )
+                    ),
                 ])
                 kwargs["reply_markup"] = InlineKeyboardMarkup(rows)
 
@@ -2886,7 +2886,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     thread_id,
                     metadata,
                     reply_to_message_id=reply_to_id,
-                )
+                ),
             )
 
             msg = await self._send_message_with_thread_fallback(**kwargs)
@@ -2930,7 +2930,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     f"⚙ *Model Configuration*\n\n"
                     f"Current model: `{current_model or 'unknown'}`\n"
                     f"Provider: {provider_label}\n\n"
-                    f"Select a provider:"
+                    f"Select a provider:",
                 
             )
 
@@ -2947,7 +2947,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     thread_id,
                     metadata,
                     reply_to_message_id=reply_to_id,
-                    reply_to_mode=self._reply_to_mode
+                    reply_to_mode=self._reply_to_mode,
                 ),
                 **self._link_preview_kwargs(),
             )
@@ -3005,7 +3005,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     if any(m.get("is_current") for m in members):
                         label = f"✓ {label}"
                     buttons.append(
-                        InlineKeyboardButton(label, callback_data=f"mpg:{row['group_id']}")
+                        InlineKeyboardButton(label, callback_data=f"mpg:{row['group_id']}"),
                     )
                 else:
                     p = by_slug.get(row["slug"])
@@ -3037,7 +3037,7 @@ class TelegramAdapter(BasePlatformAdapter):
             if len(short) > 38:
                 short = short[:35] + "..."
             buttons.append(
-                InlineKeyboardButton(short, callback_data=f"mm:{abs_idx}")
+                InlineKeyboardButton(short, callback_data=f"mm:{abs_idx}"),
             )
 
         rows = [buttons[i : i + 2] for i in range(0, len(buttons), 2)]
@@ -3061,7 +3061,7 @@ class TelegramAdapter(BasePlatformAdapter):
         return InlineKeyboardMarkup(rows), page_info
 
     async def _handle_model_picker_callback(
-        self, query, data: str, chat_id: str
+        self, query, data: str, chat_id: str,
     ) -> None:
         """Handle model picker inline keyboard callbacks (mp:/mm:/mc:/mb:/mx:/mg:)."""
         state = self._model_picker_state.get(chat_id)
@@ -3104,7 +3104,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     
                         f"⚙ *Model Configuration*\n\n"
                         f"Provider: *{pname}*{page_info}\n"
-                        f"Select a model:{extra}"
+                        f"Select a model:{extra}",
                     
                 ),
                 parse_mode=ParseMode.MARKDOWN_V2,
@@ -3140,7 +3140,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     
                         f"⚙ *Model Configuration*\n\n"
                         f"Provider: *{pname}*{page_info}\n"
-                        f"Select a model:{extra}"
+                        f"Select a model:{extra}",
                     
                 ),
                 parse_mode=ParseMode.MARKDOWN_V2,
@@ -3193,7 +3193,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 except Exception:
                     pass
             await query.answer(
-                text="Switch failed." if switch_failed else "Model switched!"
+                text="Switch failed." if switch_failed else "Model switched!",
             )
             self._model_picker_state.pop(chat_id, None)
 
@@ -3240,7 +3240,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 ])
                 await query.edit_message_text(
                     text=self.format_message(
-                        f"⚠ *Expensive Model Warning*\n\n{warning.message}"
+                        f"⚠ *Expensive Model Warning*\n\n{warning.message}",
                     ),
                     parse_mode=ParseMode.MARKDOWN_V2,
                     reply_markup=keyboard,
@@ -3274,7 +3274,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 except Exception:
                     pass
             await query.answer(
-                text="Switch failed." if switch_failed else "Model switched!"
+                text="Switch failed." if switch_failed else "Model switched!",
             )
 
             # Clean up state
@@ -3302,7 +3302,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 if p.get("is_current"):
                     label = f"✓ {label}"
                 buttons.append(
-                    InlineKeyboardButton(label, callback_data=f"mp:{p['slug']}")
+                    InlineKeyboardButton(label, callback_data=f"mp:{p['slug']}"),
                 )
             rows = [buttons[i : i + 2] for i in range(0, len(buttons), 2)]
             rows.append([
@@ -3316,7 +3316,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     
                         f"⚙ *Model Configuration*\n\n"
                         f"Provider family: *{_label or group_id}*\n\n"
-                        f"Select a provider:"
+                        f"Select a provider:",
                     
                 ),
                 parse_mode=ParseMode.MARKDOWN_V2,
@@ -3339,7 +3339,7 @@ class TelegramAdapter(BasePlatformAdapter):
                         f"⚙ *Model Configuration*\n\n"
                         f"Current model: `{state['current_model'] or 'unknown'}`\n"
                         f"Provider: {provider_label}\n\n"
-                        f"Select a provider:"
+                        f"Select a provider:",
                     
                 ),
                 parse_mode=ParseMode.MARKDOWN_V2,
@@ -3361,7 +3361,7 @@ class TelegramAdapter(BasePlatformAdapter):
             await query.answer()
 
     async def _handle_callback_query(
-        self, update: "Update", context: "ContextTypes.DEFAULT_TYPE"
+        self, update: "Update", context: "ContextTypes.DEFAULT_TYPE",
     ) -> None:
         """Handle inline keyboard button clicks."""
         query = update.callback_query
@@ -3548,8 +3548,8 @@ class TelegramAdapter(BasePlatformAdapter):
                                         "telegram_dm_topic_reply_fallback": True,
                                     },
                                     reply_to_message_id=reply_to_id,
-                                    reply_to_mode=self._reply_to_mode
-                                )
+                                    reply_to_mode=self._reply_to_mode,
+                                ),
                             )
                         elif thread_id is not None:
                             send_kwargs.update(
@@ -3557,8 +3557,8 @@ class TelegramAdapter(BasePlatformAdapter):
                                     str(query.message.chat_id),
                                     str(thread_id),
                                     {"thread_id": str(thread_id)},
-                                    reply_to_mode=self._reply_to_mode
-                                )
+                                    reply_to_mode=self._reply_to_mode,
+                                ),
                             )
                         await self._send_message_with_thread_fallback(**send_kwargs)
                 except Exception as exc:
@@ -3865,7 +3865,7 @@ class TelegramAdapter(BasePlatformAdapter):
                         _voice_thread,
                         metadata,
                         reply_to_message_id=reply_to_id,
-                        reply_to_mode=self._reply_to_mode
+                        reply_to_mode=self._reply_to_mode,
                     )
                     msg = await self._send_with_dm_topic_reply_anchor_retry(
                         self._bot.send_voice,
@@ -3891,7 +3891,7 @@ class TelegramAdapter(BasePlatformAdapter):
                         _audio_thread,
                         metadata,
                         reply_to_message_id=reply_to_id,
-                        reply_to_mode=self._reply_to_mode
+                        reply_to_mode=self._reply_to_mode,
                     )
                     msg = await self._send_with_dm_topic_reply_anchor_retry(
                         self._bot.send_audio,
@@ -4022,7 +4022,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     _thread,
                     metadata,
                     reply_to_message_id=reply_to_id,
-                    reply_to_mode=self._reply_to_mode
+                    reply_to_mode=self._reply_to_mode,
                 )
 
                 def _reset_opened_files() -> None:
@@ -4087,7 +4087,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 _thread,
                 metadata,
                 reply_to_message_id=reply_to_id,
-                reply_to_mode=self._reply_to_mode
+                reply_to_mode=self._reply_to_mode,
             )
             with open(image_path, "rb") as image_file:
                 msg = await self._send_with_dm_topic_reply_anchor_retry(
@@ -4182,7 +4182,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 _thread,
                 metadata,
                 reply_to_message_id=reply_to_id,
-                reply_to_mode=self._reply_to_mode
+                reply_to_mode=self._reply_to_mode,
             )
 
             with open(file_path, "rb") as f:
@@ -4231,7 +4231,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 _thread,
                 metadata,
                 reply_to_message_id=reply_to_id,
-                reply_to_mode=self._reply_to_mode
+                reply_to_mode=self._reply_to_mode,
             )
             with open(video_path, "rb") as f:
                 msg = await self._send_with_dm_topic_reply_anchor_retry(
@@ -4284,7 +4284,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 _photo_thread,
                 metadata,
                 reply_to_message_id=reply_to_id,
-                reply_to_mode=self._reply_to_mode
+                reply_to_mode=self._reply_to_mode,
             )
             msg = await self._send_with_dm_topic_reply_anchor_retry(
                 self._bot.send_photo,
@@ -4321,7 +4321,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     _photo_thread,
                     metadata,
                     reply_to_message_id=reply_to_id,
-                    reply_to_mode=self._reply_to_mode
+                    reply_to_mode=self._reply_to_mode,
                 )
                 msg = await self._send_with_dm_topic_reply_anchor_retry(
                     self._bot.send_photo,
@@ -4368,7 +4368,7 @@ class TelegramAdapter(BasePlatformAdapter):
                 _anim_thread,
                 metadata,
                 reply_to_message_id=reply_to_id,
-                reply_to_mode=self._reply_to_mode
+                reply_to_mode=self._reply_to_mode,
             )
             msg = await self._send_with_dm_topic_reply_anchor_retry(
                 self._bot.send_animation,
@@ -4535,7 +4535,7 @@ class TelegramAdapter(BasePlatformAdapter):
             return _ph(f'*{_escape_mdv2(inner)}*')
 
         text = re.sub(
-            r'^#{1,6}\s+(.+)$', _convert_header, text, flags=re.MULTILINE
+            r'^#{1,6}\s+(.+)$', _convert_header, text, flags=re.MULTILINE,
         )
 
         # 5) Convert bold: **text** → *text* (MarkdownV2 bold)
@@ -5127,7 +5127,7 @@ class TelegramAdapter(BasePlatformAdapter):
 
         if cached is None:
             event.text = self._append_observed_note(
-                event.text, "[Observed Telegram attachment: unsupported type, not cached.]"
+                event.text, "[Observed Telegram attachment: unsupported type, not cached.]",
             )
             return
 
@@ -5434,7 +5434,7 @@ class TelegramAdapter(BasePlatformAdapter):
         if prior_task and not prior_task.done():
             prior_task.cancel()
         self._pending_text_batch_tasks[key] = asyncio.create_task(
-            self._flush_text_batch(key)
+            self._flush_text_batch(key),
         )
 
     async def _flush_text_batch(self, key: str) -> None:
@@ -5542,7 +5542,7 @@ class TelegramAdapter(BasePlatformAdapter):
                     _event.text = self._clean_bot_trigger_text(_m.caption)
                 await self._cache_observed_media(_m, _event)
                 self._observe_unmentioned_group_message(
-                    _m, _event.message_type, update_id=update.update_id, event=_event
+                    _m, _event.message_type, update_id=update.update_id, event=_event,
                 )
             return
 
@@ -5803,7 +5803,7 @@ class TelegramAdapter(BasePlatformAdapter):
             prior_task.cancel()
 
         self._media_group_tasks[media_group_id] = asyncio.create_task(
-            self._flush_media_group_event(media_group_id)
+            self._flush_media_group_event(media_group_id),
         )
 
     async def _flush_media_group_event(self, media_group_id: str) -> None:
@@ -5846,7 +5846,7 @@ class TelegramAdapter(BasePlatformAdapter):
         cached = get_cached_description(sticker.file_unique_id)
         if cached:
             event.text = build_sticker_injection(
-                cached["description"], cached.get("emoji", emoji), cached.get("set_name", set_name)
+                cached["description"], cached.get("emoji", emoji), cached.get("set_name", set_name),
             )
             logger.info("[Telegram] Sticker cache hit: %s", sticker.file_unique_id)
             return

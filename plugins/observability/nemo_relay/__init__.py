@@ -347,7 +347,7 @@ class _Runtime:
                             "api_request_id": kwargs.get("api_request_id"),
                             "api_call_count": kwargs.get("api_call_count"),
                             "mode": self.settings.adaptive_mode,
-                        }
+                        },
                     ),
                     metadata=_metadata(kwargs),
                     model_name=str(kwargs.get("model") or ""),
@@ -359,7 +359,7 @@ class _Runtime:
             return _managed_execute()
 
         return self._run_managed_with_downstream_preservation(
-            next_call, _normalize, _llm_response_payload, _make_managed
+            next_call, _normalize, _llm_response_payload, _make_managed,
         )
 
     def execute_tool(self, kwargs: dict[str, Any]) -> Any:
@@ -386,7 +386,7 @@ class _Runtime:
                             "api_request_id": kwargs.get("api_request_id"),
                             "tool_call_id": kwargs.get("tool_call_id"),
                             "mode": self.settings.adaptive_mode,
-                        }
+                        },
                     ),
                     metadata=_metadata(kwargs),
                 )
@@ -397,7 +397,7 @@ class _Runtime:
             return _managed_execute()
 
         return self._run_managed_with_downstream_preservation(
-            next_call, _normalize, _jsonable, _make_managed
+            next_call, _normalize, _jsonable, _make_managed,
         )
 
 
@@ -772,7 +772,7 @@ def _api_key(kwargs: dict[str, Any]) -> str:
 def _tool_key(kwargs: dict[str, Any]) -> str:
     return str(
         kwargs.get("tool_call_id")
-        or f"{_session_id(kwargs)}:{kwargs.get('turn_id') or ''}:{kwargs.get('tool_name') or 'tool'}"
+        or f"{_session_id(kwargs)}:{kwargs.get('turn_id') or ''}:{kwargs.get('tool_name') or 'tool'}",
     )
 
 
@@ -915,7 +915,7 @@ def _tool_calls_payload(tool_calls: Any) -> list[dict[str, Any]]:
                     "name": _value(function, "name"),
                     "arguments": _value(function, "arguments"),
                 },
-            }
+            },
         )
     return normalized
 

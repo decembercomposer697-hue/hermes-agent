@@ -163,7 +163,7 @@ class TestFallbackChainAdvancement:
                 "model": "fallback-model",
                 "base_url": "https://fallback.example/v1",
                 "key_env": "MY_FALLBACK_KEY",
-            }
+            },
         ]
         agent = _make_agent(fallback_model=fbs)
         with (

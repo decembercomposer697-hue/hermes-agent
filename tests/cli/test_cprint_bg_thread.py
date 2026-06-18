@@ -132,7 +132,7 @@ def test_cprint_same_thread_as_app_loop_direct_print(monkeypatch):
 
         def call_soon_threadsafe(self, cb, *args):
             raise AssertionError(
-                "call_soon_threadsafe must not be used on the app's own thread"
+                "call_soon_threadsafe must not be used on the app's own thread",
             )
 
     fake_loop = FakeLoop()

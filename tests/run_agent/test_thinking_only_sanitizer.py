@@ -109,7 +109,7 @@ class TestIsThinkingOnlyAssistant:
 
     def test_tool_message_never_thinking_only(self):
         assert not AIAgent._is_thinking_only_assistant(
-            {"role": "tool", "content": "", "tool_call_id": "x"}
+            {"role": "tool", "content": "", "tool_call_id": "x"},
         )
 
     def test_non_dict_returns_false(self):

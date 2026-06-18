@@ -57,7 +57,7 @@ def test_shell_linter_skipped_when_lsp_will_handle(ext, tmp_path):
 
     def _exec_must_not_run(*args, **kwargs):  # pragma: no cover
         raise AssertionError(
-            "shell linter was invoked despite LSP claiming the file"
+            "shell linter was invoked despite LSP claiming the file",
         )
 
     with patch.object(fops, "_lsp_will_handle", return_value=True), \

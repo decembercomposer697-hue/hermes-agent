@@ -688,7 +688,7 @@ class TestPasteCallbackReader:
     def test_garbage_input_noop(self, monkeypatch, capsys):
         result = self._empty_result()
         monkeypatch.setattr(
-            "sys.stdin", MagicMock(readline=lambda: "not a url at all\n")
+            "sys.stdin", MagicMock(readline=lambda: "not a url at all\n"),
         )
         _paste_callback_reader(result)
         assert result["auth_code"] is None

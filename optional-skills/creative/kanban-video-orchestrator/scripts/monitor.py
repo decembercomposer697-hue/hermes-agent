@@ -99,7 +99,7 @@ def detect_issues(tasks: list[dict]) -> list[str]:
         if now - hb_dt > timedelta(minutes=2):
             issues.append(
                 f"STUCK: {t['id']} ({t.get('assignee', '?')}) — "
-                f"no heartbeat in {(now - hb_dt).total_seconds():.0f}s"
+                f"no heartbeat in {(now - hb_dt).total_seconds():.0f}s",
             )
 
     # Tasks exceeding max_runtime
@@ -116,7 +116,7 @@ def detect_issues(tasks: list[dict]) -> list[str]:
         if elapsed > max_rt:
             issues.append(
                 f"OVERTIME: {t['id']} ({t.get('assignee', '?')}) — "
-                f"running {elapsed:.0f}s, cap was {max_rt}s"
+                f"running {elapsed:.0f}s, cap was {max_rt}s",
             )
 
     # Repeated retries
@@ -125,7 +125,7 @@ def detect_issues(tasks: list[dict]) -> list[str]:
         if retries and retries >= 2:
             issues.append(
                 f"FLAPPING: {t['id']} ({t.get('assignee', '?')}) — "
-                f"retried {retries}× — fix root cause before next run"
+                f"retried {retries}× — fix root cause before next run",
             )
 
     return issues

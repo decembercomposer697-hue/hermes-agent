@@ -69,7 +69,7 @@ class SmsAdapter(BasePlatformAdapter):
         self._auth_token: str = os.environ["TWILIO_AUTH_TOKEN"]
         self._from_number: str = os.getenv("TWILIO_PHONE_NUMBER", "")
         self._webhook_port: int = int(
-            os.getenv("SMS_WEBHOOK_PORT", str(DEFAULT_WEBHOOK_PORT))
+            os.getenv("SMS_WEBHOOK_PORT", str(DEFAULT_WEBHOOK_PORT)),
         )
         self._webhook_host: str = os.getenv("SMS_WEBHOOK_HOST", DEFAULT_WEBHOOK_HOST)
         self._webhook_url: str = os.getenv("SMS_WEBHOOK_URL", "").strip()
@@ -272,14 +272,14 @@ class SmsAdapter(BasePlatformAdapter):
             # Has explicit default port → strip it
             return urllib.parse.urlunparse(
                 (parsed.scheme, parsed.hostname, parsed.path,
-                 parsed.params, parsed.query, parsed.fragment)
+                 parsed.params, parsed.query, parsed.fragment),
             )
         elif parsed.port is None:
             # No port → add default
             netloc = f"{parsed.hostname}:{default_port}"
             return urllib.parse.urlunparse(
                 (parsed.scheme, netloc, parsed.path,
-                 parsed.params, parsed.query, parsed.fragment)
+                 parsed.params, parsed.query, parsed.fragment),
             )
 
         # Non-standard port — no variant
@@ -316,7 +316,7 @@ class SmsAdapter(BasePlatformAdapter):
                 )
             flat_params = {k: v[0] for k, v in form.items() if v}
             if not self._validate_twilio_signature(
-                self._webhook_url, flat_params, twilio_sig
+                self._webhook_url, flat_params, twilio_sig,
             ):
                 logger.warning("[sms] Rejected: invalid Twilio signature")
                 return web.Response(

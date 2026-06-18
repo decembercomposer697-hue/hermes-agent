@@ -45,7 +45,7 @@ def test_build_welcome_banner_uses_normalized_toolset_names():
         patch.object(tools.mcp_tool, "get_mcp_status", return_value=[]),
     ):
         console = Console(
-            record=True, force_terminal=False, color_system=None, width=160
+            record=True, force_terminal=False, color_system=None, width=160,
         )
         banner.build_welcome_banner(
             console=console,

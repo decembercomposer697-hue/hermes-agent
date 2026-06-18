@@ -288,7 +288,7 @@ def _scan_for_plugin_adapter_antipattern(source: str) -> list[str]:
                 ):
                     offenses.append(
                         f"line {node.lineno}: {target_name}(...) points into "
-                        f"plugins/platforms/"
+                        f"plugins/platforms/",
                     )
 
     # Bare `import adapter` / `from adapter import ...` anywhere (module level
@@ -300,14 +300,14 @@ def _scan_for_plugin_adapter_antipattern(source: str) -> list[str]:
                     offenses.append(
                         f"line {node.lineno}: ``import adapter`` "
                         f"(bare — resolves to whichever plugin's adapter.py "
-                        f"is first on sys.path)"
+                        f"is first on sys.path)",
                     )
         elif isinstance(node, ast.ImportFrom):
             if node.module == "adapter" and node.level == 0:
                 offenses.append(
                     f"line {node.lineno}: ``from adapter import ...`` "
                     f"(bare — resolves to whichever plugin's adapter.py "
-                    f"is first on sys.path)"
+                    f"is first on sys.path)",
                 )
 
     return offenses
@@ -360,7 +360,7 @@ def _run_adapter_antipattern_scan() -> list[str]:
         if offenses:
             violations.append(
                 f"  {path.relative_to(_GATEWAY_DIR.parent.parent)}:\n    "
-                + "\n    ".join(offenses)
+                + "\n    ".join(offenses),
             )
     return violations
 

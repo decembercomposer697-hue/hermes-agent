@@ -79,7 +79,7 @@ async def test_notify_on_complete_sets_internal_flag(monkeypatch, tmp_path):
 
     sessions = [
         SimpleNamespace(
-            output_buffer="done\n", exited=True, exit_code=0, command="echo test"
+            output_buffer="done\n", exited=True, exit_code=0, command="echo test",
         ),
     ]
     monkeypatch.setattr(pr_module, "process_registry", _FakeRegistry(sessions))
@@ -206,7 +206,7 @@ async def test_notify_on_complete_preserves_user_identity(monkeypatch, tmp_path)
 
     sessions = [
         SimpleNamespace(
-            output_buffer="done\n", exited=True, exit_code=0, command="echo test"
+            output_buffer="done\n", exited=True, exit_code=0, command="echo test",
         ),
     ]
     monkeypatch.setattr(pr_module, "process_registry", _FakeRegistry(sessions))
@@ -237,7 +237,7 @@ async def test_notify_on_complete_uses_session_store_origin_for_group_topic(monk
 
     sessions = [
         SimpleNamespace(
-            output_buffer="done\n", exited=True, exit_code=0, command="echo test"
+            output_buffer="done\n", exited=True, exit_code=0, command="echo test",
         ),
     ]
     monkeypatch.setattr(pr_module, "process_registry", _FakeRegistry(sessions))
@@ -257,7 +257,7 @@ async def test_notify_on_complete_uses_session_store_origin_for_group_topic(monk
             thread_id="42",
             user_id="user-42",
             user_name="alice",
-        )
+        ),
     )
 
     watcher = {

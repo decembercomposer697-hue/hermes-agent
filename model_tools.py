@@ -133,7 +133,7 @@ def _run_async(coro):
                         t.cancel()
                     if pending:
                         worker_loop.run_until_complete(
-                            asyncio.gather(*pending, return_exceptions=True)
+                            asyncio.gather(*pending, return_exceptions=True),
                         )
                 except Exception:
                     pass
@@ -228,7 +228,7 @@ _LEGACY_TOOLSET_MAP = {
         "browser_navigate", "browser_snapshot", "browser_click",
         "browser_type", "browser_scroll", "browser_back",
         "browser_press", "browser_get_images",
-        "browser_vision", "browser_console"
+        "browser_vision", "browser_console",
     ],
     "cronjob_tools": ["cronjob"],
     "file_tools": ["read_file", "write_file", "patch", "search_files"],
@@ -527,7 +527,7 @@ def _compute_tool_definitions(
                 print(
                     f"🔎 Tool Search: {assembly.deferred_count} MCP/plugin tools deferred "
                     f"(~{assembly.deferred_tokens} tokens) behind tool_search/describe/call. "
-                    f"Threshold ~{assembly.threshold_tokens} tokens."
+                    f"Threshold ~{assembly.threshold_tokens} tokens.",
                 )
             filtered_tools = assembly.tool_defs
     except Exception as e:  # pragma: no cover — never break tool loading

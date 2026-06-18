@@ -1420,7 +1420,7 @@ def _fetch_codex_oauth_context_lengths(access_token: str) -> dict[str, int]:
 
 
 def _resolve_codex_oauth_context_length(
-    model: str, access_token: str = ""
+    model: str, access_token: str = "",
 ) -> int | None:
     """Resolve a Codex OAuth model's real context window.
 
@@ -1444,7 +1444,7 @@ def _resolve_codex_oauth_context_length(
     # Fallback: longest-key-first substring match over hardcoded defaults.
     model_lower = model_bare.lower()
     for slug, ctx in sorted(
-        _CODEX_OAUTH_CONTEXT_FALLBACK.items(), key=lambda x: len(x[0]), reverse=True
+        _CODEX_OAUTH_CONTEXT_FALLBACK.items(), key=lambda x: len(x[0]), reverse=True,
     ):
         if slug in model_lower:
             return ctx
@@ -1771,7 +1771,7 @@ def get_model_context_length(
 
     if effective_provider == "nous":
         ctx, source = _resolve_nous_context_length(
-            model, base_url=base_url or "", api_key=api_key or ""
+            model, base_url=base_url or "", api_key=api_key or "",
         )
         if ctx:
             # Persist ONLY portal-derived values.  Caching an OR-fallback
@@ -1877,7 +1877,7 @@ def get_model_context_length(
     # "claude-sonnet-4" to incorrectly match "claude-sonnet-4-6" and return 1M.
     model_lower = model.lower()
     for default_model, length in sorted(
-        DEFAULT_CONTEXT_LENGTHS.items(), key=lambda x: len(x[0]), reverse=True
+        DEFAULT_CONTEXT_LENGTHS.items(), key=lambda x: len(x[0]), reverse=True,
     ):
         if default_model in model_lower:
             return length

@@ -51,7 +51,7 @@ class DCFModelValidator:
             'warning_count': len(self.warnings),
             'errors': self.errors,
             'warnings': self.warnings,
-            'info': self.info
+            'info': self.info,
         }
 
         return results
@@ -142,11 +142,11 @@ class DCFModelValidator:
                 if terminal_growth >= wacc:
                     self.errors.append(
                         f"CRITICAL: Terminal growth ({terminal_growth:.2%}) >= WACC ({wacc:.2%}). "
-                        "This creates infinite value and is mathematically invalid."
+                        "This creates infinite value and is mathematically invalid.",
                     )
                 else:
                     self.info.append(
-                        f"✓ Terminal growth ({terminal_growth:.2%}) < WACC ({wacc:.2%})"
+                        f"✓ Terminal growth ({terminal_growth:.2%}) < WACC ({wacc:.2%})",
                     )
             else:
                 self.warnings.append("Could not locate terminal growth and WACC values")
@@ -175,7 +175,7 @@ class DCFModelValidator:
             if wacc is not None:
                 if wacc < 0.05 or wacc > 0.20:
                     self.warnings.append(
-                        f"WACC ({wacc:.2%}) is outside typical range (5%-20%). Verify calculation."
+                        f"WACC ({wacc:.2%}) is outside typical range (5%-20%). Verify calculation.",
                     )
                 else:
                     self.info.append(f"✓ WACC ({wacc:.2%}) in reasonable range")
@@ -215,12 +215,12 @@ class DCFModelValidator:
                 if proportion > 0.80:
                     self.warnings.append(
                         f"Terminal value is {proportion:.1%} of EV (typically should be 50-70%). "
-                        "Model may be over-reliant on terminal assumptions."
+                        "Model may be over-reliant on terminal assumptions.",
                     )
                 elif proportion < 0.40:
                     self.warnings.append(
                         f"Terminal value is {proportion:.1%} of EV (typically should be 50-70%). "
-                        "Check if terminal assumptions are too conservative."
+                        "Check if terminal assumptions are too conservative.",
                     )
                 else:
                     self.info.append(f"✓ Terminal value is {proportion:.1%} of EV")
@@ -281,7 +281,7 @@ def main():
         error_result = {
             'file': excel_file,
             'status': 'ERROR',
-            'error': str(e)
+            'error': str(e),
         }
         print(json.dumps(error_result, indent=2))
         sys.exit(1)

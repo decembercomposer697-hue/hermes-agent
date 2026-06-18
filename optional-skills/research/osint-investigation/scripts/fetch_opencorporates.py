@@ -81,7 +81,7 @@ def _via_html(query: str, limit: int) -> list[dict]:
                 "jurisdiction_code": (m.group("jur") or "").strip(),
                 "company_number": (m.group("num") or "").strip(),
                 "_via": "html",
-            }
+            },
         )
     return out
 
@@ -130,7 +130,7 @@ def fetch(
                     "opencorporates_url": c.get("opencorporates_url", ""),
                     "officers_count": "",
                     "source": source_tag,
-                }
+                },
             )
             continue
         addr = c.get("registered_address_in_full") or ""
@@ -148,7 +148,7 @@ def fetch(
                 "opencorporates_url": c.get("opencorporates_url", "") or "",
                 "officers_count": str(c.get("officers", {}).get("total_count", "") if c.get("officers") else ""),
                 "source": source_tag,
-            }
+            },
         )
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)

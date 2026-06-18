@@ -116,11 +116,11 @@ class AudioBridge:
             )
         except FileNotFoundError as exc:
             raise RuntimeError(
-                "pactl not found — install PulseAudio/pipewire-pulse"
+                "pactl not found — install PulseAudio/pipewire-pulse",
             ) from exc
         except subprocess.CalledProcessError as exc:
             raise RuntimeError(
-                f"pactl load-module null-sink failed: {exc.stderr or exc}"
+                f"pactl load-module null-sink failed: {exc.stderr or exc}",
             ) from exc
 
         sink_mod_id = self._parse_module_id(sink_out.stdout)
@@ -148,7 +148,7 @@ class AudioBridge:
                 stdin=subprocess.DEVNULL,
             )
             raise RuntimeError(
-                f"pactl load-module virtual-source failed: {exc.stderr or exc}"
+                f"pactl load-module virtual-source failed: {exc.stderr or exc}",
             ) from exc
 
         src_mod_id = self._parse_module_id(src_out.stdout)
@@ -177,17 +177,17 @@ class AudioBridge:
             )
         except FileNotFoundError as exc:
             raise RuntimeError(
-                "system_profiler not found (macOS-only command)"
+                "system_profiler not found (macOS-only command)",
             ) from exc
         except subprocess.CalledProcessError as exc:
             raise RuntimeError(
-                f"system_profiler failed: {exc.output}"
+                f"system_profiler failed: {exc.output}",
             ) from exc
 
         if "BlackHole" not in out:
             raise RuntimeError(
                 "BlackHole virtual audio device not installed. "
-                "Install via: brew install blackhole-2ch"
+                "Install via: brew install blackhole-2ch",
             )
 
         self._platform = "darwin"
@@ -220,7 +220,7 @@ class AudioBridge:
             return int(token)
         except ValueError as exc:
             raise RuntimeError(
-                f"could not parse pactl module id from: {stdout!r}"
+                f"could not parse pactl module id from: {stdout!r}",
             ) from exc
 
 

@@ -298,8 +298,8 @@ class TestSkillsShSource:
                         "name": "vercel-react-best-practices",
                         "installs": 207679,
                         "source": "vercel-labs/agent-skills",
-                    }
-                ]
+                    },
+                ],
             },
         )
 
@@ -810,7 +810,7 @@ class TestWellKnownSkillSource:
                 "skills": [
                     {"name": "git-workflow", "description": "Git rules", "files": ["SKILL.md"]},
                     {"name": "code-review", "description": "Review code", "files": ["SKILL.md", "references/checklist.md"]},
-                ]
+                ],
             },
         )
 
@@ -844,7 +844,7 @@ class TestWellKnownSkillSource:
         def fake_get(url, *args, **kwargs):
             if url.endswith("/index.json"):
                 return MagicMock(status_code=200, json=lambda: {
-                    "skills": [{"name": "git-workflow", "description": "Git rules", "files": ["SKILL.md"]}]
+                    "skills": [{"name": "git-workflow", "description": "Git rules", "files": ["SKILL.md"]}],
                 })
             if url.endswith("/git-workflow/SKILL.md"):
                 return MagicMock(status_code=200, text="---\nname: git-workflow\ndescription: Git rules\n---\n\n# Git Workflow\n")
@@ -870,7 +870,7 @@ class TestWellKnownSkillSource:
                         "name": "code-review",
                         "description": "Review code",
                         "files": ["SKILL.md", "references/checklist.md"],
-                    }]
+                    }],
                 })
             if url.endswith("/code-review/SKILL.md"):
                 return MagicMock(status_code=200, text="# Code Review\n")
@@ -898,7 +898,7 @@ class TestWellKnownSkillSource:
                         "name": "code-review",
                         "description": "Review code",
                         "files": ["SKILL.md", "../../../escape.txt"],
-                    }]
+                    }],
                 })
             if url.endswith("/code-review/SKILL.md"):
                 return MagicMock(status_code=200, text="# Code Review\n")
@@ -934,10 +934,10 @@ class TestUrlSource:
     def test_rejects_well_known_url(self):
         # Leave these for WellKnownSkillSource.
         assert self._source()._matches(
-            "https://example.com/.well-known/skills/git-workflow/SKILL.md"
+            "https://example.com/.well-known/skills/git-workflow/SKILL.md",
         ) is False
         assert self._source()._matches(
-            "https://example.com/.well-known/skills/index.json"
+            "https://example.com/.well-known/skills/index.json",
         ) is False
 
     def test_rejects_wrapped_identifiers(self):
@@ -1318,7 +1318,7 @@ class TestHubLockFile:
         lock_file = tmp_path / "lock.json"
         lock_file.write_text(json.dumps({
             "version": 1,
-            "installed": {"my-skill": {"source": "github"}}
+            "installed": {"my-skill": {"source": "github"}},
         }))
         lock = HubLockFile(path=lock_file)
         data = lock.load()
@@ -1600,7 +1600,7 @@ class TestUnifiedSearchDedup:
         failing.search.side_effect = RuntimeError("boom")
         ok = self._make_source("ok", [
             SkillMeta(name="s1", description="d", source="ok",
-                       identifier="x", trust_level="community")
+                       identifier="x", trust_level="community"),
         ])
         results = unified_search("query", [failing, ok])
         assert len(results) == 1
@@ -1675,10 +1675,10 @@ class TestOptionalSkillSourceBinaryAssets:
         )
         wav_bytes = b"RIFF\x00\x01fakewav"
         (skill_dir / "assets" / "neutts-cli" / "samples" / "jo.wav").write_bytes(
-            wav_bytes
+            wav_bytes,
         )
         (skill_dir / "assets" / "neutts-cli" / "samples" / "jo.txt").write_text(
-            "hello\n", encoding="utf-8"
+            "hello\n", encoding="utf-8",
         )
         pycache_dir = skill_dir / "assets" / "neutts-cli" / "src" / "neutts_cli" / "__pycache__"
         pycache_dir.mkdir(parents=True)
@@ -2056,8 +2056,8 @@ class TestInstallPathSafety:
                     "metadata": {},
                     "installed_at": "now",
                     "updated_at": "now",
-                }
-            }
+                },
+            },
         }))
 
         patch_lock_file(lock_path)
@@ -2084,8 +2084,8 @@ class TestInstallPathSafety:
                     "install_path": "../sibling",
                     "files": [], "metadata": {},
                     "installed_at": "now", "updated_at": "now",
-                }
-            }
+                },
+            },
         }))
 
         patch_lock_file(lock_path)
@@ -2112,8 +2112,8 @@ class TestInstallPathSafety:
                     "install_path": "",
                     "files": [], "metadata": {},
                     "installed_at": "now", "updated_at": "now",
-                }
-            }
+                },
+            },
         }))
 
         patch_lock_file(lock_path)
@@ -2122,7 +2122,7 @@ class TestInstallPathSafety:
         assert (isolated_skills_dir / "bystander" / "SKILL.md").read_text() == "safe"
 
     def test_uninstall_rejects_symlink_redirect_inside_skills(
-        self, tmp_path, isolated_skills_dir, patch_lock_file
+        self, tmp_path, isolated_skills_dir, patch_lock_file,
     ):
         """A symlinked skill dir that points outside skills/ must not be followed."""
         from tools.skills_hub import uninstall_skill
@@ -2149,8 +2149,8 @@ class TestInstallPathSafety:
                     "install_path": "evil",
                     "files": [], "metadata": {},
                     "installed_at": "now", "updated_at": "now",
-                }
-            }
+                },
+            },
         }))
 
         patch_lock_file(lock_path)

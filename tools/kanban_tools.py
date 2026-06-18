@@ -116,7 +116,7 @@ def _worker_run_id(task_id: str) -> int | None:
 
 
 def _stamp_worker_session_metadata(
-    task_id: str, metadata: dict | None
+    task_id: str, metadata: dict | None,
 ) -> dict | None:
     """Add trusted worker session id metadata for this worker's own task."""
     if os.environ.get("HERMES_KANBAN_TASK") != task_id:
@@ -156,7 +156,7 @@ def _enforce_worker_task_ownership(tid: str) -> str | None:
         return tool_error(
             f"worker is scoped to task {env_tid}; refusing to mutate "
             f"{tid}. Use kanban_comment to hand off information to other "
-            f"tasks, or kanban_create to spawn follow-up work."
+            f"tasks, or kanban_create to spawn follow-up work.",
         )
     return None
 
@@ -301,7 +301,7 @@ def _require_orchestrator_tool(tool_name: str) -> str | None:
         return tool_error(
             f"{tool_name} is orchestrator-only; dispatcher-spawned workers "
             "must use kanban_complete, kanban_block, kanban_heartbeat, or "
-            "kanban_comment for their assigned task."
+            "kanban_comment for their assigned task.",
         )
     return None
 
@@ -342,7 +342,7 @@ def _handle_show(args: dict, **kw) -> str:
     tid = _default_task_id(args.get("task_id"))
     if not tid:
         return tool_error(
-            "task_id is required (or set HERMES_KANBAN_TASK in the env)"
+            "task_id is required (or set HERMES_KANBAN_TASK in the env)",
         )
     board = args.get("board")
     try:
@@ -478,7 +478,7 @@ def _handle_complete(args: dict, **kw) -> str:
     tid = _default_task_id(args.get("task_id"))
     if not tid:
         return tool_error(
-            "task_id is required (or set HERMES_KANBAN_TASK in the env)"
+            "task_id is required (or set HERMES_KANBAN_TASK in the env)",
         )
     ownership_err = _enforce_worker_task_ownership(tid)
     if ownership_err:
@@ -495,7 +495,7 @@ def _handle_complete(args: dict, **kw) -> str:
         if not isinstance(created_cards, (list, tuple)):
             return tool_error(
                 f"created_cards must be a list of task ids, got "
-                f"{type(created_cards).__name__}"
+                f"{type(created_cards).__name__}",
             )
         # Normalise: strings only, stripped, non-empty.
         created_cards = [
@@ -508,7 +508,7 @@ def _handle_complete(args: dict, **kw) -> str:
         if not isinstance(artifacts, (list, tuple)):
             return tool_error(
                 f"artifacts must be a list of file paths, got "
-                f"{type(artifacts).__name__}"
+                f"{type(artifacts).__name__}",
             )
         artifacts = [
             str(p).strip() for p in artifacts if str(p).strip()
@@ -524,7 +524,7 @@ def _handle_complete(args: dict, **kw) -> str:
             elif not isinstance(metadata, dict):
                 return tool_error(
                     f"metadata must be an object/dict, got "
-                    f"{type(metadata).__name__}"
+                    f"{type(metadata).__name__}",
                 )
             # Don't overwrite an existing metadata.artifacts the worker
             # passed manually — merge instead.
@@ -542,11 +542,11 @@ def _handle_complete(args: dict, **kw) -> str:
                 metadata["artifacts"] = artifacts
     if not (summary or result):
         return tool_error(
-            "provide at least one of: summary (preferred), result"
+            "provide at least one of: summary (preferred), result",
         )
     if metadata is not None and not isinstance(metadata, dict):
         return tool_error(
-            f"metadata must be an object/dict, got {type(metadata).__name__}"
+            f"metadata must be an object/dict, got {type(metadata).__name__}",
         )
     metadata = _stamp_worker_session_metadata(tid, metadata)
     board = args.get("board")
@@ -578,11 +578,11 @@ def _handle_complete(args: dict, **kw) -> str:
                     f"Your task is still in-flight (no state change). "
                     f"Retry kanban_complete with the same summary/metadata "
                     f"and either drop these ids from created_cards, or pass "
-                    f"created_cards=[] to skip the card-claim check entirely."
+                    f"created_cards=[] to skip the card-claim check entirely.",
                 )
             if not ok:
                 return tool_error(
-                    f"could not complete {tid} (unknown id or already terminal)"
+                    f"could not complete {tid} (unknown id or already terminal)",
                 )
             run = kb.latest_run(conn, tid)
             return _ok(task_id=tid, run_id=run.id if run else None)
@@ -600,7 +600,7 @@ def _handle_block(args: dict, **kw) -> str:
     tid = _default_task_id(args.get("task_id"))
     if not tid:
         return tool_error(
-            "task_id is required (or set HERMES_KANBAN_TASK in the env)"
+            "task_id is required (or set HERMES_KANBAN_TASK in the env)",
         )
     ownership_err = _enforce_worker_task_ownership(tid)
     if ownership_err:
@@ -620,7 +620,7 @@ def _handle_block(args: dict, **kw) -> str:
             if not ok:
                 return tool_error(
                     f"could not block {tid} (unknown id or not in "
-                    f"running/ready)"
+                    f"running/ready)",
                 )
             run = kb.latest_run(conn, tid)
             return _ok(task_id=tid, run_id=run.id if run else None)
@@ -646,7 +646,7 @@ def _handle_heartbeat(args: dict, **kw) -> str:
     tid = _default_task_id(args.get("task_id"))
     if not tid:
         return tool_error(
-            "task_id is required (or set HERMES_KANBAN_TASK in the env)"
+            "task_id is required (or set HERMES_KANBAN_TASK in the env)",
         )
     ownership_err = _enforce_worker_task_ownership(tid)
     if ownership_err:
@@ -672,7 +672,7 @@ def _handle_heartbeat(args: dict, **kw) -> str:
             )
             if not ok:
                 return tool_error(
-                    f"could not heartbeat {tid} (unknown id or not running)"
+                    f"could not heartbeat {tid} (unknown id or not running)",
                 )
             return _ok(task_id=tid)
         finally:
@@ -690,7 +690,7 @@ def _handle_comment(args: dict, **kw) -> str:
     if not tid:
         return tool_error(
             "task_id is required (use the current task id if that's what "
-            "you mean — pulls from env but kept explicit here)"
+            "you mean — pulls from env but kept explicit here)",
         )
     body = args.get("body")
     if not body or not str(body).strip():
@@ -733,7 +733,7 @@ def _handle_create(args: dict, **kw) -> str:
     if not assignee:
         return tool_error(
             "assignee is required — name the profile that should execute this "
-            "task (the dispatcher will only spawn tasks with an assignee)"
+            "task (the dispatcher will only spawn tasks with an assignee)",
         )
     body = args.get("body")
     parents = args.get("parents") or []
@@ -767,7 +767,7 @@ def _handle_create(args: dict, **kw) -> str:
         skills = [skills]
     if skills is not None and not isinstance(skills, (list, tuple)):
         return tool_error(
-            f"skills must be a list of skill names, got {type(skills).__name__}"
+            f"skills must be a list of skill names, got {type(skills).__name__}",
         )
     goal_mode, goal_bool_error = _parse_bool_arg(args, "goal_mode")
     if goal_bool_error:
@@ -777,7 +777,7 @@ def _handle_create(args: dict, **kw) -> str:
         parents = [parents]
     if not isinstance(parents, (list, tuple)):
         return tool_error(
-            f"parents must be a list of task ids, got {type(parents).__name__}"
+            f"parents must be a list of task ids, got {type(parents).__name__}",
         )
     board = args.get("board")
     try:

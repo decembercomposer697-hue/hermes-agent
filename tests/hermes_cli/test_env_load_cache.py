@@ -26,7 +26,7 @@ def test_load_env_caches_on_repeat_calls():
     invalidate_env_cache()
 
     with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".env", delete=False, encoding="utf-8"
+        mode="w", suffix=".env", delete=False, encoding="utf-8",
     ) as f:
         f.write("OPENAI_API_KEY=sk-first\n")
         env_path = Path(f.name)
@@ -54,7 +54,7 @@ def test_load_env_invalidates_on_mtime_bump():
     invalidate_env_cache()
 
     with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".env", delete=False, encoding="utf-8"
+        mode="w", suffix=".env", delete=False, encoding="utf-8",
     ) as f:
         f.write("OPENAI_API_KEY=sk-old\n")
         env_path = Path(f.name)
@@ -90,7 +90,7 @@ def test_invalidate_env_cache_forces_reread():
     invalidate_env_cache()
 
     with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".env", delete=False, encoding="utf-8"
+        mode="w", suffix=".env", delete=False, encoding="utf-8",
     ) as f:
         f.write("OPENAI_API_KEY=sk-old\n")
         env_path = Path(f.name)

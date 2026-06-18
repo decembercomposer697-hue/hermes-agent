@@ -255,7 +255,7 @@ class TestInterleavedReplayCredentialRedaction:
                     "function": {
                         "name": "terminal",
                         "arguments": json.dumps(
-                            {"command": f"curl -H 'Authorization: Bearer {REDACTED}'"}
+                            {"command": f"curl -H 'Authorization: Bearer {REDACTED}'"},
                         ),
                     },
                 },

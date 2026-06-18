@@ -801,13 +801,13 @@ class InsightsEngine:
                 if skill.get("last_used_at"):
                     last_used = datetime.fromtimestamp(skill["last_used_at"]).strftime("%b %d")
                 lines.append(
-                    f"  {skill['skill'][:28]:<28} {skill['view_count']:>7,} {skill['manage_count']:>7,} {last_used:>11}"
+                    f"  {skill['skill'][:28]:<28} {skill['view_count']:>7,} {skill['manage_count']:>7,} {last_used:>11}",
                 )
             summary = skills.get("summary", {})
             lines.append(
                 f"  Distinct skills: {summary.get('distinct_skills_used', 0)}  "
                 f"Loads: {summary.get('total_skill_loads', 0):,}  "
-                f"Edits: {summary.get('total_skill_edits', 0):,}"
+                f"Edits: {summary.get('total_skill_edits', 0):,}",
             )
             lines.append("")
 
@@ -902,7 +902,7 @@ class InsightsEngine:
                 if skill.get("last_used_at"):
                     suffix = f", last used {datetime.fromtimestamp(skill['last_used_at']).strftime('%b %d')}"
                 lines.append(
-                    f"  {skill['skill']} — {skill['view_count']:,} loads, {skill['manage_count']:,} edits{suffix}"
+                    f"  {skill['skill']} — {skill['view_count']:,} loads, {skill['manage_count']:,} edits{suffix}",
                 )
             lines.append("")
 
@@ -914,7 +914,7 @@ class InsightsEngine:
             display_hr = hr % 12 or 12
             lines.append(f"**📅 Busiest:** {act['busiest_day']['day']}s ({act['busiest_day']['count']} sessions), {display_hr}{ampm} ({act['busiest_hour']['count']} sessions)")
             if act.get("active_days"):
-                lines.append(f"**Active days:** {act['active_days']}", )
+                lines.append(f"**Active days:** {act['active_days']}" )
             if act.get("max_streak", 0) > 1:
                 lines.append(f"**Best streak:** {act['max_streak']} consecutive days")
 

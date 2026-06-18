@@ -134,7 +134,7 @@ def _pipe_stdin(proc: subprocess.Popen, data: str) -> None:
 
 
 def _popen_bash(
-    cmd: list[str], stdin_data: str | None = None, **kwargs
+    cmd: list[str], stdin_data: str | None = None, **kwargs,
 ) -> subprocess.Popen:
     """Spawn a subprocess with standard stdout/stderr/stdin setup.
 
@@ -437,7 +437,7 @@ class BaseEnvironment(ABC):
         # silent here, but the redirect is harmless.
         if self._snapshot_ready:
             parts.append(
-                f"source {_quoted_snap} >/dev/null 2>&1 || true"
+                f"source {_quoted_snap} >/dev/null 2>&1 || true",
             )
 
         # Preserve bare ``~`` expansion, but rewrite ``~/...`` through
@@ -461,7 +461,7 @@ class BaseEnvironment(ABC):
         # end with a newline (e.g. printf 'exact'). We'll strip this
         # injected newline in _extract_cwd_from_output.
         parts.append(
-            f"printf '\\n{self._cwd_marker}%s{self._cwd_marker}\\n' \"$(pwd -P)\""
+            f"printf '\\n{self._cwd_marker}%s{self._cwd_marker}\\n' \"$(pwd -P)\"",
         )
         parts.append("exit $__hermes_ec")
 
@@ -868,7 +868,7 @@ class BaseEnvironment(ABC):
         login = not self._snapshot_ready
 
         proc = self._run_bash(
-            wrapped, login=login, timeout=effective_timeout, stdin_data=effective_stdin
+            wrapped, login=login, timeout=effective_timeout, stdin_data=effective_stdin,
         )
         result = self._wait_for_process(proc, timeout=effective_timeout)
         self._update_cwd(result)

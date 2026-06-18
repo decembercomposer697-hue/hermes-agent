@@ -188,7 +188,7 @@ class TestDelegateTask(unittest.TestCase):
     def test_single_task_mode(self, mock_run):
         mock_run.return_value = {
             "task_index": 0, "status": "completed",
-            "summary": "Done!", "api_calls": 3, "duration_seconds": 5.0
+            "summary": "Done!", "api_calls": 3, "duration_seconds": 5.0,
         }
         parent = _make_mock_parent()
         result = json.loads(delegate_task(goal="Fix tests", context="error log...", parent_agent=parent))
@@ -239,7 +239,7 @@ class TestDelegateTask(unittest.TestCase):
             [
                 {"goal": "Research topic A"},
                 {"goal": "Research topic B"},
-            ]
+            ],
         )
 
         result = json.loads(delegate_task(tasks=tasks, parent_agent=parent))
@@ -254,7 +254,7 @@ class TestDelegateTask(unittest.TestCase):
         parent = _make_mock_parent()
 
         result = json.loads(
-            delegate_task(tasks=["not a task object"], parent_agent=parent)
+            delegate_task(tasks=["not a task object"], parent_agent=parent),
         )
 
         self.assertIn("error", result)
@@ -266,7 +266,7 @@ class TestDelegateTask(unittest.TestCase):
         parent = _make_mock_parent()
 
         result = json.loads(
-            delegate_task(tasks='[{"goal": "bad}', parent_agent=parent)
+            delegate_task(tasks='[{"goal": "bad}', parent_agent=parent),
         )
 
         self.assertIn("error", result)
@@ -277,7 +277,7 @@ class TestDelegateTask(unittest.TestCase):
     def test_batch_capped_at_3(self, mock_run):
         mock_run.return_value = {
             "task_index": 0, "status": "completed",
-            "summary": "Done", "api_calls": 1, "duration_seconds": 1.0
+            "summary": "Done", "api_calls": 1, "duration_seconds": 1.0,
         }
         parent = _make_mock_parent()
         limit = _get_max_concurrent_children()
@@ -293,7 +293,7 @@ class TestDelegateTask(unittest.TestCase):
         """When tasks array is provided, top-level goal/context/toolsets are ignored."""
         mock_run.return_value = {
             "task_index": 0, "status": "completed",
-            "summary": "Done", "api_calls": 1, "duration_seconds": 1.0
+            "summary": "Done", "api_calls": 1, "duration_seconds": 1.0,
         }
         parent = _make_mock_parent()
         result = json.loads(delegate_task(
@@ -310,7 +310,7 @@ class TestDelegateTask(unittest.TestCase):
         mock_run.return_value = {
             "task_index": 0, "status": "error",
             "summary": None, "error": "Something broke",
-            "api_calls": 0, "duration_seconds": 0.5
+            "api_calls": 0, "duration_seconds": 0.5,
         }
         parent = _make_mock_parent()
         result = json.loads(delegate_task(goal="Break things", parent_agent=parent))
@@ -324,7 +324,7 @@ class TestDelegateTask(unittest.TestCase):
         with patch("run_agent.AIAgent") as MockAgent:
             mock_child = MagicMock()
             mock_child.run_conversation.return_value = {
-                "final_response": "done", "completed": True, "api_calls": 1
+                "final_response": "done", "completed": True, "api_calls": 1,
             }
             MockAgent.return_value = mock_child
 
@@ -338,7 +338,7 @@ class TestDelegateTask(unittest.TestCase):
         with patch("run_agent.AIAgent") as MockAgent:
             mock_child = MagicMock()
             mock_child.run_conversation.return_value = {
-                "final_response": "done", "completed": True, "api_calls": 1
+                "final_response": "done", "completed": True, "api_calls": 1,
             }
             MockAgent.return_value = mock_child
 
@@ -482,7 +482,7 @@ class TestToolNamePreservation(unittest.TestCase):
             except NameError as exc:
                 self.fail(
                     f"_build_child_agent raised NameError — "
-                    f"_saved_tool_names leaked back into wrong scope: {exc}"
+                    f"_saved_tool_names leaked back into wrong scope: {exc}",
                 )
 
     def test_saved_tool_names_set_on_child_before_run(self):
@@ -531,7 +531,7 @@ class TestDelegateObservability(unittest.TestCase):
                 "messages": [
                     {"role": "user", "content": "do something"},
                     {"role": "assistant", "tool_calls": [
-                        {"id": "tc_1", "function": {"name": "web_search", "arguments": '{"query": "test"}'}}
+                        {"id": "tc_1", "function": {"name": "web_search", "arguments": '{"query": "test"}'}},
                     ]},
                     {"role": "tool", "tool_call_id": "tc_1", "content": '{"results": [1,2,3]}'},
                     {"role": "assistant", "content": "done"},
@@ -571,7 +571,7 @@ class TestDelegateObservability(unittest.TestCase):
                 "api_calls": 1,
                 "messages": [
                     {"role": "assistant", "tool_calls": [
-                        {"id": "tc_1", "function": {"name": "image_generate", "arguments": '{"prompt": "x"}'}}
+                        {"id": "tc_1", "function": {"name": "image_generate", "arguments": '{"prompt": "x"}'}},
                     ]},
                     {"role": "tool", "tool_call_id": "tc_1", "content": [
                         {"type": "text", "text": '{"success": true}'},
@@ -593,19 +593,19 @@ class TestDelegateObservability(unittest.TestCase):
         result = {
             "messages": [
                 {"role": "assistant", "tool_calls": [
-                    {"id": "t1", "function": {"name": "terminal", "arguments": "{}"}}
+                    {"id": "t1", "function": {"name": "terminal", "arguments": "{}"}},
                 ]},
                 {"role": "tool", "tool_call_id": "t1", "content": [
                     {"type": "text", "text": "Error: command not found"},
                 ]},
                 {"role": "assistant", "tool_calls": [
-                    {"id": "t2", "function": {"name": "vision", "arguments": "{}"}}
+                    {"id": "t2", "function": {"name": "vision", "arguments": "{}"}},
                 ]},
                 {"role": "tool", "tool_call_id": "t2", "content": [
                     {"type": "text", "text": "all good"},
                     {"type": "image_url", "image_url": {"url": "data:x"}},
                 ]},
-            ]
+            ],
         }
         tail = _extract_output_tail(result, max_entries=8, max_chars=600)
         by_tool = {t["tool"]: t for t in tail}
@@ -636,7 +636,7 @@ class TestDelegateObservability(unittest.TestCase):
                 "api_calls": 1,
                 "messages": [
                     {"role": "assistant", "tool_calls": [
-                        {"id": "tc_1", "function": {"name": "terminal", "arguments": '{"cmd": "ls"}'}}
+                        {"id": "tc_1", "function": {"name": "terminal", "arguments": '{"cmd": "ls"}'}},
                     ]},
                     {"role": "tool", "tool_call_id": "tc_1", "content": "Error: command not found"},
                 ],
@@ -817,7 +817,7 @@ class TestSubagentCostRollup(unittest.TestCase):
                 delegate_task(
                     tasks=[{"goal": "A"}, {"goal": "B"}, {"goal": "C"}],
                     parent_agent=parent,
-                )
+                ),
             )
 
         # 0.15 + 0.27 + 0.03 even though one child failed — the API calls it
@@ -1102,7 +1102,7 @@ class TestDelegationCredentialResolution(unittest.TestCase):
         self.assertEqual(creds["api_key"], "crof-key-abc")
         # Verify resolve_runtime_provider was called with the configured name
         mock_resolve.assert_called_once_with(
-            requested="crof.ai", target_model="deepseek-v4-pro-CEER"
+            requested="crof.ai", target_model="deepseek-v4-pro-CEER",
         )
 
     @patch("hermes_cli.runtime_provider.resolve_runtime_provider")
@@ -1186,7 +1186,7 @@ class TestDelegationProviderIntegration(unittest.TestCase):
         with patch("run_agent.AIAgent") as MockAgent:
             mock_child = MagicMock()
             mock_child.run_conversation.return_value = {
-                "final_response": "done", "completed": True, "api_calls": 1
+                "final_response": "done", "completed": True, "api_calls": 1,
             }
             MockAgent.return_value = mock_child
 
@@ -1223,7 +1223,7 @@ class TestDelegationProviderIntegration(unittest.TestCase):
         with patch("run_agent.AIAgent") as MockAgent:
             mock_child = MagicMock()
             mock_child.run_conversation.return_value = {
-                "final_response": "done", "completed": True, "api_calls": 1
+                "final_response": "done", "completed": True, "api_calls": 1,
             }
             MockAgent.return_value = mock_child
 
@@ -1240,7 +1240,7 @@ class TestDelegationProviderIntegration(unittest.TestCase):
     @patch("tools.delegate_tool._load_config")
     @patch("tools.delegate_tool._resolve_delegation_credentials")
     def test_provider_override_clears_parent_openrouter_filters(
-        self, mock_creds, mock_cfg
+        self, mock_creds, mock_cfg,
     ):
         """Delegated provider should not inherit parent provider-preference filters."""
         mock_cfg.return_value = {
@@ -1300,7 +1300,7 @@ class TestDelegationProviderIntegration(unittest.TestCase):
         with patch("run_agent.AIAgent") as MockAgent:
             mock_child = MagicMock()
             mock_child.run_conversation.return_value = {
-                "final_response": "done", "completed": True, "api_calls": 1
+                "final_response": "done", "completed": True, "api_calls": 1,
             }
             MockAgent.return_value = mock_child
 
@@ -1330,7 +1330,7 @@ class TestDelegationProviderIntegration(unittest.TestCase):
         with patch("run_agent.AIAgent") as MockAgent:
             mock_child = MagicMock()
             mock_child.run_conversation.return_value = {
-                "final_response": "done", "completed": True, "api_calls": 1
+                "final_response": "done", "completed": True, "api_calls": 1,
             }
             MockAgent.return_value = mock_child
 
@@ -1347,7 +1347,7 @@ class TestDelegationProviderIntegration(unittest.TestCase):
         """When credential resolution fails, delegate_task returns a JSON error."""
         mock_cfg.return_value = {"model": "bad-model", "provider": "nonexistent"}
         mock_creds.side_effect = ValueError(
-            "Cannot resolve delegation provider 'nonexistent': Unknown provider"
+            "Cannot resolve delegation provider 'nonexistent': Unknown provider",
         )
         parent = _make_mock_parent(depth=0)
 
@@ -1382,7 +1382,7 @@ class TestDelegationProviderIntegration(unittest.TestCase):
             mock_build.return_value = mock_child
             mock_run.return_value = {
                 "task_index": 0, "status": "completed",
-                "summary": "Done", "api_calls": 1, "duration_seconds": 1.0
+                "summary": "Done", "api_calls": 1, "duration_seconds": 1.0,
             }
 
             tasks = [{"goal": "Task A"}, {"goal": "Task B"}]
@@ -1422,7 +1422,7 @@ class TestDelegationProviderIntegration(unittest.TestCase):
             mock_build.return_value = mock_child
             mock_run.return_value = {
                 "task_index": 0, "status": "completed",
-                "summary": "Done", "api_calls": 1, "duration_seconds": 1.0
+                "summary": "Done", "api_calls": 1, "duration_seconds": 1.0,
             }
 
             delegate_task(goal="ACP delegation test", parent_agent=parent)
@@ -1456,7 +1456,7 @@ class TestDelegationProviderIntegration(unittest.TestCase):
         with patch("run_agent.AIAgent") as MockAgent:
             mock_child = MagicMock()
             mock_child.run_conversation.return_value = {
-                "final_response": "done", "completed": True, "api_calls": 1
+                "final_response": "done", "completed": True, "api_calls": 1,
             }
             MockAgent.return_value = mock_child
 
@@ -1540,7 +1540,7 @@ class TestChildCredentialPoolResolution(unittest.TestCase):
         with patch("agent.credential_pool.get_custom_provider_pool_key", side_effect=fake_key), \
              patch("agent.credential_pool.load_pool", return_value=child_pool) as load_mock:
             result = _resolve_child_credential_pool(
-                "custom", parent, "https://endpoint-b.example.com/v1"
+                "custom", parent, "https://endpoint-b.example.com/v1",
             )
 
         # Loaded the child's OWN endpoint pool, not the parent's.
@@ -1561,7 +1561,7 @@ class TestChildCredentialPoolResolution(unittest.TestCase):
             return_value="custom:endpoint-a",
         ):
             result = _resolve_child_credential_pool(
-                "custom", parent, "https://endpoint-a.example.com/v1"
+                "custom", parent, "https://endpoint-a.example.com/v1",
             )
 
         self.assertIs(result, parent._credential_pool)
@@ -1580,7 +1580,7 @@ class TestChildCredentialPoolResolution(unittest.TestCase):
             return_value=None,
         ):
             result = _resolve_child_credential_pool(
-                "custom", parent, "https://raw-unregistered.example.com/v1"
+                "custom", parent, "https://raw-unregistered.example.com/v1",
             )
 
         self.assertIsNone(result)
@@ -2358,7 +2358,7 @@ class TestOrchestratorRoleBehavior(unittest.TestCase):
     @patch("tools.delegate_tool._load_config",
            return_value={"max_spawn_depth": 2})
     def test_orchestrator_role_keeps_delegation_at_depth_1(
-        self, mock_cfg, mock_creds
+        self, mock_cfg, mock_creds,
     ):
         """role='orchestrator' + depth-0 parent with max_spawn_depth=2 →
         child at depth 1 gets 'delegation' in enabled_toolsets (can
@@ -2382,7 +2382,7 @@ class TestOrchestratorRoleBehavior(unittest.TestCase):
     @patch("tools.delegate_tool._load_config",
            return_value={"max_spawn_depth": 2})
     def test_orchestrator_blocked_at_max_spawn_depth(
-        self, mock_cfg, mock_creds
+        self, mock_cfg, mock_creds,
     ):
         """Parent at depth 1 with max_spawn_depth=2 spawns child
         at depth 2 (the floor); role='orchestrator' degrades to leaf."""
@@ -2403,7 +2403,7 @@ class TestOrchestratorRoleBehavior(unittest.TestCase):
     @patch("tools.delegate_tool._resolve_delegation_credentials")
     @patch("tools.delegate_tool._load_config", return_value={})
     def test_orchestrator_blocked_at_default_flat_depth(
-        self, mock_cfg, mock_creds
+        self, mock_cfg, mock_creds,
     ):
         """With default max_spawn_depth=1 (flat), role='orchestrator'
         on a depth-0 parent produces a depth-1 child that is already at
@@ -2525,7 +2525,7 @@ class TestOrchestratorRoleBehavior(unittest.TestCase):
     @patch("tools.delegate_tool._load_config",
            return_value={"max_spawn_depth": 2})
     def test_intersection_preserves_delegation_bound(
-        self, mock_cfg, mock_creds
+        self, mock_cfg, mock_creds,
     ):
         """Design decision: orchestrator capability is granted by role,
         NOT inherited from the parent's toolset. A parent without

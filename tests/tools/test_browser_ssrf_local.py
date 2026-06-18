@@ -124,7 +124,7 @@ class TestPreNavigationSsrf:
 
     @pytest.mark.parametrize("imds_url", IMDS_URLS)
     def test_cloud_blocks_imds_even_when_routing_to_local_sidecar(
-        self, monkeypatch, _common_patches, imds_url
+        self, monkeypatch, _common_patches, imds_url,
     ):
         """Hybrid routing must not let cloud metadata endpoints through."""
         monkeypatch.setattr(browser_tool, "_is_local_backend", lambda: False)
@@ -144,7 +144,7 @@ class TestPreNavigationSsrf:
         assert "cloud metadata endpoint" in result["error"]
 
     def test_cloud_allows_ordinary_private_url_via_sidecar(
-        self, monkeypatch, _common_patches
+        self, monkeypatch, _common_patches,
     ):
         """Hybrid routing still works for ordinary private URLs — floor
         must be narrow enough to not break the PR #16136 feature."""
@@ -295,7 +295,7 @@ class TestPostRedirectSsrf:
     # -- Always-blocked floor: redirect to IMDS via hybrid sidecar (#16234) ----
 
     def test_cloud_blocks_redirect_to_imds_even_via_sidecar(
-        self, monkeypatch, _common_patches
+        self, monkeypatch, _common_patches,
     ):
         """Redirect to a cloud metadata endpoint is blocked regardless of
         routing — even the hybrid local sidecar path can't return IMDS

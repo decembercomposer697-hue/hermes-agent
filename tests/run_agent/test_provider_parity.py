@@ -134,7 +134,7 @@ class TestBuildApiKwargsOpenRouter:
                         "type": "function",
                         "function": {"name": "terminal", "arguments": "{\"command\":\"pwd\"}"},
                         "extra_content": {"thought_signature": "opaque"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_123", "content": "/tmp"},
@@ -180,7 +180,7 @@ class TestBuildApiKwargsOpenRouter:
                         "type": "function",
                         "function": {"name": "terminal", "arguments": "{\"command\":\"pwd\"}"},
                         "extra_content": {"google": {"thought_signature": "opaque"}},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_123", "content": "/tmp"},
@@ -197,7 +197,7 @@ class TestBuildApiKwargsOpenRouter:
         assert messages[1]["tool_calls"][0]["call_id"] == "call_123"
         assert messages[1]["tool_calls"][0]["response_item_id"] == "fc_123"
         assert messages[1]["tool_calls"][0]["extra_content"] == {
-            "google": {"thought_signature": "opaque"}
+            "google": {"thought_signature": "opaque"},
         }
 
     def test_gemini_native_passes_base_url_for_top_level_thinking_config(self, monkeypatch):
@@ -263,7 +263,7 @@ class TestBuildApiKwargsOpenRouter:
         agent = _make_agent(monkeypatch, "openrouter")
         api_msg = self._api_msg_with_extra_content()
         result = agent._sanitize_tool_calls_for_strict_api(
-            api_msg, model="accounts/fireworks/models/llama-v3p1-70b"
+            api_msg, model="accounts/fireworks/models/llama-v3p1-70b",
         )
         assert "extra_content" not in result["tool_calls"][0]
         assert "call_id" not in result["tool_calls"][0]
@@ -280,10 +280,10 @@ class TestBuildApiKwargsOpenRouter:
         agent = _make_agent(monkeypatch, "openrouter")
         api_msg = self._api_msg_with_extra_content()
         result = agent._sanitize_tool_calls_for_strict_api(
-            api_msg, model="google/gemini-3-pro-preview"
+            api_msg, model="google/gemini-3-pro-preview",
         )
         assert result["tool_calls"][0]["extra_content"] == {
-            "google": {"thought_signature": "SIG_123"}
+            "google": {"thought_signature": "SIG_123"},
         }
         # call_id/response_item_id still stripped regardless of model
         assert "call_id" not in result["tool_calls"][0]
@@ -474,7 +474,7 @@ class TestBuildApiKwargsCustomEndpoint:
                             "name": "terminal",
                             "arguments": "{\"command\":\"pwd\"}",
                         },
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_fw_123", "content": "/tmp"},
@@ -713,13 +713,13 @@ class TestChatContentToResponsesParts:
 
     def test_explicit_user_role_emits_input_text(self):
         result = _chat_content_to_responses_parts(
-            [{"type": "text", "text": "hello"}], role="user"
+            [{"type": "text", "text": "hello"}], role="user",
         )
         assert result[0]["type"] == "input_text"
 
     def test_assistant_role_emits_output_text(self):
         result = _chat_content_to_responses_parts(
-            [{"type": "text", "text": "hello"}], role="assistant"
+            [{"type": "text", "text": "hello"}], role="assistant",
         )
         assert result[0]["type"] == "output_text"
 

@@ -189,7 +189,7 @@ def test_get_platform_tools_x_search_auto_enabled_when_xai_oauth_present(monkeyp
     """
     monkeypatch.delenv("XAI_API_KEY", raising=False)
     monkeypatch.setattr(
-        "hermes_cli.tools_config._xai_credentials_present", lambda: True
+        "hermes_cli.tools_config._xai_credentials_present", lambda: True,
     )
 
     for plat in ("cli", "cron", "telegram"):
@@ -211,7 +211,7 @@ def test_get_platform_tools_x_search_off_when_no_xai_credentials(monkeypatch):
     "don't ship the schema to users who can't use it" default."""
     monkeypatch.delenv("XAI_API_KEY", raising=False)
     monkeypatch.setattr(
-        "hermes_cli.tools_config._xai_credentials_present", lambda: False
+        "hermes_cli.tools_config._xai_credentials_present", lambda: False,
     )
 
     cli_enabled = _get_platform_tools({}, "cli")
@@ -224,7 +224,7 @@ def test_get_platform_tools_x_search_respects_explicit_config(monkeypatch):
     when xAI creds exist. The saved list represents deliberate choices."""
     monkeypatch.delenv("XAI_API_KEY", raising=False)
     monkeypatch.setattr(
-        "hermes_cli.tools_config._xai_credentials_present", lambda: True
+        "hermes_cli.tools_config._xai_credentials_present", lambda: True,
     )
 
     # User explicitly opted into spotify but not x_search via `hermes tools`.
@@ -363,7 +363,7 @@ def test_get_platform_tools_includes_enabled_mcp_servers_by_default():
             "exa": {"url": "https://mcp.exa.ai/mcp"},
             "web-search-prime": {"url": "https://api.z.ai/api/mcp/web_search_prime/mcp"},
             "disabled-server": {"url": "https://example.com/mcp", "enabled": False},
-        }
+        },
     }
 
     enabled = _get_platform_tools(config, "cli")
@@ -432,7 +432,7 @@ def test_get_platform_tools_no_mcp_sentinel_does_not_affect_other_platforms():
 def test_toolset_has_keys_for_vision_accepts_codex_auth(tmp_path, monkeypatch):
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
     (tmp_path / "auth.json").write_text(
-        '{"active_provider":"openai-codex","providers":{"openai-codex":{"tokens":{"access_token": "codex-...oken","refresh_token": "codex-...oken"}}}}'
+        '{"active_provider":"openai-codex","providers":{"openai-codex":{"tokens":{"access_token": "codex-...oken","refresh_token": "codex-...oken"}}}}',
     )
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
@@ -453,8 +453,8 @@ def test_save_platform_tools_preserves_mcp_server_names():
     """
     config = {
         "platform_toolsets": {
-            "cli": ["web", "terminal", "time", "github", "custom-mcp-server"]
-        }
+            "cli": ["web", "terminal", "time", "github", "custom-mcp-server"],
+        },
     }
 
     new_selection = {"web", "browser"}
@@ -488,8 +488,8 @@ def test_save_platform_tools_handles_invalid_existing_config():
     """Saving platform tools works when existing config is not a list."""
     config = {
         "platform_toolsets": {
-            "cli": "invalid-string-value"
-        }
+            "cli": "invalid-string-value",
+        },
     }
 
     with patch("hermes_cli.tools_config.save_config"):
@@ -520,8 +520,8 @@ def test_save_platform_tools_does_not_preserve_platform_default_toolsets():
                 "delegation", "file", "hermes-cli",  # <-- the culprit
                 "memory", "session_search", "skills", "terminal",
                 "todo", "tts", "vision", "web",
-            ]
-        }
+            ],
+        },
     }
 
     # User unchecks image_gen, homeassistant, moa — keeps the rest
@@ -556,8 +556,8 @@ def test_save_platform_tools_does_not_preserve_hermes_telegram():
         "platform_toolsets": {
             "telegram": [
                 "browser", "file", "hermes-telegram", "terminal", "web",
-            ]
-        }
+            ],
+        },
     }
 
     new_selection = {"browser", "file", "terminal", "web"}
@@ -577,8 +577,8 @@ def test_save_platform_tools_still_preserves_mcp_with_platform_default_present()
         "platform_toolsets": {
             "cli": [
                 "web", "terminal", "hermes-cli", "my-mcp-server", "github-tools",
-            ]
-        }
+            ],
+        },
     }
 
     new_selection = {"web", "browser"}
@@ -1158,8 +1158,8 @@ def test_save_platform_tools_normalizes_numeric_entries():
     """
     config = {
         "platform_toolsets": {
-            "cli": ["web", "terminal", 12306, "custom-mcp"]
-        }
+            "cli": ["web", "terminal", 12306, "custom-mcp"],
+        },
     }
 
     with patch("hermes_cli.tools_config.save_config"):
@@ -1177,8 +1177,8 @@ def test_save_platform_tools_clears_no_mcp_sentinel():
     """
     config = {
         "platform_toolsets": {
-            "cli": ["web", "terminal", "no_mcp"]
-        }
+            "cli": ["web", "terminal", "no_mcp"],
+        },
     }
 
     with patch("hermes_cli.tools_config.save_config"):
@@ -1194,8 +1194,8 @@ def test_save_platform_tools_preserves_mcp_server_names():
     """
     config = {
         "platform_toolsets": {
-            "cli": ["web", "terminal", "custom-mcp", "another-mcp"]
-        }
+            "cli": ["web", "terminal", "custom-mcp", "another-mcp"],
+        },
     }
 
     with patch("hermes_cli.tools_config.save_config"):
@@ -1372,7 +1372,7 @@ def test_reconfigure_browser_provider_overwrites_stale_use_gateway():
     ("Camofox", "camofox"),
 ])
 def test_reconfigure_provider_runs_post_setup_for_env_var_providers(
-    monkeypatch, provider_name, post_setup_key
+    monkeypatch, provider_name, post_setup_key,
 ):
     """_reconfigure_provider() must call _run_post_setup() for providers that have
     both env_vars and post_setup — parity with _configure_provider() line 2286."""
@@ -1446,7 +1446,7 @@ def test_configure_non_managed_provider_skips_portal_gate(monkeypatch):
         return False
 
     monkeypatch.setattr(
-        "hermes_cli.nous_subscription.ensure_nous_portal_access", _boom
+        "hermes_cli.nous_subscription.ensure_nous_portal_access", _boom,
     )
     provider = {"name": "Tavily", "web_backend": "tavily", "env_vars": []}
     config = {}

@@ -566,7 +566,7 @@ def test_cancel_loopback_session_shuts_down_callback_server():
 
     try:
         resp = client.delete(
-            f"/api/providers/oauth/sessions/{session_id}", headers=HEADERS
+            f"/api/providers/oauth/sessions/{session_id}", headers=HEADERS,
         )
         assert resp.status_code == 200, resp.text
         assert resp.json()["ok"] is True

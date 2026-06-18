@@ -287,7 +287,7 @@ def decompose_task(
         return DecomposeOutcome(task_id, False, "unknown task id")
     if task.status != "triage":
         return DecomposeOutcome(
-            task_id, False, f"task is not in triage (status={task.status!r})"
+            task_id, False, f"task is not in triage (status={task.status!r})",
         )
 
     cfg = _load_config()

@@ -168,7 +168,7 @@ class TestXiaomiModelCatalog:
                         "tool_call": True,
                     },
                 },
-            }
+            },
         }
         monkeypatch.setattr(md, "fetch_models_dev", lambda: fake_data)
 

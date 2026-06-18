@@ -41,7 +41,7 @@ class NodeClient:
         except ImportError as exc:
             raise RuntimeError(
                 "NodeClient requires the 'websockets' package. "
-                "Install it with: pip install websockets"
+                "Install it with: pip install websockets",
             ) from exc
 
         req = _proto.make_request(type, self.token, payload)
@@ -60,7 +60,7 @@ class NodeClient:
             raise RuntimeError(f"node error: {resp.get('error', '<unknown>')}")
         if resp.get("id") != req["id"]:
             raise RuntimeError(
-                f"response id mismatch: sent {req['id']}, got {resp.get('id')!r}"
+                f"response id mismatch: sent {req['id']}, got {resp.get('id')!r}",
             )
         payload_out = resp.get("payload")
         if not isinstance(payload_out, dict):

@@ -113,7 +113,7 @@ class TestAgentCloseMethod:
                 agent.close()
 
                 mock_registry.kill_all.assert_called_once_with(
-                    task_id="test-close-cleanup"
+                    task_id="test-close-cleanup",
                 )
                 mock_cleanup_vm.assert_called_once_with("test-close-cleanup")
                 mock_cleanup_browser.assert_called_once_with("test-close-cleanup")
@@ -168,11 +168,11 @@ class TestAgentCloseMethod:
             agent.client = None
 
             with patch(
-                "tools.process_registry.process_registry"
+                "tools.process_registry.process_registry",
             ) as mock_reg, patch(
-                "run_agent.cleanup_vm"
+                "run_agent.cleanup_vm",
             ) as mock_vm, patch(
-                "run_agent.cleanup_browser"
+                "run_agent.cleanup_browser",
             ) as mock_browser:
                 mock_reg.kill_all.side_effect = RuntimeError("boom")
 

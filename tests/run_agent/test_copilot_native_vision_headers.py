@@ -35,13 +35,13 @@ def test_request_client_adds_copilot_vision_header_for_native_image_payload():
                     {"type": "text", "text": "What is in this image?"},
                     {"type": "image_url", "image_url": {"url": "data:image/png;base64,abc"}},
                 ],
-            }
+            },
         ],
     }
 
     agent.client = object()
     with patch.object(agent, "_is_openai_client_closed", return_value=False), patch.object(
-        agent, "_create_openai_client", side_effect=fake_create
+        agent, "_create_openai_client", side_effect=fake_create,
     ):
         agent._create_request_openai_client(reason="test", api_kwargs=api_kwargs)
 
@@ -61,7 +61,7 @@ def test_request_client_leaves_copilot_text_requests_without_vision_header():
 
     agent.client = object()
     with patch.object(agent, "_is_openai_client_closed", return_value=False), patch.object(
-        agent, "_create_openai_client", side_effect=fake_create
+        agent, "_create_openai_client", side_effect=fake_create,
     ):
         agent._create_request_openai_client(reason="test", api_kwargs=api_kwargs)
 
@@ -82,13 +82,13 @@ def test_request_client_does_not_add_vision_header_after_non_vision_fallback():
     api_kwargs = {
         "model": "gpt-5.4",
         "messages": [
-            {"role": "user", "content": "[user image: a dog]\n\nWhat is in this image?"}
+            {"role": "user", "content": "[user image: a dog]\n\nWhat is in this image?"},
         ],
     }
 
     agent.client = object()
     with patch.object(agent, "_is_openai_client_closed", return_value=False), patch.object(
-        agent, "_create_openai_client", side_effect=fake_create
+        agent, "_create_openai_client", side_effect=fake_create,
     ):
         agent._create_request_openai_client(reason="test", api_kwargs=api_kwargs)
 

@@ -226,7 +226,7 @@ class TestTransparentRefreshOnAccessTokenEviction:
         provider = StubAuthProvider(default_ttl=900)
         register_provider(provider)
         valid_rt = _sign(
-            {"sub": "stub-user-1", "kind": "refresh", "exp": int(_t.time()) + 30 * 86400}
+            {"sub": "stub-user-1", "kind": "refresh", "exp": int(_t.time()) + 30 * 86400},
         )
         return provider, valid_rt
 
@@ -496,7 +496,7 @@ class TestAuthCallbackNext:
 
     def test_callback_with_query_string_in_next(self, gated_app):
         r = self._drive_oauth_via_login(
-            gated_app, next_path="/sessions?page=2"
+            gated_app, next_path="/sessions?page=2",
         )
         assert r.status_code == 302
         assert r.headers["location"] == "/sessions?page=2"
@@ -531,7 +531,7 @@ class TestAuthCallbackNext:
         r_login = gated_app.get("/login", follow_redirects=False)
         assert r_login.status_code == 200
         r_to_idp = gated_app.get(
-            "/auth/login?provider=stub", follow_redirects=False
+            "/auth/login?provider=stub", follow_redirects=False,
         )
         state = r_to_idp.headers["location"].split("state=")[1]
         # Attacker appends next=/internal-admin to the callback URL.
@@ -620,7 +620,7 @@ class TestValidatePostLoginTarget:
         # URL-encoded form — what the cookie actually carries.
         assert (
             _validate_post_login_target(
-                "%2Fapi%2Fanalytics%2Fmodels%3Fdays%3D30"
+                "%2Fapi%2Fanalytics%2Fmodels%3Fdays%3D30",
             ) == ""
         )
 
@@ -692,7 +692,7 @@ class TestAuthLoginPkceCookieNext:
 
     def test_no_next_query_omits_next_segment(self, gated_app):
         r = gated_app.get(
-            "/auth/login?provider=stub", follow_redirects=False
+            "/auth/login?provider=stub", follow_redirects=False,
         )
         assert r.status_code == 302
         cookies = r.headers.get_list("set-cookie")

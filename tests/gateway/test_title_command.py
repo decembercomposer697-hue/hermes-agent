@@ -226,7 +226,7 @@ class TestResetCommandWithTitle:
 
         runner = object.__new__(GatewayRunner)
         runner.config = GatewayConfig(
-            platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+            platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
         )
         adapter = MagicMock()
         adapter.send = AsyncMock()
@@ -271,7 +271,7 @@ class TestResetCommandWithTitle:
 
         runner.session_store.reset_session.assert_called_once()
         runner._session_db.set_session_title.assert_called_once_with(
-            "sess-new", "Custom Name"
+            "sess-new", "Custom Name",
         )
         # Header reflects the applied title
         assert "Custom Name" in str(result)
@@ -286,7 +286,7 @@ class TestResetCommandWithTitle:
 
         runner = object.__new__(GatewayRunner)
         runner.config = GatewayConfig(
-            platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+            platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
         )
         adapter = MagicMock()
         adapter.send = AsyncMock()
@@ -322,7 +322,7 @@ class TestResetCommandWithTitle:
         runner._pending_approvals = {}
         runner._session_db = MagicMock()
         runner._session_db.set_session_title.side_effect = ValueError(
-            "Title 'Dup' is already in use by session abc-123"
+            "Title 'Dup' is already in use by session abc-123",
         )
         runner._agent_cache = {}
         runner._agent_cache_lock = None

@@ -1047,7 +1047,7 @@ def _parse_env_var(name: str, default: str, converter: Any = int, type_label: st
     except (ValueError, json.JSONDecodeError):
         raise ValueError(
             f"Invalid value for {name}: {raw!r} (expected {type_label}). "
-            f"Check ~/.hermes/.env or environment variables."
+            f"Check ~/.hermes/.env or environment variables.",
         )
 
 
@@ -1180,14 +1180,14 @@ def _get_env_config() -> dict[str, Any]:
         # ``false`` for hard per-process isolation (no reuse, container is
         # removed on exit).
         "docker_persist_across_processes": os.getenv(
-            "TERMINAL_DOCKER_PERSIST_ACROSS_PROCESSES", "true"
+            "TERMINAL_DOCKER_PERSIST_ACROSS_PROCESSES", "true",
         ).lower() in {"true", "1", "yes"},
         # Startup orphan reaper for hermes-tagged containers left behind by
         # crashed / SIGKILL'd previous processes that bypassed atexit.
         # Conservative: only sweeps Exited containers older than 2× the
         # idle-reap window AND scoped to the current profile. Issue #20561.
         "docker_orphan_reaper": os.getenv(
-            "TERMINAL_DOCKER_ORPHAN_REAPER", "true"
+            "TERMINAL_DOCKER_ORPHAN_REAPER", "true",
         ).lower() in {"true", "1", "yes"},
     }
 
@@ -1297,18 +1297,18 @@ def _create_environment(env_type: str, image: str, cwd: str, timeout: int,
                     + nous_tool_gateway_unavailable_message(
                         "managed Modal execution",
                     )
-                    + " Choose TERMINAL_MODAL_MODE=direct/auto to use direct Modal credentials."
+                    + " Choose TERMINAL_MODAL_MODE=direct/auto to use direct Modal credentials.",
                 )
             if modal_state["mode"] == "managed":
                 raise ValueError(
                     "Modal backend is configured for managed mode, but the managed tool gateway is unavailable. "
                     + nous_tool_gateway_unavailable_message(
                         "managed Modal execution",
-                    )
+                    ),
                 )
             if modal_state["mode"] == "direct":
                 raise ValueError(
-                    "Modal backend is configured for direct mode, but no direct Modal credentials/config were found."
+                    "Modal backend is configured for direct mode, but no direct Modal credentials/config were found.",
                 )
             message = "Modal backend selected but no direct Modal credentials/config was found."
             if managed_nous_tools_enabled():
@@ -1347,7 +1347,7 @@ def _create_environment(env_type: str, image: str, cwd: str, timeout: int,
     else:
         raise ValueError(
             f"Unknown environment type: {env_type}. Use 'local', 'docker', "
-            f"'singularity', 'modal', 'daytona', or 'ssh'"
+            f"'singularity', 'modal', 'daytona', or 'ssh'",
         )
 
 
@@ -1686,7 +1686,7 @@ def _command_requires_pipe_stdin(command: str) -> bool:
 
 
 _SHELL_LEVEL_BACKGROUND_RE = re.compile(
-    r"(?:^|[;&|]\s*|&&\s*|\|\|\s*|\$\(\s*)(?:nohup|disown|setsid)\b", re.IGNORECASE | re.MULTILINE
+    r"(?:^|[;&|]\s*|&&\s*|\|\|\s*|\$\(\s*)(?:nohup|disown|setsid)\b", re.IGNORECASE | re.MULTILINE,
 )
 _INLINE_BACKGROUND_AMP_RE = re.compile(r"\s&\s")
 _TRAILING_BACKGROUND_AMP_RE = re.compile(r"\s&\s*(?:#.*)?$")
@@ -2036,7 +2036,7 @@ def terminal_tool(
                             "output": "",
                             "exit_code": -1,
                             "error": f"Terminal tool disabled: environment creation failed ({e})",
-                            "status": "disabled"
+                            "status": "disabled",
                         }, ensure_ascii=False)
 
                     with _env_lock:
@@ -2073,7 +2073,7 @@ def terminal_tool(
                     "output": "",
                     "exit_code": -1,
                     "error": approval.get("message", fallback_msg),
-                    "status": "blocked"
+                    "status": "blocked",
                 }, ensure_ascii=False)
             # Track whether approval was explicitly granted by the user
             if approval.get("user_approved"):
@@ -2093,7 +2093,7 @@ def terminal_tool(
                     "output": "",
                     "exit_code": -1,
                     "error": workdir_error,
-                    "status": "blocked"
+                    "status": "blocked",
                 }, ensure_ascii=False)
 
         # Prepare command for execution
@@ -2325,7 +2325,7 @@ def terminal_tool(
                 return json.dumps({
                     "output": "",
                     "exit_code": -1,
-                    "error": f"Failed to start background process: {str(e)}"
+                    "error": f"Failed to start background process: {str(e)}",
                 }, ensure_ascii=False)
         else:
             # Run foreground command with retry logic
@@ -2350,7 +2350,7 @@ def terminal_tool(
                         return json.dumps({
                             "output": "",
                             "exit_code": 124,
-                            "error": f"Command timed out after {effective_timeout} seconds"
+                            "error": f"Command timed out after {effective_timeout} seconds",
                         }, ensure_ascii=False)
                     
                     # Retry on transient errors
@@ -2367,7 +2367,7 @@ def terminal_tool(
                     return json.dumps({
                         "output": "",
                         "exit_code": -1,
-                        "error": f"Command execution failed: {type(e).__name__}: {str(e)}"
+                        "error": f"Command execution failed: {type(e).__name__}: {str(e)}",
                     }, ensure_ascii=False)
                 
                 # Got a result
@@ -2448,7 +2448,7 @@ def terminal_tool(
             "exit_code": -1,
             "error": f"Failed to execute command: {str(e)}",
             "traceback": tb_str,
-            "status": "error"
+            "status": "error",
         }, ensure_ascii=False)
 
 
@@ -2481,7 +2481,7 @@ def check_terminal_requirements() -> bool:
             if not config.get("ssh_host") or not config.get("ssh_user"):
                 logger.error(
                     "SSH backend selected but TERMINAL_SSH_HOST and TERMINAL_SSH_USER "
-                    "are not both set. Configure both or switch TERMINAL_ENV to 'local'."
+                    "are not both set. Configure both or switch TERMINAL_ENV to 'local'.",
                 )
                 return False
             return True
@@ -2517,13 +2517,13 @@ def check_terminal_requirements() -> bool:
                         logger.error(
                             "Modal backend selected with TERMINAL_MODAL_MODE=direct, but no direct "
                             "Modal credentials/config were found. Configure Modal or choose "
-                            "TERMINAL_MODAL_MODE=managed/auto."
+                            "TERMINAL_MODAL_MODE=managed/auto.",
                         )
                     else:
                         logger.error(
                             "Modal backend selected with TERMINAL_MODAL_MODE=direct, but no direct "
                             "Modal credentials/config were found. Configure Modal or choose "
-                            "TERMINAL_MODAL_MODE=auto."
+                            "TERMINAL_MODAL_MODE=auto.",
                         )
                     return False
                 else:
@@ -2531,12 +2531,12 @@ def check_terminal_requirements() -> bool:
                         logger.error(
                             "Modal backend selected but no direct Modal credentials/config or managed "
                             "tool gateway was found. Configure Modal, set up the managed gateway, "
-                            "or choose a different TERMINAL_ENV."
+                            "or choose a different TERMINAL_ENV.",
                         )
                     else:
                         logger.error(
                             "Modal backend selected but no direct Modal credentials/config was found. "
-                            "Configure Modal or choose a different TERMINAL_ENV."
+                            "Configure Modal or choose a different TERMINAL_ENV.",
                         )
                     return False
 
@@ -2596,7 +2596,7 @@ if __name__ == "__main__":
     print(
         "  TERMINAL_ENV: "
         f"{os.getenv('TERMINAL_ENV', 'local')} "
-        "(local/docker/singularity/modal/daytona/ssh)"
+        "(local/docker/singularity/modal/daytona/ssh)",
     )
     print(f"  TERMINAL_DOCKER_IMAGE: {os.getenv('TERMINAL_DOCKER_IMAGE', default_img)}")
     print(f"  TERMINAL_SINGULARITY_IMAGE: {os.getenv('TERMINAL_SINGULARITY_IMAGE', f'docker://{default_img}')}")
@@ -2622,40 +2622,40 @@ TERMINAL_SCHEMA = {
         "properties": {
             "command": {
                 "type": "string",
-                "description": "The command to execute on the VM"
+                "description": "The command to execute on the VM",
             },
             "background": {
                 "type": "boolean",
                 "description": "Run the command in the background. Almost always pair with notify_on_complete=true — without it, the process runs silently and you'll have no way to learn it finished short of calling process(action='poll') yourself (easy to forget, leading to silent blindness on long jobs). Two legitimate patterns: (1) Long-lived processes that never exit (servers, watchers, daemons) — these stay silent because there's no exit to notify on. (2) Long-running bounded tasks (tests, builds, deploys, CI pollers, batch jobs) — these MUST set notify_on_complete=true. For short commands, prefer foreground with a generous timeout instead.",
-                "default": False
+                "default": False,
             },
             "timeout": {
                 "type": "integer",
                 "description": f"Max seconds to wait (default: 180, foreground max: {FOREGROUND_MAX_TIMEOUT}). Returns INSTANTLY when command finishes — set high for long tasks, you won't wait unnecessarily. Foreground timeout above {FOREGROUND_MAX_TIMEOUT}s is rejected; use background=true for longer commands.",
-                "minimum": 1
+                "minimum": 1,
             },
             "workdir": {
                 "type": "string",
-                "description": "Working directory for this command (absolute path). Defaults to the session working directory."
+                "description": "Working directory for this command (absolute path). Defaults to the session working directory.",
             },
             "pty": {
                 "type": "boolean",
                 "description": "Run in pseudo-terminal (PTY) mode for interactive CLI tools like Codex, Claude Code, or Python REPL. Only works with local and SSH backends. Default: false.",
-                "default": False
+                "default": False,
             },
             "notify_on_complete": {
                 "type": "boolean",
                 "description": "When true (and background=true), you'll be automatically notified exactly once when the process finishes. **This is the right choice for almost every long-running task** — tests, builds, deployments, multi-item batch jobs, anything that takes over a minute and has a defined end. Use this and keep working on other things; the system notifies you on exit. MUTUALLY EXCLUSIVE with watch_patterns — when both are set, watch_patterns is dropped.",
-                "default": False
+                "default": False,
             },
             "watch_patterns": {
                 "type": "array",
                 "items": {"type": "string"},
-                "description": "Strings to watch for in background process output. HARD RATE LIMIT: at most 1 notification per 15 seconds per process — matches arriving inside the cooldown are dropped. After 3 consecutive 15-second windows with dropped matches, watch_patterns is automatically disabled for that process and promoted to notify_on_complete behavior (one notification on exit, no more mid-process spam). USE ONLY for truly rare, one-shot mid-process signals on LONG-LIVED processes that will never exit on their own — e.g. ['Application startup complete'] on a server so you know when to hit its endpoint, or ['migration done'] on a daemon. DO NOT use for: (1) end-of-run markers like 'DONE'/'PASS' — use notify_on_complete instead; (2) error patterns like 'ERROR'/'Traceback' in loops or multi-item batch jobs — they fire on every iteration and you'll hit the strike limit fast; (3) anything you'd ever combine with notify_on_complete. When in doubt, choose notify_on_complete. MUTUALLY EXCLUSIVE with notify_on_complete — set one, not both."
-            }
+                "description": "Strings to watch for in background process output. HARD RATE LIMIT: at most 1 notification per 15 seconds per process — matches arriving inside the cooldown are dropped. After 3 consecutive 15-second windows with dropped matches, watch_patterns is automatically disabled for that process and promoted to notify_on_complete behavior (one notification on exit, no more mid-process spam). USE ONLY for truly rare, one-shot mid-process signals on LONG-LIVED processes that will never exit on their own — e.g. ['Application startup complete'] on a server so you know when to hit its endpoint, or ['migration done'] on a daemon. DO NOT use for: (1) end-of-run markers like 'DONE'/'PASS' — use notify_on_complete instead; (2) error patterns like 'ERROR'/'Traceback' in loops or multi-item batch jobs — they fire on every iteration and you'll hit the strike limit fast; (3) anything you'd ever combine with notify_on_complete. When in doubt, choose notify_on_complete. MUTUALLY EXCLUSIVE with notify_on_complete — set one, not both.",
+            },
         },
-        "required": ["command"]
-    }
+        "required": ["command"],
+    },
 }
 
 

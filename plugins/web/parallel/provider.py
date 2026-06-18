@@ -124,7 +124,7 @@ def _get_sync_client() -> Any:
     if not api_key:
         raise ValueError(
             "PARALLEL_API_KEY environment variable not set. "
-            "Get your API key at https://parallel.ai"
+            "Get your API key at https://parallel.ai",
         )
 
     _ensure_parallel_sdk_installed()
@@ -150,7 +150,7 @@ def _get_async_client() -> Any:
     if not api_key:
         raise ValueError(
             "PARALLEL_API_KEY environment variable not set. "
-            "Get your API key at https://parallel.ai"
+            "Get your API key at https://parallel.ai",
         )
 
     _ensure_parallel_sdk_installed()
@@ -326,12 +326,12 @@ def _mcp_payload(envelope: dict[str, Any]) -> dict[str, Any]:
             except json.JSONDecodeError:
                 continue
     raise RuntimeError(
-        f"Parallel MCP returned no parseable content: {str(result)[:500]}"
+        f"Parallel MCP returned no parseable content: {str(result)[:500]}",
     )
 
 
 def _mcp_call(
-    tool_name: str, arguments: dict[str, Any], api_key: str | None
+    tool_name: str, arguments: dict[str, Any], api_key: str | None,
 ) -> dict[str, Any]:
     """Run the MCP handshake then a single ``tools/call`` and return its payload.
 
@@ -427,7 +427,7 @@ def _mcp_web_search(query: str, limit: int, api_key: str | None) -> dict[str, An
                 "title": result.get("title") or "",
                 "description": " ".join(excerpts) if excerpts else "",
                 "position": i + 1,
-            }
+            },
         )
 
     # Credit the free tier (anonymous path only — keyed search uses REST and
@@ -475,7 +475,7 @@ def _mcp_web_fetch(urls: list[str], api_key: str | None) -> list[dict[str, Any]]
                     "content": "",
                     "error": "extraction failed (no content returned)",
                     "metadata": {"sourceURL": url},
-                }
+                },
             )
             continue
         title = item.get("title") or ""
@@ -489,7 +489,7 @@ def _mcp_web_fetch(urls: list[str], api_key: str | None) -> list[dict[str, Any]]
                 "content": content,
                 "raw_content": content,
                 "metadata": {"sourceURL": url, "title": title},
-            }
+            },
         )
 
     return results
@@ -541,7 +541,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
             api_key = os.getenv("PARALLEL_API_KEY", "").strip()
             if not api_key:
                 logger.info(
-                    "Parallel search (free MCP): '%s' (limit=%d)", query, limit
+                    "Parallel search (free MCP): '%s' (limit=%d)", query, limit,
                 )
                 return _mcp_web_search(query, limit, api_key=None)
 
@@ -570,7 +570,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
                         "title": result.title or "",
                         "description": " ".join(excerpts) if excerpts else "",
                         "position": i + 1,
-                    }
+                    },
                 )
 
             # Paid/REST path: no attribution and no "[Parallel]" label — the
@@ -588,7 +588,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
             return {"success": False, "error": f"Parallel search failed: {exc}"}
 
     async def extract(
-        self, urls: list[str], **kwargs: Any
+        self, urls: list[str], **kwargs: Any,
     ) -> list[dict[str, Any]]:
         """Extract content from one or more URLs.
 
@@ -613,7 +613,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
             api_key = os.getenv("PARALLEL_API_KEY", "").strip()
             if not api_key:
                 logger.info(
-                    "Parallel extract (free MCP web_fetch): %d URL(s)", len(urls)
+                    "Parallel extract (free MCP web_fetch): %d URL(s)", len(urls),
                 )
                 # _mcp_web_fetch is sync httpx; run off the event loop.
                 return await asyncio.to_thread(_mcp_web_fetch, list(urls), None)
@@ -641,7 +641,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
                         "content": content,
                         "raw_content": content,
                         "metadata": {"sourceURL": url, "title": title},
-                    }
+                    },
                 )
 
             for error in response.errors or []:
@@ -659,7 +659,7 @@ class ParallelWebSearchProvider(WebSearchProvider):
                         "content": "",
                         "error": err_msg,
                         "metadata": {"sourceURL": err_url},
-                    }
+                    },
                 )
 
             return results

@@ -57,7 +57,7 @@ class TestPkce:
 
         verifier, challenge = _generate_pkce_pair()
         expected = base64.urlsafe_b64encode(
-            hashlib.sha256(verifier.encode("ascii")).digest()
+            hashlib.sha256(verifier.encode("ascii")).digest(),
         ).rstrip(b"=").decode("ascii")
         assert challenge == expected
         assert 43 <= len(verifier) <= 128
@@ -141,7 +141,7 @@ class TestClientCredResolution:
         oauth_dir.mkdir(parents=True)
         (oauth_dir / "oauth2.js").write_text(
             'const OAUTH_CLIENT_ID = "99999-fakescrapedxyz.apps.googleusercontent.com";\n'
-            'const OAUTH_CLIENT_SECRET = "GOCSPX-scraped-test-value-placeholder";\n'
+            'const OAUTH_CLIENT_SECRET = "GOCSPX-scraped-test-value-placeholder";\n',
         )
 
         monkeypatch.setattr("shutil.which", lambda _: str(fake_bin))
@@ -182,7 +182,7 @@ class TestClientCredResolution:
         # Synthesize a harmless test fingerprint (valid shape, obvious test values)
         oauth_js.write_text(
             'const OAUTH_CLIENT_ID = "12345678-testfakenotrealxyz.apps.googleusercontent.com";\n'
-            'const OAUTH_CLIENT_SECRET = "GOCSPX-aaaaaaaaaaaaaaaaaaaaaaaa";\n'
+            'const OAUTH_CLIENT_SECRET = "GOCSPX-aaaaaaaaaaaaaaaaaaaaaaaa";\n',
         )
 
         monkeypatch.setattr("shutil.which", lambda _: str(fake_gemini_bin))
@@ -390,7 +390,7 @@ class TestCodeAssistVpcScDetection:
             "error": {
                 "details": [{"reason": "SECURITY_POLICY_VIOLATED"}],
                 "message": "blocked by policy",
-            }
+            },
         })
         assert _is_vpc_sc_violation(body) is True
 
@@ -496,7 +496,7 @@ class TestRetrieveUserQuota:
                     "modelId": "gemini-2.5-flash",
                     "remainingFraction": 0.9,
                 },
-            ]
+            ],
         }
         monkeypatch.setattr(google_code_assist, "_post_json", lambda *a, **kw: fake)
 
@@ -669,7 +669,7 @@ class TestBuildGeminiRequest:
                                 "$schema": "ignored",
                                 "description": "City name",
                                 "additionalProperties": False,
-                            }
+                            },
                         },
                         "required": ["city"],
                     },
@@ -773,7 +773,7 @@ class TestTranslateGeminiResponse:
                     "candidatesTokenCount": 5,
                     "totalTokenCount": 15,
                 },
-            }
+            },
         }
         result = _translate_gemini_response(resp, model="gemini-2.5-flash")
         assert result.choices[0].message.content == "hello world"
@@ -794,7 +794,7 @@ class TestTranslateGeminiResponse:
                     }]},
                     "finishReason": "STOP",
                 }],
-            }
+            },
         }
         result = _translate_gemini_response(resp, model="gemini-2.5-flash")
         tc = result.choices[0].message.tool_calls[0]
@@ -813,7 +813,7 @@ class TestTranslateGeminiResponse:
                         {"text": "final answer"},
                     ]},
                 }],
-            }
+            },
         }
         result = _translate_gemini_response(resp, model="gemini-2.5-flash")
         assert result.choices[0].message.content == "final answer"
@@ -865,7 +865,7 @@ class TestTranslateStreamEvent:
                         {"functionCall": {"name": "read_file", "args": {"path": "c"}}},
                     ]},
                 }],
-            }
+            },
         }
         counter = [0]
         chunks = _translate_stream_event(event, model="gemini-2.5-flash",
@@ -995,7 +995,7 @@ class TestGeminiHttpErrorParsing:
                         "retryDelay": "30s",
                     },
                 ],
-            }
+            },
         }
         err = _gemini_http_error(self._fake_response(429, body))
         assert err.status_code == 429
@@ -1018,7 +1018,7 @@ class TestGeminiHttpErrorParsing:
                 "code": 429,
                 "message": "Quota exceeded for requests per minute.",
                 "status": "RESOURCE_EXHAUSTED",
-            }
+            },
         }
         err = _gemini_http_error(self._fake_response(429, body))
         assert err.status_code == 429
@@ -1034,7 +1034,7 @@ class TestGeminiHttpErrorParsing:
                 "code": 404,
                 "message": "models/gemma-4-26b-it is not found for API version v1internal",
                 "status": "NOT_FOUND",
-            }
+            },
         }
         err = _gemini_http_error(self._fake_response(404, body))
         assert err.status_code == 404
@@ -1093,9 +1093,9 @@ class TestGeminiHttpErrorParsing:
                         "@type": "type.googleapis.com/google.rpc.ErrorInfo",
                         "reason": "MODEL_CAPACITY_EXHAUSTED",
                         "metadata": {"model": "gemini-2.5-pro"},
-                    }
+                    },
                 ],
-            }
+            },
         }
         err = _gemini_http_error(self._fake_response(429, body))
 

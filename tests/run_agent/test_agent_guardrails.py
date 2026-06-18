@@ -99,7 +99,7 @@ class TestSanitizeApiMessages:
 
     def test_sdk_object_tool_calls(self):
         tc_obj = types.SimpleNamespace(id="c6", function=types.SimpleNamespace(
-            name="terminal", arguments="{}"
+            name="terminal", arguments="{}",
         ))
         msgs = [
             {"role": "assistant", "tool_calls": [tc_obj]},
@@ -273,7 +273,7 @@ class TestGetToolCallNameStatic:
 
     def test_dict_with_valid_name(self):
         assert AIAgent._get_tool_call_name_static(
-            {"id": "call_1", "function": {"name": "terminal", "arguments": "{}"}}
+            {"id": "call_1", "function": {"name": "terminal", "arguments": "{}"}},
         ) == "terminal"
 
     def test_dict_with_missing_function(self):
@@ -284,7 +284,7 @@ class TestGetToolCallNameStatic:
 
     def test_dict_with_none_name(self):
         assert AIAgent._get_tool_call_name_static(
-            {"function": {"name": None, "arguments": "{}"}}
+            {"function": {"name": None, "arguments": "{}"}},
         ) == ""
 
     def test_object_with_valid_name(self):

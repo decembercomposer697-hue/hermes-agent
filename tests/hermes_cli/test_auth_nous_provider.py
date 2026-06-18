@@ -157,7 +157,7 @@ def _setup_nous_auth(
                 "agent_key_expires_in": None,
                 "agent_key_reused": None,
                 "agent_key_obtained_at": None,
-            }
+            },
         },
     }
     (hermes_home / "auth.json").write_text(json.dumps(auth_store, indent=2))
@@ -1664,7 +1664,7 @@ def test_persist_nous_credentials_mirrors_to_shared_store(
     hermes_home = tmp_path / "hermes"
     hermes_home.mkdir(parents=True, exist_ok=True)
     (hermes_home / "auth.json").write_text(
-        json.dumps({"version": 1, "providers": {}})
+        json.dumps({"version": 1, "providers": {}}),
     )
     monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 
@@ -1799,7 +1799,7 @@ def test_shared_store_survives_across_profile_switch(
     profile_a = tmp_path / "profile_a"
     profile_a.mkdir(parents=True, exist_ok=True)
     (profile_a / "auth.json").write_text(
-        json.dumps({"version": 1, "providers": {}})
+        json.dumps({"version": 1, "providers": {}}),
     )
     monkeypatch.setenv("HERMES_HOME", str(profile_a))
     auth_mod.persist_nous_credentials(_full_state_fixture())
@@ -1813,7 +1813,7 @@ def test_shared_store_survives_across_profile_switch(
     profile_b = tmp_path / "profile_b"
     profile_b.mkdir(parents=True, exist_ok=True)
     (profile_b / "auth.json").write_text(
-        json.dumps({"version": 1, "providers": {}})
+        json.dumps({"version": 1, "providers": {}}),
     )
     monkeypatch.setenv("HERMES_HOME", str(profile_b))
 

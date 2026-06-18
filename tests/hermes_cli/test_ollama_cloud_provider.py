@@ -125,8 +125,8 @@ class TestOllamaCloudModelCatalog:
                 "models": {
                     "qwen3.5:397b": {"tool_call": True},
                     "glm-5": {"tool_call": True},
-                }
-            }
+                },
+            },
         }
         with patch("hermes_cli.models.fetch_api_models", return_value=["qwen3.5:397b"]), \
              patch("agent.models_dev.fetch_models_dev", return_value=mock_mdev):
@@ -151,8 +151,8 @@ class TestOllamaCloudModelPicker:
                 "models": {
                     "qwen3.5:397b": {"tool_call": True},
                     "glm-5": {"tool_call": True},
-                }
-            }
+                },
+            },
         }
         with patch("hermes_cli.models.fetch_api_models", return_value=["qwen3.5:397b"]), \
              patch("agent.models_dev.fetch_models_dev", return_value=mock_mdev):
@@ -189,8 +189,8 @@ class TestOllamaCloudMergedDiscovery:
                     "glm-5": {"tool_call": True},
                     "kimi-k2.5": {"tool_call": True},
                     "nemotron-3-super": {"tool_call": True},
-                }
-            }
+                },
+            },
         }
         with patch("hermes_cli.models.fetch_api_models", return_value=["qwen3.5:397b", "glm-5"]), \
              patch("agent.models_dev.fetch_models_dev", return_value=mock_mdev):
@@ -214,8 +214,8 @@ class TestOllamaCloudMergedDiscovery:
             "ollama-cloud": {
                 "models": {
                     "glm-5": {"tool_call": True},
-                }
-            }
+                },
+            },
         }
         with patch("agent.models_dev.fetch_models_dev", return_value=mock_mdev):
             result = fetch_ollama_cloud_models(force_refresh=True)
@@ -333,8 +333,8 @@ class TestOllamaCloudModelsDev:
                     "glm-5": {"tool_call": True},
                     "nemotron-3-nano:30b": {"tool_call": True},
                     "some-embedding:latest": {"tool_call": False},
-                }
-            }
+                },
+            },
         }
         with patch("agent.models_dev.fetch_models_dev", return_value=mock_data):
             result = list_agentic_models("ollama-cloud")
@@ -418,8 +418,8 @@ class TestOllamaCloudSuffixStripping:
 
         mock_mdev = {
             "ollama-cloud": {
-                "models": {"kimi-k2.6:cloud": {"tool_call": True}}
-            }
+                "models": {"kimi-k2.6:cloud": {"tool_call": True}},
+            },
         }
         with patch("agent.models_dev.fetch_models_dev", return_value=mock_mdev):
             result = fetch_ollama_cloud_models(force_refresh=True)
@@ -436,8 +436,8 @@ class TestOllamaCloudSuffixStripping:
 
         mock_mdev = {
             "ollama-cloud": {
-                "models": {"qwen3-coder:480b-cloud": {"tool_call": True}}
-            }
+                "models": {"qwen3-coder:480b-cloud": {"tool_call": True}},
+            },
         }
         with patch("agent.models_dev.fetch_models_dev", return_value=mock_mdev):
             result = fetch_ollama_cloud_models(force_refresh=True)
@@ -457,8 +457,8 @@ class TestOllamaCloudSuffixStripping:
                 "models": {
                     "kimi-k2.6:cloud": {"tool_call": True},
                     "glm-5.1:cloud": {"tool_call": True},
-                }
-            }
+                },
+            },
         }
         with patch("hermes_cli.models.fetch_api_models", return_value=["kimi-k2.6", "glm-5.1"]), \
              patch("agent.models_dev.fetch_models_dev", return_value=mock_mdev):
@@ -478,8 +478,8 @@ class TestOllamaCloudSuffixStripping:
 
         mock_mdev = {
             "ollama-cloud": {
-                "models": {"nemotron-3-nano:30b": {"tool_call": True}}
-            }
+                "models": {"nemotron-3-nano:30b": {"tool_call": True}},
+            },
         }
         with patch("agent.models_dev.fetch_models_dev", return_value=mock_mdev):
             result = fetch_ollama_cloud_models(force_refresh=True)

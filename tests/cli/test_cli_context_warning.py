@@ -38,7 +38,7 @@ def cli_obj(_isolate):
         obj._provider_source = None
         # Mock agent with context compressor
         obj.agent = SimpleNamespace(
-            context_compressor=SimpleNamespace(context_length=None)
+            context_compressor=SimpleNamespace(context_length=None),
         )
         return obj
 

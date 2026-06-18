@@ -104,7 +104,7 @@ class TestVerifyCoreDependencies:
             assert "-e" in args and "." in args, "first repair should be base group reinstall"
 
     def test_falls_back_to_per_package_install_when_reinstall_did_not_help(
-        self, temp_pyproject, fake_venv_python
+        self, temp_pyproject, fake_venv_python,
     ):
         """If --reinstall doesn't repair the partial install (uv resolver
         thinks the env is satisfied), force-install each missing dep with
@@ -190,7 +190,7 @@ class TestVerifyCoreDependencies:
             assert not mock_install.called
 
     def test_repair_reinstall_quarantines_running_shim_on_windows(
-        self, temp_pyproject, fake_venv_python
+        self, temp_pyproject, fake_venv_python,
     ):
         """Regression: the ``--reinstall -e .`` repair must
         quarantine the running ``hermes.exe`` on Windows before installing.
@@ -248,7 +248,7 @@ class TestResolveInstallTargetPython:
         with patch("hermes_cli.main._is_windows", return_value=True):
             from hermes_cli.main import _resolve_install_target_python
             result = _resolve_install_target_python(
-                ["uv", "pip"], env={"VIRTUAL_ENV": str(venv_root)}
+                ["uv", "pip"], env={"VIRTUAL_ENV": str(venv_root)},
             )
             assert result == py
 
@@ -259,6 +259,6 @@ class TestResolveInstallTargetPython:
         with patch("hermes_cli.main._is_windows", return_value=True):
             from hermes_cli.main import _resolve_install_target_python
             result = _resolve_install_target_python(
-                ["uv", "pip"], env={"VIRTUAL_ENV": str(tmp_path / "does_not_exist")}
+                ["uv", "pip"], env={"VIRTUAL_ENV": str(tmp_path / "does_not_exist")},
             )
             assert result is None

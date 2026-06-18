@@ -20,7 +20,7 @@ def _run_migration(hermes_home: Path, **env_overrides: str) -> subprocess.Comple
             "HERMES_HOME": str(hermes_home),
             "HERMES_SKIP_CHMOD": "1",
             "PYTHONPATH": str(REPO_ROOT),
-        }
+        },
     )
     env.update(env_overrides)
     return subprocess.run(
@@ -53,9 +53,9 @@ def test_docker_config_migrate_backs_up_and_migrates_legacy_config(tmp_path: Pat
                         "models": model_map,
                         "context_length": 32768,
                         "discover_models": False,
-                    }
+                    },
                 ],
-            }
+            },
         ),
         encoding="utf-8",
     )
@@ -89,9 +89,9 @@ def test_docker_config_migrate_backs_up_and_migrates_unversioned_config(tmp_path
                         "name": "Local API",
                         "base_url": "http://localhost:8080/v1",
                         "api_key": "test-key",
-                    }
+                    },
                 ],
-            }
+            },
         ),
         encoding="utf-8",
     )

@@ -41,7 +41,7 @@ def _install_fake_honcho_sdk(monkeypatch, build_count, build_lock):
     monkeypatch.setitem(sys.modules, "honcho", fake_mod)
     # Skip the lazy-install path entirely.
     monkeypatch.setattr(
-        honcho_client, "_resolve_optional_float", lambda *a, **k: None, raising=False
+        honcho_client, "_resolve_optional_float", lambda *a, **k: None, raising=False,
     )
 
 
@@ -83,7 +83,7 @@ def test_reset_allows_rebuild(monkeypatch):
     _install_fake_honcho_sdk(monkeypatch, build_count, build_lock)
 
     config = HonchoClientConfig(
-        api_key="test-key", workspace_id="ws", environment="production"
+        api_key="test-key", workspace_id="ws", environment="production",
     )
 
     c1 = get_honcho_client(config)

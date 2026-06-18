@@ -107,7 +107,7 @@ async def _run_reference_model_safe(
     user_prompt: str,
     temperature: float = REFERENCE_TEMPERATURE,
     max_tokens: int = 32000,
-    max_retries: int = 6
+    max_retries: int = 6,
 ) -> tuple[str, str, bool]:
     """
     Run a single reference model with retry logic and graceful failure handling.
@@ -134,9 +134,9 @@ async def _run_reference_model_safe(
                 "extra_body": {
                     "reasoning": {
                         "enabled": True,
-                        "effort": "xhigh"
-                    }
-                }
+                        "effort": "xhigh",
+                    },
+                },
             }
             
             # GPT models (especially gpt-4o-mini) don't support custom temperature values
@@ -182,7 +182,7 @@ async def _run_aggregator_model(
     system_prompt: str,
     user_prompt: str,
     temperature: float = AGGREGATOR_TEMPERATURE,
-    max_tokens: int = None
+    max_tokens: int = None,
 ) -> str:
     """
     Run the aggregator model to synthesize the final response.
@@ -203,15 +203,15 @@ async def _run_aggregator_model(
         "model": AGGREGATOR_MODEL,
         "messages": [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
+            {"role": "user", "content": user_prompt},
         ],
         "max_tokens": max_tokens,
         "extra_body": {
             "reasoning": {
                 "enabled": True,
-                "effort": "xhigh"
-            }
-        }
+                "effort": "xhigh",
+            },
+        },
     }
 
     # GPT models (especially gpt-4o-mini) don't support custom temperature values
@@ -236,7 +236,7 @@ async def _run_aggregator_model(
 async def mixture_of_agents_tool(
     user_prompt: str,
     reference_models: list[str] | None = None,
-    aggregator_model: str | None = None
+    aggregator_model: str | None = None,
 ) -> str:
     """
     Process a complex query using the Mixture-of-Agents methodology.
@@ -283,7 +283,7 @@ async def mixture_of_agents_tool(
             "aggregator_model": aggregator_model or AGGREGATOR_MODEL,
             "reference_temperature": REFERENCE_TEMPERATURE,
             "aggregator_temperature": AGGREGATOR_TEMPERATURE,
-            "min_successful_references": MIN_SUCCESSFUL_REFERENCES
+            "min_successful_references": MIN_SUCCESSFUL_REFERENCES,
         },
         "error": None,
         "success": False,
@@ -292,7 +292,7 @@ async def mixture_of_agents_tool(
         "failed_models": [],
         "final_response_length": 0,
         "processing_time_seconds": 0,
-        "models_used": {}
+        "models_used": {},
     }
     
     try:
@@ -346,13 +346,13 @@ async def mixture_of_agents_tool(
         logger.info("Layer 2: Synthesizing final response...")
         aggregator_system_prompt = _construct_aggregator_prompt(
             AGGREGATOR_SYSTEM_PROMPT, 
-            successful_responses
+            successful_responses,
         )
         
         final_response = await _run_aggregator_model(
             aggregator_system_prompt,
             user_prompt,
-            AGGREGATOR_TEMPERATURE
+            AGGREGATOR_TEMPERATURE,
         )
         
         # Calculate processing time
@@ -367,8 +367,8 @@ async def mixture_of_agents_tool(
             "response": final_response,
             "models_used": {
                 "reference_models": ref_models,
-                "aggregator_model": agg_model
-            }
+                "aggregator_model": agg_model,
+            },
         }
         
         debug_call_data["success"] = True
@@ -396,9 +396,9 @@ async def mixture_of_agents_tool(
             "response": "MoA processing failed. Please try again or use a single model for this query.",
             "models_used": {
                 "reference_models": reference_models or REFERENCE_MODELS,
-                "aggregator_model": aggregator_model or AGGREGATOR_MODEL
+                "aggregator_model": aggregator_model or AGGREGATOR_MODEL,
             },
-            "error": error_msg
+            "error": error_msg,
         }
         
         debug_call_data["error"] = error_msg
@@ -434,7 +434,7 @@ def get_moa_configuration() -> dict[str, Any]:
         "aggregator_temperature": AGGREGATOR_TEMPERATURE,
         "min_successful_references": MIN_SUCCESSFUL_REFERENCES,
         "total_reference_models": len(REFERENCE_MODELS),
-        "failure_tolerance": f"{len(REFERENCE_MODELS) - MIN_SUCCESSFUL_REFERENCES}/{len(REFERENCE_MODELS)} models can fail"
+        "failure_tolerance": f"{len(REFERENCE_MODELS) - MIN_SUCCESSFUL_REFERENCES}/{len(REFERENCE_MODELS)} models can fail",
     }
 
 
@@ -523,11 +523,11 @@ MOA_SCHEMA = {
         "properties": {
             "user_prompt": {
                 "type": "string",
-                "description": "The complex query or problem to solve using multiple AI models. Should be a challenging problem that benefits from diverse perspectives and collaborative reasoning."
-            }
+                "description": "The complex query or problem to solve using multiple AI models. Should be a challenging problem that benefits from diverse perspectives and collaborative reasoning.",
+            },
         },
-        "required": ["user_prompt"]
-    }
+        "required": ["user_prompt"],
+    },
 }
 
 registry.register(

@@ -1652,7 +1652,7 @@ def _update_acp_registry_versions(semver: str) -> None:
             uvx["package"] = f"hermes-agent[acp]=={semver}"
         # Preserve trailing newline + 2-space indent the file already uses.
         ACP_REGISTRY_MANIFEST.write_text(
-            json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+            json.dumps(manifest, indent=2) + "\n", encoding="utf-8",
         )
 
 
@@ -2043,7 +2043,7 @@ def main():
                 return
 
             commit_result = git_result(
-                "commit", "-m", f"chore: bump version to v{new_version} ({calver_date})"
+                "commit", "-m", f"chore: bump version to v{new_version} ({calver_date})",
             )
             if commit_result.returncode != 0:
                 print(f"  ✗ Failed to commit version bump: {commit_result.stderr.strip()}")
@@ -2053,7 +2053,7 @@ def main():
         # Create annotated tag
         tag_result = git_result(
             "tag", "-a", tag_name, "-m",
-            f"Hermes Agent v{new_version} ({calver_date})\n\nWeekly release"
+            f"Hermes Agent v{new_version} ({calver_date})\n\nWeekly release",
         )
         if tag_result.returncode != 0:
             print(f"  ✗ Failed to create tag {tag_name}: {tag_result.stderr.strip()}")
@@ -2111,7 +2111,7 @@ def main():
             print(f"    Tag was created locally. Create the release manually:")
             print(
                 f"    gh release create {tag_name} --title 'Hermes Agent v{new_version} ({calver_date})' "
-                f"--notes-file .release_notes.md {' '.join(str(path) for path in artifacts)}"
+                f"--notes-file .release_notes.md {' '.join(str(path) for path in artifacts)}",
             )
             print(f"\n  ✓ Release artifacts prepared for manual publish: v{new_version} ({tag_name})")
     else:

@@ -201,7 +201,7 @@ def _resolve_mcp_server_config(config: dict) -> dict:
 
 
 def _probe_single_server(
-    name: str, config: dict, connect_timeout: float = 30
+    name: str, config: dict, connect_timeout: float = 30,
 ) -> list[tuple[str, str]]:
     """Temporarily connect to one MCP server, list its tools, disconnect.
 
@@ -223,7 +223,7 @@ def _probe_single_server(
 
     async def _probe():
         server = await asyncio.wait_for(
-            _connect_server(name, config), timeout=connect_timeout
+            _connect_server(name, config), timeout=connect_timeout,
         )
         try:
             for t in server._tools:
@@ -387,7 +387,7 @@ def cmd_mcp_add(args):
                 # Set header with env var interpolation
                 if api_key or existing_key:
                     server_config["headers"] = {
-                        "Authorization": f"Bearer ${{{env_key}}}"
+                        "Authorization": f"Bearer ${{{env_key}}}",
                     }
 
     # ── Discovery: connect and list tools ─────────────────────────────
@@ -426,7 +426,7 @@ def cmd_mcp_add(args):
     # Ask: enable all, select, or cancel
     try:
         choice = input(
-            color(f"  Enable all {len(tools)} tools? [Y/n/select]: ", Colors.YELLOW)
+            color(f"  Enable all {len(tools)} tools? [Y/n/select]: ", Colors.YELLOW),
         ).strip().lower()
     except (KeyboardInterrupt, EOFError):
         print()
@@ -699,13 +699,13 @@ def cmd_mcp_login(args):
         if not _oauth_tokens_present(name):
             _warning(
                 "Server responded, but no OAuth token was obtained — "
-                "authentication did not complete."
+                "authentication did not complete.",
             )
             print()
             _info(
                 "Some providers (e.g. Google Drive, Atlassian) do not support "
                 "automatic client registration. For those you must create an "
-                "OAuth client yourself and add its credentials to config.yaml:"
+                "OAuth client yourself and add its credentials to config.yaml:",
             )
             print()
             print(color(f"    mcp_servers:", Colors.DIM))

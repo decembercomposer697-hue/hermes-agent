@@ -298,7 +298,7 @@ class TestFileDedup(unittest.TestCase):
         """
         fake = MagicMock()
         fake.write_file = lambda path, content: MagicMock(
-            to_dict=lambda: {"success": True, "path": path}
+            to_dict=lambda: {"success": True, "path": path},
         )
         mock_ops.return_value = fake
 
@@ -707,7 +707,7 @@ class TestWriteInvalidatesDedup(unittest.TestCase):
             content="original content\n", total_lines=1, file_size=18,
         )
         fake.write_file = lambda path, content: MagicMock(
-            to_dict=lambda: {"success": True, "path": path}
+            to_dict=lambda: {"success": True, "path": path},
         )
         mock_ops.return_value = fake
 
@@ -736,7 +736,7 @@ class TestWriteInvalidatesDedup(unittest.TestCase):
             content="line1\nline2\nline3\n", total_lines=3, file_size=20,
         )
         fake.write_file = lambda path, content: MagicMock(
-            to_dict=lambda: {"success": True, "path": path}
+            to_dict=lambda: {"success": True, "path": path},
         )
         mock_ops.return_value = fake
 
@@ -767,7 +767,7 @@ class TestWriteInvalidatesDedup(unittest.TestCase):
             content="other content\n", total_lines=1, file_size=15,
         )
         fake.write_file = lambda path, content: MagicMock(
-            to_dict=lambda: {"success": True, "path": path}
+            to_dict=lambda: {"success": True, "path": path},
         )
         mock_ops.return_value = fake
 
@@ -795,7 +795,7 @@ class TestWriteInvalidatesDedup(unittest.TestCase):
             content="original content\n", total_lines=1, file_size=18,
         )
         fake.write_file = lambda path, content: MagicMock(
-            to_dict=lambda: {"success": True, "path": path}
+            to_dict=lambda: {"success": True, "path": path},
         )
         mock_ops.return_value = fake
 

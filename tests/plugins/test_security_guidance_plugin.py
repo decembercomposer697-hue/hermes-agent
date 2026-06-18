@@ -46,7 +46,7 @@ def _load_patterns():
     """Import patterns.py in isolation (no plugin glue)."""
     pat_path = _repo_root() / "plugins" / "security-guidance" / "patterns.py"
     spec = importlib.util.spec_from_file_location(
-        "security_guidance_patterns_under_test", pat_path
+        "security_guidance_patterns_under_test", pat_path,
     )
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -120,7 +120,7 @@ class TestScanContent:
     def test_pickle_load_in_py_warns(self):
         mod = _load_plugin_init()
         findings = mod._scan_content(
-            "/tmp/foo.py", "import pickle\nx = pickle.load(open('p.pkl', 'rb'))\n"
+            "/tmp/foo.py", "import pickle\nx = pickle.load(open('p.pkl', 'rb'))\n",
         )
         names = [n for n, _ in findings]
         assert "pickle_deserialization" in names
@@ -128,7 +128,7 @@ class TestScanContent:
     def test_pickle_load_in_md_skipped_by_path_filter(self):
         mod = _load_plugin_init()
         findings = mod._scan_content(
-            "/tmp/foo.md", "import pickle\nx = pickle.load(open('p.pkl', 'rb'))\n"
+            "/tmp/foo.md", "import pickle\nx = pickle.load(open('p.pkl', 'rb'))\n",
         )
         assert findings == []
 
@@ -146,14 +146,14 @@ class TestScanContent:
     def test_subprocess_shell_true_warns(self):
         mod = _load_plugin_init()
         findings = mod._scan_content(
-            "/tmp/foo.py", "subprocess.run('ls ' + path, shell=True)\n"
+            "/tmp/foo.py", "subprocess.run('ls ' + path, shell=True)\n",
         )
         assert "python_subprocess_shell" in [n for n, _ in findings]
 
     def test_dangerously_set_inner_html_warns(self):
         mod = _load_plugin_init()
         findings = mod._scan_content(
-            "/tmp/foo.tsx", "<div dangerouslySetInnerHTML={{__html: x}} />"
+            "/tmp/foo.tsx", "<div dangerouslySetInnerHTML={{__html: x}} />",
         )
         assert "react_dangerously_set_html" in [n for n, _ in findings]
 
@@ -161,7 +161,7 @@ class TestScanContent:
         """github_actions_workflow has no regex/substring — fires on path."""
         mod = _load_plugin_init()
         findings = mod._scan_content(
-            ".github/workflows/test.yml", "name: CI\non: pull_request"
+            ".github/workflows/test.yml", "name: CI\non: pull_request",
         )
         assert "github_actions_workflow" in [n for n, _ in findings]
 
@@ -209,7 +209,7 @@ class TestTransformToolResultHook:
         args = {"path": "/tmp/foo.py", "content": "import json\nx = json.loads(b)\n"}
         assert (
             mod._on_transform_tool_result(
-                tool_name="write_file", args=args, result='{"success": true}'
+                tool_name="write_file", args=args, result='{"success": true}',
             )
             is None
         )
@@ -221,7 +221,7 @@ class TestTransformToolResultHook:
         # top — the model has bigger problems to solve.
         assert (
             mod._on_transform_tool_result(
-                tool_name="write_file", args=args, result='{"error": "boom"}'
+                tool_name="write_file", args=args, result='{"error": "boom"}',
             )
             is None
         )
@@ -234,7 +234,7 @@ class TestTransformToolResultHook:
             "new_string": "x = eval(user_input)",
         }
         result = mod._on_transform_tool_result(
-            tool_name="patch", args=args, result='{"success": true}'
+            tool_name="patch", args=args, result='{"success": true}',
         )
         assert isinstance(result, str)
         assert "eval_injection" in result
@@ -246,7 +246,7 @@ class TestTransformToolResultHook:
         args = {"command": "echo pickle.load"}
         assert (
             mod._on_transform_tool_result(
-                tool_name="terminal", args=args, result='{"output": "pickle.load"}'
+                tool_name="terminal", args=args, result='{"output": "pickle.load"}',
             )
             is None
         )
@@ -257,7 +257,7 @@ class TestTransformToolResultHook:
         args = {"path": "/tmp/foo.py", "content": "pickle.load(f)\n"}
         assert (
             mod._on_transform_tool_result(
-                tool_name="write_file", args=args, result='{"ok": true}'
+                tool_name="write_file", args=args, result='{"ok": true}',
             )
             is None
         )
@@ -270,7 +270,7 @@ class TestTransformToolResultHook:
         args = {"path": "/tmp/foo.py", "content": "pickle.load(f)\n"}
         assert (
             mod._on_transform_tool_result(
-                tool_name="write_file", args=args, result='{"ok": true}'
+                tool_name="write_file", args=args, result='{"ok": true}',
             )
             is None
         )

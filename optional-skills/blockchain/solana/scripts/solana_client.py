@@ -200,7 +200,7 @@ def fetch_prices(mints: list[str], max_lookups: int = 20) -> dict[str, float]:
 def fetch_sol_price() -> float | None:
     """Fetch current SOL price in USD via CoinGecko."""
     data = _http_get_json(
-        "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd"
+        "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd",
     )
     if data and "solana" in data:
         return data["solana"].get("usd")

@@ -263,7 +263,7 @@ def _make_event(entity_id, old_state, new_state, old_attrs=None, new_attrs=None)
             "entity_id": entity_id,
             "old_state": {"state": old_state, "attributes": old_attrs or {}},
             "new_state": {"state": new_state, "attributes": new_attrs or {"friendly_name": entity_id}},
-        }
+        },
     }
 
 
@@ -285,7 +285,7 @@ class TestEventFilteringPipeline:
         adapter = _make_adapter(watch_domains=["climate"], cooldown_seconds=0)
         await adapter._handle_ha_event(
             _make_event("climate.thermostat", "off", "heat",
-                        new_attrs={"friendly_name": "Thermostat", "current_temperature": 20, "temperature": 22})
+                        new_attrs={"friendly_name": "Thermostat", "current_temperature": 20, "temperature": 22}),
         )
         adapter.handle_message.assert_called_once()
 
@@ -301,7 +301,7 @@ class TestEventFilteringPipeline:
         adapter = _make_adapter(watch_entities=["sensor.important"], cooldown_seconds=0)
         await adapter._handle_ha_event(
             _make_event("sensor.important", "10", "20",
-                        new_attrs={"friendly_name": "Important Sensor", "unit_of_measurement": "W"})
+                        new_attrs={"friendly_name": "Important Sensor", "unit_of_measurement": "W"}),
         )
         adapter.handle_message.assert_called_once()
         msg_event = adapter.handle_message.call_args[0][0]
@@ -338,7 +338,7 @@ class TestEventFilteringPipeline:
         adapter = _make_adapter(watch_all=True, cooldown_seconds=0)
         await adapter._handle_ha_event(
             _make_event("light.test", "off", "on",
-                        new_attrs={"friendly_name": "Test Light"})
+                        new_attrs={"friendly_name": "Test Light"}),
         )
         msg_event = adapter.handle_message.call_args[0][0]
         assert msg_event.source.user_name == "Home Assistant"
@@ -389,17 +389,17 @@ class TestCooldown:
         adapter = _make_adapter(watch_all=True, cooldown_seconds=60)
 
         await adapter._handle_ha_event(
-            _make_event("sensor.a", "1", "2", new_attrs={"friendly_name": "A"})
+            _make_event("sensor.a", "1", "2", new_attrs={"friendly_name": "A"}),
         )
         await adapter._handle_ha_event(
-            _make_event("sensor.b", "3", "4", new_attrs={"friendly_name": "B"})
+            _make_event("sensor.b", "3", "4", new_attrs={"friendly_name": "B"}),
         )
         # Both should pass - different entities
         assert adapter.handle_message.call_count == 2
 
         # Same entity again - should be blocked
         await adapter._handle_ha_event(
-            _make_event("sensor.a", "2", "3", new_attrs={"friendly_name": "A"})
+            _make_event("sensor.a", "2", "3", new_attrs={"friendly_name": "A"}),
         )
         assert adapter.handle_message.call_count == 2  # Still 2
 
@@ -410,7 +410,7 @@ class TestCooldown:
         for i in range(5):
             await adapter._handle_ha_event(
                 _make_event("sensor.temp", str(i), str(i + 1),
-                            new_attrs={"friendly_name": "Temp"})
+                            new_attrs={"friendly_name": "Temp"}),
             )
         assert adapter.handle_message.call_count == 5
 

@@ -66,7 +66,7 @@ class GatewayKanbanWatchersMixin:
         kanban_cfg = cfg.get("kanban", {}) if isinstance(cfg, dict) else {}
         if not kanban_cfg.get("dispatch_in_gateway", True):
             logger.info(
-                "kanban notifier: disabled via config kanban.dispatch_in_gateway=false"
+                "kanban notifier: disabled via config kanban.dispatch_in_gateway=false",
             )
             return
         from gateway.config import Platform as _Platform
@@ -95,7 +95,7 @@ class GatewayKanbanWatchersMixin:
         # against a dead chat every 5 seconds forever.
         MAX_SEND_FAILURES = 3
         sub_fail_counts: dict[tuple, int] = getattr(
-            self, "_kanban_sub_fail_counts", {}
+            self, "_kanban_sub_fail_counts", {},
         )
         self._kanban_sub_fail_counts = sub_fail_counts
         notifier_profile = getattr(self, "_kanban_notifier_profile", None)
@@ -596,7 +596,7 @@ class GatewayKanbanWatchersMixin:
         kanban_cfg = cfg.get("kanban", {}) if isinstance(cfg, dict) else {}
         if not kanban_cfg.get("dispatch_in_gateway", True):
             logger.info(
-                "kanban dispatcher: disabled via config kanban.dispatch_in_gateway=false"
+                "kanban dispatcher: disabled via config kanban.dispatch_in_gateway=false",
             )
             return
 
@@ -735,7 +735,7 @@ class GatewayKanbanWatchersMixin:
         # surface as "database disk image is malformed" for one tick.
         CORRUPT_BOARD_RETRY_AFTER_SECONDS = 300
         disabled_corrupt_boards: dict[
-            str, tuple[tuple[str, int | None, int | None], float]
+            str, tuple[tuple[str, int | None, int | None], float],
         ] = {}
 
         def _board_db_fingerprint(slug: str) -> tuple[str, int | None, int | None]:
@@ -911,7 +911,7 @@ class GatewayKanbanWatchersMixin:
         auto_decompose_enabled = bool(kanban_cfg.get("auto_decompose", True))
         try:
             auto_decompose_per_tick = int(
-                kanban_cfg.get("auto_decompose_per_tick", 3) or 3
+                kanban_cfg.get("auto_decompose_per_tick", 3) or 3,
             )
         except (TypeError, ValueError):
             auto_decompose_per_tick = 3
@@ -996,7 +996,7 @@ class GatewayKanbanWatchersMixin:
             return successes
 
         logger.info(
-            "kanban dispatcher: embedded in gateway (interval=%.1fs)", interval
+            "kanban dispatcher: embedded in gateway (interval=%.1fs)", interval,
         )
         while self._running:
             try:

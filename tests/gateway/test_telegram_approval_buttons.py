@@ -173,7 +173,7 @@ class TestTelegramExecApproval:
         adapter = _make_adapter()
         adapter._bot = None
         result = await adapter.send_exec_approval(
-            chat_id="12345", command="ls", session_key="s"
+            chat_id="12345", command="ls", session_key="s",
         )
         assert result.success is False
 
@@ -185,7 +185,7 @@ class TestTelegramExecApproval:
         adapter._bot.send_message = AsyncMock(return_value=mock_msg)
 
         await adapter.send_exec_approval(
-            chat_id="12345", command="ls", session_key="s"
+            chat_id="12345", command="ls", session_key="s",
         )
 
         kwargs = adapter._bot.send_message.call_args[1]
@@ -226,7 +226,7 @@ class TestTelegramExecApproval:
 
         long_cmd = "x" * 5000
         await adapter.send_exec_approval(
-            chat_id="12345", command=long_cmd, session_key="s"
+            chat_id="12345", command=long_cmd, session_key="s",
         )
 
         kwargs = adapter._bot.send_message.call_args[1]

@@ -52,7 +52,7 @@ def _make_codex_agent(tmp_path, monkeypatch):
     # Keep the wall-clock stale timeout high so any early kill is unambiguously
     # the TTFB path, not the stale-call path.
     monkeypatch.setattr(
-        agent, "_compute_non_stream_stale_timeout", lambda *a, **k: 60.0
+        agent, "_compute_non_stream_stale_timeout", lambda *a, **k: 60.0,
     )
     return agent
 
@@ -364,10 +364,10 @@ def test_large_codex_request_waits_instead_of_ttfb_reconnect(tmp_path, monkeypat
     dummy_client = SimpleNamespace()
     monkeypatch.setattr(agent, "_create_request_openai_client", lambda **k: dummy_client)
     monkeypatch.setattr(
-        agent, "_abort_request_openai_client", lambda c, reason=None: closes.append(reason)
+        agent, "_abort_request_openai_client", lambda c, reason=None: closes.append(reason),
     )
     monkeypatch.setattr(
-        agent, "_close_request_openai_client", lambda c, reason=None: closes.append(reason)
+        agent, "_close_request_openai_client", lambda c, reason=None: closes.append(reason),
     )
 
     sentinel = SimpleNamespace(ok=True)
@@ -399,10 +399,10 @@ def test_large_codex_request_strict_ttfb_env_still_reconnects(tmp_path, monkeypa
     dummy_client = SimpleNamespace()
     monkeypatch.setattr(agent, "_create_request_openai_client", lambda **k: dummy_client)
     monkeypatch.setattr(
-        agent, "_abort_request_openai_client", lambda c, reason=None: closes.append(reason)
+        agent, "_abort_request_openai_client", lambda c, reason=None: closes.append(reason),
     )
     monkeypatch.setattr(
-        agent, "_close_request_openai_client", lambda c, reason=None: closes.append(reason)
+        agent, "_close_request_openai_client", lambda c, reason=None: closes.append(reason),
     )
 
     stop = {"flag": False}

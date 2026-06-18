@@ -1044,7 +1044,7 @@ class _AnthropicCompletionsAdapter:
         response = self._client.messages.create(**anthropic_kwargs)
         _transport = get_transport("anthropic_messages")
         _nr = _transport.normalize_response(
-            response, strip_tool_prefix=self._is_oauth
+            response, strip_tool_prefix=self._is_oauth,
         )
 
         # ToolCall already duck-types as OpenAI shape (.type, .function.name,
@@ -1351,7 +1351,7 @@ def _resolve_xai_oauth_for_aux() -> tuple[str, str] | None:
                 api_key = str(
                     getattr(entry, "runtime_api_key", None)
                     or getattr(entry, "access_token", "")
-                    or ""
+                    or "",
                 ).strip()
                 base_url = _xai_validate_inference_base_url(
                     os.getenv("HERMES_XAI_BASE_URL", "").strip().rstrip("/")
@@ -1597,14 +1597,14 @@ def _try_nous(vision: bool = False) -> tuple[OpenAI | None, str | None]:
     if runtime is None and not nous:
         logger.warning(
             "Auxiliary Nous client unavailable: no Nous authentication found "
-            "(run: hermes auth)."
+            "(run: hermes auth).",
         )
         _mark_provider_unhealthy("nous", ttl=60)
         return None, None
     if runtime is None and nous:
         logger.debug(
             "Auxiliary Nous: runtime JWT refresh failed; checking stored "
-            "auth.json token."
+            "auth.json token.",
         )
     global auxiliary_is_nous
     auxiliary_is_nous = True
@@ -1645,7 +1645,7 @@ def _try_nous(vision: bool = False) -> tuple[OpenAI | None, str | None]:
         if not api_key:
             logger.warning(
                 "Auxiliary Nous client unavailable: no usable inference JWT found "
-                "(run: hermes auth add nous)."
+                "(run: hermes auth add nous).",
             )
             _mark_provider_unhealthy("nous", ttl=60)
             return None, None
@@ -1660,7 +1660,7 @@ def _try_nous(vision: bool = False) -> tuple[OpenAI | None, str | None]:
 
 
 def _refresh_nous_recommended_model(
-    *, vision: bool, stale_model: str | None
+    *, vision: bool, stale_model: str | None,
 ) -> str | None:
     """Re-fetch the Nous Portal's recommended model after a stale-model 404.
 
@@ -1883,7 +1883,7 @@ def _validate_proxy_env_urls() -> None:
         except ValueError as exc:
             raise RuntimeError(
                 f"Malformed proxy environment variable {key}={value!r}. "
-                "Fix or unset your proxy settings and try again."
+                "Fix or unset your proxy settings and try again.",
             ) from exc
 
 
@@ -1901,7 +1901,7 @@ def _validate_base_url(base_url: str) -> None:
     except ValueError as exc:
         raise RuntimeError(
             f"Malformed custom endpoint URL: {candidate!r}. "
-            "Run `hermes setup` or `hermes model` and enter a valid http(s) base URL."
+            "Run `hermes setup` or `hermes model` and enter a valid http(s) base URL.",
         ) from exc
 
 
@@ -1940,7 +1940,7 @@ def _try_custom_endpoint() -> tuple[Any | None, str | None]:
         except ImportError:
             logger.warning(
                 "Custom endpoint declares api_mode=anthropic_messages but the "
-                "anthropic SDK is not installed — falling back to OpenAI-wire."
+                "anthropic SDK is not installed — falling back to OpenAI-wire.",
             )
             return OpenAI(api_key=custom_key, base_url=_clean_base, **_extra), model
         return (
@@ -1970,7 +1970,7 @@ def _build_xai_oauth_aux_client(model: str) -> tuple[Any | None, str | None]:
     if not model:
         logger.warning(
             "Auxiliary client: xai-oauth requested without a model; "
-            "pass model explicitly (auxiliary.<task>.model in config.yaml)."
+            "pass model explicitly (auxiliary.<task>.model in config.yaml).",
         )
         return None, None
     resolved = _resolve_xai_oauth_for_aux()
@@ -1996,7 +1996,7 @@ def _build_codex_client(model: str) -> tuple[Any | None, str | None]:
     if not model:
         logger.warning(
             "Auxiliary client: openai-codex requested without a model; "
-            "pass model explicitly (auxiliary.<task>.model in config.yaml)."
+            "pass model explicitly (auxiliary.<task>.model in config.yaml).",
         )
         return None, None
     pool_present, entry = _select_pool_entry("openai-codex")
@@ -2490,7 +2490,7 @@ def _is_transient_transport_error(exc: Exception) -> bool:
     if _is_connection_error(exc):
         return True
     status = getattr(exc, "status_code", None) or getattr(
-        getattr(exc, "response", None), "status_code", None
+        getattr(exc, "response", None), "status_code", None,
     )
     return isinstance(status, int) and (status == 408 or 500 <= status < 600)
 
@@ -2809,7 +2809,7 @@ def _retry_same_provider_sync(
         )
     if retry_client is None:
         raise RuntimeError(
-            f"Auxiliary {task or 'call'}: provider {resolved_provider} could not be rebuilt after recovery"
+            f"Auxiliary {task or 'call'}: provider {resolved_provider} could not be rebuilt after recovery",
         )
 
     retry_base = str(getattr(retry_client, "base_url", "") or "")
@@ -2866,7 +2866,7 @@ async def _retry_same_provider_async(
         )
     if retry_client is None:
         raise RuntimeError(
-            f"Auxiliary {task or 'call'}: provider {resolved_provider} could not be rebuilt after recovery"
+            f"Auxiliary {task or 'call'}: provider {resolved_provider} could not be rebuilt after recovery",
         )
 
     retry_base = str(getattr(retry_client, "base_url", "") or "")
@@ -3295,7 +3295,7 @@ def _to_async_client(sync_client, model: str, is_vision: bool = False):
         from hermes_cli.copilot_auth import copilot_request_headers
 
         async_kwargs["default_headers"] = copilot_request_headers(
-            is_agent_turn=True, is_vision=is_vision
+            is_agent_turn=True, is_vision=is_vision,
         )
     elif base_url_host_matches(sync_base_url, "api.kimi.com"):
         async_kwargs["default_headers"] = {"User-Agent": "claude-code/0.1.0"}
@@ -3515,7 +3515,7 @@ def resolve_provider_client(
             logger.warning(
                 "resolve_provider_client: openai-codex requested without a "
                 "model; pass model explicitly (e.g. model.model in config.yaml "
-                "or auxiliary.<task>.model for per-task aux routing)."
+                "or auxiliary.<task>.model for per-task aux routing).",
             )
             return None, None
         if raw_codex:
@@ -3556,7 +3556,7 @@ def resolve_provider_client(
         if client is None:
             logger.warning(
                 "resolve_provider_client: xai-oauth requested but no xAI "
-                "OAuth token found (run: hermes model -> xAI Grok OAuth — SuperGrok / Premium+)"
+                "OAuth token found (run: hermes model -> xAI Grok OAuth — SuperGrok / Premium+)",
             )
             return None, None
         final_model = _normalize_resolved_model(model or default, provider)
@@ -3575,7 +3575,7 @@ def resolve_provider_client(
             if not custom_base:
                 logger.warning(
                     "resolve_provider_client: explicit custom endpoint requested "
-                    "but base_url is empty"
+                    "but base_url is empty",
                 )
                 return None, None
             final_model = _normalize_resolved_model(
@@ -3591,7 +3591,7 @@ def resolve_provider_client(
             elif base_url_host_matches(custom_base, "api.githubcopilot.com"):
                 from hermes_cli.copilot_auth import copilot_request_headers
                 extra["default_headers"] = copilot_request_headers(
-                    is_agent_turn=True, is_vision=is_vision
+                    is_agent_turn=True, is_vision=is_vision,
                 )
             elif base_url_host_matches(custom_base, "integrate.api.nvidia.com"):
                 extra["default_headers"] = build_nvidia_nim_headers(custom_base)
@@ -3727,7 +3727,7 @@ def resolve_provider_client(
                 # override). Named-provider entry api_mode=codex_responses also
                 # flows through here.
                 if entry_api_mode == "codex_responses" and not isinstance(
-                    client, CodexAuxiliaryClient
+                    client, CodexAuxiliaryClient,
                 ):
                     client = CodexAuxiliaryClient(client, final_model)
                 else:
@@ -3768,7 +3768,7 @@ def resolve_provider_client(
             logger.warning(
                 "resolve_provider_client: azure-foundry requested but "
                 "runtime resolution failed (run: hermes doctor for "
-                "diagnostics)"
+                "diagnostics)",
             )
             return None, None
         final_model = _normalize_resolved_model(model or default_model, provider)
@@ -3845,7 +3845,7 @@ def resolve_provider_client(
             from hermes_cli.copilot_auth import copilot_request_headers
 
             headers.update(copilot_request_headers(
-                is_agent_turn=True, is_vision=is_vision
+                is_agent_turn=True, is_vision=is_vision,
             ))
         elif base_url_host_matches(base_url, "integrate.api.nvidia.com"):
             headers.update(build_nvidia_nim_headers(base_url))
@@ -3910,13 +3910,13 @@ def resolve_provider_client(
             if not final_model:
                 logger.warning(
                     "resolve_provider_client: copilot-acp requested but no model "
-                    "was provided or configured"
+                    "was provided or configured",
                 )
                 return None, None
             if not api_key or not base_url:
                 logger.warning(
                     "resolve_provider_client: copilot-acp requested but external "
-                    "process credentials are incomplete"
+                    "process credentials are incomplete",
                 )
                 return None, None
             from agent.copilot_acp_client import CopilotACPClient
@@ -4140,7 +4140,7 @@ def resolve_vision_provider_client(
     stays conservative and only tries vision backends known to work today.
     """
     requested, resolved_model, resolved_base_url, resolved_api_key, resolved_api_mode = _resolve_task_provider_model(
-        "vision", provider, model, base_url, api_key
+        "vision", provider, model, base_url, api_key,
     )
     requested = _normalize_vision_provider(requested)
 
@@ -4187,7 +4187,7 @@ def resolve_vision_provider_client(
             vision_model = _PROVIDER_VISION_MODELS.get(main_provider, main_model)
             if main_provider == "nous":
                 sync_client, default_model = _resolve_strict_vision_backend(
-                    main_provider, vision_model
+                    main_provider, vision_model,
                 )
                 if sync_client is not None:
                     logger.info(
@@ -4252,7 +4252,7 @@ def resolve_vision_provider_client(
 
     if requested in _VISION_AUTO_PROVIDER_ORDER:
         sync_client, default_model = _resolve_strict_vision_backend(
-            requested, resolved_model
+            requested, resolved_model,
         )
         return _finalize(requested, sync_client, default_model)
 
@@ -5023,7 +5023,7 @@ def _validate_llm_response(response: Any, task: str = None) -> Any:
     """
     if response is None:
         raise RuntimeError(
-            f"Auxiliary {task or 'call'}: LLM returned None response"
+            f"Auxiliary {task or 'call'}: LLM returned None response",
         )
     # Allow SimpleNamespace responses from adapters (CodexAuxiliaryClient,
     # AnthropicAuxiliaryClient) — they have .choices[0].message.
@@ -5038,7 +5038,7 @@ def _validate_llm_response(response: Any, task: str = None) -> Any:
             f"Auxiliary {task or 'call'}: LLM returned invalid response "
             f"(type={response_type}): {response_preview!r}. "
             f"Expected object with .choices[0].message — check provider "
-            f"adapter or custom endpoint compatibility."
+            f"adapter or custom endpoint compatibility.",
         ) from exc
     return response
 
@@ -5108,7 +5108,7 @@ def call_llm(
         if client is None:
             raise RuntimeError(
                 f"No LLM provider configured for task={task} provider={resolved_provider}. "
-                f"Run: hermes setup"
+                f"Run: hermes setup",
             )
         resolved_provider = effective_provider or resolved_provider
     else:
@@ -5129,7 +5129,7 @@ def call_llm(
                 raise RuntimeError(
                     f"Provider '{_explicit}' is set in config.yaml but no API key "
                     f"was found. Set the {_explicit.upper()}_API_KEY environment "
-                    f"variable, or switch to a different provider with `hermes model`."
+                    f"variable, or switch to a different provider with `hermes model`.",
                 )
             # For auto/custom with no credentials, try the full auto chain
             # rather than hardcoding OpenRouter (which may be depleted).
@@ -5454,7 +5454,7 @@ def call_llm(
                 # 402). Mark THAT label unhealthy so subsequent aux calls
                 # skip it instead of paying another doomed RTT.
                 _mark_provider_unhealthy(
-                    _recoverable_pool_provider(resolved_provider, client, main_runtime=main_runtime) or resolved_provider
+                    _recoverable_pool_provider(resolved_provider, client, main_runtime=main_runtime) or resolved_provider,
                 )
             elif _is_rate_limit_error(first_err):
                 reason = "rate limit"
@@ -5612,7 +5612,7 @@ async def async_call_llm(
         if client is None:
             raise RuntimeError(
                 f"No LLM provider configured for task={task} provider={resolved_provider}. "
-                f"Run: hermes setup"
+                f"Run: hermes setup",
             )
         resolved_provider = effective_provider or resolved_provider
     else:
@@ -5630,7 +5630,7 @@ async def async_call_llm(
                 raise RuntimeError(
                     f"Provider '{_explicit}' is set in config.yaml but no API key "
                     f"was found. Set the {_explicit.upper()}_API_KEY environment "
-                    f"variable, or switch to a different provider with `hermes model`."
+                    f"variable, or switch to a different provider with `hermes model`.",
                 )
             if not resolved_base_url:
                 logger.info("Auxiliary %s: provider %s unavailable, trying auto-detection chain",
@@ -5892,7 +5892,7 @@ async def async_call_llm(
             if _is_payment_error(first_err):
                 reason = "payment error"
                 _mark_provider_unhealthy(
-                    _recoverable_pool_provider(resolved_provider, client) or resolved_provider
+                    _recoverable_pool_provider(resolved_provider, client) or resolved_provider,
                 )
             elif _is_rate_limit_error(first_err):
                 reason = "rate limit"
@@ -5926,7 +5926,7 @@ async def async_call_llm(
                     base_url=str(getattr(fb_client, "base_url", "") or ""))
                 # Convert sync fallback client to async
                 async_fb, async_fb_model = _to_async_client(
-                    fb_client, fb_model or "", is_vision=(task == "vision")
+                    fb_client, fb_model or "", is_vision=(task == "vision"),
                 )
                 if async_fb_model and async_fb_model != fb_kwargs.get("model"):
                     fb_kwargs["model"] = async_fb_model

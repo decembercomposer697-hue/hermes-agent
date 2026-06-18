@@ -58,7 +58,7 @@ def get(
                     body = ""
                 raise RuntimeError(
                     f"HTTP 429 rate-limited by {urllib.parse.urlsplit(url).netloc}. "
-                    f"Slow down or supply a real API key. Body: {body[:300]}"
+                    f"Slow down or supply a real API key. Body: {body[:300]}",
                 ) from e
             if e.code in {500, 502, 503, 504} and attempt < max_retries:
                 retry_after = e.headers.get("Retry-After") if e.headers else None

@@ -515,7 +515,7 @@ def _get_cloud_provider() -> CloudBrowserProvider | None:
         provider_key = None
         if isinstance(browser_cfg, dict) and "cloud_provider" in browser_cfg:
             provider_key = normalize_browser_cloud_provider(
-                browser_cfg.get("cloud_provider")
+                browser_cfg.get("cloud_provider"),
             )
             if provider_key == "local":
                 _cached_cloud_provider = None
@@ -814,7 +814,7 @@ def _run_chrome_fallback_command(
     # ``_engine_override=\"auto\"`` so this helper does not recursively trigger
     # Lightpanda→Chrome fallback if the eval call itself fails.
     url_result = _run_browser_command(
-        task_id, "eval", ["window.location.href"], timeout=10, _engine_override="auto"
+        task_id, "eval", ["window.location.href"], timeout=10, _engine_override="auto",
     )
     current_url = None
     if url_result.get("success"):
@@ -990,7 +990,7 @@ def _auto_local_for_private_urls() -> bool:
         browser_cfg = cfg.get("browser", {})
         if isinstance(browser_cfg, dict) and "auto_local_for_private_urls" in browser_cfg:
             _cached_auto_local_for_private_urls = bool(
-                browser_cfg.get("auto_local_for_private_urls")
+                browser_cfg.get("auto_local_for_private_urls"),
             )
     except Exception as e:
         logger.debug("Could not read auto_local_for_private_urls from config: %s", e)
@@ -1034,7 +1034,7 @@ def _url_is_private(url: str) -> bool:
         # Hostname — must resolve to confirm it's private (bare "localhost"
         # resolves to 127.0.0.1 via /etc/hosts).  Short-circuit on obvious
         # names to avoid a DNS hop.
-        if hostname in {"localhost",} or hostname.endswith(".localhost"):
+        if hostname in {"localhost"} or hostname.endswith(".localhost"):
             return True
         if hostname.endswith(".local") or hostname.endswith(".lan") or hostname.endswith(".internal"):
             return True
@@ -1126,7 +1126,7 @@ def _allow_private_urls() -> bool:
         browser_cfg = cfg.get("browser", {})
         if isinstance(browser_cfg, dict):
             _cached_allow_private_urls = is_truthy_value(
-                browser_cfg.get("allow_private_urls"), default=False
+                browser_cfg.get("allow_private_urls"), default=False,
             )
     except Exception as e:
         logger.debug("Could not read allow_private_urls from config: %s", e)
@@ -1440,7 +1440,7 @@ def _start_browser_cleanup_thread():
             _cleanup_thread = threading.Thread(
                 target=_browser_cleanup_thread_worker,
                 daemon=True,
-                name="browser-cleanup"
+                name="browser-cleanup",
             )
             _cleanup_thread.start()
             logger.info("Started inactivity cleanup thread (timeout: %ss)", BROWSER_SESSION_INACTIVITY_TIMEOUT)
@@ -1477,11 +1477,11 @@ BROWSER_TOOL_SCHEMAS = [
             "properties": {
                 "url": {
                     "type": "string",
-                    "description": "The URL to navigate to (e.g., 'https://example.com')"
-                }
+                    "description": "The URL to navigate to (e.g., 'https://example.com')",
+                },
             },
-            "required": ["url"]
-        }
+            "required": ["url"],
+        },
     },
     {
         "name": "browser_snapshot",
@@ -1492,11 +1492,11 @@ BROWSER_TOOL_SCHEMAS = [
                 "full": {
                     "type": "boolean",
                     "description": "If true, returns complete page content. If false (default), returns compact view with interactive elements only.",
-                    "default": False
-                }
+                    "default": False,
+                },
             },
-            "required": []
-        }
+            "required": [],
+        },
     },
     {
         "name": "browser_click",
@@ -1506,11 +1506,11 @@ BROWSER_TOOL_SCHEMAS = [
             "properties": {
                 "ref": {
                     "type": "string",
-                    "description": "The element reference from the snapshot (e.g., '@e5', '@e12')"
-                }
+                    "description": "The element reference from the snapshot (e.g., '@e5', '@e12')",
+                },
             },
-            "required": ["ref"]
-        }
+            "required": ["ref"],
+        },
     },
     {
         "name": "browser_type",
@@ -1520,15 +1520,15 @@ BROWSER_TOOL_SCHEMAS = [
             "properties": {
                 "ref": {
                     "type": "string",
-                    "description": "The element reference from the snapshot (e.g., '@e3')"
+                    "description": "The element reference from the snapshot (e.g., '@e3')",
                 },
                 "text": {
                     "type": "string",
-                    "description": "The text to type into the field"
-                }
+                    "description": "The text to type into the field",
+                },
             },
-            "required": ["ref", "text"]
-        }
+            "required": ["ref", "text"],
+        },
     },
     {
         "name": "browser_scroll",
@@ -1539,11 +1539,11 @@ BROWSER_TOOL_SCHEMAS = [
                 "direction": {
                     "type": "string",
                     "enum": ["up", "down"],
-                    "description": "Direction to scroll"
-                }
+                    "description": "Direction to scroll",
+                },
             },
-            "required": ["direction"]
-        }
+            "required": ["direction"],
+        },
     },
     {
         "name": "browser_back",
@@ -1551,8 +1551,8 @@ BROWSER_TOOL_SCHEMAS = [
         "parameters": {
             "type": "object",
             "properties": {},
-            "required": []
-        }
+            "required": [],
+        },
     },
     {
         "name": "browser_press",
@@ -1562,11 +1562,11 @@ BROWSER_TOOL_SCHEMAS = [
             "properties": {
                 "key": {
                     "type": "string",
-                    "description": "Key to press (e.g., 'Enter', 'Tab', 'Escape', 'ArrowDown')"
-                }
+                    "description": "Key to press (e.g., 'Enter', 'Tab', 'Escape', 'ArrowDown')",
+                },
             },
-            "required": ["key"]
-        }
+            "required": ["key"],
+        },
     },
     {
         "name": "browser_get_images",
@@ -1574,8 +1574,8 @@ BROWSER_TOOL_SCHEMAS = [
         "parameters": {
             "type": "object",
             "properties": {},
-            "required": []
-        }
+            "required": [],
+        },
     },
     {
         "name": "browser_vision",
@@ -1585,16 +1585,16 @@ BROWSER_TOOL_SCHEMAS = [
             "properties": {
                 "question": {
                     "type": "string",
-                    "description": "What you want to know about the page visually. Be specific about what you're looking for."
+                    "description": "What you want to know about the page visually. Be specific about what you're looking for.",
                 },
                 "annotate": {
                     "type": "boolean",
                     "default": False,
-                    "description": "If true, overlay numbered [N] labels on interactive elements. Each [N] maps to ref @eN for subsequent browser commands. Useful for QA and spatial reasoning about page layout."
-                }
+                    "description": "If true, overlay numbered [N] labels on interactive elements. Each [N] maps to ref @eN for subsequent browser commands. Useful for QA and spatial reasoning about page layout.",
+                },
             },
-            "required": ["question"]
-        }
+            "required": ["question"],
+        },
     },
     {
         "name": "browser_console",
@@ -1605,15 +1605,15 @@ BROWSER_TOOL_SCHEMAS = [
                 "clear": {
                     "type": "boolean",
                     "default": False,
-                    "description": "If true, clear the message buffers after reading"
+                    "description": "If true, clear the message buffers after reading",
                 },
                 "expression": {
                     "type": "string",
-                    "description": "JavaScript expression to evaluate in the page context. Runs in the browser like DevTools console — full access to DOM, window, document. Return values are serialized to JSON. Example: 'document.title' or 'document.querySelectorAll(\"a\").length'"
-                }
+                    "description": "JavaScript expression to evaluate in the page context. Runs in the browser like DevTools console — full access to DOM, window, document. Return values are serialized to JSON. Example: 'document.title' or 'document.querySelectorAll(\"a\").length'",
+                },
             },
-            "required": []
-        }
+            "required": [],
+        },
     },
 ]
 
@@ -1721,7 +1721,7 @@ def _get_session_info(task_id: str | None = None) -> dict[str, str]:
                 except Exception as local_error:
                     raise RuntimeError(
                         f"Cloud provider {provider_name} failed ({e}) and local "
-                        f"fallback also failed ({local_error})"
+                        f"fallback also failed ({local_error})",
                     ) from e
                 # Mark session as degraded for observability
                 if isinstance(session_info, dict):
@@ -1769,7 +1769,7 @@ def _find_agent_browser() -> str:
                 "agent-browser CLI not found (cached). Install it with: "
                 f"{_browser_install_hint()}\n"
                 "Or run 'npm install' in the repo root to install locally.\n"
-                "Or ensure npx is available in your PATH."
+                "Or ensure npx is available in your PATH.",
             )
         return _cached_agent_browser
 
@@ -1848,7 +1848,7 @@ def _find_agent_browser() -> str:
         "agent-browser CLI not found. Install it with: "
         f"{_browser_install_hint()}\n"
         "Or run 'npm install' in the repo root to install locally.\n"
-        "Or ensure npx is available in your PATH."
+        "Or ensure npx is available in your PATH.",
     )
 
 
@@ -1974,7 +1974,7 @@ def _run_browser_command(
 
     cmd_parts = cmd_prefix + backend_args + [
         "--json",
-        command
+        command,
     ] + args
 
     try:
@@ -1983,7 +1983,7 @@ def _run_browser_command(
         # causing "Failed to create socket directory: Permission denied" errors.
         task_socket_dir = os.path.join(
             _socket_safe_tmpdir(),
-            f"agent-browser-{session_info['session_name']}"
+            f"agent-browser-{session_info['session_name']}",
         )
         os.makedirs(task_socket_dir, mode=0o700, exist_ok=True)
         # Record this hermes PID as the session owner (cross-process safe
@@ -2033,7 +2033,7 @@ def _run_browser_command(
                             _needs_sandbox_bypass = True
                             logger.debug(
                                 "browser: AppArmor userns restrictions detected — "
-                                "injecting --no-sandbox"
+                                "injecting --no-sandbox",
                             )
                 except OSError:
                     pass
@@ -2155,12 +2155,12 @@ def _run_browser_command(
                         else:
                             result = {
                                 "success": False,
-                                "error": f"Non-JSON output from agent-browser for '{command}': {raw}"
+                                "error": f"Non-JSON output from agent-browser for '{command}': {raw}",
                             }
                     else:
                         result = {
                             "success": False,
-                            "error": f"Non-JSON output from agent-browser for '{command}': {raw}"
+                            "error": f"Non-JSON output from agent-browser for '{command}': {raw}",
                         }
             elif returncode != 0:
                 # Check for errors
@@ -2198,7 +2198,7 @@ def _run_browser_command(
 
 def _extract_relevant_content(
     snapshot_text: str,
-    user_task: str | None = None
+    user_task: str | None = None,
 ) -> str:
     """Use LLM to extract relevant content from a snapshot based on the user's task.
 
@@ -2437,7 +2437,7 @@ def browser_navigate(url: str, task_id: str | None = None) -> str:
         response = {
             "success": True,
             "url": final_url,
-            "title": title
+            "title": title,
         }
         _copy_fallback_warning(response, result)
 
@@ -2447,7 +2447,7 @@ def browser_navigate(url: str, task_id: str | None = None) -> str:
             "blocked", "bot detected", "verification required",
             "please verify", "are you a robot", "captcha",
             "cloudflare", "ddos protection", "checking your browser",
-            "just a moment", "attention required"
+            "just a moment", "attention required",
         ]
         title_lower = title.lower()
 
@@ -2491,14 +2491,14 @@ def browser_navigate(url: str, task_id: str | None = None) -> str:
     else:
         return json.dumps({
             "success": False,
-            "error": result.get("error", "Navigation failed")
+            "error": result.get("error", "Navigation failed"),
         }, ensure_ascii=False)
 
 
 def browser_snapshot(
     full: bool = False,
     task_id: str | None = None,
-    user_task: str | None = None
+    user_task: str | None = None,
 ) -> str:
     """
     Get a text-based snapshot of the current page's accessibility tree.
@@ -2538,7 +2538,7 @@ def browser_snapshot(
         response = {
             "success": True,
             "snapshot": snapshot_text,
-            "element_count": len(refs) if refs else 0
+            "element_count": len(refs) if refs else 0,
         }
         _copy_fallback_warning(response, result)
 
@@ -2559,7 +2559,7 @@ def browser_snapshot(
     else:
         response = {
             "success": False,
-            "error": result.get("error", "Failed to get snapshot")
+            "error": result.get("error", "Failed to get snapshot"),
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
@@ -2590,13 +2590,13 @@ def browser_click(ref: str, task_id: str | None = None) -> str:
     if result.get("success"):
         response = {
             "success": True,
-            "clicked": ref
+            "clicked": ref,
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
     else:
         response = {
             "success": False,
-            "error": result.get("error", f"Failed to click {ref}")
+            "error": result.get("error", f"Failed to click {ref}"),
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
@@ -2630,13 +2630,13 @@ def browser_type(ref: str, text: str, task_id: str | None = None) -> str:
         response = {
             "success": True,
             "typed": text,
-            "element": ref
+            "element": ref,
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
     else:
         response = {
             "success": False,
-            "error": result.get("error", f"Failed to type into {ref}")
+            "error": result.get("error", f"Failed to type into {ref}"),
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
@@ -2656,7 +2656,7 @@ def browser_scroll(direction: str, task_id: str | None = None) -> str:
     if direction not in {"up", "down"}:
         return json.dumps({
             "success": False,
-            "error": f"Invalid direction '{direction}'. Use 'up' or 'down'."
+            "error": f"Invalid direction '{direction}'. Use 'up' or 'down'.",
         }, ensure_ascii=False)
 
     # Single scroll with pixel amount instead of 5x subprocess calls.
@@ -2679,13 +2679,13 @@ def browser_scroll(direction: str, task_id: str | None = None) -> str:
     if not result.get("success"):
         response = {
             "success": False,
-            "error": result.get("error", f"Failed to scroll {direction}")
+            "error": result.get("error", f"Failed to scroll {direction}"),
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
     response = {
         "success": True,
-        "scrolled": direction
+        "scrolled": direction,
     }
     return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
@@ -2711,13 +2711,13 @@ def browser_back(task_id: str | None = None) -> str:
         data = result.get("data", {})
         response = {
             "success": True,
-            "url": data.get("url", "")
+            "url": data.get("url", ""),
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
     else:
         response = {
             "success": False,
-            "error": result.get("error", "Failed to go back")
+            "error": result.get("error", "Failed to go back"),
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
@@ -2743,13 +2743,13 @@ def browser_press(key: str, task_id: str | None = None) -> str:
     if result.get("success"):
         response = {
             "success": True,
-            "pressed": key
+            "pressed": key,
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
     else:
         response = {
             "success": False,
-            "error": result.get("error", f"Failed to press {key}")
+            "error": result.get("error", f"Failed to press {key}"),
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
@@ -3050,7 +3050,7 @@ def browser_get_images(task_id: str | None = None) -> str:
             response = {
                 "success": True,
                 "images": images,
-                "count": len(images)
+                "count": len(images),
             }
             return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
         except json.JSONDecodeError:
@@ -3058,13 +3058,13 @@ def browser_get_images(task_id: str | None = None) -> str:
                 "success": True,
                 "images": [],
                 "count": 0,
-                "warning": "Could not parse image data"
+                "warning": "Could not parse image data",
             }
             return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
     else:
         response = {
             "success": False,
-            "error": result.get("error", "Failed to get images")
+            "error": result.get("error", "Failed to get images"),
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
@@ -3188,7 +3188,7 @@ def browser_vision(question: str, annotate: bool = False, task_id: str | None = 
             mode = "local" if _cp is None else f"cloud ({_cp.provider_name()})"
             error_response = {
                 "success": False,
-                "error": f"Failed to take screenshot ({mode} mode): {error_detail}"
+                "error": f"Failed to take screenshot ({mode} mode): {error_detail}",
             }
             return json.dumps(_copy_fallback_warning(error_response, result), ensure_ascii=False)
 
@@ -3284,7 +3284,7 @@ def browser_vision(question: str, annotate: bool = False, task_id: str | None = 
                         {"type": "text", "text": vision_prompt},
                         {"type": "image_url", "image_url": {"url": data_url}},
                     ],
-                }
+                },
             ],
             "max_tokens": 2000,
             "temperature": vision_temperature,
@@ -3570,7 +3570,7 @@ def _chromium_search_roots() -> list[str]:
         roots.append(os.path.join(home, "Library", "Caches", "ms-playwright"))
     if sys.platform == "win32":
         local = os.environ.get("LOCALAPPDATA") or os.path.join(
-            home, "AppData", "Local"
+            home, "AppData", "Local",
         )
         roots.append(os.path.join(local, "ms-playwright"))
     return roots
@@ -3629,7 +3629,7 @@ def _chromium_installed() -> bool:
         # ``chromium_headless_shell-<build>``; agent-browser accepts either.
         for entry in entries:
             if entry.startswith("chromium-") or entry.startswith(
-                "chromium_headless_shell-"
+                "chromium_headless_shell-",
             ):
                 _cached_chromium_installed = True
                 return True
@@ -3757,7 +3757,7 @@ if __name__ == "__main__":
                 if _running_in_docker():
                     print(
                         "     Docker: pull the latest image — the current one "
-                        "predates the bundled Chromium install"
+                        "predates the bundled Chromium install",
                     )
                     print("       docker pull ghcr.io/nousresearch/hermes-agent:latest")
                 else:

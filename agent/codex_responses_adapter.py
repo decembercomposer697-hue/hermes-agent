@@ -469,7 +469,7 @@ def _chat_messages_to_responses_input(
                             continue
 
                         embedded_call_id, embedded_response_item_id = _split_responses_tool_id(
-                            tc.get("id")
+                            tc.get("id"),
                         )
                         call_id = tc.get("call_id")
                         if not isinstance(call_id, str) or not call_id.strip():
@@ -581,7 +581,7 @@ def _preflight_codex_input_items(raw_items: Any) -> list[dict[str, Any]]:
                     "call_id": call_id.strip(),
                     "name": name.strip(),
                     "arguments": arguments,
-                }
+                },
             )
             continue
 
@@ -621,7 +621,7 @@ def _preflight_codex_input_items(raw_items: Any) -> list[dict[str, Any]]:
                         "type": "function_call_output",
                         "call_id": call_id.strip(),
                         "output": cleaned if cleaned else "",
-                    }
+                    },
                 )
                 continue
             if not isinstance(output, str):
@@ -632,7 +632,7 @@ def _preflight_codex_input_items(raw_items: Any) -> list[dict[str, Any]]:
                     "type": "function_call_output",
                     "call_id": call_id.strip(),
                     "output": output,
-                }
+                },
             )
             continue
 
@@ -668,12 +668,12 @@ def _preflight_codex_input_items(raw_items: Any) -> list[dict[str, Any]]:
             for part_idx, part in enumerate(content):
                 if not isinstance(part, dict):
                     raise ValueError(
-                        f"Codex Responses input[{idx}] message content[{part_idx}] must be an object."
+                        f"Codex Responses input[{idx}] message content[{part_idx}] must be an object.",
                     )
                 part_type = part.get("type")
                 if part_type not in {"output_text", "text"}:
                     raise ValueError(
-                        f"Codex Responses input[{idx}] message content[{part_idx}] has unsupported type {part_type!r}."
+                        f"Codex Responses input[{idx}] message content[{part_idx}] has unsupported type {part_type!r}.",
                     )
                 text = part.get("text", "")
                 if text is None:
@@ -718,7 +718,7 @@ def _preflight_codex_input_items(raw_items: Any) -> list[dict[str, Any]]:
                         continue
                     if not isinstance(part, dict):
                         raise ValueError(
-                            f"Codex Responses input[{idx}].content[{part_idx}] must be an object or string."
+                            f"Codex Responses input[{idx}].content[{part_idx}] must be an object or string.",
                         )
                     ptype = str(part.get("type") or "").strip().lower()
                     if ptype in {"input_text", "text", "output_text"}:
@@ -742,7 +742,7 @@ def _preflight_codex_input_items(raw_items: Any) -> list[dict[str, Any]]:
                         validated.append(image_part)
                     else:
                         raise ValueError(
-                            f"Codex Responses input[{idx}].content[{part_idx}] has unsupported type {part.get('type')!r}."
+                            f"Codex Responses input[{idx}].content[{part_idx}] has unsupported type {part.get('type')!r}.",
                         )
                 normalized.append({"role": role, "content": validated})
                 continue
@@ -753,7 +753,7 @@ def _preflight_codex_input_items(raw_items: Any) -> list[dict[str, Any]]:
             continue
 
         raise ValueError(
-            f"Codex Responses input[{idx}] has unsupported item shape (type={item_type!r}, role={role!r})."
+            f"Codex Responses input[{idx}] has unsupported item shape (type={item_type!r}, role={role!r}).",
         )
 
     return normalized
@@ -822,7 +822,7 @@ def _preflight_codex_api_kwargs(
                     "description": description,
                     "strict": strict,
                     "parameters": parameters,
-                }
+                },
             )
 
     store = api_kwargs.get("store", False)
@@ -936,7 +936,7 @@ def _preflight_codex_api_kwargs(
     unexpected = sorted(key for key in api_kwargs if key not in allowed_keys)
     if unexpected:
         raise ValueError(
-            f"Codex Responses request has unsupported field(s): {', '.join(unexpected)}."
+            f"Codex Responses request has unsupported field(s): {', '.join(unexpected)}.",
         )
 
     return normalized

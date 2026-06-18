@@ -25,7 +25,7 @@ def _cap(fn):
 def test_loopback_ssh_hint_silent_when_not_remote(monkeypatch):
     monkeypatch.setattr(auth_mod, "_is_remote_session", lambda: False)
     out = _cap(lambda: auth_mod._print_loopback_ssh_hint(
-        "http://127.0.0.1:56121/callback", docs_url=auth_mod.XAI_OAUTH_DOCS_URL
+        "http://127.0.0.1:56121/callback", docs_url=auth_mod.XAI_OAUTH_DOCS_URL,
     ))
     assert out == ""
 
@@ -33,7 +33,7 @@ def test_loopback_ssh_hint_silent_when_not_remote(monkeypatch):
 def test_loopback_ssh_hint_prints_tunnel_command_on_ssh(monkeypatch):
     monkeypatch.setattr(auth_mod, "_is_remote_session", lambda: True)
     out = _cap(lambda: auth_mod._print_loopback_ssh_hint(
-        "http://127.0.0.1:56121/callback", docs_url=auth_mod.XAI_OAUTH_DOCS_URL
+        "http://127.0.0.1:56121/callback", docs_url=auth_mod.XAI_OAUTH_DOCS_URL,
     ))
     # Must include the exact ssh -L command with the port from the redirect URI
     assert "ssh -N -L 56121:127.0.0.1:56121" in out
@@ -49,7 +49,7 @@ def test_loopback_ssh_hint_uses_actual_bound_port(monkeypatch):
     not the hardcoded constant."""
     monkeypatch.setattr(auth_mod, "_is_remote_session", lambda: True)
     out = _cap(lambda: auth_mod._print_loopback_ssh_hint(
-        "http://127.0.0.1:51234/callback", docs_url=auth_mod.XAI_OAUTH_DOCS_URL
+        "http://127.0.0.1:51234/callback", docs_url=auth_mod.XAI_OAUTH_DOCS_URL,
     ))
     assert "ssh -N -L 51234:127.0.0.1:51234" in out
     assert "56121" not in out
@@ -60,7 +60,7 @@ def test_loopback_ssh_hint_silent_for_non_loopback_uri(monkeypatch):
     by mistake, we don't tell the user to forward an external port."""
     monkeypatch.setattr(auth_mod, "_is_remote_session", lambda: True)
     out = _cap(lambda: auth_mod._print_loopback_ssh_hint(
-        "https://example.com/callback", docs_url=auth_mod.XAI_OAUTH_DOCS_URL
+        "https://example.com/callback", docs_url=auth_mod.XAI_OAUTH_DOCS_URL,
     ))
     assert out == ""
 
@@ -68,7 +68,7 @@ def test_loopback_ssh_hint_silent_for_non_loopback_uri(monkeypatch):
 def test_loopback_ssh_hint_silent_for_malformed_uri(monkeypatch):
     monkeypatch.setattr(auth_mod, "_is_remote_session", lambda: True)
     out = _cap(lambda: auth_mod._print_loopback_ssh_hint(
-        "not-a-uri", docs_url=auth_mod.XAI_OAUTH_DOCS_URL
+        "not-a-uri", docs_url=auth_mod.XAI_OAUTH_DOCS_URL,
     ))
     assert out == ""
 
@@ -76,7 +76,7 @@ def test_loopback_ssh_hint_silent_for_malformed_uri(monkeypatch):
 def test_loopback_ssh_hint_works_without_provider_docs_url(monkeypatch):
     monkeypatch.setattr(auth_mod, "_is_remote_session", lambda: True)
     out = _cap(lambda: auth_mod._print_loopback_ssh_hint(
-        "http://127.0.0.1:43827/spotify/callback"
+        "http://127.0.0.1:43827/spotify/callback",
     ))
     assert "ssh -N -L 43827:127.0.0.1:43827" in out
     # Generic SSH guide is always present even without a provider-specific URL
@@ -90,7 +90,7 @@ def test_loopback_ssh_hint_accepts_localhost_hostname(monkeypatch):
     a future caller normalizes the URI differently."""
     monkeypatch.setattr(auth_mod, "_is_remote_session", lambda: True)
     out = _cap(lambda: auth_mod._print_loopback_ssh_hint(
-        "http://localhost:56121/callback"
+        "http://localhost:56121/callback",
     ))
     assert "ssh -N -L 56121:127.0.0.1:56121" in out
 
@@ -101,7 +101,7 @@ def test_loopback_ssh_hint_includes_user_at_host(monkeypatch):
     monkeypatch.setattr(auth_mod, "_is_remote_session", lambda: True)
     monkeypatch.setattr(auth_mod, "_ssh_user_at_host", lambda: "alice@myserver.lan")
     out = _cap(lambda: auth_mod._print_loopback_ssh_hint(
-        "http://127.0.0.1:56121/callback"
+        "http://127.0.0.1:56121/callback",
     ))
     assert "ssh -N -L 56121:127.0.0.1:56121 alice@myserver.lan" in out
 
@@ -110,7 +110,7 @@ def test_loopback_ssh_hint_has_visual_header(monkeypatch):
     """The hint should print a divider and header so it stands out in noisy output."""
     monkeypatch.setattr(auth_mod, "_is_remote_session", lambda: True)
     out = _cap(lambda: auth_mod._print_loopback_ssh_hint(
-        "http://127.0.0.1:56121/callback"
+        "http://127.0.0.1:56121/callback",
     ))
     assert "Remote session detected" in out
     assert "---" in out  # divider is present

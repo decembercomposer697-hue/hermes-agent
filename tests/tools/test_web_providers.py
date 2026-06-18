@@ -452,7 +452,7 @@ class TestDispatchersTriggerPluginDiscovery:
             # the test stays valid even if the import inside the helper is
             # later moved to module scope or renamed.
             monkeypatch.setattr(
-                web_tools, "_ensure_web_plugins_loaded", mock_hook
+                web_tools, "_ensure_web_plugins_loaded", mock_hook,
             )
             monkeypatch.setattr(
                 web_tools, "_load_web_config",
@@ -465,7 +465,7 @@ class TestDispatchersTriggerPluginDiscovery:
                 web_tools.web_extract_tool(
                     ["https://example.com"],
                     use_llm_processing=False,
-                )
+                ),
             ))
 
             # The hook must have been called BEFORE the registry lookup —
@@ -512,7 +512,7 @@ class TestDispatchersTriggerPluginDiscovery:
                 def search(self, query, limit=5):
                     return {"success": True, "data": {"web": [
                         {"title": "ok", "url": "https://x", "description": "",
-                         "position": 0}
+                         "position": 0},
                     ]}}
 
             def _register_fake() -> None:
@@ -521,7 +521,7 @@ class TestDispatchersTriggerPluginDiscovery:
 
             mock_hook = MagicMock(wraps=_register_fake)
             monkeypatch.setattr(
-                web_tools, "_ensure_web_plugins_loaded", mock_hook
+                web_tools, "_ensure_web_plugins_loaded", mock_hook,
             )
             monkeypatch.setattr(
                 web_tools, "_load_web_config",

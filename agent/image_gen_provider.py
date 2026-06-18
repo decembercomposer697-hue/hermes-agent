@@ -259,7 +259,7 @@ def save_url_image(
                 except OSError:
                     pass
                 raise ValueError(
-                    f"Image at {url} exceeds {max_bytes // (1024 * 1024)}MB cap; refusing to cache."
+                    f"Image at {url} exceeds {max_bytes // (1024 * 1024)}MB cap; refusing to cache.",
                 )
             fh.write(chunk)
 

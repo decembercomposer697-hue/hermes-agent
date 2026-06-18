@@ -26,9 +26,9 @@ async def test_reference_model_retry_warnings_avoid_exc_info_until_terminal_fail
     fake_client = SimpleNamespace(
         chat=SimpleNamespace(
             completions=SimpleNamespace(
-                create=AsyncMock(side_effect=RuntimeError("rate limited"))
-            )
-        )
+                create=AsyncMock(side_effect=RuntimeError("rate limited")),
+            ),
+        ),
     )
     warn = MagicMock()
     err = MagicMock()
@@ -38,7 +38,7 @@ async def test_reference_model_retry_warnings_avoid_exc_info_until_terminal_fail
     monkeypatch.setattr(moa.logger, "error", err)
 
     model, message, success = await moa._run_reference_model_safe(
-        "openai/gpt-5.4-pro", "hello", max_retries=2
+        "openai/gpt-5.4-pro", "hello", max_retries=2,
     )
 
     assert model == "openai/gpt-5.4-pro"
@@ -76,7 +76,7 @@ async def test_moa_top_level_error_logs_single_traceback_on_aggregator_failure(m
         await moa.mixture_of_agents_tool(
             "solve this",
             reference_models=["anthropic/claude-opus-4.6"],
-        )
+        ),
     )
 
     assert result["success"] is False

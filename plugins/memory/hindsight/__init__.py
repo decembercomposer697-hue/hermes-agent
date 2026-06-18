@@ -334,7 +334,7 @@ def _load_config() -> dict:
                 "bankId": os.environ.get("HINDSIGHT_BANK_ID", "hermes"),
                 "budget": os.environ.get("HINDSIGHT_BUDGET", "mid"),
                 "enabled": True,
-            }
+            },
         },
     }
 
@@ -434,7 +434,7 @@ def _build_embedded_profile_env(config: dict[str, Any], *, llm_api_key: str | No
     )
     if idle_timeout is not None and idle_timeout != "":
         env_values["HINDSIGHT_EMBED_DAEMON_IDLE_TIMEOUT"] = str(
-            _parse_int_setting(idle_timeout, _DEFAULT_IDLE_TIMEOUT)
+            _parse_int_setting(idle_timeout, _DEFAULT_IDLE_TIMEOUT),
         )
     return env_values
 
@@ -616,7 +616,7 @@ class HindsightMemoryProvider(MemoryProvider):
             has_key = bool(
                 cfg.get("apiKey")
                 or cfg.get("api_key")
-                or os.environ.get("HINDSIGHT_API_KEY", "")
+                or os.environ.get("HINDSIGHT_API_KEY", ""),
             )
             has_url = bool(cfg.get("api_url") or os.environ.get("HINDSIGHT_API_URL", ""))
             return has_key or has_url
@@ -891,7 +891,7 @@ class HindsightMemoryProvider(MemoryProvider):
                 if not available:
                     raise RuntimeError(
                         "Hindsight local runtime is unavailable"
-                        + (f": {reason}" if reason else "")
+                        + (f": {reason}" if reason else ""),
                     )
                 try:
                     from tools.lazy_deps import ensure as _lazy_ensure
@@ -1181,19 +1181,19 @@ class HindsightMemoryProvider(MemoryProvider):
         # Tags
         self._retain_tags = _normalize_retain_tags(
             self._config.get("retain_tags")
-            or os.environ.get("HINDSIGHT_RETAIN_TAGS", "")
+            or os.environ.get("HINDSIGHT_RETAIN_TAGS", ""),
         )
         self._tags = self._retain_tags or None
         self._recall_tags = self._config.get("recall_tags") or None
         self._recall_tags_match = self._config.get("recall_tags_match", "any")
         self._retain_source = str(
-            self._config.get("retain_source") or os.environ.get("HINDSIGHT_RETAIN_SOURCE", "")
+            self._config.get("retain_source") or os.environ.get("HINDSIGHT_RETAIN_SOURCE", ""),
         ).strip()
         self._retain_user_prefix = str(
-            self._config.get("retain_user_prefix") or os.environ.get("HINDSIGHT_RETAIN_USER_PREFIX", "User")
+            self._config.get("retain_user_prefix") or os.environ.get("HINDSIGHT_RETAIN_USER_PREFIX", "User"),
         ).strip() or "User"
         self._retain_assistant_prefix = str(
-            self._config.get("retain_assistant_prefix") or os.environ.get("HINDSIGHT_RETAIN_ASSISTANT_PREFIX", "Assistant")
+            self._config.get("retain_assistant_prefix") or os.environ.get("HINDSIGHT_RETAIN_ASSISTANT_PREFIX", "Assistant"),
         ).strip() or "Assistant"
 
         # Retain controls
@@ -1523,7 +1523,7 @@ class HindsightMemoryProvider(MemoryProvider):
                     items=[item],
                     document_id=document_id,
                     retain_async=retain_async_flag,
-                )
+                ),
             )
             logger.debug("Hindsight retain succeeded")
 
@@ -1597,8 +1597,8 @@ class HindsightMemoryProvider(MemoryProvider):
                              self._bank_id, len(query), self._budget)
                 resp = self._run_hindsight_operation(
                     lambda client: client.areflect(
-                        bank_id=self._bank_id, query=query, budget=self._budget
-                    )
+                        bank_id=self._bank_id, query=query, budget=self._budget,
+                    ),
                 )
                 logger.debug("Tool hindsight_reflect: response_len=%d", len(resp.text or ""))
                 return json.dumps({"result": resp.text or "No relevant memories found."})
@@ -1674,7 +1674,7 @@ class HindsightMemoryProvider(MemoryProvider):
             # session's document either way (legacy: per-process unique;
             # ≥0.5.0: stable session-scoped + append).
             old_document_id, old_update_mode = self._resolve_retain_target(
-                self._document_id
+                self._document_id,
             )
 
             def _flush():
@@ -1699,7 +1699,7 @@ class HindsightMemoryProvider(MemoryProvider):
                             items=[item],
                             document_id=old_document_id,
                             retain_async=self._retain_async,
-                        )
+                        ),
                     )
                 except Exception as e:
                     logger.warning("Hindsight flush-on-switch failed: %s", e, exc_info=True)

@@ -966,7 +966,7 @@ class TestChatCompletionsEndpoint:
                         return_value=(
                             {"final_response": "ok", "messages": [], "api_calls": 1},
                             {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
-                        )
+                        ),
                     ),
                 ),
                 patch("gateway.platforms.api_server.asyncio.ensure_future", side_effect=_fake_ensure_future),
@@ -1745,7 +1745,7 @@ class TestResponsesEndpoint:
                             "name": "read_file",
                             "arguments": '{"path":"old.txt"}',
                         },
-                    }
+                    },
                 ],
             },
             {
@@ -1774,7 +1774,7 @@ class TestResponsesEndpoint:
                             "name": "read_file",
                             "arguments": '{"path":"new.txt"}',
                         },
-                    }
+                    },
                 ],
             },
             {
@@ -2067,7 +2067,7 @@ class TestResponsesStreaming:
                         return_value=(
                             {"final_response": "ok", "messages": [], "api_calls": 1},
                             {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
-                        )
+                        ),
                     ),
                 ),
                 patch("gateway.platforms.api_server.asyncio.ensure_future", side_effect=_fake_ensure_future),
@@ -2113,7 +2113,7 @@ class TestResponsesStreaming:
                                             "name": "read_file",
                                             "arguments": '{"path":"/tmp/test.txt"}',
                                         },
-                                    }
+                                    },
                                 ],
                             },
                             {
@@ -2647,7 +2647,7 @@ class TestToolCallsInOutput:
                                 "name": "calculator",
                                 "arguments": '{"expression": "6*7"}',
                             },
-                        }
+                        },
                     ],
                 },
                 {

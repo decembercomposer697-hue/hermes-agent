@@ -28,13 +28,13 @@ class TestCustomProvidersVisionOverride:
                     "models": {
                         "mimoanth/mimo-v2.5": {
                             "supports_vision": True,
-                        }
-                    }
-                }
-            ]
+                        },
+                    },
+                },
+            ],
         }
         result = _supports_vision_override(
-            cfg, "9router-anthropic", "mimoanth/mimo-v2.5"
+            cfg, "9router-anthropic", "mimoanth/mimo-v2.5",
         )
         assert result is True
 
@@ -48,10 +48,10 @@ class TestCustomProvidersVisionOverride:
                     "models": {
                         "some-model": {
                             "supports_vision": False,
-                        }
-                    }
-                }
-            ]
+                        },
+                    },
+                },
+            ],
         }
         result = _supports_vision_override(cfg, "my-llm", "some-model")
         assert result is False
@@ -66,14 +66,14 @@ class TestCustomProvidersVisionOverride:
                     "models": {
                         "mimoanth/mimo-v2.5": {
                             "supports_vision": True,
-                        }
-                    }
-                }
-            ]
+                        },
+                    },
+                },
+            ],
         }
         # Runtime provider is "custom:9router-anthropic"
         result = _supports_vision_override(
-            cfg, "custom:9router-anthropic", "mimoanth/mimo-v2.5"
+            cfg, "custom:9router-anthropic", "mimoanth/mimo-v2.5",
         )
         assert result is True
 
@@ -87,13 +87,13 @@ class TestCustomProvidersVisionOverride:
                     "models": {
                         "other-model": {
                             "supports_vision": True,
-                        }
-                    }
-                }
-            ]
+                        },
+                    },
+                },
+            ],
         }
         result = _supports_vision_override(
-            cfg, "my-provider", "my-model"
+            cfg, "my-provider", "my-model",
         )
         assert result is None
 
@@ -107,13 +107,13 @@ class TestCustomProvidersVisionOverride:
                     "models": {
                         "other-model": {
                             "supports_vision": True,
-                        }
-                    }
-                }
-            ]
+                        },
+                    },
+                },
+            ],
         }
         result = _supports_vision_override(
-            cfg, "my-provider", "unlisted-model"
+            cfg, "my-provider", "unlisted-model",
         )
         assert result is None
 
@@ -130,13 +130,13 @@ class TestCustomProvidersVisionOverride:
                     "models": {
                         "my-model": {
                             "supports_vision": True,
-                        }
-                    }
-                }
-            ]
+                        },
+                    },
+                },
+            ],
         }
         result = _supports_vision_override(
-            cfg, "my-provider", "my-model"
+            cfg, "my-provider", "my-model",
         )
         assert result is True
 
@@ -152,11 +152,11 @@ class TestCustomProvidersVisionOverride:
         from agent.image_routing import _supports_vision_override
         cfg = {
             "custom_providers": [
-                {"name": "my-provider"}  # no models key
-            ]
+                {"name": "my-provider"},  # no models key
+            ],
         }
         result = _supports_vision_override(
-            cfg, "my-provider", "my-model"
+            cfg, "my-provider", "my-model",
         )
         assert result is None
 
@@ -168,8 +168,8 @@ class TestCustomProvidersVisionOverride:
                 {
                     "name": "",
                     "models": {"m": {"supports_vision": True}},
-                }
-            ]
+                },
+            ],
         }
         result = _supports_vision_override(cfg, "any", "m")
         assert result is None
@@ -192,13 +192,13 @@ class TestDecideImageInputMode:
                     "models": {
                         "mimoanth/mimo-v2.5": {
                             "supports_vision": True,
-                        }
-                    }
-                }
-            ]
+                        },
+                    },
+                },
+            ],
         }
         result = decide_image_input_mode(
-            "9router-anthropic", "mimoanth/mimo-v2.5", cfg
+            "9router-anthropic", "mimoanth/mimo-v2.5", cfg,
         )
         assert result == "native"
 
@@ -211,10 +211,10 @@ class TestDecideImageInputMode:
                     "models": {
                         "my-model": {
                             "supports_vision": False,
-                        }
-                    }
-                }
-            ]
+                        },
+                    },
+                },
+            ],
         }
         result = decide_image_input_mode("my-provider", "my-model", cfg)
         assert result == "text"
@@ -230,10 +230,10 @@ class TestDecideImageInputMode:
                     "models": {
                         "my-model": {
                             "supports_vision": True,
-                        }
-                    }
-                }
-            ]
+                        },
+                    },
+                },
+            ],
         }
         result = decide_image_input_mode("my-provider", "my-model", cfg)
         assert result == "text"
@@ -245,18 +245,18 @@ class TestDecideImageInputMode:
             "providers": {
                 "my-provider": {
                     "models": {
-                        "my-model": {"supports_vision": False}
-                    }
-                }
+                        "my-model": {"supports_vision": False},
+                    },
+                },
             },
             "custom_providers": [
                 {
                     "name": "my-provider",
                     "models": {
-                        "my-model": {"supports_vision": True}
-                    }
-                }
-            ]
+                        "my-model": {"supports_vision": True},
+                    },
+                },
+            ],
         }
         result = decide_image_input_mode("my-provider", "my-model", cfg)
         assert result == "text"

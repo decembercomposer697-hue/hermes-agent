@@ -180,7 +180,7 @@ def _cmd_setup(args: argparse.Namespace) -> int:
         color(
             "[4/5] Your iMessage phone number (E.164, e.g. +15551234567): ",
             Colors.CYAN,
-        )
+        ),
     )
     agent_number = None
     registered_phone = None
@@ -234,7 +234,7 @@ def _cmd_setup(args: argparse.Namespace) -> int:
         print(color("┌─ Your agent's iMessage number ───────────────────────────────", Colors.GREEN))
         print(
             color("│  📱 ", Colors.GREEN)
-            + color(str(agent_number), Colors.GREEN, Colors.BOLD)
+            + color(str(agent_number), Colors.GREEN, Colors.BOLD),
         )
         print(color("│  Text this number from your phone to talk to your agent.", Colors.GREEN))
         print(color("└──────────────────────────────────────────────────────────────", Colors.GREEN))

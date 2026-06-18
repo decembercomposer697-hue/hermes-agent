@@ -116,8 +116,8 @@ def test_openrouter_models_api_pricing_is_converted_from_per_token_to_per_millio
                     "completion": "0.000025",
                     "input_cache_read": "0.0000005",
                     "input_cache_write": "0.00000625",
-                }
-            }
+                },
+            },
         },
     )
 
@@ -153,8 +153,8 @@ def test_estimate_usage_cost_refuses_cache_pricing_without_official_cache_rate(m
                 "pricing": {
                     "prompt": "0.00000125",
                     "completion": "0.00001",
-                }
-            }
+                },
+            },
         },
     )
 
@@ -176,8 +176,8 @@ def test_custom_endpoint_models_api_pricing_is_supported(monkeypatch):
                 "pricing": {
                     "prompt": "0.0000005",
                     "completion": "0.000002",
-                }
-            }
+                },
+            },
         },
     )
 
@@ -202,8 +202,8 @@ def test_nous_portal_pricing_preserves_vendor_prefixed_model_ids(monkeypatch):
                 "pricing": {
                     "prompt": "0.000025",
                     "completion": "0.000125",
-                }
-            }
+                },
+            },
         }
 
     monkeypatch.setattr(

@@ -305,7 +305,7 @@ def build_session_context_prompt(
         session_label = "Multi-user thread" if context.source.thread_id else "Multi-user session"
         lines.append(
             f"**Session type:** {session_label} — messages are prefixed "
-            "with [sender name]. Multiple users may participate."
+            "with [sender name]. Multiple users may participate.",
         )
     elif context.source.user_name:
         lines.append(f"**User:** {context.source.user_name}")
@@ -324,7 +324,7 @@ def build_session_context_prompt(
             "channel history, pin/unpin messages, manage channels, or list users. "
             "Do not promise to perform these actions. The gateway may inline the "
             "current message's Slack block/attachment payload when available, but "
-            "you still cannot call Slack APIs yourself."
+            "you still cannot call Slack APIs yourself.",
         )
     elif context.source.platform == Platform.DISCORD:
         # Inject the Discord IDs block only when the agent actually has
@@ -352,7 +352,7 @@ def build_session_context_prompt(
                 "You do NOT have access to Discord-specific APIs — you cannot search "
                 "channel history, pin messages, manage roles, or list server members. "
                 "Do not promise to perform these actions. If the user asks, explain "
-                "that you can only read messages sent directly to you and respond."
+                "that you can only read messages sent directly to you and respond.",
             )
     elif context.source.platform == Platform.BLUEBUBBLES:
         lines.append("")
@@ -364,7 +364,7 @@ def build_session_context_prompt(
             "will be delivered as its own iMessage bubble, so write accordingly: "
             "one idea per bubble, 1–3 sentences each. "
             "If the user needs a detailed answer, give the short version first "
-            "and offer to elaborate."
+            "and offer to elaborate.",
         )
     elif context.source.platform == Platform.YUANBAO:
         lines.append("")
@@ -372,7 +372,7 @@ def build_session_context_prompt(
             "**Platform notes:** You are running inside Yuanbao. "
             "You CAN send private (DM) messages via the send_message tool. "
             "Use target='yuanbao:direct:<account_id>' for DM "
-            "and target='yuanbao:group:<group_code>' for group chat."
+            "and target='yuanbao:group:<group_code>' for group chat.",
         )
 
     # Connected platforms
@@ -408,7 +408,7 @@ def build_session_context_prompt(
 
     # Local always available
     lines.append(
-        f"- `\"local\"` → Save to local files only ({display_hermes_home()}/cron/output/)"
+        f"- `\"local\"` → Save to local files only ({display_hermes_home()}/cron/output/)",
     )
 
     # Platform home channels
@@ -743,7 +743,7 @@ class SessionStore:
 
         data = {key: entry.to_dict() for key, entry in self._entries.items()}
         fd, tmp_path = tempfile.mkstemp(
-            dir=str(self.sessions_dir), suffix=".tmp", prefix=".sessions_"
+            dir=str(self.sessions_dir), suffix=".tmp", prefix=".sessions_",
         )
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
@@ -820,7 +820,7 @@ class SessionStore:
 
         policy = self.config.get_reset_policy(
             platform=source.platform,
-            session_type=source.chat_type
+            session_type=source.chat_type,
         )
         
         if policy.mode == "none":
@@ -838,7 +838,7 @@ class SessionStore:
                 hour=policy.at_hour, 
                 minute=0, 
                 second=0, 
-                microsecond=0
+                microsecond=0,
             )
             if now.hour < policy.at_hour:
                 today_reset -= timedelta(days=1)
@@ -873,7 +873,7 @@ class SessionStore:
     def get_or_create_session(
         self,
         source: SessionSource,
-        force_new: bool = False
+        force_new: bool = False,
     ) -> SessionEntry:
         """
         Get an existing session or create a new one.
@@ -1382,7 +1382,7 @@ class SessionStore:
 def build_session_context(
     source: SessionSource,
     config: GatewayConfig,
-    session_entry: SessionEntry | None = None
+    session_entry: SessionEntry | None = None,
 ) -> SessionContext:
     """
     Build a full session context from a source and config.

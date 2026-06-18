@@ -430,7 +430,7 @@ class TestWindowsWmicEncoding:
         monkeypatch.setattr(sys, "platform", "win32")
         with patch("subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                returncode=0, stdout=None, stderr=""
+                returncode=0, stdout=None, stderr="",
             )
             # Must not raise.
             assert _find_stale_dashboard_pids() == []

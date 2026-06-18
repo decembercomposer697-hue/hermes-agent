@@ -151,7 +151,7 @@ def build_turn_context(
                 agent._emit_status(
                     "🔌 Detected stale connections from a previous provider "
                     "issue — cleaned up automatically. Proceeding with fresh "
-                    "connection."
+                    "connection.",
                 )
         except Exception:
             pass
@@ -226,7 +226,7 @@ def build_turn_context(
         _print_preview = summarize_user_message_for_log(user_message)
         agent._safe_print(
             f"💬 Starting conversation: '{_print_preview[:60]}"
-            f"{'...' if len(_print_preview) > 60 else ''}'"
+            f"{'...' if len(_print_preview) > 60 else ''}'",
         )
 
     # ── System prompt (cached per session for prefix caching) ──
@@ -289,7 +289,7 @@ def build_turn_context(
             agent._emit_status(
                 f"📦 Preflight compression: ~{_preflight_tokens:,} tokens "
                 f">= {_compressor.threshold_tokens:,} threshold. "
-                "This may take a moment."
+                "This may take a moment.",
             )
             for _pass in range(3):
                 _orig_len = len(messages)

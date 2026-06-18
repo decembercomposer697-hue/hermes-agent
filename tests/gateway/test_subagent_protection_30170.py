@@ -104,7 +104,7 @@ def _make_adapter() -> MagicMock:
 
 
 def _make_parent_with_subagents(
-    *, children: int = 1, with_lock: bool = True
+    *, children: int = 1, with_lock: bool = True,
 ) -> MagicMock:
     """A MagicMock shaped like an AIAgent that currently owns *children* subagents."""
     parent = MagicMock()
@@ -170,7 +170,7 @@ class TestAgentHasActiveSubagents:
     def test_returns_true_for_many_children(self) -> None:
         assert (
             GatewayRunner._agent_has_active_subagents(
-                _make_parent_with_subagents(children=5)
+                _make_parent_with_subagents(children=5),
             )
             is True
         )
@@ -179,7 +179,7 @@ class TestAgentHasActiveSubagents:
         """``_active_children_lock`` is optional in test stubs."""
         assert (
             GatewayRunner._agent_has_active_subagents(
-                _make_parent_with_subagents(with_lock=False)
+                _make_parent_with_subagents(with_lock=False),
             )
             is True
         )

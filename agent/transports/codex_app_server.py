@@ -107,7 +107,7 @@ class CodexAppServerClient:
                     f'sandbox_workspace_write.writable_roots=["{kanban_root}"]',
                     "-c",
                     "sandbox_workspace_write.network_access=false",
-                ]
+                ],
             )
 
         cmd = [codex_bin, "app-server"] + app_server_args
@@ -211,7 +211,7 @@ class CodexAppServerClient:
             with self._pending_lock:
                 self._pending.pop(rid, None)
             raise TimeoutError(
-                f"codex app-server method {method!r} timed out after {timeout}s"
+                f"codex app-server method {method!r} timed out after {timeout}s",
             )
         if "error" in msg:
             err = msg["error"]
@@ -231,7 +231,7 @@ class CodexAppServerClient:
         self._send({"id": request_id, "result": result})
 
     def respond_error(
-        self, request_id: Any, code: int, message: str, data: Any | None = None
+        self, request_id: Any, code: int, message: str, data: Any | None = None,
     ) -> None:
         """Reply to a server-initiated request with an error."""
         err: dict[str, Any] = {"code": code, "message": message}
@@ -290,7 +290,7 @@ class CodexAppServerClient:
             self._proc.stdin.flush()
         except (BrokenPipeError, ValueError) as exc:
             raise RuntimeError(
-                f"codex app-server stdin closed unexpectedly: {exc}"
+                f"codex app-server stdin closed unexpectedly: {exc}",
             ) from exc
 
     def _read_stdout(self) -> None:
@@ -310,7 +310,7 @@ class CodexAppServerClient:
                     # on stderr. Surface it via stderr buffer for diagnostics.
                     with self._stderr_lock:
                         self._stderr_lines.append(
-                            f"<non-json on stdout> {line[:200]!r}"
+                            f"<non-json on stdout> {line[:200]!r}",
                         )
                     continue
                 self._dispatch(msg)
@@ -346,7 +346,7 @@ class CodexAppServerClient:
                     break
                 with self._stderr_lock:
                     self._stderr_lines.append(
-                        line.decode("utf-8", "replace").rstrip()
+                        line.decode("utf-8", "replace").rstrip(),
                     )
                     # Bound memory: keep last 500 lines.
                     if len(self._stderr_lines) > 500:
@@ -367,7 +367,7 @@ def parse_codex_version(output: str) -> tuple[int, int, int] | None:
 
 
 def check_codex_binary(
-    codex_bin: str = "codex", min_version: tuple[int, int, int] = MIN_CODEX_VERSION
+    codex_bin: str = "codex", min_version: tuple[int, int, int] = MIN_CODEX_VERSION,
 ) -> tuple[bool, str]:
     """Verify codex CLI is installed and meets minimum version.
 

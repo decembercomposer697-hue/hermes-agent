@@ -35,7 +35,7 @@ def container_env(tmp_path, monkeypatch):
         "backend=podman\n"
         "container_name=hermes-agent\n"
         "exec_user=hermes\n"
-        "hermes_bin=/data/current-package/bin/hermes\n"
+        "hermes_bin=/data/current-package/bin/hermes\n",
     )
     return hermes_home
 
@@ -101,7 +101,7 @@ def test_get_container_exec_info_defaults():
         hermes_home = Path(tmpdir) / ".hermes"
         hermes_home.mkdir()
         (hermes_home / ".container-mode").write_text(
-            "# minimal file with no keys\n"
+            "# minimal file with no keys\n",
         )
 
         with patch("hermes_constants.is_container", return_value=False), \
@@ -123,7 +123,7 @@ def test_get_container_exec_info_docker_backend(container_env):
         "backend=docker\n"
         "container_name=hermes-custom\n"
         "exec_user=myuser\n"
-        "hermes_bin=/opt/hermes/bin/hermes\n"
+        "hermes_bin=/opt/hermes/bin/hermes\n",
     )
 
     with patch("hermes_constants.is_container", return_value=False):

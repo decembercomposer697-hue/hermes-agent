@@ -1058,19 +1058,19 @@ class TestBedrockErrorClassification:
     def test_context_overflow_validation_exception(self):
         from agent.bedrock_adapter import classify_bedrock_error
         assert classify_bedrock_error(
-            "ValidationException: input is too long for model"
+            "ValidationException: input is too long for model",
         ) == "context_overflow"
 
     def test_context_overflow_max_tokens(self):
         from agent.bedrock_adapter import classify_bedrock_error
         assert classify_bedrock_error(
-            "ValidationException: exceeds the maximum number of input tokens"
+            "ValidationException: exceeds the maximum number of input tokens",
         ) == "context_overflow"
 
     def test_context_overflow_stream_error(self):
         from agent.bedrock_adapter import classify_bedrock_error
         assert classify_bedrock_error(
-            "ModelStreamErrorException: Input is too long"
+            "ModelStreamErrorException: Input is too long",
         ) == "context_overflow"
 
     def test_rate_limit_throttling(self):

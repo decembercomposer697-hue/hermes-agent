@@ -38,9 +38,9 @@ class TestMSGraphWebhookConfig:
                     "msgraph_webhook": {
                         "enabled": True,
                         "extra": {"client_state": "expected"},
-                    }
-                }
-            }
+                    },
+                },
+            },
         )
 
         assert Platform.MSGRAPH_WEBHOOK in config.platforms
@@ -48,7 +48,7 @@ class TestMSGraphWebhookConfig:
 
     def test_env_overrides_apply_to_existing_msgraph_webhook_platform(self, monkeypatch):
         config = GatewayConfig(
-            platforms={Platform.MSGRAPH_WEBHOOK: PlatformConfig(enabled=True, extra={})}
+            platforms={Platform.MSGRAPH_WEBHOOK: PlatformConfig(enabled=True, extra={})},
         )
 
         monkeypatch.setenv("MSGRAPH_WEBHOOK_PORT", "8650")
@@ -105,7 +105,7 @@ class TestMSGraphValidationHandshake:
     async def test_validation_token_echo_on_get(self):
         adapter = _make_adapter()
         resp = await adapter._handle_validation(
-            _FakeRequest(query={"validationToken": "abc123"})
+            _FakeRequest(query={"validationToken": "abc123"}),
         )
         assert resp.status == 200
         assert resp.text == "abc123"
@@ -123,7 +123,7 @@ class TestMSGraphValidationHandshake:
         """Tolerate defensive clients that send validationToken on POST."""
         adapter = _make_adapter()
         resp = await adapter._handle_notification(
-            _FakeRequest(query={"validationToken": "abc123"})
+            _FakeRequest(query={"validationToken": "abc123"}),
         )
         assert resp.status == 200
         assert resp.text == "abc123"
@@ -140,8 +140,8 @@ class TestMSGraphNotifications:
                     "subscriptionId": "sub-1",
                     "changeType": "updated",
                     "resource": "communications/onlineMeetings/meeting-1",
-                }
-            ]
+                },
+            ],
         }
         resp = await adapter._handle_notification(_FakeRequest(json_payload=payload))
         assert resp.status == 403
@@ -164,8 +164,8 @@ class TestMSGraphNotifications:
                     "resource": "communications/onlineMeetings/meeting-1",
                     "clientState": "expected-client-state",
                     "resourceData": {"id": "meeting-1"},
-                }
-            ]
+                },
+            ],
         }
 
         resp = await adapter._handle_notification(_FakeRequest(json_payload=payload))
@@ -201,8 +201,8 @@ class TestMSGraphNotifications:
                     "changeType": "updated",
                     "resource": "communications/onlineMeetings/meeting-2",
                     "clientState": "wrong-state",
-                }
-            ]
+                },
+            ],
         }
 
         resp = await adapter._handle_notification(_FakeRequest(json_payload=payload))
@@ -225,7 +225,7 @@ class TestMSGraphNotifications:
             return real_compare(a, b)
 
         monkeypatch.setattr(
-            "gateway.platforms.msgraph_webhook.hmac.compare_digest", _spy
+            "gateway.platforms.msgraph_webhook.hmac.compare_digest", _spy,
         )
 
         adapter = _make_adapter()
@@ -237,8 +237,8 @@ class TestMSGraphNotifications:
                     "changeType": "updated",
                     "resource": "communications/onlineMeetings/meeting-x",
                     "clientState": "expected-client-state",
-                }
-            ]
+                },
+            ],
         }
         await adapter._handle_notification(_FakeRequest(json_payload=payload))
 
@@ -264,8 +264,8 @@ class TestMSGraphNotifications:
                     "changeType": "updated",
                     "resource": "communications/onlineMeetings/meeting-3",
                     "clientState": "expected-client-state",
-                }
-            ]
+                },
+            ],
         }
 
         first = await adapter._handle_notification(_FakeRequest(json_payload=payload))
@@ -296,8 +296,8 @@ class TestMSGraphNotifications:
                     "resource": "communications/onlineMeetings/meeting-3",
                     "clientState": "expected-client-state",
                     "resourceData": {"id": "meeting-3"},
-                }
-            ]
+                },
+            ],
         }
 
         first = await adapter._handle_notification(_FakeRequest(json_payload=payload))
@@ -321,8 +321,8 @@ class TestMSGraphNotifications:
                     "changeType": "updated",
                     "resource": "communications/onlineMeetings/meeting-4",
                     "clientState": "expected-client-state",
-                }
-            ]
+                },
+            ],
         }
 
         resp = await adapter._handle_notification(_FakeRequest(json_payload=payload))
@@ -338,8 +338,8 @@ class TestMSGraphNotifications:
                     "id": "notif-bad-resource",
                     "resource": "users/u1/messages",
                     "clientState": "expected-client-state",
-                }
-            ]
+                },
+            ],
         }
         resp = await adapter._handle_notification(_FakeRequest(json_payload=payload))
         assert resp.status == 400
@@ -348,7 +348,7 @@ class TestMSGraphNotifications:
     async def test_malformed_body_returns_400(self):
         adapter = _make_adapter()
         resp = await adapter._handle_notification(
-            _FakeRequest(json_payload=ValueError("bad json"))
+            _FakeRequest(json_payload=ValueError("bad json")),
         )
         assert resp.status == 400
 
@@ -356,7 +356,7 @@ class TestMSGraphNotifications:
     async def test_missing_value_array_returns_400(self):
         adapter = _make_adapter()
         resp = await adapter._handle_notification(
-            _FakeRequest(json_payload={"not_value": []})
+            _FakeRequest(json_payload={"not_value": []}),
         )
         assert resp.status == 400
 
@@ -378,8 +378,8 @@ class TestMSGraphNotifications:
                         "changeType": "updated",
                         "resource": "communications/onlineMeetings/meeting-3",
                         "clientState": "expected-client-state",
-                    }
-                ]
+                    },
+                ],
             }
             return await adapter._handle_notification(_FakeRequest(json_payload=payload))
 
@@ -411,11 +411,11 @@ class TestMSGraphSourceIPAllowlist:
                     "id": "notif-ip",
                     "resource": "communications/onlineMeetings/m",
                     "clientState": "expected-client-state",
-                }
-            ]
+                },
+            ],
         }
         resp = await adapter._handle_notification(
-            _FakeRequest(json_payload=payload, remote="203.0.113.99")
+            _FakeRequest(json_payload=payload, remote="203.0.113.99"),
         )
         assert resp.status == 403
 
@@ -429,11 +429,11 @@ class TestMSGraphSourceIPAllowlist:
                     "id": "notif-ip-local",
                     "resource": "communications/onlineMeetings/m",
                     "clientState": "expected-client-state",
-                }
-            ]
+                },
+            ],
         }
         resp = await adapter._handle_notification(
-            _FakeRequest(json_payload=payload, remote="127.0.0.1")
+            _FakeRequest(json_payload=payload, remote="127.0.0.1"),
         )
         assert resp.status == 202
 
@@ -446,11 +446,11 @@ class TestMSGraphSourceIPAllowlist:
                     "id": "notif-ip-bad",
                     "resource": "communications/onlineMeetings/m",
                     "clientState": "expected-client-state",
-                }
-            ]
+                },
+            ],
         }
         resp = await adapter._handle_notification(
-            _FakeRequest(json_payload=payload, remote="203.0.113.99")
+            _FakeRequest(json_payload=payload, remote="203.0.113.99"),
         )
         assert resp.status == 403
 
@@ -463,11 +463,11 @@ class TestMSGraphSourceIPAllowlist:
                     "id": "notif-ip-ok",
                     "resource": "communications/onlineMeetings/m",
                     "clientState": "expected-client-state",
-                }
-            ]
+                },
+            ],
         }
         resp = await adapter._handle_notification(
-            _FakeRequest(json_payload=payload, remote="203.0.113.5")
+            _FakeRequest(json_payload=payload, remote="203.0.113.5"),
         )
         assert resp.status == 202
 
@@ -476,7 +476,7 @@ class TestMSGraphSourceIPAllowlist:
         """A disallowed IP shouldn't be able to probe the handshake endpoint."""
         adapter = _make_adapter(allowed_source_cidrs=["10.0.0.0/8"])
         resp = await adapter._handle_validation(
-            _FakeRequest(query={"validationToken": "probe"}, remote="203.0.113.99")
+            _FakeRequest(query={"validationToken": "probe"}, remote="203.0.113.99"),
         )
         assert resp.status == 403
 
@@ -491,7 +491,7 @@ class TestMSGraphSourceIPAllowlist:
     async def test_invalid_cidr_entries_are_ignored_at_init(self):
         """Malformed CIDR strings should log a warning and be ignored, not crash."""
         adapter = _make_adapter(
-            allowed_source_cidrs=["10.0.0.0/8", "not-a-cidr", "", "203.0.113.0/24"]
+            allowed_source_cidrs=["10.0.0.0/8", "not-a-cidr", "", "203.0.113.0/24"],
         )
         assert len(adapter._allowed_source_networks) == 2
 

@@ -79,7 +79,7 @@ def chrome_cdp(request):
         try:
             import urllib.request
             with urllib.request.urlopen(
-                f"http://127.0.0.1:{port}/json/version", timeout=1
+                f"http://127.0.0.1:{port}/json/version", timeout=1,
             ) as r:
                 info = json.loads(r.read().decode())
                 ws_url = info["webSocketDebuggerUrl"]
@@ -164,7 +164,7 @@ def _fire_on_page(cdp_url: str, expression: str) -> None:
             targets = (await call("Target.getTargets"))["result"]["targetInfos"]
             page = next(t for t in targets if t.get("type") == "page")
             attach = await call(
-                "Target.attachToTarget", {"targetId": page["targetId"], "flatten": True}
+                "Target.attachToTarget", {"targetId": page["targetId"], "flatten": True},
             )
             sid = attach["result"]["sessionId"]
             await call("Page.navigate", {"url": _test_page_url()}, session_id=sid)
@@ -455,7 +455,7 @@ def test_browser_cdp_frame_id_real_oopif_smoke_documented():
         "Real-OOPIF E2E verified manually with smoke_local_oopif.py and "
         "smoke_bb_iframe_agent_path.py — pytest version hits an asyncio "
         "version quirk between venv (3.11) and standalone (3.13). "
-        "Smoke logs preserved in /tmp/dialog-iframe-test/."
+        "Smoke logs preserved in /tmp/dialog-iframe-test/.",
     )
 
 

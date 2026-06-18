@@ -125,7 +125,7 @@ class TestCreatePairing:
         }
 
         with patch(
-            "hermes_cli.telegram_managed_bot.httpx.post", return_value=mock_resp
+            "hermes_cli.telegram_managed_bot.httpx.post", return_value=mock_resp,
         ) as post:
             pairing = create_pairing("https://api.example.com", bot_name="Hermes Agent")
 
@@ -147,7 +147,7 @@ class TestCreatePairing:
         mock_resp = MagicMock()
         mock_resp.status_code = 500
         with patch(
-            "hermes_cli.telegram_managed_bot.httpx.post", return_value=mock_resp
+            "hermes_cli.telegram_managed_bot.httpx.post", return_value=mock_resp,
         ):
             assert create_pairing("https://api.example.com") is None
 
@@ -156,7 +156,7 @@ class TestCreatePairing:
         mock_resp.status_code = 201
         mock_resp.json.return_value = {"pairing_id": "missing-poll-token"}
         with patch(
-            "hermes_cli.telegram_managed_bot.httpx.post", return_value=mock_resp
+            "hermes_cli.telegram_managed_bot.httpx.post", return_value=mock_resp,
         ):
             assert create_pairing("https://api.example.com") is None
 
@@ -165,7 +165,7 @@ class TestCreatePairing:
         mock_resp = MagicMock()
         mock_resp.status_code = 500
         with patch(
-            "hermes_cli.telegram_managed_bot.httpx.post", return_value=mock_resp
+            "hermes_cli.telegram_managed_bot.httpx.post", return_value=mock_resp,
         ) as post:
             create_pairing()
         assert post.call_args.args[0] == "https://worker.example/v1/telegram/pairings"
@@ -192,11 +192,11 @@ class TestPollForToken:
         }
 
         with patch(
-            "hermes_cli.telegram_managed_bot.httpx.get", return_value=mock_resp
+            "hermes_cli.telegram_managed_bot.httpx.get", return_value=mock_resp,
         ) as get:
             with patch("hermes_cli.telegram_managed_bot.time.sleep"):
                 token = poll_for_token(
-                    "https://api.example.com", self.pairing(), timeout=5
+                    "https://api.example.com", self.pairing(), timeout=5,
                 )
 
         assert token == VALID_TOKEN
@@ -205,7 +205,7 @@ class TestPollForToken:
             == "https://api.example.com/v1/telegram/pairings/abcdefghijklmnop"
         )
         assert get.call_args.kwargs["headers"] == {
-            "Authorization": "Bearer secret-token"
+            "Authorization": "Bearer secret-token",
         }
 
     def test_setup_result_includes_owner_user_id(self):
@@ -221,7 +221,7 @@ class TestPollForToken:
         with patch("hermes_cli.telegram_managed_bot.httpx.get", return_value=mock_resp):
             with patch("hermes_cli.telegram_managed_bot.time.sleep"):
                 result = poll_for_setup_result(
-                    "https://api.example.com", self.pairing(), timeout=5
+                    "https://api.example.com", self.pairing(), timeout=5,
                 )
 
         assert result == TelegramBotSetupResult(
@@ -242,7 +242,7 @@ class TestPollForToken:
 
         with patch("hermes_cli.telegram_managed_bot.httpx.get", return_value=mock_resp):
             result = poll_for_setup_result(
-                "https://api.example.com", self.pairing(), timeout=5
+                "https://api.example.com", self.pairing(), timeout=5,
             )
 
         assert result == TelegramBotSetupResult(
@@ -264,12 +264,12 @@ class TestPollForToken:
         with patch("hermes_cli.telegram_managed_bot.httpx.get", return_value=mock_resp):
             with patch("hermes_cli.telegram_managed_bot.time.sleep"):
                 with patch(
-                    "hermes_cli.telegram_managed_bot.time.monotonic"
+                    "hermes_cli.telegram_managed_bot.time.monotonic",
                 ) as mock_time:
                     mock_time.side_effect = [0, 0, 999]
                     assert (
                         poll_for_token(
-                            "https://api.example.com", self.pairing(), timeout=1
+                            "https://api.example.com", self.pairing(), timeout=1,
                         )
                         is None
                     )
@@ -282,11 +282,11 @@ class TestPollForToken:
         with patch("hermes_cli.telegram_managed_bot.httpx.get", return_value=mock_resp):
             with patch("hermes_cli.telegram_managed_bot.time.sleep"):
                 with patch(
-                    "hermes_cli.telegram_managed_bot.time.monotonic"
+                    "hermes_cli.telegram_managed_bot.time.monotonic",
                 ) as mock_time:
                     mock_time.side_effect = [0, 0, 999]
                     token = poll_for_token(
-                        "https://api.example.com", self.pairing(), timeout=1
+                        "https://api.example.com", self.pairing(), timeout=1,
                     )
                     assert token is None
 
@@ -311,7 +311,7 @@ class TestPollForToken:
         with patch("hermes_cli.telegram_managed_bot.httpx.get", side_effect=fake_get):
             with patch("hermes_cli.telegram_managed_bot.time.sleep"):
                 token = poll_for_token(
-                    "https://api.example.com", self.pairing(), timeout=30
+                    "https://api.example.com", self.pairing(), timeout=30,
                 )
                 assert token == SECOND_VALID_TOKEN
 

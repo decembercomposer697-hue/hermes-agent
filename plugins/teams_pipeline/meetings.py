@@ -219,7 +219,7 @@ async def download_transcript_text(
 
     if not text:
         raise TeamsMeetingArtifactNotFoundError(
-            f"Transcript {transcript.artifact_id} for meeting {meeting_ref.meeting_id} was empty."
+            f"Transcript {transcript.artifact_id} for meeting {meeting_ref.meeting_id} was empty.",
         )
     return text
 

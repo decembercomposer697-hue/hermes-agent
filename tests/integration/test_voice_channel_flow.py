@@ -183,7 +183,7 @@ class TestRealNaClDecrypt:
 
         for seq in range(1, 6):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
 
@@ -228,7 +228,7 @@ class TestRealNaClWithDAVE:
         key = _make_secret_key()
         dave = MagicMock()
         dave.decrypt.side_effect = Exception(
-            "DecryptionFailed(UnencryptedWhenPassthroughDisabled)"
+            "DecryptionFailed(UnencryptedWhenPassthroughDisabled)",
         )
         receiver = _make_voice_receiver(key, dave_session=dave)
         receiver.map_ssrc(100, 42)
@@ -278,12 +278,12 @@ class TestRTPPaddingStrip:
 
         recv_plain = _make_voice_receiver(key)
         recv_plain._on_packet(
-            _build_encrypted_rtp_packet(key, opus_silence, ssrc=100)
+            _build_encrypted_rtp_packet(key, opus_silence, ssrc=100),
         )
 
         recv_padded = _make_voice_receiver(key)
         recv_padded._on_packet(
-            _build_padded_rtp_packet(key, opus_silence, pad_len=7, ssrc=100)
+            _build_padded_rtp_packet(key, opus_silence, pad_len=7, ssrc=100),
         )
 
         assert bytes(recv_plain._buffers[100]) == bytes(recv_padded._buffers[100])
@@ -309,7 +309,7 @@ class TestRTPPaddingStrip:
         receiver = _make_voice_receiver(key)
 
         packet = _build_padded_rtp_packet(
-            key, opus_silence, pad_len=4, declared_pad_len=0, ssrc=100
+            key, opus_silence, pad_len=4, declared_pad_len=0, ssrc=100,
         )
         receiver._on_packet(packet)
 
@@ -322,7 +322,7 @@ class TestRTPPaddingStrip:
         receiver = _make_voice_receiver(key)
 
         packet = _build_padded_rtp_packet(
-            key, opus_silence, pad_len=4, declared_pad_len=255, ssrc=100
+            key, opus_silence, pad_len=4, declared_pad_len=255, ssrc=100,
         )
         receiver._on_packet(packet)
 
@@ -347,14 +347,14 @@ class TestRTPPaddingStrip:
         # Same opus payload sent two ways: plain, and with both ext+padding
         recv_plain = _make_voice_receiver(key)
         recv_plain._on_packet(
-            _build_encrypted_rtp_packet(key, opus_silence, ssrc=100)
+            _build_encrypted_rtp_packet(key, opus_silence, ssrc=100),
         )
 
         recv_ext_pad = _make_voice_receiver(key)
         recv_ext_pad._on_packet(
             _build_padded_rtp_packet(
-                key, opus_silence, pad_len=5, ext_words=2, ssrc=100
-            )
+                key, opus_silence, pad_len=5, ext_words=2, ssrc=100,
+            ),
         )
 
         # Both must yield identical decoded PCM — ext data and padding both
@@ -376,7 +376,7 @@ class TestFullVoiceFlow:
         # Need 96000 bytes = ~25 frames
         for seq in range(1, 30):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
 
@@ -397,13 +397,13 @@ class TestFullVoiceFlow:
             SimpleNamespace(id=42, name="Alice"),
         ]
         receiver = _make_voice_receiver(
-            key, allowed_user_ids={"42"}, members=members
+            key, allowed_user_ids={"42"}, members=members,
         )
         # No map_ssrc call — simulating missing SPEAKING event
 
         for seq in range(1, 30):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
 
@@ -457,7 +457,7 @@ class TestFullVoiceFlow:
 
         for seq in range(1, 10):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
 
@@ -504,7 +504,7 @@ class TestSPEAKINGHook:
 
         for seq in range(1, 30):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
 
@@ -531,7 +531,7 @@ class TestAuthFiltering:
 
         for seq in range(1, 30):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
 
@@ -555,7 +555,7 @@ class TestAuthFiltering:
 
         for seq in range(1, 30):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
 
@@ -576,7 +576,7 @@ class TestAuthFiltering:
 
         for seq in range(1, 30):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
 
@@ -598,7 +598,7 @@ class TestRejoinFlow:
 
         for seq in range(1, 10):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver1._on_packet(packet)
 
@@ -623,7 +623,7 @@ class TestRejoinFlow:
 
         for seq in range(1, 30):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=200, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=200, seq=seq, timestamp=960 * seq,
             )
             receiver2._on_packet(packet)
 
@@ -655,7 +655,7 @@ class TestRejoinFlow:
 
         for seq in range(1, 30):
             packet = _build_encrypted_rtp_packet(
-                new_key, b'\xf8\xff\xfe', ssrc=300, seq=seq, timestamp=960 * seq
+                new_key, b'\xf8\xff\xfe', ssrc=300, seq=seq, timestamp=960 * seq,
             )
             receiver2._on_packet(packet)
 
@@ -682,7 +682,7 @@ class TestMultiGuildIsolation:
         # Send to receiver1
         for seq in range(1, 10):
             packet = _build_encrypted_rtp_packet(
-                key1, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key1, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver1._on_packet(packet)
 
@@ -703,7 +703,7 @@ class TestMultiGuildIsolation:
 
         for seq in range(1, 10):
             packet = _build_encrypted_rtp_packet(
-                key2, b'\xf8\xff\xfe', ssrc=200, seq=seq, timestamp=960 * seq
+                key2, b'\xf8\xff\xfe', ssrc=200, seq=seq, timestamp=960 * seq,
             )
             receiver2._on_packet(packet)
 
@@ -726,7 +726,7 @@ class TestEchoPreventionFlow:
 
         for seq in range(1, 30):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
 
@@ -742,7 +742,7 @@ class TestEchoPreventionFlow:
         receiver.pause()
         for seq in range(1, 5):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
         assert len(receiver._buffers.get(100, b"")) == 0
@@ -750,7 +750,7 @@ class TestEchoPreventionFlow:
         receiver.resume()
         for seq in range(5, 35):
             packet = _build_encrypted_rtp_packet(
-                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq
+                key, b'\xf8\xff\xfe', ssrc=100, seq=seq, timestamp=960 * seq,
             )
             receiver._on_packet(packet)
 

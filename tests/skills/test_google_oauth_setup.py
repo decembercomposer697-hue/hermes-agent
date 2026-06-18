@@ -126,7 +126,7 @@ def setup_module(monkeypatch, tmp_path):
             "client_secret": "client-secret",
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
-        }
+        },
     }
     module.CLIENT_SECRET_PATH.write_text(json.dumps(client_secret))
     return module
@@ -151,7 +151,7 @@ class TestGetAuthUrl:
 class TestExchangeAuthCode:
     def test_reuses_saved_pkce_material_for_plain_code(self, setup_module):
         setup_module.PENDING_AUTH_PATH.write_text(
-            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"})
+            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"}),
         )
 
         setup_module.exchange_auth_code("4/test-auth-code")
@@ -167,11 +167,11 @@ class TestExchangeAuthCode:
 
     def test_extracts_code_from_redirect_url_and_checks_state(self, setup_module):
         setup_module.PENDING_AUTH_PATH.write_text(
-            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"})
+            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"}),
         )
 
         setup_module.exchange_auth_code(
-            "http://localhost:1/?code=4/extracted-code&state=saved-state&scope=gmail"
+            "http://localhost:1/?code=4/extracted-code&state=saved-state&scope=gmail",
         )
 
         flow = FakeFlow.created[-1]
@@ -180,7 +180,7 @@ class TestExchangeAuthCode:
     def test_passes_scopes_from_redirect_url_to_flow(self, setup_module):
         """Callback URL carries space-delimited scope list; Flow must receive it (not full SCOPES)."""
         setup_module.PENDING_AUTH_PATH.write_text(
-            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"})
+            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"}),
         )
         g1 = "https://www.googleapis.com/auth/gmail.readonly"
         g2 = "https://www.googleapis.com/auth/calendar"
@@ -188,19 +188,19 @@ class TestExchangeAuthCode:
 
         scope_q = quote(f"{g1} {g2}", safe="")
         setup_module.exchange_auth_code(
-            f"http://localhost:1/?code=4/extracted-code&state=saved-state&scope={scope_q}"
+            f"http://localhost:1/?code=4/extracted-code&state=saved-state&scope={scope_q}",
         )
         flow = FakeFlow.created[-1]
         assert flow.scopes == [g1, g2]
 
     def test_rejects_state_mismatch(self, setup_module, capsys):
         setup_module.PENDING_AUTH_PATH.write_text(
-            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"})
+            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"}),
         )
 
         with pytest.raises(SystemExit):
             setup_module.exchange_auth_code(
-                "http://localhost:1/?code=4/extracted-code&state=wrong-state"
+                "http://localhost:1/?code=4/extracted-code&state=wrong-state",
             )
 
         out = capsys.readouterr().out
@@ -217,7 +217,7 @@ class TestExchangeAuthCode:
 
     def test_keeps_pending_auth_session_when_exchange_fails(self, setup_module, capsys):
         setup_module.PENDING_AUTH_PATH.write_text(
-            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"})
+            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"}),
         )
         FakeFlow.fetch_error = Exception("invalid_grant: Missing code verifier")
 
@@ -232,7 +232,7 @@ class TestExchangeAuthCode:
     def test_accepts_narrower_scopes_with_warning(self, setup_module, capsys):
         """Partial scopes are accepted with a warning (gws migration: v2.0)."""
         setup_module.PENDING_AUTH_PATH.write_text(
-            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"})
+            json.dumps({"state": "saved-state", "code_verifier": "saved-verifier"}),
         )
         setup_module.TOKEN_PATH.write_text(json.dumps({"token": "***", "scopes": setup_module.SCOPES}))
         FakeFlow.credentials_payload = {
@@ -314,7 +314,7 @@ class TestHermesConstantsFallback:
     def test_delegates_to_hermes_constants_when_available(self):
         """When hermes_constants IS importable, _hermes_home delegates to it."""
         spec = importlib.util.spec_from_file_location(
-            "_hermes_home_happy", self.HELPER_PATH
+            "_hermes_home_happy", self.HELPER_PATH,
         )
         module = importlib.util.module_from_spec(spec)
         assert spec.loader is not None
@@ -327,7 +327,7 @@ class TestHermesConstantsFallback:
 def _load_setup_module(monkeypatch):
     """Load setup.py without stubbing _ensure_deps (for install_deps tests)."""
     spec = importlib.util.spec_from_file_location(
-        "google_workspace_setup_installdeps_test", SCRIPT_PATH
+        "google_workspace_setup_installdeps_test", SCRIPT_PATH,
     )
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -357,7 +357,7 @@ class TestInstallDeps:
         # against any subprocess being spawned.
         calls = []
         monkeypatch.setattr(
-            module.subprocess, "check_call", lambda *a, **k: calls.append(a)
+            module.subprocess, "check_call", lambda *a, **k: calls.append(a),
         )
         # google_auth_oauthlib may not be installed in the test env; only run
         # this assertion when the early-return path is actually reachable.
@@ -384,7 +384,7 @@ class TestInstallDeps:
         which_calls = []
         monkeypatch.setattr(module.subprocess, "check_call", fake_check_call)
         monkeypatch.setattr(
-            module.shutil, "which", lambda name: which_calls.append(name)
+            module.shutil, "which", lambda name: which_calls.append(name),
         )
 
         assert module.install_deps() is True

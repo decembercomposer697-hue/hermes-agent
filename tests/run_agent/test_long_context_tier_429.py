@@ -85,10 +85,10 @@ class TestLongContextTierDetection:
     def test_rejects_partial_match(self):
         """Both 'extra usage' AND 'long context' must be present."""
         assert not self._is_long_context_tier_error(
-            429, "extra usage required"
+            429, "extra usage required",
         )
         assert not self._is_long_context_tier_error(
-            429, "long context requests not supported"
+            429, "long context requests not supported",
         )
 
 

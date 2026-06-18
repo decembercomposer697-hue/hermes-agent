@@ -368,7 +368,7 @@ def main():
     MIN_TOTAL = 1500
     if len(deduped) < MIN_TOTAL:
         health_errors.append(
-            f"  total: {len(deduped)} < expected floor {MIN_TOTAL}"
+            f"  total: {len(deduped)} < expected floor {MIN_TOTAL}",
         )
 
     if health_errors:

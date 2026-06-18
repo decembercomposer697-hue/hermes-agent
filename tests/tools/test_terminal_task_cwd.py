@@ -69,7 +69,7 @@ def test_explicit_workdir_still_wins_over_registered_task_cwd(monkeypatch):
             command="pwd",
             task_id=task_id,
             workdir="/explicit/workdir",
-        )
+        ),
     )
 
     assert result["exit_code"] == 0
@@ -145,7 +145,7 @@ def test_background_command_prefers_live_env_cwd_over_init_time_cwd(monkeypatch)
             command="sleep 1",
             task_id=task_id,
             background=True,
-        )
+        ),
     )
 
     assert result["exit_code"] == 0
@@ -186,7 +186,7 @@ def test_registering_cwd_override_updates_live_env_cwd(monkeypatch):
 
     # A subsequent command resolves to the new cwd (env.cwd precedence).
     assert terminal_tool._resolve_command_cwd(
-        workdir=None, env=fake_env, default_cwd="/workspace/config"
+        workdir=None, env=fake_env, default_cwd="/workspace/config",
     ) == "/workspace/new"
 
 

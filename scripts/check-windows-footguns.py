@@ -148,7 +148,7 @@ FOOTGUNS: list[Footgun] = [
         # explicit builtins-style open() call.  Path.open() is rare in the
         # codebase compared to open() and can be audited separately.
         pattern=re.compile(
-            r"""(?:^|[\s\(,;=])(?<![.\w])open\s*\(\s*[^,)]+\s*(?:,\s*['"](?P<mode>[^'"]*)['"])?"""
+            r"""(?:^|[\s\(,;=])(?<![.\w])open\s*\(\s*[^,)]+\s*(?:,\s*['"](?P<mode>[^'"]*)['"])?""",
         ),
         message=(
             "open() without an explicit encoding= uses the platform default "
@@ -249,7 +249,7 @@ FOOTGUNS: list[Footgun] = [
     Footgun(
         name="bare signal.SIGHUP / SIGUSR1 / SIGUSR2 / SIGALRM / SIGCHLD / SIGPIPE / SIGQUIT",
         pattern=re.compile(
-            r"\bsignal\.(?:SIGHUP|SIGUSR1|SIGUSR2|SIGALRM|SIGCHLD|SIGPIPE|SIGQUIT)\b"
+            r"\bsignal\.(?:SIGHUP|SIGUSR1|SIGUSR2|SIGALRM|SIGCHLD|SIGPIPE|SIGQUIT)\b",
         ),
         message=(
             "These POSIX signals don't exist on Windows; referencing "
@@ -263,7 +263,7 @@ FOOTGUNS: list[Footgun] = [
     Footgun(
         name="subprocess shebang script invocation",
         pattern=re.compile(
-            r"subprocess\.(?:run|Popen|call|check_output|check_call)\s*\(\s*\[\s*['\"]\./"
+            r"subprocess\.(?:run|Popen|call|check_output|check_call)\s*\(\s*\[\s*['\"]\./",
         ),
         message=(
             "Running a script via './scriptname' doesn't work on Windows — "
@@ -278,7 +278,7 @@ FOOTGUNS: list[Footgun] = [
         # shutil.which("wmic") guard pattern itself. Looks for wmic in a
         # list or as first arg of subprocess.run/Popen.
         pattern=re.compile(
-            r"""(?:subprocess\.\w+\s*\(\s*\[\s*['"]wmic['"]|['"]wmic\.exe['"])"""
+            r"""(?:subprocess\.\w+\s*\(\s*\[\s*['"]wmic['"]|['"]wmic\.exe['"])""",
         ),
         message=(
             "wmic was removed in Windows 10 21H1 and later. Always "
@@ -296,7 +296,7 @@ FOOTGUNS: list[Footgun] = [
     Footgun(
         name="hardcoded ~/Desktop (OneDrive trap)",
         pattern=re.compile(
-            r"""['"](?:~|~/|[A-Z]:[/\\]Users[/\\][^/\\'"]+[/\\])Desktop\b"""
+            r"""['"](?:~|~/|[A-Z]:[/\\]Users[/\\][^/\\'"]+[/\\])Desktop\b""",
         ),
         message=(
             "When OneDrive Backup is enabled on Windows, the real Desktop "
@@ -515,7 +515,7 @@ def get_diff_files(ref: str) -> list[Path]:
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="Flag Windows cross-platform footguns in Python code."
+        description="Flag Windows cross-platform footguns in Python code.",
     )
     p.add_argument(
         "paths",
@@ -623,7 +623,7 @@ def main(argv: list[str]) -> int:
         return 1
 
     print(
-        f"✓ No Windows footguns found ({files_scanned} file(s) scanned)."
+        f"✓ No Windows footguns found ({files_scanned} file(s) scanned).",
     )
     return 0
 

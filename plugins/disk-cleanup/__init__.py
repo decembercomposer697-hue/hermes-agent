@@ -184,7 +184,7 @@ def _on_session_end(
     if summary["deleted"] or summary["empty_dirs"]:
         dg._log(
             f"AUTO_QUICK (session_end): deleted={summary['deleted']} "
-            f"dirs={summary['empty_dirs']} freed={dg.fmt_size(summary['freed'])}"
+            f"dirs={summary['empty_dirs']} freed={dg.fmt_size(summary['freed'])}",
         )
 
 
@@ -241,12 +241,12 @@ def _handle_slash(raw_args: str) -> str | None:
         for item in auto:
             lines.append(f"    [{item['category']}] {item['path']}")
         lines.append(
-            f"  Needs prompt: {len(prompt)} files ({dg.fmt_size(prompt_size)})"
+            f"  Needs prompt: {len(prompt)} files ({dg.fmt_size(prompt_size)})",
         )
         for item in prompt:
             lines.append(f"    [{item['category']}] {item['path']}")
         lines.append(
-            f"\n  Total potential: {dg.fmt_size(auto_size + prompt_size)}"
+            f"\n  Total potential: {dg.fmt_size(auto_size + prompt_size)}",
         )
         return "\n".join(lines)
 
@@ -263,13 +263,13 @@ def _handle_slash(raw_args: str) -> str | None:
             size = sum(i["size"] for i in prompt_items)
             lines.append(
                 f"\n{len(prompt_items)} item(s) need confirmation "
-                f"({dg.fmt_size(size)}):"
+                f"({dg.fmt_size(size)}):",
             )
             for item in prompt_items:
                 lines.append(f"  [{item['category']}] {item['path']}")
             lines.append(
                 "\nRun `/disk-cleanup forget <path>` to skip, or delete "
-                "manually via terminal."
+                "manually via terminal.",
             )
         return "\n".join(lines)
 

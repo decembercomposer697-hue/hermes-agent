@@ -82,7 +82,7 @@ def fetch(
                     "status": entry[idx["statuscode"]] if "statuscode" in idx else "",
                     "digest": entry[idx["digest"]] if "digest" in idx else "",
                     "length": entry[idx["length"]] if "length" in idx else "",
-                }
+                },
             )
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)

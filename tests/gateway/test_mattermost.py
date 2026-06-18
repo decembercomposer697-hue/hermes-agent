@@ -478,7 +478,7 @@ class TestMattermostMentionBehavior:
         with patch.dict(os.environ, {}, clear=False):
             os.environ.pop("MATTERMOST_REQUIRE_MENTION", None)
             await self.adapter._handle_ws_event(
-                self._make_event("@hermes-bot what is 2+2")
+                self._make_event("@hermes-bot what is 2+2"),
             )
             assert self.adapter.handle_message.called
             msg = self.adapter.handle_message.call_args[0][0]
@@ -511,7 +511,7 @@ class TestMattermostFileUpload:
         mock_upload_resp = AsyncMock()
         mock_upload_resp.status = 200
         mock_upload_resp.json = AsyncMock(return_value={
-            "file_infos": [{"id": "file_abc123"}]
+            "file_infos": [{"id": "file_abc123"}],
         })
         mock_upload_resp.text = AsyncMock(return_value="")
         mock_upload_resp.__aenter__ = AsyncMock(return_value=mock_upload_resp)
@@ -539,7 +539,7 @@ class TestMattermostFileUpload:
         self.adapter._session.post = MagicMock(side_effect=post_side_effect)
 
         result = await self.adapter.send_image(
-            "channel_1", "https://img.example.com/cat.png", caption="A cat"
+            "channel_1", "https://img.example.com/cat.png", caption="A cat",
         )
 
         assert result.success is True

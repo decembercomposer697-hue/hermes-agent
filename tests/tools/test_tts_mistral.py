@@ -38,7 +38,7 @@ class TestGenerateMistralTts:
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
         audio_content = b"fake-audio-bytes"
         mock_mistral_module.audio.speech.complete.return_value = MagicMock(
-            audio_data=base64.b64encode(audio_content).decode()
+            audio_data=base64.b64encode(audio_content).decode(),
         )
 
         output_path = str(tmp_path / "test.mp3")
@@ -57,13 +57,13 @@ class TestGenerateMistralTts:
         [(".ogg", "opus"), (".wav", "wav"), (".flac", "flac"), (".mp3", "mp3")],
     )
     def test_response_format_from_extension(
-        self, tmp_path, mock_mistral_module, monkeypatch, extension, expected_format
+        self, tmp_path, mock_mistral_module, monkeypatch, extension, expected_format,
     ):
         from tools.tts_tool import _generate_mistral_tts
 
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
         mock_mistral_module.audio.speech.complete.return_value = MagicMock(
-            audio_data=base64.b64encode(b"data").decode()
+            audio_data=base64.b64encode(b"data").decode(),
         )
 
         output_path = str(tmp_path / f"test{extension}")
@@ -73,13 +73,13 @@ class TestGenerateMistralTts:
         assert call_kwargs["response_format"] == expected_format
 
     def test_voice_id_passed_when_configured(
-        self, tmp_path, mock_mistral_module, monkeypatch
+        self, tmp_path, mock_mistral_module, monkeypatch,
     ):
         from tools.tts_tool import _generate_mistral_tts
 
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
         mock_mistral_module.audio.speech.complete.return_value = MagicMock(
-            audio_data=base64.b64encode(b"data").decode()
+            audio_data=base64.b64encode(b"data").decode(),
         )
 
         config = {"mistral": {"voice_id": "my-voice-uuid"}}
@@ -89,13 +89,13 @@ class TestGenerateMistralTts:
         assert call_kwargs["voice_id"] == "my-voice-uuid"
 
     def test_default_voice_id_when_absent(
-        self, tmp_path, mock_mistral_module, monkeypatch
+        self, tmp_path, mock_mistral_module, monkeypatch,
     ):
         from tools.tts_tool import DEFAULT_MISTRAL_TTS_VOICE_ID, _generate_mistral_tts
 
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
         mock_mistral_module.audio.speech.complete.return_value = MagicMock(
-            audio_data=base64.b64encode(b"data").decode()
+            audio_data=base64.b64encode(b"data").decode(),
         )
 
         _generate_mistral_tts("Hi", str(tmp_path / "test.mp3"), {})
@@ -104,13 +104,13 @@ class TestGenerateMistralTts:
         assert call_kwargs["voice_id"] == DEFAULT_MISTRAL_TTS_VOICE_ID
 
     def test_default_voice_id_when_empty_string(
-        self, tmp_path, mock_mistral_module, monkeypatch
+        self, tmp_path, mock_mistral_module, monkeypatch,
     ):
         from tools.tts_tool import DEFAULT_MISTRAL_TTS_VOICE_ID, _generate_mistral_tts
 
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
         mock_mistral_module.audio.speech.complete.return_value = MagicMock(
-            audio_data=base64.b64encode(b"data").decode()
+            audio_data=base64.b64encode(b"data").decode(),
         )
 
         config = {"mistral": {"voice_id": ""}}
@@ -124,7 +124,7 @@ class TestGenerateMistralTts:
 
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
         mock_mistral_module.audio.speech.complete.side_effect = RuntimeError(
-            "secret-key-in-error"
+            "secret-key-in-error",
         )
 
         with pytest.raises(RuntimeError, match="RuntimeError") as exc_info:
@@ -136,7 +136,7 @@ class TestGenerateMistralTts:
 
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
         mock_mistral_module.audio.speech.complete.return_value = MagicMock(
-            audio_data=base64.b64encode(b"data").decode()
+            audio_data=base64.b64encode(b"data").decode(),
         )
 
         _generate_mistral_tts("Hi", str(tmp_path / "test.mp3"), {})
@@ -145,13 +145,13 @@ class TestGenerateMistralTts:
         assert call_kwargs["model"] == DEFAULT_MISTRAL_TTS_MODEL
 
     def test_model_from_config_overrides_default(
-        self, tmp_path, mock_mistral_module, monkeypatch
+        self, tmp_path, mock_mistral_module, monkeypatch,
     ):
         from tools.tts_tool import _generate_mistral_tts
 
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
         mock_mistral_module.audio.speech.complete.return_value = MagicMock(
-            audio_data=base64.b64encode(b"data").decode()
+            audio_data=base64.b64encode(b"data").decode(),
         )
 
         config = {"mistral": {"model": "voxtral-large-tts-9999"}}
@@ -163,7 +163,7 @@ class TestGenerateMistralTts:
 
 class TestTtsDispatcherMistral:
     def test_dispatcher_routes_to_mistral(
-        self, tmp_path, mock_mistral_module, monkeypatch
+        self, tmp_path, mock_mistral_module, monkeypatch,
     ):
         import json
 
@@ -171,7 +171,7 @@ class TestTtsDispatcherMistral:
 
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
         mock_mistral_module.audio.speech.complete.return_value = MagicMock(
-            audio_data=base64.b64encode(b"audio").decode()
+            audio_data=base64.b64encode(b"audio").decode(),
         )
 
         output_path = str(tmp_path / "out.mp3")
@@ -189,10 +189,10 @@ class TestTtsDispatcherMistral:
 
         monkeypatch.setenv("MISTRAL_API_KEY", "test-key")
         with patch(
-            "tools.tts_tool._import_mistral_client", side_effect=ImportError("no module")
+            "tools.tts_tool._import_mistral_client", side_effect=ImportError("no module"),
         ), patch("tools.tts_tool._load_tts_config", return_value={"provider": "mistral"}):
             result = json.loads(
-                text_to_speech_tool("Hello", output_path=str(tmp_path / "out.mp3"))
+                text_to_speech_tool("Hello", output_path=str(tmp_path / "out.mp3")),
             )
 
         assert result["success"] is False

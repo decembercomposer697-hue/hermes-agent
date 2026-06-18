@@ -25,10 +25,10 @@ class TestCmdSetupNonTtyGuard:
         """Non-TTY with no flags → exit 1 with missing flags listed."""
         monkeypatch.setattr("sys.stdin.isatty", lambda: False)
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli.bw.find_bws", lambda install_if_missing=False: "/usr/bin/bws"
+            "hermes_cli.secrets_cli.bw.find_bws", lambda install_if_missing=False: "/usr/bin/bws",
         )
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0"
+            "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0",
         )
 
         from hermes_cli.secrets_cli import cmd_setup
@@ -45,10 +45,10 @@ class TestCmdSetupNonTtyGuard:
         """Non-TTY with server-url and project-id but no token → reports --access-token."""
         monkeypatch.setattr("sys.stdin.isatty", lambda: False)
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli.bw.find_bws", lambda install_if_missing=False: "/usr/bin/bws"
+            "hermes_cli.secrets_cli.bw.find_bws", lambda install_if_missing=False: "/usr/bin/bws",
         )
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0"
+            "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0",
         )
 
         from hermes_cli.secrets_cli import cmd_setup
@@ -74,10 +74,10 @@ class TestCmdSetupNonTtyGuard:
         monkeypatch.setattr("sys.stdin.isatty", lambda: False)
         monkeypatch.setenv("BWS_SERVER_URL", "https://vault.bitwarden.com")
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli.bw.find_bws", lambda install_if_missing=False: "/usr/bin/bws"
+            "hermes_cli.secrets_cli.bw.find_bws", lambda install_if_missing=False: "/usr/bin/bws",
         )
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0"
+            "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0",
         )
         monkeypatch.setattr("hermes_cli.secrets_cli.load_config", lambda: {})
         monkeypatch.setattr("hermes_cli.secrets_cli.save_env_value", lambda *a: None)
@@ -99,10 +99,10 @@ class TestCmdSetupNonTtyGuard:
         """Non-TTY with all three flags → guard passes, proceeds to setup."""
         monkeypatch.setattr("sys.stdin.isatty", lambda: False)
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli.bw.find_bws", lambda install_if_missing=False: "/usr/bin/bws"
+            "hermes_cli.secrets_cli.bw.find_bws", lambda install_if_missing=False: "/usr/bin/bws",
         )
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0"
+            "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0",
         )
         monkeypatch.setattr("hermes_cli.secrets_cli.load_config", lambda: {})
         monkeypatch.setattr("hermes_cli.secrets_cli.save_env_value", lambda *a: None)
@@ -125,13 +125,13 @@ class TestCmdSetupNonTtyGuard:
         """With TTY, the guard should not trigger (interactive mode allowed)."""
         monkeypatch.setattr("sys.stdin.isatty", lambda: True)
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli.bw.find_bws", lambda install_if_missing=False: "/usr/bin/bws"
+            "hermes_cli.secrets_cli.bw.find_bws", lambda install_if_missing=False: "/usr/bin/bws",
         )
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0"
+            "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0",
         )
         monkeypatch.setattr(
-            "hermes_cli.secrets_cli.masked_secret_prompt", lambda prompt: "0.valid-token"
+            "hermes_cli.secrets_cli.masked_secret_prompt", lambda prompt: "0.valid-token",
         )
         monkeypatch.setattr("hermes_cli.secrets_cli.load_config", lambda: {})
         monkeypatch.setattr("hermes_cli.secrets_cli.save_env_value", lambda *a: None)

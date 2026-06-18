@@ -268,7 +268,7 @@ class TestCacheDiscordDocument:
         att = _make_attachment_without_read()  # no .read → forces fallback
 
         with patch(
-            "plugins.platforms.discord.adapter.is_safe_url", return_value=False
+            "plugins.platforms.discord.adapter.is_safe_url", return_value=False,
         ) as mock_safe, patch("aiohttp.ClientSession") as mock_session:
             with pytest.raises(ValueError, match="SSRF"):
                 await adapter._cache_discord_document(att, ".pdf")
@@ -296,7 +296,7 @@ class TestCacheDiscordDocument:
         session.__aexit__ = AsyncMock(return_value=False)
 
         with patch(
-            "plugins.platforms.discord.adapter.is_safe_url", return_value=True
+            "plugins.platforms.discord.adapter.is_safe_url", return_value=True,
         ), patch("aiohttp.ClientSession", return_value=session):
             result = await adapter._cache_discord_document(att, ".pdf")
 

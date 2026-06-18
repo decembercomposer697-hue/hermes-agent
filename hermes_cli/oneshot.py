@@ -79,7 +79,7 @@ def _validate_explicit_toolsets(toolsets: object = None) -> tuple[list[str] | No
         if ignored:
             sys.stderr.write(
                 "hermes -z: --toolsets all enables every toolset; "
-                f"ignoring additional entries: {', '.join(ignored)}\n"
+                f"ignoring additional entries: {', '.join(ignored)}\n",
             )
         return None, None
 
@@ -113,7 +113,7 @@ def _validate_explicit_toolsets(toolsets: object = None) -> tuple[list[str] | No
     if disabled:
         sys.stderr.write(
             "hermes -z: ignoring disabled MCP servers (set enabled: true in config.yaml to use): "
-            f"{', '.join(disabled)}\n"
+            f"{', '.join(disabled)}\n",
         )
 
     if not valid:
@@ -156,7 +156,7 @@ def run_oneshot(
     if provider and not ((model or "").strip() or env_model_early):
         sys.stderr.write(
             "hermes -z: --provider requires --model (or HERMES_INFERENCE_MODEL). "
-            "Pass both explicitly, or neither to use your configured defaults.\n"
+            "Pass both explicitly, or neither to use your configured defaults.\n",
         )
         return 2
 

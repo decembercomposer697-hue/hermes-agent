@@ -357,7 +357,7 @@ ACTIVE_SESSION_BYPASS_COMMANDS: frozenset[str] = frozenset(
         "stop",
         "update",
         "version",
-    }
+    },
 )
 
 
@@ -1495,7 +1495,7 @@ class SlashCommandCompleter(Completer):
                 filename = os.path.basename(fp)
                 kind = "folder" if is_dir else "file"
                 meta = "dir" if is_dir else _file_size_label(
-                    os.path.join(os.getcwd(), fp)
+                    os.path.join(os.getcwd(), fp),
                 )
                 yield Completion(
                     f"@{kind}:{fp}",
@@ -1518,7 +1518,7 @@ class SlashCommandCompleter(Completer):
             filename = os.path.basename(fp)
             kind = "folder" if is_dir else "file"
             meta = "dir" if is_dir else _file_size_label(
-                os.path.join(os.getcwd(), fp)
+                os.path.join(os.getcwd(), fp),
             )
             yield Completion(
                 f"@{kind}:{fp}",

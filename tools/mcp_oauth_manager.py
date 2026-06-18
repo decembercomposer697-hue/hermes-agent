@@ -211,7 +211,7 @@ def _make_hermes_provider_class() -> type | None:
             async with httpx.AsyncClient(timeout=10.0) as client:
                 # Step 1: PRM discovery to learn the authorization_server URL.
                 for url in build_protected_resource_metadata_discovery_urls(
-                    None, server_url
+                    None, server_url,
                 ):
                     req = create_oauth_metadata_request(url)
                     try:
@@ -227,14 +227,14 @@ def _make_hermes_provider_class() -> type | None:
                         self.context.protected_resource_metadata = prm
                         if prm.authorization_servers:
                             self.context.auth_server_url = str(
-                                prm.authorization_servers[0]
+                                prm.authorization_servers[0],
                             )
                         break
 
                 # Step 2: ASM discovery against the auth_server_url (or
                 # server_url fallback for legacy providers).
                 for url in build_oauth_authorization_server_metadata_discovery_urls(
-                    self.context.auth_server_url, server_url
+                    self.context.auth_server_url, server_url,
                 ):
                     req = create_oauth_metadata_request(url)
                     try:
@@ -290,7 +290,7 @@ def _make_hermes_provider_class() -> type | None:
             # whatever state the SDK already has.
             try:
                 await get_manager().invalidate_if_disk_changed(
-                    self._hermes_server_name
+                    self._hermes_server_name,
                 )
             except Exception as exc:  # pragma: no cover — defensive
                 logger.debug(
@@ -538,7 +538,7 @@ class MCPOAuthManager:
                     try:
                         # Step 1: Did disk change? Picks up external refresh.
                         disk_changed = await self.invalidate_if_disk_changed(
-                            server_name
+                            server_name,
                         )
                         if disk_changed:
                             if not pending.done():

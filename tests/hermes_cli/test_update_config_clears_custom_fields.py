@@ -41,10 +41,10 @@ def _seed_custom_provider_config(api_mode: str = "anthropic_messages") -> None:
                     "api_key": "mxp-stale-key",
                     "api_mode": api_mode,
                     "default": "claude-sonnet-4-6",
-                }
+                },
             },
             sort_keys=False,
-        )
+        ),
     )
 
 

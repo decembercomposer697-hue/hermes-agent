@@ -188,7 +188,7 @@ class TestBaseUrlLeak:
         still have the fallback base_url, not the primary's."""
         agent = _make_agent(
             provider="openai-codex",
-            base_url="https://chatgpt.com/backend-api/codex"
+            base_url="https://chatgpt.com/backend-api/codex",
         )
 
         # Simulate what _try_activate_fallback does:

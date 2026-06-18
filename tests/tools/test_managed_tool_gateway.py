@@ -89,8 +89,8 @@ def test_read_nous_access_token_refreshes_expiring_cached_token(tmp_path, monkey
                 "access_token": "stale-token",
                 "refresh_token": "refresh-token",
                 "expires_at": expires_at,
-            }
-        }
+            },
+        },
     }))
     monkeypatch.setattr(
         "hermes_cli.auth.resolve_nous_access_token",
@@ -110,8 +110,8 @@ def test_is_managed_tool_gateway_ready_skips_refresh_for_expired_cached_token(tm
                 "access_token": "expired-token",
                 "refresh_token": "refresh-token",
                 "expires_at": expired_at,
-            }
-        }
+            },
+        },
     }))
     refresh_calls = []
 

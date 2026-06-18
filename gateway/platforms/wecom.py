@@ -157,7 +157,7 @@ class WeComAdapter(BasePlatformAdapter):
         self._ws_url = str(
             extra.get("websocket_url")
             or extra.get("websocketUrl")
-            or os.getenv("WECOM_WEBSOCKET_URL", DEFAULT_WS_URL)
+            or os.getenv("WECOM_WEBSOCKET_URL", DEFAULT_WS_URL),
         ).strip() or DEFAULT_WS_URL
 
         self._dm_policy = str(extra.get("dm_policy") or os.getenv("WECOM_DM_POLICY", "open")).strip().lower()
@@ -168,7 +168,7 @@ class WeComAdapter(BasePlatformAdapter):
         self._allow_from = _coerce_list(
             extra.get("allow_from")
             or extra.get("allowFrom")
-            or os.getenv("WECOM_ALLOWED_USERS", "")
+            or os.getenv("WECOM_ALLOWED_USERS", ""),
         )
 
         self._group_policy = str(extra.get("group_policy") or os.getenv("WECOM_GROUP_POLICY", "open")).strip().lower()
@@ -298,7 +298,7 @@ class WeComAdapter(BasePlatformAdapter):
                     "secret": self._secret,
                     "device_id": self._device_id,
                 },
-            }
+            },
         )
 
         auth_payload = await self._wait_for_handshake(req_id)
@@ -385,7 +385,7 @@ class WeComAdapter(BasePlatformAdapter):
                             "cmd": APP_CMD_PING,
                             "headers": {"req_id": self._new_req_id("ping")},
                             "body": {},
-                        }
+                        },
                     )
                 except Exception as exc:
                     logger.debug("[%s] Heartbeat send failed: %s", self.name, exc)
@@ -458,7 +458,7 @@ class WeComAdapter(BasePlatformAdapter):
         self._pending_responses[normalized_req_id] = future
         try:
             await self._send_json(
-                {"cmd": cmd, "headers": {"req_id": normalized_req_id}, "body": body}
+                {"cmd": cmd, "headers": {"req_id": normalized_req_id}, "body": body},
             )
             response = await asyncio.wait_for(future, timeout=timeout)
             return response
@@ -606,7 +606,7 @@ class WeComAdapter(BasePlatformAdapter):
         if prior_task and not prior_task.done():
             prior_task.cancel()
         self._pending_text_batch_tasks[key] = asyncio.create_task(
-            self._flush_text_batch(key)
+            self._flush_text_batch(key),
         )
 
     async def _flush_text_batch(self, key: str) -> None:
@@ -1093,7 +1093,7 @@ class WeComAdapter(BasePlatformAdapter):
                 content_length = headers.get("content-length")
                 if content_length and content_length.isdigit() and int(content_length) > max_bytes:
                     raise ValueError(
-                        f"Remote media exceeds WeCom limit: {int(content_length)} bytes > {max_bytes} bytes"
+                        f"Remote media exceeds WeCom limit: {int(content_length)} bytes > {max_bytes} bytes",
                     )
 
                 data = bytearray()
@@ -1101,7 +1101,7 @@ class WeComAdapter(BasePlatformAdapter):
                     data.extend(chunk)
                     if len(data) > max_bytes:
                         raise ValueError(
-                            f"Remote media exceeds WeCom limit while downloading: {len(data)} bytes > {max_bytes} bytes"
+                            f"Remote media exceeds WeCom limit while downloading: {len(data)} bytes > {max_bytes} bytes",
                         )
 
                 return bytes(data), headers
@@ -1173,7 +1173,7 @@ class WeComAdapter(BasePlatformAdapter):
         total_chunks = (total_size + UPLOAD_CHUNK_SIZE - 1) // UPLOAD_CHUNK_SIZE
         if total_chunks > MAX_UPLOAD_CHUNKS:
             raise ValueError(
-                f"File too large: {total_chunks} chunks exceeds maximum of {MAX_UPLOAD_CHUNKS} chunks"
+                f"File too large: {total_chunks} chunks exceeds maximum of {MAX_UPLOAD_CHUNKS} chunks",
             )
 
         init_response = await self._send_request(
@@ -1624,7 +1624,7 @@ def qr_scan_for_bot_info(
             print(
                 "  QR scan reported success but no bot credentials were returned.\n"
                 "  This usually means the bot was not actually created on the WeCom side.\n"
-                "  Falling back to manual credential entry."
+                "  Falling back to manual credential entry.",
             )
             return None
 

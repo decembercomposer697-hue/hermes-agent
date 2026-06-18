@@ -463,7 +463,7 @@ class TestHistoryDisplay:
             cli.process_command("/sessions Checking Running Hermes Agent")
 
         mock_resume.assert_called_once_with(
-            "/resume Checking Running Hermes Agent"
+            "/resume Checking Running Hermes Agent",
         )
 
     def test_sessions_command_is_dispatched(self):

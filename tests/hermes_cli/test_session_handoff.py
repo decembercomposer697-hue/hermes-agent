@@ -42,7 +42,7 @@ class TestHandoffStateDB:
     def test_columns_exist(self, db):
         db._conn.execute(
             "SELECT handoff_state, handoff_platform, handoff_error "
-            "FROM sessions LIMIT 0"
+            "FROM sessions LIMIT 0",
         )
 
     def test_request_handoff_marks_pending(self, db):

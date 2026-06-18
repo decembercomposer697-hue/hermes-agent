@@ -46,7 +46,7 @@ class StubEngine(ContextEngine):
                 "name": "stub_search",
                 "description": "Search the stub engine",
                 "parameters": {"type": "object", "properties": {}},
-            }
+            },
         ]
 
     def handle_tool_call(self, name: str, args: dict[str, Any]) -> str:

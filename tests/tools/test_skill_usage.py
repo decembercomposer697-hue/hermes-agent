@@ -297,9 +297,9 @@ description: test skill
                     "getnote": {
                         "source": "taps/main",
                         "install_path": "productivity/getnote",
-                    }
+                    },
                 },
-            }
+            },
         ),
         encoding="utf-8",
     )

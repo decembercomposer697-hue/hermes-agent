@@ -22,7 +22,7 @@ def test_custom_provider_extra_body_merges_into_request_overrides():
                     "enable_thinking": True,
                     "reasoning_effort": "high",
                 },
-            }
+            },
         ],
     )
 
@@ -44,7 +44,7 @@ def test_custom_provider_extra_body_preserves_caller_override():
             "extra_body": {
                 "reasoning_effort": "low",
                 "caller_only": True,
-            }
+            },
         },
     )
 
@@ -59,7 +59,7 @@ def test_custom_provider_extra_body_preserves_caller_override():
                     "enable_thinking": True,
                     "reasoning_effort": "high",
                 },
-            }
+            },
         ],
     )
 
@@ -86,7 +86,7 @@ def test_custom_provider_extra_body_ignores_other_custom_models():
                 "base_url": "https://example.test/v1",
                 "model": "google/gemma-4-31b-it",
                 "extra_body": {"enable_thinking": True},
-            }
+            },
         ],
     )
 

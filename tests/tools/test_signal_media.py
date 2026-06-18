@@ -72,7 +72,7 @@ class TestSendSignalMediaFiles:
         extra = {"http_url": "http://localhost:8080", "account": "+155****4567"}
 
         result = asyncio.run(
-            _send_signal(extra, "+155****9999", "Check this out", media_files=[(str(img_path), False)])
+            _send_signal(extra, "+155****9999", "Check this out", media_files=[(str(img_path), False)]),
         )
 
         assert result["success"] is True
@@ -85,7 +85,7 @@ class TestSendSignalMediaFiles:
         extra = {"http_url": "http://localhost:8080", "account": "+155****4567"}
 
         result = asyncio.run(
-            _send_signal(extra, "+155****9999", "File missing?", media_files=[("/nonexistent.png", False)])
+            _send_signal(extra, "+155****9999", "File missing?", media_files=[("/nonexistent.png", False)]),
         )
 
         assert result["success"] is True  # Should succeed despite missing file
@@ -115,8 +115,8 @@ class TestSendSignalMediaRestrictions:
                     config,
                     "+155****9999",
                     "",  # Empty message - media is the message
-                    media_files=[("/tmp/test.png", False)]
-                )
+                    media_files=[("/tmp/test.png", False)],
+                ),
             )
 
             assert result["success"] is True
@@ -139,8 +139,8 @@ class TestSendSignalMediaRestrictions:
                 config,
                 "C012AB3CD",
                 "",  # Empty message - media is the only content
-                media_files=[("/tmp/test.png", False)]
-            )
+                media_files=[("/tmp/test.png", False)],
+            ),
         )
 
         assert "error" in result
@@ -169,8 +169,8 @@ class TestSendSignalMediaWarningMessages:
                     config,
                     "C012AB3CD",
                     "Test message with media",
-                    media_files=[("/tmp/test.png", False)]
-                )
+                    media_files=[("/tmp/test.png", False)],
+                ),
             )
 
         assert result.get("warnings") is not None
@@ -192,7 +192,7 @@ class TestSendSignalGroupChats:
         extra = {"http_url": "http://localhost:8080", "account": "+155****4567"}
 
         result = asyncio.run(
-            _send_signal(extra, "group:abc123==", "Group file", media_files=[(str(img_path), False)])
+            _send_signal(extra, "group:abc123==", "Group file", media_files=[(str(img_path), False)]),
         )
 
         assert result["success"] is True

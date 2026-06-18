@@ -24,7 +24,7 @@ def test_all_servers_disabled_prints_info(capsys):
         "mcp_servers": {
             "github": {"command": "npx", "enabled": False},
             "slack": {"command": "npx", "enabled": "false"},
-        }
+        },
     }
     _configure_mcp_tools_interactive(config)
     captured = capsys.readouterr()
@@ -54,7 +54,7 @@ def test_no_changes_when_checklist_cancelled(capsys):
     config = {
         "mcp_servers": {
             "github": {"command": "npx", "args": ["-y", "server-github"]},
-        }
+        },
     }
     tools = [("create_issue", "Create an issue"), ("search_repos", "Search repos")]
 
@@ -77,7 +77,7 @@ def test_disabling_tool_writes_include_list(capsys):
     config = {
         "mcp_servers": {
             "github": {"command": "npx"},
-        }
+        },
     }
     tools = [
         ("create_issue", "Create an issue"),
@@ -105,7 +105,7 @@ def test_enabling_all_clears_filters(capsys):
                 "command": "npx",
                 "tools": {"exclude": ["delete_repo"], "include": ["create_issue"]},
             },
-        }
+        },
     }
     tools = [("create_issue", "Create"), ("delete_repo", "Delete")]
 
@@ -130,7 +130,7 @@ def test_pre_selection_respects_existing_exclude(capsys):
                 "command": "npx",
                 "tools": {"exclude": ["delete_repo"]},
             },
-        }
+        },
     }
     tools = [("create_issue", "Create"), ("delete_repo", "Delete"), ("search", "Search")]
     captured_pre_selected = {}
@@ -156,7 +156,7 @@ def test_pre_selection_respects_existing_include(capsys):
                 "command": "npx",
                 "tools": {"include": ["search"]},
             },
-        }
+        },
     }
     tools = [("create_issue", "Create"), ("delete_repo", "Delete"), ("search", "Search")]
     captured_pre_selected = {}
@@ -180,7 +180,7 @@ def test_multiple_servers_each_get_checklist(capsys):
         "mcp_servers": {
             "github": {"command": "npx"},
             "slack": {"url": "https://mcp.example.com"},
-        }
+        },
     }
     checklist_calls = []
 
@@ -209,7 +209,7 @@ def test_failed_server_shows_warning(capsys):
         "mcp_servers": {
             "github": {"command": "npx"},
             "broken": {"command": "nonexistent"},
-        }
+        },
     }
 
     # Only github succeeds
@@ -228,7 +228,7 @@ def test_description_truncation_in_labels():
     config = {
         "mcp_servers": {
             "github": {"command": "npx"},
-        }
+        },
     }
     long_desc = "A" * 100
     captured_labels = {}
@@ -257,7 +257,7 @@ def test_modifying_include_stays_in_include_mode(capsys):
                 "command": "npx",
                 "tools": {"include": ["create_issue"]},
             },
-        }
+        },
     }
     tools = [("create_issue", "Create"), ("search", "Search"), ("delete", "Delete")]
 
@@ -277,7 +277,7 @@ def test_empty_tools_server_skipped(capsys):
     config = {
         "mcp_servers": {
             "empty": {"command": "npx"},
-        }
+        },
     }
     checklist_calls = []
 

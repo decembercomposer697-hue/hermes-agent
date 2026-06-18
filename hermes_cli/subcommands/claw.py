@@ -26,7 +26,7 @@ def build_claw_parser(subparsers, *, cmd_claw: Callable) -> None:
         "Always shows a preview before making changes.",
     )
     claw_migrate.add_argument(
-        "--source", help="Path to OpenClaw directory (default: ~/.openclaw)"
+        "--source", help="Path to OpenClaw directory (default: ~/.openclaw)",
     )
     claw_migrate.add_argument(
         "--dry-run",
@@ -59,7 +59,7 @@ def build_claw_parser(subparsers, *, cmd_claw: Callable) -> None:
         "before apply; restorable with 'hermes import').",
     )
     claw_migrate.add_argument(
-        "--workspace-target", help="Absolute path to copy workspace instructions into"
+        "--workspace-target", help="Absolute path to copy workspace instructions into",
     )
     claw_migrate.add_argument(
         "--skill-conflict",
@@ -68,7 +68,7 @@ def build_claw_parser(subparsers, *, cmd_claw: Callable) -> None:
         help="How to handle skill name conflicts (default: skip)",
     )
     claw_migrate.add_argument(
-        "--yes", "-y", action="store_true", help="Skip confirmation prompts"
+        "--yes", "-y", action="store_true", help="Skip confirmation prompts",
     )
 
     # claw cleanup
@@ -79,7 +79,7 @@ def build_claw_parser(subparsers, *, cmd_claw: Callable) -> None:
         description="Scan for and archive leftover OpenClaw directories to prevent state fragmentation",
     )
     claw_cleanup.add_argument(
-        "--source", help="Path to a specific OpenClaw directory to clean up"
+        "--source", help="Path to a specific OpenClaw directory to clean up",
     )
     claw_cleanup.add_argument(
         "--dry-run",
@@ -87,6 +87,6 @@ def build_claw_parser(subparsers, *, cmd_claw: Callable) -> None:
         help="Preview what would be archived without making changes",
     )
     claw_cleanup.add_argument(
-        "--yes", "-y", action="store_true", help="Skip confirmation prompts"
+        "--yes", "-y", action="store_true", help="Skip confirmation prompts",
     )
     claw_parser.set_defaults(func=cmd_claw)

@@ -86,7 +86,7 @@ class TestGetActiveProvider:
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         (tmp_path / "config.yaml").write_text(
-            yaml.safe_dump({"image_gen": {"provider": "openai"}})
+            yaml.safe_dump({"image_gen": {"provider": "openai"}}),
         )
         image_gen_registry.register_provider(_FakeProvider("fal"))
         image_gen_registry.register_provider(_FakeProvider("openai"))
@@ -98,7 +98,7 @@ class TestGetActiveProvider:
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         (tmp_path / "config.yaml").write_text(
-            yaml.safe_dump({"image_gen": {"provider": "replicate"}})
+            yaml.safe_dump({"image_gen": {"provider": "replicate"}}),
         )
         # Only FAL is registered — configured provider doesn't exist
         image_gen_registry.register_provider(_FakeProvider("fal"))

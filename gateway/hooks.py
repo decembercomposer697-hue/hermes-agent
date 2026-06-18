@@ -125,7 +125,7 @@ class HookRegistry:
                 # dispatch with "TypeAdapter ... is not fully defined".
                 module_name = f"hermes_hook_{hook_name}"
                 spec = importlib.util.spec_from_file_location(
-                    module_name, handler_path
+                    module_name, handler_path,
                 )
                 if spec is None or spec.loader is None:
                     print(f"[hooks] Skipping {hook_name}: could not load handler.py", flush=True)

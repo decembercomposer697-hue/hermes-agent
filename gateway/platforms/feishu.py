@@ -503,7 +503,7 @@ def _render_text_element(element: dict[str, Any]) -> str:
 
 def _render_code_block_element(element: dict[str, Any]) -> str:
     language = _sanitize_fence_language(
-        str(element.get("language", "") or "") or str(element.get("lang", "") or "")
+        str(element.get("language", "") or "") or str(element.get("lang", "") or ""),
     )
     code = (
         str(element.get("text", "") or "") or str(element.get("content", "") or "")
@@ -555,7 +555,7 @@ def _build_markdown_post_payload(content: str) -> str:
         {
             "zh_cn": {
                 "content": rows,
-            }
+            },
         },
         ensure_ascii=False,
     )
@@ -592,7 +592,7 @@ def _build_markdown_post_rows(content: str) -> list[list[dict[str, str]]]:
         is_fence = bool(
             _MARKDOWN_FENCE_CLOSE_RE.match(stripped_line)
             if in_code_block
-            else _MARKDOWN_FENCE_OPEN_RE.match(stripped_line)
+            else _MARKDOWN_FENCE_OPEN_RE.match(stripped_line),
         )
 
         if is_fence:
@@ -634,7 +634,7 @@ def parse_feishu_post_payload(
             "".join(
                 _render_post_element(item, image_keys, media_refs, mentions_map)
                 for item in row
-            )
+            ),
         )
         if row_text:
             parts.append(row_text)
@@ -746,7 +746,7 @@ def _render_post_element(
                     file_key=file_key,
                     file_name=file_name,
                     resource_type=tag if tag in {"audio", "video"} else "file",
-                )
+                ),
             )
         return f"[Attachment: {file_name}]" if file_name else "[Attachment]"
     if tag in {"emotion", "emoji"}:
@@ -1521,11 +1521,11 @@ class FeishuAdapter(BasePlatformAdapter):
             app_secret=str(extra.get("app_secret") or os.getenv("FEISHU_APP_SECRET", "")).strip(),
             domain_name=str(extra.get("domain") or os.getenv("FEISHU_DOMAIN", "feishu")).strip().lower(),
             connection_mode=str(
-                extra.get("connection_mode") or os.getenv("FEISHU_CONNECTION_MODE", "websocket")
+                extra.get("connection_mode") or os.getenv("FEISHU_CONNECTION_MODE", "websocket"),
             ).strip().lower(),
             encrypt_key=str(extra.get("encrypt_key") or os.getenv("FEISHU_ENCRYPT_KEY", "")).strip(),
             verification_token=str(
-                extra.get("verification_token") or os.getenv("FEISHU_VERIFICATION_TOKEN", "")
+                extra.get("verification_token") or os.getenv("FEISHU_VERIFICATION_TOKEN", ""),
             ).strip(),
             group_policy=os.getenv("FEISHU_GROUP_POLICY", "allowlist").strip().lower(),
             allowed_group_users=frozenset(
@@ -1541,10 +1541,10 @@ class FeishuAdapter(BasePlatformAdapter):
                 int(os.getenv("HERMES_FEISHU_DEDUP_CACHE_SIZE", str(_DEFAULT_DEDUP_CACHE_SIZE))),
             ),
             text_batch_delay_seconds=float(
-                os.getenv("HERMES_FEISHU_TEXT_BATCH_DELAY_SECONDS", str(_DEFAULT_TEXT_BATCH_DELAY_SECONDS))
+                os.getenv("HERMES_FEISHU_TEXT_BATCH_DELAY_SECONDS", str(_DEFAULT_TEXT_BATCH_DELAY_SECONDS)),
             ),
             text_batch_split_delay_seconds=float(
-                os.getenv("HERMES_FEISHU_TEXT_BATCH_SPLIT_DELAY_SECONDS", "2.0")
+                os.getenv("HERMES_FEISHU_TEXT_BATCH_SPLIT_DELAY_SECONDS", "2.0"),
             ),
             text_batch_max_messages=max(
                 1,
@@ -1555,13 +1555,13 @@ class FeishuAdapter(BasePlatformAdapter):
                 int(os.getenv("HERMES_FEISHU_TEXT_BATCH_MAX_CHARS", str(_DEFAULT_TEXT_BATCH_MAX_CHARS))),
             ),
             media_batch_delay_seconds=float(
-                os.getenv("HERMES_FEISHU_MEDIA_BATCH_DELAY_SECONDS", str(_DEFAULT_MEDIA_BATCH_DELAY_SECONDS))
+                os.getenv("HERMES_FEISHU_MEDIA_BATCH_DELAY_SECONDS", str(_DEFAULT_MEDIA_BATCH_DELAY_SECONDS)),
             ),
             webhook_host=str(
-                extra.get("webhook_host") or os.getenv("FEISHU_WEBHOOK_HOST", _DEFAULT_WEBHOOK_HOST)
+                extra.get("webhook_host") or os.getenv("FEISHU_WEBHOOK_HOST", _DEFAULT_WEBHOOK_HOST),
             ).strip(),
             webhook_port=int(
-                extra.get("webhook_port") or os.getenv("FEISHU_WEBHOOK_PORT", str(_DEFAULT_WEBHOOK_PORT))
+                extra.get("webhook_port") or os.getenv("FEISHU_WEBHOOK_PORT", str(_DEFAULT_WEBHOOK_PORT)),
             ),
             webhook_path=(
                 str(extra.get("webhook_path") or os.getenv("FEISHU_WEBHOOK_PATH", _DEFAULT_WEBHOOK_PATH)).strip()
@@ -1576,7 +1576,7 @@ class FeishuAdapter(BasePlatformAdapter):
             group_rules=group_rules,
             allow_bots=allow_bots,
             require_mention=_to_boolean(
-                extra.get("require_mention", os.getenv("FEISHU_REQUIRE_MENTION", "true"))
+                extra.get("require_mention", os.getenv("FEISHU_REQUIRE_MENTION", "true")),
             ),
         )
 
@@ -1622,10 +1622,10 @@ class FeishuAdapter(BasePlatformAdapter):
             .register_p2_im_message_message_read_v1(self._on_message_read_event)
             .register_p2_im_message_receive_v1(self._on_message_event)
             .register_p2_im_message_reaction_created_v1(
-                lambda data: self._on_reaction_event("im.message.reaction.created_v1", data)
+                lambda data: self._on_reaction_event("im.message.reaction.created_v1", data),
             )
             .register_p2_im_message_reaction_deleted_v1(
-                lambda data: self._on_reaction_event("im.message.reaction.deleted_v1", data)
+                lambda data: self._on_reaction_event("im.message.reaction.deleted_v1", data),
             )
             .register_p2_card_action_trigger(self._on_card_action_trigger)
             .register_p2_im_chat_member_bot_added_v1(self._on_bot_added_to_chat)
@@ -1659,7 +1659,7 @@ class FeishuAdapter(BasePlatformAdapter):
             return False
         if self._connection_mode == "webhook" and not (self._verification_token or self._encrypt_key):
             logger.error(
-                "[Feishu] Webhook mode requires FEISHU_VERIFICATION_TOKEN or FEISHU_ENCRYPT_KEY."
+                "[Feishu] Webhook mode requires FEISHU_VERIFICATION_TOKEN or FEISHU_ENCRYPT_KEY.",
             )
             return False
 
@@ -2370,7 +2370,7 @@ class FeishuAdapter(BasePlatformAdapter):
                     requeue: list[Any] = []
                     for event in batch:
                         if self._submit_on_loop(
-                            loop, self._handle_message_event_data(event)
+                            loop, self._handle_message_event_data(event),
                         ):
                             dispatched += 1
                         else:
@@ -3040,7 +3040,7 @@ class FeishuAdapter(BasePlatformAdapter):
             self._remember_processing_reaction(message_id, reaction_id)
 
     async def on_processing_complete(
-        self, event: MessageEvent, outcome: ProcessingOutcome
+        self, event: MessageEvent, outcome: ProcessingOutcome,
     ) -> None:
         if not self._reactions_enabled():
             return
@@ -3196,7 +3196,7 @@ class FeishuAdapter(BasePlatformAdapter):
     def _should_batch_media_event(self, event: MessageEvent) -> bool:
         return bool(
             event.media_urls
-            and event.message_type in {MessageType.PHOTO, MessageType.VIDEO, MessageType.DOCUMENT, MessageType.AUDIO}
+            and event.message_type in {MessageType.PHOTO, MessageType.VIDEO, MessageType.DOCUMENT, MessageType.AUDIO},
         )
 
     def _media_batch_key(self, event: MessageEvent) -> str:
@@ -3603,7 +3603,7 @@ class FeishuAdapter(BasePlatformAdapter):
     # =========================================================================
 
     async def _extract_message_content(
-        self, message: Any
+        self, message: Any,
     ) -> tuple[str, MessageType, list[str], list[str], list[FeishuMentionRef]]:
         raw_content = getattr(message, "content", "") or ""
         raw_type = getattr(message, "message_type", "") or ""
@@ -4267,13 +4267,13 @@ class FeishuAdapter(BasePlatformAdapter):
                 if open_id:
                     if self._bot_open_id and self._bot_open_id != open_id:
                         logger.warning(
-                            "[Feishu] FEISHU_BOT_OPEN_ID is stale; using /bot/v3/info open_id for group @mention gating."
+                            "[Feishu] FEISHU_BOT_OPEN_ID is stale; using /bot/v3/info open_id for group @mention gating.",
                         )
                     self._bot_open_id = open_id
                 if bot_name:
                     if self._bot_name and self._bot_name != bot_name:
                         logger.info(
-                            "[Feishu] FEISHU_BOT_NAME differs from /bot/v3/info; using hydrated bot name for group @mention gating."
+                            "[Feishu] FEISHU_BOT_NAME differs from /bot/v3/info; using hydrated bot name for group @mention gating.",
                         )
                     self._bot_name = bot_name
         except Exception:
@@ -4296,7 +4296,7 @@ class FeishuAdapter(BasePlatformAdapter):
                     logger.warning(
                         "[Feishu] Unable to hydrate bot name from application info. "
                         "Grant admin:app.info:readonly or application:application:self_manage "
-                        "so group @mention gating can resolve the bot name precisely."
+                        "so group @mention gating can resolve the bot name precisely.",
                     )
                 return
             app = getattr(getattr(response, "data", None), "app", None)
@@ -4934,7 +4934,7 @@ def _init_registration(domain: str = "feishu") -> None:
     if "client_secret" not in methods:
         raise RuntimeError(
             f"Feishu / Lark registration environment does not support client_secret auth. "
-            f"Supported: {methods}"
+            f"Supported: {methods}",
         )
 
 

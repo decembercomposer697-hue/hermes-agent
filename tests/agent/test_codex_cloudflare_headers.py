@@ -154,7 +154,7 @@ class TestPrimaryClientWiring:
             # Simulate rotation into a Codex credential
             agent._client_kwargs["api_key"] = token
             agent._apply_client_headers_for_base_url(
-                "https://chatgpt.com/backend-api/codex"
+                "https://chatgpt.com/backend-api/codex",
             )
             headers = agent._client_kwargs.get("default_headers") or {}
             assert headers.get("originator") == "codex_cli_rs"
@@ -179,7 +179,7 @@ class TestPrimaryClientWiring:
             # Sanity: headers are set initially
             assert "originator" in (agent._client_kwargs.get("default_headers") or {})
             agent._apply_client_headers_for_base_url(
-                "https://api.anthropic.com"
+                "https://api.anthropic.com",
             )
             # default_headers should be popped for anthropic base
             assert "default_headers" not in agent._client_kwargs

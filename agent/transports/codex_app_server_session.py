@@ -245,7 +245,7 @@ class CodexAppServerSession:
             return self._thread_id
         if self._client is None:
             self._client = self._client_factory(
-                codex_bin=self._codex_bin, codex_home=self._codex_home
+                codex_bin=self._codex_bin, codex_home=self._codex_home,
             )
         self._client.initialize(
             client_name="hermes",
@@ -391,7 +391,7 @@ class CodexAppServerSession:
             self.ensure_started()
         except (CodexAppServerError, TimeoutError) as exc:
             result.error = self._format_error_with_stderr(
-                "codex app-server startup failed", exc
+                "codex app-server startup failed", exc,
             )
             # Subprocess almost certainly unhealthy — retire so the next
             # turn re-spawns cleanly.
@@ -430,7 +430,7 @@ class CodexAppServerSession:
                 result.should_retire = True
             else:
                 result.error = self._format_error_with_stderr(
-                    "turn/start failed", exc
+                    "turn/start failed", exc,
                 )
             return result
         except TimeoutError as exc:
@@ -438,7 +438,7 @@ class CodexAppServerSession:
             stderr_blob = "\n".join(self._client.stderr_tail(40))
             hint = _classify_oauth_failure(stderr_blob)
             result.error = hint or self._format_error_with_stderr(
-                "turn/start timed out", exc
+                "turn/start timed out", exc,
             )
             result.should_retire = True
             return result
@@ -529,7 +529,7 @@ class CodexAppServerSession:
                 continue
 
             note = self._client.take_notification(
-                timeout=notification_poll_timeout
+                timeout=notification_poll_timeout,
             )
             if note is None:
                 continue
@@ -594,7 +594,7 @@ class CodexAppServerSession:
                         # rewrite the error into a re-auth hint AND mark
                         # the session for retirement.
                         stderr_blob = "\n".join(
-                            self._client.stderr_tail(40)
+                            self._client.stderr_tail(40),
                         )
                         hint = _classify_oauth_failure(err_msg, stderr_blob)
                         if hint is not None:
@@ -602,7 +602,7 @@ class CodexAppServerSession:
                             result.should_retire = True
                         else:
                             result.error = self._format_error_with_stderr(
-                                f"turn ended status={turn_status}", err_msg
+                                f"turn ended status={turn_status}", err_msg,
                             )
 
         if not turn_complete and not result.interrupted:
@@ -614,7 +614,7 @@ class CodexAppServerSession:
             result.interrupted = True
             if not result.error:
                 result.error = self._format_error_with_stderr(
-                    f"turn timed out after {turn_timeout}s"
+                    f"turn timed out after {turn_timeout}s",
                 )
             result.should_retire = True
 
@@ -692,7 +692,7 @@ class CodexAppServerSession:
             # cleanly so codex doesn't hang waiting for us.
             logger.warning("Unknown codex server request: %s", method)
             self._client.respond_error(
-                rid, code=-32601, message=f"Unsupported method: {method}"
+                rid, code=-32601, message=f"Unsupported method: {method}",
             )
 
     def _decide_exec_approval(self, params: dict) -> str:
@@ -710,7 +710,7 @@ class CodexAppServerSession:
         if self._approval_callback is not None:
             try:
                 choice = self._approval_callback(
-                    command, description, allow_permanent=False
+                    command, description, allow_permanent=False,
                 )
                 return _approval_choice_to_codex_decision(choice)
             except Exception:
@@ -842,7 +842,7 @@ def _approval_choice_to_codex_decision(choice: str) -> str:
     (verified against codex-rs/app-server-protocol/src/protocol/v2/item.rs
     on codex 0.130.0).
     """
-    if choice in {"once",}:
+    if choice in {"once"}:
         return "accept"
     if choice in {"session", "always"}:
         return "acceptForSession"

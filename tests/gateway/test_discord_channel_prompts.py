@@ -136,7 +136,7 @@ class TestResolveChannelPrompts:
             "channel_prompts": {
                 "999": "Thread override",
                 "200": "Forum prompt",
-            }
+            },
         }
         assert adapter._resolve_channel_prompt("999", parent_id="200") == "Thread override"
 

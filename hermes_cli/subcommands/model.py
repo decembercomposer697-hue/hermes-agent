@@ -38,7 +38,7 @@ def build_model_parser(subparsers, *, cmd_model: Callable) -> None:
         help="OAuth client id to use for Nous login (default: hermes-cli)",
     )
     model_parser.add_argument(
-        "--scope", default=None, help="OAuth scope to request for Nous login"
+        "--scope", default=None, help="OAuth scope to request for Nous login",
     )
     model_parser.add_argument(
         "--no-browser",
@@ -62,7 +62,7 @@ def build_model_parser(subparsers, *, cmd_model: Callable) -> None:
         help="HTTP request timeout in seconds for Nous login (default: 15)",
     )
     model_parser.add_argument(
-        "--ca-bundle", help="Path to CA bundle PEM file for Nous TLS verification"
+        "--ca-bundle", help="Path to CA bundle PEM file for Nous TLS verification",
     )
     model_parser.add_argument(
         "--insecure",

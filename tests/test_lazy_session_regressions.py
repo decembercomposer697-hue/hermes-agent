@@ -236,7 +236,7 @@ class TestPendingTitleValueError:
         monkeypatch.setattr(server, "make_stream_renderer", lambda cols: None)
         monkeypatch.setattr(server, "render_message", lambda raw, cols: None)
         monkeypatch.setattr(
-            server, "_sync_session_key_after_compress", lambda *a, **kw: None
+            server, "_sync_session_key_after_compress", lambda *a, **kw: None,
         )
 
         class _ImmediateThread:
@@ -290,7 +290,7 @@ class TestPendingTitleValueError:
         monkeypatch.setattr(server, "make_stream_renderer", lambda cols: None)
         monkeypatch.setattr(server, "render_message", lambda raw, cols: None)
         monkeypatch.setattr(
-            server, "_sync_session_key_after_compress", lambda *a, **kw: None
+            server, "_sync_session_key_after_compress", lambda *a, **kw: None,
         )
 
         class _ImmediateThread:
@@ -446,7 +446,7 @@ class TestFinalizeOrphanedCompressionSessions:
             lambda conn: conn.execute(
                 "UPDATE sessions SET started_at = ? WHERE id = ?",
                 (time.time() - 800000, "ghost-cont"),  # ~9 days old
-            )
+            ),
         )
 
         count = db.finalize_orphaned_compression_sessions()
@@ -468,7 +468,7 @@ class TestFinalizeOrphanedCompressionSessions:
             lambda conn: conn.execute(
                 "UPDATE sessions SET started_at = ? WHERE id = ?",
                 (time.time() - 800000, "ghost-notitle"),
-            )
+            ),
         )
 
         count = db.finalize_orphaned_compression_sessions()
@@ -513,7 +513,7 @@ class TestFinalizeOrphanedCompressionSessions:
             lambda conn: conn.execute(
                 "UPDATE sessions SET started_at = ? WHERE id = ?",
                 (time.time() - 800000, "already-ended"),
-            )
+            ),
         )
 
         count = db.finalize_orphaned_compression_sessions()
@@ -540,7 +540,7 @@ class TestFinalizeOrphanedCompressionSessions:
             lambda conn: conn.execute(
                 "UPDATE sessions SET started_at = ? WHERE id = ?",
                 (time.time() - 800000, "child"),
-            )
+            ),
         )
 
         count = db.finalize_orphaned_compression_sessions()
@@ -567,7 +567,7 @@ class TestFinalizeOrphanedCompressionSessions:
             lambda conn: conn.execute(
                 "UPDATE sessions SET started_at = ? WHERE id = ?",
                 (time.time() - 800000, "empty-ghost"),
-            )
+            ),
         )
 
         count = db.finalize_orphaned_compression_sessions()
@@ -596,7 +596,7 @@ class TestFinalizeOrphanedCompressionSessions:
             lambda conn: conn.execute(
                 "UPDATE sessions SET started_at = ? WHERE id = ?",
                 (time.time() - 800000, "titled-ghost"),
-            )
+            ),
         )
 
         count = db.finalize_orphaned_compression_sessions()

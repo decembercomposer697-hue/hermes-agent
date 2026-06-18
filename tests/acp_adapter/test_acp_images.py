@@ -90,7 +90,7 @@ async def test_initialize_advertises_image_prompt_capability():
 # 1x1 transparent PNG — smallest valid image payload for inlining tests.
 _ONE_PX_PNG = bytes.fromhex(
     "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4"
-    "890000000a49444154789c6300010000000500010d0a2db40000000049454e44ae426082"
+    "890000000a49444154789c6300010000000500010d0a2db40000000049454e44ae426082",
 )
 
 

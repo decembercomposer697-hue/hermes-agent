@@ -684,7 +684,7 @@ class TestMatrixBangCommandAlias:
 
         fake_skills = {"/arxiv": {}, "/obsidian": {}}
         with patch.object(
-            skill_commands_mod, "get_skill_commands", return_value=fake_skills
+            skill_commands_mod, "get_skill_commands", return_value=fake_skills,
         ):
             from gateway.platforms.matrix import _normalize_matrix_bang_command
 
@@ -705,7 +705,7 @@ class TestMatrixBangCommandAlias:
         """A bang command that follows a Matrix reply-fallback quote is
         normalized after the quote is stripped, matching /command behavior."""
         captured_event = await self._dispatch_text_reply(
-            "> <@bob:example.org> earlier message\n\n!model"
+            "> <@bob:example.org> earlier message\n\n!model",
         )
 
         assert captured_event is not None
@@ -718,7 +718,7 @@ class TestMatrixBangCommandAlias:
         """Sanity: the slash equivalent already works post-strip — the bang
         form above must reach parity with this."""
         captured_event = await self._dispatch_text_reply(
-            "> <@bob:example.org> earlier message\n\n/model"
+            "> <@bob:example.org> earlier message\n\n/model",
         )
 
         assert captured_event is not None
@@ -1717,7 +1717,7 @@ class TestMatrixEncryptedEventHandler:
         mock_olm = MagicMock()
         mock_olm.load = AsyncMock()
         mock_olm.share_keys = AsyncMock(
-            side_effect=[None, Exception("One time key signed_curve25519:AAAAAQ already exists")]
+            side_effect=[None, Exception("One time key signed_curve25519:AAAAAQ already exists")],
         )
         mock_olm.share_keys_min_trust = None
         mock_olm.send_keys_min_trust = None
@@ -2173,7 +2173,7 @@ class TestMatrixReadReceipts:
 
         assert ctx is not None
         self.adapter._background_read_receipt.assert_called_once_with(
-            "!room:ex", "$event1"
+            "!room:ex", "$event1",
         )
 
     @pytest.mark.asyncio
@@ -2186,7 +2186,7 @@ class TestMatrixReadReceipts:
         result = await self.adapter.send_read_receipt("!room:ex", "$event1")
         assert result is True
         mock_client.set_fully_read_marker.assert_awaited_once_with(
-            "!room:ex", "$event1", "$event1"
+            "!room:ex", "$event1", "$event1",
         )
 
     @pytest.mark.asyncio
@@ -2251,7 +2251,7 @@ class TestMatrixImageOnlyMediaNormalization:
         assert captured_event is not None
         assert captured_event.text == ""
         assert captured_event.media_urls == [
-            "https://matrix.example.org/_matrix/media/v3/download/example/30.png"
+            "https://matrix.example.org/_matrix/media/v3/download/example/30.png",
         ]
         assert captured_event.message_type == MessageType.PHOTO
 
@@ -2425,13 +2425,13 @@ class TestMatrixSystemBridgeFilter:
     def test_appservice_underscore_prefix_is_bridge(self):
         # Conventional appservice namespace puppets
         assert self.adapter._is_system_or_bridge_sender(
-            "@_telegram_12345:bridge.example.org"
+            "@_telegram_12345:bridge.example.org",
         ) is True
         assert self.adapter._is_system_or_bridge_sender(
-            "@_discord_999:example.org"
+            "@_discord_999:example.org",
         ) is True
         assert self.adapter._is_system_or_bridge_sender(
-            "@_slackbridge_puppet:example.org"
+            "@_slackbridge_puppet:example.org",
         ) is True
 
     def test_empty_localpart_is_system(self):
@@ -2443,12 +2443,12 @@ class TestMatrixSystemBridgeFilter:
 
     def test_regular_user_is_not_bridge(self):
         assert self.adapter._is_system_or_bridge_sender(
-            "@alice:example.org"
+            "@alice:example.org",
         ) is False
         # A user whose localpart merely CONTAINS an underscore is not a
         # bridge — the convention is a LEADING underscore.
         assert self.adapter._is_system_or_bridge_sender(
-            "@alice_smith:example.org"
+            "@alice_smith:example.org",
         ) is False
 
     def test_bot_account_is_not_bridge(self):
@@ -2456,7 +2456,7 @@ class TestMatrixSystemBridgeFilter:
         # classified as a bridge — that filter is a pairing guard, not
         # a self-filter.
         assert self.adapter._is_system_or_bridge_sender(
-            "@daemon:nerdworks.casa"
+            "@daemon:nerdworks.casa",
         ) is False
 
 
@@ -2564,7 +2564,7 @@ class TestMatrixClockSkewWarning:
         with caplog.at_level(logging.WARNING, logger="gateway.platforms.matrix"):
             for i in range(5):
                 ev = self._mk_event(
-                    sender=f"@alice{i}:example.org", ts_ms=skewed_event_ts_ms
+                    sender=f"@alice{i}:example.org", ts_ms=skewed_event_ts_ms,
                 )
                 await self.adapter._on_room_message(ev)
 
@@ -2603,7 +2603,7 @@ class TestMatrixClockSkewWarning:
         with caplog.at_level(logging.WARNING, logger="gateway.platforms.matrix"):
             for i in range(5):
                 ev = self._mk_event(
-                    sender=f"@alice{i}:example.org", ts_ms=old_ts_ms
+                    sender=f"@alice{i}:example.org", ts_ms=old_ts_ms,
                 )
                 await self.adapter._on_room_message(ev)
 
@@ -2629,7 +2629,7 @@ class TestMatrixClockSkewWarning:
         with caplog.at_level(logging.WARNING, logger="gateway.platforms.matrix"):
             for i in range(2):  # only 2 late drops — under the threshold
                 ev = self._mk_event(
-                    sender=f"@alice{i}:example.org", ts_ms=old_ts_ms
+                    sender=f"@alice{i}:example.org", ts_ms=old_ts_ms,
                 )
                 await self.adapter._on_room_message(ev)
 
@@ -2656,7 +2656,7 @@ class TestMatrixClockSkewWarning:
             for i, hrs in enumerate(ages_in_hours):
                 ts_ms = int((self.adapter._startup_ts - hrs * 3600) * 1000)
                 ev = self._mk_event(
-                    sender=f"@alice{i}:example.org", ts_ms=ts_ms
+                    sender=f"@alice{i}:example.org", ts_ms=ts_ms,
                 )
                 await self.adapter._on_room_message(ev)
 
@@ -2849,8 +2849,8 @@ class TestCreateMatrixSession:
             with patch.dict("sys.modules", {
                 "aiohttp_socks": MagicMock(
                     ProxyConnector=MagicMock(
-                        from_url=MagicMock(return_value=fake_connector)
-                    )
+                        from_url=MagicMock(return_value=fake_connector),
+                    ),
                 ),
             }):
                 from gateway.platforms.matrix import _create_matrix_session

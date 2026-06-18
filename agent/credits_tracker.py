@@ -317,7 +317,7 @@ def evaluate_credits_notices(
                     kind=CREDITS_NOTICE_KIND,
                     key=CREDITS_USAGE_KEY,
                     id=CREDITS_USAGE_KEY,
-                )
+                ),
             )
             active.add(CREDITS_USAGE_KEY)
         latch["usage_band"] = target_band
@@ -331,7 +331,7 @@ def evaluate_credits_notices(
                 kind=CREDITS_NOTICE_KIND,
                 key="credits.grant_spent",
                 id="credits.grant_spent",
-            )
+            ),
         )
         active.add("credits.grant_spent")
     elif "credits.grant_spent" in active and not grant_cond:
@@ -351,7 +351,7 @@ def evaluate_credits_notices(
                 kind=CREDITS_NOTICE_KIND,
                 key="credits.depleted",
                 id="credits.depleted",
-            )
+            ),
         )
         active.add("credits.depleted")
     elif "credits.depleted" in active and not show_depleted:
@@ -369,7 +369,7 @@ def evaluate_credits_notices(
                     ttl_ms=CREDITS_RESTORED_TTL_MS,
                     key="credits.restored",
                     id="credits.restored",
-                )
+                ),
             )
 
     return (to_show, to_clear)

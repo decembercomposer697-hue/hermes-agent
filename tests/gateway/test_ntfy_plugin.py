@@ -83,7 +83,7 @@ class TestNtfyRequirements:
         monkeypatch.delenv("NTFY_TOPIC", raising=False)
         assert validate_config(PlatformConfig(enabled=True, extra={})) is False
         assert validate_config(
-            PlatformConfig(enabled=True, extra={"topic": "t"})
+            PlatformConfig(enabled=True, extra={"topic": "t"}),
         ) is True
 
     def test_is_connected_from_extra(self, monkeypatch):
@@ -379,7 +379,7 @@ class TestSend:
         adapter._http_client = mock_client
 
         result = _run(adapter.send(
-            "hermes-in", "Hi!", metadata={"publish_topic": "override-out"}
+            "hermes-in", "Hi!", metadata={"publish_topic": "override-out"},
         ))
         assert result.success is True
         posted_url = mock_client.post.call_args[0][0]
@@ -543,7 +543,7 @@ class TestOnMessage:
 
         adapter.set_message_handler(handler)
         _run(adapter._on_message({
-            "id": "x", "event": "message", "topic": "t", "message": "", "time": None
+            "id": "x", "event": "message", "topic": "t", "message": "", "time": None,
         }))
         assert calls == []
 

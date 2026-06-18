@@ -199,7 +199,7 @@ def test_skill_command_that_would_start_agent_is_blocked_at_limit(monkeypatch):
 
     with patch.object(GatewayRunner, "_handle_message_with_agent", fail_if_agent_runs):
         result = asyncio.run(
-            runner._handle_message(_make_event("/demo please", chat_id="new"))
+            runner._handle_message(_make_event("/demo please", chat_id="new")),
         )
 
     assert result == (

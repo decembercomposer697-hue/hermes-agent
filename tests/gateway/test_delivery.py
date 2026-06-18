@@ -136,7 +136,7 @@ class RecordingAdapter:
 
     async def ensure_dm_topic(self, chat_id, topic_name, force_create=False):
         self.ensure_dm_topic_calls.append(
-            {"chat_id": chat_id, "topic_name": topic_name, "force_create": force_create}
+            {"chat_id": chat_id, "topic_name": topic_name, "force_create": force_create},
         )
         return "38049"
 
@@ -154,7 +154,7 @@ class StaleTopicAdapter:
 
     async def ensure_dm_topic(self, chat_id, topic_name, force_create=False):
         self.ensure_dm_topic_calls.append(
-            {"chat_id": chat_id, "topic_name": topic_name, "force_create": force_create}
+            {"chat_id": chat_id, "topic_name": topic_name, "force_create": force_create},
         )
         return "38064" if force_create else "32343"
 
@@ -182,7 +182,7 @@ async def test_named_telegram_private_topic_is_created_before_delivery(tmp_path,
     await router._deliver_to_platform(target, "hello", metadata=None)
 
     assert adapter.ensure_dm_topic_calls == [
-        {"chat_id": "722341991", "topic_name": "Hermes API Test", "force_create": False}
+        {"chat_id": "722341991", "topic_name": "Hermes API Test", "force_create": False},
     ]
     assert adapter.calls == [
         {
@@ -192,7 +192,7 @@ async def test_named_telegram_private_topic_is_created_before_delivery(tmp_path,
                 "thread_id": "38049",
                 "telegram_dm_topic_created_for_send": True,
             },
-        }
+        },
     ]
 
 
@@ -236,7 +236,7 @@ async def test_explicit_telegram_private_thread_uses_reply_fallback_with_anchor(
                 "thread_id": "32344",
                 "telegram_dm_topic_reply_fallback": True,
             },
-        }
+        },
     ]
 
 

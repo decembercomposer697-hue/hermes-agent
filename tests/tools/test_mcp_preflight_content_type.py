@@ -148,8 +148,8 @@ def test_network_error_passes():
     s.server_close()
     asyncio.run(
         task._preflight_content_type(
-            f"http://127.0.0.1:{dead_port}/mcp", timeout=2.0
-        )
+            f"http://127.0.0.1:{dead_port}/mcp", timeout=2.0,
+        ),
     )
 
 

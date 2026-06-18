@@ -52,7 +52,7 @@ class QwenProfile(ProviderProfile):
         return prepared
 
     def build_extra_body(
-        self, *, session_id: str | None = None, **context
+        self, *, session_id: str | None = None, **context,
     ) -> dict[str, Any]:
         return {"vl_high_resolution_images": True}
 

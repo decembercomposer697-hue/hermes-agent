@@ -69,13 +69,13 @@ class TestSanitizePluginName:
 
     def test_allow_subdir_accepts_single_slash(self, tmp_path):
         target = _sanitize_plugin_name(
-            "observability/langfuse", tmp_path, allow_subdir=True
+            "observability/langfuse", tmp_path, allow_subdir=True,
         )
         assert target == (tmp_path / "observability" / "langfuse").resolve()
 
     def test_allow_subdir_strips_leading_trailing_slash(self, tmp_path):
         target = _sanitize_plugin_name(
-            "/image_gen/openai/", tmp_path, allow_subdir=True
+            "/image_gen/openai/", tmp_path, allow_subdir=True,
         )
         assert target == (tmp_path / "image_gen" / "openai").resolve()
 
@@ -153,7 +153,7 @@ class TestResolveGitUrl:
 
     def test_https_url_with_nested_subdir(self):
         url, subdir = _resolve_git_url(
-            "https://github.com/owner/repo.git/path/to/plugin"
+            "https://github.com/owner/repo.git/path/to/plugin",
         )
         assert url == "https://github.com/owner/repo.git"
         assert subdir == "path/to/plugin"
@@ -415,7 +415,7 @@ class TestCmdUpdate:
         mock_target = MagicMock()
         mock_target.exists.return_value = True
         mock_target.__truediv__ = lambda self, x: MagicMock(
-            exists=MagicMock(return_value=True)
+            exists=MagicMock(return_value=True),
         )
         mock_sanitize.return_value = mock_target
 
@@ -508,7 +508,7 @@ class TestCmdList:
         mock_plugin_dir.name = "test-plugin"
         mock_plugin_dir.is_dir.return_value = True
         mock_plugin_dir.__truediv__ = lambda self, x: MagicMock(
-            exists=MagicMock(return_value=False)
+            exists=MagicMock(return_value=False),
         )
         mock_plugins_dir_val.iterdir.return_value = [mock_plugin_dir]
         mock_plugins_dir.return_value = mock_plugins_dir_val
@@ -816,7 +816,7 @@ class TestSubdirInstallE2E:
         plugin_dir = repo_root / "my-plugin"
         plugin_dir.mkdir()
         (plugin_dir / "plugin.yaml").write_text(
-            "name: my-plugin\nmanifest_version: 1\ndescription: A subdir plugin\n"
+            "name: my-plugin\nmanifest_version: 1\ndescription: A subdir plugin\n",
         )
         (plugin_dir / "__init__.py").write_text("# plugin entry\n")
 

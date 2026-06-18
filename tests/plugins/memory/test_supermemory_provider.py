@@ -262,7 +262,7 @@ def test_store_tool_returns_saved_payload(provider):
 
 def test_search_tool_formats_results(provider):
     provider._client.search_results = [
-        {"id": "m1", "memory": "Jordan likes concise docs", "similarity": 0.92}
+        {"id": "m1", "memory": "Jordan likes concise docs", "similarity": 0.92},
     ]
     result = json.loads(provider.handle_tool_call("supermemory_search", {"query": "concise docs"}))
     assert result["count"] == 1

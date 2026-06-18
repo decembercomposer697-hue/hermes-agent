@@ -40,7 +40,7 @@ class FakeTransport(httpx.AsyncBaseTransport):
                 "host_header": request.headers.get("host"),
                 "sni_hostname": request.extensions.get("sni_hostname"),
                 "path": request.url.path,
-            }
+            },
         )
         action = self.behavior.get(request.url.host, "ok")
         if action == "timeout":
@@ -305,14 +305,14 @@ class TestFallbackTransportPassthrough:
 class TestFallbackTransportInit:
     def test_deduplicates_fallback_ips(self, monkeypatch):
         monkeypatch.setattr(
-            tnet.httpx, "AsyncHTTPTransport", lambda **kw: FakeTransport([], {})
+            tnet.httpx, "AsyncHTTPTransport", lambda **kw: FakeTransport([], {}),
         )
         transport = tnet.TelegramFallbackTransport(["149.154.167.220", "149.154.167.220"])
         assert transport._fallback_ips == ["149.154.167.220"]
 
     def test_filters_invalid_ips_at_init(self, monkeypatch):
         monkeypatch.setattr(
-            tnet.httpx, "AsyncHTTPTransport", lambda **kw: FakeTransport([], {})
+            tnet.httpx, "AsyncHTTPTransport", lambda **kw: FakeTransport([], {}),
         )
         transport = tnet.TelegramFallbackTransport(["149.154.167.220", "not-an-ip"])
         assert transport._fallback_ips == ["149.154.167.220"]
@@ -651,7 +651,7 @@ class TestDiscoverFallbackIps:
                 {"type": 5, "data": "telegram.org"},  # CNAME
                 {"type": 28, "data": "2001:67c:4e8:f004::9"},  # AAAA
                 {"type": 1, "data": "149.154.167.220"},  # A ✓
-            ]
+            ],
         }
         self._patch_doh(monkeypatch, {
             "https://dns.google": (200, answer),

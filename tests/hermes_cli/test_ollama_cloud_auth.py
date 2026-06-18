@@ -31,7 +31,7 @@ class TestOllamaCloudCredentials:
                 "default": "qwen3.5:397b",
                 "provider": "custom",
                 "base_url": "https://ollama.com/v1",
-            }
+            },
         }
         monkeypatch.setattr(
             "hermes_cli.runtime_provider._get_model_config",
@@ -55,7 +55,7 @@ class TestOllamaCloudCredentials:
             "model": {
                 "provider": "custom",
                 "base_url": "http://localhost:11434/v1",
-            }
+            },
         }
         monkeypatch.setattr(
             "hermes_cli.runtime_provider._get_model_config",
@@ -84,8 +84,8 @@ class TestDirectAliases:
                     "model": "custom-model:latest",
                     "provider": "custom",
                     "base_url": "https://example.com/v1",
-                }
-            }
+                },
+            },
         }
         monkeypatch.setattr(
             "hermes_cli.config.load_config",
@@ -270,7 +270,7 @@ class TestLoadDirectAliasesEdgeCases:
                     "model": "valid-model",
                     "provider": "custom",
                 },
-            }
+            },
         }
         monkeypatch.setattr(
             "hermes_cli.config.load_config",
@@ -290,7 +290,7 @@ class TestLoadDirectAliasesEdgeCases:
                 "none_entry": None,
                 "list_entry": ["a", "b"],
                 "good": {"model": "real-model", "provider": "custom"},
-            }
+            },
         }
         monkeypatch.setattr(
             "hermes_cli.config.load_config",
@@ -322,8 +322,8 @@ class TestLoadDirectAliasesEdgeCases:
                 "  MyModel  ": {
                     "model": "my-model:latest",
                     "provider": "custom",
-                }
-            }
+                },
+            },
         }
         monkeypatch.setattr(
             "hermes_cli.config.load_config",
@@ -341,7 +341,7 @@ class TestLoadDirectAliasesEdgeCases:
             "model_aliases": {
                 "empty": {"model": "", "provider": "custom"},
                 "good": {"model": "real", "provider": "custom"},
-            }
+            },
         }
         monkeypatch.setattr(
             "hermes_cli.config.load_config",
@@ -368,7 +368,7 @@ class TestEnsureDirectAliases:
         mock_config = {
             "model_aliases": {
                 "test": {"model": "test-model", "provider": "custom"},
-            }
+            },
         }
         monkeypatch.setattr(
             "hermes_cli.config.load_config",

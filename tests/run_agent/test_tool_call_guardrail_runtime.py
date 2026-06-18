@@ -80,7 +80,7 @@ def _hard_stop_config(**overrides) -> dict:
                 "same_tool_failure": 8,
                 "idempotent_no_progress": 5,
             },
-        }
+        },
     }
     cfg["tool_loop_guardrails"].update(overrides)
     return cfg

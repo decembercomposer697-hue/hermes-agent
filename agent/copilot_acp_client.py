@@ -127,7 +127,7 @@ def _permission_denied(message_id: Any) -> dict[str, Any]:
         "result": {
             "outcome": {
                 "outcome": "cancelled",
-            }
+            },
         },
     }
 
@@ -163,14 +163,14 @@ def _format_messages_as_prompt(
                     "name": name.strip(),
                     "description": fn.get("description", ""),
                     "parameters": fn.get("parameters", {}),
-                }
+                },
             )
         if tool_specs:
             sections.append(
                 "Available tools (OpenAI function schema). "
                 "When using a tool, emit ONLY <tool_call>{...}</tool_call> with one JSON object "
                 "containing id/type/function{name,arguments}. arguments must be a JSON string.\n"
-                + json.dumps(tool_specs, ensure_ascii=False)
+                + json.dumps(tool_specs, ensure_ascii=False),
             )
 
     if tool_choice is not None:
@@ -265,7 +265,7 @@ def _extract_tool_calls_from_text(text: str) -> tuple[list[SimpleNamespace], str
                 response_item_id=None,
                 type="function",
                 function=SimpleNamespace(name=fn_name.strip(), arguments=fn_args),
-            )
+            ),
         )
 
     for m in _TOOL_CALL_BLOCK_RE.finditer(text):
@@ -450,7 +450,7 @@ class CopilotACPClient:
         except FileNotFoundError as exc:
             raise RuntimeError(
                 f"Could not start Copilot ACP command '{self._acp_command}'. "
-                "Install GitHub Copilot CLI or set HERMES_COPILOT_ACP_COMMAND/COPILOT_CLI_PATH."
+                "Install GitHub Copilot CLI or set HERMES_COPILOT_ACP_COMMAND/COPILOT_CLI_PATH.",
             ) from exc
 
         if proc.stdin is None or proc.stdout is None:
@@ -522,7 +522,7 @@ class CopilotACPClient:
                 if "error" in msg:
                     err = msg.get("error") or {}
                     raise RuntimeError(
-                        f"Copilot ACP {method} failed: {err.get('message') or err}"
+                        f"Copilot ACP {method} failed: {err.get('message') or err}",
                     )
                 return msg.get("result")
 
@@ -541,7 +541,7 @@ class CopilotACPClient:
                         "  export HERMES_COPILOT_ACP_COMMAND=/path/to/new/copilot\n\n"
                         "Alternative: use the `copilot` provider (no ACP, hits the Copilot API\n"
                         "directly with a Copilot subscription token) via `hermes setup`.\n\n"
-                        f"Original error:\n{stderr_text}"
+                        f"Original error:\n{stderr_text}",
                     )
                 raise RuntimeError(f"Copilot ACP process exited early: {stderr_text}")
             raise TimeoutError(f"Timed out waiting for Copilot ACP response to {method}.")
@@ -555,7 +555,7 @@ class CopilotACPClient:
                         "fs": {
                             "readTextFile": True,
                             "writeTextFile": True,
-                        }
+                        },
                     },
                     "clientInfo": {
                         "name": "hermes-agent",
@@ -585,7 +585,7 @@ class CopilotACPClient:
                         {
                             "type": "text",
                             "text": prompt_text,
-                        }
+                        },
                     ],
                 },
                 text_parts=text_parts,
@@ -663,7 +663,7 @@ class CopilotACPClient:
                 path = _ensure_path_within_cwd(str(params.get("path") or ""), cwd)
                 if is_write_denied(str(path)):
                     raise PermissionError(
-                        f"Write denied: '{path}' is a protected system/credential file."
+                        f"Write denied: '{path}' is a protected system/credential file.",
                     )
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text(str(params.get("content") or ""))

@@ -91,7 +91,7 @@ def _load_skill_payload(skill_identifier: str, task_id: str | None = None) -> tu
             normalized = raw_identifier.lstrip("/")
 
         loaded_skill = json.loads(
-            skill_view(normalized, task_id=task_id, preprocess=False)
+            skill_view(normalized, task_id=task_id, preprocess=False),
         )
     except Exception:
         return None
@@ -190,7 +190,7 @@ def _build_skill_message(
         parts.append(
             "Resolve any relative paths in this skill (e.g. `scripts/foo.js`, "
             "`templates/config.yaml`) against that directory, then run them "
-            "with the terminal tool using the absolute path."
+            "with the terminal tool using the absolute path.",
         )
 
     # ── Inject resolved skill config values ──
@@ -201,21 +201,21 @@ def _build_skill_message(
             [
                 "",
                 "[Skill setup note: Required environment setup was skipped. Continue loading the skill and explain any reduced functionality if it matters.]",
-            ]
+            ],
         )
     elif loaded_skill.get("gateway_setup_hint"):
         parts.extend(
             [
                 "",
                 f"[Skill setup note: {loaded_skill['gateway_setup_hint']}]",
-            ]
+            ],
         )
     elif loaded_skill.get("setup_needed") and loaded_skill.get("setup_note"):
         parts.extend(
             [
                 "",
                 f"[Skill setup note: {loaded_skill['setup_note']}]",
-            ]
+            ],
         )
 
     supporting = []
@@ -246,7 +246,7 @@ def _build_skill_message(
         parts.append(
             f'\nLoad any of these with skill_view(name="{skill_view_target}", '
             f'file_path="<path>"), or run scripts directly by absolute path '
-            f"(e.g. `node {skill_dir}/scripts/foo.js`)."
+            f"(e.g. `node {skill_dir}/scripts/foo.js`).",
         )
 
     if user_instruction:
@@ -520,7 +520,7 @@ def build_preloaded_skills_prompt(
                 skill_dir,
                 activation_note,
                 session_id=task_id,
-            )
+            ),
         )
         loaded_names.append(skill_name)
 

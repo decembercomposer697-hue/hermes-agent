@@ -232,7 +232,7 @@ class TestStepCallback:
             cb(1, [{"name": "terminal", "result": '{"output": "hello"}'}])
 
         mock_btc.assert_called_once_with(
-            "tc-xyz789", "terminal", result='{"output": "hello"}', function_args=None, snapshot=None
+            "tc-xyz789", "terminal", result='{"output": "hello"}', function_args=None, snapshot=None,
         )
 
     def test_none_result_passed_through(self, mock_conn, event_loop_fixture):

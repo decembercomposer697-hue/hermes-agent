@@ -176,7 +176,7 @@ def make_runner(platform: Platform, session_entry: SessionEntry = None) -> "Gate
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={platform: PlatformConfig(enabled=True, token="e2e-test-token")}
+        platforms={platform: PlatformConfig(enabled=True, token="e2e-test-token")},
     )
     runner.adapters = {}
     runner._voice_mode = {}

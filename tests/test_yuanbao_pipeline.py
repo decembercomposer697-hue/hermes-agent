@@ -557,7 +557,7 @@ class TestExtractContentMiddleware:
         msg_body = [
             {"msg_type": "TIMTextElem", "msg_content": {"text": "Hello!"}},
             {"msg_type": "TIMImageElem", "msg_content": {
-                "image_info_array": [{"url": "https://img.example.com/1.jpg"}]
+                "image_info_array": [{"url": "https://img.example.com/1.jpg"}],
             }},
         ]
         ctx = make_ctx(adapter=adapter, msg_body=msg_body)
@@ -621,7 +621,7 @@ class TestGroupAtGuardMiddleware:
         adapter._bot_id = "bot_123"
         msg_body = [
             {"msg_type": "TIMCustomElem", "msg_content": {
-                "data": json.dumps({"elem_type": 1002, "text": "@Bot", "user_id": "bot_123"})
+                "data": json.dumps({"elem_type": 1002, "text": "@Bot", "user_id": "bot_123"}),
             }},
         ]
         ctx = make_ctx(
@@ -963,7 +963,7 @@ class TestQuoteContextMiddleware:
                 "id": "quoted-msg-001",
                 "desc": "Hello world",
                 "sender_nickname": "Alice",
-            }
+            },
         })
         quote_id, quote_text = QuoteContextMiddleware()._extract_quote_context(cloud_data)
         assert quote_id == "quoted-msg-001"
@@ -976,7 +976,7 @@ class TestQuoteContextMiddleware:
                 "id": "quoted-msg-003",
                 "desc": "",
                 "sender_nickname": "Carol",
-            }
+            },
         })
         quote_id, quote_text = QuoteContextMiddleware()._extract_quote_context(cloud_data)
         assert quote_id == "quoted-msg-003"
@@ -988,7 +988,7 @@ class TestQuoteContextMiddleware:
             "quote": {
                 "id": "",
                 "desc": "some text",
-            }
+            },
         })
         quote_id, _quote_text = QuoteContextMiddleware()._extract_quote_context(cloud_data)
         assert quote_id is None
@@ -1005,7 +1005,7 @@ class TestQuoteContextMiddleware:
                 "id": "quoted-msg-004",
                 "desc": "Check this image",
                 "sender_nickname": "Dave",
-            }
+            },
         })
         adapter = make_adapter()
         adapter._session_store = None  # no transcript lookup path

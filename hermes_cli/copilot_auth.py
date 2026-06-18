@@ -77,7 +77,7 @@ def resolve_copilot_token() -> tuple[str, str]:
             valid, msg = validate_copilot_token(val)
             if not valid:
                 logger.warning(
-                    "Token from %s is not supported: %s", env_var, msg
+                    "Token from %s is not supported: %s", env_var, msg,
                 )
                 continue
             return val, env_var
@@ -88,7 +88,7 @@ def resolve_copilot_token() -> tuple[str, str]:
         valid, msg = validate_copilot_token(token)
         if not valid:
             raise ValueError(
-                f"Token from `gh auth token` is a classic PAT (ghp_*). {msg}"
+                f"Token from `gh auth token` is a classic PAT (ghp_*). {msg}",
             )
         return token, "gh auth token"
 

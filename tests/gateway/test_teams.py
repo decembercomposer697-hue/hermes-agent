@@ -31,7 +31,7 @@ def _ensure_teams_mock():
     microsoft_teams_api_activities_typing = types.ModuleType("microsoft_teams.api.activities.typing")
     microsoft_teams_api_activities_invoke = types.ModuleType("microsoft_teams.api.activities.invoke")
     microsoft_teams_api_activities_invoke_adaptive_card = types.ModuleType(
-        "microsoft_teams.api.activities.invoke.adaptive_card"
+        "microsoft_teams.api.activities.invoke.adaptive_card",
     )
     microsoft_teams_common = types.ModuleType("microsoft_teams.common")
     microsoft_teams_common_http = types.ModuleType("microsoft_teams.common.http")
@@ -282,7 +282,7 @@ class TestTeamsAdapterInit:
 
     def test_invalid_port_from_extra_falls_back_to_default(self):
         adapter = TeamsAdapter(
-            _make_config(client_id="id", client_secret="secret", tenant_id="tenant", port="abc")
+            _make_config(client_id="id", client_secret="secret", tenant_id="tenant", port="abc"),
         )
         assert adapter._port == 3978
 
@@ -502,7 +502,7 @@ class TestTeamsSummaryWriter:
     @pytest.mark.anyio
     async def test_graph_delivery_posts_to_channel(self):
         graph_client = SimpleNamespace(
-            post_json=AsyncMock(return_value={"id": "msg-123", "webUrl": "https://teams.example/messages/123"})
+            post_json=AsyncMock(return_value={"id": "msg-123", "webUrl": "https://teams.example/messages/123"}),
         )
         writer = TeamsSummaryWriter(graph_client=graph_client)
         payload = _make_summary_payload()

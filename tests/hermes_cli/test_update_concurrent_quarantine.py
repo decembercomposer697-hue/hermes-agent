@@ -379,7 +379,7 @@ def test_quarantine_retries_then_succeeds(_winp, tmp_path, monkeypatch):
     # Speed up the test: avoid actual sleeps in the backoff schedule.
     monkeypatch.setattr(cli_main, "_hermes_exe_shims", lambda d: [shim])
     with patch.object(Path, "rename", flaky_rename), patch(
-        "time.sleep", lambda *_a, **_k: None
+        "time.sleep", lambda *_a, **_k: None,
     ):
         pairs = cli_main._quarantine_running_hermes_exe(tmp_path)
 
@@ -405,7 +405,7 @@ def test_quarantine_falls_back_to_reboot_schedule(_winp, tmp_path, capsys, monke
 
     monkeypatch.setattr(cli_main, "_hermes_exe_shims", lambda d: [shim])
     with patch.object(Path, "rename", always_fails), patch.object(
-        cli_main, "_schedule_replace_on_reboot", fake_schedule
+        cli_main, "_schedule_replace_on_reboot", fake_schedule,
     ), patch("time.sleep", lambda *_a, **_k: None):
         pairs = cli_main._quarantine_running_hermes_exe(tmp_path)
 
@@ -423,7 +423,7 @@ def test_quarantine_falls_back_to_reboot_schedule(_winp, tmp_path, capsys, monke
 
 @patch.object(cli_main, "_is_windows", return_value=True)
 def test_quarantine_actionable_warning_when_everything_fails(
-    _winp, tmp_path, capsys, monkeypatch
+    _winp, tmp_path, capsys, monkeypatch,
 ):
     """When even MoveFileEx fails we should print remediation hints, not a bare error."""
     shim = tmp_path / "hermes.exe"
@@ -434,7 +434,7 @@ def test_quarantine_actionable_warning_when_everything_fails(
 
     monkeypatch.setattr(cli_main, "_hermes_exe_shims", lambda d: [shim])
     with patch.object(Path, "rename", always_fails), patch.object(
-        cli_main, "_schedule_replace_on_reboot", lambda *_a, **_k: False
+        cli_main, "_schedule_replace_on_reboot", lambda *_a, **_k: False,
     ), patch("time.sleep", lambda *_a, **_k: None):
         pairs = cli_main._quarantine_running_hermes_exe(tmp_path)
 
@@ -468,17 +468,17 @@ def test_cmd_update_aborts_on_concurrent_instance(_winp, tmp_path, capsys):
     )
 
     with patch.object(
-        cli_main, "_venv_scripts_dir", return_value=scripts_dir
+        cli_main, "_venv_scripts_dir", return_value=scripts_dir,
     ), patch.object(
         cli_main,
         "_detect_concurrent_hermes_instances",
         return_value=[(4242, "hermes.exe")],
     ), patch.object(
-        cli_main, "_run_pre_update_backup"
+        cli_main, "_run_pre_update_backup",
     ) as mock_backup, patch.object(
-        cli_main, "_install_hangup_protection", return_value={}
+        cli_main, "_install_hangup_protection", return_value={},
     ), patch.object(
-        cli_main, "_finalize_update_output"
+        cli_main, "_finalize_update_output",
     ):
         with pytest.raises(SystemExit) as excinfo:
             cli_main.cmd_update(args)
@@ -515,15 +515,15 @@ def test_cmd_update_force_bypasses_concurrent_check(_winp, tmp_path):
     # AFTER the gate. _run_pre_update_backup is the first call after the gate.
     sentinel = RuntimeError("reached post-gate body")
     with patch.object(
-        cli_main, "_venv_scripts_dir", return_value=scripts_dir
+        cli_main, "_venv_scripts_dir", return_value=scripts_dir,
     ), patch.object(
-        cli_main, "_detect_concurrent_hermes_instances", detect
+        cli_main, "_detect_concurrent_hermes_instances", detect,
     ), patch.object(
-        cli_main, "_run_pre_update_backup", side_effect=sentinel
+        cli_main, "_run_pre_update_backup", side_effect=sentinel,
     ), patch.object(
-        cli_main, "_install_hangup_protection", return_value={}
+        cli_main, "_install_hangup_protection", return_value={},
     ), patch.object(
-        cli_main, "_finalize_update_output"
+        cli_main, "_finalize_update_output",
     ):
         with pytest.raises(RuntimeError, match="reached post-gate body"):
             cli_main.cmd_update(args)

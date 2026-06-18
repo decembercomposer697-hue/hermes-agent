@@ -69,7 +69,7 @@ def _bootstrap(monkeypatch, tmp_path):
 
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "fake"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "fake"},
     )
     monkeypatch.setattr(
         "agent.model_metadata.get_model_context_length",
@@ -125,7 +125,7 @@ def _assert_user_call_has_skip_db(calls, expected_skip_db: bool):
 
 @pytest.mark.asyncio
 async def test_agent_failed_early_skip_db_when_agent_has_session_db(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     runner = _bootstrap(monkeypatch, tmp_path)
 
@@ -138,15 +138,15 @@ async def test_agent_failed_early_skip_db_when_agent_has_session_db(
             "messages": [],
             "history_offset": 0,
             "last_prompt_tokens": 0,
-        }
+        },
     )
 
     await runner._handle_message_with_agent(
-        _event(), _source(), "agent:main:telegram:group:-1001:12345", 1
+        _event(), _source(), "agent:main:telegram:group:-1001:12345", 1,
     )
 
     _assert_user_call_has_skip_db(
-        runner.session_store.append_to_transcript.call_args_list, True
+        runner.session_store.append_to_transcript.call_args_list, True,
     )
 
 
@@ -155,7 +155,7 @@ async def test_agent_failed_early_skip_db_when_agent_has_session_db(
 
 @pytest.mark.asyncio
 async def test_agent_failed_early_no_skip_db_when_no_session_db(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     runner = _bootstrap(monkeypatch, tmp_path)
     runner._session_db = None  # No agent DB → agent_persisted=False
@@ -168,15 +168,15 @@ async def test_agent_failed_early_no_skip_db_when_no_session_db(
             "messages": [],
             "history_offset": 0,
             "last_prompt_tokens": 0,
-        }
+        },
     )
 
     await runner._handle_message_with_agent(
-        _event(), _source(), "agent:main:telegram:group:-1001:12345", 1
+        _event(), _source(), "agent:main:telegram:group:-1001:12345", 1,
     )
 
     _assert_user_call_has_skip_db(
-        runner.session_store.append_to_transcript.call_args_list, False
+        runner.session_store.append_to_transcript.call_args_list, False,
     )
 
 
@@ -185,7 +185,7 @@ async def test_agent_failed_early_no_skip_db_when_no_session_db(
 
 @pytest.mark.asyncio
 async def test_not_new_messages_skip_db_when_agent_has_session_db(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     runner = _bootstrap(monkeypatch, tmp_path)
 
@@ -197,15 +197,15 @@ async def test_not_new_messages_skip_db_when_agent_has_session_db(
             "tools": [],
             "history_offset": 1,  # equals len(messages) → new_messages=[]
             "last_prompt_tokens": 0,
-        }
+        },
     )
 
     await runner._handle_message_with_agent(
-        _event(), _source(), "agent:main:telegram:group:-1001:12345", 1
+        _event(), _source(), "agent:main:telegram:group:-1001:12345", 1,
     )
 
     _assert_user_call_has_skip_db(
-        runner.session_store.append_to_transcript.call_args_list, True
+        runner.session_store.append_to_transcript.call_args_list, True,
     )
 
 
@@ -214,7 +214,7 @@ async def test_not_new_messages_skip_db_when_agent_has_session_db(
 
 @pytest.mark.asyncio
 async def test_normal_path_skip_db_when_agent_has_session_db(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     runner = _bootstrap(monkeypatch, tmp_path)
 
@@ -229,13 +229,13 @@ async def test_normal_path_skip_db_when_agent_has_session_db(
             "tools": [],
             "history_offset": 0,
             "last_prompt_tokens": 0,
-        }
+        },
     )
 
     await runner._handle_message_with_agent(
-        _event(), _source(), "agent:main:telegram:group:-1001:12345", 1
+        _event(), _source(), "agent:main:telegram:group:-1001:12345", 1,
     )
 
     _assert_user_call_has_skip_db(
-        runner.session_store.append_to_transcript.call_args_list, True
+        runner.session_store.append_to_transcript.call_args_list, True,
     )

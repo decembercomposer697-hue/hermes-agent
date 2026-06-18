@@ -184,7 +184,7 @@ def _cmd_subscribe(args):
         if route["deliver"] == "log":
             print(
                 "Error: --deliver-only requires --deliver to be a real target "
-                "(telegram, discord, slack, github_comment, etc.) — not 'log'."
+                "(telegram, discord, slack, github_comment, etc.) — not 'log'.",
             )
             return
         route["deliver_only"] = True
@@ -274,7 +274,7 @@ def _cmd_test(args):
     import hmac
     import hashlib
     sig = "sha256=" + hmac.new(
-        secret.encode(), payload.encode(), hashlib.sha256
+        secret.encode(), payload.encode(), hashlib.sha256,
     ).hexdigest()
 
     print(f"  Sending test POST to {url}")

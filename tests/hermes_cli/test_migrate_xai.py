@@ -91,7 +91,7 @@ class TestNoOpPaths:
                     config_path="principal.model",
                     current_model="grok-3",
                     replacement="grok-4.3",
-                )
+                ),
             ])
 
 

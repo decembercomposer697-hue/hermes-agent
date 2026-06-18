@@ -205,7 +205,7 @@ async def test_auto_registered_command_with_args(adapter):
     adapter._run_simple_slash.reset_mock()
     await branch_cmd.callback(interaction, args="my-branch")
     adapter._run_simple_slash.assert_awaited_once_with(
-        interaction, "/branch my-branch"
+        interaction, "/branch my-branch",
     )
 
 
@@ -222,7 +222,7 @@ async def test_auto_registers_plugin_commands_for_discord(adapter):
                 "description": "Metrics dashboard",
                 "args_hint": "dias:7 formato:json",
                 "plugin": "metrics-plugin",
-            }
+            },
         },
     ):
         adapter._register_slash_commands()
@@ -234,7 +234,7 @@ async def test_auto_registers_plugin_commands_for_discord(adapter):
     interaction = SimpleNamespace()
     await metricas_cmd.callback(interaction, args="dias:7 formato:json")
     adapter._run_simple_slash.assert_awaited_once_with(
-        interaction, "/metricas dias:7 formato:json"
+        interaction, "/metricas dias:7 formato:json",
     )
 
 
@@ -251,7 +251,7 @@ async def test_auto_registered_plugin_command_without_args_hint(adapter):
                 "description": "Ping the plugin",
                 "args_hint": "",
                 "plugin": "ping-plugin",
-            }
+            },
         },
     ):
         adapter._register_slash_commands()
@@ -276,7 +276,7 @@ async def test_plugin_command_name_conflict_skipped(adapter):
                 "description": "Plugin status",
                 "args_hint": "",
                 "plugin": "shadow-plugin",
-            }
+            },
         },
     ):
         adapter._register_slash_commands()

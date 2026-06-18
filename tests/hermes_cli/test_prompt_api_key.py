@@ -83,7 +83,7 @@ def test_replace_saves_new_key(profile_env):
     save_env_value("DEEPSEEK_API_KEY", "sk-malformed-junk")
 
     key, abort = _run_prompt(
-        existing_key="sk-malformed-junk", choice="r", new_key="sk-fresh"
+        existing_key="sk-malformed-junk", choice="r", new_key="sk-fresh",
     )
     assert key == "sk-fresh"
     assert abort is False
@@ -96,7 +96,7 @@ def test_replace_cancelled_preserves_key(profile_env):
     save_env_value("DEEPSEEK_API_KEY", "sk-existing")
 
     key, abort = _run_prompt(
-        existing_key="sk-existing", choice="r", new_key=""
+        existing_key="sk-existing", choice="r", new_key="",
     )
     assert key == "sk-existing"
     assert abort is False

@@ -33,7 +33,7 @@ class _FakeChatCompletions:
                 SimpleNamespace(
                     message=SimpleNamespace(content="done", reasoning=None, tool_calls=[]),
                     finish_reason="stop",
-                )
+                ),
             ],
             usage=None,
         )

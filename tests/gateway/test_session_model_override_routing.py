@@ -78,7 +78,7 @@ def _codex_override():
 
 def _explode_runtime_resolution():
     raise AssertionError(
-        "global runtime resolution should not run when a complete session override exists"
+        "global runtime resolution should not run when a complete session override exists",
     )
 
 
@@ -113,7 +113,7 @@ def test_run_agent_prefers_session_override_over_global_runtime(monkeypatch):
             source=source,
             session_id="session-1",
             session_key=session_key,
-        )
+        ),
     )
 
     assert result["final_response"] == "ok"

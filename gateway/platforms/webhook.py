@@ -137,7 +137,7 @@ class WebhookAdapter(BasePlatformAdapter):
 
         # Body size limit (auth-before-body pattern)
         self._max_body_bytes: int = int(
-            config.extra.get("max_body_bytes", 1_048_576)
+            config.extra.get("max_body_bytes", 1_048_576),
         )  # 1MB
 
     # ------------------------------------------------------------------
@@ -155,7 +155,7 @@ class WebhookAdapter(BasePlatformAdapter):
                 raise ValueError(
                     f"[webhook] Route '{name}' has no HMAC secret. "
                     f"Set 'secret' on the route or globally. "
-                    f"For testing without auth, set secret to '{_INSECURE_NO_AUTH}'."
+                    f"For testing without auth, set secret to '{_INSECURE_NO_AUTH}'.",
                 )
 
             # Safety rail: refuse to start if INSECURE_NO_AUTH is combined with a
@@ -167,7 +167,7 @@ class WebhookAdapter(BasePlatformAdapter):
                     f"[webhook] Route '{name}' uses INSECURE_NO_AUTH secret "
                     f"but is bound to non-loopback host '{self._host}'. "
                     f"INSECURE_NO_AUTH is for local testing only. "
-                    f"Refusing to start to prevent accidental exposure."
+                    f"Refusing to start to prevent accidental exposure.",
                 )
             # deliver_only routes bypass the agent — the POST body becomes a
             # direct push notification via the configured delivery target.
@@ -179,7 +179,7 @@ class WebhookAdapter(BasePlatformAdapter):
                     raise ValueError(
                         f"[webhook] Route '{name}' has deliver_only=true but "
                         f"deliver is '{deliver}'. Direct delivery requires a "
-                        f"real target (telegram, discord, slack, github_comment, etc.)."
+                        f"real target (telegram, discord, slack, github_comment, etc.).",
                     )
 
         app = web.Application()
@@ -256,12 +256,12 @@ class WebhookAdapter(BasePlatformAdapter):
                 pass
         if self.gateway_runner and _is_known_platform:
             return await self._deliver_cross_platform(
-                deliver_type, content, delivery
+                deliver_type, content, delivery,
             )
 
         logger.warning("[webhook] Unknown deliver type: %s", deliver_type)
         return SendResult(
-            success=False, error=f"Unknown deliver type: {deliver_type}"
+            success=False, error=f"Unknown deliver type: {deliver_type}",
         )
 
     def _prune_delivery_info(self, now: float) -> None:
@@ -361,7 +361,7 @@ class WebhookAdapter(BasePlatformAdapter):
 
         if not route_config:
             return web.json_response(
-                {"error": f"Unknown route: {route_name}"}, status=404
+                {"error": f"Unknown route: {route_name}"}, status=404,
             )
 
         # Disabled routes are kept in the subscriptions file (so the dashboard
@@ -370,7 +370,7 @@ class WebhookAdapter(BasePlatformAdapter):
         # mcp_servers ``enabled`` semantics.
         if route_config.get("enabled", True) is False:
             return web.json_response(
-                {"error": f"Route disabled: {route_name}"}, status=403
+                {"error": f"Route disabled: {route_name}"}, status=403,
             )
 
         # ── Auth-before-body ─────────────────────────────────────
@@ -378,7 +378,7 @@ class WebhookAdapter(BasePlatformAdapter):
         content_length = request.content_length or 0
         if content_length > self._max_body_bytes:
             return web.json_response(
-                {"error": "Payload too large"}, status=413
+                {"error": "Payload too large"}, status=413,
             )
 
         # Read body (must be done before any validation)
@@ -405,10 +405,10 @@ class WebhookAdapter(BasePlatformAdapter):
         if secret != _INSECURE_NO_AUTH:
             if not self._validate_signature(request, raw_body, secret):
                 logger.warning(
-                    "[webhook] Invalid signature for route %s", route_name
+                    "[webhook] Invalid signature for route %s", route_name,
                 )
                 return web.json_response(
-                    {"error": "Invalid signature"}, status=401
+                    {"error": "Invalid signature"}, status=401,
                 )
 
         # ── Rate limiting (after auth) ───────────────────────────
@@ -417,7 +417,7 @@ class WebhookAdapter(BasePlatformAdapter):
         window[:] = [t for t in window if now - t < 60]
         if len(window) >= self._rate_limit:
             return web.json_response(
-                {"error": "Rate limit exceeded"}, status=429
+                {"error": "Rate limit exceeded"}, status=429,
             )
         window.append(now)
 
@@ -430,11 +430,11 @@ class WebhookAdapter(BasePlatformAdapter):
                 import urllib.parse
 
                 payload = dict(
-                    urllib.parse.parse_qsl(raw_body.decode("utf-8"))
+                    urllib.parse.parse_qsl(raw_body.decode("utf-8")),
                 )
             except Exception:
                 return web.json_response(
-                    {"error": "Cannot parse body"}, status=400
+                    {"error": "Cannot parse body"}, status=400,
                 )
 
         # Check event type filter
@@ -454,13 +454,13 @@ class WebhookAdapter(BasePlatformAdapter):
                 allowed_events,
             )
             return web.json_response(
-                {"status": "ignored", "event": event_type}
+                {"status": "ignored", "event": event_type},
             )
 
         # Format prompt from template
         prompt_template = route_config.get("prompt", "")
         prompt = self._render_prompt(
-            prompt_template, payload, event_type, route_name
+            prompt_template, payload, event_type, route_name,
         )
 
         # Inject skill content if configured.
@@ -480,14 +480,14 @@ class WebhookAdapter(BasePlatformAdapter):
                     cmd_key = f"/{skill_name}"
                     if cmd_key in skill_cmds:
                         skill_content = build_skill_invocation_message(
-                            cmd_key, user_instruction=prompt
+                            cmd_key, user_instruction=prompt,
                         )
                         if skill_content:
                             prompt = skill_content
                             break  # Load the first matching skill
                     else:
                         logger.warning(
-                            "[webhook] Skill '%s' not found", skill_name
+                            "[webhook] Skill '%s' not found", skill_name,
                         )
             except Exception as e:
                 logger.warning("[webhook] Skill loading failed: %s", e)
@@ -512,7 +512,7 @@ class WebhookAdapter(BasePlatformAdapter):
         }
         if delivery_id in self._seen_deliveries:
             logger.info(
-                "[webhook] Skipping duplicate delivery %s", delivery_id
+                "[webhook] Skipping duplicate delivery %s", delivery_id,
             )
             return web.json_response(
                 {"status": "duplicate", "delivery_id": delivery_id},
@@ -530,7 +530,7 @@ class WebhookAdapter(BasePlatformAdapter):
             delivery = {
                 "deliver": route_config.get("deliver", "log"),
                 "deliver_extra": self._render_delivery_extra(
-                    route_config.get("deliver_extra", {}), payload
+                    route_config.get("deliver_extra", {}), payload,
                 ),
                 "payload": payload,
             }
@@ -588,7 +588,7 @@ class WebhookAdapter(BasePlatformAdapter):
         deliver_config = {
             "deliver": route_config.get("deliver", "log"),
             "deliver_extra": self._render_delivery_extra(
-                route_config.get("deliver_extra", {}), payload
+                route_config.get("deliver_extra", {}), payload,
             ),
             "payload": payload,
         }
@@ -641,7 +641,7 @@ class WebhookAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     def _validate_signature(
-        self, request: "web.Request", body: bytes, secret: str
+        self, request: "web.Request", body: bytes, secret: str,
     ) -> bool:
         """Validate webhook signature (GitHub, GitLab, Svix, generic HMAC-SHA256)."""
         def _header(name: str) -> str:
@@ -673,7 +673,7 @@ class WebhookAdapter(BasePlatformAdapter):
         gh_sig = request.headers.get("X-Hub-Signature-256", "")
         if gh_sig:
             expected = "sha256=" + hmac.new(
-                secret.encode(), body, hashlib.sha256
+                secret.encode(), body, hashlib.sha256,
             ).hexdigest()
             return hmac.compare_digest(gh_sig, expected)
 
@@ -686,13 +686,13 @@ class WebhookAdapter(BasePlatformAdapter):
         generic_sig = request.headers.get("X-Webhook-Signature", "")
         if generic_sig:
             expected = hmac.new(
-                secret.encode(), body, hashlib.sha256
+                secret.encode(), body, hashlib.sha256,
             ).hexdigest()
             return hmac.compare_digest(generic_sig, expected)
 
         # No recognised signature header but secret is configured → reject
         logger.debug(
-            "[webhook] Secret configured but no signature header found"
+            "[webhook] Secret configured but no signature header found",
         )
         return False
 
@@ -732,7 +732,7 @@ class WebhookAdapter(BasePlatformAdapter):
 
         signed_content = msg_id.encode() + b"." + timestamp.encode() + b"." + body
         expected = base64.b64encode(
-            hmac.new(key, signed_content, hashlib.sha256).digest()
+            hmac.new(key, signed_content, hashlib.sha256).digest(),
         ).decode()
 
         # Svix can send multiple signatures separated by spaces during secret
@@ -791,7 +791,7 @@ class WebhookAdapter(BasePlatformAdapter):
         return re.sub(r"\{([a-zA-Z0-9_.]+)\}", _resolve, template)
 
     def _render_delivery_extra(
-        self, extra: dict, payload: dict
+        self, extra: dict, payload: dict,
     ) -> dict:
         """Render delivery_extra template values with payload data."""
         rendered: dict[str, Any] = {}
@@ -807,7 +807,7 @@ class WebhookAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     async def _direct_deliver(
-        self, content: str, delivery: dict
+        self, content: str, delivery: dict,
     ) -> SendResult:
         """Deliver *content* directly without invoking the agent.
 
@@ -831,11 +831,11 @@ class WebhookAdapter(BasePlatformAdapter):
         # Fall through to the cross-platform dispatcher, which validates the
         # target name and routes via the gateway runner.
         return await self._deliver_cross_platform(
-            deliver_type, content, delivery
+            deliver_type, content, delivery,
         )
 
     async def _deliver_github_comment(
-        self, content: str, delivery: dict
+        self, content: str, delivery: dict,
     ) -> SendResult:
         """Post agent response as a GitHub PR/issue comment via ``gh`` CLI."""
         extra = delivery.get("deliver_extra", {})
@@ -844,10 +844,10 @@ class WebhookAdapter(BasePlatformAdapter):
 
         if not repo or not pr_number:
             logger.error(
-                "[webhook] github_comment delivery missing repo or pr_number"
+                "[webhook] github_comment delivery missing repo or pr_number",
             )
             return SendResult(
-                success=False, error="Missing repo or pr_number"
+                success=False, error="Missing repo or pr_number",
             )
 
         try:
@@ -868,28 +868,28 @@ class WebhookAdapter(BasePlatformAdapter):
             )
             if result.returncode == 0:
                 logger.info(
-                    "[webhook] Posted comment on %s#%s", repo, pr_number
+                    "[webhook] Posted comment on %s#%s", repo, pr_number,
                 )
                 return SendResult(success=True)
             else:
                 logger.error(
-                    "[webhook] gh pr comment failed: %s", result.stderr
+                    "[webhook] gh pr comment failed: %s", result.stderr,
                 )
                 return SendResult(success=False, error=result.stderr)
         except FileNotFoundError:
             logger.error(
                 "[webhook] 'gh' CLI not found — install GitHub CLI for "
-                "github_comment delivery"
+                "github_comment delivery",
             )
             return SendResult(
-                success=False, error="gh CLI not installed"
+                success=False, error="gh CLI not installed",
             )
         except Exception as e:
             logger.error("[webhook] github_comment delivery error: %s", e)
             return SendResult(success=False, error=str(e))
 
     async def _deliver_cross_platform(
-        self, platform_name: str, content: str, delivery: dict
+        self, platform_name: str, content: str, delivery: dict,
     ) -> SendResult:
         """Route response to another platform (telegram, discord, etc.)."""
         if not self.gateway_runner:
@@ -902,7 +902,7 @@ class WebhookAdapter(BasePlatformAdapter):
             target_platform = Platform(platform_name)
         except ValueError:
             return SendResult(
-                success=False, error=f"Unknown platform: {platform_name}"
+                success=False, error=f"Unknown platform: {platform_name}",
             )
 
         adapter = self.gateway_runner.adapters.get(target_platform)

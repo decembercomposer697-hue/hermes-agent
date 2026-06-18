@@ -124,7 +124,7 @@ class DaytonaEnvironment(BaseEnvironment):
                     labels=labels,
                     auto_stop_interval=0,
                     resources=resources,
-                )
+                ),
             )
             logger.info("Daytona: created sandbox %s for task %s",
                         self._sandbox.id, task_id)
@@ -186,7 +186,7 @@ class DaytonaEnvironment(BaseEnvironment):
         # concurrently for the same sandbox (e.g. retry after partial failure).
         remote_tar = f"/tmp/.hermes_sync.{os.getpid()}.tar"
         self._sandbox.process.exec(
-            f"tar cf {shlex.quote(remote_tar)} -C / {shlex.quote(rel_base)}"
+            f"tar cf {shlex.quote(remote_tar)} -C / {shlex.quote(rel_base)}",
         )
         self._sandbox.fs.download_file(remote_tar, str(dest))
         # Clean up remote temp file

@@ -142,7 +142,7 @@ async def test_acp_steer_after_zed_interrupt_replays_interrupted_prompt_with_gui
     assert response.stop_reason == "end_turn"
     assert fake.steers == []
     assert fake.runs == [
-        "write hi to a text file\n\nUser correction/guidance after interrupt: write HELLO instead"
+        "write hi to a text file\n\nUser correction/guidance after interrupt: write HELLO instead",
     ]
     assert state.interrupted_prompt_text == ""
 

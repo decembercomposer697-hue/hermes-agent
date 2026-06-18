@@ -129,27 +129,27 @@ async def _cdp_call(
                         "id": attach_id,
                         "method": "Target.attachToTarget",
                         "params": {"targetId": target_id, "flatten": True},
-                    }
-                )
+                    },
+                ),
             )
             deadline = asyncio.get_running_loop().time() + timeout
             while True:
                 remaining = deadline - asyncio.get_running_loop().time()
                 if remaining <= 0:
                     raise TimeoutError(
-                        f"Timed out attaching to target {target_id}"
+                        f"Timed out attaching to target {target_id}",
                     )
                 raw = await asyncio.wait_for(ws.recv(), timeout=remaining)
                 msg = json.loads(raw)
                 if msg.get("id") == attach_id:
                     if "error" in msg:
                         raise RuntimeError(
-                            f"Target.attachToTarget failed: {msg['error']}"
+                            f"Target.attachToTarget failed: {msg['error']}",
                         )
                     session_id = msg.get("result", {}).get("sessionId")
                     if not session_id:
                         raise RuntimeError(
-                            "Target.attachToTarget did not return a sessionId"
+                            "Target.attachToTarget did not return a sessionId",
                         )
                     break
                 # Ignore events (messages without "id") while waiting
@@ -171,7 +171,7 @@ async def _cdp_call(
             remaining = deadline - asyncio.get_running_loop().time()
             if remaining <= 0:
                 raise TimeoutError(
-                    f"Timed out waiting for response to {method}"
+                    f"Timed out waiting for response to {method}",
                 )
             raw = await asyncio.wait_for(ws.recv(), timeout=remaining)
             msg = json.loads(raw)
@@ -207,7 +207,7 @@ def _browser_cdp_via_supervisor(
         return tool_error(
             f"CDP supervisor is not available: {exc}. frame_id routing requires "
             f"a running supervisor attached via /browser connect or an active "
-            f"Browserbase session."
+            f"Browserbase session.",
         )
 
     supervisor = SUPERVISOR_REGISTRY.get(task_id)
@@ -216,7 +216,7 @@ def _browser_cdp_via_supervisor(
             f"No CDP supervisor is attached for task={task_id!r}. Call "
             f"browser_navigate or /browser connect first so the supervisor "
             f"can attach. Once attached, browser_snapshot will populate "
-            f"frame_tree with frame_ids you can pass here."
+            f"frame_tree with frame_ids you can pass here.",
         )
 
     snap = supervisor.snapshot()
@@ -240,7 +240,7 @@ def _browser_cdp_via_supervisor(
     if frame_info is None:
         return tool_error(
             f"frame_id {frame_id!r} not found in supervisor state. "
-            f"Call browser_snapshot to see current frame_tree."
+            f"Call browser_snapshot to see current frame_tree.",
         )
 
     child_sid = frame_info.get("session_id")
@@ -253,7 +253,7 @@ def _browser_cdp_via_supervisor(
             f"dedicated CDP session). For same-origin iframes, use "
             f"`browser_cdp(method='Runtime.evaluate', params={{'expression': "
             f"\"document.querySelector('iframe').contentDocument.title\"}})` "
-            f"at the top-level page instead."
+            f"at the top-level page instead.",
         )
 
     # Dispatch onto the supervisor's loop.
@@ -261,7 +261,7 @@ def _browser_cdp_via_supervisor(
     if loop is None or not loop.is_running():
         return tool_error(
             "CDP supervisor loop is not running. Try reconnecting with "
-            "/browser connect."
+            "/browser connect.",
         )
 
     async def _do_cdp():
@@ -350,7 +350,7 @@ def browser_cdp(
     if not _WS_AVAILABLE:
         return tool_error(
             "The 'websockets' Python package is required but not installed. "
-            "Install it with: pip install websockets"
+            "Install it with: pip install websockets",
         )
 
     endpoint = _resolve_cdp_endpoint()
@@ -368,13 +368,13 @@ def browser_cdp(
             f"CDP endpoint is not a WebSocket URL: {endpoint!r}. "
             "Expected ws://... or wss://... — the /browser connect "
             "resolver should have rewritten this. Check that a Chromium-family "
-            "browser is actually listening on the debug port."
+            "browser is actually listening on the debug port.",
         )
 
     call_params: dict[str, Any] = params or {}
     if not isinstance(call_params, dict):
         return tool_error(
-            f"'params' must be an object/dict, got {type(call_params).__name__}"
+            f"'params' must be an object/dict, got {type(call_params).__name__}",
         )
 
     try:
@@ -385,7 +385,7 @@ def browser_cdp(
 
     try:
         result = _run_async(
-            _cdp_call(endpoint, method, call_params, target_id, safe_timeout)
+            _cdp_call(endpoint, method, call_params, target_id, safe_timeout),
         )
     except TimeoutError as exc:
         return tool_error(

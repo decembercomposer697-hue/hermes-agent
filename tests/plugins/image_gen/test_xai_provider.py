@@ -239,7 +239,7 @@ class TestGenerate:
         response.headers["Content-Type"] = "application/json"
 
         response.raise_for_status = MagicMock(
-            side_effect=req_lib.HTTPError(response=response)
+            side_effect=req_lib.HTTPError(response=response),
         )
 
         with patch("plugins.image_gen.xai.requests.post", return_value=response):

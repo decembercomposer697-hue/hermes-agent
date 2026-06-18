@@ -164,7 +164,7 @@ class TestResolveAutoCustomEndToEnd:
             "model:\n"
             "  default: glm-5.1\n"
             "  provider: 'custom:ephemeral'\n"
-            "  base_url: ''\n"
+            "  base_url: ''\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 
@@ -208,7 +208,7 @@ class TestResolveAutoCustomEndToEnd:
             "  - name: openclaw\n"
             "    base_url: 'https://withcfg.example/v1'\n"
             "    model: glm-5.1\n"
-            "    api_key: cfg-key\n"
+            "    api_key: cfg-key\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
 

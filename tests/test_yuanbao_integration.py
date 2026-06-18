@@ -76,8 +76,8 @@ class TestYuanbaoConfig:
                 Platform.YUANBAO: PlatformConfig(
                     enabled=True,
                     extra={"app_id": "key"},
-                )
-            }
+                ),
+            },
         )
         platforms = gw_only_key.get_connected_platforms()
         assert Platform.YUANBAO not in platforms
@@ -88,8 +88,8 @@ class TestYuanbaoConfig:
                 Platform.YUANBAO: PlatformConfig(
                     enabled=True,
                     extra={"app_id": "key", "app_secret": "secret"},
-                )
-            }
+                ),
+            },
         )
         platforms2 = gw_full.get_connected_platforms()
         assert Platform.YUANBAO in platforms2

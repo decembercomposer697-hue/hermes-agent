@@ -456,7 +456,7 @@ def resolve_runtime_mode(
     resolved_cwd = _resolve_cwd(cwd)
     mode = _coding_mode(config)
     name = _detect_profile_name(
-        mode, (platform or "").strip().lower(), str(resolved_cwd)
+        mode, (platform or "").strip().lower(), str(resolved_cwd),
     )
     return RuntimeMode(
         profile=get_profile(name),
@@ -492,7 +492,7 @@ def coding_selection(
     active — the default coding posture never overrides configured toolsets.
     """
     return resolve_runtime_mode(
-        platform=platform, cwd=cwd, config=config
+        platform=platform, cwd=cwd, config=config,
     ).toolset_selection(config)
 
 
@@ -508,7 +508,7 @@ def coding_system_blocks(
     ``model`` steers the brief's edit-format nudge toward the model's family.
     """
     return resolve_runtime_mode(
-        platform=platform, cwd=cwd, config=config, model=model
+        platform=platform, cwd=cwd, config=config, model=model,
     ).system_blocks()
 
 
@@ -524,7 +524,7 @@ def coding_hidden_skill_categories(
     loadable via ``skills_list`` / ``skill_view``.
     """
     return resolve_runtime_mode(
-        platform=platform, cwd=cwd, config=config
+        platform=platform, cwd=cwd, config=config,
     ).hidden_skill_categories()
 
 

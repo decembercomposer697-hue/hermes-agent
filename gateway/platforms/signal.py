@@ -410,7 +410,7 @@ class SignalAdapter(BasePlatformAdapter):
                 logger.warning("Signal: SSE idle for %.0fs, checking daemon health", elapsed)
                 try:
                     resp = await self.client.get(
-                        f"{self.http_url}/api/v1/check", timeout=10.0
+                        f"{self.http_url}/api/v1/check", timeout=10.0,
                     )
                     if resp.status_code == 200:
                         # Daemon is alive but SSE is idle — update activity to
@@ -539,7 +539,7 @@ class SignalAdapter(BasePlatformAdapter):
             )
             if not mentioned_in_text and not mentioned_in_metadata:
                 logger.debug(
-                    "Signal: ignoring group message (require_mention=true, bot not mentioned)"
+                    "Signal: ignoring group message (require_mention=true, bot not mentioned)",
                 )
                 return
 
@@ -1105,7 +1105,7 @@ class SignalAdapter(BasePlatformAdapter):
             file_size = Path(file_path).stat().st_size
             if file_size > SIGNAL_MAX_ATTACHMENT_SIZE:
                 logger.warning(
-                    "Signal: image too large (%d bytes), skipping %s", file_size, image_url
+                    "Signal: image too large (%d bytes), skipping %s", file_size, image_url,
                 )
                 skipped_oversize += 1
                 continue
@@ -1148,7 +1148,7 @@ class SignalAdapter(BasePlatformAdapter):
             )
             if estimated >= SIGNAL_BATCH_PACING_NOTICE_THRESHOLD:
                 await self._notify_batch_pacing(
-                    chat_id, idx + 1, len(att_batches), estimated
+                    chat_id, idx + 1, len(att_batches), estimated,
                 )
 
             params = dict(base_params, attachments=att_batch)

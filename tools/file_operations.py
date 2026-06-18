@@ -735,7 +735,7 @@ class ShellFileOperations(FileOperations):
         result = self.env.execute(command, cwd=effective_cwd, **kwargs)
         return ExecuteResult(
             stdout=result.get("output", ""),
-            exit_code=result.get("returncode", 0)
+            exit_code=result.get("returncode", 0),
         )
     
     def _has_command(self, cmd: str) -> bool:
@@ -935,7 +935,7 @@ class ShellFileOperations(FileOperations):
         diff = difflib.unified_diff(
             old_lines, new_lines,
             fromfile=f"a/{filename}",
-            tofile=f"b/{filename}"
+            tofile=f"b/{filename}",
         )
         return ''.join(diff)
     
@@ -1000,7 +1000,7 @@ class ShellFileOperations(FileOperations):
             return ReadResult(
                 is_binary=True,
                 file_size=file_size,
-                error="Binary file - cannot display as text. Use appropriate tools to handle this file type."
+                error="Binary file - cannot display as text. Use appropriate tools to handle this file type.",
             )
         
         # Read with pagination using sed
@@ -1037,7 +1037,7 @@ class ShellFileOperations(FileOperations):
             total_lines=total_lines,
             file_size=file_size,
             truncated=truncated,
-            hint=hint
+            hint=hint,
         )
     
     def _suggest_similar_files(self, path: str) -> ReadResult:
@@ -1089,7 +1089,7 @@ class ShellFileOperations(FileOperations):
 
         return ReadResult(
             error=f"File not found: {path}",
-            similar_files=similar
+            similar_files=similar,
         )
     
     def read_file_raw(self, path: str) -> ReadResult:
@@ -1115,7 +1115,7 @@ class ShellFileOperations(FileOperations):
         if self._is_likely_binary(path, sample_output):
             return ReadResult(
                 is_binary=True, file_size=file_size,
-                error="Binary file — cannot display as text."
+                error="Binary file — cannot display as text.",
             )
         cat_result = self._exec(f"cat {self._escape_shell_arg(path)}")
         if cat_result.exit_code != 0:
@@ -1200,7 +1200,7 @@ class ShellFileOperations(FileOperations):
             if _is_write_denied(p):
                 return WriteResult(error=f"Move denied: {p} is a protected path")
         result = self._exec(
-            f"mv {self._escape_shell_arg(src)} {self._escape_shell_arg(dst)}"
+            f"mv {self._escape_shell_arg(src)} {self._escape_shell_arg(dst)}",
         )
         if result.exit_code != 0:
             return WriteResult(error=f"Failed to move {src} -> {dst}: {result.stdout}")
@@ -1348,7 +1348,7 @@ class ShellFileOperations(FileOperations):
         lsp_diagnostics: str | None = None
         if lint_result.success or lint_result.skipped:
             block = self._maybe_lsp_diagnostics(
-                path, pre_content=pre_content, post_content=content
+                path, pre_content=pre_content, post_content=content,
             )
             if block:
                 lsp_diagnostics = block
@@ -1404,7 +1404,7 @@ class ShellFileOperations(FileOperations):
         from tools.fuzzy_match import fuzzy_find_and_replace
         
         new_content, match_count, _strategy, error = fuzzy_find_and_replace(
-            content, old_string, new_string, replace_all
+            content, old_string, new_string, replace_all,
         )
         
         if error or match_count == 0:
@@ -1602,7 +1602,7 @@ class ShellFileOperations(FileOperations):
 
         return LintResult(
             success=result.exit_code == 0,
-            output=result.stdout.strip() if result.stdout.strip() else ""
+            output=result.stdout.strip() if result.stdout.strip() else "",
         )
 
     def _check_lint_delta(self, path: str, pre_content: str | None,
@@ -1687,7 +1687,7 @@ class ShellFileOperations(FileOperations):
             output=(
                 "New lint errors introduced by this edit "
                 "(pre-existing errors filtered out):\n" + "\n".join(post_lines)
-            )
+            ),
         )
 
     def _lsp_local_only(self) -> bool:
@@ -1894,11 +1894,11 @@ class ShellFileOperations(FileOperations):
             hint_parts = [f"Path not found: {path}"]
             # Check if parent directory exists and list similar entries
             parent_check = self._exec(
-                f"test -d {self._escape_shell_arg(parent)} && echo yes || echo no"
+                f"test -d {self._escape_shell_arg(parent)} && echo yes || echo no",
             )
             if "yes" in parent_check.stdout and basename_query:
                 ls_result = self._exec(
-                    f"ls -1 {self._escape_shell_arg(parent)} 2>/dev/null | head -20"
+                    f"ls -1 {self._escape_shell_arg(parent)} 2>/dev/null | head -20",
                 )
                 if ls_result.exit_code == 0 and ls_result.stdout.strip():
                     lower_q = basename_query.lower()
@@ -1911,11 +1911,11 @@ class ShellFileOperations(FileOperations):
                             candidates.append(os.path.join(parent, entry))
                     if candidates:
                         hint_parts.append(
-                            "Similar paths: " + ", ".join(candidates[:5])
+                            "Similar paths: " + ", ".join(candidates[:5]),
                         )
             return SearchResult(
                 error=". ".join(hint_parts),
-                total_count=0
+                total_count=0,
             )
         
         if target == "files":
@@ -1949,7 +1949,7 @@ class ShellFileOperations(FileOperations):
             return SearchResult(
                 error="File search requires 'rg' (ripgrep) or 'find'. "
                       "Install ripgrep for best results: "
-                      "https://github.com/BurntSushi/ripgrep#installation"
+                      "https://github.com/BurntSushi/ripgrep#installation",
             )
 
         # Exclude hidden directories (matching ripgrep's default behavior).
@@ -2003,7 +2003,7 @@ class ShellFileOperations(FileOperations):
 
         return SearchResult(
             files=files,
-            total_count=len(files)
+            total_count=len(files),
         )
 
     def _search_files_rg(self, pattern: str, path: str, limit: int, offset: int) -> SearchResult:
@@ -2063,7 +2063,7 @@ class ShellFileOperations(FileOperations):
             # Neither rg nor grep available (Windows without Git Bash, etc.)
             return SearchResult(
                 error="Content search requires ripgrep (rg) or grep. "
-                      "Install ripgrep: https://github.com/BurntSushi/ripgrep#installation"
+                      "Install ripgrep: https://github.com/BurntSushi/ripgrep#installation",
             )
     
     def _search_with_rg(self, pattern: str, path: str, file_glob: str | None,
@@ -2157,7 +2157,7 @@ class ShellFileOperations(FileOperations):
                     matches.append(SearchMatch(
                         path=(m.group(1) or '') + m.group(2),
                         line_number=int(m.group(3)),
-                        content=m.group(4)[:500]
+                        content=m.group(4)[:500],
                     ))
                     continue
                 
@@ -2169,7 +2169,7 @@ class ShellFileOperations(FileOperations):
                         matches.append(SearchMatch(
                             path=parsed[0],
                             line_number=parsed[1],
-                            content=parsed[2][:500]
+                            content=parsed[2][:500],
                         ))
             
             total = len(matches)
@@ -2177,7 +2177,7 @@ class ShellFileOperations(FileOperations):
             return SearchResult(
                 matches=page,
                 total_count=total,
-                truncated=total > offset + limit
+                truncated=total > offset + limit,
             )
     
     def _search_with_grep(self, pattern: str, path: str, file_glob: str | None,
@@ -2269,7 +2269,7 @@ class ShellFileOperations(FileOperations):
                     matches.append(SearchMatch(
                         path=(m.group(1) or '') + m.group(2),
                         line_number=int(m.group(3)),
-                        content=m.group(4)[:500]
+                        content=m.group(4)[:500],
                     ))
                     continue
                 
@@ -2279,7 +2279,7 @@ class ShellFileOperations(FileOperations):
                         matches.append(SearchMatch(
                             path=parsed[0],
                             line_number=parsed[1],
-                            content=parsed[2][:500]
+                            content=parsed[2][:500],
                         ))
 
             
@@ -2288,5 +2288,5 @@ class ShellFileOperations(FileOperations):
             return SearchResult(
                 matches=page,
                 total_count=total,
-                truncated=total > offset + limit
+                truncated=total > offset + limit,
             )

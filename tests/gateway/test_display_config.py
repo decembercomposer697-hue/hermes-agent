@@ -18,7 +18,7 @@ class TestResolveDisplaySetting:
                 "platforms": {
                     "telegram": {"tool_progress": "verbose"},
                 },
-            }
+            },
         }
         assert resolve_display_setting(config, "telegram", "tool_progress") == "verbose"
 
@@ -30,7 +30,7 @@ class TestResolveDisplaySetting:
             "display": {
                 "tool_progress": "new",
                 "platforms": {},
-            }
+            },
         }
         assert resolve_display_setting(config, "telegram", "tool_progress") == "new"
 
@@ -73,7 +73,7 @@ class TestResolveDisplaySetting:
                 "platforms": {
                     "slack": {"tool_progress": "off"},
                 },
-            }
+            },
         }
         assert resolve_display_setting(config, "slack", "tool_progress") == "off"
         assert resolve_display_setting(config, "telegram", "tool_progress") == "all"
@@ -97,7 +97,7 @@ class TestBackwardCompat:
                     "signal": "off",
                     "telegram": "verbose",
                 },
-            }
+            },
         }
         assert resolve_display_setting(config, "signal", "tool_progress") == "off"
         assert resolve_display_setting(config, "telegram", "tool_progress") == "verbose"
@@ -111,7 +111,7 @@ class TestBackwardCompat:
                 "tool_progress": "all",
                 "tool_progress_overrides": {"telegram": "verbose"},
                 "platforms": {"telegram": {"tool_progress": "new"}},
-            }
+            },
         }
         assert resolve_display_setting(config, "telegram", "tool_progress") == "new"
 
@@ -122,7 +122,7 @@ class TestBackwardCompat:
         config = {
             "display": {
                 "tool_progress_overrides": {"telegram": "verbose"},
-            }
+            },
         }
         # show_reasoning should NOT read from tool_progress_overrides
         assert resolve_display_setting(config, "telegram", "show_reasoning") is False
@@ -259,9 +259,9 @@ class TestPlatformDefaults:
                         "interim_assistant_messages": False,
                         "long_running_notifications": False,
                         "busy_ack_detail": "on",
-                    }
-                }
-            }
+                    },
+                },
+            },
         }
         assert resolve_display_setting(config, "telegram", "interim_assistant_messages") is False
         assert resolve_display_setting(config, "telegram", "long_running_notifications") is False
@@ -361,7 +361,7 @@ class TestStreamingPerPlatform:
         config = {
             "display": {
                 "platforms": {"telegram": {"streaming": False}},
-            }
+            },
         }
         assert resolve_display_setting(config, "telegram", "streaming") is False
 
@@ -372,7 +372,7 @@ class TestStreamingPerPlatform:
         config = {
             "display": {
                 "platforms": {"email": {"streaming": True}},
-            }
+            },
         }
         assert resolve_display_setting(config, "email", "streaming") is True
 
@@ -409,7 +409,7 @@ class TestCleanupProgress:
                 "platforms": {
                     "telegram": {"cleanup_progress": True},
                 },
-            }
+            },
         }
         assert resolve_display_setting(config, "telegram", "cleanup_progress") is True
         assert resolve_display_setting(config, "discord", "cleanup_progress") is False
@@ -421,7 +421,7 @@ class TestCleanupProgress:
         config = {
             "display": {
                 "platforms": {"telegram": {"cleanup_progress": "off"}},
-            }
+            },
         }
         assert resolve_display_setting(config, "telegram", "cleanup_progress") is False
 
@@ -433,6 +433,6 @@ class TestCleanupProgress:
             config = {
                 "display": {
                     "platforms": {"telegram": {"cleanup_progress": val}},
-                }
+                },
             }
             assert resolve_display_setting(config, "telegram", "cleanup_progress") is True, val

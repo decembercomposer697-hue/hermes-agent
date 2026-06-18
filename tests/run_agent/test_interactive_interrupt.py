@@ -115,7 +115,7 @@ def main() -> int:
                 original_init(self_agent, *a, **kw)
                 child_running.set()
                 log.info(
-                    f"🟡 Child started, parent._active_children = {len(parent._active_children)}"
+                    f"🟡 Child started, parent._active_children = {len(parent._active_children)}",
                 )
 
             with patch.object(AIAgent, "__init__", patched_init):

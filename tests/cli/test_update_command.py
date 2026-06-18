@@ -45,7 +45,7 @@ def _make_self(modal_response):
         _prompt_text_input_modal=lambda **_kw: modal_response,
     )
     self_._normalize_slash_confirm_choice = _bound(
-        HermesCLI._normalize_slash_confirm_choice, self_
+        HermesCLI._normalize_slash_confirm_choice, self_,
     )
     return self_
 
@@ -70,7 +70,7 @@ def test_managed_install_refuses_and_does_not_set_pending_relaunch(capsys):
         _prompt_text_input_modal=lambda **_kw: pytest.fail("Modal should not be called"),
     )
     self_._normalize_slash_confirm_choice = _bound(
-        HermesCLI._normalize_slash_confirm_choice, self_
+        HermesCLI._normalize_slash_confirm_choice, self_,
     )
     with (
         patch("hermes_cli.config.is_managed", return_value=True),

@@ -103,13 +103,13 @@ class TestStreamingAccumulator:
 
         chunks = [
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, tc_id="call_123", name="terminal")
+                _make_tool_call_delta(index=0, tc_id="call_123", name="terminal"),
             ]),
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, arguments='{"command":')
+                _make_tool_call_delta(index=0, arguments='{"command":'),
             ]),
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, arguments=' "ls"}')
+                _make_tool_call_delta(index=0, arguments=' "ls"}'),
             ]),
             _make_stream_chunk(finish_reason="tool_calls"),
         ]
@@ -150,13 +150,13 @@ class TestStreamingAccumulator:
 
         chunks = [
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, tc_id="call_nim", name="read_file")
+                _make_tool_call_delta(index=0, tc_id="call_nim", name="read_file"),
             ]),
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, tc_id="call_nim", name="read_file", arguments='{"path":')
+                _make_tool_call_delta(index=0, tc_id="call_nim", name="read_file", arguments='{"path":'),
             ]),
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, tc_id="call_nim", name="read_file", arguments=' "x.py"}')
+                _make_tool_call_delta(index=0, tc_id="call_nim", name="read_file", arguments=' "x.py"}'),
             ]),
             _make_stream_chunk(finish_reason="tool_calls"),
         ]
@@ -198,13 +198,13 @@ class TestStreamingAccumulator:
                     name="cronjob",
                     model_extra={
                         "extra_content": {
-                            "google": {"thought_signature": "sig-123"}
-                        }
+                            "google": {"thought_signature": "sig-123"},
+                        },
                     },
-                )
+                ),
             ]),
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, arguments='{"task": "deep index on ."}')
+                _make_tool_call_delta(index=0, arguments='{"task": "deep index on ."}'),
             ]),
             _make_stream_chunk(finish_reason="tool_calls"),
         ]
@@ -229,7 +229,7 @@ class TestStreamingAccumulator:
         tc = response.choices[0].message.tool_calls
         assert tc is not None
         assert tc[0].extra_content == {
-            "google": {"thought_signature": "sig-123"}
+            "google": {"thought_signature": "sig-123"},
         }
 
     @patch("run_agent.AIAgent._create_request_openai_client")
@@ -241,10 +241,10 @@ class TestStreamingAccumulator:
         chunks = [
             _make_stream_chunk(content="Let me check"),
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, tc_id="call_456", name="web_search")
+                _make_tool_call_delta(index=0, tc_id="call_456", name="web_search"),
             ]),
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, arguments='{"query": "test"}')
+                _make_tool_call_delta(index=0, arguments='{"query": "test"}'),
             ]),
             _make_stream_chunk(finish_reason="tool_calls"),
         ]
@@ -341,7 +341,7 @@ class TestStreamingCallbacks:
         agent._interrupt_requested = False
 
         agent._interruptible_streaming_api_call(
-            {}, on_first_delta=lambda: first_delta_calls.append(True)
+            {}, on_first_delta=lambda: first_delta_calls.append(True),
         )
 
         assert len(first_delta_calls) == 1
@@ -388,10 +388,10 @@ class TestStreamingCallbacks:
 
         chunks = [
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, tc_id="call_789", name="terminal")
+                _make_tool_call_delta(index=0, tc_id="call_789", name="terminal"),
             ]),
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, arguments='{"command": "ls"}')
+                _make_tool_call_delta(index=0, arguments='{"command": "ls"}'),
             ]),
             _make_stream_chunk(finish_reason="tool_calls"),
         ]
@@ -427,7 +427,7 @@ class TestStreamingCallbacks:
         chunks = [
             _make_stream_chunk(content="thinking..."),
             _make_stream_chunk(tool_calls=[
-                _make_tool_call_delta(index=0, tc_id="call_abc", name="read_file")
+                _make_tool_call_delta(index=0, tc_id="call_abc", name="read_file"),
             ]),
             _make_stream_chunk(content=" more text"),
             _make_stream_chunk(finish_reason="tool_calls"),
@@ -484,7 +484,7 @@ class TestStreamingFallback:
 
         mock_client = MagicMock()
         mock_client.chat.completions.create.side_effect = Exception(
-            "Streaming is not supported for this model"
+            "Streaming is not supported for this model",
         )
         mock_create.return_value = mock_client
 
@@ -513,7 +513,7 @@ class TestStreamingFallback:
 
         mock_client = MagicMock()
         mock_client.chat.completions.create.side_effect = Exception(
-            "Connection reset by peer"
+            "Connection reset by peer",
         )
         mock_create.return_value = mock_client
 
@@ -871,7 +871,7 @@ class TestCodexStreamCallbacks:
         def _create_side_effect(**kwargs):
             call_count["n"] += 1
             raise httpx.RemoteProtocolError(
-                "peer closed connection without sending complete message body"
+                "peer closed connection without sending complete message body",
             )
 
         mock_client = MagicMock()
@@ -908,7 +908,7 @@ class TestCodexStreamCallbacks:
                     output=[SimpleNamespace(
                         type="message",
                         content=[SimpleNamespace(type="output_text", text="Hello")],
-                    )]
+                    )],
                 ),
             ),
         ]
@@ -1059,7 +1059,7 @@ class TestAnthropicStreamCallbacks:
 
         agent._anthropic_client = MagicMock()
         agent._anthropic_client.messages.stream.side_effect = ValueError(
-            "invalid local request shape"
+            "invalid local request shape",
         )
 
         with pytest.raises(ValueError, match="invalid local request shape"):
@@ -1439,7 +1439,7 @@ def _valid_acp_response():
                     role="assistant",
                 ),
                 finish_reason="stop",
-            )
+            ),
         ],
         usage=SimpleNamespace(prompt_tokens=5, completion_tokens=3),
         model="claude-opus-4.7",
@@ -1478,7 +1478,7 @@ class TestCopilotACPStreamingDecision:
     @patch("run_agent.check_toolset_requirements", return_value={})
     @patch("agent.copilot_acp_client.CopilotACPClient")
     def test_provider_name_triggers_non_streaming(
-        self, mock_acp_cls, _mock_check, _mock_tools
+        self, mock_acp_cls, _mock_check, _mock_tools,
     ):
         """provider='copilot-acp' → non-streaming path."""
         mock_acp_cls.return_value = MagicMock()
@@ -1509,7 +1509,7 @@ class TestCopilotACPStreamingDecision:
     @patch("run_agent.check_toolset_requirements", return_value={})
     @patch("agent.copilot_acp_client.CopilotACPClient")
     def test_acp_base_url_triggers_non_streaming(
-        self, mock_acp_cls, _mock_check, _mock_tools
+        self, mock_acp_cls, _mock_check, _mock_tools,
     ):
         """base_url='acp://copilot' → non-streaming even without provider name."""
         mock_acp_cls.return_value = MagicMock()
@@ -1530,7 +1530,7 @@ class TestCopilotACPStreamingDecision:
     @patch("run_agent.check_toolset_requirements", return_value={})
     @patch("agent.copilot_acp_client.CopilotACPClient")
     def test_acp_tcp_url_triggers_non_streaming(
-        self, mock_acp_cls, _mock_check, _mock_tools
+        self, mock_acp_cls, _mock_check, _mock_tools,
     ):
         """base_url='acp+tcp://...' → non-streaming."""
         mock_acp_cls.return_value = MagicMock()

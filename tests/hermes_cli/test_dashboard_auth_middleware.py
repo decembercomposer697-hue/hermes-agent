@@ -278,7 +278,7 @@ _GATED_REQUIRE_TOKEN_ROUTES = [
 
 @pytest.mark.parametrize("method,path,body", _GATED_REQUIRE_TOKEN_ROUTES)
 def test_gated_require_token_routes_accept_cookie_session(
-    gated_app, method, path, body
+    gated_app, method, path, body,
 ):
     """Every ``_require_token`` route must clear auth for a logged-in caller.
 

@@ -111,7 +111,7 @@ class TestWeComConnect:
         )
 
         adapter = WeComAdapter(
-            PlatformConfig(enabled=True, extra={"bot_id": "bot-1", "secret": "secret-1"})
+            PlatformConfig(enabled=True, extra={"bot_id": "bot-1", "secret": "secret-1"}),
         )
         adapter._open_connection = AsyncMock(side_effect=RuntimeError("invalid secret (errcode=40013)"))
 
@@ -173,7 +173,7 @@ class TestWeComReplyMode:
         adapter = WeComAdapter(PlatformConfig(enabled=True))
         adapter._reply_req_ids["msg-1"] = "req-1"
         adapter._send_reply_request = AsyncMock(
-            return_value={"headers": {"req_id": "req-1"}, "errcode": 0}
+            return_value={"headers": {"req_id": "req-1"}, "errcode": 0},
         )
 
         result = await adapter.send("chat-123", "hello from reply", reply_to="msg-1")
@@ -204,11 +204,11 @@ class TestWeComReplyMode:
                 "reject_reason": None,
                 "downgraded": False,
                 "downgrade_note": None,
-            }
+            },
         )
         adapter._upload_media_bytes = AsyncMock(return_value={"media_id": "media-1", "type": "image"})
         adapter._send_reply_request = AsyncMock(
-            return_value={"headers": {"req_id": "req-1"}, "errcode": 0}
+            return_value={"headers": {"req_id": "req-1"}, "errcode": 0},
         )
 
         result = await adapter.send_image_file("chat-123", "/tmp/demo.png", reply_to="msg-1")
@@ -242,7 +242,7 @@ class TestExtractText:
                     {"msgtype": "text", "text": {"content": "part1"}},
                     {"msgtype": "image", "image": {"url": "https://example.com/x.png"}},
                     {"msgtype": "text", "text": {"content": "part2"}},
-                ]
+                ],
             },
         }
         text, _reply_text = WeComAdapter._extract_text(body)
@@ -280,7 +280,7 @@ class TestPolicyHelpers:
         from gateway.platforms.wecom import WeComAdapter
 
         adapter = WeComAdapter(
-            PlatformConfig(enabled=True, extra={"dm_policy": "allowlist", "allow_from": ["user-1"]})
+            PlatformConfig(enabled=True, extra={"dm_policy": "allowlist", "allow_from": ["user-1"]}),
         )
         assert adapter._is_dm_allowed("user-1") is True
         assert adapter._is_dm_allowed("user-2") is False
@@ -311,7 +311,7 @@ class TestPolicyHelpers:
         monkeypatch.setenv("WECOM_ALLOWED_USERS", "env-user")
 
         adapter = WeComAdapter(
-            PlatformConfig(enabled=True, extra={"dm_policy": "allowlist", "allow_from": ["cfg-user"]})
+            PlatformConfig(enabled=True, extra={"dm_policy": "allowlist", "allow_from": ["cfg-user"]}),
         )
 
         assert adapter._allow_from == ["cfg-user"]
@@ -329,7 +329,7 @@ class TestPolicyHelpers:
                     "group_allow_from": ["group-1"],
                     "groups": {"group-1": {"allow_from": ["user-1"]}},
                 },
-            )
+            ),
         )
 
         assert adapter._is_group_allowed("group-1", "user-1") is True
@@ -487,7 +487,7 @@ class TestMediaUpload:
                     "content-type": "application/octet-stream",
                     "content-disposition": 'attachment; filename="secret.bin"',
                 },
-            )
+            ),
         )
 
         cached = await adapter._cache_media(
@@ -565,7 +565,7 @@ class TestSend:
                 "reject_reason": None,
                 "downgraded": True,
                 "downgrade_note": "语音格式 audio/mpeg 不支持，企微仅支持 AMR 格式，已转为文件格式发送",
-            }
+            },
         )
         adapter._upload_media_bytes = AsyncMock(return_value={"media_id": "media-1", "type": "file"})
         adapter._send_media_message = AsyncMock(return_value={"headers": {"req_id": "req-media"}, "errcode": 0})
@@ -654,7 +654,7 @@ class TestInboundMessages:
             PlatformConfig(
                 enabled=True,
                 extra={"group_policy": "allowlist", "group_allow_from": ["group-allowed"]},
-            )
+            ),
         )
         adapter.handle_message = AsyncMock()
         adapter._extract_media = AsyncMock(return_value=([], []))
@@ -779,7 +779,7 @@ class TestWeComZombieSessionFix:
             PlatformConfig(
                 enabled=True,
                 extra={"group_policy": "allowlist", "group_allow_from": ["group-ok"]},
-            )
+            ),
         )
         adapter.handle_message = AsyncMock()
         adapter._extract_media = AsyncMock(return_value=([], []))
@@ -831,10 +831,10 @@ class TestWeComZombieSessionFix:
         adapter = WeComAdapter(PlatformConfig(enabled=True))
         adapter._last_chat_req_ids["group-1"] = "inbound-req-42"
         adapter._send_reply_request = AsyncMock(
-            return_value={"headers": {"req_id": "inbound-req-42"}, "errcode": 0}
+            return_value={"headers": {"req_id": "inbound-req-42"}, "errcode": 0},
         )
         adapter._send_request = AsyncMock(
-            return_value={"headers": {"req_id": "new"}, "errcode": 0}
+            return_value={"headers": {"req_id": "new"}, "errcode": 0},
         )
 
         result = await adapter.send("group-1", "ping", reply_to=None)
@@ -855,7 +855,7 @@ class TestWeComZombieSessionFix:
 
         adapter = WeComAdapter(PlatformConfig(enabled=True))
         adapter._send_request = AsyncMock(
-            return_value={"headers": {"req_id": "new"}, "errcode": 0}
+            return_value={"headers": {"req_id": "new"}, "errcode": 0},
         )
 
         result = await adapter.send("fresh-dm-chat", "ping", reply_to=None)

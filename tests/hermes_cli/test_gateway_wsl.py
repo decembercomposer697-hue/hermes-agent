@@ -68,7 +68,7 @@ class TestWslSystemdOperational:
         monkeypatch.setattr(
             gateway.subprocess, "run",
             lambda *a, **kw: SimpleNamespace(
-                returncode=0, stdout="running\n", stderr=""
+                returncode=0, stdout="running\n", stderr="",
             ),
         )
         assert gateway._wsl_systemd_operational() is True
@@ -77,7 +77,7 @@ class TestWslSystemdOperational:
         monkeypatch.setattr(
             gateway.subprocess, "run",
             lambda *a, **kw: SimpleNamespace(
-                returncode=1, stdout="degraded\n", stderr=""
+                returncode=1, stdout="degraded\n", stderr="",
             ),
         )
         assert gateway._wsl_systemd_operational() is True
@@ -86,7 +86,7 @@ class TestWslSystemdOperational:
         monkeypatch.setattr(
             gateway.subprocess, "run",
             lambda *a, **kw: SimpleNamespace(
-                returncode=1, stdout="starting\n", stderr=""
+                returncode=1, stdout="starting\n", stderr="",
             ),
         )
         assert gateway._wsl_systemd_operational() is True
@@ -95,7 +95,7 @@ class TestWslSystemdOperational:
         monkeypatch.setattr(
             gateway.subprocess, "run",
             lambda *a, **kw: SimpleNamespace(
-                returncode=1, stdout="offline\n", stderr=""
+                returncode=1, stdout="offline\n", stderr="",
             ),
         )
         assert gateway._wsl_systemd_operational() is False

@@ -187,7 +187,7 @@ class TestEnsure:
         monkeypatch.setattr(
             ld, "_venv_pip_install",
             lambda specs, **kw: ld._InstallResult(
-                False, "", "ERROR: package not found on PyPI"
+                False, "", "ERROR: package not found on PyPI",
             ),
         )
         with pytest.raises(ld.FeatureUnavailable, match="pip install failed"):
@@ -368,7 +368,7 @@ class TestRefreshActiveFeatures:
         monkeypatch.setattr(
             ld, "_venv_pip_install",
             lambda specs, **kw: ld._InstallResult(
-                False, "", "ERROR: PyPI 404 quarantine"
+                False, "", "ERROR: PyPI 404 quarantine",
             ),
         )
         result = ld.refresh_active_features()

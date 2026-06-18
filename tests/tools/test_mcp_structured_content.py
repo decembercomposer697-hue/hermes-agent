@@ -71,7 +71,7 @@ class TestStructuredContentPreservation:
         session.call_tool = AsyncMock(
             return_value=_FakeCallToolResult(
                 content=[_FakeContentBlock("hello")],
-            )
+            ),
         )
         handler = mcp_tool._make_tool_handler("test-server", "my-tool", 30.0)
         raw = handler({})
@@ -86,7 +86,7 @@ class TestStructuredContentPreservation:
             return_value=_FakeCallToolResult(
                 content=[_FakeContentBlock("OK")],
                 structuredContent=payload,
-            )
+            ),
         )
         handler = mcp_tool._make_tool_handler("test-server", "my-tool", 30.0)
         raw = handler({})
@@ -105,7 +105,7 @@ class TestStructuredContentPreservation:
             return_value=_FakeCallToolResult(
                 content=[_FakeContentBlock(file_text)],
                 structuredContent=metadata,
-            )
+            ),
         )
         handler = mcp_tool._make_tool_handler("test-server", "my-tool", 30.0)
         raw = handler({})
@@ -120,7 +120,7 @@ class TestStructuredContentPreservation:
             return_value=_FakeCallToolResult(
                 content=[_FakeContentBlock("done")],
                 structuredContent=None,
-            )
+            ),
         )
         handler = mcp_tool._make_tool_handler("test-server", "my-tool", 30.0)
         raw = handler({})
@@ -135,7 +135,7 @@ class TestStructuredContentPreservation:
             return_value=_FakeCallToolResult(
                 content=[],
                 structuredContent=payload,
-            )
+            ),
         )
         handler = mcp_tool._make_tool_handler("test-server", "my-tool", 30.0)
         raw = handler({})

@@ -606,7 +606,7 @@ def union_with_portal_free_recommendations(
     """
     try:
         payload = fetch_nous_recommended_models(
-            portal_base_url, force_refresh=force_refresh
+            portal_base_url, force_refresh=force_refresh,
         )
     except Exception:
         return (list(curated_ids), dict(pricing))
@@ -678,7 +678,7 @@ def union_with_portal_paid_recommendations(
     """
     try:
         payload = fetch_nous_recommended_models(
-            portal_base_url, force_refresh=force_refresh
+            portal_base_url, force_refresh=force_refresh,
         )
     except Exception:
         return (list(curated_ids), dict(pricing))
@@ -823,7 +823,7 @@ def _write_nous_recommended_disk(base: str, data: dict[str, Any]) -> None:
     except OSError as exc:
         import logging
         logging.getLogger(__name__).debug(
-            "nous recommended-models disk cache write failed: %s", exc
+            "nous recommended-models disk cache write failed: %s", exc,
         )
 
 
@@ -1148,7 +1148,7 @@ def group_providers(slugs):
             label, desc, _ = PROVIDER_GROUPS[gid]
             rows.append(
                 {"kind": "group", "group_id": gid, "label": label,
-                 "description": desc, "members": list(members)}
+                 "description": desc, "members": list(members)},
             )
     return rows
 
@@ -1741,7 +1741,7 @@ def _model_in_provider_catalog(name_lower: str, providers: set[str]) -> bool:
 
 
 _AGGREGATOR_PROVIDERS = frozenset(
-    {"nous", "openrouter", "copilot", "kilocode"}
+    {"nous", "openrouter", "copilot", "kilocode"},
 )
 
 
@@ -2594,7 +2594,7 @@ def _fetch_anthropic_models(timeout: float = 5.0) -> list[str] | None:
                 if "long context beta" in body_text and "not yet available" in body_text:
                     headers["anthropic-beta"] = ",".join(
                         [b for b in _COMMON_BETAS if b != _CONTEXT_1M_BETA]
-                        + list(_OAUTH_ONLY_BETAS)
+                        + list(_OAUTH_ONLY_BETAS),
                     )
                     data = _do_request(headers)
                 else:
@@ -2665,7 +2665,7 @@ def _copilot_catalog_item_is_text_model(item: dict[str, Any]) -> bool:
             if str(endpoint).strip()
         }
         if normalized_endpoints and not normalized_endpoints.intersection(
-            {"/chat/completions", "/responses", "/v1/messages"}
+            {"/chat/completions", "/responses", "/v1/messages"},
         ):
             return False
 
@@ -2673,7 +2673,7 @@ def _copilot_catalog_item_is_text_model(item: dict[str, Any]) -> bool:
 
 
 def fetch_github_model_catalog(
-    api_key: str | None = None, timeout: float = 5.0
+    api_key: str | None = None, timeout: float = 5.0,
 ) -> list[dict[str, Any]] | None:
     """Fetch the live GitHub Copilot model catalog for this account."""
     attempts: list[dict[str, str]] = []
@@ -3949,7 +3949,7 @@ def validate_requested_model(
             }
         catalog_lower_list = list(catalog_lower.keys())
         auto = get_close_matches(
-            requested_for_lookup.lower(), catalog_lower_list, n=1, cutoff=0.9
+            requested_for_lookup.lower(), catalog_lower_list, n=1, cutoff=0.9,
         )
         if auto:
             corrected = catalog_lower[auto[0]]
@@ -3961,7 +3961,7 @@ def validate_requested_model(
                 "message": f"Auto-corrected `{requested}` → `{corrected}`",
             }
         suggestions = get_close_matches(
-            requested_for_lookup.lower(), catalog_lower_list, n=3, cutoff=0.5
+            requested_for_lookup.lower(), catalog_lower_list, n=3, cutoff=0.5,
         )
         suggestion_text = ""
         if suggestions:

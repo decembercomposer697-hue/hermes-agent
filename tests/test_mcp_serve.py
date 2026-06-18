@@ -512,7 +512,7 @@ def mcp_server_e2e(populated_sessions_dir, mock_session_db, monkeypatch):
 def _run_tool(server, name, args=None):
     """Call an MCP tool through FastMCP's tool manager and return parsed JSON."""
     result = asyncio.get_event_loop().run_until_complete(
-        server._tool_manager.call_tool(name, args or {})
+        server._tool_manager.call_tool(name, args or {}),
     )
     return json.loads(result) if isinstance(result, str) else result
 
@@ -782,7 +782,7 @@ class TestMCPToolParameterCoercion:
                 type="message",
                 session_key="test",
                 data={"content": "waiting for this"},
-            )
+            ),
         )
 
         result = _run_tool(server, "events_wait", {"after_cursor": "0", "timeout_ms": "bad"})
@@ -1078,7 +1078,7 @@ class TestEventBridgePollE2E:
                 "display_name": "PollTest",
                 "updated_at": "2026-03-29T15:00:05",
                 "origin": {"platform": "telegram", "chat_id": "poll_test"},
-            }
+            },
         }
         (sessions_dir / "sessions.json").write_text(json.dumps(sessions_data))
 
@@ -1133,7 +1133,7 @@ class TestEventBridgePollE2E:
                 "platform": "telegram",
                 "updated_at": "2026-03-29T15:00:05",
                 "origin": {"platform": "telegram", "chat_id": "skip"},
-            }
+            },
         }
         (sessions_dir / "sessions.json").write_text(json.dumps(sessions_data))
         _create_test_db(db_path, session_id, [
@@ -1185,7 +1185,7 @@ class TestEventBridgePollE2E:
                 "platform": "telegram",
                 "updated_at": "2026-03-29T15:00:05",
                 "origin": {"platform": "telegram", "chat_id": "new"},
-            }
+            },
         }
         (sessions_dir / "sessions.json").write_text(json.dumps(sessions_data))
         _create_test_db(db_path, session_id, [

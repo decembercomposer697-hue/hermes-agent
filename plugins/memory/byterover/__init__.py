@@ -258,7 +258,7 @@ class ByteRoverMemoryProvider(MemoryProvider):
             self._sync_thread.join(timeout=5.0)
 
         self._sync_thread = threading.Thread(
-            target=_sync, daemon=True, name="brv-sync"
+            target=_sync, daemon=True, name="brv-sync",
         )
         self._sync_thread.start()
 

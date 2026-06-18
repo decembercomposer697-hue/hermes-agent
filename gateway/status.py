@@ -379,7 +379,7 @@ def _pid_exists(pid: int) -> bool:
             ERROR_INVALID_PARAMETER = 87
             ERROR_ACCESS_DENIED = 5
             handle = kernel32.OpenProcess(
-                PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, False, int(pid)
+                PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, False, int(pid),
             )
             if not handle:
                 err = kernel32.GetLastError()

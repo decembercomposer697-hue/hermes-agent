@@ -7,7 +7,7 @@ from hermes_cli.config import DEFAULT_CONFIG
 GATEWAY_SERVICE_RESTART_EXIT_CODE = 75
 
 DEFAULT_GATEWAY_RESTART_DRAIN_TIMEOUT = float(
-    DEFAULT_CONFIG["agent"]["restart_drain_timeout"]
+    DEFAULT_CONFIG["agent"]["restart_drain_timeout"],
 )
 
 

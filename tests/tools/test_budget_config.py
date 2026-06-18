@@ -156,7 +156,7 @@ class TestResolveThreshold:
         cfg = BudgetConfig()
         result = cfg.resolve_threshold("some_tool")
         mock_registry.get_max_result_size.assert_called_once_with(
-            "some_tool", default=DEFAULT_RESULT_SIZE_CHARS
+            "some_tool", default=DEFAULT_RESULT_SIZE_CHARS,
         )
         assert result == 77_777
 
@@ -167,7 +167,7 @@ class TestResolveThreshold:
         cfg = BudgetConfig(default_result_size=50_000)
         cfg.resolve_threshold("unknown_tool")
         mock_registry.get_max_result_size.assert_called_once_with(
-            "unknown_tool", default=50_000
+            "unknown_tool", default=50_000,
         )
 
     def test_pinned_read_file_returns_inf(self):

@@ -88,7 +88,7 @@ async def test_model_global_persists_when_config_has_flat_string_model(tmp_path,
     cfg_path = _setup_isolated_home(tmp_path, monkeypatch, "deepseek-v4-flash")
 
     result = await _make_runner()._handle_model_command(
-        _make_event("/model gpt-5.5 --global")
+        _make_event("/model gpt-5.5 --global"),
     )
 
     # Sanity: the handler returned a success-looking message (not a crash log).
@@ -127,7 +127,7 @@ async def test_model_global_persists_when_config_has_missing_model(tmp_path, mon
     monkeypatch.setattr("hermes_cli.config.get_hermes_home", lambda: hermes_home)
 
     result = await _make_runner()._handle_model_command(
-        _make_event("/model gpt-5.5 --global")
+        _make_event("/model gpt-5.5 --global"),
     )
 
     assert result is not None
@@ -149,7 +149,7 @@ async def test_model_global_persists_when_config_has_proper_dict_model(tmp_path,
     )
 
     result = await _make_runner()._handle_model_command(
-        _make_event("/model gpt-5.5 --global")
+        _make_event("/model gpt-5.5 --global"),
     )
 
     assert result is not None

@@ -1325,7 +1325,7 @@ async def test_send_retries_pool_timeout():
             raise FakeTimedOut(
                 "Pool timeout: All connections in the connection pool are "
                 "occupied. Request was *not* sent to Telegram. Consider "
-                "adjusting the connection pool size or the pool timeout."
+                "adjusting the connection pool size or the pool timeout.",
             )
         return SimpleNamespace(message_id=202)
 
@@ -1349,7 +1349,7 @@ async def test_send_marks_pool_timeout_retryable_after_exhaustion():
         attempt[0] += 1
         raise FakeTimedOut(
             "Pool timeout: All connections in the connection pool are occupied. "
-            "Request was *not* sent to Telegram."
+            "Request was *not* sent to Telegram.",
         )
 
     adapter._bot = SimpleNamespace(send_message=mock_send_message)

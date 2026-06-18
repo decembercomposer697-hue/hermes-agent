@@ -33,7 +33,7 @@ class _ToolEngine(_StubEngine):
                 "name": "stub_recover",
                 "description": "Recover context from the stub engine.",
                 "parameters": {"type": "object", "properties": {}},
-            }
+            },
         ]
 
 

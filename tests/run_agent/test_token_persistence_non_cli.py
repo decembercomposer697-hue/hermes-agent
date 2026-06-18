@@ -38,7 +38,7 @@ def _make_agent(session_db, *, platform: str):
             "prompt_tokens": 11,
             "completion_tokens": 7,
             "total_tokens": 18,
-        }
+        },
     )
     return agent
 

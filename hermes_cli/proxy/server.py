@@ -45,7 +45,7 @@ _HOP_BY_HOP_HEADERS = frozenset(
         "transfer-encoding",
         "upgrade",
         "authorization",  # we replace this one
-    }
+    },
 )
 
 DEFAULT_PORT = 8645
@@ -86,7 +86,7 @@ def create_app(adapter: UpstreamAdapter) -> web.Application:
     if not AIOHTTP_AVAILABLE:
         raise RuntimeError(
             "aiohttp is required for `hermes proxy`. Install with: "
-            "pip install 'hermes-agent[messaging]' or `pip install aiohttp`."
+            "pip install 'hermes-agent[messaging]' or `pip install aiohttp`.",
         )
 
     app = web.Application()
@@ -101,7 +101,7 @@ def create_app(adapter: UpstreamAdapter) -> web.Application:
                 "status": "ok",
                 "upstream": adapter.display_name,
                 "authenticated": adapter.is_authenticated(),
-            }
+            },
         )
 
     async def handle_proxy(request: web.Request) -> web.StreamResponse:
@@ -253,7 +253,7 @@ async def run_server(
     if not AIOHTTP_AVAILABLE:
         raise RuntimeError(
             "aiohttp is required for `hermes proxy`. Install with: "
-            "pip install 'hermes-agent[messaging]' or `pip install aiohttp`."
+            "pip install 'hermes-agent[messaging]' or `pip install aiohttp`.",
         )
 
     app = create_app(adapter)

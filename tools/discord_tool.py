@@ -161,10 +161,10 @@ def _detect_capabilities(token: str, *, force: bool = False) -> dict[str, Any]:
         app = _discord_request("GET", "/applications/@me", token, timeout=5)
         flags = int(app.get("flags", 0) or 0)
         caps["has_members_intent"] = bool(
-            flags & (_FLAG_GATEWAY_GUILD_MEMBERS | _FLAG_GATEWAY_GUILD_MEMBERS_LIMITED)
+            flags & (_FLAG_GATEWAY_GUILD_MEMBERS | _FLAG_GATEWAY_GUILD_MEMBERS_LIMITED),
         )
         caps["has_message_content"] = bool(
-            flags & (_FLAG_GATEWAY_MESSAGE_CONTENT | _FLAG_GATEWAY_MESSAGE_CONTENT_LIMITED)
+            flags & (_FLAG_GATEWAY_MESSAGE_CONTENT | _FLAG_GATEWAY_MESSAGE_CONTENT_LIMITED),
         )
         caps["detected"] = True
     except Exception as exc:  # nosec — detection is best-effort

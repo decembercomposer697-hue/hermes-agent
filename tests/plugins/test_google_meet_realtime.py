@@ -238,7 +238,7 @@ def test_speaker_run_until_stopped_processes_queue(tmp_path):
     processed = tmp_path / "processed.jsonl"
     queue.write_text(
         json.dumps({"id": "a", "text": "hello one"}) + "\n"
-        + json.dumps({"id": "b", "text": "hello two"}) + "\n"
+        + json.dumps({"id": "b", "text": "hello two"}) + "\n",
     )
 
     stub = _StubSession()

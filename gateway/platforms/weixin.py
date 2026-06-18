@@ -600,7 +600,7 @@ _WEIXIN_CDN_ALLOWLIST: frozenset[str] = frozenset(
         "res.wx.qq.com",
         "mmbiz.qpic.cn",
         "mmbiz.qlogo.cn",
-    }
+    },
 )
 
 
@@ -615,12 +615,12 @@ def _assert_weixin_cdn_url(url: str) -> None:
 
     if scheme not in {"http", "https"}:
         raise ValueError(
-            f"Media URL has disallowed scheme {scheme!r}; only http/https are permitted."
+            f"Media URL has disallowed scheme {scheme!r}; only http/https are permitted.",
         )
     if host not in _WEIXIN_CDN_ALLOWLIST:
         raise ValueError(
             f"Media URL host {host!r} is not in the WeChat CDN allowlist. "
-            "Refusing to fetch to prevent SSRF."
+            "Refusing to fetch to prevent SSRF.",
         )
 
 
@@ -1162,33 +1162,33 @@ class WeixinAdapter(BasePlatformAdapter):
         self._token = str(config.token or extra.get("token") or os.getenv("WEIXIN_TOKEN", "")).strip()
         self._base_url = str(extra.get("base_url") or os.getenv("WEIXIN_BASE_URL", ILINK_BASE_URL)).strip().rstrip("/")
         self._cdn_base_url = str(
-            extra.get("cdn_base_url") or os.getenv("WEIXIN_CDN_BASE_URL", WEIXIN_CDN_BASE_URL)
+            extra.get("cdn_base_url") or os.getenv("WEIXIN_CDN_BASE_URL", WEIXIN_CDN_BASE_URL),
         ).strip().rstrip("/")
         self._send_chunk_delay_seconds = float(
-            extra.get("send_chunk_delay_seconds") or os.getenv("WEIXIN_SEND_CHUNK_DELAY_SECONDS", "1.5")
+            extra.get("send_chunk_delay_seconds") or os.getenv("WEIXIN_SEND_CHUNK_DELAY_SECONDS", "1.5"),
         )
         self._send_chunk_retries = int(
-            extra.get("send_chunk_retries") or os.getenv("WEIXIN_SEND_CHUNK_RETRIES", "4")
+            extra.get("send_chunk_retries") or os.getenv("WEIXIN_SEND_CHUNK_RETRIES", "4"),
         )
         self._send_chunk_retry_delay_seconds = float(
             extra.get("send_chunk_retry_delay_seconds")
-            or os.getenv("WEIXIN_SEND_CHUNK_RETRY_DELAY_SECONDS", "1.0")
+            or os.getenv("WEIXIN_SEND_CHUNK_RETRY_DELAY_SECONDS", "1.0"),
         )
         self._send_text_gate = asyncio.Lock()
         self._rate_limit_circuit_threshold = max(
             1,
             int(
                 extra.get("rate_limit_circuit_threshold")
-                or os.getenv("WEIXIN_RATE_LIMIT_CIRCUIT_THRESHOLD", "1")
+                or os.getenv("WEIXIN_RATE_LIMIT_CIRCUIT_THRESHOLD", "1"),
             ),
         )
         self._rate_limit_circuit_window_seconds = float(
             extra.get("rate_limit_circuit_window_seconds")
-            or os.getenv("WEIXIN_RATE_LIMIT_CIRCUIT_WINDOW_SECONDS", "30.0")
+            or os.getenv("WEIXIN_RATE_LIMIT_CIRCUIT_WINDOW_SECONDS", "30.0"),
         )
         self._rate_limit_circuit_open_seconds = float(
             extra.get("rate_limit_circuit_open_seconds")
-            or os.getenv("WEIXIN_RATE_LIMIT_CIRCUIT_OPEN_SECONDS", "30.0")
+            or os.getenv("WEIXIN_RATE_LIMIT_CIRCUIT_OPEN_SECONDS", "30.0"),
         )
         self._rate_limit_circuit_until = 0.0
         self._rate_limit_events: list[float] = []
@@ -1217,10 +1217,10 @@ class WeixinAdapter(BasePlatformAdapter):
         # ``gateway.platforms.weixin.extra.text_batch_delay_seconds`` /
         # ``text_batch_split_delay_seconds``.
         self._text_batch_delay_seconds = self._coerce_float_extra(
-            "text_batch_delay_seconds", 3.0
+            "text_batch_delay_seconds", 3.0,
         )
         self._text_batch_split_delay_seconds = self._coerce_float_extra(
-            "text_batch_split_delay_seconds", 5.0
+            "text_batch_split_delay_seconds", 5.0,
         )
         self._pending_text_batches: dict[str, MessageEvent] = {}
         self._pending_text_batch_tasks: dict[str, asyncio.Task] = {}
@@ -1522,7 +1522,7 @@ class WeixinAdapter(BasePlatformAdapter):
         if prior_task and not prior_task.done():
             prior_task.cancel()
         self._pending_text_batch_tasks[key] = asyncio.create_task(
-            self._flush_text_batch(key)
+            self._flush_text_batch(key),
         )
 
     async def _flush_text_batch(self, key: str) -> None:
@@ -1670,7 +1670,7 @@ class WeixinAdapter(BasePlatformAdapter):
 
     def _rate_limit_error(self) -> RuntimeError:
         return RuntimeError(
-            f"iLink sendmessage rate limited; cooldown active for {self._rate_limit_cooldown_remaining():.1f}s"
+            f"iLink sendmessage rate limited; cooldown active for {self._rate_limit_cooldown_remaining():.1f}s",
         )
 
     def _open_rate_limit_circuit(self) -> None:
@@ -1747,7 +1747,7 @@ class WeixinAdapter(BasePlatformAdapter):
                 if resp and isinstance(resp, dict):
                     ret = resp.get("ret")
                     errcode = resp.get("errcode")
-                    if (ret is not None and ret not in {0,}) or (errcode is not None and errcode not in {0,}):
+                    if (ret is not None and ret not in {0}) or (errcode is not None and errcode not in {0}):
                         is_session_expired = (
                             ret == SESSION_EXPIRED_ERRCODE
                             or errcode == SESSION_EXPIRED_ERRCODE
@@ -1758,7 +1758,7 @@ class WeixinAdapter(BasePlatformAdapter):
                             retried_without_token = True
                             context_token = None
                             self._token_store._cache.pop(
-                                self._token_store._key(self._account_id, chat_id), None
+                                self._token_store._key(self._account_id, chat_id), None,
                             )
                             logger.warning(
                                 "[%s] session expired for %s; retrying without context_token",
@@ -1776,7 +1776,7 @@ class WeixinAdapter(BasePlatformAdapter):
                             # RuntimeError (instead of AssertionError) if the
                             # loop exhausts with the server still rate-limiting.
                             last_error = RuntimeError(
-                                f"iLink sendmessage rate limited: ret={ret} errcode={errcode} errmsg={errmsg}"
+                                f"iLink sendmessage rate limited: ret={ret} errcode={errcode} errmsg={errmsg}",
                             )
                             if self._record_rate_limit_event():
                                 last_error = self._rate_limit_error()
@@ -1792,7 +1792,7 @@ class WeixinAdapter(BasePlatformAdapter):
                             continue
                         errmsg = resp.get("errmsg") or resp.get("msg") or "unknown error"
                         raise RuntimeError(
-                            f"iLink sendmessage error: ret={ret} errcode={errcode} errmsg={errmsg}"
+                            f"iLink sendmessage error: ret={ret} errcode={errcode} errmsg={errmsg}",
                         )
                 self._reset_rate_limit_circuit()
                 return
@@ -2171,7 +2171,7 @@ class WeixinAdapter(BasePlatformAdapter):
                     "message_state": MSG_STATE_FINISH,
                     "item_list": [media_item],
                     **({"context_token": context_token} if context_token else {}),
-                }
+                },
             },
             token=self._token,
             timeout_ms=API_TIMEOUT_MS,
@@ -2323,7 +2323,7 @@ async def send_weixin_direct(
                     "base_url": base_url,
                     "cdn_base_url": cdn_base_url,
                 },
-            )
+            ),
         )
         adapter._send_session = session
         adapter._session = session

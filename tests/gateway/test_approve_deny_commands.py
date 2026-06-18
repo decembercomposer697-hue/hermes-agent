@@ -44,7 +44,7 @@ def _make_runner():
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
     adapter = MagicMock()
     adapter.send = AsyncMock()
@@ -390,7 +390,7 @@ class TestBlockingApprovalE2E:
             os.environ["HERMES_SESSION_KEY"] = session_key
             try:
                 result_holder[0] = check_all_command_guards(
-                    "rm -rf /important", "local"
+                    "rm -rf /important", "local",
                 )
             finally:
                 os.environ.pop("HERMES_GATEWAY_SESSION", None)
@@ -438,7 +438,7 @@ class TestBlockingApprovalE2E:
             os.environ["HERMES_SESSION_KEY"] = session_key
             try:
                 result_holder[0] = check_all_command_guards(
-                    "rm -rf /important", "local"
+                    "rm -rf /important", "local",
                 )
             finally:
                 os.environ.pop("HERMES_GATEWAY_SESSION", None)
@@ -483,7 +483,7 @@ class TestBlockingApprovalE2E:
                 with patch("tools.approval._get_approval_config",
                            return_value={"gateway_timeout": 1}):
                     result_holder[0] = check_all_command_guards(
-                        "rm -rf /important", "local"
+                        "rm -rf /important", "local",
                     )
             finally:
                 os.environ.pop("HERMES_GATEWAY_SESSION", None)

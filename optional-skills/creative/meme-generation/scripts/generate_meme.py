@@ -254,7 +254,7 @@ def draw_outlined_text(
             if dx == 0 and dy == 0:
                 continue
             draw.multiline_text(
-                (tx + dx, ty + dy), wrapped, font=font, fill="black", align=align
+                (tx + dx, ty + dy), wrapped, font=font, fill="black", align=align,
             )
     # Draw main text (white)
     draw.multiline_text((tx, ty), wrapped, font=font, fill="white", align=align)
@@ -299,7 +299,7 @@ def _add_bars(img: Image.Image, texts: list) -> Image.Image:
             return 0
         wrapped = _wrap_text(text, font, int(w * 0.92))
         bbox = ImageDraw.Draw(Image.new("RGB", (1, 1))).multiline_textbbox(
-            (0, 0), wrapped, font=font, align="center"
+            (0, 0), wrapped, font=font, align="center",
         )
         return (bbox[3] - bbox[1]) + padding * 2
 
@@ -364,7 +364,7 @@ def generate_meme(template_id: str, texts: list[str], output_path: str) -> str:
 
 
 def generate_from_image(
-    image_path: str, texts: list[str], output_path: str, use_bars: bool = False
+    image_path: str, texts: list[str], output_path: str, use_bars: bool = False,
 ) -> str:
     """Generate a meme from a custom image (e.g. AI-generated). Returns the path."""
     img = Image.open(image_path).convert("RGBA")

@@ -184,7 +184,7 @@ class TestStalenessCheck(unittest.TestCase):
                     f.write("live copy modified elsewhere\n")
 
                 result = json.loads(
-                    write_file_tool("shared.txt", "replacement", task_id="live_task")
+                    write_file_tool("shared.txt", "replacement", task_id="live_task"),
                 )
         finally:
             with file_tools._file_ops_lock:

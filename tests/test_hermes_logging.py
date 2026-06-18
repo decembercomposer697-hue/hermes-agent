@@ -133,7 +133,7 @@ class TestSetupLogging:
 
     def test_custom_max_size_and_backup(self, hermes_home):
         hermes_logging.setup_logging(
-            hermes_home=hermes_home, max_size_mb=10, backup_count=5
+            hermes_home=hermes_home, max_size_mb=10, backup_count=5,
         )
 
         root = logging.getLogger()
@@ -547,37 +547,37 @@ class TestComponentFilter:
     def test_passes_matching_prefix(self):
         f = hermes_logging._ComponentFilter(("gateway",))
         record = logging.LogRecord(
-            "gateway.run", logging.INFO, "", 0, "msg", (), None
+            "gateway.run", logging.INFO, "", 0, "msg", (), None,
         )
         assert f.filter(record) is True
 
     def test_passes_nested_matching_prefix(self):
         f = hermes_logging._ComponentFilter(("gateway",))
         record = logging.LogRecord(
-            "gateway.platforms.telegram", logging.INFO, "", 0, "msg", (), None
+            "gateway.platforms.telegram", logging.INFO, "", 0, "msg", (), None,
         )
         assert f.filter(record) is True
 
     def test_blocks_non_matching(self):
         f = hermes_logging._ComponentFilter(("gateway",))
         record = logging.LogRecord(
-            "tools.terminal_tool", logging.INFO, "", 0, "msg", (), None
+            "tools.terminal_tool", logging.INFO, "", 0, "msg", (), None,
         )
         assert f.filter(record) is False
 
     def test_multiple_prefixes(self):
         f = hermes_logging._ComponentFilter(("agent", "run_agent", "model_tools"))
         assert f.filter(logging.LogRecord(
-            "agent.compressor", logging.INFO, "", 0, "", (), None
+            "agent.compressor", logging.INFO, "", 0, "", (), None,
         ))
         assert f.filter(logging.LogRecord(
-            "run_agent", logging.INFO, "", 0, "", (), None
+            "run_agent", logging.INFO, "", 0, "", (), None,
         ))
         assert f.filter(logging.LogRecord(
-            "model_tools", logging.INFO, "", 0, "", (), None
+            "model_tools", logging.INFO, "", 0, "", (), None,
         ))
         assert not f.filter(logging.LogRecord(
-            "tools.browser", logging.INFO, "", 0, "", (), None
+            "tools.browser", logging.INFO, "", 0, "", (), None,
         ))
 
 
@@ -1058,7 +1058,7 @@ class TestSafeStderr:
                 io.BytesIO(),
                 encoding="utf-8",
                 errors="replace",
-            )
+            ),
         )
         handler.setFormatter(logging.Formatter("%(message)s"))
         logger = logging.getLogger("_test_unicode")

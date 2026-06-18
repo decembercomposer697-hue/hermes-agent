@@ -40,7 +40,7 @@ def _load_lib():
     repo_root = Path(__file__).resolve().parents[2]
     lib_path = repo_root / "plugins" / "disk-cleanup" / "disk_cleanup.py"
     spec = importlib.util.spec_from_file_location(
-        "disk_cleanup_under_test", lib_path
+        "disk_cleanup_under_test", lib_path,
     )
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -488,7 +488,7 @@ class TestSlashCommand:
     def test_track_rejects_missing(self, _isolate_env):
         pi = _load_plugin_init()
         out = pi._handle_slash(
-            f"track {_isolate_env / 'nope.txt'} temp"
+            f"track {_isolate_env / 'nope.txt'} temp",
         )
         assert "Not tracked" in out
 
@@ -563,7 +563,7 @@ class TestBundledDiscovery:
             "plugins": {
                 "enabled": ["disk-cleanup"],
                 "disabled": ["disk-cleanup"],
-            }
+            },
         }))
         from hermes_cli import plugins as pmod
         mgr = pmod.PluginManager()
@@ -576,7 +576,7 @@ class TestBundledDiscovery:
         """Bundled scan must NOT pick up plugins/memory or plugins/context_engine
         as top-level plugins — they have their own discovery paths."""
         self._write_enabled_config(
-            _isolate_env, ["memory", "context_engine", "disk-cleanup"]
+            _isolate_env, ["memory", "context_engine", "disk-cleanup"],
         )
         from hermes_cli import plugins as pmod
         mgr = pmod.PluginManager()

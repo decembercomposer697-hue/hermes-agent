@@ -43,7 +43,7 @@ def test_normalize_codex_response_drops_transient_rs_tmp_reasoning_items():
             "encrypted_content": "opaque-stable",
             "id": "rs_456",
             "summary": [{"type": "summary_text", "text": "stable summary"}],
-        }
+        },
     ]
 
 
@@ -56,7 +56,7 @@ def test_normalize_codex_response_treats_summary_only_reasoning_as_incomplete():
                 id="rs_tmp_789",
                 encrypted_content="opaque-transient",
                 summary=[SimpleNamespace(text="still thinking")],
-            )
+            ),
         ],
     )
 

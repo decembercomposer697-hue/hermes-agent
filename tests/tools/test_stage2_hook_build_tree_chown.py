@@ -63,7 +63,7 @@ def test_build_tree_chown_not_gated_on_hermes_home(stage2_text: str) -> None:
 
 
 def _run_build_tree_block(
-    text: str, *, venv_owner: int, hermes_uid: int
+    text: str, *, venv_owner: int, hermes_uid: int,
 ) -> bool:
     """Run the extracted build-tree block with `stat`, `id`, and `chown`
     stubbed. Returns True iff the block attempted the recursive chown."""

@@ -366,7 +366,7 @@ class TestScriptOutputNotStrictScanned:
             "issue #103: privilege escalation by editing " + self.SUDOERS + "\n"
         )
         prompt = scheduler._build_job_prompt(
-            self._script_job(), prerun_script=(True, feed)
+            self._script_job(), prerun_script=(True, feed),
         )
         assert prompt is not None
         assert self.RM_ROOT in prompt
@@ -410,7 +410,7 @@ class TestScriptOutputNotStrictScanned:
         """A stray zero-width space in feed data is stripped, not a hard block."""
         _, scheduler = cron_env
         prompt = scheduler._build_job_prompt(
-            self._script_job(), prerun_script=(True, "item one\u200bitem two")
+            self._script_job(), prerun_script=(True, "item one\u200bitem two"),
         )
         assert prompt is not None
         assert "\u200b" not in prompt

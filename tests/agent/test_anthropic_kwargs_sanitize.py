@@ -27,7 +27,7 @@ def _fake_anthropic_call(**kwargs):
     if bad:
         raise TypeError(
             "Messages.stream() got an unexpected keyword argument "
-            f"{sorted(bad)[0]!r}"
+            f"{sorted(bad)[0]!r}",
         )
     return "OK"
 
@@ -69,7 +69,7 @@ def test_clean_anthropic_payload_is_untouched():
 def test_warns_when_keys_are_stripped(caplog):
     with caplog.at_level(logging.WARNING, logger="agent.anthropic_adapter"):
         sanitize_anthropic_kwargs(
-            {"model": "m", "instructions": "sys"}, log_prefix="[pfx] "
+            {"model": "m", "instructions": "sys"}, log_prefix="[pfx] ",
         )
     assert any(
         "31673" in r.message and "[pfx] " in r.message

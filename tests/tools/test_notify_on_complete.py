@@ -414,7 +414,7 @@ def test_background_without_notify_emits_silent_process_hint(monkeypatch, tmp_pa
             tt.terminal_tool(
                 command="while true; do gh pr checks 999; sleep 30; done",
                 background=True,
-            )
+            ),
         )
     finally:
         tt._active_environments.pop("default", None)
@@ -440,7 +440,7 @@ def test_background_with_notify_does_not_emit_hint(monkeypatch, tmp_path):
                 command="pytest tests/",
                 background=True,
                 notify_on_complete=True,
-            )
+            ),
         )
     finally:
         tt._active_environments.pop("default", None)
@@ -461,7 +461,7 @@ def test_background_with_watch_patterns_does_not_emit_hint(monkeypatch, tmp_path
                 command="uvicorn app:server --port 8080",
                 background=True,
                 watch_patterns=["Application startup complete"],
-            )
+            ),
         )
     finally:
         tt._active_environments.pop("default", None)
@@ -492,7 +492,7 @@ def test_foreground_command_does_not_emit_hint(monkeypatch, tmp_path):
             tt.terminal_tool(
                 command="echo hello",
                 background=False,
-            )
+            ),
         )
     finally:
         tt._active_environments.pop("default", None)
@@ -533,7 +533,7 @@ def test_homebrew_ci_poller_via_statusCheckRollup_emits_hint(monkeypatch, tmp_pa
                 ),
                 background=True,
                 notify_on_complete=True,
-            )
+            ),
         )
     finally:
         tt._active_environments.pop("default", None)
@@ -565,7 +565,7 @@ def test_homebrew_ci_poller_via_gh_pr_checks_piped_to_jq_emits_hint(monkeypatch,
                 ),
                 background=True,
                 notify_on_complete=True,
-            )
+            ),
         )
     finally:
         tt._active_environments.pop("default", None)
@@ -597,7 +597,7 @@ def test_canonical_column2_awk_poller_does_not_emit_homebrew_hint(monkeypatch, t
                 ),
                 background=True,
                 notify_on_complete=True,
-            )
+            ),
         )
     finally:
         tt._active_environments.pop("default", None)
@@ -624,7 +624,7 @@ def test_canonical_gh_pr_checks_exit_code_loop_does_not_emit_hint(monkeypatch, t
                 ),
                 background=True,
                 notify_on_complete=True,
-            )
+            ),
         )
     finally:
         tt._active_environments.pop("default", None)
@@ -648,7 +648,7 @@ def test_non_ci_background_command_does_not_emit_homebrew_hint(monkeypatch, tmp_
                 command="cat /var/log/syslog | awk '/error/ {print}' > /tmp/errs.log",
                 background=True,
                 notify_on_complete=True,
-            )
+            ),
         )
     finally:
         tt._active_environments.pop("default", None)

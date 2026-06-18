@@ -235,7 +235,7 @@ def _resolve_anthropic_messages_max_tokens(
         return fallback
     raise ValueError(
         f"Anthropic Messages adapter requires a positive max_tokens value for "
-        f"model {model!r}; got {requested!r} and no model default resolved."
+        f"model {model!r}; got {requested!r} and no model default resolved.",
     )
 
 
@@ -565,7 +565,7 @@ def _is_minimax_anthropic_endpoint(base_url: str | None) -> bool:
         return False
     normalized = normalized.rstrip("/").lower()
     return normalized.startswith(
-        ("https://api.minimax.io/anthropic", "https://api.minimaxi.com/anthropic")
+        ("https://api.minimax.io/anthropic", "https://api.minimaxi.com/anthropic"),
     )
 
 
@@ -651,7 +651,7 @@ def _build_anthropic_client_with_bearer_hook(
     if _anthropic_sdk is None:
         raise ImportError(
             "The 'anthropic' package is required for Azure Foundry Anthropic-style "
-            "endpoints with Entra ID auth. Install with: pip install 'anthropic>=0.39.0'"
+            "endpoints with Entra ID auth. Install with: pip install 'anthropic>=0.39.0'",
         )
 
     normalize_proxy_env_vars()
@@ -735,7 +735,7 @@ def build_anthropic_client(
     if _anthropic_sdk is None:
         raise ImportError(
             "The 'anthropic' package is required for the Anthropic provider. "
-            "Install it with: pip install 'anthropic>=0.39.0'"
+            "Install it with: pip install 'anthropic>=0.39.0'",
         )
 
     # Callable api_key → Entra ID bearer provider path. Delegated to a
@@ -777,7 +777,7 @@ def build_anthropic_client(
         kwargs["api_key"] = api_key
         kwargs["default_headers"] = {
             "User-Agent": "claude-code/0.1.0",
-            **( {"anthropic-beta": ",".join(common_betas)} if common_betas else {} )
+            **( {"anthropic-beta": ",".join(common_betas)} if common_betas else {} ),
         }
     elif _requires_bearer_auth(normalized_base_url):
         # Some Anthropic-compatible providers (e.g. MiniMax) expect the API key in
@@ -837,12 +837,12 @@ def build_anthropic_bedrock_client(region: str):
     if _anthropic_sdk is None:
         raise ImportError(
             "The 'anthropic' package is required for the Bedrock provider. "
-            "Install it with: pip install 'anthropic>=0.39.0'"
+            "Install it with: pip install 'anthropic>=0.39.0'",
         )
     if not hasattr(_anthropic_sdk, "AnthropicBedrock"):
         raise ImportError(
             "anthropic.AnthropicBedrock not available. "
-            "Upgrade with: pip install 'anthropic>=0.39.0'"
+            "Upgrade with: pip install 'anthropic>=0.39.0'",
         )
     from httpx import Timeout
 
@@ -1150,7 +1150,7 @@ def _prefer_refreshable_claude_code_token(env_token: str, creds: dict[str, Any] 
     resolved = _resolve_claude_code_token_from_credentials(creds)
     if resolved and resolved != env_token:
         logger.debug(
-            "Preferring Claude Code credential file over static env OAuth token so refresh can proceed"
+            "Preferring Claude Code credential file over static env OAuth token so refresh can proceed",
         )
         return resolved
     return None
@@ -1217,7 +1217,7 @@ def run_oauth_setup_token() -> str | None:
     if not claude_path:
         raise FileNotFoundError(
             "The 'claude' CLI is not installed. "
-            "Install it with: npm install -g @anthropic-ai/claude-code"
+            "Install it with: npm install -g @anthropic-ai/claude-code",
         )
 
     # Run interactively — stdin/stdout/stderr inherited so the user can
@@ -1262,7 +1262,7 @@ def _generate_pkce() -> tuple:
 
     verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b"=").decode()
     challenge = base64.urlsafe_b64encode(
-        hashlib.sha256(verifier.encode()).digest()
+        hashlib.sha256(verifier.encode()).digest(),
     ).rstrip(b"=").decode()
     return verifier, challenge
 
@@ -1523,7 +1523,7 @@ def convert_tools_to_anthropic(tools: list[dict]) -> list[dict]:
             "name": name,
             "description": fn.get("description", ""),
             "input_schema": _normalize_tool_input_schema(
-                fn.get("parameters", {"type": "object", "properties": {}})
+                fn.get("parameters", {"type": "object", "properties": {}}),
             ),
         }
         # Forward cache_control marker when present on the OpenAI-format
@@ -1858,7 +1858,7 @@ def _convert_assistant_message(m: dict[str, Any]) -> dict[str, Any]:
 
 
 def _convert_tool_message_to_result(
-    result: list[dict[str, Any]], m: dict[str, Any]
+    result: list[dict[str, Any]], m: dict[str, Any],
 ) -> None:
     """Convert a tool message to an Anthropic tool_result, merging consecutive
     results into one user message.
@@ -1870,12 +1870,12 @@ def _convert_tool_message_to_result(
     multimodal_blocks: list[dict[str, Any]] | None = None
     if isinstance(content, dict) and content.get("_multimodal"):
         multimodal_blocks = _content_parts_to_anthropic_blocks(
-            content.get("content") or []
+            content.get("content") or [],
         )
         # Fallback text if the conversion produced nothing usable.
         if not multimodal_blocks and content.get("text_summary"):
             multimodal_blocks = [
-                {"type": "text", "text": str(content["text_summary"])}
+                {"type": "text", "text": str(content["text_summary"])},
             ]
     elif isinstance(content, list):
         converted = _content_parts_to_anthropic_blocks(content)
@@ -2046,7 +2046,7 @@ def _merge_consecutive_roles(result: list[dict[str, Any]]) -> list[dict[str, Any
 
 
 def _manage_thinking_signatures(
-    result: list[dict[str, Any]], base_url: str | None, model: str | None
+    result: list[dict[str, Any]], base_url: str | None, model: str | None,
 ) -> None:
     """Strip or preserve thinking blocks based on endpoint type.
 
@@ -2303,7 +2303,7 @@ def build_anthropic_kwargs(
     compatible ones).
     """
     system, anthropic_messages = convert_messages_to_anthropic(
-        messages, base_url=base_url, model=model
+        messages, base_url=base_url, model=model,
     )
     anthropic_tools = convert_tools_to_anthropic(tools) if tools else []
 
@@ -2313,7 +2313,7 @@ def build_anthropic_kwargs(
     # fractional floats, NaN, non-numeric) fail locally with a clear error
     # rather than 400-ing at the Anthropic API. See openclaw/openclaw#66664.
     effective_max_tokens = _resolve_anthropic_messages_max_tokens(
-        max_tokens, model, context_length=context_length
+        max_tokens, model, context_length=context_length,
     )
 
     # Clamp output cap to fit inside the total context window.
@@ -2477,7 +2477,7 @@ def build_anthropic_kwargs(
 # The Anthropic Messages SDK (``messages.create()`` / ``messages.stream()``)
 # raises ``TypeError: ... got an unexpected keyword argument`` on any of them.
 _RESPONSES_ONLY_KWARGS = frozenset(
-    {"instructions", "input", "store", "parallel_tool_calls"}
+    {"instructions", "input", "store", "parallel_tool_calls"},
 )
 
 

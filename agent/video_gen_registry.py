@@ -44,7 +44,7 @@ def register_provider(provider: VideoGenProvider) -> None:
     if not isinstance(provider, VideoGenProvider):
         raise TypeError(
             f"register_provider() expects a VideoGenProvider instance, "
-            f"got {type(provider).__name__}"
+            f"got {type(provider).__name__}",
         )
     name = provider.name
     if not isinstance(name, str) or not name.strip():

@@ -50,7 +50,7 @@ class TestMaybeApplyCodexAppServerRuntime:
     def test_default_off_for_openai(self, model_cfg) -> None:
         """Default behavior is preserved when the flag is unset/auto."""
         got = _maybe_apply_codex_app_server_runtime(
-            provider="openai", api_mode="chat_completions", model_cfg=model_cfg
+            provider="openai", api_mode="chat_completions", model_cfg=model_cfg,
         )
         assert got == "chat_completions"
 
@@ -234,7 +234,7 @@ class TestSpawnEnvIsolation:
         monkeypatch.setenv("HOME", "/users/alice")
 
         client = cas.CodexAppServerClient(
-            codex_bin="codex", codex_home="/tmp/profile/codex"
+            codex_bin="codex", codex_home="/tmp/profile/codex",
         )
         client._closed = True
 

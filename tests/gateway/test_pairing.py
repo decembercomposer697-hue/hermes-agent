@@ -100,7 +100,7 @@ class TestHashedStorage:
             store = PairingStore()
             code = store.generate_code("telegram", "user1", "Alice")
             raw = json.loads(
-                (tmp_path / "telegram-pending.json").read_text(encoding="utf-8")
+                (tmp_path / "telegram-pending.json").read_text(encoding="utf-8"),
             )
 
         assert len(raw) == 1
@@ -156,7 +156,7 @@ class TestHashedStorage:
             store.generate_code("telegram", "user1")
             store.generate_code("telegram", "user2")
             raw = json.loads(
-                (tmp_path / "telegram-pending.json").read_text(encoding="utf-8")
+                (tmp_path / "telegram-pending.json").read_text(encoding="utf-8"),
             )
         salts = [entry["salt"] for entry in raw.values()]
         assert len(set(salts)) == 3  # all unique
@@ -193,10 +193,10 @@ class TestLegacyPendingFileCompat:
                 "user_id": "legacy-user",
                 "user_name": "Legacy",
                 "created_at": created_at,
-            }
+            },
         }
         (tmp_path / "telegram-pending.json").write_text(
-            json.dumps(legacy), encoding="utf-8"
+            json.dumps(legacy), encoding="utf-8",
         )
 
     def test_approve_code_ignores_legacy_entries(self, tmp_path):
@@ -235,7 +235,7 @@ class TestLegacyPendingFileCompat:
             store = PairingStore()
             store._cleanup_expired("telegram")
             raw = json.loads(
-                (tmp_path / "telegram-pending.json").read_text(encoding="utf-8")
+                (tmp_path / "telegram-pending.json").read_text(encoding="utf-8"),
             )
         assert raw == {}
 
@@ -253,7 +253,7 @@ class TestLegacyPendingFileCompat:
             store = PairingStore()
             store._cleanup_expired("telegram")
             raw = json.loads(
-                (tmp_path / "telegram-pending.json").read_text(encoding="utf-8")
+                (tmp_path / "telegram-pending.json").read_text(encoding="utf-8"),
             )
         assert raw == {}
 
@@ -457,7 +457,7 @@ class TestApprovalFlow:
                     "15551234567@s.whatsapp.net": {
                         "user_name": "Legacy Alice",
                         "approved_at": time.time(),
-                    }
+                    },
                 },
                 indent=2,
             ),

@@ -92,7 +92,7 @@ class TestProjectPluginsEnvGate:
 
     @pytest.mark.parametrize("value", ["", "0", "false", "FALSE", "no", "off", "False"])
     def test_falsy_values_keep_project_plugins_disabled(
-        self, project_plugin, monkeypatch, value
+        self, project_plugin, monkeypatch, value,
     ):
         if value == "":
             monkeypatch.delenv("HERMES_ENABLE_PROJECT_PLUGINS", raising=False)
@@ -108,7 +108,7 @@ class TestProjectPluginsEnvGate:
 
     @pytest.mark.parametrize("value", ["1", "true", "TRUE", "yes", "on", "YES"])
     def test_truthy_values_enable_project_plugins(
-        self, project_plugin, monkeypatch, value
+        self, project_plugin, monkeypatch, value,
     ):
         monkeypatch.setenv("HERMES_ENABLE_PROJECT_PLUGINS", value)
         plugins = web_server._get_dashboard_plugins(force_rescan=True)
@@ -142,7 +142,7 @@ class TestApiPathSanitizer:
         (d / "backend").mkdir()
         (d / "backend" / "routes.py").write_text("router = None\n")
         out = web_server._safe_plugin_api_relpath(
-            "backend/routes.py", dashboard_dir=d
+            "backend/routes.py", dashboard_dir=d,
         )
         assert out == "backend/routes.py"
 
@@ -226,7 +226,7 @@ class TestDiscoveryScrubsApiField:
         # Make the api file actually exist so a downstream mount could
         # in principle proceed — we're only testing the discovery scrub.
         (tmp_path / "plugins" / "safe" / "dashboard" / "api.py").write_text(
-            "router = None\n"
+            "router = None\n",
         )
         plugins = web_server._get_dashboard_plugins(force_rescan=True)
         entry = next(p for p in plugins if p["name"] == "safe")
@@ -251,7 +251,7 @@ class TestMountApiRoutesRefusesUntrusted:
         # regardless of whether it exists, since the source/path checks
         # short-circuit before the importer runs.
         (dash / "api.py").write_text(
-            "from fastapi import APIRouter\nrouter = APIRouter()\n"
+            "from fastapi import APIRouter\nrouter = APIRouter()\n",
         )
         return {
             "name": "synthetic",

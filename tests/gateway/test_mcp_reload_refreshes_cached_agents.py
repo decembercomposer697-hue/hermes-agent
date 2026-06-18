@@ -46,7 +46,7 @@ def _make_runner_with_cached_agents(num_agents: int = 2):
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
 
     # Session store stub — _execute_mcp_reload writes a transcript message

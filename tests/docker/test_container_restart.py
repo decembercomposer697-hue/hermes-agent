@@ -132,7 +132,7 @@ def restart_container(request, built_image: str):
         # test failure points at "container never finished cont-init"
         # rather than mid-test where the symptom would be obscure.
         raise RuntimeError(
-            f"container {name} did not finish cont-init within 30s"
+            f"container {name} did not finish cont-init within 30s",
         )
     yield name
     _docker("rm", "-f", name)

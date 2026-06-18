@@ -377,7 +377,7 @@ def repair_state_db_schema(db_path: Path, *, backup: bool = True) -> dict[str, A
             conn.execute("PRAGMA writable_schema=ON")
             dupes = conn.execute(
                 "SELECT type, name, COUNT(*) AS c, MIN(rowid) AS keep "
-                "FROM sqlite_master GROUP BY type, name HAVING c > 1"
+                "FROM sqlite_master GROUP BY type, name HAVING c > 1",
             ).fetchall()
             for type_, name, _count, keep in dupes:
                 conn.execute(
@@ -394,7 +394,7 @@ def repair_state_db_schema(db_path: Path, *, backup: bool = True) -> dict[str, A
             report["strategy"] = "dedup_schema"
             logger.warning(
                 "state.db schema repaired by de-duplicating sqlite_master "
-                "(FTS index preserved): %s", db_path
+                "(FTS index preserved): %s", db_path,
             )
             return report
     except sqlite3.DatabaseError as exc:
@@ -417,7 +417,7 @@ def repair_state_db_schema(db_path: Path, *, backup: bool = True) -> dict[str, A
             report["strategy"] = "drop_fts_rebuild"
             logger.warning(
                 "state.db schema repaired by dropping FTS schema; indexes "
-                "will rebuild from messages on next open: %s", db_path
+                "will rebuild from messages on next open: %s", db_path,
             )
             return report
         report["error"] = reason
@@ -754,7 +754,7 @@ class SessionDB:
             "COALESCE(content, '') || ' ' || "
             "COALESCE(tool_name, '') || ' ' || "
             "COALESCE(tool_calls, '') "
-            "FROM messages"
+            "FROM messages",
         )
         cursor.execute(
             "INSERT INTO messages_fts_trigram(rowid, content) "
@@ -762,7 +762,7 @@ class SessionDB:
             "COALESCE(content, '') || ' ' || "
             "COALESCE(tool_name, '') || ' ' || "
             "COALESCE(tool_calls, '') "
-            "FROM messages"
+            "FROM messages",
         )
 
     def _fts_table_probe(self, cursor: sqlite3.Cursor, table_name: str) -> bool | None:
@@ -847,7 +847,7 @@ class SessionDB:
                 raise
         # Retries exhausted (shouldn't normally reach here).
         raise last_err or sqlite3.OperationalError(
-            "database is locked after max retries"
+            "database is locked after max retries",
         )
 
     def _try_wal_checkpoint(self) -> None:
@@ -871,7 +871,7 @@ class SessionDB:
         try:
             with self._lock:
                 result = self._conn.execute(
-                    "PRAGMA wal_checkpoint(TRUNCATE)"
+                    "PRAGMA wal_checkpoint(TRUNCATE)",
                 ).fetchone()
                 if result and result[1] > 0:
                     logger.debug(
@@ -915,11 +915,11 @@ class SessionDB:
             table_columns: dict[str, dict[str, str]] = {}
             for (tbl,) in ref.execute(
                 "SELECT name FROM sqlite_master "
-                "WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+                "WHERE type='table' AND name NOT LIKE 'sqlite_%'",
             ).fetchall():
                 cols: dict[str, str] = {}
                 for row in ref.execute(
-                    f'PRAGMA table_info("{tbl}")'
+                    f'PRAGMA table_info("{tbl}")',
                 ).fetchall():
                     # row: (cid, name, type, notnull, dflt_value, pk)
                     col_name = row[1]
@@ -957,7 +957,7 @@ class SessionDB:
             # Get current columns from the live table
             try:
                 rows = cursor.execute(
-                    f'PRAGMA table_info("{table_name}")'
+                    f'PRAGMA table_info("{table_name}")',
                 ).fetchall()
             except sqlite3.OperationalError:
                 continue  # Table doesn't exist yet (shouldn't happen after executescript)
@@ -972,7 +972,7 @@ class SessionDB:
                     safe_name = col_name.replace('"', '""')
                     try:
                         cursor.execute(
-                            f'ALTER TABLE "{table_name}" ADD COLUMN "{safe_name}" {col_type}'
+                            f'ALTER TABLE "{table_name}" ADD COLUMN "{safe_name}" {col_type}',
                         )
                     except sqlite3.OperationalError as exc:
                         # Expected: "duplicate column name" from a race or
@@ -1015,7 +1015,7 @@ class SessionDB:
             cursor.execute(
                 "CREATE INDEX IF NOT EXISTS idx_messages_platform_msg_id "
                 "ON messages(session_id, platform_message_id) "
-                "WHERE platform_message_id IS NOT NULL"
+                "WHERE platform_message_id IS NOT NULL",
             )
         except sqlite3.OperationalError as exc:
             logger.debug("idx_messages_platform_msg_id create skipped: %s", exc)
@@ -1057,15 +1057,15 @@ class SessionDB:
                 # backfill into the FTS index.
                 if fts5_available:
                     _fts_trigram_exists = self._fts_table_probe(
-                        cursor, "messages_fts_trigram"
+                        cursor, "messages_fts_trigram",
                     )
                     if _fts_trigram_exists is False:
                         if self._ensure_fts_schema(
-                            cursor, "messages_fts_trigram", FTS_TRIGRAM_SQL
+                            cursor, "messages_fts_trigram", FTS_TRIGRAM_SQL,
                         ):
                             cursor.execute(
                                 "INSERT INTO messages_fts_trigram(rowid, content) "
-                                "SELECT id, content FROM messages WHERE content IS NOT NULL"
+                                "SELECT id, content FROM messages WHERE content IS NOT NULL",
                             )
                         else:
                             fts_migrations_complete = False
@@ -1099,7 +1099,7 @@ class SessionDB:
                         if (
                             self._ensure_fts_schema(cursor, "messages_fts", FTS_SQL)
                             and self._ensure_fts_schema(
-                                cursor, "messages_fts_trigram", FTS_TRIGRAM_SQL
+                                cursor, "messages_fts_trigram", FTS_TRIGRAM_SQL,
                             )
                         ):
                             # Backfill both indexes from every existing messages row.
@@ -1109,7 +1109,7 @@ class SessionDB:
                                 "COALESCE(content, '') || ' ' || "
                                 "COALESCE(tool_name, '') || ' ' || "
                                 "COALESCE(tool_calls, '') "
-                                "FROM messages"
+                                "FROM messages",
                             )
                             cursor.execute(
                                 "INSERT INTO messages_fts_trigram(rowid, content) "
@@ -1117,7 +1117,7 @@ class SessionDB:
                                 "COALESCE(content, '') || ' ' || "
                                 "COALESCE(tool_name, '') || ' ' || "
                                 "COALESCE(tool_calls, '') "
-                                "FROM messages"
+                                "FROM messages",
                             )
                         else:
                             fts_migrations_complete = False
@@ -1131,7 +1131,7 @@ class SessionDB:
                 # active=1 rather than NULL.
                 try:
                     cursor.execute(
-                        "UPDATE messages SET active = 1 WHERE active IS NULL"
+                        "UPDATE messages SET active = 1 WHERE active IS NULL",
                     )
                 except sqlite3.OperationalError:
                     pass
@@ -1145,7 +1145,7 @@ class SessionDB:
         try:
             cursor.execute(
                 "CREATE UNIQUE INDEX IF NOT EXISTS idx_sessions_title_unique "
-                "ON sessions(title) WHERE title IS NOT NULL"
+                "ON sessions(title) WHERE title IS NOT NULL",
             )
         except sqlite3.OperationalError:
             pass  # Index already exists
@@ -1162,7 +1162,7 @@ class SessionDB:
             # back to LIKE.
             if self._fts_enabled:
                 trigram_enabled = self._ensure_fts_schema(
-                    cursor, "messages_fts_trigram", FTS_TRIGRAM_SQL
+                    cursor, "messages_fts_trigram", FTS_TRIGRAM_SQL,
                 )
                 if trigram_enabled and triggers_need_repair:
                     self._rebuild_fts_indexes(cursor)
@@ -1541,7 +1541,7 @@ class SessionDB:
             if ids:
                 placeholders = ",".join("?" * len(ids))
                 conn.execute(
-                    f"DELETE FROM sessions WHERE id IN ({placeholders})", ids
+                    f"DELETE FROM sessions WHERE id IN ({placeholders})", ids,
                 )
             return ids
 
@@ -1595,7 +1595,7 @@ class SessionDB:
         """Get a session by ID."""
         with self._lock:
             cursor = self._conn.execute(
-                "SELECT * FROM sessions WHERE id = ?", (session_id,)
+                "SELECT * FROM sessions WHERE id = ?", (session_id,),
             )
             row = cursor.fetchone()
         return dict(row) if row else None
@@ -1669,7 +1669,7 @@ class SessionDB:
 
         if len(cleaned) > SessionDB.MAX_TITLE_LENGTH:
             raise ValueError(
-                f"Title too long ({len(cleaned)} chars, max {SessionDB.MAX_TITLE_LENGTH})"
+                f"Title too long ({len(cleaned)} chars, max {SessionDB.MAX_TITLE_LENGTH})",
             )
 
         return cleaned
@@ -1693,7 +1693,7 @@ class SessionDB:
                 conflict = cursor.fetchone()
                 if conflict:
                     raise ValueError(
-                        f"Title '{title}' is already in use by session {conflict['id']}"
+                        f"Title '{title}' is already in use by session {conflict['id']}",
                     )
             cursor = conn.execute(
                 "UPDATE sessions SET title = ? WHERE id = ?",
@@ -1707,7 +1707,7 @@ class SessionDB:
         """Get the title for a session, or None."""
         with self._lock:
             cursor = self._conn.execute(
-                "SELECT title FROM sessions WHERE id = ?", (session_id,)
+                "SELECT title FROM sessions WHERE id = ?", (session_id,),
             )
             row = cursor.fetchone()
         return row["title"] if row else None
@@ -1768,7 +1768,7 @@ class SessionDB:
         """Look up a session by exact title. Returns session dict or None."""
         with self._lock:
             cursor = self._conn.execute(
-                "SELECT * FROM sessions WHERE title = ?", (title,)
+                "SELECT * FROM sessions WHERE title = ?", (title,),
             )
             row = cursor.fetchone()
         return dict(row) if row else None
@@ -1938,7 +1938,7 @@ class SessionDB:
                 " OR EXISTS (SELECT 1 FROM sessions p"
                 "            WHERE p.id = s.parent_session_id"
                 "            AND p.end_reason = 'branched'"
-                "            AND s.started_at >= p.ended_at))"
+                "            AND s.started_at >= p.ended_at))",
             )
 
         if source:
@@ -2259,7 +2259,7 @@ class SessionDB:
             except (json.JSONDecodeError, TypeError):
                 logger.warning(
                     "Failed to decode JSON-encoded message content; "
-                    "returning raw string"
+                    "returning raw string",
                 )
                 return content
         return content
@@ -2371,7 +2371,7 @@ class SessionDB:
 
         def _do(conn):
             conn.execute(
-                "DELETE FROM messages WHERE session_id = ?", (session_id,)
+                "DELETE FROM messages WHERE session_id = ?", (session_id,),
             )
             conn.execute(
                 "UPDATE sessions SET message_count = 0, tool_call_count = 0 WHERE id = ?",
@@ -2448,7 +2448,7 @@ class SessionDB:
         self._execute_write(_do)
 
     def get_messages(
-        self, session_id: str, include_inactive: bool = False
+        self, session_id: str, include_inactive: bool = False,
     ) -> list[dict[str, Any]]:
         """Load messages for a session in insertion order.
 
@@ -2545,7 +2545,7 @@ class SessionDB:
                     msg["tool_calls"] = json.loads(msg["tool_calls"])
                 except (json.JSONDecodeError, TypeError):
                     logger.warning(
-                        "Failed to deserialize tool_calls in get_messages_around, falling back to []"
+                        "Failed to deserialize tool_calls in get_messages_around, falling back to []",
                     )
                     msg["tool_calls"] = []
             result.append(msg)
@@ -2600,7 +2600,7 @@ class SessionDB:
         # Reuse the primitive — handles anchor-existence, content decoding,
         # tool_calls deserialisation, and boundary counts.
         primitive = self.get_messages_around(
-            session_id, around_message_id, window=window
+            session_id, around_message_id, window=window,
         )
         window_rows = primitive["window"]
         if not window_rows:
@@ -2667,7 +2667,7 @@ class SessionDB:
                     msg["tool_calls"] = json.loads(msg["tool_calls"])
                 except (json.JSONDecodeError, TypeError):
                     logger.warning(
-                        "Failed to deserialize tool_calls in get_anchored_view, falling back to []"
+                        "Failed to deserialize tool_calls in get_anchored_view, falling back to []",
                     )
                     msg["tool_calls"] = []
             return msg
@@ -2874,7 +2874,7 @@ class SessionDB:
     # =========================================================================
 
     def rewind_to_message(
-        self, session_id: str, target_message_id: int
+        self, session_id: str, target_message_id: int,
     ) -> dict[str, Any]:
         """Soft-delete all messages with id >= ``target_message_id`` in *session_id*.
 
@@ -2910,13 +2910,13 @@ class SessionDB:
             ).fetchone()
         if row is None:
             raise ValueError(
-                f"message {target_message_id} not found in session {session_id}"
+                f"message {target_message_id} not found in session {session_id}",
             )
         target_row = dict(row)
         if target_row.get("role") != "user":
             raise ValueError(
                 f"rewind target must be a 'user' message (got role="
-                f"{target_row.get('role')!r}, id={target_message_id})"
+                f"{target_row.get('role')!r}, id={target_message_id})",
             )
 
         # Decode content for callers (prefill the prompt buffer).
@@ -3034,7 +3034,7 @@ class SessionDB:
                     "id": row["id"],
                     "timestamp": row["timestamp"],
                     "preview": preview,
-                }
+                },
             )
         return result
 
@@ -3332,7 +3332,7 @@ class SessionDB:
                 for tok in non_op_tokens:
                     esc = tok.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
                     token_clauses.append(
-                        "(m.content LIKE ? ESCAPE '\\' OR m.tool_name LIKE ? ESCAPE '\\' OR m.tool_calls LIKE ? ESCAPE '\\')"
+                        "(m.content LIKE ? ESCAPE '\\' OR m.tool_name LIKE ? ESCAPE '\\' OR m.tool_calls LIKE ? ESCAPE '\\')",
                     )
                     like_params += [f"%{esc}%", f"%{esc}%", f"%{esc}%"]
                 like_where = [f"({' OR '.join(token_clauses)})"]
@@ -3430,7 +3430,7 @@ class SessionDB:
                         else:
                             preview = ""
                         context_msgs.append(
-                            {"role": r["role"], "content": preview[:200]}
+                            {"role": r["role"], "content": preview[:200]},
                         )
                 match["context"] = context_msgs
             except Exception:
@@ -3564,7 +3564,7 @@ class SessionDB:
                 " OR EXISTS (SELECT 1 FROM sessions p"
                 "            WHERE p.id = s.parent_session_id"
                 "            AND p.end_reason = 'branched'"
-                "            AND s.started_at >= p.ended_at))"
+                "            AND s.started_at >= p.ended_at))",
             )
         if source:
             where_clauses.append("s.source = ?")
@@ -3592,7 +3592,7 @@ class SessionDB:
         with self._lock:
             if session_id:
                 cursor = self._conn.execute(
-                    "SELECT COUNT(*) FROM messages WHERE session_id = ?", (session_id,)
+                    "SELECT COUNT(*) FROM messages WHERE session_id = ?", (session_id,),
                 )
             else:
                 cursor = self._conn.execute("SELECT COUNT(*) FROM messages")
@@ -3626,7 +3626,7 @@ class SessionDB:
         """Delete all messages for a session and reset its counters."""
         def _do(conn):
             conn.execute(
-                "DELETE FROM messages WHERE session_id = ?", (session_id,)
+                "DELETE FROM messages WHERE session_id = ?", (session_id,),
             )
             conn.execute(
                 "UPDATE sessions SET message_count = 0, tool_call_count = 0 WHERE id = ?",
@@ -3676,7 +3676,7 @@ class SessionDB:
         """
         def _do(conn):
             cursor = conn.execute(
-                "SELECT COUNT(*) FROM sessions WHERE id = ?", (session_id,)
+                "SELECT COUNT(*) FROM sessions WHERE id = ?", (session_id,),
             )
             if cursor.fetchone()[0] == 0:
                 return False
@@ -3796,7 +3796,7 @@ class SessionDB:
                 "SELECT COUNT(*) FROM sessions "
                 "WHERE message_count = 0 "
                 "AND ended_at IS NOT NULL "
-                "AND archived = 0"
+                "AND archived = 0",
             )
             return cursor.fetchone()[0]
 
@@ -3836,7 +3836,7 @@ class SessionDB:
                 "SELECT id FROM sessions "
                 "WHERE message_count = 0 "
                 "AND ended_at IS NOT NULL "
-                "AND archived = 0"
+                "AND archived = 0",
             )
             session_ids = {row["id"] for row in cursor.fetchall()}
 
@@ -3856,7 +3856,7 @@ class SessionDB:
                 # bookkeeping bug ever lets the counter drift below the
                 # real row count, we still leave a clean FK state.
                 conn.execute(
-                    "DELETE FROM messages WHERE session_id = ?", (sid,)
+                    "DELETE FROM messages WHERE session_id = ?", (sid,),
                 )
                 conn.execute("DELETE FROM sessions WHERE id = ?", (sid,))
                 removed_ids.append(sid)
@@ -3928,7 +3928,7 @@ class SessionDB:
         """Read a value from the state_meta key/value store."""
         with self._lock:
             row = self._conn.execute(
-                "SELECT value FROM state_meta WHERE key = ?", (key,)
+                "SELECT value FROM state_meta WHERE key = ?", (key,),
             ).fetchone()
         if row is None:
             return None
@@ -3990,7 +3990,7 @@ class SessionDB:
 
                 CREATE INDEX IF NOT EXISTS idx_telegram_dm_topic_bindings_user
                 ON telegram_dm_topic_bindings(user_id, chat_id);
-                """
+                """,
             )
 
             # v1 → v2: rebuild telegram_dm_topic_bindings if its session_id FK
@@ -4003,7 +4003,7 @@ class SessionDB:
             current_version = int(current[0]) if current and str(current[0]).isdigit() else 0
             if current_version < 2:
                 fk_rows = conn.execute(
-                    "PRAGMA foreign_key_list('telegram_dm_topic_bindings')"
+                    "PRAGMA foreign_key_list('telegram_dm_topic_bindings')",
                 ).fetchall()
                 needs_rebuild = any(
                     row[2] == "sessions" and (row[6] or "") != "CASCADE"
@@ -4034,7 +4034,7 @@ class SessionDB:
                             ON telegram_dm_topic_bindings(session_id);
                         CREATE INDEX idx_telegram_dm_topic_bindings_user
                             ON telegram_dm_topic_bindings(user_id, chat_id);
-                        """
+                        """,
                     )
 
             conn.execute(
@@ -4416,12 +4416,12 @@ class SessionDB:
                     # The column name in the INSERT must match the table name
                     # for FTS5 special commands.
                     self._conn.execute(
-                        f"INSERT INTO {tbl}({tbl}) VALUES('optimize')"
+                        f"INSERT INTO {tbl}({tbl}) VALUES('optimize')",
                     )
                     optimized += 1
                 except sqlite3.OperationalError as exc:
                     logger.warning(
-                        "FTS optimize failed for %s: %s", tbl, exc
+                        "FTS optimize failed for %s: %s", tbl, exc,
                     )
         return optimized
 
@@ -4599,7 +4599,7 @@ class SessionDB:
             cur = self._conn.execute(
                 "SELECT * FROM sessions "
                 "WHERE handoff_state = 'pending' "
-                "ORDER BY started_at ASC"
+                "ORDER BY started_at ASC",
             )
             return [dict(r) for r in cur.fetchall()]
         except Exception:

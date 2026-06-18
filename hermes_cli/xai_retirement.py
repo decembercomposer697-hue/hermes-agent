@@ -123,7 +123,7 @@ def find_retired_xai_refs(config: dict[str, Any]) -> list[RetirementIssue]:
 def format_issue(issue: RetirementIssue) -> str:
     """One-line human-readable rendering of a retirement issue."""
     parts = [
-        f"{issue.config_path}: {issue.current_model!r} → use {issue.replacement!r}"
+        f"{issue.config_path}: {issue.current_model!r} → use {issue.replacement!r}",
     ]
     if issue.reasoning_effort:
         parts.append(f'(set reasoning_effort: "{issue.reasoning_effort}")')
@@ -238,7 +238,7 @@ def apply_migration(
     if backup:
         ts = _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
         backup_path = config_path.with_name(
-            f"{config_path.name}.bak-pre-migrate-xai-{ts}"
+            f"{config_path.name}.bak-pre-migrate-xai-{ts}",
         )
         shutil.copy2(config_path, backup_path)
 

@@ -28,7 +28,7 @@ class TestRenderNoticeLine:
         )
         assert (
             render_notice_line(
-                AgentNotice(text="✕ Credit access paused · run /usage for balance", level="error")
+                AgentNotice(text="✕ Credit access paused · run /usage for balance", level="error"),
             )
             == "✕ Credit access paused · run /usage for balance"
         )
@@ -136,7 +136,7 @@ class TestDeliverNoticeLine:
         runner = _make_runner_with_adapter(source, adapter)
 
         line = render_notice_line(
-            AgentNotice(text="⚠ Credits 90% used · $20.00 cap", level="warn")
+            AgentNotice(text="⚠ Credits 90% used · $20.00 cap", level="warn"),
         )
         await runner._deliver_platform_notice(source, line)
 
@@ -156,7 +156,7 @@ class TestDeliverNoticeLine:
         runner.config.get_notice_delivery = MagicMock(return_value="private")
 
         line = render_notice_line(
-            AgentNotice(text="✓ Credit access restored", level="success")
+            AgentNotice(text="✓ Credit access restored", level="success"),
         )
         await runner._deliver_platform_notice(source, line)
 

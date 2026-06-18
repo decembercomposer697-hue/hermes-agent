@@ -92,7 +92,7 @@ def _mock_request(headers=None, body=b"", content_length=None, match_info=None):
 def _github_signature(body: bytes, secret: str) -> str:
     """Compute X-Hub-Signature-256 for *body* using *secret*."""
     return "sha256=" + hmac.new(
-        secret.encode(), body, hashlib.sha256
+        secret.encode(), body, hashlib.sha256,
     ).hexdigest()
 
 
@@ -196,7 +196,7 @@ class TestValidateSignature:
                 "svix-id": msg_id,
                 "svix-timestamp": timestamp,
                 "svix-signature": sig,
-            }
+            },
         )
         assert adapter._validate_signature(req, body, secret) is True
 
@@ -214,7 +214,7 @@ class TestValidateSignature:
                 "svix-id": msg_id,
                 "svix-timestamp": timestamp,
                 "svix-signature": sig,
-            }
+            },
         )
         assert adapter._validate_signature(req, received_body, secret) is False
 
@@ -231,7 +231,7 @@ class TestValidateSignature:
                 "svix-id": msg_id,
                 "svix-timestamp": timestamp,
                 "svix-signature": sig,
-            }
+            },
         )
         assert adapter._validate_signature(req, body, secret) is False
 
@@ -248,7 +248,7 @@ class TestValidateSignature:
                 "svix-id": msg_id,
                 "svix-timestamp": timestamp,
                 "svix-signature": "v1,wrong " + sig,
-            }
+            },
         )
         assert adapter._validate_signature(req, body, secret) is True
 
@@ -271,7 +271,7 @@ class TestValidateSignature:
                 "svix-id": msg_id,
                 "svix-timestamp": timestamp,
                 "svix-signature": sig,
-            }
+            },
         )
         assert adapter._validate_signature(req, body, secret) is False
 
@@ -283,14 +283,14 @@ class TestValidateSignature:
         msg_id = "msg_123"
         timestamp = str(int(time.time()))
         raw_sig = _svix_signature(
-            body, malformed_secret.removeprefix("whsec_"), msg_id, timestamp
+            body, malformed_secret.removeprefix("whsec_"), msg_id, timestamp,
         )
         req = _mock_request(
             headers={
                 "svix-id": msg_id,
                 "svix-timestamp": timestamp,
                 "svix-signature": raw_sig,
-            }
+            },
         )
         assert adapter._validate_signature(req, body, malformed_secret) is False
 
@@ -307,7 +307,7 @@ class TestValidateSignature:
                 "svix-id": msg_id,
                 "svix-timestamp": timestamp,
                 "svix-signature": sig,
-            }
+            },
         )
         assert adapter._validate_signature(req, body, secret) is True
 
@@ -386,7 +386,7 @@ class TestEventFilter:
                 "secret": _INSECURE_NO_AUTH,
                 "events": ["pull_request"],
                 "prompt": "PR: {action}",
-            }
+            },
         }
         adapter = _make_adapter(routes=routes)
         # Stub handle_message to avoid running the agent
@@ -409,7 +409,7 @@ class TestEventFilter:
                 "secret": _INSECURE_NO_AUTH,
                 "events": ["pull_request"],
                 "prompt": "test",
-            }
+            },
         }
         adapter = _make_adapter(routes=routes)
 
@@ -431,7 +431,7 @@ class TestEventFilter:
             "all": {
                 "secret": _INSECURE_NO_AUTH,
                 "prompt": "got it",
-            }
+            },
         }
         adapter = _make_adapter(routes=routes)
         adapter.handle_message = AsyncMock()
@@ -453,7 +453,7 @@ class TestEventFilter:
                 "secret": _INSECURE_NO_AUTH,
                 "events": ["message.received"],
                 "prompt": "got it",
-            }
+            },
         }
         adapter = _make_adapter(routes=routes)
         adapter.handle_message = AsyncMock()
@@ -866,7 +866,7 @@ class TestRawTemplateToken:
         adapter = _make_adapter()
         payload = {"action": "opened", "number": 42}
         result = adapter._render_prompt(
-            "Payload: {__raw__}", payload, "push", "test"
+            "Payload: {__raw__}", payload, "push", "test",
         )
         expected_json = json.dumps(payload, indent=2)
         assert result == f"Payload: {expected_json}"
@@ -884,7 +884,7 @@ class TestRawTemplateToken:
         adapter = _make_adapter()
         payload = {"action": "closed", "number": 7}
         result = adapter._render_prompt(
-            "Action={action} Raw={__raw__}", payload, "push", "test"
+            "Action={action} Raw={__raw__}", payload, "push", "test",
         )
         assert result.startswith("Action=closed Raw=")
         assert '"action": "closed"' in result
@@ -920,11 +920,11 @@ class TestDeliverCrossPlatformThreadId:
             "deliver_extra": {
                 "chat_id": "12345",
                 "thread_id": "999",
-            }
+            },
         }
         await adapter._deliver_cross_platform("telegram", "hello", delivery)
         mock_target.send.assert_awaited_once_with(
-            "12345", "hello", metadata={"thread_id": "999"}
+            "12345", "hello", metadata={"thread_id": "999"},
         )
 
     @pytest.mark.asyncio
@@ -935,11 +935,11 @@ class TestDeliverCrossPlatformThreadId:
             "deliver_extra": {
                 "chat_id": "12345",
                 "message_thread_id": "888",
-            }
+            },
         }
         await adapter._deliver_cross_platform("telegram", "hello", delivery)
         mock_target.send.assert_awaited_once_with(
-            "12345", "hello", metadata={"thread_id": "888"}
+            "12345", "hello", metadata={"thread_id": "888"},
         )
 
     @pytest.mark.asyncio
@@ -949,11 +949,11 @@ class TestDeliverCrossPlatformThreadId:
         delivery = {
             "deliver_extra": {
                 "chat_id": "12345",
-            }
+            },
         }
         await adapter._deliver_cross_platform("telegram", "hello", delivery)
         mock_target.send.assert_awaited_once_with(
-            "12345", "hello", metadata=None
+            "12345", "hello", metadata=None,
         )
 
 

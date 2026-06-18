@@ -11,7 +11,7 @@ def test_runtime_health_lines_include_fatal_platform_and_startup_reason(monkeypa
                 "telegram": {
                     "state": "fatal",
                     "error_message": "another poller is active",
-                }
+                },
             },
         },
     )

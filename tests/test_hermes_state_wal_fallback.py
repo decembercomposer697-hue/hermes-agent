@@ -104,7 +104,7 @@ class TestApplyWalWithFallback:
     def test_falls_back_on_not_authorized(self, tmp_path):
         """Some FUSE mounts block WAL pragma outright ('not authorized')."""
         conn, _ = _open_blocking(
-            tmp_path / "fuse.db", reason="not authorized", isolation_level=None
+            tmp_path / "fuse.db", reason="not authorized", isolation_level=None,
         )
         mode = apply_wal_with_fallback(conn)
         assert mode == "delete"
@@ -124,7 +124,7 @@ class TestApplyWalWithFallback:
         can retry, not to walk the DB into a permanently downgraded state.
         """
         conn, _ = _open_blocking(
-            tmp_path / "flaky.db", reason="disk I/O error", isolation_level=None
+            tmp_path / "flaky.db", reason="disk I/O error", isolation_level=None,
         )
         with pytest.raises(sqlite3.OperationalError, match="disk I/O error"):
             apply_wal_with_fallback(conn)
@@ -145,7 +145,7 @@ class TestApplyWalWithFallback:
         """
         # Prime the file in WAL mode using a normal connection
         primer = sqlite3.connect(
-            str(tmp_path / "already-wal.db"), isolation_level=None
+            str(tmp_path / "already-wal.db"), isolation_level=None,
         )
         try:
             primer.execute("PRAGMA journal_mode=WAL")
@@ -207,7 +207,7 @@ class TestApplyWalWithFallback:
             # Three separate connections to "the same DB" via the same label
             for i in range(3):
                 conn, _ = _open_blocking(
-                    tmp_path / f"dup-{i}.db", isolation_level=None
+                    tmp_path / f"dup-{i}.db", isolation_level=None,
                 )
                 mode = apply_wal_with_fallback(conn, db_label="shared.db")
                 assert mode == "delete"
@@ -292,7 +292,7 @@ class TestGetLastInitError:
             def execute(self, sql, *args, **kwargs):  # type: ignore[override]
                 if "journal_mode" in sql.lower():
                     raise sqlite3.OperationalError(
-                        "locking protocol: read-only filesystem"
+                        "locking protocol: read-only filesystem",
                     )
                 return super().execute(sql, *args, **kwargs)
 

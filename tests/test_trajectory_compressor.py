@@ -44,7 +44,7 @@ def test_generate_summary_kimi_omits_temperature():
     compressor._use_call_llm = False
     compressor.client = MagicMock()
     compressor.client.chat.completions.create.return_value = SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))]
+        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))],
     )
 
     metrics = TrajectoryMetrics()
@@ -69,7 +69,7 @@ def test_generate_summary_public_moonshot_kimi_k2_5_omits_temperature():
     compressor._use_call_llm = False
     compressor.client = MagicMock()
     compressor.client.chat.completions.create.return_value = SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))]
+        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))],
     )
 
     metrics = TrajectoryMetrics()
@@ -94,7 +94,7 @@ def test_generate_summary_public_moonshot_cn_kimi_k2_5_omits_temperature():
     compressor._use_call_llm = False
     compressor.client = MagicMock()
     compressor.client.chat.completions.create.return_value = SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))]
+        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))],
     )
 
     metrics = TrajectoryMetrics()
@@ -484,7 +484,7 @@ class TestGenerateSummary:
         tc = _make_compressor()
         tc.client = MagicMock()
         tc.client.chat.completions.create.return_value = SimpleNamespace(
-            choices=[SimpleNamespace(message=SimpleNamespace(content=None))]
+            choices=[SimpleNamespace(message=SimpleNamespace(content=None))],
         )
         metrics = TrajectoryMetrics()
 
@@ -498,8 +498,8 @@ class TestGenerateSummary:
         mock_client = MagicMock()
         mock_client.chat.completions.create = AsyncMock(
             return_value=SimpleNamespace(
-                choices=[SimpleNamespace(message=SimpleNamespace(content=None))]
-            )
+                choices=[SimpleNamespace(message=SimpleNamespace(content=None))],
+            ),
         )
         tc._get_async_client = MagicMock(return_value=mock_client)
         metrics = TrajectoryMetrics()
@@ -574,7 +574,7 @@ class TestCompressionToolPairIntegrity:
     def test_sync_compression_does_not_orphan_tool_markers(self):
         tc = _make_compressor(self._config())
         tc._generate_summary = MagicMock(
-            return_value="[CONTEXT SUMMARY]: middle turns summarized."
+            return_value="[CONTEXT SUMMARY]: middle turns summarized.",
         )
         trajectory = _paired_trajectory()
         tc.config.target_max_tokens = _target_that_splits_after_index_4(tc, trajectory)
@@ -584,7 +584,7 @@ class TestCompressionToolPairIntegrity:
         assert metrics.was_compressed
         # Every <tool_call> must keep its matching <tool_response>.
         assert _count_marker(compressed, "<tool_call>") == _count_marker(
-            compressed, "<tool_response>"
+            compressed, "<tool_response>",
         )
         # A kept 'tool' turn must always immediately follow its 'gpt' turn —
         # never the inserted summary (a 'human' turn) or another 'tool' turn.
@@ -596,7 +596,7 @@ class TestCompressionToolPairIntegrity:
     async def test_async_compression_does_not_orphan_tool_markers(self):
         tc = _make_compressor(self._config())
         tc._generate_summary_async = AsyncMock(
-            return_value="[CONTEXT SUMMARY]: middle turns summarized."
+            return_value="[CONTEXT SUMMARY]: middle turns summarized.",
         )
         trajectory = _paired_trajectory()
         tc.config.target_max_tokens = _target_that_splits_after_index_4(tc, trajectory)
@@ -605,7 +605,7 @@ class TestCompressionToolPairIntegrity:
 
         assert metrics.was_compressed
         assert _count_marker(compressed, "<tool_call>") == _count_marker(
-            compressed, "<tool_response>"
+            compressed, "<tool_response>",
         )
         for i, turn in enumerate(compressed):
             if turn.get("from") == "tool":

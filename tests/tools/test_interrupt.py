@@ -170,7 +170,7 @@ class TestSIGKILLEscalation:
 
     @pytest.mark.skipif(
         not __import__("shutil").which("bash"),
-        reason="Requires bash"
+        reason="Requires bash",
     )
     def test_sigterm_trap_killed_within_2s(self):
         """A process that traps SIGTERM should be SIGKILL'd after 1s grace."""
@@ -243,7 +243,7 @@ class TestRunToolCleanupOnBaseException:
         # Bind the real concurrent method so we get _run_tool
         from run_agent import AIAgent
         agent._execute_tool_calls_concurrent = types.MethodType(
-            AIAgent._execute_tool_calls_concurrent, agent
+            AIAgent._execute_tool_calls_concurrent, agent,
         )
 
         # Build a single tool call

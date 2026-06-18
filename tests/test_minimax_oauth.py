@@ -99,7 +99,7 @@ def test_pkce_pair_produces_valid_s256():
 
     # Re-compute challenge from verifier and verify it matches
     expected = base64.urlsafe_b64encode(
-        hashlib.sha256(verifier.encode()).digest()
+        hashlib.sha256(verifier.encode()).digest(),
     ).decode().rstrip("=")
     assert challenge == expected
 

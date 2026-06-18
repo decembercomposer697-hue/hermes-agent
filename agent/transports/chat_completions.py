@@ -126,7 +126,7 @@ class ChatCompletionsTransport(ProviderTransport):
         return "chat_completions"
 
     def convert_messages(
-        self, messages: list[dict[str, Any]], **kwargs
+        self, messages: list[dict[str, Any]], **kwargs,
     ) -> list[dict[str, Any]]:
         """Messages are already in OpenAI format — strip internal fields
         that strict chat-completions providers reject with HTTP 400/422
@@ -162,7 +162,7 @@ class ChatCompletionsTransport(ProviderTransport):
           which then poisons every subsequent request in the session.
         """
         strip_extra_content = not _model_consumes_thought_signature(
-            kwargs.get("model")
+            kwargs.get("model"),
         )
         needs_sanitize = False
         for msg in messages:
@@ -280,7 +280,7 @@ class ChatCompletionsTransport(ProviderTransport):
         _profile = params.get("provider_profile")
         if _profile:
             return self._build_kwargs_from_profile(
-                _profile, model, sanitized, tools, params
+                _profile, model, sanitized, tools, params,
             )
 
         # ── Legacy fallback (unregistered / unknown provider) ───────────
@@ -338,7 +338,7 @@ class ChatCompletionsTransport(ProviderTransport):
             _kimi_thinking_off = bool(
                 reasoning_config
                 and isinstance(reasoning_config, dict)
-                and reasoning_config.get("enabled") is False
+                and reasoning_config.get("enabled") is False,
             )
             if not _kimi_thinking_off:
                 _kimi_effort = "medium"
@@ -353,7 +353,7 @@ class ChatCompletionsTransport(ProviderTransport):
             _tokenhub_thinking_off = bool(
                 reasoning_config
                 and isinstance(reasoning_config, dict)
-                and reasoning_config.get("enabled") is False
+                and reasoning_config.get("enabled") is False,
             )
             if not _tokenhub_thinking_off:
                 _tokenhub_effort = "high"
@@ -400,7 +400,7 @@ class ChatCompletionsTransport(ProviderTransport):
                     _pareto_score_f = None
                 if _pareto_score_f is not None and 0.0 <= _pareto_score_f <= 1.0:
                     extra_body["plugins"] = [
-                        {"id": "pareto-router", "min_coding_score": _pareto_score_f}
+                        {"id": "pareto-router", "min_coding_score": _pareto_score_f},
                     ]
 
         # Kimi extra_body.thinking
@@ -634,7 +634,7 @@ class ChatCompletionsTransport(ProviderTransport):
                         name=tc.function.name,
                         arguments=tc.function.arguments,
                         provider_data=tc_provider_data or None,
-                    )
+                    ),
                 )
 
         usage = None

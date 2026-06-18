@@ -23,16 +23,16 @@ def hermes_home(tmp_path, monkeypatch):
     (logs_dir / "agent.log").write_text(
         "2026-04-12 17:00:00 INFO agent: session started\n"
         "2026-04-12 17:00:01 INFO tools.terminal: running ls\n"
-        "2026-04-12 17:00:02 WARNING agent: high token usage\n"
+        "2026-04-12 17:00:02 WARNING agent: high token usage\n",
     )
     (logs_dir / "errors.log").write_text(
-        "2026-04-12 17:00:05 ERROR gateway.run: connection lost\n"
+        "2026-04-12 17:00:05 ERROR gateway.run: connection lost\n",
     )
     (logs_dir / "gateway.log").write_text(
-        "2026-04-12 17:00:10 INFO gateway.run: started\n"
+        "2026-04-12 17:00:10 INFO gateway.run: started\n",
     )
     (logs_dir / "desktop.log").write_text(
-        "2026-04-12 17:00:15 INFO desktop: backend spawned\n"
+        "2026-04-12 17:00:15 INFO desktop: backend spawned\n",
     )
 
     return home
@@ -242,7 +242,7 @@ class TestCaptureLogSnapshot:
         # Remove the primary (if any) and create a .1 rotation
         (logs_dir / "gateway.log").unlink(missing_ok=True)
         (logs_dir / "gateway.log.1").write_text(
-            "2026-04-12 10:00:00 INFO gateway.run: rotated content\n"
+            "2026-04-12 10:00:00 INFO gateway.run: rotated content\n",
         )
 
         snap = _capture_log_snapshot("gateway", tail_lines=10)
@@ -302,7 +302,7 @@ class TestCaptureLogSnapshotRedaction:
         logs_dir = home / "logs"
         logs_dir.mkdir()
         (logs_dir / "agent.log").write_text(
-            f"2026-04-12 17:00:00 INFO config: api_key={_REDACT_FIXTURE_TOKEN} loaded\n"
+            f"2026-04-12 17:00:00 INFO config: api_key={_REDACT_FIXTURE_TOKEN} loaded\n",
         )
         (logs_dir / "errors.log").write_text("")
         (logs_dir / "gateway.log").write_text("")
@@ -328,7 +328,7 @@ class TestCaptureLogSnapshotRedaction:
         assert _REDACT_FIXTURE_TOKEN in (snap.full_text or "")
 
     def test_force_true_works_when_redaction_disabled(
-        self, hermes_home_with_secret, monkeypatch
+        self, hermes_home_with_secret, monkeypatch,
     ):
         """Regression test: redact_sensitive_text short-circuits without force=True.
 
@@ -354,7 +354,7 @@ class TestCaptureLogSnapshotRedaction:
         assert _REDACT_FIXTURE_TOKEN not in snap.full_text
 
     def test_default_redacts_email_addresses_for_public_share(
-        self, hermes_home_with_secret
+        self, hermes_home_with_secret,
     ):
         from hermes_cli.debug import _capture_log_snapshot
 
@@ -362,7 +362,7 @@ class TestCaptureLogSnapshotRedaction:
         log_path.write_text(
             "2026-04-12 17:00:00 INFO gateway.run: "
             "inbound message: platform=bluebubbles "
-            "user=person@example.com chat=iMessage;-;person@example.com msg='hello'\n"
+            "user=person@example.com chat=iMessage;-;person@example.com msg='hello'\n",
         )
 
         snap = _capture_log_snapshot("agent", tail_lines=10)
@@ -379,7 +379,7 @@ class TestCaptureLogSnapshotRedaction:
         log_path.write_text(
             "2026-04-12 17:00:00 INFO gateway.run: "
             "inbound message: platform=bluebubbles "
-            "user=person@example.com chat=iMessage;-;person@example.com msg='hello'\n"
+            "user=person@example.com chat=iMessage;-;person@example.com msg='hello'\n",
         )
 
         snap = _capture_log_snapshot("agent", tail_lines=10, redact=False)
@@ -388,7 +388,7 @@ class TestCaptureLogSnapshotRedaction:
         assert "person@example.com" in (snap.full_text or "")
 
     def test_capture_default_log_snapshots_threads_redact(
-        self, hermes_home_with_secret
+        self, hermes_home_with_secret,
     ):
         from hermes_cli.debug import _capture_default_log_snapshots
 
@@ -399,7 +399,7 @@ class TestCaptureLogSnapshotRedaction:
         assert _REDACT_FIXTURE_TOKEN not in (snaps["agent"].full_text or "")
 
     def test_capture_default_log_snapshots_no_redact_passes_through(
-        self, hermes_home_with_secret
+        self, hermes_home_with_secret,
     ):
         from hermes_cli.debug import _capture_default_log_snapshots
 
@@ -421,7 +421,7 @@ class TestCollectDebugReport:
 
         with patch("hermes_cli.dump.run_dump") as mock_dump:
             mock_dump.side_effect = lambda args: print(
-                "--- hermes dump ---\nversion: 0.8.0\n--- end dump ---"
+                "--- hermes dump ---\nversion: 0.8.0\n--- end dump ---",
             )
             report = collect_debug_report(log_lines=50)
 
@@ -589,10 +589,10 @@ class TestRunDebugShare:
 
         logs_dir = hermes_home / "logs"
         (logs_dir / "agent.log").write_text(
-            "2026-04-22 12:00:00 INFO agent: newest line\n"
+            "2026-04-22 12:00:00 INFO agent: newest line\n",
         )
         (logs_dir / "agent.log.1").write_text(
-            "2026-04-10 12:00:00 INFO agent: old rotated line\n"
+            "2026-04-10 12:00:00 INFO agent: old rotated line\n",
         )
 
         args = MagicMock()
@@ -617,7 +617,7 @@ class TestRunDebugShare:
             # standalone upload.
             (logs_dir / "agent.log").write_text("")
             (logs_dir / "agent.log.1").write_text(
-                "2026-04-10 12:00:00 INFO agent: old rotated line\n"
+                "2026-04-10 12:00:00 INFO agent: old rotated line\n",
             )
             return report
 
@@ -724,16 +724,16 @@ class TestRunDebugShareRedaction:
         logs_dir = home / "logs"
         logs_dir.mkdir()
         (logs_dir / "agent.log").write_text(
-            f"2026-04-12 17:00:00 INFO config: api_key={_REDACT_FIXTURE_TOKEN} loaded\n"
+            f"2026-04-12 17:00:00 INFO config: api_key={_REDACT_FIXTURE_TOKEN} loaded\n",
         )
         (logs_dir / "errors.log").write_text("")
         (logs_dir / "gateway.log").write_text(
-            f"2026-04-12 17:00:01 INFO gateway.run: token {_REDACT_FIXTURE_TOKEN}\n"
+            f"2026-04-12 17:00:01 INFO gateway.run: token {_REDACT_FIXTURE_TOKEN}\n",
         )
         return home
 
     def test_default_share_redacts_uploaded_content(
-        self, hermes_home_with_secret, capsys
+        self, hermes_home_with_secret, capsys,
     ):
         """The uploaded report and full-log pastes do not contain the raw token."""
         from hermes_cli.debug import run_debug_share
@@ -763,7 +763,7 @@ class TestRunDebugShareRedaction:
             )
 
     def test_default_share_includes_redaction_banner(
-        self, hermes_home_with_secret, capsys
+        self, hermes_home_with_secret, capsys,
     ):
         """Each upload-bound paste carries the visible redaction banner."""
         from hermes_cli.debug import run_debug_share
@@ -791,7 +791,7 @@ class TestRunDebugShareRedaction:
             )
 
     def test_no_redact_flag_disables_redaction_and_banner(
-        self, hermes_home_with_secret, capsys
+        self, hermes_home_with_secret, capsys,
     ):
         """--no-redact preserves original log content and omits the banner."""
         from hermes_cli.debug import run_debug_share
@@ -1298,7 +1298,7 @@ class TestBuildDebugShare:
             return f"https://paste.rs/p{count[0]}"
 
         with patch("hermes_cli.dump.run_dump"), patch(
-            "hermes_cli.debug.upload_to_pastebin", side_effect=_upload
+            "hermes_cli.debug.upload_to_pastebin", side_effect=_upload,
         ), patch("hermes_cli.debug._schedule_auto_delete"):
             result = build_debug_share(log_lines=50, redact=True)
 
@@ -1332,7 +1332,7 @@ class TestBuildDebugShare:
 
         secret = "sk-proj-SUPERSECRETtoken1234567890"
         (hermes_home / "logs" / "agent.log").write_text(
-            f"line one\nauthorization token={secret}\nline three\n"
+            f"line one\nauthorization token={secret}\nline three\n",
         )
 
         uploaded = []
@@ -1342,7 +1342,7 @@ class TestBuildDebugShare:
             return "https://paste.rs/x"
 
         with patch("hermes_cli.dump.run_dump"), patch(
-            "hermes_cli.debug.upload_to_pastebin", side_effect=_upload
+            "hermes_cli.debug.upload_to_pastebin", side_effect=_upload,
         ), patch("hermes_cli.debug._schedule_auto_delete"):
             result = build_debug_share(log_lines=50, redact=True)
 
@@ -1363,7 +1363,7 @@ class TestBuildDebugShare:
             return f"https://paste.rs/p{count[0]}"
 
         with patch("hermes_cli.dump.run_dump"), patch(
-            "hermes_cli.debug.upload_to_pastebin", side_effect=_upload
+            "hermes_cli.debug.upload_to_pastebin", side_effect=_upload,
         ), patch("hermes_cli.debug._schedule_auto_delete"):
             result = build_debug_share(log_lines=50, redact=True)
 

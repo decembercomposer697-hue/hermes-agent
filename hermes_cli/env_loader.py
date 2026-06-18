@@ -191,7 +191,7 @@ def _sanitize_env_file_if_needed(path: Path) -> None:
         if sanitized != original:
             import tempfile
             fd, tmp = tempfile.mkstemp(
-                dir=str(path.parent), suffix=".tmp", prefix=".env_"
+                dir=str(path.parent), suffix=".tmp", prefix=".env_",
             )
             try:
                 with os.fdopen(fd, "w", encoding="utf-8") as f:

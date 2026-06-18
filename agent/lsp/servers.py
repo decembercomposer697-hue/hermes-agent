@@ -229,7 +229,7 @@ def _root_or_workspace(file_path: str, workspace: str, markers: Sequence[str], e
 
 def _spawn_pyright(root: str, ctx: ServerContext) -> SpawnSpec | None:
     bin_path = _resolve_override(ctx, "pyright") or _which(
-        "pyright-langserver", "pyright"
+        "pyright-langserver", "pyright",
     )
     if bin_path is None:
         from agent.lsp.install import try_install
@@ -357,7 +357,7 @@ def _spawn_bash_ls(root: str, ctx: ServerContext) -> SpawnSpec | None:
         logger.warning(
             "bash-language-server: shellcheck not found on PATH — "
             "diagnostics will be empty until shellcheck is installed "
-            "(apt: shellcheck, brew: shellcheck, scoop: shellcheck)."
+            "(apt: shellcheck, brew: shellcheck, scoop: shellcheck).",
         )
     return SpawnSpec(
         command=[bin_path, "start"],
@@ -455,7 +455,7 @@ def _spawn_terraform_ls(root: str, ctx: ServerContext) -> SpawnSpec | None:
         "experimentalFeatures": {
             "prefillRequiredFields": True,
             "validateOnSave": True,
-        }
+        },
     }
     init.update(ctx.init_overrides.get("terraform-ls", {}))
     return SpawnSpec(
@@ -482,7 +482,7 @@ def _spawn_dart(root: str, ctx: ServerContext) -> SpawnSpec | None:
 
 def _spawn_haskell_ls(root: str, ctx: ServerContext) -> SpawnSpec | None:
     bin_path = _resolve_override(ctx, "haskell-language-server") or _which(
-        "haskell-language-server-wrapper", "haskell-language-server"
+        "haskell-language-server-wrapper", "haskell-language-server",
     )
     if bin_path is None:
         return None
@@ -594,7 +594,7 @@ def _spawn_prisma(root: str, ctx: ServerContext) -> SpawnSpec | None:
 
 def _spawn_kotlin_ls(root: str, ctx: ServerContext) -> SpawnSpec | None:
     bin_path = _resolve_override(ctx, "kotlin-language-server") or _which(
-        "kotlin-language-server"
+        "kotlin-language-server",
     )
     if bin_path is None:
         return None
@@ -625,7 +625,7 @@ def _spawn_jdtls(root: str, ctx: ServerContext) -> SpawnSpec | None:
 
 def _spawn_vue(root: str, ctx: ServerContext) -> SpawnSpec | None:
     bin_path = _resolve_override(ctx, "vue-language-server") or _which(
-        "vue-language-server"
+        "vue-language-server",
     )
     if bin_path is None:
         from agent.lsp.install import try_install
@@ -643,7 +643,7 @@ def _spawn_vue(root: str, ctx: ServerContext) -> SpawnSpec | None:
 
 def _spawn_svelte(root: str, ctx: ServerContext) -> SpawnSpec | None:
     bin_path = _resolve_override(ctx, "svelte-language-server") or _which(
-        "svelteserver", "svelte-language-server"
+        "svelteserver", "svelte-language-server",
     )
     if bin_path is None:
         from agent.lsp.install import try_install
@@ -661,7 +661,7 @@ def _spawn_svelte(root: str, ctx: ServerContext) -> SpawnSpec | None:
 
 def _spawn_astro(root: str, ctx: ServerContext) -> SpawnSpec | None:
     bin_path = _resolve_override(ctx, "astro-language-server") or _which(
-        "astro-ls", "astro-language-server"
+        "astro-ls", "astro-language-server",
     )
     if bin_path is None:
         from agent.lsp.install import try_install
@@ -785,7 +785,7 @@ def _root_julia(file_path: str, workspace: str) -> str | None:
 
 def _root_clojure(file_path: str, workspace: str) -> str | None:
     return _root_or_workspace(
-        file_path, workspace, ["deps.edn", "project.clj", "shadow-cljs.edn", "bb.edn", "build.boot"]
+        file_path, workspace, ["deps.edn", "project.clj", "shadow-cljs.edn", "bb.edn", "build.boot"],
     )
 
 
@@ -804,7 +804,7 @@ def _root_elixir(file_path: str, workspace: str) -> str | None:
 
 def _root_prisma(file_path: str, workspace: str) -> str | None:
     return _root_or_workspace(
-        file_path, workspace, ["schema.prisma", "prisma/schema.prisma"]
+        file_path, workspace, ["schema.prisma", "prisma/schema.prisma"],
     )
 
 

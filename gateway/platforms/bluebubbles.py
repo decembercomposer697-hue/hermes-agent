@@ -118,7 +118,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         super().__init__(config, Platform.BLUEBUBBLES)
         extra = config.extra or {}
         self.server_url = _normalize_server_url(
-            extra.get("server_url") or os.getenv("BLUEBUBBLES_SERVER_URL", "")
+            extra.get("server_url") or os.getenv("BLUEBUBBLES_SERVER_URL", ""),
         )
         self.password = extra.get("password") or os.getenv("BLUEBUBBLES_PASSWORD", "")
         self.webhook_host = (
@@ -127,7 +127,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         )
         self.webhook_port = int(
             extra.get("webhook_port")
-            or os.getenv("BLUEBUBBLES_WEBHOOK_PORT", str(DEFAULT_WEBHOOK_PORT))
+            or os.getenv("BLUEBUBBLES_WEBHOOK_PORT", str(DEFAULT_WEBHOOK_PORT)),
         )
         self.webhook_path = (
             extra.get("webhook_path")
@@ -143,7 +143,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         self._mention_patterns = self._compile_mention_patterns(
             extra["mention_patterns"]
             if "mention_patterns" in extra
-            else os.getenv("BLUEBUBBLES_MENTION_PATTERNS")
+            else os.getenv("BLUEBUBBLES_MENTION_PATTERNS"),
         )
         self.client: httpx.AsyncClient | None = None
         self._runner = None
@@ -234,7 +234,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
     async def connect(self) -> bool:
         if not self.server_url or not self.password:
             logger.error(
-                "[bluebubbles] BLUEBUBBLES_SERVER_URL and BLUEBUBBLES_PASSWORD are required"
+                "[bluebubbles] BLUEBUBBLES_SERVER_URL and BLUEBUBBLES_PASSWORD are required",
             )
             return False
         from aiohttp import web
@@ -256,7 +256,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             )
         except Exception as exc:
             logger.error(
-                "[bluebubbles] cannot reach server at %s: %s", self.server_url, exc
+                "[bluebubbles] cannot reach server at %s: %s", self.server_url, exc,
             )
             if self.client:
                 await self.client.aclose()
@@ -407,7 +407,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
                 wh_id = wh.get("id")
                 if wh_id:
                     res = await self.client.delete(
-                        self._api_url(f"/api/v1/webhook/{wh_id}")
+                        self._api_url(f"/api/v1/webhook/{wh_id}"),
                     )
                     res.raise_for_status()
                     removed = True
@@ -469,7 +469,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         return None
 
     async def _create_chat_for_handle(
-        self, address: str, message: str
+        self, address: str, message: str,
     ) -> SendResult:
         """Create a new chat by sending the first message to *address*."""
         payload = {
@@ -543,7 +543,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
                 data = res.get("data") or {}
                 msg_id = data.get("guid") or data.get("messageGuid") or "ok"
                 last = SendResult(
-                    success=True, message_id=str(msg_id), raw_response=res
+                    success=True, message_id=str(msg_id), raw_response=res,
                 )
             except Exception as exc:
                 return SendResult(success=False, error=str(exc))
@@ -598,7 +598,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
                 rdata = result.get("data") or {}
                 msg_id = rdata.get("guid") if isinstance(rdata, dict) else None
                 return SendResult(
-                    success=True, message_id=msg_id, raw_response=result
+                    success=True, message_id=msg_id, raw_response=result,
                 )
             return SendResult(
                 success=False,
@@ -642,7 +642,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         **kwargs,
     ) -> SendResult:
         return await self._send_attachment(
-            chat_id, audio_path, caption=caption, is_audio_message=True
+            chat_id, audio_path, caption=caption, is_audio_message=True,
         )
 
     async def send_video(
@@ -665,7 +665,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         **kwargs,
     ) -> SendResult:
         return await self._send_attachment(
-            chat_id, file_path, filename=file_name, caption=caption
+            chat_id, file_path, filename=file_name, caption=caption,
         )
 
     async def send_animation(
@@ -677,7 +677,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         return await self.send_image(
-            chat_id, animation_url, caption, reply_to, metadata
+            chat_id, animation_url, caption, reply_to, metadata,
         )
 
     # ------------------------------------------------------------------
@@ -692,7 +692,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             if guid:
                 encoded = quote(guid, safe="")
                 await self.client.post(
-                    self._api_url(f"/api/v1/chat/{encoded}/typing"), timeout=5
+                    self._api_url(f"/api/v1/chat/{encoded}/typing"), timeout=5,
                 )
         except Exception:
             pass
@@ -705,7 +705,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             if guid:
                 encoded = quote(guid, safe="")
                 await self.client.delete(
-                    self._api_url(f"/api/v1/chat/{encoded}/typing"), timeout=5
+                    self._api_url(f"/api/v1/chat/{encoded}/typing"), timeout=5,
                 )
         except Exception:
             pass
@@ -722,7 +722,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             if guid:
                 encoded = quote(guid, safe="")
                 await self.client.post(
-                    self._api_url(f"/api/v1/chat/{encoded}/read"), timeout=5
+                    self._api_url(f"/api/v1/chat/{encoded}/read"), timeout=5,
                 )
                 return True
         except Exception:
@@ -748,7 +748,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
             if guid:
                 encoded = quote(guid, safe="")
                 res = await self._api_get(
-                    f"/api/v1/chat/{encoded}?with=participants"
+                    f"/api/v1/chat/{encoded}?with=participants",
                 )
                 data = (res or {}).get("data", {})
                 display_name = (
@@ -776,7 +776,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     async def _download_attachment(
-        self, att_guid: str, att_meta: dict[str, Any]
+        self, att_guid: str, att_meta: dict[str, Any],
     ) -> str | None:
         """Download an attachment from BlueBubbles and cache it locally.
 
@@ -840,7 +840,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
     # ------------------------------------------------------------------
 
     def _extract_payload_record(
-        self, payload: dict[str, Any]
+        self, payload: dict[str, Any],
     ) -> dict[str, Any] | None:
         data = payload.get("data")
         if isinstance(data, dict):
@@ -901,7 +901,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         is_from_me = bool(
             record.get("isFromMe")
             or record.get("fromMe")
-            or record.get("is_from_me")
+            or record.get("is_from_me"),
         )
         if is_from_me:
             return web.Response(text="ok")
@@ -916,7 +916,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
 
         text = (
             self._value(
-                record.get("text"), record.get("message"), record.get("body")
+                record.get("text"), record.get("message"), record.get("body"),
             )
             or ""
         )
@@ -939,7 +939,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
                 if mime.startswith("image/"):
                     msg_type = MessageType.PHOTO
                 elif mime.startswith("audio/") or (att.get("uti") or "").endswith(
-                    "caf"
+                    "caf",
                 ):
                     msg_type = MessageType.VOICE
                 elif mime.startswith("video/"):
@@ -998,7 +998,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         if is_group and self.require_mention:
             if not self._message_matches_mention_patterns(text):
                 logger.debug(
-                    "[bluebubbles] ignoring group message (require_mention=true, no mention pattern matched)"
+                    "[bluebubbles] ignoring group message (require_mention=true, no mention pattern matched)",
                 )
                 return web.Response(text="ok")
             text = self._clean_mention_text(text)

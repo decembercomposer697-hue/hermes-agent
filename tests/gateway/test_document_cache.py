@@ -26,7 +26,7 @@ from gateway.platforms.base import (
 def _redirect_cache(tmp_path, monkeypatch):
     """Point the module-level DOCUMENT_CACHE_DIR to a fresh tmp_path."""
     monkeypatch.setattr(
-        "gateway.platforms.base.DOCUMENT_CACHE_DIR", tmp_path / "doc_cache"
+        "gateway.platforms.base.DOCUMENT_CACHE_DIR", tmp_path / "doc_cache",
     )
 
 
@@ -164,7 +164,7 @@ class TestSupportedDocumentTypes:
 # 1x1 transparent PNG (passes cache_image_from_bytes validation)
 _PNG_1PX = bytes.fromhex(
     "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4"
-    "890000000d49444154789c6360000002000154a24f5f0000000049454e44ae426082"
+    "890000000d49444154789c6360000002000154a24f5f0000000049454e44ae426082",
 )
 
 

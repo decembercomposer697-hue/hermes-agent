@@ -15,7 +15,7 @@ from hermes_cli.subcommands._shared import add_accept_hooks_flag
 def build_cron_parser(subparsers, *, cmd_cron: Callable) -> None:
     """Attach the ``cron`` subcommand (and its sub-actions) to ``subparsers``."""
     cron_parser = subparsers.add_parser(
-        "cron", help="Cron job management", description="Manage scheduled tasks"
+        "cron", help="Cron job management", description="Manage scheduled tasks",
     )
     cron_subparsers = cron_parser.add_subparsers(dest="cron_command")
 
@@ -25,13 +25,13 @@ def build_cron_parser(subparsers, *, cmd_cron: Callable) -> None:
 
     # cron create/add
     cron_create = cron_subparsers.add_parser(
-        "create", aliases=["add"], help="Create a scheduled job"
+        "create", aliases=["add"], help="Create a scheduled job",
     )
     cron_create.add_argument(
-        "schedule", help="Schedule like '30m', 'every 2h', or '0 9 * * *'"
+        "schedule", help="Schedule like '30m', 'every 2h', or '0 9 * * *'",
     )
     cron_create.add_argument(
-        "prompt", nargs="?", help="Optional self-contained prompt or task instruction"
+        "prompt", nargs="?", help="Optional self-contained prompt or task instruction",
     )
     cron_create.add_argument("--name", help="Optional human-friendly job name")
     cron_create.add_argument(
@@ -73,7 +73,7 @@ def build_cron_parser(subparsers, *, cmd_cron: Callable) -> None:
 
     # cron edit
     cron_edit = cron_subparsers.add_parser(
-        "edit", help="Edit an existing scheduled job"
+        "edit", help="Edit an existing scheduled job",
     )
     cron_edit.add_argument("job_id", help="Job ID to edit")
     cron_edit.add_argument("--schedule", help="New schedule")
@@ -143,13 +143,13 @@ def build_cron_parser(subparsers, *, cmd_cron: Callable) -> None:
     cron_resume.add_argument("job_id", help="Job ID to resume")
 
     cron_run = cron_subparsers.add_parser(
-        "run", help="Run a job on the next scheduler tick"
+        "run", help="Run a job on the next scheduler tick",
     )
     cron_run.add_argument("job_id", help="Job ID to trigger")
     add_accept_hooks_flag(cron_run)
 
     cron_remove = cron_subparsers.add_parser(
-        "remove", aliases=["rm", "delete"], help="Remove a scheduled job"
+        "remove", aliases=["rm", "delete"], help="Remove a scheduled job",
     )
     cron_remove.add_argument("job_id", help="Job ID to remove")
 

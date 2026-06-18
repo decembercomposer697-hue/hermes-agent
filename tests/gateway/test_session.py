@@ -799,10 +799,10 @@ class TestWhatsAppSessionKeyConsistency:
         """Two different DM senders without chat_id must not share one
         session (the cross-user history-bleed footgun)."""
         first = SessionSource(
-            platform=Platform.TELEGRAM, chat_id="", chat_type="dm", user_id="jordan"
+            platform=Platform.TELEGRAM, chat_id="", chat_type="dm", user_id="jordan",
         )
         second = SessionSource(
-            platform=Platform.TELEGRAM, chat_id="", chat_type="dm", user_id="dima"
+            platform=Platform.TELEGRAM, chat_id="", chat_type="dm", user_id="dima",
         )
         assert build_session_key(first) != build_session_key(second)
         assert build_session_key(first) == "agent:main:telegram:dm:jordan"
@@ -824,7 +824,7 @@ class TestWhatsAppSessionKeyConsistency:
         """With neither chat_id nor user identifiers, thread_id is the next
         discriminator; only a completely identifier-less DM hits the sink."""
         threaded = SessionSource(
-            platform=Platform.TELEGRAM, chat_id="", chat_type="dm", thread_id="7"
+            platform=Platform.TELEGRAM, chat_id="", chat_type="dm", thread_id="7",
         )
         assert build_session_key(threaded) == "agent:main:telegram:dm:7"
 

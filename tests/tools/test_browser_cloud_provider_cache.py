@@ -47,7 +47,7 @@ class TestCloudProviderCachePolicy:
         fake_provider = Mock(name="BrowserUseProvider-instance")
         factory = Mock(return_value=fake_provider)
         monkeypatch.setattr(
-            browser_tool, "_PROVIDER_REGISTRY", {"browser-use": factory}
+            browser_tool, "_PROVIDER_REGISTRY", {"browser-use": factory},
         )
         monkeypatch.setattr(
             "hermes_cli.config.read_raw_config",
@@ -73,10 +73,10 @@ class TestCloudProviderCachePolicy:
         bb_unconfigured = Mock()
         bb_unconfigured.is_configured.return_value = False
         monkeypatch.setattr(
-            browser_tool, "BrowserUseProvider", lambda: bu_unconfigured
+            browser_tool, "BrowserUseProvider", lambda: bu_unconfigured,
         )
         monkeypatch.setattr(
-            browser_tool, "BrowserbaseProvider", lambda: bb_unconfigured
+            browser_tool, "BrowserbaseProvider", lambda: bb_unconfigured,
         )
 
         assert browser_tool._get_cloud_provider() is None
@@ -101,14 +101,14 @@ class TestCloudProviderCachePolicy:
         assert browser_tool._cloud_provider_resolved is False
 
     def test_explicit_provider_instantiation_failure_does_not_cache(
-        self, monkeypatch, caplog
+        self, monkeypatch, caplog,
     ):
         """If `_PROVIDER_REGISTRY[key]()` raises, log warning and don't cache."""
         def exploding_factory():
             raise RuntimeError("missing dependency")
 
         monkeypatch.setattr(
-            browser_tool, "_PROVIDER_REGISTRY", {"browser-use": exploding_factory}
+            browser_tool, "_PROVIDER_REGISTRY", {"browser-use": exploding_factory},
         )
         monkeypatch.setattr(
             "hermes_cli.config.read_raw_config",

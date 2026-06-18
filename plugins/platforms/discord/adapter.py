@@ -403,7 +403,7 @@ class VoiceReceiver:
                 try:
                     import davey
                     decrypted = self._dave_session.decrypt(
-                        user_id, davey.MediaType.audio, decrypted
+                        user_id, davey.MediaType.audio, decrypted,
                     )
                 except Exception as e:
                     # Unencrypted passthrough — use NaCl-decrypted data as-is
@@ -761,7 +761,7 @@ class DiscordAdapter(BasePlatformAdapter):
                 if adapter_self._post_connect_task and not adapter_self._post_connect_task.done():
                     adapter_self._post_connect_task.cancel()
                 adapter_self._post_connect_task = asyncio.create_task(
-                    adapter_self._run_post_connect_initialization()
+                    adapter_self._run_post_connect_initialization(),
                 )
 
             @self._client.event
@@ -847,7 +847,7 @@ class DiscordAdapter(BasePlatformAdapter):
                     # EXCEPT in free-response channels where the bot should
                     # answer regardless of who is mentioned.
                     _ignore_no_mention = os.getenv(
-                        "DISCORD_IGNORE_NO_MENTION", "true"
+                        "DISCORD_IGNORE_NO_MENTION", "true",
                     ).lower() in {"true", "1", "yes"}
                     if _ignore_no_mention and not _self_mentioned and not _other_bots_mentioned:
                         _channel_id = str(message.channel.id)
@@ -1207,7 +1207,7 @@ class DiscordAdapter(BasePlatformAdapter):
             "name": str(payload.get("name", "") or ""),
             "description": str(payload.get("description", "") or ""),
             "default_member_permissions": self._normalize_permissions(
-                payload.get("default_member_permissions")
+                payload.get("default_member_permissions"),
             ),
             "dm_permission": bool(payload.get("dm_permission", True)),
             "nsfw": bool(payload.get("nsfw", False)),
@@ -1249,7 +1249,7 @@ class DiscordAdapter(BasePlatformAdapter):
         default_permissions = getattr(command, "default_member_permissions", None)
         if default_permissions is not None:
             payload["default_member_permissions"] = getattr(
-                default_permissions, "value", default_permissions
+                default_permissions, "value", default_permissions,
             )
         return payload
 
@@ -1423,7 +1423,7 @@ class DiscordAdapter(BasePlatformAdapter):
         chat_id: str,
         content: str,
         reply_to: str | None = None,
-        metadata: dict[str, Any] | None = None
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Send a message to a Discord channel or thread.
 
@@ -1523,7 +1523,7 @@ class DiscordAdapter(BasePlatformAdapter):
             return SendResult(
                 success=True,
                 message_id=message_ids[0] if message_ids else None,
-                raw_response={"message_ids": message_ids}
+                raw_response={"message_ids": message_ids},
             )
 
         except Exception as e:  # pragma: no cover - defensive logging
@@ -2061,7 +2061,7 @@ class DiscordAdapter(BasePlatformAdapter):
         try:
             from tools.tts_tool import text_to_speech_tool
             result_json = await asyncio.to_thread(
-                text_to_speech_tool, text=phrase, output_path=audio_path
+                text_to_speech_tool, text=phrase, output_path=audio_path,
             )
             result = json.loads(result_json)
             actual = result.get("file_path", audio_path)
@@ -2075,7 +2075,7 @@ class DiscordAdapter(BasePlatformAdapter):
             if not pcm:
                 return False
             mixer.play_speech(
-                pcm, gain=float(self._voice_fx_cfg.get("speech_gain", 1.0))
+                pcm, gain=float(self._voice_fx_cfg.get("speech_gain", 1.0)),
             )
             self._reset_voice_timeout(guild_id)
             return True
@@ -2122,7 +2122,7 @@ class DiscordAdapter(BasePlatformAdapter):
                 receiver.start()
                 self._voice_receivers[guild_id] = receiver
                 self._voice_listen_tasks[guild_id] = asyncio.ensure_future(
-                    self._voice_listen_loop(guild_id)
+                    self._voice_listen_loop(guild_id),
                 )
             except Exception as e:
                 logger.warning("Voice receiver failed to start: %s", e)
@@ -2263,7 +2263,7 @@ class DiscordAdapter(BasePlatformAdapter):
         if task:
             task.cancel()
         self._voice_timeout_tasks[guild_id] = asyncio.ensure_future(
-            self._voice_timeout_handler(guild_id)
+            self._voice_timeout_handler(guild_id),
         )
 
     async def _voice_timeout_handler(self, guild_id: int) -> None:
@@ -3366,7 +3366,7 @@ class DiscordAdapter(BasePlatformAdapter):
                     @discord.app_commands.describe(args=f"Arguments: {__hint}"[:100])
                     async def _handler(interaction: discord.Interaction, args: str = ""):
                         await self._run_simple_slash(
-                            interaction, f"/{__name} {args}".strip()
+                            interaction, f"/{__name} {args}".strip(),
                         )
                     _handler.__name__ = f"auto_slash_{__name.replace('-', '_')}"
                     return _handler
@@ -3451,7 +3451,7 @@ class DiscordAdapter(BasePlatformAdapter):
                     pass
         except Exception as e:
             logger.warning(
-                "Discord auto-register from plugin commands failed: %s", e
+                "Discord auto-register from plugin commands failed: %s", e,
             )
 
         # Register skills under a single /skill command group with category
@@ -3592,7 +3592,7 @@ class DiscordAdapter(BasePlatformAdapter):
                         if len(label) > 100:
                             label = label[:97] + "..."
                         choices.append(
-                            discord.app_commands.Choice(name=label, value=name)
+                            discord.app_commands.Choice(name=label, value=name),
                         )
                         if len(choices) >= 25:
                             break
@@ -3622,7 +3622,7 @@ class DiscordAdapter(BasePlatformAdapter):
                     return
                 _desc, cmd_key = entry
                 await self._run_simple_slash(
-                    interaction, f"{cmd_key} {args}".strip()
+                    interaction, f"{cmd_key} {args}".strip(),
                 )
 
             cmd = discord.app_commands.Command(
@@ -4173,7 +4173,7 @@ class DiscordAdapter(BasePlatformAdapter):
                     "error": (
                         "Discord rejected direct thread creation and the fallback also failed. "
                         f"Direct error: {direct_error}. Fallback error: {fallback_error}"
-                    )
+                    ),
                 }
 
     # ------------------------------------------------------------------
@@ -4713,7 +4713,7 @@ class DiscordAdapter(BasePlatformAdapter):
         # Fallback: SSRF-gated URL download.
         if not is_safe_url(att.url):
             raise ValueError(
-                f"Blocked unsafe attachment URL (SSRF protection): {att.url}"
+                f"Blocked unsafe attachment URL (SSRF protection): {att.url}",
             )
         import aiohttp
         from gateway.platforms.base import resolve_proxy_url, proxy_kwargs_for_aiohttp
@@ -4978,7 +4978,7 @@ class DiscordAdapter(BasePlatformAdapter):
                         try:
                             raw_bytes = await self._cache_discord_document(att, ext)
                             cached_path = cache_document_from_bytes(
-                                raw_bytes, att.filename or f"document{ext or '.bin'}"
+                                raw_bytes, att.filename or f"document{ext or '.bin'}",
                             )
                             if in_allowlist:
                                 doc_mime = SUPPORTED_DOCUMENT_TYPES[ext]
@@ -5162,7 +5162,7 @@ class DiscordAdapter(BasePlatformAdapter):
         if prior_task and not prior_task.done():
             prior_task.cancel()
         self._pending_text_batch_tasks[key] = asyncio.create_task(
-            self._flush_text_batch(key)
+            self._flush_text_batch(key),
         )
 
     async def _flush_text_batch(self, key: str) -> None:
@@ -5324,13 +5324,13 @@ def _define_discord_view_classes() -> None:
             """Resolve the approval via the gateway approval queue and update the embed."""
             if self.resolved:
                 await interaction.response.send_message(
-                    "This approval has already been resolved~", ephemeral=True
+                    "This approval has already been resolved~", ephemeral=True,
                 )
                 return
 
             if not self._check_auth(interaction):
                 await interaction.response.send_message(
-                    "You're not authorized to approve commands~", ephemeral=True
+                    "You're not authorized to approve commands~", ephemeral=True,
                 )
                 return
 
@@ -5361,25 +5361,25 @@ def _define_discord_view_classes() -> None:
 
         @discord.ui.button(label="Allow Once", style=discord.ButtonStyle.green)
         async def allow_once(
-            self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button,
         ):
             await self._resolve(interaction, "once", discord.Color.green(), "Approved once")
 
         @discord.ui.button(label="Allow Session", style=discord.ButtonStyle.grey)
         async def allow_session(
-            self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button,
         ):
             await self._resolve(interaction, "session", discord.Color.blue(), "Approved for session")
 
         @discord.ui.button(label="Always Allow", style=discord.ButtonStyle.blurple)
         async def allow_always(
-            self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button,
         ):
             await self._resolve(interaction, "always", discord.Color.purple(), "Approved permanently")
 
         @discord.ui.button(label="Deny", style=discord.ButtonStyle.red)
         async def deny(
-            self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button,
         ):
             await self._resolve(interaction, "deny", discord.Color.red(), "Denied")
 
@@ -5547,12 +5547,12 @@ def _define_discord_view_classes() -> None:
         ):
             if self.resolved:
                 await interaction.response.send_message(
-                    "Already answered~", ephemeral=True
+                    "Already answered~", ephemeral=True,
                 )
                 return
             if not self._check_auth(interaction):
                 await interaction.response.send_message(
-                    "You're not authorized~", ephemeral=True
+                    "You're not authorized~", ephemeral=True,
                 )
                 return
 
@@ -5585,13 +5585,13 @@ def _define_discord_view_classes() -> None:
 
         @discord.ui.button(label="Yes", style=discord.ButtonStyle.green, emoji="✓")
         async def yes_btn(
-            self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button,
         ):
             await self._respond(interaction, "y", discord.Color.green(), "Yes")
 
         @discord.ui.button(label="No", style=discord.ButtonStyle.red, emoji="✗")
         async def no_btn(
-            self, interaction: discord.Interaction, button: discord.ui.Button
+            self, interaction: discord.Interaction, button: discord.ui.Button,
         ):
             await self._respond(interaction, "n", discord.Color.red(), "No")
 
@@ -5661,7 +5661,7 @@ def _define_discord_view_classes() -> None:
                         label=label[:100],
                         value=p["slug"],
                         description=desc,
-                    )
+                    ),
                 )
             if not options:
                 return
@@ -5675,7 +5675,7 @@ def _define_discord_view_classes() -> None:
             self.add_item(select)
 
             cancel_btn = discord.ui.Button(
-                label="Cancel", style=discord.ButtonStyle.red, custom_id="model_cancel"
+                label="Cancel", style=discord.ButtonStyle.red, custom_id="model_cancel",
             )
             cancel_btn.callback = self._on_cancel
             self.add_item(cancel_btn)
@@ -5684,7 +5684,7 @@ def _define_discord_view_classes() -> None:
             """Build the model dropdown for a specific provider."""
             self.clear_items()
             provider = next(
-                (p for p in self.providers if p["slug"] == provider_slug), None
+                (p for p in self.providers if p["slug"] == provider_slug), None,
             )
             if not provider:
                 return
@@ -5697,7 +5697,7 @@ def _define_discord_view_classes() -> None:
                     discord.SelectOption(
                         label=short[:100],
                         value=model_id[:100],
-                    )
+                    ),
                 )
             if not options:
                 return
@@ -5711,13 +5711,13 @@ def _define_discord_view_classes() -> None:
             self.add_item(select)
 
             back_btn = discord.ui.Button(
-                label="◀ Back", style=discord.ButtonStyle.grey, custom_id="model_back"
+                label="◀ Back", style=discord.ButtonStyle.grey, custom_id="model_back",
             )
             back_btn.callback = self._on_back
             self.add_item(back_btn)
 
             cancel_btn = discord.ui.Button(
-                label="Cancel", style=discord.ButtonStyle.red, custom_id="model_cancel2"
+                label="Cancel", style=discord.ButtonStyle.red, custom_id="model_cancel2",
             )
             cancel_btn.callback = self._on_cancel
             self.add_item(cancel_btn)
@@ -5760,14 +5760,14 @@ def _define_discord_view_classes() -> None:
         async def _on_provider_selected(self, interaction: discord.Interaction):
             if not self._check_auth(interaction):
                 await interaction.response.send_message(
-                    "You're not authorized~", ephemeral=True
+                    "You're not authorized~", ephemeral=True,
                 )
                 return
 
             provider_slug = interaction.data["values"][0]
             self._selected_provider = provider_slug
             provider = next(
-                (p for p in self.providers if p["slug"] == provider_slug), None
+                (p for p in self.providers if p["slug"] == provider_slug), None,
             )
             pname = provider.get("name", provider_slug) if provider else provider_slug
 
@@ -5793,12 +5793,12 @@ def _define_discord_view_classes() -> None:
         ):
             if self.resolved:
                 await interaction.response.send_message(
-                    "Already resolved~", ephemeral=True
+                    "Already resolved~", ephemeral=True,
                 )
                 return
             if not self._check_auth(interaction):
                 await interaction.response.send_message(
-                    "You're not authorized~", ephemeral=True
+                    "You're not authorized~", ephemeral=True,
                 )
                 return
 
@@ -5834,12 +5834,12 @@ def _define_discord_view_classes() -> None:
         async def _on_model_selected(self, interaction: discord.Interaction):
             if self.resolved:
                 await interaction.response.send_message(
-                    "Already resolved~", ephemeral=True
+                    "Already resolved~", ephemeral=True,
                 )
                 return
             if not self._check_auth(interaction):
                 await interaction.response.send_message(
-                    "You're not authorized~", ephemeral=True
+                    "You're not authorized~", ephemeral=True,
                 )
                 return
 
@@ -5862,12 +5862,12 @@ def _define_discord_view_classes() -> None:
         async def _on_expensive_confirm(self, interaction: discord.Interaction):
             if not self._check_auth(interaction):
                 await interaction.response.send_message(
-                    "You're not authorized~", ephemeral=True
+                    "You're not authorized~", ephemeral=True,
                 )
                 return
             if not self._pending_expensive_model:
                 await interaction.response.send_message(
-                    "Model selection expired.", ephemeral=True
+                    "Model selection expired.", ephemeral=True,
                 )
                 return
             await self._switch_selected_model(
@@ -5878,7 +5878,7 @@ def _define_discord_view_classes() -> None:
         async def _on_back(self, interaction: discord.Interaction):
             if not self._check_auth(interaction):
                 await interaction.response.send_message(
-                    "You're not authorized~", ephemeral=True
+                    "You're not authorized~", ephemeral=True,
                 )
                 return
 
@@ -6451,7 +6451,7 @@ def interactive_setup() -> None:
     print_info("   You can also use Discord usernames (resolved on gateway start).")
     print()
     allowed_users = prompt(
-        "Allowed user IDs or usernames (comma-separated, leave empty for open access)"
+        "Allowed user IDs or usernames (comma-separated, leave empty for open access)",
     )
     if allowed_users:
         cleaned_ids = _clean_discord_user_ids(allowed_users)

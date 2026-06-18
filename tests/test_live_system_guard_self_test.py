@@ -158,7 +158,7 @@ def test_asyncio_create_subprocess_exec_systemctl_blocked():
 
     async def _attempt():
         await asyncio.create_subprocess_exec(
-            "systemctl", "--user", "restart", "hermes-gateway"
+            "systemctl", "--user", "restart", "hermes-gateway",
         )
 
     with pytest.raises(RuntimeError, match="live-system guard"):
@@ -170,7 +170,7 @@ def test_asyncio_create_subprocess_shell_systemctl_blocked():
 
     async def _attempt():
         await asyncio.create_subprocess_shell(
-            "systemctl --user restart hermes-gateway"
+            "systemctl --user restart hermes-gateway",
         )
 
     with pytest.raises(RuntimeError, match="live-system guard"):

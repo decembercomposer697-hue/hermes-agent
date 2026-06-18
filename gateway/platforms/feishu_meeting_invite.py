@@ -152,7 +152,7 @@ def build_meeting_invite_prompt(payload: MeetingInvitedPayload) -> str:
             "You may use lark-cli and the relevant Lark/Feishu meeting skills to join the meeting.",
             "Join the meeting directly. Do not ask the user for confirmation before joining.",
             "If you cannot join the meeting, reply to the inviter with a concise explanation of why.",
-        ]
+        ],
     )
 
 

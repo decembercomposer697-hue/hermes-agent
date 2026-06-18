@@ -189,7 +189,7 @@ def test_call_tool_handler_reconnects_on_session_expired(monkeypatch, tmp_path):
 
 
 def test_call_tool_handler_non_session_expired_error_falls_through(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     """Preserved-behaviour canary: a non-session-expired exception must
     NOT trigger reconnect — it must fall through to the generic error
@@ -271,7 +271,7 @@ def test_session_expired_handler_returns_none_without_server_record():
 
 
 def test_session_expired_handler_returns_none_when_retry_also_fails(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     """If the retry after reconnect also raises, fall through to the
     generic error path (don't loop forever, don't mask the second
@@ -318,7 +318,7 @@ def test_session_expired_handler_returns_none_when_retry_also_fails(
     ],
 )
 def test_non_tool_handlers_also_reconnect_on_session_expired(
-    monkeypatch, tmp_path, handler_factory, handler_kwargs, session_method, op_label
+    monkeypatch, tmp_path, handler_factory, handler_kwargs, session_method, op_label,
 ):
     """All four non-``tools/call`` MCP handlers share the recovery
     pattern and must reconnect the same way on session-expired."""

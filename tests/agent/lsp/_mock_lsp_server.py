@@ -76,7 +76,7 @@ def main():
                         },
                         "serverInfo": {"name": "mock-lsp", "version": "0.1"},
                     },
-                }
+                },
             )
             if script == "crash":
                 return 0
@@ -108,7 +108,7 @@ def main():
                         "code": "MOCK001",
                         "source": "mock-lsp",
                         "message": "synthetic error from mock-lsp",
-                    }
+                    },
                 ]
             write_message(
                 {
@@ -119,7 +119,7 @@ def main():
                         "version": version,
                         "diagnostics": diagnostics,
                     },
-                }
+                },
             )
             continue
 
@@ -130,7 +130,7 @@ def main():
                     "jsonrpc": "2.0",
                     "id": msg["id"],
                     "result": {"kind": "full", "items": []},
-                }
+                },
             )
             continue
 
@@ -151,7 +151,7 @@ def main():
                     "jsonrpc": "2.0",
                     "id": msg["id"],
                     "error": {"code": -32601, "message": f"method not found: {msg.get('method')}"},
-                }
+                },
             )
 
 

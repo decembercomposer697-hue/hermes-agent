@@ -191,7 +191,7 @@ _SAFE_SPEC = re.compile(
     r"^[A-Za-z0-9_][A-Za-z0-9_.\-]*"        # package name
     r"(?:\[[A-Za-z0-9_,\-]+\])?"            # optional [extras]
     r"(?:[<>=!~]=?[A-Za-z0-9_.\-+,*<>=!~]+)?"  # optional version specifier
-    r"$"
+    r"$",
 )
 
 
@@ -439,7 +439,7 @@ def ensure(feature: str, *, prompt: bool = True) -> None:
     """
     if feature not in LAZY_DEPS:
         raise FeatureUnavailable(
-            feature, (), f"feature {feature!r} not in LAZY_DEPS allowlist"
+            feature, (), f"feature {feature!r} not in LAZY_DEPS allowlist",
         )
 
     missing = feature_missing(feature)
@@ -452,13 +452,13 @@ def ensure(feature: str, *, prompt: bool = True) -> None:
         if not _spec_is_safe(spec):
             raise FeatureUnavailable(
                 feature, missing,
-                f"refusing to install unsafe spec {spec!r}"
+                f"refusing to install unsafe spec {spec!r}",
             )
 
     if not _allow_lazy_installs():
         raise FeatureUnavailable(
             feature, missing,
-            "lazy installs disabled (security.allow_lazy_installs=false)"
+            "lazy installs disabled (security.allow_lazy_installs=false)",
         )
 
     # Only show the interactive confirmation when we own a TTY and
@@ -482,13 +482,13 @@ def ensure(feature: str, *, prompt: bool = True) -> None:
         try:
             answer = input(
                 f"\nFeature {feature!r} requires: {spec_list}\n"
-                f"Install into the active venv now? [Y/n] "
+                f"Install into the active venv now? [Y/n] ",
             ).strip().lower()
         except (EOFError, KeyboardInterrupt):
             answer = "n"
         if answer and answer not in {"y", "yes"}:
             raise FeatureUnavailable(
-                feature, missing, "user declined install at prompt"
+                feature, missing, "user declined install at prompt",
             )
 
     logger.info("Lazy-installing %s for feature %r", " ".join(missing), feature)
@@ -502,7 +502,7 @@ def ensure(feature: str, *, prompt: bool = True) -> None:
             snippet = snippet[-2000:]
         raise FeatureUnavailable(
             feature, missing,
-            f"pip install failed: {snippet or 'no error output'}"
+            f"pip install failed: {snippet or 'no error output'}",
         )
 
     # Verify post-install. importlib.metadata caches per-process, so if we
@@ -519,7 +519,7 @@ def ensure(feature: str, *, prompt: bool = True) -> None:
         raise FeatureUnavailable(
             feature, still_missing,
             "install reported success but packages still not importable "
-            "(may require Python restart)"
+            "(may require Python restart)",
         )
 
     logger.info("Lazy install complete for feature %r", feature)

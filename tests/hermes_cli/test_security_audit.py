@@ -49,7 +49,7 @@ class TestRequirementsParser:
 class TestMCPComponentExtraction:
     def test_npx_scoped_pinned(self):
         comp = sa._extract_mcp_component(
-            "fs", "npx", ["-y", "@modelcontextprotocol/server-filesystem@0.5.0"]
+            "fs", "npx", ["-y", "@modelcontextprotocol/server-filesystem@0.5.0"],
         )
         assert comp == sa.Component(
             name="@modelcontextprotocol/server-filesystem",
@@ -60,7 +60,7 @@ class TestMCPComponentExtraction:
 
     def test_npx_full_path_command(self):
         comp = sa._extract_mcp_component(
-            "fetch", "/usr/local/bin/npx", ["mcp-server-fetch@1.2.3"]
+            "fetch", "/usr/local/bin/npx", ["mcp-server-fetch@1.2.3"],
         )
         assert comp is not None
         assert comp.name == "mcp-server-fetch"
@@ -104,7 +104,7 @@ class TestPluginDiscovery:
     def test_skips_hidden_dirs(self, tmp_path: Path):
         (tmp_path / "plugins" / ".hidden").mkdir(parents=True)
         (tmp_path / "plugins" / ".hidden" / "requirements.txt").write_text(
-            "requests==2.20.0\n"
+            "requests==2.20.0\n",
         )
         assert sa._discover_plugins(tmp_path) == []
 
@@ -112,7 +112,7 @@ class TestPluginDiscovery:
         plugin = tmp_path / "plugins" / "py"
         plugin.mkdir(parents=True)
         (plugin / "pyproject.toml").write_text(
-            '[project]\ndependencies = ["flask==2.0.1", "uvicorn>=0.20"]\n'
+            '[project]\ndependencies = ["flask==2.0.1", "uvicorn>=0.20"]\n',
         )
         components = sa._discover_plugins(tmp_path)
         # uvicorn>=0.20 is unpinned, so only flask comes through
@@ -145,12 +145,12 @@ class TestSeverityExtraction:
                             "events": [
                                 {"introduced": "0"},
                                 {"fixed": "2.0.0"},
-                            ]
-                        }
-                    ]
+                            ],
+                        },
+                    ],
                 },
                 {"ranges": [{"events": [{"fixed": "2.0.0"}, {"fixed": "1.9.5"}]}]},
-            ]
+            ],
         }
         assert sa._osv_fixed_versions(rec) == ["2.0.0", "1.9.5"]
 
@@ -161,7 +161,7 @@ class TestSeverityExtraction:
 class TestRunAudit:
     def test_no_components_returns_empty(self, tmp_path: Path):
         findings = sa.run_audit(
-            skip_venv=True, skip_plugins=True, skip_mcp=True, hermes_home=tmp_path
+            skip_venv=True, skip_plugins=True, skip_mcp=True, hermes_home=tmp_path,
         )
         assert findings == []
 
@@ -185,7 +185,7 @@ class TestRunAudit:
         with patch.object(sa, "_osv_query_batch", side_effect=fake_batch), \
              patch.object(sa, "_osv_fetch_details", side_effect=fake_details):
             findings = sa.run_audit(
-                skip_venv=True, skip_plugins=False, skip_mcp=True, hermes_home=tmp_path
+                skip_venv=True, skip_plugins=False, skip_mcp=True, hermes_home=tmp_path,
             )
         assert len(findings) == 2
         # CRITICAL must come first
@@ -222,11 +222,11 @@ class TestExitCodes:
         monkeypatch.setattr(sa, "get_hermes_home", lambda: str(tmp_path))
         # Force a venv discovery to return one component, OSV to flag it CRITICAL
         fake_comp = sa.Component(
-            name="pkg", version="1.0", ecosystem="PyPI", source="venv"
+            name="pkg", version="1.0", ecosystem="PyPI", source="venv",
         )
         monkeypatch.setattr(sa, "_discover_venv", lambda: [fake_comp])
         monkeypatch.setattr(
-            sa, "_osv_query_batch", lambda comps: {fake_comp: ["X-1"]}
+            sa, "_osv_query_batch", lambda comps: {fake_comp: ["X-1"]},
         )
         monkeypatch.setattr(
             sa,
@@ -234,18 +234,18 @@ class TestExitCodes:
             lambda ids: {"X-1": sa.Vulnerability(osv_id="X-1", severity="CRITICAL")},
         )
         code = sa.cmd_security_audit(
-            self._build_args(skip_venv=False, fail_on="critical")
+            self._build_args(skip_venv=False, fail_on="critical"),
         )
         assert code == 1
 
     def test_finding_below_threshold_exits_zero(self, tmp_path: Path, monkeypatch):
         monkeypatch.setattr(sa, "get_hermes_home", lambda: str(tmp_path))
         fake_comp = sa.Component(
-            name="pkg", version="1.0", ecosystem="PyPI", source="venv"
+            name="pkg", version="1.0", ecosystem="PyPI", source="venv",
         )
         monkeypatch.setattr(sa, "_discover_venv", lambda: [fake_comp])
         monkeypatch.setattr(
-            sa, "_osv_query_batch", lambda comps: {fake_comp: ["X-1"]}
+            sa, "_osv_query_batch", lambda comps: {fake_comp: ["X-1"]},
         )
         monkeypatch.setattr(
             sa,
@@ -253,7 +253,7 @@ class TestExitCodes:
             lambda ids: {"X-1": sa.Vulnerability(osv_id="X-1", severity="MODERATE")},
         )
         code = sa.cmd_security_audit(
-            self._build_args(skip_venv=False, fail_on="critical")
+            self._build_args(skip_venv=False, fail_on="critical"),
         )
         assert code == 0
 
@@ -267,11 +267,11 @@ class TestExitCodes:
     def test_json_output_shape(self, tmp_path: Path, monkeypatch, capsys):
         monkeypatch.setattr(sa, "get_hermes_home", lambda: str(tmp_path))
         fake_comp = sa.Component(
-            name="pkg", version="1.0", ecosystem="PyPI", source="venv"
+            name="pkg", version="1.0", ecosystem="PyPI", source="venv",
         )
         monkeypatch.setattr(sa, "_discover_venv", lambda: [fake_comp])
         monkeypatch.setattr(
-            sa, "_osv_query_batch", lambda comps: {fake_comp: ["X-1"]}
+            sa, "_osv_query_batch", lambda comps: {fake_comp: ["X-1"]},
         )
         monkeypatch.setattr(
             sa,
@@ -282,11 +282,11 @@ class TestExitCodes:
                     severity="HIGH",
                     summary="bad",
                     fixed_versions=["1.1"],
-                )
+                ),
             },
         )
         sa.cmd_security_audit(
-            self._build_args(skip_venv=False, json=True, fail_on="critical")
+            self._build_args(skip_venv=False, json=True, fail_on="critical"),
         )
         payload = capsys.readouterr().out
         # The bitwarden banner can leak above the json; pick the first { line.

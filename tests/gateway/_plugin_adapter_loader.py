@@ -53,7 +53,7 @@ def load_plugin_adapter(plugin_name: str) -> ModuleType:
     if not adapter_path.is_file():
         raise FileNotFoundError(
             f"Plugin adapter not found: {adapter_path}. "
-            f"Known plugins: {sorted(p.name for p in _PLUGINS_DIR.iterdir() if p.is_dir())}"
+            f"Known plugins: {sorted(p.name for p in _PLUGINS_DIR.iterdir() if p.is_dir())}",
         )
 
     spec = importlib.util.spec_from_file_location(module_name, adapter_path)

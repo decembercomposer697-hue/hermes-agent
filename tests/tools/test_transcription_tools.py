@@ -572,7 +572,7 @@ class TestTranscribeLocalExtended:
         # First model loads fine (auto), but transcribe() blows up on dlopen
         gpu_model = MagicMock()
         gpu_model.transcribe.side_effect = RuntimeError(
-            "Library libcublas.so.12 is not found or cannot be loaded"
+            "Library libcublas.so.12 is not found or cannot be loaded",
         )
         # Second model (forced CPU) works
         cpu_model = MagicMock()
@@ -1405,7 +1405,7 @@ class TestTranscribeElevenLabs:
                 "language_code": "eng",
                 "tag_audio_events": True,
                 "diarize": True,
-            }
+            },
         }
         with patch("tools.transcription_tools._load_stt_config", return_value=config), \
              patch("requests.post", return_value=mock_response) as mock_post:

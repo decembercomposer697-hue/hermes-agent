@@ -286,7 +286,7 @@ def _(home, kb):
             if not done.is_set():
                 assert False, "recompute_ready HUNG on cyclic graph"
             raise AssertionError(
-                "cycle creation was allowed; kernel should reject"
+                "cycle creation was allowed; kernel should reject",
             )
         except (ValueError, RuntimeError, sqlite3.IntegrityError) as e:
             # Expected: kernel refuses the cycle

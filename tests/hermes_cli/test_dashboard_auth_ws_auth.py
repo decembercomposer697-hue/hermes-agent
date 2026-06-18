@@ -106,7 +106,7 @@ def _logged_in(client: TestClient) -> None:
     assert r1.status_code == 302
     state = r1.headers["location"].split("state=")[1]
     r2 = client.get(
-        f"/auth/callback?code=stub_code&state={state}", follow_redirects=False
+        f"/auth/callback?code=stub_code&state={state}", follow_redirects=False,
     )
     assert r2.status_code == 302
 
@@ -379,7 +379,7 @@ class TestWsRequestIsAllowedGated:
         assert web_server._ws_request_is_allowed(ws) is True
 
     def test_rebinding_host_rejected_on_explicit_non_loopback_bind(
-        self, insecure_explicit_host_app
+        self, insecure_explicit_host_app,
     ):
         """Lifting the peer-IP gate for an explicit bind must NOT lift the
         DNS-rebinding Host guard: a mismatched Host header is still rejected,
@@ -458,7 +458,7 @@ class TestWsHostOriginGuardOrigins:
         assert web_server._ws_host_origin_is_allowed(ws) is True
 
     def test_explicit_non_loopback_cross_site_http_origin_rejected(
-        self, insecure_explicit_host_app
+        self, insecure_explicit_host_app,
     ):
         ws = self._ws(origin="http://localhost:9119", host="100.64.0.10:9119")
         assert web_server._ws_host_origin_is_allowed(ws) is False

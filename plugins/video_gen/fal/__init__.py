@@ -386,7 +386,7 @@ def _submit_fal_video_request(endpoint: str, arguments: dict[str, Any]):
                 f"(HTTP {status}). This model may not yet be enabled on "
                 f"the Nous Portal's FAL proxy. Either:\n"
                 f"  • Set FAL_KEY in your environment to use FAL.ai directly, or\n"
-                f"  • Pick a different model via `hermes tools` → Video Generation."
+                f"  • Pick a different model via `hermes tools` → Video Generation.",
             ) from exc
         raise
 

@@ -105,7 +105,7 @@ template in the LAST triple-backtick block of your response.
     ) -> list[ParrotOrganism]:
         fc = failure_cases[0]
         prompt = jinja2.Template(self.IMPROVEMENT_PROMPT_TEMPLATE).render(
-            organism=organism, failure_case=fc
+            organism=organism, failure_case=fc,
         )
         try:
             resp = _prompt_llm(prompt)

@@ -367,7 +367,7 @@ def _translate_gemini_response(
             ))
 
     finish_reason = "tool_calls" if tool_calls else _map_gemini_finish_reason(
-        str(cand.get("finishReason") or "")
+        str(cand.get("finishReason") or ""),
     )
 
     usage_meta = inner.get("usageMetadata") or {}

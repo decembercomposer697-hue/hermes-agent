@@ -151,7 +151,7 @@ def _require_https_or_loopback(url: str, *, field: str) -> str:
     ):
         return url
     raise ProviderError(
-        f"OIDC {field} must be https:// (or http on localhost), got {url!r}"
+        f"OIDC {field} must be https:// (or http on localhost), got {url!r}",
     )
 
 
@@ -203,7 +203,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
 
         code_verifier = _b64url_no_pad(secrets.token_bytes(64))  # ~86 chars
         code_challenge = _b64url_no_pad(
-            hashlib.sha256(code_verifier.encode("ascii")).digest()
+            hashlib.sha256(code_verifier.encode("ascii")).digest(),
         )
         state = _b64url_no_pad(secrets.token_bytes(32))
 
@@ -249,7 +249,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
         # here (and switch to HTTP Basic auth if the IDP's
         # token_endpoint_auth_methods_supported prefers client_secret_basic).
         return self._exchange(
-            disco["token_endpoint"], data, bad_request_exc=InvalidCodeError
+            disco["token_endpoint"], data, bad_request_exc=InvalidCodeError,
         )
 
     def refresh_session(self, *, refresh_token: str) -> Session:
@@ -289,7 +289,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
         # No refresh token available on this path; "" is fine — the middleware
         # re-reads the refresh-token cookie separately for refresh_session.
         return self._session_from_tokens(
-            id_token=access_token, refresh_token="", claims=claims
+            id_token=access_token, refresh_token="", claims=claims,
         )
 
     def revoke_session(self, *, refresh_token: str) -> None:
@@ -345,19 +345,19 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
             )
         except httpx.RequestError as exc:
             raise ProviderError(
-                f"OIDC token endpoint unreachable: {exc}"
+                f"OIDC token endpoint unreachable: {exc}",
             ) from exc
 
         if response.status_code == 400:
             body = self._parse_json_body(response)
             error_code = body.get("error", "invalid_request")
             raise bad_request_exc(
-                f"IDP rejected token request: {error_code}"
+                f"IDP rejected token request: {error_code}",
             )
         if response.status_code != 200:
             raise ProviderError(
                 f"OIDC token endpoint returned {response.status_code}: "
-                f"{response.text[:200]!r}"
+                f"{response.text[:200]!r}",
             )
 
         payload = self._parse_json_body(response)
@@ -367,7 +367,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
             raise ProviderError(
                 "OIDC token response missing id_token — ensure the 'openid' "
                 "scope is configured and the client is allowed to receive an "
-                "ID token."
+                "ID token.",
             )
 
         token_type = str(payload.get("token_type", "")).lower()
@@ -384,7 +384,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
             refresh_token = previous_refresh_token or ""
 
         return self._session_from_tokens(
-            id_token=id_token, refresh_token=refresh_token, claims=claims
+            id_token=id_token, refresh_token=refresh_token, claims=claims,
         )
 
     # ---- internals: discovery ---------------------------------------------
@@ -428,21 +428,21 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
             raise ProviderError(f"OIDC discovery unreachable: {exc}") from exc
         if response.status_code != 200:
             raise ProviderError(
-                f"OIDC discovery returned {response.status_code} for {url!r}"
+                f"OIDC discovery returned {response.status_code} for {url!r}",
             )
         payload = self._parse_json_body(response)
         if not payload:
             raise ProviderError("OIDC discovery returned a non-JSON body")
 
         authorization_endpoint = str(
-            payload.get("authorization_endpoint", "") or ""
+            payload.get("authorization_endpoint", "") or "",
         ).strip()
         token_endpoint = str(payload.get("token_endpoint", "") or "").strip()
         jwks_uri = str(payload.get("jwks_uri", "") or "").strip()
         if not authorization_endpoint or not token_endpoint or not jwks_uri:
             raise ProviderError(
                 "OIDC discovery missing one of authorization_endpoint / "
-                "token_endpoint / jwks_uri"
+                "token_endpoint / jwks_uri",
             )
 
         # Pin the discovered issuer: a mismatch between the configured issuer
@@ -454,17 +454,17 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
             raise ProviderError(
                 f"OIDC discovery issuer mismatch: document advertises "
                 f"{advertised_issuer!r} but configured issuer is "
-                f"{self._issuer!r}"
+                f"{self._issuer!r}",
             )
 
         _require_https_or_loopback(
-            authorization_endpoint, field="authorization_endpoint"
+            authorization_endpoint, field="authorization_endpoint",
         )
         _require_https_or_loopback(token_endpoint, field="token_endpoint")
         _require_https_or_loopback(jwks_uri, field="jwks_uri")
 
         revocation_endpoint = str(
-            payload.get("revocation_endpoint", "") or ""
+            payload.get("revocation_endpoint", "") or "",
         ).strip()
 
         return {
@@ -496,7 +496,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
 
         try:
             signing_key = self._get_jwks_client().get_signing_key_from_jwt(
-                id_token
+                id_token,
             )
         except jwt.PyJWKClientError as exc:
             raise ProviderError(f"JWKS lookup failed: {exc}") from exc
@@ -535,7 +535,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
             except Exception:
                 pass
             raise ProviderError(
-                f"ID token verification failed: {exc}{details}"
+                f"ID token verification failed: {exc}{details}",
             ) from exc
 
         return claims
@@ -567,7 +567,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
             or claims.get("preferred_username")
             or claims.get("nickname")
             or email
-            or ""
+            or "",
         )
         # Org/tenant is non-standard; accept the common spellings. Groups, if
         # present as a list, are joined so multi-tenant IDPs surface *something*
@@ -599,7 +599,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
         parsed = urllib.parse.urlparse(redirect_uri)
         if parsed.scheme not in ("https", "http"):
             raise ProviderError(
-                f"redirect_uri must be http(s), got {redirect_uri!r}"
+                f"redirect_uri must be http(s), got {redirect_uri!r}",
             )
         if parsed.scheme == "http" and parsed.hostname not in (
             "localhost",
@@ -607,12 +607,12 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
         ):
             raise ProviderError(
                 "redirect_uri may only use http:// for localhost/127.0.0.1, "
-                f"got {redirect_uri!r}"
+                f"got {redirect_uri!r}",
             )
         if not parsed.path or not parsed.path.endswith("/auth/callback"):
             raise ProviderError(
                 "redirect_uri path must end with '/auth/callback', "
-                f"got {redirect_uri!r}"
+                f"got {redirect_uri!r}",
             )
 
     def _parse_json_body(self, response: httpx.Response) -> dict[str, Any]:
@@ -692,10 +692,10 @@ def register(ctx) -> None:
     oidc_cfg = _oidc_subsection(oauth_section)
 
     issuer = _resolve_setting(
-        "HERMES_DASHBOARD_OIDC_ISSUER", oidc_cfg.get("issuer")
+        "HERMES_DASHBOARD_OIDC_ISSUER", oidc_cfg.get("issuer"),
     )
     client_id = _resolve_setting(
-        "HERMES_DASHBOARD_OIDC_CLIENT_ID", oidc_cfg.get("client_id")
+        "HERMES_DASHBOARD_OIDC_CLIENT_ID", oidc_cfg.get("client_id"),
     )
     scopes = (
         _resolve_setting("HERMES_DASHBOARD_OIDC_SCOPES", oidc_cfg.get("scopes"))
@@ -717,7 +717,7 @@ def register(ctx) -> None:
 
     try:
         provider = SelfHostedOIDCProvider(
-            issuer=issuer, client_id=client_id, scopes=scopes
+            issuer=issuer, client_id=client_id, scopes=scopes,
         )
     except (ValueError, ProviderError) as exc:
         LAST_SKIP_REASON = (

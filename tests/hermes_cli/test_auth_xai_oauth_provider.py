@@ -183,7 +183,7 @@ def test_xai_access_token_is_expiring_returns_false_for_jwt_without_exp():
 
 def test_xai_validate_loopback_redirect_uri_accepts_localhost_with_port():
     host, port, path = _xai_validate_loopback_redirect_uri(
-        "http://127.0.0.1:56121/callback"
+        "http://127.0.0.1:56121/callback",
     )
     assert host == XAI_OAUTH_REDIRECT_HOST
     assert port == 56121
@@ -703,7 +703,7 @@ _STALE_XAI_OAUTH_STATE = {
 
 
 def _seed_xai_oauth_state(
-    hermes_home: Path, state: dict, *, active_provider: str = "xai-oauth"
+    hermes_home: Path, state: dict, *, active_provider: str = "xai-oauth",
 ) -> None:
     hermes_home.mkdir(parents=True, exist_ok=True)
     auth_store = {
@@ -845,7 +845,7 @@ def test_refresh_xai_oauth_pure_relogin_on_400(monkeypatch):
     _patch_httpx_client(monkeypatch, response)
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
-            "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token"
+            "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token",
         )
     assert exc.value.code == "xai_refresh_failed"
     assert exc.value.relogin_required is True
@@ -856,7 +856,7 @@ def test_refresh_xai_oauth_pure_no_relogin_on_500(monkeypatch):
     _patch_httpx_client(monkeypatch, response)
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
-            "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token"
+            "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token",
         )
     assert exc.value.code == "xai_refresh_failed"
     assert exc.value.relogin_required is False
@@ -876,7 +876,7 @@ def test_refresh_xai_oauth_pure_403_marked_tier_denied_not_relogin(monkeypatch):
     _patch_httpx_client(monkeypatch, response)
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
-            "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token"
+            "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token",
         )
     assert exc.value.code == "xai_oauth_tier_denied"
     assert exc.value.relogin_required is False
@@ -924,7 +924,7 @@ def test_refresh_xai_oauth_pure_returns_updated_tokens(monkeypatch):
     holder = _patch_httpx_client(monkeypatch, response)
 
     updated = refresh_xai_oauth_pure(
-        "at", "rt-old", token_endpoint="https://auth.x.ai/oauth2/token"
+        "at", "rt-old", token_endpoint="https://auth.x.ai/oauth2/token",
     )
     assert updated["access_token"] == new_access
     assert updated["refresh_token"] == "rt-rotated"
@@ -953,7 +953,7 @@ def test_refresh_xai_oauth_pure_keeps_refresh_token_when_response_omits_it(monke
     _patch_httpx_client(monkeypatch, response)
 
     updated = refresh_xai_oauth_pure(
-        "at", "rt-stable", token_endpoint="https://auth.x.ai/oauth2/token"
+        "at", "rt-stable", token_endpoint="https://auth.x.ai/oauth2/token",
     )
     assert updated["access_token"] == new_access
     assert updated["refresh_token"] == "rt-stable"
@@ -967,7 +967,7 @@ def test_refresh_xai_oauth_pure_rejects_response_without_access_token(monkeypatc
     _patch_httpx_client(monkeypatch, response)
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
-            "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token"
+            "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token",
         )
     assert exc.value.code == "xai_refresh_missing_access_token"
     assert exc.value.relogin_required is True
@@ -983,7 +983,7 @@ def test_refresh_xai_oauth_pure_raises_typed_error_on_malformed_json(monkeypatch
     _patch_httpx_client(monkeypatch, response)
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
-            "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token"
+            "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token",
         )
     assert exc.value.code == "xai_refresh_invalid_json"
 
@@ -1046,7 +1046,7 @@ def test_refresh_xai_oauth_pure_rejects_non_https_token_endpoint(monkeypatch):
     # No HTTP stub installed — refresh must fail at validation, not at POST.
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
-            "at", "rt", token_endpoint="http://auth.x.ai/oauth2/token"
+            "at", "rt", token_endpoint="http://auth.x.ai/oauth2/token",
         )
     assert exc.value.code == "xai_discovery_invalid"
 
@@ -1059,7 +1059,7 @@ def test_refresh_xai_oauth_pure_rejects_off_origin_token_endpoint(monkeypatch):
     the user can re-run discovery."""
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
-            "at", "rt", token_endpoint="https://evil.example.com/token"
+            "at", "rt", token_endpoint="https://evil.example.com/token",
         )
     assert exc.value.code == "xai_discovery_invalid"
 
@@ -1070,7 +1070,7 @@ def test_refresh_xai_oauth_pure_rejects_lookalike_suffix(monkeypatch):
     so attacker-registered apex lookalikes can't slip through."""
     with pytest.raises(AuthError) as exc:
         refresh_xai_oauth_pure(
-            "at", "rt", token_endpoint="https://evilx.ai/token"
+            "at", "rt", token_endpoint="https://evilx.ai/token",
         )
     assert exc.value.code == "xai_discovery_invalid"
 
@@ -1088,13 +1088,13 @@ def test_refresh_xai_oauth_pure_accepts_apex_and_subdomain_endpoints(monkeypatch
     _patch_httpx_client(monkeypatch, response)
     # auth.x.ai (current production)
     updated = refresh_xai_oauth_pure(
-        "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token"
+        "at", "rt", token_endpoint="https://auth.x.ai/oauth2/token",
     )
     assert updated["access_token"] == new_access
     # hypothetical migration to accounts.x.ai
     _patch_httpx_client(monkeypatch, response)
     updated2 = refresh_xai_oauth_pure(
-        "at", "rt", token_endpoint="https://accounts.x.ai/token"
+        "at", "rt", token_endpoint="https://accounts.x.ai/token",
     )
     assert updated2["access_token"] == new_access
 
@@ -1198,7 +1198,7 @@ def test_credential_pool_does_not_seed_when_singleton_missing_access_token(tmp_p
             "xai-oauth": {
                 "tokens": {"access_token": "", "refresh_token": "rt"},
                 "auth_mode": "oauth_pkce",
-            }
+            },
         },
     }
     (hermes_home / "auth.json").write_text(json.dumps(auth_store))
@@ -1373,7 +1373,7 @@ def test_runtime_provider_default_base_url_when_pool_entry_missing_url(tmp_path,
             access_token=fresh,
             refresh_token="rt",
             base_url="",
-        )
+        ),
     )
 
     from hermes_cli.runtime_provider import resolve_runtime_provider
@@ -1493,7 +1493,7 @@ def test_pool_select_proactively_refreshes_expiring_token(tmp_path, monkeypatch)
             access_token=near_expiry,
             refresh_token="rt-old",
             base_url=DEFAULT_XAI_OAUTH_BASE_URL,
-        )
+        ),
     )
 
     selected = pool.select()
@@ -1547,7 +1547,7 @@ def test_pool_try_refresh_current_handles_xai_oauth(tmp_path, monkeypatch):
             access_token=seemingly_fresh,
             refresh_token="rt-old",
             base_url=DEFAULT_XAI_OAUTH_BASE_URL,
-        )
+        ),
     )
     pool.select()
     refreshed = pool.try_refresh_current()
@@ -1589,7 +1589,7 @@ def test_pool_refresh_marks_entry_exhausted_on_failure(tmp_path, monkeypatch):
             access_token=seemingly_fresh,
             refresh_token="rt-revoked",
             base_url=DEFAULT_XAI_OAUTH_BASE_URL,
-        )
+        ),
     )
     pool.select()
     refreshed = pool.try_refresh_current()
@@ -1822,7 +1822,7 @@ def test_pool_manual_xai_entry_not_synced_from_singleton(tmp_path, monkeypatch):
             access_token=manual_at_old,
             refresh_token="rt-manual",
             base_url=DEFAULT_XAI_OAUTH_BASE_URL,
-        )
+        ),
     )
     manual_entry = next(e for e in pool.entries() if e.source == "manual:xai_pkce")
     synced = pool._sync_xai_oauth_entry_from_auth_store(manual_entry)
@@ -1874,7 +1874,7 @@ def test_pool_manual_entry_does_not_sync_back_to_singleton(tmp_path, monkeypatch
             access_token=manual_at_old,
             refresh_token="rt-manual",
             base_url=DEFAULT_XAI_OAUTH_BASE_URL,
-        )
+        ),
     )
     # Refresh the manual entry — singleton must be left alone.
     manual_entries = [e for e in pool.entries() if e.source == "manual:xai_pkce"]

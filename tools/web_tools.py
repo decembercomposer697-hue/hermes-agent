@@ -145,7 +145,7 @@ def _load_web_config() -> dict:
 # ``web.search_backend`` / ``web.extract_backend``). Kept as a single source of
 # truth for config validation across the selection helpers.
 _KNOWN_WEB_BACKENDS = frozenset(
-    {"parallel", "firecrawl", "tavily", "exa", "searxng", "brave-free", "ddgs", "xai"}
+    {"parallel", "firecrawl", "tavily", "exa", "searxng", "brave-free", "ddgs", "xai"},
 )
 
 # Backends that only service web_search (their provider's ``supports_extract()``
@@ -383,7 +383,7 @@ async def process_content_with_llm(
     url: str = "", 
     title: str = "",
     model: str | None = None,
-    min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION
+    min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION,
 ) -> str | None:
     """
     Process web content using LLM to create intelligent summaries with key excerpts.
@@ -437,7 +437,7 @@ async def process_content_with_llm(
         if content_len > CHUNK_THRESHOLD:
             logger.info("Content large (%d chars). Using chunked processing...", content_len)
             return await _process_large_content_chunked(
-                content, context_str, model, CHUNK_SIZE, MAX_OUTPUT_SIZE
+                content, context_str, model, CHUNK_SIZE, MAX_OUTPUT_SIZE,
             )
         
         # Standard single-pass processing for normal content
@@ -484,7 +484,7 @@ async def _call_summarizer_llm(
     model: str | None, 
     max_tokens: int = 20000,
     is_chunk: bool = False,
-    chunk_info: str = ""
+    chunk_info: str = "",
 ) -> str | None:
     """
     Make a single LLM call to summarize content.
@@ -601,7 +601,7 @@ async def _process_large_content_chunked(
     context_str: str, 
     model: str | None, 
     chunk_size: int,
-    max_output_size: int
+    max_output_size: int,
 ) -> str | None:
     """
     Process large content by chunking, summarizing each chunk in parallel,
@@ -636,7 +636,7 @@ async def _process_large_content_chunked(
                 model, 
                 max_tokens=10000,
                 is_chunk=True,
-                chunk_info=chunk_info
+                chunk_info=chunk_info,
             )
             if summary:
                 logger.info("Chunk %d/%d summarized: %d -> %d chars", chunk_idx + 1, len(chunks), len(chunk_content), len(summary))
@@ -866,12 +866,12 @@ def web_search_tool(query: str, limit: int = 5) -> str:
     debug_call_data = {
         "parameters": {
             "query": query,
-            "limit": limit
+            "limit": limit,
         },
         "error": None,
         "results_count": 0,
         "original_response_size": 0,
-        "final_response_size": 0
+        "final_response_size": 0,
     }
     
     try:
@@ -935,7 +935,7 @@ async def web_extract_tool(
     format: str = None,
     use_llm_processing: bool = True,
     model: str | None = None,
-    min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION
+    min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION,
 ) -> str:
     """
     Extract content from specific web pages using available extraction API backend.
@@ -985,7 +985,7 @@ async def web_extract_tool(
             "format": format,
             "use_llm_processing": use_llm_processing,
             "model": model,
-            "min_length": min_length
+            "min_length": min_length,
         },
         "error": None,
         "pages_extracted": 0,
@@ -993,7 +993,7 @@ async def web_extract_tool(
         "original_response_size": 0,
         "final_response_size": 0,
         "compression_metrics": [],
-        "processing_applied": []
+        "processing_applied": [],
     }
     
     try:
@@ -1074,7 +1074,7 @@ async def web_extract_tool(
                     )
 
             logger.info(
-                "Web extract via %s: %d URL(s)", provider.name, len(safe_urls)
+                "Web extract via %s: %d URL(s)", provider.name, len(safe_urls),
             )
 
             # Async-or-sync dispatch: parallel + firecrawl have async
@@ -1086,7 +1086,7 @@ async def web_extract_tool(
                 # Run sync extract() in a thread so we don't block the
                 # event loop on network I/O.
                 results = await asyncio.to_thread(
-                    provider.extract, safe_urls, format=format
+                    provider.extract, safe_urls, format=format,
                 )
 
         # Merge any SSRF-blocked results back in
@@ -1122,7 +1122,7 @@ async def web_extract_tool(
                 
                 # Process content with LLM
                 processed = await process_content_with_llm(
-                    raw_content, url, title, effective_model, min_length
+                    raw_content, url, title, effective_model, min_length,
                 )
                 
                 if processed:
@@ -1138,7 +1138,7 @@ async def web_extract_tool(
                         "original_size": original_size,
                         "processed_size": processed_size,
                         "compression_ratio": compression_ratio,
-                        "model_used": effective_model
+                        "model_used": effective_model,
                     }
                     return result, metrics, "processed"
                 else:
@@ -1148,7 +1148,7 @@ async def web_extract_tool(
                         "processed_size": original_size,
                         "compression_ratio": 1.0,
                         "model_used": None,
-                        "reason": "content_too_short"
+                        "reason": "content_too_short",
                     }
                     return result, metrics, "too_short"
             
@@ -1343,7 +1343,7 @@ if __name__ == "__main__":
         print("❌ No web search backend configured")
         print(
             "Set EXA_API_KEY, PARALLEL_API_KEY, TAVILY_API_KEY, FIRECRAWL_API_KEY, FIRECRAWL_API_URL"
-            f"{_firecrawl_backend_help_suffix()}"
+            f"{_firecrawl_backend_help_suffix()}",
         )
 
     if not nous_available:
@@ -1422,18 +1422,18 @@ WEB_SEARCH_SCHEMA = {
         "properties": {
             "query": {
                 "type": "string",
-                "description": "The search query to look up on the web. You may include backend-supported operators such as site:example.com, filetype:pdf, intitle:word, -term, or \"exact phrase\"."
+                "description": "The search query to look up on the web. You may include backend-supported operators such as site:example.com, filetype:pdf, intitle:word, -term, or \"exact phrase\".",
             },
             "limit": {
                 "type": "integer",
                 "description": "Maximum number of results to return. Defaults to 5.",
                 "minimum": 1,
                 "maximum": 100,
-                "default": 5
-            }
+                "default": 5,
+            },
         },
-        "required": ["query"]
-    }
+        "required": ["query"],
+    },
 }
 
 WEB_EXTRACT_SCHEMA = {
@@ -1446,11 +1446,11 @@ WEB_EXTRACT_SCHEMA = {
                 "type": "array",
                 "items": {"type": "string"},
                 "description": "List of URLs to extract content from (max 5 URLs per call)",
-                "maxItems": 5
-            }
+                "maxItems": 5,
+            },
         },
-        "required": ["urls"]
-    }
+        "required": ["urls"],
+    },
 }
 
 registry.register(

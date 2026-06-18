@@ -46,7 +46,7 @@ def _write_plugin(
         manifest.update(manifest_extra)
     (plugin_dir / "plugin.yaml").write_text(yaml.dump(manifest))
     (plugin_dir / "__init__.py").write_text(
-        f"def register(ctx):\n    {register_body}\n"
+        f"def register(ctx):\n    {register_body}\n",
     )
     return plugin_dir
 

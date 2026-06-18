@@ -161,7 +161,7 @@ class TestAgentCbsNoticeBinding:
                     ttl_ms=None,
                     key="credits.warn90",
                     id="n1",
-                )
+                ),
             )
 
         assert len(captured) == 1

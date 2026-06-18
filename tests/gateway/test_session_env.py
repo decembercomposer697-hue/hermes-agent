@@ -298,7 +298,7 @@ async def test_run_in_executor_with_context_preserves_session_env(monkeypatch):
                 "chat_id": get_session_env("HERMES_SESSION_CHAT_ID"),
                 "user_id": get_session_env("HERMES_SESSION_USER_ID"),
                 "session_key": get_session_env("HERMES_SESSION_KEY"),
-            }
+            },
         )
     finally:
         runner._clear_session_env(tokens)

@@ -104,7 +104,7 @@ def test_registered_sudo_callback_is_used_without_interactive_env(monkeypatch):
     terminal_tool.set_sudo_password_callback(sudo_callback)
     try:
         transformed, sudo_stdin = terminal_tool._transform_sudo_command(
-            "echo ok | sudo tee /tmp/hermes-test"
+            "echo ok | sudo tee /tmp/hermes-test",
         )
     finally:
         terminal_tool.set_sudo_password_callback(None)
@@ -135,7 +135,7 @@ def test_passwordless_sudo_skips_interactive_prompt_and_rewrite(monkeypatch):
 
     def _fail_prompt(*_args, **_kwargs):
         raise AssertionError(
-            "interactive sudo prompt should not run when sudo -n already works"
+            "interactive sudo prompt should not run when sudo -n already works",
         )
 
     monkeypatch.setattr(terminal_tool, "_prompt_for_sudo_password", _fail_prompt)

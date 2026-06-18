@@ -175,11 +175,11 @@ class TestVerboseCommand:
 
         # Cycle on Telegram
         await runner._handle_verbose_command(
-            _make_event(platform=Platform.TELEGRAM)
+            _make_event(platform=Platform.TELEGRAM),
         )
         # Cycle on Slack
         await runner._handle_verbose_command(
-            _make_event(platform=Platform.SLACK)
+            _make_event(platform=Platform.SLACK),
         )
 
         saved = yaml.safe_load(config_path.read_text(encoding="utf-8"))

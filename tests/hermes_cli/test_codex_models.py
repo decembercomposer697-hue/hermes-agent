@@ -17,9 +17,9 @@ def test_get_codex_model_ids_prioritizes_default_and_cache(tmp_path, monkeypatch
                     {"slug": "gpt-5.1-codex", "priority": 5, "supported_in_api": True},
                     {"slug": "gpt-5.4", "priority": 1, "supported_in_api": True},
                     {"slug": "gpt-5-hidden-codex", "priority": 2, "visibility": "hidden"},
-                ]
-            }
-        )
+                ],
+            },
+        ),
     )
     monkeypatch.setenv("CODEX_HOME", str(codex_home))
 
@@ -96,7 +96,7 @@ def test_fetch_from_api_keeps_supported_in_api_false_models(monkeypatch):
                     {"slug": "gpt-5.5", "priority": 0, "supported_in_api": True},
                     {"slug": "gpt-5.3-codex-spark", "priority": 7, "supported_in_api": False},
                     {"slug": "gpt-5-internal", "priority": 99, "visibility": "hidden"},
-                ]
+                ],
             }
 
     class _FakeHttpx:

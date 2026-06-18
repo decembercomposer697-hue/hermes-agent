@@ -366,8 +366,8 @@ def _write_xai_pool_entry(
                     "access_token": access_token,
                     "refresh_token": refresh_token,
                     "base_url": base_url,
-                }
-            ]
+                },
+            ],
         },
     }))
     return auth_path
@@ -490,7 +490,7 @@ def test_xai_adapter_retry_rotates_pool_entry_on_429(tmp_path, monkeypatch):
                     "refresh_token": "second-refresh-token",
                     "base_url": "https://api.x.ai/v1",
                 },
-            ]
+            ],
         },
     }))
 
@@ -715,7 +715,7 @@ def test_server_retries_once_with_adapter_retry_credential_on_401():
     async def run():
         captured: dict[str, Any] = {"requests": []}
         upstream_runner, upstream_base = await _start_runner(
-            _build_retrying_fake_upstream(captured)
+            _build_retrying_fake_upstream(captured),
         )
         adapter = FakeAdapter(
             f"{upstream_base}/v1",

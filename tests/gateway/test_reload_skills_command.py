@@ -43,7 +43,7 @@ def _make_runner():
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
     adapter = MagicMock()
     adapter.send = AsyncMock()
@@ -176,7 +176,7 @@ async def test_dispatcher_routes_reload_skills(monkeypatch):
     runner._handle_reload_skills_command = AsyncMock(return_value=sentinel)  # type: ignore[attr-defined]
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/reload-skills"))
@@ -192,7 +192,7 @@ async def test_underscored_alias_not_flagged_unknown(monkeypatch):
     runner._handle_reload_skills_command = AsyncMock(return_value="ok")  # type: ignore[attr-defined]
 
     monkeypatch.setattr(
-        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"}
+        gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"},
     )
 
     result = await runner._handle_message(_make_event("/reload_skills"))

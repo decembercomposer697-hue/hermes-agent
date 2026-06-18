@@ -117,7 +117,7 @@ def _resolve_xai_bearer() -> tuple[str, str, str]:
     if not api_key:
         raise RuntimeError(
             "No xAI credentials available. Run `hermes auth add xai-oauth` "
-            "to sign in with your SuperGrok subscription, or set XAI_API_KEY."
+            "to sign in with your SuperGrok subscription, or set XAI_API_KEY.",
         )
     base_url = str(creds.get("base_url") or DEFAULT_XAI_BASE_URL).strip().rstrip("/")
     source = str(creds.get("provider") or "xai")
@@ -169,7 +169,7 @@ def _parse_iso_date(value: str, field_name: str) -> date:
         return datetime.strptime(raw, "%Y-%m-%d").date()
     except ValueError as exc:
         raise ValueError(
-            f"{field_name} must be YYYY-MM-DD (got {raw!r})"
+            f"{field_name} must be YYYY-MM-DD (got {raw!r})",
         ) from exc
 
 
@@ -193,7 +193,7 @@ def _validate_date_range(from_date: str, to_date: str) -> None:
     if parsed_from and parsed_to and parsed_from > parsed_to:
         raise ValueError(
             f"from_date ({parsed_from.isoformat()}) must be on or before "
-            f"to_date ({parsed_to.isoformat()})"
+            f"to_date ({parsed_to.isoformat()})",
         )
     if parsed_from is not None:
         today_utc = datetime.now(UTC).date()
@@ -201,7 +201,7 @@ def _validate_date_range(from_date: str, to_date: str) -> None:
             raise ValueError(
                 f"from_date ({parsed_from.isoformat()}) is in the future; "
                 f"X Search only indexes past posts (today UTC is "
-                f"{today_utc.isoformat()})"
+                f"{today_utc.isoformat()})",
             )
 
 
@@ -238,7 +238,7 @@ def _extract_inline_citations(payload: dict[str, Any]) -> list[dict[str, Any]]:
                         "title": annotation.get("title", ""),
                         "start_index": annotation.get("start_index"),
                         "end_index": annotation.get("end_index"),
-                    }
+                    },
                 )
     return citations
 
@@ -319,7 +319,7 @@ def x_search_tool(
                 {
                     "role": "user",
                     "content": query.strip(),
-                }
+                },
             ],
             "tools": [tool_def],
             "store": False,

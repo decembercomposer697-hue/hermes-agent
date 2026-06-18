@@ -177,7 +177,7 @@ class TestPoolRotationCycle:
         """First 429 should just set has_retried_429=True, no rotation."""
         agent, pool, _ = self._make_agent_with_pool(3)
         recovered, has_retried = agent._recover_with_credential_pool(
-            status_code=429, has_retried_429=False
+            status_code=429, has_retried_429=False,
         )
         assert recovered is False
         assert has_retried is True
@@ -187,7 +187,7 @@ class TestPoolRotationCycle:
         """Second consecutive 429 should rotate to next credential."""
         agent, pool, entries = self._make_agent_with_pool(3)
         recovered, has_retried = agent._recover_with_credential_pool(
-            status_code=429, has_retried_429=True
+            status_code=429, has_retried_429=True,
         )
         assert recovered is True
         assert has_retried is False  # reset after rotation
@@ -199,13 +199,13 @@ class TestPoolRotationCycle:
         agent, pool, _ = self._make_agent_with_pool(1)
         # First 429 sets flag
         _, has_retried = agent._recover_with_credential_pool(
-            status_code=429, has_retried_429=False
+            status_code=429, has_retried_429=False,
         )
         assert has_retried is True
 
         # Second 429 tries to rotate but pool is exhausted (only 1 entry)
         recovered, _ = agent._recover_with_credential_pool(
-            status_code=429, has_retried_429=True
+            status_code=429, has_retried_429=True,
         )
         assert recovered is False
 
@@ -213,7 +213,7 @@ class TestPoolRotationCycle:
         """402 (billing) should immediately rotate, no retry-first."""
         agent, pool, entries = self._make_agent_with_pool(3)
         recovered, has_retried = agent._recover_with_credential_pool(
-            status_code=402, has_retried_429=False
+            status_code=402, has_retried_429=False,
         )
         assert recovered is True
         assert has_retried is False
@@ -228,7 +228,7 @@ class TestPoolRotationCycle:
         agent._credential_pool = None
 
         recovered, has_retried = agent._recover_with_credential_pool(
-            status_code=429, has_retried_429=False
+            status_code=429, has_retried_429=False,
         )
         assert recovered is False
         assert has_retried is False

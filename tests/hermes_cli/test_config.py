@@ -523,7 +523,7 @@ class TestSanitizeEnvLines:
         env_file = tmp_path / ".env"
         env_file.write_text(
             "ANTHROPIC_API_KEY=sk-antOPENAI_BASE_URL=https://api.openai.com/v1\n"
-            "FAL_KEY=existing\n"
+            "FAL_KEY=existing\n",
         )
         with patch.dict(os.environ, {"HERMES_HOME": str(tmp_path)}):
             save_env_value("MESSAGING_CWD", "/tmp")
@@ -541,7 +541,7 @@ class TestSanitizeEnvLines:
         env_file = tmp_path / ".env"
         env_file.write_text(
             "FAL_KEY=good\n"
-            "OPENROUTER_API_KEY=valFIRECRAWL_API_KEY=val2\n"
+            "OPENROUTER_API_KEY=valFIRECRAWL_API_KEY=val2\n",
         )
         with patch.dict(os.environ, {"HERMES_HOME": str(tmp_path)}):
             fixes = sanitize_env_file()
@@ -624,7 +624,7 @@ class TestConfigMigrationSecretPrompts:
                     "description": "Test key",
                     "prompt": "Test API key",
                     "password": True,
-                }
+                },
             ]
             if required_only
             else [],
@@ -721,12 +721,12 @@ class TestCustomProviderCompatibility:
                             "api_key": "test-key",
                             "api_mode": "codex_responses",
                             "model": "gpt-5-mini",
-                        }
+                        },
                     ],
                     "fallback_providers": [
-                        {"provider": "openai-direct", "model": "gpt-5-mini"}
+                        {"provider": "openai-direct", "model": "gpt-5-mini"},
                     ],
-                }
+                },
             ),
             encoding="utf-8",
         )
@@ -769,7 +769,7 @@ class TestCustomProviderCompatibility:
                             "rate_limit_delay": 0.25,
                             "discover_models": False,
                             "extra_body": {
-                                "chat_template_kwargs": {"enable_thinking": False}
+                                "chat_template_kwargs": {"enable_thinking": False},
                             },
                         },
                         {
@@ -778,7 +778,7 @@ class TestCustomProviderCompatibility:
                             "models": ["alpha", "beta"],
                         },
                     ],
-                }
+                },
             ),
             encoding="utf-8",
         )
@@ -799,7 +799,7 @@ class TestCustomProviderCompatibility:
         assert provider["rate_limit_delay"] == 0.25
         assert provider["discover_models"] is False
         assert provider["extra_body"] == {
-            "chat_template_kwargs": {"enable_thinking": False}
+            "chat_template_kwargs": {"enable_thinking": False},
         }
         assert raw["providers"]["list-models"]["models"] == {
             "alpha": {},
@@ -827,9 +827,9 @@ class TestCustomProviderCompatibility:
                             "default_model": "gpt-5-mini",
                             "name": "OpenAI Direct",
                             "transport": "codex_responses",
-                        }
+                        },
                     },
-                }
+                },
             ),
             encoding="utf-8",
         )
@@ -856,9 +856,9 @@ class TestCustomProviderCompatibility:
                             "api": "https://api.example.com/v1",
                             "url": "https://url.example.com/v1",
                             "base_url": "https://base.example.com/v1",
-                        }
+                        },
                     },
-                }
+                },
             ),
             encoding="utf-8",
         )
@@ -871,7 +871,7 @@ class TestCustomProviderCompatibility:
                 "name": "My Provider",
                 "base_url": "https://base.example.com/v1",
                 "provider_key": "my-provider",
-            }
+            },
         ]
 
     def test_dedup_across_legacy_and_providers(self, tmp_path):
@@ -886,16 +886,16 @@ class TestCustomProviderCompatibility:
                             "name": "OpenAI Direct",
                             "base_url": "https://api.openai.com/v1",
                             "api_key": "legacy-key",
-                        }
+                        },
                     ],
                     "providers": {
                         "openai-direct": {
                             "api": "https://api.openai.com/v1",
                             "api_key": "new-key",
                             "name": "OpenAI Direct",
-                        }
+                        },
                     },
-                }
+                },
             ),
             encoding="utf-8",
         )
@@ -919,7 +919,7 @@ class TestCustomProviderCompatibility:
                         {"name": "Ollama Cloud", "base_url": "https://ollama.com/v1", "model": "glm-5.1"},
                         {"name": "Ollama Cloud", "base_url": "https://ollama.com/v1", "model": "kimi-k2.5"},
                     ],
-                }
+                },
             ),
             encoding="utf-8",
         )

@@ -419,7 +419,7 @@ class TestBusyInputModeQueueFifo:
         cap = GatewayRunner._BUSY_QUEUE_MAX_PENDING
         for i in range(cap + 5):
             runner._queue_or_replace_pending_event(
-                session_key, self._text_event(f"msg-{i:03d}")
+                session_key, self._text_event(f"msg-{i:03d}"),
             )
 
         # Exactly ``cap`` follow-ups retained (head + cap-1 in overflow).

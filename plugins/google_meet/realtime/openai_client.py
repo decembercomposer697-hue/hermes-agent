@@ -32,7 +32,7 @@ def _require_websockets():
     except ImportError as exc:  # pragma: no cover - exercised via test
         raise RuntimeError(
             "websockets package is required for OpenAI Realtime; "
-            "install with: pip install websockets"
+            "install with: pip install websockets",
         ) from exc
     return _connect
 
@@ -101,7 +101,7 @@ class RealtimeSession:
                     "output_audio_format": "pcm16",
                     "input_audio_format": "pcm16",
                 },
-            }
+            },
         )
 
     def close(self) -> None:
@@ -134,13 +134,13 @@ class RealtimeSession:
                     "role": "user",
                     "content": [{"type": "input_text", "text": text}],
                 },
-            }
+            },
         )
         self._send_json(
             {
                 "type": "response.create",
                 "response": {"modalities": ["audio"]},
-            }
+            },
         )
 
         bytes_written = 0
@@ -154,7 +154,7 @@ class RealtimeSession:
                 remaining = timeout - (time.monotonic() - start)
                 if remaining <= 0:
                     raise TimeoutError(
-                        f"realtime response did not complete within {timeout}s"
+                        f"realtime response did not complete within {timeout}s",
                     )
                 raw = self._recv(timeout=remaining)
                 if raw is None:
@@ -285,7 +285,7 @@ class RealtimeSpeaker:
             self.queue_path.write_text("")
             return
         self.queue_path.write_text(
-            "\n".join(json.dumps(e) for e in remaining) + "\n"
+            "\n".join(json.dumps(e) for e in remaining) + "\n",
         )
 
     def _append_processed(self, entry: dict, result: dict) -> None:
@@ -329,5 +329,5 @@ class RealtimeSpeaker:
             else:
                 # Fallback: drop-by-id anywhere in the queue.
                 self._rewrite_queue(
-                    [e for e in latest if e.get("id") != head.get("id")]
+                    [e for e in latest if e.get("id") != head.get("id")],
                 )

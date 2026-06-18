@@ -18,13 +18,13 @@ def _teams_delivery_is_configured(teams_extra: dict[str, Any], teams_delivery: d
         teams_delivery.get("mode")
         or teams_delivery.get("delivery_mode")
         or teams_extra.get("delivery_mode")
-        or ""
+        or "",
     ).strip().lower()
 
     if delivery_mode == "incoming_webhook":
         return bool(
             teams_delivery.get("incoming_webhook_url")
-            or teams_extra.get("incoming_webhook_url")
+            or teams_extra.get("incoming_webhook_url"),
         )
     if delivery_mode == "graph":
         chat_id = teams_delivery.get("chat_id") or teams_extra.get("chat_id")
@@ -82,7 +82,7 @@ def build_pipeline_runtime(gateway: Any) -> TeamsMeetingPipeline:
             from plugins.platforms.teams.adapter import TeamsSummaryWriter
         except ImportError:
             logger.debug(
-                "TeamsSummaryWriter unavailable; Teams outbound delivery remains disabled until the adapter layer is present."
+                "TeamsSummaryWriter unavailable; Teams outbound delivery remains disabled until the adapter layer is present.",
             )
         else:
             teams_sender = TeamsSummaryWriter(platform_config=teams_config)

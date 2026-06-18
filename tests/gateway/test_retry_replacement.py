@@ -43,7 +43,7 @@ async def test_gateway_retry_replaces_last_user_turn_in_transcript(tmp_path, mon
         assert event.text == "retry me"
         transcript_before = store.load_transcript(session_id)
         assert [m.get("content") for m in transcript_before if m.get("role") == "user"] == [
-            "first question"
+            "first question",
         ]
         store.append_to_transcript(session_id, {"role": "user", "content": event.text})
         store.append_to_transcript(session_id, {"role": "assistant", "content": "new answer"})
@@ -52,7 +52,7 @@ async def test_gateway_retry_replaces_last_user_turn_in_transcript(tmp_path, mon
     gw._handle_message = AsyncMock(side_effect=fake_handle_message)
 
     result = await gw._handle_retry_command(
-        MessageEvent(text="/retry", message_type=MessageType.TEXT, source=MagicMock())
+        MessageEvent(text="/retry", message_type=MessageType.TEXT, source=MagicMock()),
     )
 
     assert result == "new answer"
@@ -94,7 +94,7 @@ async def test_gateway_retry_replays_original_text_not_retry_command(tmp_path):
     gw._handle_message = AsyncMock(side_effect=fake_handle_message)
 
     await gw._handle_retry_command(
-        MessageEvent(text="/retry", message_type=MessageType.TEXT, source=MagicMock())
+        MessageEvent(text="/retry", message_type=MessageType.TEXT, source=MagicMock()),
     )
 
     assert captured["text"] == "real message"

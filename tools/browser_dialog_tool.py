@@ -98,7 +98,7 @@ def browser_dialog(
                     "Playwright) or no browser session has been started yet. "
                     "Call browser_navigate or /browser connect first."
                 ),
-            }
+            },
         )
 
     result = supervisor.respond_to_dialog(
@@ -112,7 +112,7 @@ def browser_dialog(
                 "success": True,
                 "action": action,
                 "dialog": result.get("dialog", {}),
-            }
+            },
         )
     return json.dumps({"success": False, "error": result.get("error", "unknown error")})
 

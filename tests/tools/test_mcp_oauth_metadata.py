@@ -37,7 +37,7 @@ def _make_metadata(token_endpoint: str = "https://auth.example.com/oauth/token")
             "authorization_endpoint": "https://auth.example.com/oauth/authorize",
             "token_endpoint": token_endpoint,
             "response_types_supported": ["code"],
-        }
+        },
     )
 
 
@@ -123,7 +123,7 @@ class TestManagerOAuthProviderMetadata:
         provider = _manager_provider_with_context(storage, oauth_metadata=None)
 
         with patch.object(
-            _HERMES_PROVIDER_CLS.__bases__[0], "_initialize", new=AsyncMock()
+            _HERMES_PROVIDER_CLS.__bases__[0], "_initialize", new=AsyncMock(),
         ):
             asyncio.run(provider._initialize())
 
@@ -141,7 +141,7 @@ class TestManagerOAuthProviderMetadata:
         provider = _manager_provider_with_context(storage, oauth_metadata=in_memory)
 
         with patch.object(
-            _HERMES_PROVIDER_CLS.__bases__[0], "_initialize", new=AsyncMock()
+            _HERMES_PROVIDER_CLS.__bases__[0], "_initialize", new=AsyncMock(),
         ):
             asyncio.run(provider._initialize())
 
@@ -173,7 +173,7 @@ class TestManagerOAuthProviderMetadata:
         provider = _manager_provider_with_context(storage, oauth_metadata=meta)
 
         with patch.object(
-            HermesTokenStorage, "save_oauth_metadata"
+            HermesTokenStorage, "save_oauth_metadata",
         ) as save_spy:
             provider._persist_oauth_metadata_if_changed()
             save_spy.assert_not_called()

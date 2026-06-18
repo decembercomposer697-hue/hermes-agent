@@ -1787,7 +1787,7 @@ def list_authenticated_providers(
             api_mode = str(
                 entry.get("api_mode")
                 or entry.get("transport")
-                or ""
+                or "",
             ).strip().lower()
             credential_identity = (
                 inline_api_key

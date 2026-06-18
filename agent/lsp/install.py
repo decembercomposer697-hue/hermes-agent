@@ -175,7 +175,7 @@ def try_install(pkg: str, strategy: str = "auto") -> str | None:
     same path (or ``None``) without reinstalling.  Concurrent calls
     are serialized.
     """
-    if strategy not in {"auto",}:
+    if strategy not in {"auto"}:
         # Only ``auto`` triggers an actual install.  In manual/off,
         # we still check whether the binary already exists.
         recipe = INSTALL_RECIPES.get(pkg, {})
@@ -266,7 +266,7 @@ def _install_npm(
         )
         if proc.returncode != 0:
             logger.warning(
-                "[install] npm install failed for %s: %s", pkg, proc.stderr.strip()[:500]
+                "[install] npm install failed for %s: %s", pkg, proc.stderr.strip()[:500],
             )
             return None
     except (subprocess.TimeoutExpired, OSError) as e:
@@ -315,7 +315,7 @@ def _install_go(pkg: str, bin_name: str) -> str | None:
         )
         if proc.returncode != 0:
             logger.warning(
-                "[install] go install failed for %s: %s", pkg, proc.stderr.strip()[:500]
+                "[install] go install failed for %s: %s", pkg, proc.stderr.strip()[:500],
             )
             return None
     except (subprocess.TimeoutExpired, OSError) as e:
@@ -353,7 +353,7 @@ def _install_pip(pkg: str, bin_name: str) -> str | None:
         )
         if proc.returncode != 0:
             logger.warning(
-                "[install] pip install failed for %s: %s", pkg, proc.stderr.strip()[:500]
+                "[install] pip install failed for %s: %s", pkg, proc.stderr.strip()[:500],
             )
             return None
     except (subprocess.TimeoutExpired, OSError) as e:

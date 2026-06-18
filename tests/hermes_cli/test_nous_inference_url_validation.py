@@ -55,7 +55,7 @@ class TestValidatorRules:
         """
         assert (
             _validate_nous_inference_url_from_network(
-                "https://evil.inference-api.nousresearch.com/v1"
+                "https://evil.inference-api.nousresearch.com/v1",
             )
             is None
         )
@@ -64,7 +64,7 @@ class TestValidatorRules:
         with caplog.at_level(logging.WARNING, logger="hermes_cli.auth"):
             assert (
                 _validate_nous_inference_url_from_network(
-                    "http://inference-api.nousresearch.com/v1"
+                    "http://inference-api.nousresearch.com/v1",
                 )
                 is None
             )
@@ -78,7 +78,7 @@ class TestValidatorRules:
     def test_javascript_scheme_rejected(self):
         assert (
             _validate_nous_inference_url_from_network(
-                "javascript:alert(document.cookie)"
+                "javascript:alert(document.cookie)",
             )
             is None
         )
@@ -166,10 +166,10 @@ class TestCallSiteWiring:
         site to be sure validation is appropriate."""
         source = self._read_auth_source()
         refresh_count = source.count(
-            '_validate_nous_inference_url_from_network(refreshed.get("inference_base_url"))'
+            '_validate_nous_inference_url_from_network(refreshed.get("inference_base_url"))',
         )
         mint_count = source.count(
-            '_validate_nous_inference_url_from_network(mint_payload.get("inference_base_url"))'
+            '_validate_nous_inference_url_from_network(mint_payload.get("inference_base_url"))',
         )
         assert refresh_count == 2, f"expected 2 refresh sites, found {refresh_count}"
         assert mint_count == 0, f"expected 0 mint sites, found {mint_count}"

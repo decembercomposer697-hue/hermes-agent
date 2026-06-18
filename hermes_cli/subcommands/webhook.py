@@ -22,18 +22,18 @@ def build_webhook_parser(subparsers, *, cmd_webhook: Callable) -> None:
     webhook_subparsers = webhook_parser.add_subparsers(dest="webhook_action")
 
     wh_sub = webhook_subparsers.add_parser(
-        "subscribe", aliases=["add"], help="Create a webhook subscription"
+        "subscribe", aliases=["add"], help="Create a webhook subscription",
     )
     wh_sub.add_argument("name", help="Route name (used in URL: /webhooks/<name>)")
     wh_sub.add_argument(
-        "--prompt", default="", help="Prompt template with {dot.notation} payload refs"
+        "--prompt", default="", help="Prompt template with {dot.notation} payload refs",
     )
     wh_sub.add_argument(
-        "--events", default="", help="Comma-separated event types to accept"
+        "--events", default="", help="Comma-separated event types to accept",
     )
     wh_sub.add_argument("--description", default="", help="What this subscription does")
     wh_sub.add_argument(
-        "--skills", default="", help="Comma-separated skill names to load"
+        "--skills", default="", help="Comma-separated skill names to load",
     )
     wh_sub.add_argument(
         "--deliver",
@@ -46,7 +46,7 @@ def build_webhook_parser(subparsers, *, cmd_webhook: Callable) -> None:
         help="Target chat ID for cross-platform delivery",
     )
     wh_sub.add_argument(
-        "--secret", default="", help="HMAC secret (auto-generated if omitted)"
+        "--secret", default="", help="HMAC secret (auto-generated if omitted)",
     )
     wh_sub.add_argument(
         "--deliver-only",
@@ -57,20 +57,20 @@ def build_webhook_parser(subparsers, *, cmd_webhook: Callable) -> None:
     )
 
     webhook_subparsers.add_parser(
-        "list", aliases=["ls"], help="List all dynamic subscriptions"
+        "list", aliases=["ls"], help="List all dynamic subscriptions",
     )
 
     wh_rm = webhook_subparsers.add_parser(
-        "remove", aliases=["rm"], help="Remove a subscription"
+        "remove", aliases=["rm"], help="Remove a subscription",
     )
     wh_rm.add_argument("name", help="Subscription name to remove")
 
     wh_test = webhook_subparsers.add_parser(
-        "test", help="Send a test POST to a webhook route"
+        "test", help="Send a test POST to a webhook route",
     )
     wh_test.add_argument("name", help="Subscription name to test")
     wh_test.add_argument(
-        "--payload", default="", help="JSON payload to send (default: test payload)"
+        "--payload", default="", help="JSON payload to send (default: test payload)",
     )
 
     webhook_parser.set_defaults(func=cmd_webhook)

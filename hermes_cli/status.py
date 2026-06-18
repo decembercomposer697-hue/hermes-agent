@@ -213,11 +213,11 @@ def show_status(args):
 
     nous_logged_in = bool(
         nous_status.get("logged_in")
-        or (nous_account_info and nous_account_info.logged_in)
+        or (nous_account_info and nous_account_info.logged_in),
     )
     nous_inference_present = bool(
         nous_status.get("inference_credential_present")
-        or (nous_account_info and nous_account_info.inference_credential_present)
+        or (nous_account_info and nous_account_info.inference_credential_present),
     )
     nous_error = nous_status.get("error")
     if nous_logged_in:
@@ -228,7 +228,7 @@ def show_status(args):
         nous_label = "not logged in (run: hermes portal)"
     print(
         f"  {'Nous Portal':<12}  {check_mark(nous_logged_in)} "
-        f"{nous_label}"
+        f"{nous_label}",
     )
     portal_url = nous_status.get("portal_base_url") or "(unknown)"
     inference_url = (
@@ -254,7 +254,7 @@ def show_status(args):
     codex_logged_in = bool(codex_status.get("logged_in"))
     print(
         f"  {'OpenAI Codex':<12}  {check_mark(codex_logged_in)} "
-        f"{'logged in' if codex_logged_in else 'not logged in (run: hermes model)'}"
+        f"{'logged in' if codex_logged_in else 'not logged in (run: hermes model)'}",
     )
     codex_auth_file = codex_status.get("auth_store")
     if codex_auth_file:
@@ -268,7 +268,7 @@ def show_status(args):
     qwen_logged_in = bool(qwen_status.get("logged_in"))
     print(
         f"  {'Qwen OAuth':<12}  {check_mark(qwen_logged_in)} "
-        f"{'logged in' if qwen_logged_in else 'not logged in (run: qwen auth qwen-oauth)'}"
+        f"{'logged in' if qwen_logged_in else 'not logged in (run: qwen auth qwen-oauth)'}",
     )
     qwen_auth_file = qwen_status.get("auth_file")
     if qwen_auth_file:
@@ -283,7 +283,7 @@ def show_status(args):
     minimax_logged_in = bool(minimax_status.get("logged_in"))
     print(
         f"  {'MiniMax OAuth':<12}  {check_mark(minimax_logged_in)} "
-        f"{'logged in' if minimax_logged_in else 'not logged in (run: hermes auth add minimax-oauth)'}"
+        f"{'logged in' if minimax_logged_in else 'not logged in (run: hermes auth add minimax-oauth)'}",
     )
     minimax_region = minimax_status.get("region")
     if minimax_logged_in and minimax_region:
@@ -305,7 +305,7 @@ def show_status(args):
     xai_oauth_logged_in = bool(xai_oauth_status.get("logged_in"))
     print(
         f"  {'xAI OAuth':<12}  {check_mark(xai_oauth_logged_in)} "
-        f"{'logged in' if xai_oauth_logged_in else 'not logged in (run: hermes auth add xai-oauth)'}"
+        f"{'logged in' if xai_oauth_logged_in else 'not logged in (run: hermes auth add xai-oauth)'}",
     )
     xai_auth_file = xai_oauth_status.get("auth_store")
     if xai_auth_file:
@@ -560,7 +560,7 @@ def show_status(args):
                 response = httpx.get(
                     OPENROUTER_MODELS_URL,
                     headers={"Authorization": f"Bearer {openrouter_key}"},
-                    timeout=10
+                    timeout=10,
                 )
                 ok = response.status_code == 200
                 print(f"  OpenRouter:   {check_mark(ok)} {'reachable' if ok else f'error ({response.status_code})'}")

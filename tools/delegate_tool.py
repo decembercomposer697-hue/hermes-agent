@@ -49,7 +49,7 @@ DELEGATE_BLOCKED_TOOLS = frozenset(
         "memory",  # no writes to shared MEMORY.md
         "send_message",  # no cross-platform side effects
         "execute_code",  # children should reason step-by-step, not write scripts
-    ]
+    ],
 )
 
 
@@ -447,7 +447,7 @@ def _get_max_spawn_depth() -> int:
         ival = int(val)
     except (TypeError, ValueError):
         logger.warning(
-            "delegation.max_spawn_depth=%r is not a valid integer; " "using default %d",
+            "delegation.max_spawn_depth=%r is not a valid integer; using default %d",
             val,
             MAX_DEPTH,
         )
@@ -533,7 +533,7 @@ def _expand_parent_toolsets(parent_toolsets: set) -> set:
 
 
 def _preserve_parent_mcp_toolsets(
-    child_toolsets: list[str], parent_toolsets: set[str]
+    child_toolsets: list[str], parent_toolsets: set[str],
 ) -> list[str]:
     """Append any parent MCP toolsets that are missing from a narrowed child."""
     preserved = list(child_toolsets)
@@ -628,7 +628,7 @@ def _build_child_system_prompt(
         parts.append(
             "\nWORKSPACE PATH:\n"
             f"{workspace_path}\n"
-            "Use this exact path for local repository/workdir operations unless the task explicitly says otherwise."
+            "Use this exact path for local repository/workdir operations unless the task explicitly says otherwise.",
         )
     parts.append(
         "\nComplete this task using the tools available to you. "
@@ -640,7 +640,7 @@ def _build_child_system_prompt(
         "Important workspace rule: Never assume a repository lives at /workspace/... or any other container-style path unless the task/context explicitly gives that path. "
         "If no exact local path is provided, discover it first before issuing git/workdir-specific commands.\n\n"
         "Be thorough but concise -- your response is returned to the "
-        "parent agent as a summary."
+        "parent agent as a summary.",
     )
     if role == "orchestrator":
         child_note = (
@@ -671,7 +671,7 @@ def _build_child_system_prompt(
             "reporting back to your parent. You are responsible for the "
             "final summary, not your workers.\n\n"
             f"NOTE: You are at depth {child_depth}. The delegation tree "
-            f"is capped at max_spawn_depth={max_spawn_depth}. {child_note}"
+            f"is capped at max_spawn_depth={max_spawn_depth}. {child_note}",
         )
     return "\n".join(parts)
 
@@ -686,7 +686,7 @@ def _resolve_workspace_hint(parent_agent) -> str | None:
     candidates = [
         os.getenv("TERMINAL_CWD"),
         getattr(
-            getattr(parent_agent, "_subdirectory_hints", None), "working_dir", None
+            getattr(parent_agent, "_subdirectory_hints", None), "working_dir", None,
         ),
         getattr(parent_agent, "terminal_cwd", None),
         getattr(parent_agent, "cwd", None),
@@ -776,7 +776,7 @@ def _build_child_progress_callback(
         return kw
 
     def _relay(
-        event_type: str, tool_name: str = None, preview: str = None, args=None, **kwargs
+        event_type: str, tool_name: str = None, preview: str = None, args=None, **kwargs,
     ):
         if not parent_cb:
             return
@@ -788,7 +788,7 @@ def _build_child_progress_callback(
             logger.debug("Parent callback failed: %s", e)
 
     def _callback(
-        event_type, tool_name: str = None, preview: str = None, args=None, **kwargs
+        event_type, tool_name: str = None, preview: str = None, args=None, **kwargs,
     ):
         # Lifecycle events emitted by the orchestrator itself — handled
         # before enum normalisation since they are not part of DelegateEvent.
@@ -984,7 +984,7 @@ def _build_child_agent(
         child_toolsets = [t for t in toolsets if t in expanded_parent]
         if _get_inherit_mcp_toolsets():
             child_toolsets = _preserve_parent_mcp_toolsets(
-                child_toolsets, parent_toolsets
+                child_toolsets, parent_toolsets,
             )
         child_toolsets = _strip_blocked_tools(child_toolsets)
     elif parent_agent and parent_enabled is not None:
@@ -1069,12 +1069,12 @@ def _build_child_agent(
     else:
         effective_api_mode = getattr(parent_agent, "api_mode", None)
     effective_acp_command = override_acp_command or getattr(
-        parent_agent, "acp_command", None
+        parent_agent, "acp_command", None,
     )
     effective_acp_args = list(
         override_acp_args
         if override_acp_args is not None
-        else (getattr(parent_agent, "acp_args", []) or [])
+        else (getattr(parent_agent, "acp_args", []) or []),
     )
 
     # When override_provider is set (e.g. delegation.provider: minimax-cn),
@@ -1185,7 +1185,7 @@ def _build_child_agent(
     # Share a credential pool with the child when possible so subagents can
     # rotate credentials on rate limits instead of getting pinned to one key.
     child_pool = _resolve_child_credential_pool(
-        effective_provider, parent_agent, effective_base_url
+        effective_provider, parent_agent, effective_base_url,
     )
     if child_pool is not None:
         child._credential_pool = child_pool
@@ -1390,7 +1390,7 @@ def _run_single_child(
     import model_tools
 
     _saved_tool_names = getattr(
-        child, "_delegate_saved_tool_names", list(model_tools._last_resolved_tool_names)
+        child, "_delegate_saved_tool_names", list(model_tools._last_resolved_tool_names),
     )
 
     child_pool = getattr(child, "_credential_pool", None)
@@ -1513,7 +1513,7 @@ def _run_single_child(
                 "status": "running",
                 "tool_count": 0,
                 "agent": child,
-            }
+            },
         )
 
     try:
@@ -1779,11 +1779,11 @@ def _run_single_child(
         try:
             if parent_task_id and parent_reads_snapshot:
                 sibling_writes = file_state.writes_since(
-                    parent_task_id, wall_start, parent_reads_snapshot
+                    parent_task_id, wall_start, parent_reads_snapshot,
                 )
                 if sibling_writes:
                     mod_paths = sorted(
-                        {p for paths in sibling_writes.values() for p in paths}
+                        {p for paths in sibling_writes.values() for p in paths},
                     )
                     if mod_paths:
                         reminder = (
@@ -1816,7 +1816,7 @@ def _run_single_child(
             _files_read = []
         try:
             _files_written_map = file_state.writes_since(
-                "", wall_start, []
+                "", wall_start, [],
             )  # all writes since wall_start
         except Exception:
             _files_written_map = {}
@@ -1826,7 +1826,7 @@ def _run_single_child(
                 for tid, paths in _files_written_map.items()
                 if tid == child_task_id
                 for p in paths
-            }
+            },
         )[:40]
 
         _output_tail = _extract_output_tail(result, max_entries=8, max_chars=600)
@@ -2000,7 +2000,7 @@ def delegate_task(
     if is_spawn_paused():
         return tool_error(
             "Delegation spawning is paused. Clear the pause via the TUI "
-            "(`p` in /agents) or the `delegation.pause` RPC before retrying."
+            "(`p` in /agents) or the `delegation.pause` RPC before retrying.",
         )
 
     # Normalise the top-level role once; per-task overrides re-normalise.
@@ -2019,8 +2019,8 @@ def delegate_task(
                     f"delegation.max_spawn_depth in config.yaml if deeper "
                     f"nesting is required (no hard ceiling, but each level "
                     f"multiplies API cost)."
-                )
-            }
+                ),
+            },
         )
 
     # Load config
@@ -2064,12 +2064,12 @@ def delegate_task(
                 f"max_concurrent_children is {max_children}. "
                 f"Either reduce the task count, split into multiple "
                 f"delegate_task calls, or increase "
-                f"delegation.max_concurrent_children in config.yaml."
+                f"delegation.max_concurrent_children in config.yaml.",
             )
         task_list = tasks
     elif goal and isinstance(goal, str) and goal.strip():
         task_list = [
-            {"goal": goal, "context": context, "toolsets": toolsets, "role": top_role}
+            {"goal": goal, "context": context, "toolsets": toolsets, "role": top_role},
         ]
     else:
         return tool_error("Provide either 'goal' (single task) or 'tasks' (batch).")
@@ -2081,7 +2081,7 @@ def delegate_task(
     for i, task in enumerate(task_list):
         if not isinstance(task, dict):
             return tool_error(
-                f"Task {i} must be an object, got {type(task).__name__}."
+                f"Task {i} must be an object, got {type(task).__name__}.",
             )
         if not task.get("goal", "").strip():
             return tool_error(f"Task {i} is missing a 'goal'.")
@@ -2191,7 +2191,7 @@ def delegate_task(
                                     "api_calls": 0,
                                     "duration_seconds": 0,
                                     "_child_role": getattr(
-                                        _child_by_index.get(idx), "_delegate_role", None
+                                        _child_by_index.get(idx), "_delegate_role", None,
                                     ),
                                 }
                         else:
@@ -2203,7 +2203,7 @@ def delegate_task(
                                 "api_calls": 0,
                                 "duration_seconds": 0,
                                 "_child_role": getattr(
-                                    _child_by_index.get(idx), "_delegate_role", None
+                                    _child_by_index.get(idx), "_delegate_role", None,
                                 ),
                             }
                         results.append(entry)
@@ -2213,7 +2213,7 @@ def delegate_task(
                 from concurrent.futures import wait as _cf_wait, FIRST_COMPLETED
 
                 done, pending = _cf_wait(
-                    pending, timeout=0.5, return_when=FIRST_COMPLETED
+                    pending, timeout=0.5, return_when=FIRST_COMPLETED,
                 )
                 for future in done:
                     try:
@@ -2228,7 +2228,7 @@ def delegate_task(
                             "api_calls": 0,
                             "duration_seconds": 0,
                             "_child_role": getattr(
-                                _child_by_index.get(idx), "_delegate_role", None
+                                _child_by_index.get(idx), "_delegate_role", None,
                             ),
                         }
                     results.append(entry)
@@ -2256,7 +2256,7 @@ def delegate_task(
                     if spinner_ref and remaining > 0:
                         try:
                             spinner_ref.update_text(
-                                f"🔀 {remaining} task{'s' if remaining != 1 else ''} remaining"
+                                f"🔀 {remaining} task{'s' if remaining != 1 else ''} remaining",
                             )
                         except Exception as e:
                             logger.debug("Spinner update_text failed: %s", e)
@@ -2415,7 +2415,7 @@ def _resolve_child_credential_pool(
 
             # Reuse the parent's pool only when it is the same custom endpoint.
             parent_key = get_custom_provider_pool_key(
-                getattr(parent_agent, "base_url", None)
+                getattr(parent_agent, "base_url", None),
             )
             if (
                 parent_pool is not None
@@ -2547,14 +2547,14 @@ def _resolve_delegation_credentials(cfg: dict, parent_agent) -> dict:
             f"Cannot resolve delegation provider '{configured_provider}': {exc}. "
             f"Check that the provider is configured (API key set, valid provider name), "
             f"or set delegation.base_url/delegation.api_key for a direct endpoint. "
-            f"Available providers: openrouter, nous, zai, kimi-coding, minimax."
+            f"Available providers: openrouter, nous, zai, kimi-coding, minimax.",
         ) from exc
 
     api_key = runtime.get("api_key", "")
     if not api_key:
         raise ValueError(
             f"Delegation provider '{configured_provider}' resolved but has no API key. "
-            f"Set the appropriate environment variable or run 'hermes auth'."
+            f"Set the appropriate environment variable or run 'hermes auth'.",
         )
 
     return {

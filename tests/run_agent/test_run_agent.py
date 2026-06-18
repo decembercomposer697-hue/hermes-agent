@@ -59,7 +59,7 @@ def agent():
     """Minimal AIAgent with mocked OpenAI client and tool loading."""
     with (
         patch(
-            "run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")
+            "run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search"),
         ),
         patch("run_agent.check_toolset_requirements", return_value={}),
         patch("run_agent.OpenAI"),
@@ -157,7 +157,7 @@ class TestProviderModelNormalization:
     def test_aiagent_strips_matching_native_provider_prefix(self):
         with (
             patch(
-                "run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")
+                "run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search"),
             ),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
@@ -177,7 +177,7 @@ class TestProviderModelNormalization:
     def test_aiagent_keeps_aggregator_vendor_slug(self):
         with (
             patch(
-                "run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")
+                "run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search"),
             ),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
@@ -349,7 +349,7 @@ class TestStripThinkBlocks:
     def test_unterminated_multiline_block_stripped(self, agent):
         """Multi-line unterminated blocks are stripped in full."""
         result = agent._strip_think_blocks(
-            "<think>\nmulti\nline\nreasoning\nthat never closes"
+            "<think>\nmulti\nline\nreasoning\nthat never closes",
         )
         assert "multi" not in result
         assert "never closes" not in result
@@ -357,7 +357,7 @@ class TestStripThinkBlocks:
     def test_unterminated_block_after_answer_preserves_prefix(self, agent):
         """Visible answer before a line-starting unterminated tag is kept."""
         result = agent._strip_think_blocks(
-            "Answer is 42.\n<think>actually let me reconsider"
+            "Answer is 42.\n<think>actually let me reconsider",
         )
         assert "Answer is 42." in result
         assert "reconsider" not in result
@@ -529,7 +529,7 @@ class TestExtractReasoning:
             content=[
                 {"type": "thinking", "thinking": "deep analysis here"},
                 {"type": "output", "text": "final answer"},
-            ]
+            ],
         )
         result = agent._extract_reasoning(msg)
         assert result == "deep analysis here"
@@ -539,7 +539,7 @@ class TestExtractReasoning:
         msg = _mock_assistant_msg(
             content=[
                 {"type": "text", "text": "just a regular response"},
-            ]
+            ],
         )
         assert agent._extract_reasoning(msg) is None
 
@@ -1238,7 +1238,7 @@ class TestToolUseEnforcementConfig:
         """Sanity: execution guidance stays off for non-targeted families."""
         from agent.prompt_builder import OPENAI_MODEL_EXECUTION_GUIDANCE
         agent = self._make_agent(
-            model="anthropic/claude-sonnet-4", tool_use_enforcement="auto"
+            model="anthropic/claude-sonnet-4", tool_use_enforcement="auto",
         )
         prompt = agent._build_system_prompt()
         assert OPENAI_MODEL_EXECUTION_GUIDANCE not in prompt
@@ -1387,7 +1387,7 @@ class TestTaskCompletionGuidance:
     def test_false_disables(self):
         from agent.prompt_builder import TASK_COMPLETION_GUIDANCE
         agent = self._make_agent(
-            model="anthropic/claude-opus-4.8", task_completion_guidance=False
+            model="anthropic/claude-opus-4.8", task_completion_guidance=False,
         )
         prompt = agent._build_system_prompt()
         assert TASK_COMPLETION_GUIDANCE not in prompt
@@ -1942,13 +1942,13 @@ class TestBuildAssistantMessage:
         """Gemini thinking models attach extra_content with thought_signature
         to tool calls. This must be preserved so subsequent API calls include it."""
         tc = _mock_tool_call(
-            name="get_weather", arguments='{"city":"NYC"}', call_id="c2"
+            name="get_weather", arguments='{"city":"NYC"}', call_id="c2",
         )
         tc.extra_content = {"google": {"thought_signature": "abc123"}}
         msg = _mock_assistant_msg(content="", tool_calls=[tc])
         result = agent._build_assistant_message(msg, "tool_calls")
         assert result["tool_calls"][0]["extra_content"] == {
-            "google": {"thought_signature": "abc123"}
+            "google": {"thought_signature": "abc123"},
         }
 
     def test_tool_call_without_extra_content(self, agent):
@@ -1967,7 +1967,7 @@ class TestBuildAssistantMessage:
         inflate context if left in place.
         """
         msg = _mock_assistant_msg(
-            content="<think>internal reasoning</think>The actual answer."
+            content="<think>internal reasoning</think>The actual answer.",
         )
         result = agent._build_assistant_message(msg, "stop")
         assert "<think>" not in result["content"]
@@ -2004,7 +2004,7 @@ class TestBuildAssistantMessage:
         """Unterminated <think> block (MiniMax / NIM dropped close tag) is
         fully stripped from stored content."""
         msg = _mock_assistant_msg(
-            content="<think>reasoning that never closes on this NIM endpoint"
+            content="<think>reasoning that never closes on this NIM endpoint",
         )
         result = agent._build_assistant_message(msg, "stop")
         assert "<think>" not in result["content"]
@@ -2044,7 +2044,7 @@ class TestExecuteToolCalls:
         mock_msg = _mock_assistant_msg(content="", tool_calls=[tc])
         messages = []
         with patch(
-            "run_agent.handle_function_call", return_value="search result"
+            "run_agent.handle_function_call", return_value="search result",
         ) as mock_hfc:
             agent._execute_tool_calls(mock_msg, messages, "task-1")
             # enabled_tools passes the agent's own valid_tool_names
@@ -2108,7 +2108,7 @@ class TestExecuteToolCalls:
 
     def test_invalid_json_args_defaults_empty(self, agent):
         tc = _mock_tool_call(
-            name="web_search", arguments="not valid json", call_id="c1"
+            name="web_search", arguments="not valid json", call_id="c1",
         )
         mock_msg = _mock_assistant_msg(content="", tool_calls=[tc])
         messages = []
@@ -2587,7 +2587,7 @@ class TestConcurrentToolExecution:
         )
         agent._checkpoint_mgr.enabled = True
         agent._checkpoint_mgr.ensure_checkpoint = MagicMock(
-            side_effect=AssertionError("checkpoint should not run")
+            side_effect=AssertionError("checkpoint should not run"),
         )
 
         starts = []
@@ -2974,7 +2974,7 @@ class TestAgentRuntimePostHookOwnershipSync:
         from agent.agent_runtime_helpers import AGENT_RUNTIME_POST_HOOK_TOOL_NAMES
 
         inline_names = self._extract_dispatch_chain_names(
-            tool_executor.execute_tool_calls_sequential
+            tool_executor.execute_tool_calls_sequential,
         )
         assert inline_names, (
             "Could not find the dispatch chain (anchored on "
@@ -3001,10 +3001,10 @@ class TestAgentRuntimePostHookOwnershipSync:
         from agent import agent_runtime_helpers, tool_executor
 
         invoke_tool_names = self._extract_invoke_tool_names(
-            agent_runtime_helpers.invoke_tool
+            agent_runtime_helpers.invoke_tool,
         )
         inline_names = self._extract_dispatch_chain_names(
-            tool_executor.execute_tool_calls_sequential
+            tool_executor.execute_tool_calls_sequential,
         )
         assert invoke_tool_names == inline_names, (
             "Static `function_name == \"...\"` branches diverged between "
@@ -3309,7 +3309,7 @@ class TestHandleMaxIterations:
                         type="message",
                         status="completed",
                         content=[SimpleNamespace(type="output_text", text="Summary")],
-                    )
+                    ),
                 ],
             )
 
@@ -3345,7 +3345,7 @@ class TestHandleMaxIterations:
                         "response_item_id": "fc_123",
                         "type": "function",
                         "function": {"name": "web_search", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_123", "content": "result"},
@@ -3354,7 +3354,7 @@ class TestHandleMaxIterations:
         sanitized = agent._sanitize_api_messages(messages)
 
         assert [m.get("tool_call_id") for m in sanitized if m.get("role") == "tool"] == [
-            "call_123"
+            "call_123",
         ]
 
 
@@ -3580,7 +3580,7 @@ class TestRunConversation:
             patch.object(agent, "_cleanup_task_resources"),
             patch("run_agent._set_interrupt"),
             patch.object(
-                agent, "_interruptible_api_call", side_effect=interrupt_side_effect
+                agent, "_interruptible_api_call", side_effect=interrupt_side_effect,
             ),
         ):
             result = agent.run_conversation("hello")
@@ -3591,7 +3591,7 @@ class TestRunConversation:
         self._setup_agent(agent)
         bad_tc = _mock_tool_call(name="nonexistent_tool", arguments="{}", call_id="c1")
         resp_bad = _mock_response(
-            content="", finish_reason="tool_calls", tool_calls=[bad_tc]
+            content="", finish_reason="tool_calls", tool_calls=[bad_tc],
         )
         resp_good = _mock_response(content="Got it", finish_reason="stop")
         agent.client.chat.completions.create.side_effect = [resp_bad, resp_good]
@@ -3940,7 +3940,7 @@ class TestRunConversation:
             if calls["api"] == 1:
                 raise _UnauthorizedError()
             return _mock_response(
-                content="Recovered after remint", finish_reason="stop"
+                content="Recovered after remint", finish_reason="stop",
             )
 
         def _fake_refresh(*, force=True):
@@ -3954,7 +3954,7 @@ class TestRunConversation:
             patch.object(agent, "_cleanup_task_resources"),
             patch.object(agent, "_interruptible_api_call", side_effect=_fake_api_call),
             patch.object(
-                agent, "_try_refresh_nous_client_credentials", side_effect=_fake_refresh
+                agent, "_try_refresh_nous_client_credentials", side_effect=_fake_refresh,
             ),
         ):
             result = agent.run_conversation("hello")
@@ -3977,7 +3977,7 @@ class TestRunConversation:
         with (
             patch("run_agent.handle_function_call", return_value="result"),
             patch.object(
-                agent.context_compressor, "should_compress", return_value=True
+                agent.context_compressor, "should_compress", return_value=True,
             ),
             patch.object(agent, "_compress_context") as mock_compress,
             patch.object(agent, "_persist_session"),
@@ -3999,7 +3999,7 @@ class TestRunConversation:
         self._setup_agent(agent)
         agent.compression_enabled = True  # this test verifies overflow→compression fires
         err_400 = Exception(
-            "Error code: 400 - {'error': {'code': '1261', 'message': 'Prompt exceeds max length'}}"
+            "Error code: 400 - {'error': {'code': '1261', 'message': 'Prompt exceeds max length'}}",
         )
         err_400.status_code = 400
         ok_resp = _mock_response(content="Recovered after compression", finish_reason="stop")
@@ -4038,11 +4038,11 @@ class TestRunConversation:
         agent.base_url = "https://api.minimax.io/anthropic"
         agent.context_compressor.context_length = 204_800
         agent.context_compressor.threshold_tokens = int(
-            agent.context_compressor.context_length * agent.context_compressor.threshold_percent
+            agent.context_compressor.context_length * agent.context_compressor.threshold_percent,
         )
 
         err_400 = Exception(
-            "HTTP 400: invalid params, context window exceeds limit (2013)"
+            "HTTP 400: invalid params, context window exceeds limit (2013)",
         )
         err_400.status_code = 400
         ok_resp = _mock_response(content="Recovered after compression", finish_reason="stop")
@@ -4084,11 +4084,11 @@ class TestRunConversation:
         agent.base_url = "https://openrouter.ai/api/v1"
         agent.context_compressor.context_length = 200_000
         agent.context_compressor.threshold_tokens = int(
-            agent.context_compressor.context_length * agent.context_compressor.threshold_percent
+            agent.context_compressor.context_length * agent.context_compressor.threshold_percent,
         )
 
         err_400 = Exception(
-            "HTTP 400: invalid params, context window exceeds limit (2013)"
+            "HTTP 400: invalid params, context window exceeds limit (2013)",
         )
         err_400.status_code = 400
         ok_resp = _mock_response(content="Recovered after compression", finish_reason="stop")
@@ -4590,7 +4590,7 @@ class TestHookPayloadSanitizesSimpleNamespace:
         response = SimpleNamespace(model="anthropic.claude-3", usage=None)
 
         payload = agent._api_response_payload_for_hook(
-            response, assistant_message, finish_reason="tool_calls"
+            response, assistant_message, finish_reason="tool_calls",
         )
 
         assert payload["model"] == "anthropic.claude-3"
@@ -4727,7 +4727,7 @@ class TestConversationHistoryNotMutated:
             patch.object(agent, "_cleanup_task_resources"),
         ):
             result = agent.run_conversation(
-                "new question", conversation_history=history
+                "new question", conversation_history=history,
             )
 
         # Caller's list must be untouched
@@ -4747,7 +4747,7 @@ class TestNousCredentialRefresh:
     """Verify Nous credential refresh rebuilds the runtime client."""
 
     def test_try_refresh_nous_client_credentials_rebuilds_client(
-        self, agent, monkeypatch
+        self, agent, monkeypatch,
     ):
         agent.provider = "nous"
         agent.api_mode = "chat_completions"
@@ -4775,7 +4775,7 @@ class TestNousCredentialRefresh:
             return _RebuiltClient()
 
         monkeypatch.setattr(
-            "hermes_cli.auth.resolve_nous_runtime_credentials", _fake_resolve
+            "hermes_cli.auth.resolve_nous_runtime_credentials", _fake_resolve,
         )
 
         agent.client = _ExistingClient()
@@ -4948,7 +4948,7 @@ class TestCredentialPoolRecovery:
                     "code": "device_code_exhausted",
                     "message": "Weekly credits exhausted.",
                     "resets_at": "2026-04-12T10:30:00Z",
-                }
+                },
             },
             response=response,
         )
@@ -4965,7 +4965,7 @@ class TestCredentialPoolRecovery:
                 "error": {
                     "type": "usage_limit_reached",
                     "message": "The usage limit has been reached",
-                }
+                },
             },
             response=SimpleNamespace(headers={}),
         )
@@ -4984,7 +4984,7 @@ class TestCredentialPoolRecovery:
                 "error": {
                     "type": "GoUsageLimitError",
                     "message": "Weekly usage limit reached. Resets in 6hr 29min.",
-                }
+                },
             },
             response=SimpleNamespace(headers={}),
         )
@@ -6204,7 +6204,7 @@ class TestReasoningReplayForStrictProviders:
                     "id": "c1",
                     "type": "function",
                     "function": {"name": "terminal", "arguments": "{\"command\":\"date\"}"},
-                }
+                },
             ],
         }
         tool_result = {"role": "tool", "tool_call_id": "c1", "content": "Tue Apr 21"}
@@ -6239,7 +6239,7 @@ class TestReasoningReplayForStrictProviders:
                     "id": "c1",
                     "type": "function",
                     "function": {"name": "web_search", "arguments": "{\"q\":\"test\"}"},
-                }
+                },
             ],
             "reasoning": "summary reasoning",
             "reasoning_content": "provider-native scratchpad",

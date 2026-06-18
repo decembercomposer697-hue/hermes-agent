@@ -279,7 +279,7 @@ def uninstall_gui(hermes_home: "Path | None" = None, *, remove_userdata: bool = 
             "If you installed the desktop via a .deb / .rpm package, remove it "
             "with your package manager (e.g. 'sudo apt remove hermes' or "
             "'sudo dnf remove hermes'). AppImage builds are a single file you "
-            "can delete from wherever you saved it."
+            "can delete from wherever you saved it.",
         )
 
     return removed

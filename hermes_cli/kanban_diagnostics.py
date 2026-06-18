@@ -258,7 +258,7 @@ def _main_model_visible(raw_config: Any) -> bool:
             model_cfg.get("default")
             or model_cfg.get("model")
             or model_cfg.get("name")
-            or ""
+            or "",
         ).strip()
         return bool(provider and model)
     return bool(str(model_cfg or "").strip())
@@ -436,7 +436,7 @@ def _rule_triage_aux_unavailable(task, events, runs, now, cfg) -> list[Diagnosti
             payload={
                 "command": (
                     f"hermes config set {primary_slot}.provider auto"
-                )
+                ),
             },
             suggested=True,
         ),
@@ -448,7 +448,7 @@ def _rule_triage_aux_unavailable(task, events, runs, now, cfg) -> list[Diagnosti
             payload={
                 "command": (
                     f"hermes config set {fallback_slot}.provider auto"
-                )
+                ),
             },
         ))
     if not auto_decompose:
@@ -880,7 +880,7 @@ def _rule_stranded_in_ready(task, events, runs, now, cfg) -> list[Diagnostic]:
     typos uniformly. No registry to curate, no per-board allowlist.
     """
     threshold_seconds = float(
-        cfg.get("stranded_threshold_seconds", 30 * 60)
+        cfg.get("stranded_threshold_seconds", 30 * 60),
     )
     status = _task_field(task, "status")
     if status != "ready":
@@ -1103,6 +1103,6 @@ def compute_task_diagnostics(
         key=lambda d: (
             -severity_idx.get(d.severity, -1),
             -(d.last_seen_at or 0),
-        )
+        ),
     )
     return out

@@ -106,7 +106,7 @@ def test_specify_emits_event(kanban_home):
         tid = _create_triage(conn, title="rough")
     with kb.connect() as conn:
         kb.specify_triage_task(
-            conn, tid, title="new", body="b", author="ace"
+            conn, tid, title="new", body="b", author="ace",
         )
     with kb.connect() as conn:
         events = kb.list_events(conn, tid)
@@ -126,7 +126,7 @@ def test_specify_records_audit_comment_only_when_author_given(kanban_home):
     with kb.connect() as conn:
         tid1 = _create_triage(conn, title="a")
         kb.specify_triage_task(
-            conn, tid1, title="A-spec", body="b", author="ace"
+            conn, tid1, title="A-spec", body="b", author="ace",
         )
         comments1 = kb.list_comments(conn, tid1)
     assert len(comments1) == 1

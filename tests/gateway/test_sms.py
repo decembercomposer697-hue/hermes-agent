@@ -309,7 +309,7 @@ class TestStartupGuard:
             mock_runner_cls.return_value.cleanup = AsyncMock()
             mock_site_cls.return_value.start = AsyncMock()
             adapter = self._make_adapter(
-                extra_env={"SMS_WEBHOOK_URL": "https://example.com/webhooks/twilio"}
+                extra_env={"SMS_WEBHOOK_URL": "https://example.com/webhooks/twilio"},
             )
             result = await adapter.connect()
             assert result is True
@@ -388,10 +388,10 @@ class TestTwilioSignatureValidation:
         adapter = self._make_adapter()
         params = {"Body": "hello"}
         sig = _compute_twilio_signature(
-            "test_token_secret", "https://a.com/webhooks/twilio", params
+            "test_token_secret", "https://a.com/webhooks/twilio", params,
         )
         assert adapter._validate_twilio_signature(
-            "https://b.com/webhooks/twilio", params, sig
+            "https://b.com/webhooks/twilio", params, sig,
         ) is False
 
     def test_port_variant_443_matches_without_port(self):
@@ -399,10 +399,10 @@ class TestTwilioSignatureValidation:
         adapter = self._make_adapter()
         params = {"From": "+15551234567", "Body": "hello"}
         sig = _compute_twilio_signature(
-            "test_token_secret", "https://example.com:443/webhooks/twilio", params
+            "test_token_secret", "https://example.com:443/webhooks/twilio", params,
         )
         assert adapter._validate_twilio_signature(
-            "https://example.com/webhooks/twilio", params, sig
+            "https://example.com/webhooks/twilio", params, sig,
         ) is True
 
     def test_port_variant_without_port_matches_443(self):
@@ -410,10 +410,10 @@ class TestTwilioSignatureValidation:
         adapter = self._make_adapter()
         params = {"From": "+15551234567", "Body": "hello"}
         sig = _compute_twilio_signature(
-            "test_token_secret", "https://example.com/webhooks/twilio", params
+            "test_token_secret", "https://example.com/webhooks/twilio", params,
         )
         assert adapter._validate_twilio_signature(
-            "https://example.com:443/webhooks/twilio", params, sig
+            "https://example.com:443/webhooks/twilio", params, sig,
         ) is True
 
     def test_non_standard_port_no_variant(self):
@@ -421,10 +421,10 @@ class TestTwilioSignatureValidation:
         adapter = self._make_adapter()
         params = {"From": "+15551234567", "Body": "hello"}
         sig = _compute_twilio_signature(
-            "test_token_secret", "https://example.com/webhooks/twilio", params
+            "test_token_secret", "https://example.com/webhooks/twilio", params,
         )
         assert adapter._validate_twilio_signature(
-            "https://example.com:8080/webhooks/twilio", params, sig
+            "https://example.com:8080/webhooks/twilio", params, sig,
         ) is False
 
     def test_port_variant_http_80(self):
@@ -432,10 +432,10 @@ class TestTwilioSignatureValidation:
         adapter = self._make_adapter()
         params = {"From": "+15551234567", "Body": "hello"}
         sig = _compute_twilio_signature(
-            "test_token_secret", "http://example.com:80/webhooks/twilio", params
+            "test_token_secret", "http://example.com:80/webhooks/twilio", params,
         )
         assert adapter._validate_twilio_signature(
-            "http://example.com/webhooks/twilio", params, sig
+            "http://example.com/webhooks/twilio", params, sig,
         ) is True
 
 
@@ -530,7 +530,7 @@ class TestWebhookSignatureEnforcement:
             "MessageSid": "SM123",
         }
         sig = _compute_twilio_signature(
-            "test_token_secret", "https://example.com:443/webhooks/twilio", params
+            "test_token_secret", "https://example.com:443/webhooks/twilio", params,
         )
         body = b"From=%2B15551234567&To=%2B15550001111&Body=hello&MessageSid=SM123"
         request = self._mock_request(body, headers={"X-Twilio-Signature": sig})

@@ -88,7 +88,7 @@ class TestDMThreadIsolation:
         thread_source = _dm_source(thread_id="1234567890.000001")
         thread_entry = store.get_or_create_session(thread_source)
         store.append_to_transcript(thread_entry.session_id, {
-            "role": "user", "content": "thread-only message"
+            "role": "user", "content": "thread-only message",
         })
 
         parent_transcript = store.load_transcript(parent_entry.session_id)
@@ -106,7 +106,7 @@ class TestDMThreadIsolation:
         thread_a_source = _dm_source(thread_id="1111.000001")
         thread_a_entry = store.get_or_create_session(thread_a_source)
         store.append_to_transcript(thread_a_entry.session_id, {
-            "role": "user", "content": "thread A message"
+            "role": "user", "content": "thread A message",
         })
 
         # Thread B
@@ -132,7 +132,7 @@ class TestDMThreadIsolation:
         thread_source = _dm_source(thread_id="1234567890.000001")
         thread_entry = store.get_or_create_session(thread_source)
         store.append_to_transcript(thread_entry.session_id, {
-            "role": "user", "content": "follow-up"
+            "role": "user", "content": "follow-up",
         })
 
         # Get the same thread session again

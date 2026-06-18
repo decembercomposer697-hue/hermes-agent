@@ -66,7 +66,7 @@ def test_top_level_max_tokens_propagates(isolated_home):
           default: glm-5.1
           provider: openrouter
           max_tokens: 16384
-        """
+        """,
     )
     grun = fresh_gateway()
     kw = grun._resolve_runtime_agent_kwargs()
@@ -87,7 +87,7 @@ def test_per_provider_max_output_tokens_fallback(isolated_home):
             api_key: sk-test
             default_model: glm-5.1
             max_output_tokens: 12000
-        """
+        """,
     )
     grun = fresh_gateway()
     kw = grun._resolve_runtime_agent_kwargs()
@@ -109,7 +109,7 @@ def test_global_max_tokens_beats_per_provider(isolated_home):
             api_key: sk-test
             default_model: glm-5.1
             max_output_tokens: 12000
-        """
+        """,
     )
     grun = fresh_gateway()
     kw = grun._resolve_runtime_agent_kwargs()
@@ -132,7 +132,7 @@ def test_env_override_beats_everything(isolated_home, monkeypatch):
             api_key: sk-test
             default_model: glm-5.1
             max_output_tokens: 12000
-        """
+        """,
     )
     grun = fresh_gateway()
     kw = grun._resolve_runtime_agent_kwargs()
@@ -147,7 +147,7 @@ def test_no_config_leaves_max_tokens_none(isolated_home):
         model:
           default: glm-5.1
           provider: openrouter
-        """
+        """,
     )
     grun = fresh_gateway()
     kw = grun._resolve_runtime_agent_kwargs()

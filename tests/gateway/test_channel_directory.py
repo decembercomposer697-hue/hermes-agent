@@ -34,7 +34,7 @@ class TestLoadDirectory:
 
     def test_valid_file(self, tmp_path):
         cache_file = _write_directory(tmp_path, {
-            "telegram": [{"id": "123", "name": "John", "type": "dm"}]
+            "telegram": [{"id": "123", "name": "John", "type": "dm"}],
         })
         with patch("gateway.channel_directory.DIRECTORY_PATH", cache_file):
             result = load_directory()
@@ -51,7 +51,7 @@ class TestLoadDirectory:
 class TestBuildChannelDirectoryWrites:
     def test_failed_write_preserves_previous_cache(self, tmp_path, monkeypatch):
         cache_file = _write_directory(tmp_path, {
-            "telegram": [{"id": "123", "name": "Alice", "type": "dm"}]
+            "telegram": [{"id": "123", "name": "Alice", "type": "dm"}],
         })
         previous = json.loads(cache_file.read_text())
 
@@ -79,7 +79,7 @@ class TestResolveChannelName:
             "discord": [
                 {"id": "111", "name": "bot-home", "guild": "MyServer", "type": "channel"},
                 {"id": "222", "name": "general", "guild": "MyServer", "type": "channel"},
-            ]
+            ],
         }
         with self._setup(tmp_path, platforms):
             assert resolve_channel_name("discord", "bot-home") == "111"
@@ -87,7 +87,7 @@ class TestResolveChannelName:
 
     def test_case_insensitive(self, tmp_path):
         platforms = {
-            "slack": [{"id": "C01", "name": "Engineering", "type": "channel"}]
+            "slack": [{"id": "C01", "name": "Engineering", "type": "channel"}],
         }
         with self._setup(tmp_path, platforms):
             assert resolve_channel_name("slack", "engineering") == "C01"
@@ -98,7 +98,7 @@ class TestResolveChannelName:
             "discord": [
                 {"id": "111", "name": "general", "guild": "ServerA", "type": "channel"},
                 {"id": "222", "name": "general", "guild": "ServerB", "type": "channel"},
-            ]
+            ],
         }
         with self._setup(tmp_path, platforms):
             assert resolve_channel_name("discord", "ServerA/general") == "111"
@@ -109,7 +109,7 @@ class TestResolveChannelName:
             "slack": [
                 {"id": "C01", "name": "engineering-backend", "type": "channel"},
                 {"id": "C02", "name": "design-team", "type": "channel"},
-            ]
+            ],
         }
         with self._setup(tmp_path, platforms):
             # "engineering" prefix matches only one channel
@@ -120,7 +120,7 @@ class TestResolveChannelName:
             "slack": [
                 {"id": "C01", "name": "eng-backend", "type": "channel"},
                 {"id": "C02", "name": "eng-frontend", "type": "channel"},
-            ]
+            ],
         }
         with self._setup(tmp_path, platforms):
             assert resolve_channel_name("slack", "eng") is None
@@ -131,14 +131,14 @@ class TestResolveChannelName:
 
     def test_no_match_returns_none(self, tmp_path):
         platforms = {
-            "telegram": [{"id": "123", "name": "John", "type": "dm"}]
+            "telegram": [{"id": "123", "name": "John", "type": "dm"}],
         }
         with self._setup(tmp_path, platforms):
             assert resolve_channel_name("telegram", "nonexistent") is None
 
     def test_topic_name_resolves_to_composite_id(self, tmp_path):
         platforms = {
-            "telegram": [{"id": "-1001:17585", "name": "Coaching Chat / topic 17585", "type": "group"}]
+            "telegram": [{"id": "-1001:17585", "name": "Coaching Chat / topic 17585", "type": "group"}],
         }
         with self._setup(tmp_path, platforms):
             assert resolve_channel_name("telegram", "Coaching Chat / topic 17585") == "-1001:17585"
@@ -151,7 +151,7 @@ class TestResolveChannelName:
             "slack": [
                 {"id": "C0B0QV5434G", "name": "engineering", "type": "channel"},
                 {"id": "C99", "name": "c0b0qv5434g", "type": "channel"},
-            ]
+            ],
         }
         with self._setup(tmp_path, platforms):
             assert resolve_channel_name("slack", "C0B0QV5434G") == "C0B0QV5434G"
@@ -164,7 +164,7 @@ class TestResolveChannelName:
                 {"id": "123", "name": "Alice", "type": "dm"},
                 {"id": "456", "name": "Dev Group", "type": "group"},
                 {"id": "-1001:17585", "name": "Coaching Chat / topic 17585", "type": "group"},
-            ]
+            ],
         }
         with self._setup(tmp_path, platforms):
             assert resolve_channel_name("telegram", "Alice (dm)") == "123"
@@ -278,7 +278,7 @@ class TestFormatDirectoryForDisplay:
                 {"id": "123", "name": "Alice", "type": "dm"},
                 {"id": "456", "name": "Dev Group", "type": "group"},
                 {"id": "-1001:17585", "name": "Coaching Chat / topic 17585", "type": "group"},
-            ]
+            ],
         })
         with patch("gateway.channel_directory.DIRECTORY_PATH", cache_file):
             result = format_directory_for_display()
@@ -294,7 +294,7 @@ class TestFormatDirectoryForDisplay:
                 {"id": "1", "name": "general", "guild": "Server1", "type": "channel"},
                 {"id": "2", "name": "bot-home", "guild": "Server1", "type": "channel"},
                 {"id": "3", "name": "chat", "guild": "Server2", "type": "channel"},
-            ]
+            ],
         })
         with patch("gateway.channel_directory.DIRECTORY_PATH", cache_file):
             result = format_directory_for_display()
@@ -313,7 +313,7 @@ class TestLookupChannelType:
         platforms = {
             "discord": [
                 {"id": "100", "name": "ideas", "guild": "Server1", "type": "forum"},
-            ]
+            ],
         }
         with self._setup(tmp_path, platforms):
             assert lookup_channel_type("discord", "100") == "forum"
@@ -322,7 +322,7 @@ class TestLookupChannelType:
         platforms = {
             "discord": [
                 {"id": "200", "name": "general", "guild": "Server1", "type": "channel"},
-            ]
+            ],
         }
         with self._setup(tmp_path, platforms):
             assert lookup_channel_type("discord", "200") == "channel"
@@ -331,7 +331,7 @@ class TestLookupChannelType:
         platforms = {
             "discord": [
                 {"id": "200", "name": "general", "guild": "Server1", "type": "channel"},
-            ]
+            ],
         }
         with self._setup(tmp_path, platforms):
             assert lookup_channel_type("discord", "999") is None
@@ -344,7 +344,7 @@ class TestLookupChannelType:
         platforms = {
             "discord": [
                 {"id": "300", "name": "general", "guild": "Server1"},
-            ]
+            ],
         }
         with self._setup(tmp_path, platforms):
             assert lookup_channel_type("discord", "300") is None

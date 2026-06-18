@@ -112,7 +112,7 @@ class TestMediaExtraction:
             {
                 "role": "assistant",
                 "tool_calls": [
-                    {"id": "call_skill", "function": {"name": "skill_view"}}
+                    {"id": "call_skill", "function": {"name": "skill_view"}},
                 ],
             },
             {
@@ -145,7 +145,7 @@ caption
             {
                 "role": "assistant",
                 "tool_calls": [
-                    {"id": "call_tts", "function": {"name": "text_to_speech"}}
+                    {"id": "call_tts", "function": {"name": "text_to_speech"}},
                 ],
             },
             {
@@ -170,7 +170,7 @@ caption
             {
                 "role": "assistant",
                 "tool_calls": [
-                    {"id": "call_img", "function": {"name": "image_generate"}}
+                    {"id": "call_img", "function": {"name": "image_generate"}},
                 ],
             },
             {
@@ -194,7 +194,7 @@ caption
             {
                 "role": "assistant",
                 "tool_calls": [
-                    {"id": "call_img", "function": {"name": "image_generate"}}
+                    {"id": "call_img", "function": {"name": "image_generate"}},
                 ],
             },
             {
@@ -216,7 +216,7 @@ caption
                 {
                     "role": "assistant",
                     "tool_calls": [
-                        {"id": "c", "function": {"name": "image_generate"}}
+                        {"id": "c", "function": {"name": "image_generate"}},
                     ],
                 },
                 {"role": "tool", "tool_call_id": "c", "content": content},
@@ -244,7 +244,7 @@ caption
             {
                 "role": "assistant",
                 "tool_calls": [
-                    {"id": "c", "function": {"name": "image_generate"}}
+                    {"id": "c", "function": {"name": "image_generate"}},
                 ],
             },
             {
@@ -255,7 +255,7 @@ caption
         ]
 
         tags, _ = _collect_auto_append_media_tags(
-            messages, history_offset=0, history_media_paths={"/tmp/gen/cat.png"}
+            messages, history_offset=0, history_media_paths={"/tmp/gen/cat.png"},
         )
         assert tags == []
 
@@ -411,7 +411,7 @@ class TestStaleToolMediaLeak:
         history_media_paths = set()
 
         tags, voice = extract_media_tags_production(
-            all_messages, history_len, history_media_paths
+            all_messages, history_len, history_media_paths,
         )
         assert tags == [], (
             "Stale tool MEDIA from a prior turn must not leak onto a "
@@ -442,7 +442,7 @@ class TestStaleToolMediaLeak:
         ]
         all_messages = history + new_messages
         tags, _ = extract_media_tags_production(
-            all_messages, len(history), set()
+            all_messages, len(history), set(),
         )
         assert len(tags) == 1 and "fresh_cover.png" in tags[0]
 
@@ -462,7 +462,7 @@ class TestStaleToolMediaLeak:
         # before compression), so it must still be excluded.
         history_media_paths = {"/tmp/old_from_history.png"}
         tags, _ = extract_media_tags_production(
-            compressed_messages, original_history_len, history_media_paths
+            compressed_messages, original_history_len, history_media_paths,
         )
         assert tags == [], (
             "On the compression fallback path, path-dedup must still exclude "

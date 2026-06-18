@@ -489,7 +489,7 @@ class XAIWebSearchProvider(WebSearchProvider):
                         # index, so a dropped malformed row doesn't leave a
                         # gap in the positions handed back to the agent.
                         "position": len(normalized) + 1,
-                    }
+                    },
                 )
             if normalized:
                 return normalized
@@ -533,7 +533,7 @@ class XAIWebSearchProvider(WebSearchProvider):
                     "url": url,
                     "description": description,
                     "position": len(results) + 1,
-                }
+                },
             )
             if len(results) >= limit:
                 break

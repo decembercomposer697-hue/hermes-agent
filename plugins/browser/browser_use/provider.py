@@ -219,7 +219,7 @@ class BrowserUseBrowserProvider(BrowserProvider):
             if managed_mode:
                 raise
             raise RuntimeError(
-                f"Browser Use API connection failed: {exc}"
+                f"Browser Use API connection failed: {exc}",
             ) from exc
 
         if not response.ok:
@@ -227,7 +227,7 @@ class BrowserUseBrowserProvider(BrowserProvider):
                 _clear_pending_create_key(task_id)
             raise RuntimeError(
                 f"Failed to create Browser Use session: "
-                f"{response.status_code} {response.text}"
+                f"{response.status_code} {response.text}",
             )
 
         session_data = response.json()
@@ -255,7 +255,7 @@ class BrowserUseBrowserProvider(BrowserProvider):
             config = self._get_config()
         except ValueError:
             logger.warning(
-                "Cannot close Browser Use session %s — missing credentials", session_id
+                "Cannot close Browser Use session %s — missing credentials", session_id,
             )
             return False
 
@@ -298,7 +298,7 @@ class BrowserUseBrowserProvider(BrowserProvider):
             )
         except Exception as e:
             logger.debug(
-                "Emergency cleanup failed for Browser Use session %s: %s", session_id, e
+                "Emergency cleanup failed for Browser Use session %s: %s", session_id, e,
             )
 
     def get_setup_schema(self) -> dict[str, Any]:

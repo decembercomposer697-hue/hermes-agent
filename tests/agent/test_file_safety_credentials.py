@@ -134,7 +134,7 @@ def test_symlink_to_auth_json_blocked(fake_home, tmp_path):
 
 
 def test_read_file_tool_blocks_relative_path_under_terminal_cwd(
-    fake_home, tmp_path, monkeypatch
+    fake_home, tmp_path, monkeypatch,
 ):
     """Bypass guard: a relative path like ``"auth.json"`` resolved by
     ``read_file_tool`` against ``TERMINAL_CWD == HERMES_HOME`` must still
@@ -151,7 +151,7 @@ def test_read_file_tool_blocks_relative_path_under_terminal_cwd(
     monkeypatch.setenv("TERMINAL_CWD", str(fake_home))
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(
-        ft, "_get_live_tracking_cwd", lambda task_id="default": None
+        ft, "_get_live_tracking_cwd", lambda task_id="default": None,
     )
 
     out = json.loads(ft.read_file_tool("auth.json"))
@@ -160,7 +160,7 @@ def test_read_file_tool_blocks_relative_path_under_terminal_cwd(
 
 
 def test_read_file_tool_blocks_nested_google_oauth_path(
-    fake_home, tmp_path, monkeypatch
+    fake_home, tmp_path, monkeypatch,
 ):
     """The real read_file tool must not return Gemini OAuth token material."""
     import json
@@ -174,13 +174,13 @@ def test_read_file_tool_blocks_nested_google_oauth_path(
                 "refresh": "REFRESH_TOKEN_MARKER",
                 "access": "ACCESS_TOKEN_MARKER",
                 "email": "user@example.com",
-            }
+            },
         ),
         encoding="utf-8",
     )
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(
-        ft, "_get_live_tracking_cwd", lambda task_id="default": None
+        ft, "_get_live_tracking_cwd", lambda task_id="default": None,
     )
 
     out = json.loads(ft.read_file_tool(str(oauth), task_id="google-oauth-test"))
@@ -247,7 +247,7 @@ def test_mcp_tokens_dir_itself_blocked(fake_home):
 
 
 def test_identically_named_hermes_files_outside_home_not_blocked(
-    fake_home, tmp_path
+    fake_home, tmp_path,
 ):
     """Hermes-specific filenames (``auth.json``, ``mcp-tokens/``, ``google_oauth.json``)
     outside HERMES_HOME must remain readable — the gate is per-location for

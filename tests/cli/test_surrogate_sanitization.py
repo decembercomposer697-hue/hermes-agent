@@ -279,7 +279,7 @@ class TestApiMessagesSurrogateRecovery:
                     {
                         "id": "call_1",
                         "function": {"name": "tool", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "content": "result", "tool_call_id": "call_1"},

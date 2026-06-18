@@ -161,7 +161,7 @@ class TestDisplayResumedHistory:
         # CLI_CONFIG is read at call-time inside _display_resumed_history, so
         # apply the override for the duration of the capture, not just at init.
         with patch.dict(_cli_mod.__dict__, {"CLI_CONFIG": {
-            "display": {"resume_skip_tool_only": False, "resume_display": "full"}
+            "display": {"resume_skip_tool_only": False, "resume_display": "full"},
         }}):
             output = self._capture_display(cli)
 
@@ -513,7 +513,7 @@ class TestDisplayResumedHistory:
                         "id": "call_1",
                         "type": "function",
                         "function": {"name": "terminal", "arguments": '{"command":"ls"}'},
-                    }
+                    },
                 ],
             },
         ]

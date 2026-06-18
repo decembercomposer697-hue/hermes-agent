@@ -285,7 +285,7 @@ def require_address(s: str, *, field: str = "address") -> str:
     """
     if not is_valid_address(s):
         sys.stderr.write(
-            f"error: invalid {field} {s!r}: expected 0x-prefixed 40-hex-char address\n"
+            f"error: invalid {field} {s!r}: expected 0x-prefixed 40-hex-char address\n",
         )
         sys.exit(2)
     return s.lower()
@@ -295,7 +295,7 @@ def require_txhash(s: str, *, field: str = "tx hash") -> str:
     """Return `s` lowercased if valid, else exit with an error message."""
     if not is_valid_txhash(s):
         sys.stderr.write(
-            f"error: invalid {field} {s!r}: expected 0x-prefixed 64-hex-char tx hash\n"
+            f"error: invalid {field} {s!r}: expected 0x-prefixed 64-hex-char tx hash\n",
         )
         sys.exit(2)
     return s.lower()

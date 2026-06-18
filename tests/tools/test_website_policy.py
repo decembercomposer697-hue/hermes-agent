@@ -22,8 +22,8 @@ def test_load_website_blocklist_merges_config_and_shared_file(tmp_path):
                         "enabled": True,
                         "domains": ["example.com", "https://www.evil.test/path"],
                         "shared_files": [str(shared)],
-                    }
-                }
+                    },
+                },
             },
             sort_keys=False,
         ),
@@ -50,8 +50,8 @@ def test_check_website_access_matches_parent_domain_subdomains(tmp_path):
                     "website_blocklist": {
                         "enabled": True,
                         "domains": ["example.com"],
-                    }
-                }
+                    },
+                },
             },
             sort_keys=False,
         ),
@@ -74,8 +74,8 @@ def test_check_website_access_supports_wildcard_subdomains_only(tmp_path):
                     "website_blocklist": {
                         "enabled": True,
                         "domains": ["*.tracking.example"],
-                    }
-                }
+                    },
+                },
             },
             sort_keys=False,
         ),
@@ -114,8 +114,8 @@ def test_load_website_blocklist_raises_clean_error_for_invalid_domains_type(tmp_
                     "website_blocklist": {
                         "enabled": True,
                         "domains": "example.com",
-                    }
-                }
+                    },
+                },
             },
             sort_keys=False,
         ),
@@ -135,8 +135,8 @@ def test_load_website_blocklist_raises_clean_error_for_invalid_shared_files_type
                     "website_blocklist": {
                         "enabled": True,
                         "shared_files": "community-blocklist.txt",
-                    }
-                }
+                    },
+                },
             },
             sort_keys=False,
         ),
@@ -170,7 +170,7 @@ def test_load_website_blocklist_raises_clean_error_for_invalid_website_blocklist
             {
                 "security": {
                     "website_blocklist": "block everything",
-                }
+                },
             },
             sort_keys=False,
         ),
@@ -189,8 +189,8 @@ def test_load_website_blocklist_raises_clean_error_for_invalid_enabled_type(tmp_
                 "security": {
                     "website_blocklist": {
                         "enabled": "false",
-                    }
-                }
+                    },
+                },
             },
             sort_keys=False,
         ),
@@ -221,8 +221,8 @@ def test_load_website_blocklist_wraps_shared_file_read_errors(tmp_path, monkeypa
                     "website_blocklist": {
                         "enabled": True,
                         "shared_files": [str(shared)],
-                    }
-                }
+                    },
+                },
             },
             sort_keys=False,
         ),
@@ -251,8 +251,8 @@ def test_check_website_access_uses_dynamic_hermes_home(monkeypatch, tmp_path):
                     "website_blocklist": {
                         "enabled": True,
                         "domains": ["dynamic.example"],
-                    }
-                }
+                    },
+                },
             },
             sort_keys=False,
         ),
@@ -282,8 +282,8 @@ def test_check_website_access_blocks_scheme_less_urls(tmp_path):
                     "website_blocklist": {
                         "enabled": True,
                         "domains": ["blocked.test"],
-                    }
-                }
+                    },
+                },
             },
             sort_keys=False,
         ),
@@ -335,8 +335,8 @@ def test_browser_navigate_allows_when_shared_file_missing(monkeypatch, tmp_path)
                     "website_blocklist": {
                         "enabled": True,
                         "shared_files": ["missing-blocklist.txt"],
-                    }
-                }
+                    },
+                },
             },
             sort_keys=False,
         ),

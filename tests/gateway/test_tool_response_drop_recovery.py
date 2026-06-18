@@ -76,13 +76,13 @@ def _strip_everything(adapter, monkeypatch):
     """Force the extract pipeline to reduce text_content to "" with no
     attachments — the exact failure mode that made the drop invisible."""
     monkeypatch.setattr(
-        type(adapter), "extract_media", staticmethod(lambda content: ([], content))
+        type(adapter), "extract_media", staticmethod(lambda content: ([], content)),
     )
     monkeypatch.setattr(
-        type(adapter), "extract_images", staticmethod(lambda content: ([], ""))
+        type(adapter), "extract_images", staticmethod(lambda content: ([], "")),
     )
     monkeypatch.setattr(
-        type(adapter), "extract_local_files", staticmethod(lambda content: ([], ""))
+        type(adapter), "extract_local_files", staticmethod(lambda content: ([], "")),
     )
 
 
@@ -93,7 +93,7 @@ class TestExtractStripRecoveryAllPlatforms:
 
     @pytest.mark.asyncio
     async def test_response_reduced_to_empty_is_recovered_and_sent(
-        self, platform, monkeypatch, caplog
+        self, platform, monkeypatch, caplog,
     ):
         adapter = _DummyAdapter(platform)
         adapter._keep_typing = _hold_typing
@@ -113,7 +113,7 @@ class TestExtractStripRecoveryAllPlatforms:
         event = _make_event(platform)
         with caplog.at_level(logging.WARNING, logger="gateway.platforms.base"):
             await adapter._process_message_background(
-                event, build_session_key(event.source)
+                event, build_session_key(event.source),
             )
 
         # The response WAS delivered, not silently dropped.
@@ -164,14 +164,14 @@ class TestExtractStripRecoveryAllPlatforms:
 
         adapter.set_message_handler(handler)
         monkeypatch.setattr(
-            type(adapter), "extract_media", staticmethod(lambda content: ([], content))
+            type(adapter), "extract_media", staticmethod(lambda content: ([], content)),
         )
         monkeypatch.setattr(
             type(adapter), "extract_images",
             staticmethod(lambda content: ([("https://example.com/chart.png", "chart")], "")),
         )
         monkeypatch.setattr(
-            type(adapter), "extract_local_files", staticmethod(lambda content: ([], ""))
+            type(adapter), "extract_local_files", staticmethod(lambda content: ([], "")),
         )
         adapter.send_multiple_images = lambda *a, **kw: asyncio.sleep(0, result=None)
 
@@ -206,13 +206,13 @@ class TestRecoveryDoesNotLeakMediaFragments:
         # but force the path to be filtered out (unsafe/nonexistent) so we hit
         # the empty-text + no-attachment recovery branch deterministically.
         monkeypatch.setattr(
-            type(adapter), "filter_media_delivery_paths", staticmethod(lambda m: [])
+            type(adapter), "filter_media_delivery_paths", staticmethod(lambda m: []),
         )
 
         event = _make_event(Platform.DISCORD)
         with caplog.at_level(logging.ERROR, logger="gateway.platforms.base"):
             await adapter._process_message_background(
-                event, build_session_key(event.source)
+                event, build_session_key(event.source),
             )
 
         # No fragment of the media path may reach the user.
@@ -248,7 +248,7 @@ class TestUnrecoverableDropIsLoud:
         event = _make_event(Platform.DISCORD)
         with caplog.at_level(logging.ERROR, logger="gateway.platforms.base"):
             await adapter._process_message_background(
-                event, build_session_key(event.source)
+                event, build_session_key(event.source),
             )
 
         assert adapter.sent == []

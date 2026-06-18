@@ -17,7 +17,7 @@ class TestResolveRuntimeAgentKwargsAuthFallback:
         config_path.write_text(
             "model:\n  provider: openai-codex\n"
             "fallback_model:\n  provider: openrouter\n"
-            "  model: meta-llama/llama-4-maverick\n"
+            "  model: meta-llama/llama-4-maverick\n",
         )
 
         monkeypatch.setattr("gateway.run._hermes_home", tmp_path)
@@ -80,7 +80,7 @@ class TestResolveRuntimeAgentKwargsAuthFallback:
             "    model: anthropic/claude-sonnet-4.6\n"
             "fallback_model:\n"
             "  provider: nous\n"
-            "  model: Hermes-4\n"
+            "  model: Hermes-4\n",
         )
 
         monkeypatch.setattr("gateway.run._hermes_home", tmp_path)

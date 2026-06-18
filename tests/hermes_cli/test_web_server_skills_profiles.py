@@ -71,7 +71,7 @@ class TestProfileScopedSkills:
         assert "dashboard-skill" not in names
 
     def test_skills_list_without_profile_uses_dashboard_home(
-        self, client, isolated_profiles
+        self, client, isolated_profiles,
     ):
         resp = client.get("/api/skills")
         assert resp.status_code == 200
@@ -138,7 +138,7 @@ class TestProfileScopedToolsets:
         assert "x_search" not in default_cfg.get("platform_toolsets", {}).get("cli", [])
 
         listing = client.get(
-            "/api/tools/toolsets", params={"profile": "worker_alpha"}
+            "/api/tools/toolsets", params={"profile": "worker_alpha"},
         ).json()
         assert {t["name"]: t for t in listing}["x_search"]["enabled"] is True
         # Unscoped listing reflects the dashboard's own (untouched) config.
@@ -155,7 +155,7 @@ class TestProfileScopedToolsets:
 
 class TestProfileScopedHubActions:
     def test_hub_install_spawns_with_profile_flag(
-        self, client, isolated_profiles, monkeypatch
+        self, client, isolated_profiles, monkeypatch,
     ):
         """Hub installs must go through a fresh ``hermes -p <profile>``
         subprocess — the in-process scope can't reach skills_hub's
@@ -178,11 +178,11 @@ class TestProfileScopedHubActions:
         )
         assert resp.status_code == 200
         assert calls == [
-            (["-p", "worker_alpha", "skills", "install", "official/demo"], "skills-install")
+            (["-p", "worker_alpha", "skills", "install", "official/demo"], "skills-install"),
         ]
 
     def test_hub_install_without_profile_keeps_legacy_argv(
-        self, client, isolated_profiles, monkeypatch
+        self, client, isolated_profiles, monkeypatch,
     ):
         import hermes_cli.web_server as web_server
 
@@ -197,7 +197,7 @@ class TestProfileScopedHubActions:
             lambda subcommand, name: calls.append(list(subcommand)) or _FakeProc(),
         )
         resp = client.post(
-            "/api/skills/hub/install", json={"identifier": "official/demo"}
+            "/api/skills/hub/install", json={"identifier": "official/demo"},
         )
         assert resp.status_code == 200
         assert calls == [["skills", "install", "official/demo"]]

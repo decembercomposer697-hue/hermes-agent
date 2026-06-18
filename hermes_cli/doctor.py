@@ -302,7 +302,7 @@ def _check_s6_supervision(issues: list[str]) -> None:
     up_count = sum(1 for p in profiles if mgr.is_running(f"gateway-{p}"))
     check_ok(
         f"Per-profile gateways: {up_count}/{len(profiles)} supervised up"
-        + (f" ({', '.join(sorted(profiles))})" if len(profiles) <= 8 else "")
+        + (f" ({', '.join(sorted(profiles))})" if len(profiles) <= 8 else ""),
     )
 
 
@@ -523,7 +523,7 @@ def run_doctor(args):
                     f"Resolve security advisory {hit.advisory.id}: "
                     f"uninstall {hit.package}=={hit.installed_version} and "
                     f"rotate credentials, then run "
-                    f"`hermes doctor --ack {hit.advisory.id}`."
+                    f"`hermes doctor --ack {hit.advisory.id}`.",
                 )
             # Acked-but-still-installed: show as informational so the user
             # knows the package is still on disk after the ack.
@@ -770,7 +770,7 @@ def run_doctor(args):
                 )
                 issues.append(
                     f"model.default '{default_model}' is vendor-prefixed but model.provider is '{provider_raw}'. "
-                    "Either set model.provider to 'openrouter', or drop the vendor prefix."
+                    "Either set model.provider to 'openrouter', or drop the vendor prefix.",
                 )
 
             # Check credentials for the configured provider.
@@ -786,7 +786,7 @@ def run_doctor(args):
 
                         configured = bool(
                             str(get_env_value("OPENROUTER_API_KEY") or "").strip()
-                            or str(get_env_value("OPENAI_API_KEY") or "").strip()
+                            or str(get_env_value("OPENAI_API_KEY") or "").strip(),
                         )
                     else:
                         from hermes_cli.auth import PROVIDER_REGISTRY, get_auth_status
@@ -798,7 +798,7 @@ def run_doctor(args):
                             configured = bool(
                                 status.get("configured")
                                 or status.get("logged_in")
-                                or status.get("api_key")
+                                or status.get("api_key"),
                             )
                     if not configured:
                         _fail_and_issue(
@@ -844,7 +844,7 @@ def run_doctor(args):
             if current_ver < latest_ver:
                 check_warn(
                     f"Config version outdated (v{current_ver} → v{latest_ver})",
-                    "(new settings available)"
+                    "(new settings available)",
                 )
                 if should_fix:
                     try:
@@ -870,7 +870,7 @@ def run_doctor(args):
             if stale_root_keys:
                 check_warn(
                     f"Stale root-level config keys: {', '.join(stale_root_keys)}",
-                    "(should be under 'model:' section)"
+                    "(should be under 'model:' section)",
                 )
                 if should_fix:
                     # Coerce scalar/None ``model:`` into a dict before mutation —
@@ -939,19 +939,19 @@ def run_doctor(args):
                     if remove_env_value("HERMES_MAX_ITERATIONS"):
                         check_ok(
                             "Removed stale HERMES_MAX_ITERATIONS from .env "
-                            f"(config.yaml agent.max_turns={cfg_max_turns} is now authoritative)"
+                            f"(config.yaml agent.max_turns={cfg_max_turns} is now authoritative)",
                         )
                         fixed_count += 1
                     else:
                         check_warn("Could not remove HERMES_MAX_ITERATIONS from .env")
                         manual_issues.append(
                             "Manually delete the HERMES_MAX_ITERATIONS line from "
-                            f"{_DHH}/.env — config.yaml agent.max_turns is authoritative."
+                            f"{_DHH}/.env — config.yaml agent.max_turns is authoritative.",
                         )
                 else:
                     issues.append(
                         "Stale HERMES_MAX_ITERATIONS in .env shadows config.yaml — "
-                        "run 'hermes doctor --fix'"
+                        "run 'hermes doctor --fix'",
                     )
         except Exception:
             pass
@@ -994,7 +994,7 @@ def run_doctor(args):
             check_info(f"Migration guide: {MIGRATION_GUIDE_URL}")
             manual_issues.append(
                 f"Update {len(retired_refs)} retired xAI model reference(s) "
-                f"in config.yaml — see {MIGRATION_GUIDE_URL}"
+                f"in config.yaml — see {MIGRATION_GUIDE_URL}",
             )
     except Exception as _xai_check_err:
         check_warn("xAI retirement check skipped", f"({_xai_check_err})")
@@ -1030,7 +1030,7 @@ def run_doctor(args):
                 check_info(
                     "codex CLI not installed "
                     "(optional — only required to import tokens "
-                    "from an existing Codex CLI login)"
+                    "from an existing Codex CLI login)",
                 )
 
         gemini_status = get_gemini_oauth_auth_status()
@@ -1168,7 +1168,7 @@ def run_doctor(args):
                         try:
                             conn = sqlite3.connect(str(state_db_path))
                             count = conn.execute(
-                                "SELECT COUNT(*) FROM sessions"
+                                "SELECT COUNT(*) FROM sessions",
                             ).fetchone()[0]
                             conn.close()
                         except Exception:
@@ -1189,12 +1189,12 @@ def run_doctor(args):
                         )
                         issues.append(
                             "state.db schema malformed and auto-repair failed — "
-                            "restore from the backup copy beside state.db"
+                            "restore from the backup copy beside state.db",
                         )
                 else:
                     issues.append(
                         "state.db schema malformed — run 'hermes doctor --fix' "
-                        "(or 'hermes sessions repair') to recover hidden sessions"
+                        "(or 'hermes sessions repair') to recover hidden sessions",
                     )
             else:
                 check_warn(f"{_DHH}/state.db exists but has issues: {e}")
@@ -1209,7 +1209,7 @@ def run_doctor(args):
             if wal_size > 50 * 1024 * 1024:  # 50 MB
                 check_warn(
                     f"WAL file is large ({wal_size // (1024*1024)} MB)",
-                    "(may indicate missed checkpoints)"
+                    "(may indicate missed checkpoints)",
                 )
                 if should_fix:
                     import sqlite3
@@ -1253,10 +1253,10 @@ def run_doctor(args):
         if _venv_bin is None:
             check_warn(
                 "Venv entry point not found",
-                "(hermes not in venv/bin/ or .venv/bin/ — reinstall with pip install -e '.[all]')"
+                "(hermes not in venv/bin/ or .venv/bin/ — reinstall with pip install -e '.[all]')",
             )
             manual_issues.append(
-                f"Reinstall entry point: cd {PROJECT_ROOT} && source venv/bin/activate && pip install -e '.[all]'"
+                f"Reinstall entry point: cd {PROJECT_ROOT} && source venv/bin/activate && pip install -e '.[all]'",
             )
         else:
             check_ok(f"Venv entry point exists ({_venv_bin.relative_to(PROJECT_ROOT)})")
@@ -1270,7 +1270,7 @@ def run_doctor(args):
                 else:
                     check_warn(
                         f"{_cmd_link_display}/hermes points to wrong target",
-                        f"(→ {_target}, expected → {_expected})"
+                        f"(→ {_target}, expected → {_expected})",
                     )
                     if should_fix:
                         _cmd_link.unlink()
@@ -1285,7 +1285,7 @@ def run_doctor(args):
             else:
                 check_fail(
                     f"{_cmd_link_display}/hermes not found",
-                    "(hermes command may not work outside the venv)"
+                    "(hermes command may not work outside the venv)",
                 )
                 if should_fix:
                     _cmd_link_dir.mkdir(parents=True, exist_ok=True)
@@ -1298,7 +1298,7 @@ def run_doctor(args):
                     if str(_cmd_link_dir) not in _path_dirs:
                         check_warn(
                             f"{_cmd_link_display} is not on your PATH",
-                            "(add it to your shell config: export PATH=\"$HOME/.local/bin:$PATH\")"
+                            "(add it to your shell config: export PATH=\"$HOME/.local/bin:$PATH\")",
                         )
                         manual_issues.append(f"Add {_cmd_link_display} to your PATH")
                 else:
@@ -1336,7 +1336,7 @@ def run_doctor(args):
         if terminal_env != "docker":
             check_info(
                 "Running inside a container — using local terminal backend "
-                "(docker-in-docker is not configured by default)"
+                "(docker-in-docker is not configured by default)",
             )
             # Skip to next section; Docker isn't relevant here.
             terminal_env = "local"
@@ -1387,7 +1387,7 @@ def run_doctor(args):
                     cmd,
                     capture_output=True,
                     text=True,
-                    timeout=15
+                    timeout=15,
                 )
             except subprocess.TimeoutExpired:
                 result = None
@@ -1489,12 +1489,12 @@ def run_doctor(args):
                         if sys.platform == "win32":
                             check_info(
                                 f"Install with: cd {PROJECT_ROOT} && "
-                                "npx playwright install chromium"
+                                "npx playwright install chromium",
                             )
                         else:
                             check_info(
                                 f"Install with: cd {PROJECT_ROOT} && "
-                                "npx playwright install --with-deps chromium"
+                                "npx playwright install --with-deps chromium",
                             )
     elif _is_termux():
         check_info("Node.js not found (browser tools are optional in the tested Termux path)")
@@ -1554,11 +1554,11 @@ def run_doctor(args):
                 elif critical > 0 or high > 0:
                     check_warn(
                         f"{label} deps",
-                        f"({critical} critical, {high} high, {moderate} moderate — run: {fix_cmd})"
+                        f"({critical} critical, {high} high, {moderate} moderate — run: {fix_cmd})",
                     )
                     issues.append(
                         f"{label} has {total} npm "
-                        f"{'vulnerability' if total == 1 else 'vulnerabilities'}"
+                        f"{'vulnerability' if total == 1 else 'vulnerabilities'}",
                     )
                 else:
                     check_ok(
@@ -1590,7 +1590,7 @@ def run_doctor(args):
     from collections import namedtuple as _namedtuple
 
     _ConnectivityResult = _namedtuple(
-        "_ConnectivityResult", ["label", "lines", "issues"]
+        "_ConnectivityResult", ["label", "lines", "issues"],
     )
     _probes: list = []  # list of (label, callable) submitted in display order
 
@@ -1691,7 +1691,7 @@ def run_doctor(args):
             ):
                 headers["anthropic-beta"] = ",".join(
                     [b for b in _COMMON_BETAS if b != _CONTEXT_1M_BETA]
-                    + list(_OAUTH_ONLY_BETAS)
+                    + list(_OAUTH_ONLY_BETAS),
                 )
                 r = httpx.get(
                     "https://api.anthropic.com/v1/models",

@@ -41,13 +41,13 @@ class TestOpusFindLibrary:
         bundled.write_bytes(b"fake dll")
 
         discord_stub = types.SimpleNamespace(
-            opus=types.SimpleNamespace(__file__=str(opus_py))
+            opus=types.SimpleNamespace(__file__=str(opus_py)),
         )
         monkeypatch.setattr(adapter.sys, "platform", "win32")
         monkeypatch.setattr(adapter.struct, "calcsize", lambda _fmt: 8)
 
         assert adapter._find_discord_windows_bundled_opus(discord_stub) == str(
-            bundled.resolve()
+            bundled.resolve(),
         )
 
     def test_opus_decode_error_logged(self):

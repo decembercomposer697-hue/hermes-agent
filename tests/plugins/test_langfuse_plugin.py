@@ -194,7 +194,7 @@ class TestPayloadSanitization:
 
         payload = "data:image/jpeg;base64," + ("b" * 20000)
         serialized = mod._serialize_messages([
-            {"role": "user", "content": [{"type": "image_url", "image_url": {"url": payload}}]}
+            {"role": "user", "content": [{"type": "image_url", "image_url": {"url": payload}}]},
         ])
 
         assert serialized[0]["content"][0]["image_url"]["url"] == {
@@ -290,17 +290,17 @@ class TestPlaceholderKeyDetection:
         self._clear_env(monkeypatch)
         plugin = self._fresh_plugin()
         assert plugin._validate_langfuse_key(
-            "HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-real-public-xyz"
+            "HERMES_LANGFUSE_PUBLIC_KEY", "pk-lf-real-public-xyz",
         ) is None
         assert plugin._validate_langfuse_key(
-            "HERMES_LANGFUSE_SECRET_KEY", "sk-lf-real-secret-xyz"
+            "HERMES_LANGFUSE_SECRET_KEY", "sk-lf-real-secret-xyz",
         ) is None
 
     def test_validate_langfuse_key_rejects_wrong_prefix(self, monkeypatch):
         self._clear_env(monkeypatch)
         plugin = self._fresh_plugin()
         msg = plugin._validate_langfuse_key(
-            "HERMES_LANGFUSE_PUBLIC_KEY", "placeholder"
+            "HERMES_LANGFUSE_PUBLIC_KEY", "placeholder",
         )
         assert msg is not None
         assert "HERMES_LANGFUSE_PUBLIC_KEY" in msg
@@ -546,7 +546,7 @@ class TestToolCallOutputBackfill:
         assert state.turn_tool_calls[0]["output"] == ended["output"]
         assert state.turn_tool_calls[0]["function"]["output"] == ended["output"]
         assert state.turn_tool_calls[0]["output"] == {
-            "results": [{"url": "https://example.com", "content": "Example Domain"}]
+            "results": [{"url": "https://example.com", "content": "Example Domain"}],
         }
 
     def test_serialize_messages_keeps_tool_name_and_call_id(self):

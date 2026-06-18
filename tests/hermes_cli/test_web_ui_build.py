@@ -159,7 +159,7 @@ class TestBuildWebUISkipsWhenFresh:
         assert install_cmd[install_cmd.index("--workspace") + 1] == "web"
 
     def test_web_install_omits_workspace_when_web_has_own_lockfile(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """web/ with its own lockfile => _workspace_root returns web_dir, so
         --workspace web would fail (npm can't find that workspace from inside
@@ -237,7 +237,7 @@ class TestBuildWebUISkipsWhenFresh:
         assert kwargs["cwd"] == tmp_path
 
     def test_desktop_web_install_uses_existing_workspace_root(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         web_dir, _ = _make_web_dir(tmp_path)
         (tmp_path / "package-lock.json").write_text("{}", encoding="utf-8")

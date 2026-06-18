@@ -97,16 +97,16 @@ TERMINAL_TOOL_DEFINITION = {
             "properties": {
                 "command": {
                     "type": "string",
-                    "description": "The bash command to execute"
+                    "description": "The bash command to execute",
                 },
                 "timeout": {
                     "type": "integer",
-                    "description": "Command timeout in seconds (default: 60)"
-                }
+                    "description": "Command timeout in seconds (default: 60)",
+                },
             },
-            "required": ["command"]
-        }
-    }
+            "required": ["command"],
+        },
+    },
 }
 
 
@@ -119,7 +119,7 @@ def create_environment(
     image: str = "python:3.11-slim",
     cwd: str = "/tmp",
     timeout: int = 60,
-    **kwargs
+    **kwargs,
 ):
     """
     Create an execution environment using Hermes-Agent's built-in backends.
@@ -198,7 +198,7 @@ class MiniSWERunner:
         logging.basicConfig(
             level=logging.DEBUG if verbose else logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s',
-            datefmt='%H:%M:%S'
+            datefmt='%H:%M:%S',
         )
         self.logger = logging.getLogger(__name__)
         
@@ -247,7 +247,7 @@ class MiniSWERunner:
             env_type=self.env_type,
             image=self.image,
             cwd=self.cwd,
-            timeout=self.command_timeout
+            timeout=self.command_timeout,
         )
         print("✅ Environment ready")
     
@@ -279,13 +279,13 @@ class MiniSWERunner:
             return {
                 "output": result.get("output", ""),
                 "exit_code": result.get("returncode", 0),
-                "error": None
+                "error": None,
             }
         except Exception as e:
             return {
                 "output": "",
                 "exit_code": -1,
-                "error": str(e)
+                "error": str(e),
             }
     
     def _format_tools_for_system_message(self) -> str:
@@ -297,7 +297,7 @@ class MiniSWERunner:
                 "name": func["name"],
                 "description": func.get("description", ""),
                 "parameters": func.get("parameters", {}),
-                "required": None
+                "required": None,
             })
         return json.dumps(formatted_tools, ensure_ascii=False)
     
@@ -305,7 +305,7 @@ class MiniSWERunner:
         self,
         messages: list[dict[str, Any]],
         user_query: str,
-        completed: bool
+        completed: bool,
     ) -> list[dict[str, Any]]:
         """
         Convert internal message format to Hermes trajectory format.
@@ -361,7 +361,7 @@ class MiniSWERunner:
                         
                         tool_call_json = {
                             "name": tool_call["function"]["name"],
-                            "arguments": arguments
+                            "arguments": arguments,
                         }
                         content += f"<tool_call>\n{json.dumps(tool_call_json, ensure_ascii=False)}\n</tool_call>\n"
                     
@@ -386,7 +386,7 @@ class MiniSWERunner:
                             "tool_call_id": tool_msg.get("tool_call_id", ""),
                             "name": msg["tool_calls"][len(tool_responses)]["function"]["name"] \
                                 if len(tool_responses) < len(msg["tool_calls"]) else "unknown",
-                            "content": tool_content
+                            "content": tool_content,
                         }, ensure_ascii=False)
                         tool_response += "\n</tool_response>"
                         tool_responses.append(tool_response)
@@ -496,11 +496,11 @@ Complete the user's task step by step."""
                                 "type": tc.type,
                                 "function": {
                                     "name": tc.function.name,
-                                    "arguments": tc.function.arguments
-                                }
+                                    "arguments": tc.function.arguments,
+                                },
                             }
                             for tc in assistant_message.tool_calls
-                        ]
+                        ],
                     })
                     
                     # Execute each tool call
@@ -523,8 +523,8 @@ Complete the user's task step by step."""
                             "content": {
                                 "output": result["output"],
                                 "exit_code": result["exit_code"],
-                                "error": result["error"]
-                            }
+                                "error": result["error"],
+                            },
                         }, ensure_ascii=False)
                         
                         # Check for task completion signal
@@ -549,7 +549,7 @@ Complete the user's task step by step."""
                     final_response = assistant_message.content or ""
                     messages.append({
                         "role": "assistant",
-                        "content": final_response
+                        "content": final_response,
                     })
                     completed = True
                     print("🎉 Agent finished (no more tool calls)")
@@ -572,14 +572,14 @@ Complete the user's task step by step."""
             "metadata": {
                 "model": self.model,
                 "env_type": self.env_type,
-                "timestamp": datetime.now().isoformat()
-            }
+                "timestamp": datetime.now().isoformat(),
+            },
         }
     
     def run_batch(
         self,
         prompts: list[str],
-        output_file: str
+        output_file: str,
     ) -> list[dict[str, Any]]:
         """
         Run multiple tasks and save trajectories to a JSONL file.
@@ -619,7 +619,7 @@ Complete the user's task step by step."""
                         "completed": False,
                         "api_calls": 0,
                         "error": str(e),
-                        "metadata": {"timestamp": datetime.now().isoformat()}
+                        "metadata": {"timestamp": datetime.now().isoformat()},
                     }
                     results.append(error_result)
                     f.write(json.dumps(error_result, ensure_ascii=False) + "\n")

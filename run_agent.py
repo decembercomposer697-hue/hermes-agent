@@ -231,7 +231,7 @@ def _routermint_headers() -> dict:
 
 
 def _pool_may_recover_from_rate_limit(
-    pool, *, provider: str | None = None, base_url: str | None = None
+    pool, *, provider: str | None = None, base_url: str | None = None,
 ) -> bool:
     """Decide whether to wait for credential-pool rotation instead of falling back.
 
@@ -313,7 +313,7 @@ class _StreamErrorEvent(Exception):
                 "code": code,
                 "param": param,
                 "type": "error",
-            }
+            },
         }
 
 
@@ -527,7 +527,7 @@ class AIAgent:
             # Transient failure (e.g. SQLite lock). Keep _session_db alive —
             # _session_db_created stays False so next run_conversation() retries.
             logger.warning(
-                "Session DB creation failed (will retry next turn): %s", e
+                "Session DB creation failed (will retry next turn): %s", e,
             )
 
     def _transition_context_engine_session(
@@ -569,7 +569,7 @@ class AIAgent:
             old_session_id
             or previous_messages is not None
             or carry_over_context
-            or extra_context
+            or extra_context,
         )
         target_session_id = new_session_id or getattr(self, "session_id", "") or ""
         if should_start and target_session_id and hasattr(engine, "on_session_start"):
@@ -946,7 +946,7 @@ class AIAgent:
         return stream_diag_init()
 
     def _stream_diag_capture_response(
-        self, diag: dict[str, Any], http_response: Any
+        self, diag: dict[str, Any], http_response: Any,
     ) -> None:
         """Forwarder — see ``agent.stream_diag.stream_diag_capture_response``."""
         from agent.stream_diag import stream_diag_capture_response
@@ -1046,7 +1046,7 @@ class AIAgent:
             hostname = base_url_hostname(base_url)
         else:
             hostname = getattr(self, "_base_url_hostname", "") or base_url_hostname(
-                getattr(self, "_base_url_lower", "")
+                getattr(self, "_base_url_lower", ""),
             )
         return hostname == "api.openai.com"
 
@@ -1072,7 +1072,7 @@ class AIAgent:
             hostname = base_url_hostname(base_url)
         else:
             hostname = getattr(self, "_base_url_hostname", "") or base_url_hostname(
-                getattr(self, "_base_url_lower", "")
+                getattr(self, "_base_url_lower", ""),
             )
         return hostname == "api.githubcopilot.com"
 
@@ -2051,7 +2051,7 @@ class AIAgent:
             {
                 "method": "POST",
                 "body": body,
-            }
+            },
         )
 
     def _api_response_payload_for_hook(
@@ -2079,7 +2079,7 @@ class AIAgent:
                     "tool_calls": tool_calls,
                 },
                 "usage": self._usage_summary_for_api_request_hook(response),
-            }
+            },
         )
 
     def _invoke_api_request_error_hook(
@@ -2543,7 +2543,7 @@ class AIAgent:
             "⚠️ File-mutation verifier: "
             f"{len(failed)} file(s) were NOT modified this turn despite any "
             "wording above that may suggest otherwise. Run `git status` or "
-            "`read_file` to confirm."
+            "`read_file` to confirm.",
         ]
         shown = 0
         for path, info in failed.items():
@@ -2785,7 +2785,7 @@ class AIAgent:
             if _dev:
                 logger.info(
                     "credits ▸ response had no valid x-nous-credits-* headers "
-                    "(miss — producer off / non-Nous path / >TTL stale)"
+                    "(miss — producer off / non-Nous path / >TTL stale)",
                 )
             return
 
@@ -3825,7 +3825,7 @@ class AIAgent:
         elif base_url_host_matches(base_url, "chatgpt.com"):
             from agent.auxiliary_client import _codex_cloudflare_headers
             self._client_kwargs["default_headers"] = _codex_cloudflare_headers(
-                self._client_kwargs.get("api_key", "")
+                self._client_kwargs.get("api_key", ""),
             )
         else:
             # No URL-specific headers — check profile.default_headers before clearing.
@@ -3942,7 +3942,7 @@ class AIAgent:
         # TypeError on them). See #31673.
         from agent.anthropic_adapter import sanitize_anthropic_kwargs
         sanitize_anthropic_kwargs(
-            api_kwargs, log_prefix=getattr(self, "log_prefix", "")
+            api_kwargs, log_prefix=getattr(self, "log_prefix", ""),
         )
         return self._anthropic_client.messages.create(**api_kwargs)
 
@@ -4035,12 +4035,12 @@ class AIAgent:
 
     def _interim_content_was_streamed(self, content: str) -> bool:
         visible_content = self._normalize_interim_visible_text(
-            self._strip_think_blocks(content or "")
+            self._strip_think_blocks(content or ""),
         )
         if not visible_content:
             return False
         streamed = self._normalize_interim_visible_text(
-            self._strip_think_blocks(getattr(self, "_current_streamed_assistant_text", "") or "")
+            self._strip_think_blocks(getattr(self, "_current_streamed_assistant_text", "") or ""),
         )
         return bool(streamed) and streamed == visible_content
 
@@ -4096,7 +4096,7 @@ class AIAgent:
                 text = sanitize_context(text)
             # Only strip leading newlines on the first delta — mid-stream "\n" is legitimate markdown.
             if not prepended_break and not getattr(
-                self, "_current_streamed_assistant_text", ""
+                self, "_current_streamed_assistant_text", "",
             ):
                 text = text.lstrip("\n")
         if not text:
@@ -4144,7 +4144,7 @@ class AIAgent:
         )
 
     def _interruptible_streaming_api_call(
-        self, api_kwargs: dict, *, on_first_delta: callable = None
+        self, api_kwargs: dict, *, on_first_delta: callable = None,
     ):
         """Forwarder — see ``agent.chat_completion_helpers.interruptible_streaming_api_call``."""
         from agent.chat_completion_helpers import interruptible_streaming_api_call
@@ -4246,7 +4246,7 @@ class AIAgent:
             from tools.vision_tools import vision_analyze_tool
 
             result_json = asyncio.run(
-                vision_analyze_tool(image_url=vision_source, user_prompt=analysis_prompt)
+                vision_analyze_tool(image_url=vision_source, user_prompt=analysis_prompt),
             )
             result = json.loads(result_json) if isinstance(result_json, str) else {}
             description = (result.get("analysis") or "").strip()
@@ -4784,7 +4784,7 @@ class AIAgent:
             if self.reasoning_config.get("enabled") is False:
                 return None
             requested_effort = str(
-                self.reasoning_config.get("effort", "medium")
+                self.reasoning_config.get("effort", "medium"),
             ).strip().lower()
         else:
             requested_effort = "medium"
@@ -5022,11 +5022,11 @@ class AIAgent:
         try:
             if not _should_parallelize_tool_batch(tool_calls):
                 return self._execute_tool_calls_sequential(
-                    assistant_message, messages, effective_task_id, api_call_count
+                    assistant_message, messages, effective_task_id, api_call_count,
                 )
 
             return self._execute_tool_calls_concurrent(
-                assistant_message, messages, effective_task_id, api_call_count
+                assistant_message, messages, effective_task_id, api_call_count,
             )
         finally:
             self._executing_tools = False
@@ -5161,7 +5161,7 @@ def main(
     save_trajectories: bool = False,
     save_sample: bool = False,
     verbose: bool = False,
-    log_prefix_chars: int = 20
+    log_prefix_chars: int = 20,
 ):
     """
     Main function for running the agent directly.
@@ -5299,7 +5299,7 @@ def main(
             disabled_toolsets=disabled_toolsets_list,
             save_trajectories=save_trajectories,
             verbose_logging=verbose,
-            log_prefix_chars=log_prefix_chars
+            log_prefix_chars=log_prefix_chars,
         )
     except RuntimeError as e:
         print(f"❌ Failed to initialize agent: {e}")
@@ -5341,7 +5341,7 @@ def main(
         trajectory = agent._convert_to_trajectory_format(
             result['messages'], 
             user_query, 
-            result['completed']
+            result['completed'],
         )
         
         entry = {
@@ -5349,7 +5349,7 @@ def main(
             "timestamp": datetime.now().isoformat(),
             "model": model,
             "completed": result['completed'],
-            "query": user_query
+            "query": user_query,
         }
         
         try:

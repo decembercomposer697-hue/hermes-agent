@@ -61,7 +61,7 @@ def test_config_parses_nested_warn_and_hard_stop_thresholds():
                 "same_tool_failure": 7,
                 "idempotent_no_progress": 8,
             },
-        }
+        },
     )
 
     assert cfg.warnings_enabled is False
@@ -82,7 +82,7 @@ def test_default_repeated_identical_failed_call_warns_without_blocking():
     for _ in range(5):
         assert controller.before_call("web_search", args).action == "allow"
         decisions.append(
-            controller.after_call("web_search", args, '{"error":"boom"}', failed=True)
+            controller.after_call("web_search", args, '{"error":"boom"}', failed=True),
         )
 
     assert decisions[0].action == "allow"
@@ -99,7 +99,7 @@ def test_hard_stop_enabled_blocks_repeated_exact_failure_before_next_execution()
             exact_failure_warn_after=2,
             exact_failure_block_after=2,
             same_tool_failure_halt_after=99,
-        )
+        ),
     )
     args = {"query": "same"}
 
@@ -120,7 +120,7 @@ def test_hard_stop_enabled_blocks_repeated_exact_failure_before_next_execution()
 
 def test_success_resets_exact_signature_failure_streak():
     controller = ToolCallGuardrailController(
-        ToolCallGuardrailConfig(hard_stop_enabled=True, exact_failure_block_after=2, same_tool_failure_halt_after=99)
+        ToolCallGuardrailConfig(hard_stop_enabled=True, exact_failure_block_after=2, same_tool_failure_halt_after=99),
     )
     args = {"query": "same"}
 
@@ -149,7 +149,7 @@ def test_file_mutation_lint_error_result_is_not_a_tool_failure():
 
 def test_same_tool_varying_args_warns_by_default_without_halting():
     controller = ToolCallGuardrailController(
-        ToolCallGuardrailConfig(same_tool_failure_warn_after=2, same_tool_failure_halt_after=3)
+        ToolCallGuardrailConfig(same_tool_failure_warn_after=2, same_tool_failure_halt_after=3),
     )
 
     first = controller.after_call("terminal", {"command": "cmd-1"}, '{"exit_code":1}', failed=True)
@@ -174,7 +174,7 @@ def test_hard_stop_enabled_halts_same_tool_varying_args_failure_streak():
             exact_failure_block_after=99,
             same_tool_failure_warn_after=2,
             same_tool_failure_halt_after=3,
-        )
+        ),
     )
 
     first = controller.after_call("terminal", {"command": "cmd-1"}, '{"exit_code":1}', failed=True)
@@ -190,7 +190,7 @@ def test_hard_stop_enabled_halts_same_tool_varying_args_failure_streak():
 
 def test_idempotent_no_progress_repeated_result_warns_without_blocking_by_default():
     controller = ToolCallGuardrailController(
-        ToolCallGuardrailConfig(no_progress_warn_after=2, no_progress_block_after=2)
+        ToolCallGuardrailConfig(no_progress_warn_after=2, no_progress_block_after=2),
     )
     args = {"path": "/tmp/same.txt"}
     result = "same file contents"
@@ -211,7 +211,7 @@ def test_hard_stop_enabled_blocks_idempotent_no_progress_future_repeat():
             hard_stop_enabled=True,
             no_progress_warn_after=2,
             no_progress_block_after=2,
-        )
+        ),
     )
     args = {"path": "/tmp/same.txt"}
     result = "same file contents"
@@ -230,7 +230,7 @@ def test_hard_stop_enabled_blocks_idempotent_no_progress_future_repeat():
 
 def test_mutating_or_unknown_tools_are_not_blocked_for_repeated_identical_success_output_by_default():
     controller = ToolCallGuardrailController(
-        ToolCallGuardrailConfig(no_progress_warn_after=2, no_progress_block_after=2)
+        ToolCallGuardrailConfig(no_progress_warn_after=2, no_progress_block_after=2),
     )
 
     for _ in range(3):
@@ -242,7 +242,7 @@ def test_mutating_or_unknown_tools_are_not_blocked_for_repeated_identical_succes
 
 def test_reset_for_turn_clears_bounded_guardrail_state():
     controller = ToolCallGuardrailController(
-        ToolCallGuardrailConfig(hard_stop_enabled=True, exact_failure_block_after=2, no_progress_block_after=2)
+        ToolCallGuardrailConfig(hard_stop_enabled=True, exact_failure_block_after=2, no_progress_block_after=2),
     )
     controller.after_call("web_search", {"query": "same"}, '{"error":"boom"}', failed=True)
     controller.after_call("web_search", {"query": "same"}, '{"error":"boom"}', failed=True)

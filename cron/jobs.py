@@ -232,7 +232,7 @@ def parse_schedule(schedule: str) -> dict[str, Any]:
         return {
             "kind": "interval",
             "minutes": minutes,
-            "display": f"every {minutes}m"
+            "display": f"every {minutes}m",
         }
     
     # Check for cron expression (5 or 6 space-separated fields)
@@ -251,7 +251,7 @@ def parse_schedule(schedule: str) -> dict[str, Any]:
         return {
             "kind": "cron",
             "expr": schedule,
-            "display": schedule
+            "display": schedule,
         }
     
     # ISO timestamp (contains T or looks like date)
@@ -266,7 +266,7 @@ def parse_schedule(schedule: str) -> dict[str, Any]:
             return {
                 "kind": "once",
                 "run_at": dt.isoformat(),
-                "display": f"once at {dt.strftime('%Y-%m-%d %H:%M')}"
+                "display": f"once at {dt.strftime('%Y-%m-%d %H:%M')}",
             }
         except ValueError as e:
             raise ValueError(f"Invalid timestamp '{schedule}': {e}")
@@ -278,7 +278,7 @@ def parse_schedule(schedule: str) -> dict[str, Any]:
         return {
             "kind": "once",
             "run_at": run_at.isoformat(),
-            "display": f"once in {original}"
+            "display": f"once in {original}",
         }
     except ValueError:
         pass
@@ -288,7 +288,7 @@ def parse_schedule(schedule: str) -> dict[str, Any]:
         f"  - Duration: '30m', '2h', '1d' (one-shot)\n"
         f"  - Interval: 'every 30m', 'every 2h' (recurring)\n"
         f"  - Cron: '0 9 * * *' (cron expression)\n"
-        f"  - Timestamp: '2026-02-03T14:00:00' (one-shot at time)"
+        f"  - Timestamp: '2026-02-03T14:00:00' (one-shot at time)",
     )
 
 
@@ -464,7 +464,7 @@ def load_jobs() -> list[dict[str, Any]]:
         return data
 
     raise RuntimeError(
-        f"Cron database corrupted: expected {{'jobs': [...]}}, got {type(data).__name__}"
+        f"Cron database corrupted: expected {{'jobs': [...]}}, got {type(data).__name__}",
     )
 
 
@@ -510,7 +510,7 @@ def _normalize_workdir(workdir: str | None) -> str | None:
     if not expanded.is_absolute():
         raise ValueError(
             f"Cron workdir must be an absolute path (got {raw!r}). "
-            f"Cron jobs run detached from any shell cwd, so relative paths are ambiguous."
+            f"Cron jobs run detached from any shell cwd, so relative paths are ambiguous.",
         )
     resolved = expanded.resolve()
     if not resolved.exists():
@@ -622,7 +622,7 @@ def create_job(
     if normalized_no_agent and not normalized_script:
         raise ValueError(
             "no_agent=True requires a script — with no agent and no script "
-            "there is nothing for the job to run."
+            "there is nothing for the job to run.",
         )
 
     # Normalize context_from: accept str or list of str, store as list or None
@@ -651,7 +651,7 @@ def create_job(
         "schedule_display": parsed_schedule.get("display", schedule),
         "repeat": {
             "times": repeat,  # None = forever
-            "completed": 0
+            "completed": 0,
         },
         "enabled": True,
         "state": "scheduled",
@@ -695,7 +695,7 @@ class AmbiguousJobReference(LookupError):
         ids = ", ".join(m["id"] for m in matches)
         super().__init__(
             f"Job name '{ref}' is ambiguous — matches {len(matches)} jobs: {ids}. "
-            f"Use the job ID instead."
+            f"Use the job ID instead.",
         )
 
 
@@ -719,7 +719,7 @@ def resolve_job_ref(ref: str) -> dict[str, Any] | None:
         return None
     if len(name_matches) > 1:
         raise AmbiguousJobReference(
-            ref, [_normalize_job_record(j) for j in name_matches]
+            ref, [_normalize_job_record(j) for j in name_matches],
         )
     return _normalize_job_record(name_matches[0])
 
@@ -740,7 +740,7 @@ def update_job(job_id: str, updates: dict[str, Any]) -> dict[str, Any] | None:
     bad_fields = _IMMUTABLE_JOB_FIELDS.intersection(updates or {})
     if bad_fields:
         raise ValueError(
-            f"Cron job field(s) cannot be updated: {', '.join(sorted(bad_fields))}"
+            f"Cron job field(s) cannot be updated: {', '.join(sorted(bad_fields))}",
         )
 
     jobs = load_jobs()
@@ -1202,7 +1202,7 @@ def rewrite_skill_refs(
         if changed:
             save_jobs(jobs)
             logger.info(
-                "Curator rewrote skill references in %d cron job(s)", len(rewrites)
+                "Curator rewrote skill references in %d cron job(s)", len(rewrites),
             )
 
         return {

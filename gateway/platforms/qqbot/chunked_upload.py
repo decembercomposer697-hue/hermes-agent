@@ -82,7 +82,7 @@ class UploadDailyLimitExceededError(Exception):
         self.file_name = file_name
         self.file_size = file_size
         super().__init__(
-            message or f"Daily upload limit exceeded for {file_name!r}"
+            message or f"Daily upload limit exceeded for {file_name!r}",
         )
 
     @property
@@ -109,7 +109,7 @@ class UploadFileTooLargeError(Exception):
             or (
                 f"File {file_name!r} ({format_size(file_size)}) "
                 f"exceeds platform limit{limit_str}"
-            )
+            ),
         )
 
     @property
@@ -158,13 +158,13 @@ def _parse_prepare_response(raw: dict[str, Any]) -> _PrepareResult:
     upload_id = str(src.get("upload_id", ""))
     if not upload_id:
         raise ValueError(
-            f"upload_prepare response missing upload_id: {str(raw)[:200]}"
+            f"upload_prepare response missing upload_id: {str(raw)[:200]}",
         )
     block_size = int(src.get("block_size", 0))
     raw_parts = src.get("parts") or src.get("part_list") or []
     if not isinstance(raw_parts, list) or not raw_parts:
         raise ValueError(
-            f"upload_prepare response missing parts: {str(raw)[:200]}"
+            f"upload_prepare response missing parts: {str(raw)[:200]}",
         )
     parts: list[_PreparePart] = []
     for p in raw_parts:
@@ -174,10 +174,10 @@ def _parse_prepare_response(raw: dict[str, Any]) -> _PrepareResult:
             _PreparePart(
                 index=int(p.get("part_index") or p.get("index") or 0),
                 presigned_url=str(
-                    p.get("presigned_url") or p.get("url") or ""
+                    p.get("presigned_url") or p.get("url") or "",
                 ),
                 block_size=int(p.get("block_size", 0)),
-            )
+            ),
         )
     return _PrepareResult(
         upload_id=upload_id,
@@ -242,7 +242,7 @@ class ChunkedUploader:
         """
         if chat_type not in {"c2c", "group"}:
             raise ValueError(
-                f"ChunkedUploader: unsupported chat_type {chat_type!r}"
+                f"ChunkedUploader: unsupported chat_type {chat_type!r}",
             )
 
         path = Path(file_path)
@@ -255,12 +255,12 @@ class ChunkedUploader:
 
         # Step 1: compute hashes (blocking I/O → executor).
         hashes = await asyncio.get_running_loop().run_in_executor(
-            None, _compute_file_hashes, file_path, file_size
+            None, _compute_file_hashes, file_path, file_size,
         )
 
         # Step 2: upload_prepare.
         prepare = await self._prepare(
-            chat_type, target_id, file_type, file_name, file_size, hashes
+            chat_type, target_id, file_type, file_name, file_size, hashes,
         )
         max_concurrent = min(prepare.concurrency, _MAX_CONCURRENT_PARTS)
         retry_timeout = min(
@@ -329,13 +329,13 @@ class ChunkedUploader:
         }
         try:
             raw = await self._api_request(
-                "POST", path, body=body, timeout=FILE_UPLOAD_TIMEOUT
+                "POST", path, body=body, timeout=FILE_UPLOAD_TIMEOUT,
             )
         except RuntimeError as exc:
             err_msg = str(exc)
             if f"{_BIZ_CODE_DAILY_LIMIT}" in err_msg:
                 raise UploadDailyLimitExceededError(
-                    file_name, file_size, err_msg
+                    file_name, file_size, err_msg,
                 ) from exc
             raise
         return _parse_prepare_response(raw)
@@ -365,7 +365,7 @@ class ChunkedUploader:
 
         # Read this slice of the file (blocking → executor).
         data = await asyncio.get_running_loop().run_in_executor(
-            None, _read_file_chunk, file_path, offset, length
+            None, _read_file_chunk, file_path, offset, length,
         )
         md5_hex = hashlib.md5(data).hexdigest()
 
@@ -376,7 +376,7 @@ class ChunkedUploader:
         )
 
         await self._put_to_presigned_url(
-            part.presigned_url, data, part_index, progress.total_parts
+            part.presigned_url, data, part_index, progress.total_parts,
         )
         await self._part_finish_with_retry(
             chat_type, target_id, upload_id,
@@ -424,7 +424,7 @@ class ChunkedUploader:
                 except Exception:  # pragma: no cover — defensive
                     pass
                 raise RuntimeError(
-                    f"COS PUT returned {status}: {body_preview}"
+                    f"COS PUT returned {status}: {body_preview}",
                 )
             except Exception as exc:
                 last_exc = exc
@@ -438,7 +438,7 @@ class ChunkedUploader:
                     await asyncio.sleep(delay)
         raise RuntimeError(
             f"Part {part_index}/{total_parts} upload failed after "
-            f"{_PART_UPLOAD_MAX_RETRIES + 1} attempts: {last_exc}"
+            f"{_PART_UPLOAD_MAX_RETRIES + 1} attempts: {last_exc}",
         )
 
     async def _part_finish_with_retry(
@@ -467,7 +467,7 @@ class ChunkedUploader:
         while True:
             try:
                 await self._api_request(
-                    "POST", path, body=body, timeout=FILE_UPLOAD_TIMEOUT
+                    "POST", path, body=body, timeout=FILE_UPLOAD_TIMEOUT,
                 )
                 return
             except RuntimeError as exc:
@@ -478,7 +478,7 @@ class ChunkedUploader:
                 if elapsed >= retry_timeout:
                     raise RuntimeError(
                         f"upload_part_finish persistent retry timed out "
-                        f"after {retry_timeout:.0f}s ({attempt} retries): {exc}"
+                        f"after {retry_timeout:.0f}s ({attempt} retries): {exc}",
                     ) from exc
                 attempt += 1
                 logger.debug(
@@ -511,7 +511,7 @@ class ChunkedUploader:
         for attempt in range(_COMPLETE_UPLOAD_MAX_RETRIES + 1):
             try:
                 return await self._api_request(
-                    "POST", path, body=body, timeout=FILE_UPLOAD_TIMEOUT
+                    "POST", path, body=body, timeout=FILE_UPLOAD_TIMEOUT,
                 )
             except Exception as exc:
                 last_exc = exc
@@ -525,7 +525,7 @@ class ChunkedUploader:
                     await asyncio.sleep(delay)
         raise RuntimeError(
             f"complete_upload failed after "
-            f"{_COMPLETE_UPLOAD_MAX_RETRIES + 1} attempts: {last_exc}"
+            f"{_COMPLETE_UPLOAD_MAX_RETRIES + 1} attempts: {last_exc}",
         )
 
 
@@ -552,7 +552,7 @@ def _read_file_chunk(file_path: str, offset: int, length: int) -> bytes:
         if len(data) != length:
             raise OSError(
                 f"Short read from {file_path}: expected {length} bytes at "
-                f"offset {offset}, got {len(data)} (file may be truncated)"
+                f"offset {offset}, got {len(data)} (file may be truncated)",
             )
         return data
 

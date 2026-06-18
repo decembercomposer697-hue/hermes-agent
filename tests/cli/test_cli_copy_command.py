@@ -51,7 +51,7 @@ def test_copy_strips_reasoning_blocks_before_copy():
         {
             "role": "assistant",
             "content": "<REASONING_SCRATCHPAD>internal</REASONING_SCRATCHPAD>\nVisible answer",
-        }
+        },
     ]
 
     with patch.object(cli_obj, "_write_osc52_clipboard") as mock_copy:

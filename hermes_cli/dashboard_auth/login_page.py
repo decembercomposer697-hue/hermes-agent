@@ -489,7 +489,7 @@ def render_login_html(*, next_path: str = "") -> str:
             buttons.append(
                 f'      <a class="provider-btn" '
                 f'href="/auth/login?provider={html.escape(p.name, quote=True)}{next_qs}">'
-                f'Sign in with {html.escape(p.display_name)}</a>'
+                f'Sign in with {html.escape(p.display_name)}</a>',
             )
     script = _PASSWORD_FORM_SCRIPT if needs_password_script else ""
     return _LOGIN_HTML_TEMPLATE.format(

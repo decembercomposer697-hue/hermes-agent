@@ -642,12 +642,12 @@ def _pricing_entry_from_metadata(
     cache_read = _to_decimal(
         pricing.get("cache_read")
         or pricing.get("cached_prompt")
-        or pricing.get("input_cache_read")
+        or pricing.get("input_cache_read"),
     )
     cache_write = _to_decimal(
         pricing.get("cache_write")
         or pricing.get("cache_creation")
-        or pricing.get("input_cache_write")
+        or pricing.get("input_cache_write"),
     )
     if prompt is None and completion is None and request is None:
         return None
@@ -734,7 +734,7 @@ def normalize_usage(
         details = getattr(response_usage, "input_tokens_details", None)
         cache_read_tokens = _to_int(getattr(details, "cached_tokens", 0) if details else 0)
         cache_write_tokens = _to_int(
-            getattr(details, "cache_creation_tokens", 0) if details else 0
+            getattr(details, "cache_creation_tokens", 0) if details else 0,
         )
         input_tokens = max(0, input_total - cache_read_tokens - cache_write_tokens)
     else:
@@ -751,11 +751,11 @@ def normalize_usage(
         if not cache_read_tokens:
             cache_read_tokens = _to_int(getattr(response_usage, "cache_read_input_tokens", 0))
         cache_write_tokens = _to_int(
-            getattr(details, "cache_write_tokens", 0) if details else 0
+            getattr(details, "cache_write_tokens", 0) if details else 0,
         )
         if not cache_write_tokens:
             cache_write_tokens = _to_int(
-                getattr(response_usage, "cache_creation_input_tokens", 0)
+                getattr(response_usage, "cache_creation_input_tokens", 0),
             )
         input_tokens = max(0, prompt_total - cache_read_tokens - cache_write_tokens)
 

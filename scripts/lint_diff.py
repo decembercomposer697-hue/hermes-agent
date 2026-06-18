@@ -58,7 +58,7 @@ def _normalize_ruff(entries: list[dict]) -> list[dict]:
                 "path": filename,
                 "line": line,
                 "message": e.get("message", ""),
-            }
+            },
         )
     return out
 
@@ -76,7 +76,7 @@ def _normalize_ty(entries: list[dict]) -> list[dict]:
                 "path": loc.get("path", ""),
                 "line": begin.get("line", 0),
                 "message": e.get("description", ""),
-            }
+            },
         )
     return out
 
@@ -147,16 +147,16 @@ def _tool_report(
     if not base_available:
         lines.append(
             "_Base report unavailable (likely main has no config for this tool yet); "
-            "treating all head diagnostics as new._\n"
+            "treating all head diagnostics as new._\n",
         )
     lines.append(
         f"**Total:** {len(head)} on HEAD, {len(base)} on base "
-        f"({emoji} {delta_str})\n"
+        f"({emoji} {delta_str})\n",
     )
     lines.append(_section("🆕 New issues", new))
     lines.append(_section("✅ Fixed issues", fixed))
     lines.append(
-        f"**Unchanged:** {len(unchanged)} pre-existing issues carried over.\n"
+        f"**Unchanged:** {len(unchanged)} pre-existing issues carried over.\n",
     )
     return "\n".join(lines)
 
@@ -170,7 +170,7 @@ def main() -> int:
     ap.add_argument("--base-ref", default="base")
     ap.add_argument("--head-ref", default="HEAD")
     ap.add_argument(
-        "--output", type=Path, help="Write summary to this file instead of stdout"
+        "--output", type=Path, help="Write summary to this file instead of stdout",
     )
     args = ap.parse_args()
 
@@ -192,7 +192,7 @@ def main() -> int:
     buf.append(_tool_report("ruff", base_ruff, head_ruff, base_ruff_avail))
     buf.append(_tool_report("ty (type checker)", base_ty, head_ty, base_ty_avail))
     buf.append(
-        "_Diagnostics are surfaced as warnings — this check never fails the build._\n"
+        "_Diagnostics are surfaced as warnings — this check never fails the build._\n",
     )
 
     summary = "\n".join(buf)

@@ -46,7 +46,7 @@ UPDATE_PROMPT_PREFIX = "update_prompt:"
 # session_key may itself contain colons (e.g. agent:main:qqbot:c2c:OPENID),
 # so the session_key group is greedy but trails the decision.
 _APPROVAL_DATA_RE = re.compile(
-    r"^approve:(.+):(allow-once|allow-always|deny)$"
+    r"^approve:(.+):(allow-once|allow-always|deny)$",
 )
 
 # Pattern: update_prompt:y | update_prompt:n
@@ -78,7 +78,7 @@ class KeyboardButtonAction:
     type: int
     data: str
     permission: KeyboardButtonPermission = field(
-        default_factory=KeyboardButtonPermission
+        default_factory=KeyboardButtonPermission,
     )
     click_limit: int = 1
 
@@ -240,8 +240,8 @@ def build_approval_keyboard(session_key: str) -> InlineKeyboard:
                         group_id="approval",
                     ),
                 ]),
-            ]
-        )
+            ],
+        ),
     )
 
 
@@ -268,8 +268,8 @@ def build_update_prompt_keyboard() -> InlineKeyboard:
                         group_id="update_prompt",
                     ),
                 ]),
-            ]
-        )
+            ],
+        ),
     )
 
 

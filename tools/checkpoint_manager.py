@@ -447,7 +447,7 @@ def _init_store(store: Path, working_dir: str) -> str | None:
     info_dir = store / "info"
     info_dir.mkdir(exist_ok=True)
     (info_dir / "exclude").write_text(
-        "\n".join(DEFAULT_EXCLUDES) + "\n", encoding="utf-8"
+        "\n".join(DEFAULT_EXCLUDES) + "\n", encoding="utf-8",
     )
 
     logger.debug("Initialised checkpoint store at %s", store)
@@ -565,7 +565,7 @@ def _init_shadow_repo(shadow_repo: Path, working_dir: str) -> str | None:
     # (write in addition to the JSON metadata).
     try:
         (shadow_repo / "HERMES_WORKDIR").write_text(
-            str(_normalize_path(working_dir)) + "\n", encoding="utf-8"
+            str(_normalize_path(working_dir)) + "\n", encoding="utf-8",
         )
     except OSError:
         pass

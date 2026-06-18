@@ -310,7 +310,7 @@ def build_bundle_invocation_message(
                 skill_dir,
                 activation_note,
                 session_id=task_id,
-            )
+            ),
         )
         loaded_names.append(skill_name)
 
@@ -333,7 +333,7 @@ def build_bundle_invocation_message(
         header_lines.extend(["", f"Bundle instruction: {extra_instruction}"])
     if user_instruction:
         header_lines.extend(
-            ["", f"User instruction: {user_instruction}"]
+            ["", f"User instruction: {user_instruction}"],
         )
 
     header = "\n".join(header_lines)

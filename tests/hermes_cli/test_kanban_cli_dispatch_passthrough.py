@@ -41,10 +41,10 @@ def test_cli_dispatch_passes_max_in_progress_from_config(isolated_kanban_home, m
             "max_spawn": 5,
             "default_assignee": "default",
             "max_in_progress_per_profile": 2,
-        }
+        },
     }
     monkeypatch.setattr(
-        "hermes_cli.config.load_config", lambda: fake_config
+        "hermes_cli.config.load_config", lambda: fake_config,
     )
 
     captured = {}

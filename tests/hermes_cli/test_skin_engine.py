@@ -223,7 +223,7 @@ class TestUserSkins:
                     "branding": ["also", "invalid"],
                     "tool_emojis": ["invalid"],
                     "tool_prefix": "!",
-                }
+                },
             ),
             encoding="utf-8",
         )

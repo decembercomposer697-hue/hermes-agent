@@ -22,7 +22,7 @@ def server():
         "sys.modules",
         {
             "hermes_constants": MagicMock(
-                get_hermes_home=MagicMock(return_value="/tmp/hermes_test_review_summary")
+                get_hermes_home=MagicMock(return_value="/tmp/hermes_test_review_summary"),
             ),
             "hermes_cli.env_loader": MagicMock(),
             "hermes_cli.banner": MagicMock(),
@@ -63,7 +63,7 @@ def test_init_session_attaches_background_review_callback(server, monkeypatch):
         server,
         "_emit",
         lambda event, sid, payload=None: captured_emits.append(
-            (event, sid, payload)
+            (event, sid, payload),
         ),
     )
 
@@ -95,7 +95,7 @@ def test_init_session_attaches_background_review_callback(server, monkeypatch):
     event, sid, payload = matched[0]
     assert sid == "sid-abc"
     assert payload == {
-        "text": "💾 Self-improvement review: Skill 'hermes-release' patched"
+        "text": "💾 Self-improvement review: Skill 'hermes-release' patched",
     }
 
 

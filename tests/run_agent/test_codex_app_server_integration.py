@@ -45,7 +45,7 @@ def fake_session(monkeypatch):
 
     monkeypatch.setattr(CodexAppServerSession, "run_turn", fake_run_turn)
     monkeypatch.setattr(
-        CodexAppServerSession, "ensure_started", lambda self: "thread-stub-1"
+        CodexAppServerSession, "ensure_started", lambda self: "thread-stub-1",
     )
 
 
@@ -103,7 +103,7 @@ class TestRunConversationCodexPath:
 
         monkeypatch.setattr(CodexAppServerSession, "run_turn", fake_run_turn)
         monkeypatch.setattr(
-            CodexAppServerSession, "ensure_started", lambda self: "thread-usage-1"
+            CodexAppServerSession, "ensure_started", lambda self: "thread-usage-1",
         )
         agent = _make_codex_agent()
         with patch.object(agent, "_spawn_background_review", return_value=None):
@@ -196,7 +196,7 @@ class TestRunConversationCodexPath:
         assert not spawn.called
 
     def test_background_review_skill_trigger_fires_above_threshold(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         """When tool iterations cross the skill nudge interval, the
         background review fires with review_skills=True and the right
@@ -217,7 +217,7 @@ class TestRunConversationCodexPath:
             )
         monkeypatch.setattr(CodexAppServerSession, "run_turn", fake_run_turn)
         monkeypatch.setattr(
-            CodexAppServerSession, "ensure_started", lambda self: "th1"
+            CodexAppServerSession, "ensure_started", lambda self: "th1",
         )
 
         agent = _make_codex_agent()
@@ -277,7 +277,7 @@ class TestRunConversationCodexPath:
         # The chat_completions loop calls self.client.chat.completions.create(...)
         # If our early-return works, that path is dead.
         with patch.object(agent, "client") as client_mock, patch.object(
-            agent, "_spawn_background_review", return_value=None
+            agent, "_spawn_background_review", return_value=None,
         ):
             agent.run_conversation("hi")
         assert not client_mock.chat.completions.create.called

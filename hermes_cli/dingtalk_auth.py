@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # ── Configuration ──────────────────────────────────────────────────────────
 
 REGISTRATION_BASE_URL = os.environ.get(
-    "DINGTALK_REGISTRATION_BASE_URL", "https://oapi.dingtalk.com"
+    "DINGTALK_REGISTRATION_BASE_URL", "https://oapi.dingtalk.com",
 ).rstrip("/")
 
 REGISTRATION_SOURCE = os.environ.get("DINGTALK_REGISTRATION_SOURCE", "openClaw")

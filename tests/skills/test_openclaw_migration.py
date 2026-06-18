@@ -121,10 +121,10 @@ def test_migrator_copies_skill_and_merges_allowlist(tmp_path: Path):
                         "allowlist": [
                             {"pattern": "/usr/bin/*"},
                             {"pattern": "/home/test/**"},
-                        ]
-                    }
-                }
-            }
+                        ],
+                    },
+                },
+            },
         ),
         encoding="utf-8",
     )
@@ -158,7 +158,7 @@ def test_migrator_optionally_imports_supported_secrets_and_messaging_settings(tm
             {
                 "agents": {"defaults": {"workspace": "/tmp/openclaw-workspace"}},
                 "channels": {"telegram": {"botToken": "123:abc"}},
-            }
+            },
         ),
         encoding="utf-8",
     )
@@ -497,8 +497,8 @@ def test_discord_settings_migrated(tmp_path: Path):
                 "discord": {
                     "token": "discord-bot-token-123",
                     "allowFrom": ["111222333", "444555666"],
-                }
-            }
+                },
+            },
         }),
         encoding="utf-8",
     )
@@ -529,8 +529,8 @@ def test_slack_settings_migrated(tmp_path: Path):
                     "botToken": "xoxb-slack-bot",
                     "appToken": "xapp-slack-app",
                     "allowFrom": ["U111", "U222"],
-                }
-            }
+                },
+            },
         }),
         encoding="utf-8",
     )
@@ -562,8 +562,8 @@ def test_signal_settings_migrated(tmp_path: Path):
                     "account": "+15551234567",
                     "httpUrl": "http://localhost:8080",
                     "allowFrom": ["+15559876543"],
-                }
-            }
+                },
+            },
         }),
         encoding="utf-8",
     )
@@ -590,7 +590,7 @@ def test_model_config_migrated(tmp_path: Path):
 
     (source / "openclaw.json").write_text(
         json.dumps({
-            "agents": {"defaults": {"model": "anthropic/claude-sonnet-4"}}
+            "agents": {"defaults": {"model": "anthropic/claude-sonnet-4"}},
         }),
         encoding="utf-8",
     )
@@ -617,7 +617,7 @@ def test_model_config_object_format(tmp_path: Path):
 
     (source / "openclaw.json").write_text(
         json.dumps({
-            "agents": {"defaults": {"model": {"primary": "openai/gpt-4o"}}}
+            "agents": {"defaults": {"model": {"primary": "openai/gpt-4o"}}},
         }),
         encoding="utf-8",
     )
@@ -650,8 +650,8 @@ def test_tts_config_migrated(tmp_path: Path):
                         "voiceId": "custom-voice-id",
                         "modelId": "eleven_turbo_v2",
                     },
-                }
-            }
+                },
+            },
         }),
         encoding="utf-8",
     )
@@ -738,9 +738,9 @@ def test_provider_keys_require_migrate_secrets_flag(tmp_path: Path):
                     "openrouter": {
                         "apiKey": "sk-or-test-key",
                         "baseUrl": "https://openrouter.ai/api/v1",
-                    }
-                }
-            }
+                    },
+                },
+            },
         }),
         encoding="utf-8",
     )
@@ -1024,8 +1024,8 @@ def test_migrate_model_config_resolves_alias_against_real_openclaw_schema(tmp_pa
                         "anthropic/claude-opus-4-6": {"alias": "Claude Opus 4.6"},
                         "openai/gpt-5.2": {"alias": "GPT"},
                     },
-                }
-            }
+                },
+            },
         },
     )
     assert _extract_model(parsed) == "anthropic/claude-opus-4-6"
@@ -1039,8 +1039,8 @@ def test_migrate_model_config_resolves_alias_with_bare_string_model(tmp_path: Pa
                 "defaults": {
                     "model": "Sonnet",
                     "models": {"anthropic/claude-sonnet-4-7": {"alias": "Sonnet"}},
-                }
-            }
+                },
+            },
         },
     )
     assert _extract_model(parsed) == "anthropic/claude-sonnet-4-7"
@@ -1058,8 +1058,8 @@ def test_migrate_model_config_passes_through_existing_api_id(tmp_path: Path):
                     "models": {
                         "anthropic/claude-opus-4-6": {"alias": "Claude Opus 4.6"},
                     },
-                }
-            }
+                },
+            },
         },
     )
     assert _extract_model(parsed) == "anthropic/claude-opus-4-6"
@@ -1077,8 +1077,8 @@ def test_migrate_model_config_passes_through_unknown_alias(tmp_path: Path):
                     "models": {
                         "anthropic/claude-opus-4-6": {"alias": "Claude Opus 4.6"},
                     },
-                }
-            }
+                },
+            },
         },
     )
     assert _extract_model(parsed) == "Totally Unknown Name"
@@ -1094,8 +1094,8 @@ def test_migrate_model_config_handles_string_valued_catalog_entries(tmp_path: Pa
                 "defaults": {
                     "model": "MyModel",
                     "models": {"provider/some-id": "MyModel"},
-                }
-            }
+                },
+            },
         },
     )
     assert _extract_model(parsed) == "provider/some-id"

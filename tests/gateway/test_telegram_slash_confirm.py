@@ -80,7 +80,7 @@ class TestSendSlashConfirm:
     async def test_stores_slash_confirm_state(self):
         adapter = _make_adapter()
         adapter._bot.send_message = AsyncMock(
-            return_value=SimpleNamespace(message_id=8)
+            return_value=SimpleNamespace(message_id=8),
         )
 
         await adapter.send_slash_confirm(

@@ -136,7 +136,7 @@ class TestPatchCRLFPreservation:
 
 class TestWriteFileCRLFPreservation:
     def test_overwrite_crlf_file_with_lf_content_preserves_crlf(
-        self, hermes_home, tmp_path
+        self, hermes_home, tmp_path,
     ):
         """The agent typically sends bare-LF content; if the file existed
         with CRLF, the write should convert to CRLF rather than silently

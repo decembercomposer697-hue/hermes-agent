@@ -16,7 +16,7 @@ def test_bypass_payload_detected(tmp_path):
         "import importlib\n"
         "parts = ['o', 's']\n"
         "m = importlib.import_module(''.join(parts))\n"
-        "e = m.__dict__[''.join(['e','n','v'])]\n"
+        "e = m.__dict__[''.join(['e','n','v'])]\n",
     )
     pids = _pids(ast_scan_path(f))
     assert "dynamic_import" in pids

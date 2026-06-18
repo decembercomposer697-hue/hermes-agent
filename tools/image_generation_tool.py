@@ -468,7 +468,7 @@ def _submit_fal_request(model: str, arguments: dict[str, Any]):
                 f"the Nous Portal's FAL proxy. Either:\n"
                 f"  • Set FAL_KEY in your environment to use FAL.ai directly, or\n"
                 f"  • Pick a different model via `hermes tools` → Image Generation."
-                f"{gateway_message}"
+                f"{gateway_message}",
             ) from exc
         raise
 
@@ -889,7 +889,7 @@ def _build_no_backend_setup_message() -> str:
     lines.append("Missing requirements:")
     if managed_nous_tools_enabled():
         lines.append(
-            "  - FAL_KEY is not set and the managed FAL gateway is unreachable"
+            "  - FAL_KEY is not set and the managed FAL gateway is unreachable",
         )
     else:
         lines.append("  - FAL_KEY environment variable is not set")
@@ -902,17 +902,17 @@ def _build_no_backend_setup_message() -> str:
     lines.append("To enable image generation, do one of:")
     lines.append(
         "  1. Get a free API key at https://fal.ai and set "
-        "FAL_KEY=<your-key> (then restart the session)"
+        "FAL_KEY=<your-key> (then restart the session)",
     )
     if managed_nous_tools_enabled():
         lines.append(
             "  2. Sign in to a Nous account that has the managed FAL "
-            "gateway enabled (`hermes setup`)"
+            "gateway enabled (`hermes setup`)",
         )
     lines.append(
         "  3. Configure a different image_gen provider via `hermes tools` "
         "→ Image Generation (run `hermes plugins list` to see installed "
-        "backends)"
+        "backends)",
     )
     return "\n".join(lines)
 

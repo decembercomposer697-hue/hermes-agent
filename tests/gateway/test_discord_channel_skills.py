@@ -21,7 +21,7 @@ class TestResolveChannelSkills:
         adapter.config.extra = {
             "channel_skill_bindings": [
                 {"id": "100", "skills": ["skill-a", "skill-b"]},
-            ]
+            ],
         }
         assert adapter._resolve_channel_skills("100") == ["skill-a", "skill-b"]
 
@@ -30,7 +30,7 @@ class TestResolveChannelSkills:
         adapter.config.extra = {
             "channel_skill_bindings": [
                 {"id": "200", "skills": ["forum-skill"]},
-            ]
+            ],
         }
         # channel_id doesn't match, but parent_id does (forum thread)
         assert adapter._resolve_channel_skills("999", parent_id="200") == ["forum-skill"]
@@ -40,7 +40,7 @@ class TestResolveChannelSkills:
         adapter.config.extra = {
             "channel_skill_bindings": [
                 {"id": "100", "skills": ["skill-a"]},
-            ]
+            ],
         }
         assert adapter._resolve_channel_skills("999") is None
 
@@ -49,7 +49,7 @@ class TestResolveChannelSkills:
         adapter.config.extra = {
             "channel_skill_bindings": [
                 {"id": "100", "skill": "solo-skill"},
-            ]
+            ],
         }
         assert adapter._resolve_channel_skills("100") == ["solo-skill"]
 
@@ -58,6 +58,6 @@ class TestResolveChannelSkills:
         adapter.config.extra = {
             "channel_skill_bindings": [
                 {"id": "100", "skills": ["a", "b", "a", "c", "b"]},
-            ]
+            ],
         }
         assert adapter._resolve_channel_skills("100") == ["a", "b", "c"]

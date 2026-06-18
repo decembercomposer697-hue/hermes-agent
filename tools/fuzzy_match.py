@@ -370,7 +370,7 @@ def _strategy_line_trimmed(content: str, pattern: str) -> list[tuple[int, int]]:
     # Build mapping from normalized positions back to original positions
     return _find_normalized_matches(
         content, content_lines, content_normalized_lines,
-        pattern, pattern_normalized
+        pattern, pattern_normalized,
     )
 
 
@@ -407,7 +407,7 @@ def _strategy_indentation_flexible(content: str, pattern: str) -> list[tuple[int
     
     return _find_normalized_matches(
         content, content_lines, content_stripped_lines,
-        pattern, '\n'.join(pattern_lines)
+        pattern, '\n'.join(pattern_lines),
     )
 
 
@@ -465,7 +465,7 @@ def _strategy_trimmed_boundary(content: str, pattern: str) -> list[tuple[int, in
         if '\n'.join(check_lines) == modified_pattern:
             # Found match - calculate original positions
             start_pos, end_pos = _calculate_line_positions(
-                content_lines, i, i + pattern_line_count, len(content)
+                content_lines, i, i + pattern_line_count, len(content),
             )
             matches.append((start_pos, end_pos))
     
@@ -602,7 +602,7 @@ def _strategy_block_anchor(content: str, pattern: str) -> list[tuple[int, int]]:
         if similarity >= threshold:
             # Calculate positions using ORIGINAL lines to ensure correct character offsets in the file
             start_pos, end_pos = _calculate_line_positions(
-                orig_content_lines, i, i + pattern_line_count, len(content)
+                orig_content_lines, i, i + pattern_line_count, len(content),
             )
             matches.append((start_pos, end_pos))
     
@@ -637,7 +637,7 @@ def _strategy_context_aware(content: str, pattern: str) -> list[tuple[int, int]]
         # Need at least 50% of lines to have high similarity
         if high_similarity_count >= len(pattern_lines) * 0.5:
             start_pos, end_pos = _calculate_line_positions(
-                content_lines, i, i + pattern_line_count, len(content)
+                content_lines, i, i + pattern_line_count, len(content),
             )
             matches.append((start_pos, end_pos))
     
@@ -695,7 +695,7 @@ def _find_normalized_matches(content: str, content_lines: list[str],
         if block == pattern_normalized:
             # Found a match - calculate original positions
             start_pos, end_pos = _calculate_line_positions(
-                content_lines, i, i + num_pattern_lines, len(content)
+                content_lines, i, i + num_pattern_lines, len(content),
             )
             matches.append((start_pos, end_pos))
     

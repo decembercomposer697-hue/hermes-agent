@@ -67,7 +67,7 @@ class GraphSubscription:
             resource=str(payload.get("resource") or "").strip(),
             change_type=str(payload.get("change_type") or payload.get("changeType") or "").strip(),
             notification_url=str(
-                payload.get("notification_url") or payload.get("notificationUrl") or ""
+                payload.get("notification_url") or payload.get("notificationUrl") or "",
             ).strip(),
             expiration_datetime=payload.get("expiration_datetime")
             or payload.get("expirationDateTime"),
@@ -87,7 +87,7 @@ class GraphSubscription:
                 "client_state": self.client_state,
                 "latest_renewal_at": _serialize_datetime(self.latest_renewal_at),
                 "status": self.status,
-            }
+            },
         )
 
 
@@ -127,7 +127,7 @@ class TeamsMeetingRef:
                 "thread_id": self.thread_id,
                 "tenant_id": self.tenant_id,
                 "metadata": self.metadata or None,
-            }
+            },
         )
 
 
@@ -147,7 +147,7 @@ class MeetingArtifact:
     def __post_init__(self) -> None:
         if self.artifact_type not in {"transcript", "recording", "call_record"}:
             raise ValueError(
-                "MeetingArtifact.artifact_type must be transcript, recording, or call_record."
+                "MeetingArtifact.artifact_type must be transcript, recording, or call_record.",
             )
         if not self.artifact_id.strip():
             raise ValueError("MeetingArtifact.artifact_id is required.")
@@ -190,7 +190,7 @@ class MeetingArtifact:
                 "available_at": _serialize_datetime(self.available_at),
                 "size_bytes": self.size_bytes,
                 "metadata": self.metadata or None,
-            }
+            },
         )
 
 
@@ -263,7 +263,7 @@ class TeamsMeetingSummaryPayload:
                 "notion_target": self.notion_target,
                 "linear_target": self.linear_target,
                 "teams_target": self.teams_target,
-            }
+            },
         )
 
 
@@ -305,7 +305,7 @@ class TeamsMeetingPipelineJob:
             job_id=str(payload.get("job_id") or payload.get("jobId") or "").strip(),
             event_id=str(payload.get("event_id") or payload.get("eventId") or "").strip(),
             source_event_type=str(
-                payload.get("source_event_type") or payload.get("sourceEventType") or ""
+                payload.get("source_event_type") or payload.get("sourceEventType") or "",
             ).strip(),
             dedupe_key=str(payload.get("dedupe_key") or payload.get("dedupeKey") or "").strip(),
             status=str(payload.get("status") or "").strip(),
@@ -336,7 +336,7 @@ class TeamsMeetingPipelineJob:
                 "selected_artifact_strategy": self.selected_artifact_strategy,
                 "summary_payload": self.summary_payload.to_dict() if self.summary_payload else None,
                 "error_info": self.error_info or None,
-            }
+            },
         )
 
 

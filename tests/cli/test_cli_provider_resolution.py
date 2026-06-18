@@ -601,7 +601,7 @@ def test_model_flow_custom_persists_selected_api_mode(monkeypatch):
                 "context_length": context_length,
                 "name": name,
                 "api_mode": api_mode,
-            }
+            },
         ),
     )
 
@@ -612,7 +612,7 @@ def test_model_flow_custom_persists_selected_api_mode(monkeypatch):
             "chosen-model",
             "",
             "",
-        ]
+        ],
     )
     monkeypatch.setattr("builtins.input", lambda _prompt="": next(answers))
     monkeypatch.setattr("hermes_cli.secret_prompt.masked_secret_prompt", lambda _prompt="": "test-key")
@@ -663,7 +663,7 @@ def test_cmd_model_forwards_nous_login_tls_options(monkeypatch):
             timeout=7.5,
             ca_bundle="/tmp/local-ca.pem",
             insecure=True,
-        )
+        ),
     )
 
     assert captured == {

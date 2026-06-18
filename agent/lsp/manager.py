@@ -499,7 +499,7 @@ class LSPService:
         per_server_root = srv.resolve_root(file_path, ws_root)
         if per_server_root is None:
             eventlog.log_disabled(
-                srv.server_id, file_path, "exclude marker hit (server gated off)"
+                srv.server_id, file_path, "exclude marker hit (server gated off)",
             )
             return None  # exclude marker hit, server gated off
 
@@ -633,7 +633,7 @@ def _diag_key(d: dict[str, Any]) -> str:
             str(d.get("source") or ""),
             str(d.get("message") or "").strip(),
             f"{start.get('line', 0)}:{start.get('character', 0)}-{end.get('line', 0)}:{end.get('character', 0)}",
-        ]
+        ],
     )
 
 

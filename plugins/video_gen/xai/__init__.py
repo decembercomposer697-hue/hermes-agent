@@ -102,7 +102,7 @@ def _resolve_xai_credentials() -> tuple[str, str]:
     base_url = str(
         creds.get("base_url")
         or os.getenv("XAI_BASE_URL")
-        or DEFAULT_XAI_BASE_URL
+        or DEFAULT_XAI_BASE_URL,
     ).strip().rstrip("/")
     return api_key, base_url
 
@@ -417,7 +417,7 @@ class XAIVideoGenProvider(VideoGenProvider):
         async with httpx.AsyncClient() as client:
             try:
                 request_id = await _submit(
-                    client, payload, api_key=api_key, base_url=base_url
+                    client, payload, api_key=api_key, base_url=base_url,
                 )
             except httpx.HTTPStatusError as exc:
                 detail = ""

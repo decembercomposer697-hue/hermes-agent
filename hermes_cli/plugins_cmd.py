@@ -51,7 +51,7 @@ def _resolve_git_executable() -> str | None:
                 (
                     os.path.join(local, "Programs", "Git", "cmd", "git.exe"),
                     os.path.join(local, "Programs", "Git", "bin", "git.exe"),
-                )
+                ),
             )
     else:
         candidates = ["/usr/bin/git", "/usr/local/bin/git", "/bin/git"]
@@ -108,7 +108,7 @@ def _sanitize_plugin_name(
 
     if name in {".", ".."}:
         raise ValueError(
-            f"Invalid plugin name '{name}': must not reference the plugins directory itself."
+            f"Invalid plugin name '{name}': must not reference the plugins directory itself.",
         )
 
     # Reject obvious traversal characters
@@ -122,14 +122,14 @@ def _sanitize_plugin_name(
 
     if target == plugins_resolved:
         raise ValueError(
-            f"Invalid plugin name '{name}': resolves to the plugins directory itself."
+            f"Invalid plugin name '{name}': resolves to the plugins directory itself.",
         )
 
     try:
         target.relative_to(plugins_resolved)
     except ValueError:
         raise ValueError(
-            f"Invalid plugin name '{name}': resolves outside the plugins directory."
+            f"Invalid plugin name '{name}': resolves outside the plugins directory.",
         )
 
     return target
@@ -185,7 +185,7 @@ def _resolve_git_url(identifier: str) -> tuple[str, str | None]:
     raise ValueError(
         f"Invalid plugin identifier: '{identifier}'. "
         "Use a Git URL or 'owner/repo' shorthand (optionally with a subdirectory: "
-        "'owner/repo/path/to/plugin')."
+        "'owner/repo/path/to/plugin').",
     )
 
 
@@ -260,11 +260,11 @@ def _copy_example_files(plugin_dir: Path, console) -> None:
             try:
                 shutil.copy2(example_file, real_path)
                 console.print(
-                    f"[dim]  Created {real_name} from {example_file.name}[/dim]"
+                    f"[dim]  Created {real_name} from {example_file.name}[/dim]",
                 )
             except OSError as e:
                 console.print(
-                    f"[yellow]Warning:[/yellow] Failed to copy {example_file.name}: {e}"
+                    f"[yellow]Warning:[/yellow] Failed to copy {example_file.name}: {e}",
                 )
 
 
@@ -385,7 +385,7 @@ def _display_after_install(plugin_dir: Path, identifier: str) -> None:
                 border_style="green",
                 title="✓ Installed",
                 expand=False,
-            )
+            ),
         )
         console.print()
 
@@ -407,7 +407,7 @@ def _require_installed_plugin(name: str, plugins_dir: Path, console) -> Path:
         installed = ", ".join(d.name for d in plugins_dir.iterdir() if d.is_dir()) or "(none)"
         console.print(
             f"[red]Error:[/red] Plugin '{name}' not found in {plugins_dir}.\n"
-            f"Installed plugins: {installed}"
+            f"Installed plugins: {installed}",
         )
         sys.exit(1)
     return target
@@ -621,7 +621,7 @@ def cmd_update(name: str) -> None:
     if not (target / ".git").exists():
         console.print(
             f"[red]Error:[/red] Plugin '{name}' was not installed from git "
-            f"(no .git directory). Cannot update."
+            f"(no .git directory). Cannot update.",
         )
         sys.exit(1)
 
@@ -638,7 +638,7 @@ def cmd_update(name: str) -> None:
     out = output.strip()
     if "Already up to date" in out:
         console.print(
-            f"[green]✓[/green] Plugin [bold]{name}[/bold] is already up to date."
+            f"[green]✓[/green] Plugin [bold]{name}[/bold] is already up to date.",
         )
     else:
         console.print(f"[green]✓[/green] Plugin [bold]{name}[/bold] updated.")
@@ -771,7 +771,7 @@ def cmd_enable(name: str) -> None:
     _save_disabled_set(disabled)
     console.print(
         f"[green]✓[/green] Plugin [bold]{key}[/bold] enabled. "
-        "Takes effect on next session."
+        "Takes effect on next session.",
     )
 
 
@@ -803,7 +803,7 @@ def cmd_disable(name: str) -> None:
     _save_disabled_set(disabled)
     console.print(
         f"[yellow]\u2298[/yellow] Plugin [bold]{key}[/bold] disabled. "
-        "Takes effect on next session."
+        "Takes effect on next session.",
     )
 
 
@@ -1452,7 +1452,7 @@ def _run_composite_ui(curses, plugin_names, plugin_labels, plugin_selected,
         _save_disabled_set(new_disabled)
         console.print(
             f"\n[green]\u2713[/green] General plugins: {len(new_enabled)} enabled, "
-            f"{len(plugin_names) - len(new_enabled)} disabled."
+            f"{len(plugin_names) - len(new_enabled)} disabled.",
         )
     elif n_plugins > 0:
         console.print("\n[dim]General plugins unchanged.[/dim]")
@@ -1462,7 +1462,7 @@ def _run_composite_ui(curses, plugin_names, plugin_labels, plugin_selected,
         new_context = _get_current_context_engine()
         console.print(
             f"[green]\u2713[/green] Memory provider: [bold]{new_memory}[/bold]  "
-            f"Context engine: [bold]{new_context}[/bold]"
+            f"Context engine: [bold]{new_context}[/bold]",
         )
 
     if n_plugins > 0 or result_holder["providers_changed"]:

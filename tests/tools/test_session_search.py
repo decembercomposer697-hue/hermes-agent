@@ -260,7 +260,7 @@ class TestScrollShape:
 
         # Now scroll
         result = json.loads(session_search(
-            session_id=anchor_sid, around_message_id=anchor_mid, window=2, db=db
+            session_id=anchor_sid, around_message_id=anchor_mid, window=2, db=db,
         ))
         assert result["success"] is True
         assert result["mode"] == "scroll"
@@ -275,7 +275,7 @@ class TestScrollShape:
         anchor_sid = disc["results"][0]["session_id"]
         anchor_mid = disc["results"][0]["match_message_id"]
         result = json.loads(session_search(
-            session_id=anchor_sid, around_message_id=anchor_mid, window=999, db=db
+            session_id=anchor_sid, around_message_id=anchor_mid, window=999, db=db,
         ))
         assert result["window"] == 20
 
@@ -285,7 +285,7 @@ class TestScrollShape:
         anchor_sid = disc["results"][0]["session_id"]
         anchor_mid = disc["results"][0]["match_message_id"]
         result = json.loads(session_search(
-            session_id=anchor_sid, around_message_id=anchor_mid, window=-5, db=db
+            session_id=anchor_sid, around_message_id=anchor_mid, window=-5, db=db,
         ))
         assert result["window"] == 1
 
@@ -295,7 +295,7 @@ class TestScrollShape:
         anchor_sid = disc["results"][0]["session_id"]
         anchor_mid = disc["results"][0]["match_message_id"]
         result = json.loads(session_search(
-            session_id=anchor_sid, around_message_id=anchor_mid, window=3, db=db
+            session_id=anchor_sid, around_message_id=anchor_mid, window=3, db=db,
         ))
         assert "messages_before" in result
         assert "messages_after" in result
@@ -306,7 +306,7 @@ class TestScrollShape:
         anchor_sid = disc["results"][0]["session_id"]
         anchor_mid = disc["results"][0]["match_message_id"]
         result = json.loads(session_search(
-            session_id=anchor_sid, around_message_id=anchor_mid, window=2, db=db
+            session_id=anchor_sid, around_message_id=anchor_mid, window=2, db=db,
         ))
         anchor_in_window = [m for m in result["messages"] if m["id"] == anchor_mid]
         assert len(anchor_in_window) == 1
@@ -315,14 +315,14 @@ class TestScrollShape:
     def test_scroll_missing_anchor_errors(self, db):
         _seed_modpack_sessions(db)
         result = json.loads(session_search(
-            session_id="s_oldest", around_message_id=999999, db=db
+            session_id="s_oldest", around_message_id=999999, db=db,
         ))
         assert result["success"] is False
         assert "not in" in result.get("error", "")
 
     def test_scroll_missing_session_errors(self, db):
         result = json.loads(session_search(
-            session_id="nonexistent", around_message_id=1, db=db
+            session_id="nonexistent", around_message_id=1, db=db,
         ))
         assert result["success"] is False
 
@@ -343,7 +343,7 @@ class TestScrollShape:
     def test_scroll_invalid_around_message_id_errors(self, db):
         _seed_modpack_sessions(db)
         result = json.loads(session_search(
-            session_id="s_oldest", around_message_id="not-an-int", db=db
+            session_id="s_oldest", around_message_id="not-an-int", db=db,
         ))
         assert result["success"] is False
 
@@ -360,11 +360,11 @@ class TestScrollPattern:
                                          content=f"long session msg {i}"))
 
         v1 = json.loads(session_search(
-            session_id="s_long", around_message_id=ids[5], window=3, db=db
+            session_id="s_long", around_message_id=ids[5], window=3, db=db,
         ))
         last_id = v1["messages"][-1]["id"]
         v2 = json.loads(session_search(
-            session_id="s_long", around_message_id=last_id, window=3, db=db
+            session_id="s_long", around_message_id=last_id, window=3, db=db,
         ))
         # Forward scroll: v2 should reach further than v1
         assert max(m["id"] for m in v2["messages"]) > max(m["id"] for m in v1["messages"])
@@ -457,7 +457,7 @@ class TestCrossProfileRead:
         other = SessionDB(other_home / "state.db")
         other.create_session("s_other", source="cli")
         other._conn.execute(
-            "UPDATE sessions SET title = ? WHERE id = ?", ("Other Profile Chat", "s_other")
+            "UPDATE sessions SET title = ? WHERE id = ?", ("Other Profile Chat", "s_other"),
         )
         other.append_message("s_other", role="user", content="hello from the other profile")
         other._conn.commit()

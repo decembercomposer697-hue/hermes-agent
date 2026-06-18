@@ -181,7 +181,7 @@ def _reconcile_cursor(filtered: list[int], cursor: int) -> tuple[int, int]:
 
 
 def _move_filtered_cursor(
-    filtered: list[int], cursor: int, cursor_pos: int, delta: int
+    filtered: list[int], cursor: int, cursor_pos: int, delta: int,
 ) -> int:
     """Move through the filtered index list, wrapping like the legacy menus."""
     if not filtered:
@@ -191,7 +191,7 @@ def _move_filtered_cursor(
 
 
 def _scroll_for_cursor(
-    scroll_offset: int, cursor_pos: int, visible_rows: int, total_rows: int
+    scroll_offset: int, cursor_pos: int, visible_rows: int, total_rows: int,
 ) -> int:
     """Clamp scroll offset so the cursor remains visible."""
     visible_rows = max(1, visible_rows)
@@ -205,7 +205,7 @@ def _scroll_for_cursor(
 
 
 def _handle_active_search_key(
-    curses_mod, key: int, search: _SearchState
+    curses_mod, key: int, search: _SearchState,
 ) -> tuple[bool, bool, bool]:
     """Handle a key while the search prompt is active.
 
@@ -421,7 +421,7 @@ def _run_curses_menu(
                 curses.init_pair(2, curses.COLOR_YELLOW, -1)
                 if extra_color_pairs:
                     curses.init_pair(
-                        3, 8 if curses.COLORS > 8 else curses.COLOR_WHITE, -1
+                        3, 8 if curses.COLORS > 8 else curses.COLOR_WHITE, -1,
                     )
             cursor = initial_cursor
             scroll_offset = 0
@@ -452,7 +452,7 @@ def _run_curses_menu(
 
                 visible_rows = max(1, max_y - items_start - reserve_bottom)
                 scroll_offset = _scroll_for_cursor(
-                    scroll_offset, cursor_pos, visible_rows, len(filtered)
+                    scroll_offset, cursor_pos, visible_rows, len(filtered),
                 )
 
                 if use_search and search.query and not filtered:
@@ -462,7 +462,7 @@ def _run_curses_menu(
                         pass
 
                 for draw_i, filtered_pos in enumerate(
-                    range(scroll_offset, min(len(filtered), scroll_offset + visible_rows))
+                    range(scroll_offset, min(len(filtered), scroll_offset + visible_rows)),
                 ):
                     i = filtered[filtered_pos]
                     y = draw_i + items_start
@@ -482,12 +482,12 @@ def _run_curses_menu(
                         # Active search consumes query-editing keys; nav keys
                         # fall through to be decoded below.
                         handled, confirm, changed = _handle_active_search_key(
-                            curses, key, search
+                            curses, key, search,
                         )
                         if changed:
                             scroll_offset = 0
                             cursor, cursor_pos = _reconcile_cursor(
-                                _filter_indices(search_labels, search.query), cursor
+                                _filter_indices(search_labels, search.query), cursor,
                             )
                         if confirm:
                             if filtered:

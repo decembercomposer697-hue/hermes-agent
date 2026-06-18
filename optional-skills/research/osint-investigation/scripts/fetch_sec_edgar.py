@@ -40,7 +40,7 @@ def _ua() -> str:
     if not ua:
         raise SystemExit(
             "SEC requires a User-Agent with contact info. "
-            "Set SEC_USER_AGENT='Your Name your@email'."
+            "Set SEC_USER_AGENT='Your Name your@email'.",
         )
     return ua
 
@@ -135,7 +135,7 @@ def fetch(
                 "primary_document": pdoc,
                 "filing_url": filing_url,
                 "reporting_period": period[i] if i < len(period) else "",
-            }
+            },
         )
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)

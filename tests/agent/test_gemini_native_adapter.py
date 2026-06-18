@@ -37,9 +37,9 @@ def test_build_native_request_preserves_thought_signature_on_tool_replay():
                             "arguments": '{"city": "Paris"}',
                         },
                         "extra_content": {
-                            "google": {"thought_signature": "sig-123"}
+                            "google": {"thought_signature": "sig-123"},
                         },
-                    }
+                    },
                 ],
             },
         ],
@@ -68,7 +68,7 @@ def test_build_native_request_uses_original_function_name_for_tool_result():
                             "name": "get_weather",
                             "arguments": '{"city": "Paris"}',
                         },
-                    }
+                    },
                 ],
             },
             {
@@ -105,12 +105,12 @@ def test_build_native_request_strips_json_schema_only_fields_from_tool_parameter
                                 "type": "string",
                                 "$schema": "ignored",
                                 "description": "City name",
-                            }
+                            },
                         },
                         "required": ["city"],
                     },
                 },
-            }
+            },
         ],
         tool_choice=None,
     )
@@ -135,10 +135,10 @@ def test_translate_native_response_surfaces_reasoning_and_tool_calls():
                     "parts": [
                         {"thought": True, "text": "thinking..."},
                         {"functionCall": {"name": "search", "args": {"q": "hermes"}}},
-                    ]
+                    ],
                 },
                 "finishReason": "STOP",
-            }
+            },
         ],
         "usageMetadata": {
             "promptTokenCount": 10,
@@ -171,14 +171,14 @@ def test_native_client_uses_x_goog_api_key_and_native_models_endpoint(monkeypatc
                         {
                             "content": {"parts": [{"text": "hello"}]},
                             "finishReason": "STOP",
-                        }
+                        },
                     ],
                     "usageMetadata": {
                         "promptTokenCount": 1,
                         "candidatesTokenCount": 1,
                         "totalTokenCount": 2,
                     },
-                }
+                },
             )
 
         def close(self):
@@ -214,9 +214,9 @@ def test_native_http_error_keeps_status_and_retry_after():
                         "@type": "type.googleapis.com/google.rpc.ErrorInfo",
                         "reason": "RESOURCE_EXHAUSTED",
                         "metadata": {"service": "generativelanguage.googleapis.com"},
-                    }
+                    },
                 ],
-            }
+            },
         },
     )
 
@@ -285,12 +285,12 @@ def test_stream_event_translation_emits_tool_call_delta_with_stable_index():
             {
                 "content": {
                     "parts": [
-                        {"functionCall": {"name": "search", "args": {"q": "abc"}}}
-                    ]
+                        {"functionCall": {"name": "search", "args": {"q": "abc"}}},
+                    ],
                 },
                 "finishReason": "STOP",
-            }
-        ]
+            },
+        ],
     }
 
     first = translate_stream_event(event, model="gemini-2.5-flash", tool_call_indices=tool_call_indices)
@@ -314,11 +314,11 @@ def test_stream_event_translation_keeps_identical_calls_in_distinct_parts():
                     "parts": [
                         {"functionCall": {"name": "search", "args": {"q": "abc"}}},
                         {"functionCall": {"name": "search", "args": {"q": "abc"}}},
-                    ]
+                    ],
                 },
                 "finishReason": "STOP",
-            }
-        ]
+            },
+        ],
     }
 
     chunks = translate_stream_event(event, model="gemini-2.5-flash", tool_call_indices={})

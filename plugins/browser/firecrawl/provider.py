@@ -70,7 +70,7 @@ class FirecrawlBrowserProvider(BrowserProvider):
         if not api_key:
             raise ValueError(
                 "FIRECRAWL_API_KEY environment variable is required. "
-                "Get your key at https://firecrawl.dev"
+                "Get your key at https://firecrawl.dev",
             )
         return {
             "Content-Type": "application/json",
@@ -94,13 +94,13 @@ class FirecrawlBrowserProvider(BrowserProvider):
             )
         except requests.RequestException as exc:
             raise RuntimeError(
-                f"Firecrawl API connection failed: {exc}"
+                f"Firecrawl API connection failed: {exc}",
             ) from exc
 
         if not response.ok:
             raise RuntimeError(
                 f"Failed to create Firecrawl browser session: "
-                f"{response.status_code} {response.text}"
+                f"{response.status_code} {response.text}",
             )
 
         data = response.json()
@@ -152,7 +152,7 @@ class FirecrawlBrowserProvider(BrowserProvider):
             )
         except Exception as e:
             logger.debug(
-                "Emergency cleanup failed for Firecrawl session %s: %s", session_id, e
+                "Emergency cleanup failed for Firecrawl session %s: %s", session_id, e,
             )
 
     def get_setup_schema(self) -> dict[str, Any]:

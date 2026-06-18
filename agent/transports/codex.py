@@ -47,7 +47,7 @@ class ResponsesApiTransport(ProviderTransport):
             messages,
             is_xai_responses=bool(kwargs.get("is_xai_responses")),
             replay_encrypted_reasoning=bool(
-                kwargs.get("replay_encrypted_reasoning", True)
+                kwargs.get("replay_encrypted_reasoning", True),
             ),
             current_issuer_kind=issuer,
         )
@@ -103,7 +103,7 @@ class ResponsesApiTransport(ProviderTransport):
         is_codex_backend = params.get("is_codex_backend", False)
         is_xai_responses = params.get("is_xai_responses", False)
         replay_encrypted_reasoning = bool(
-            params.get("replay_encrypted_reasoning", True)
+            params.get("replay_encrypted_reasoning", True),
         )
 
         # Resolve the issuing endpoint for this call. Stashed on the
@@ -229,7 +229,7 @@ class ResponsesApiTransport(ProviderTransport):
                             str(key): str(value)
                             for key, value in existing_extra_headers.items()
                             if key and value is not None
-                        }
+                        },
                     )
                 merged_extra_headers["session_id"] = cache_scope_id
                 merged_extra_headers["x-client-request-id"] = cache_scope_id
@@ -248,7 +248,7 @@ class ResponsesApiTransport(ProviderTransport):
                         str(key): str(value)
                         for key, value in existing_extra_headers.items()
                         if key and value is not None
-                    }
+                    },
                 )
             merged_extra_headers["x-grok-conv-id"] = session_id
             kwargs["extra_headers"] = merged_extra_headers

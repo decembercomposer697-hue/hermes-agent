@@ -158,7 +158,7 @@ def specify_task(
         return SpecifyOutcome(task_id, False, "unknown task id")
     if task.status != "triage":
         return SpecifyOutcome(
-            task_id, False, f"task is not in triage (status={task.status!r})"
+            task_id, False, f"task is not in triage (status={task.status!r})",
         )
 
     try:
@@ -175,7 +175,7 @@ def specify_task(
 
     if client is None or not model:
         return SpecifyOutcome(
-            task_id, False, "no auxiliary client configured"
+            task_id, False, "no auxiliary client configured",
         )
 
     user_msg = _USER_TEMPLATE.format(
@@ -202,7 +202,7 @@ def specify_task(
             task_id, exc,
         )
         return SpecifyOutcome(
-            task_id, False, f"LLM error: {type(exc).__name__}"
+            task_id, False, f"LLM error: {type(exc).__name__}",
         )
 
     try:
@@ -221,7 +221,7 @@ def specify_task(
         stripped_raw = raw.strip()
         if not stripped_raw:
             return SpecifyOutcome(
-                task_id, False, "LLM returned an empty response"
+                task_id, False, "LLM returned an empty response",
             )
         new_title = None
         new_body = stripped_raw
@@ -238,7 +238,7 @@ def specify_task(
         )
         if new_body is None and new_title is None:
             return SpecifyOutcome(
-                task_id, False, "LLM response missing title and body"
+                task_id, False, "LLM response missing title and body",
             )
 
     with kb.connect_closing() as conn:
@@ -253,7 +253,7 @@ def specify_task(
         # Race: someone else promoted / archived the task between our
         # read above and the write. Report, don't crash.
         return SpecifyOutcome(
-            task_id, False, "task moved out of triage before promotion"
+            task_id, False, "task moved out of triage before promotion",
         )
     return SpecifyOutcome(task_id, True, "specified", new_title=new_title)
 

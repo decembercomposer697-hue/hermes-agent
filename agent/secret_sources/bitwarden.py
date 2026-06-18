@@ -152,7 +152,7 @@ def _write_disk_cache(cache_key: _CacheKey, entry: _CachedFetch,
         # Write to a temp file in the same directory and atomic-rename.
         # tempfile honors os.umask, so we explicitly chmod 0600 before rename.
         fd, tmp = tempfile.mkstemp(
-            prefix=".bws_cache_", suffix=".tmp", dir=str(path.parent)
+            prefix=".bws_cache_", suffix=".tmp", dir=str(path.parent),
         )
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
@@ -283,7 +283,7 @@ def _platform_asset_name() -> str:
         return f"bws-{arch}-unknown-linux-{libc}-{_BWS_VERSION}.zip"
 
     raise RuntimeError(
-        f"Unsupported platform for bws auto-install: {system} {machine}"
+        f"Unsupported platform for bws auto-install: {system} {machine}",
     )
 
 
@@ -320,7 +320,7 @@ def install_bws(*, force: bool = False) -> Path:
         if expected.lower() != actual.lower():
             raise RuntimeError(
                 f"Checksum mismatch for {asset_name}: "
-                f"expected {expected}, got {actual}"
+                f"expected {expected}, got {actual}",
             )
 
         with zipfile.ZipFile(zip_path) as zf:
@@ -370,7 +370,7 @@ def _expected_sha256(checksum_file: Path, asset_name: str) -> str:
         if len(parts) >= 2 and parts[-1] == asset_name:
             return parts[0]
     raise RuntimeError(
-        f"No checksum entry for {asset_name} in {checksum_file.name}"
+        f"No checksum entry for {asset_name} in {checksum_file.name}",
     )
 
 
@@ -392,7 +392,7 @@ def _pick_zip_member(zf: zipfile.ZipFile, binary_name: str) -> str:
     if not candidates:
         raise RuntimeError(
             f"Could not find {binary_name} inside downloaded archive "
-            f"(members: {zf.namelist()[:5]}...)"
+            f"(members: {zf.namelist()[:5]}...)",
         )
     # Prefer the shortest path (i.e. root over nested) for determinism.
     candidates.sort(key=len)
@@ -400,7 +400,7 @@ def _pick_zip_member(zf: zipfile.ZipFile, binary_name: str) -> str:
 
 
 def _safe_extract_member(
-    zf: zipfile.ZipFile, member: str, dest_dir: Path
+    zf: zipfile.ZipFile, member: str, dest_dir: Path,
 ) -> Path:
     """Extract a single archive member, refusing path traversal.
 
@@ -420,7 +420,7 @@ def _safe_extract_member(
     if not contained or target == dest_root:
         raise RuntimeError(
             f"Refusing to extract unsafe archive member {member!r}: "
-            f"it escapes the extraction directory"
+            f"it escapes the extraction directory",
         )
     zf.extract(member, dest_root)
     return Path(target)
@@ -492,7 +492,7 @@ def fetch_bitwarden_secrets(
             "bws binary not available — auto-install failed and `bws` is "
             "not on PATH.  Install manually from "
             "https://github.com/bitwarden/sdk-sm/releases or re-run "
-            "`hermes secrets bitwarden setup`."
+            "`hermes secrets bitwarden setup`.",
         )
 
     secrets, warnings = _run_bws_list(bws, access_token, project_id, server_url)
@@ -504,7 +504,7 @@ def fetch_bitwarden_secrets(
 
 
 def _run_bws_list(
-    bws: Path, access_token: str, project_id: str, server_url: str = ""
+    bws: Path, access_token: str, project_id: str, server_url: str = "",
 ) -> tuple[dict[str, str], list[str]]:
     cmd = [str(bws), "secret", "list", project_id, "--output", "json"]
     env = os.environ.copy()
@@ -530,7 +530,7 @@ def _run_bws_list(
         )
     except subprocess.TimeoutExpired as exc:
         raise RuntimeError(
-            f"bws timed out after {_BWS_RUN_TIMEOUT}s fetching secrets"
+            f"bws timed out after {_BWS_RUN_TIMEOUT}s fetching secrets",
         ) from exc
     except OSError as exc:
         raise RuntimeError(f"failed to invoke bws: {exc}") from exc
@@ -540,7 +540,7 @@ def _run_bws_list(
         # Strip ANSI just in case and surface the first 200 chars.
         err = (proc.stderr or proc.stdout or "").strip().replace("\x1b", "")
         raise RuntimeError(
-            f"bws exited {proc.returncode}: {err[:200]}"
+            f"bws exited {proc.returncode}: {err[:200]}",
         )
 
     raw = proc.stdout.strip()
@@ -554,7 +554,7 @@ def _run_bws_list(
 
     if not isinstance(payload, list):
         raise RuntimeError(
-            f"bws returned unexpected shape: {type(payload).__name__}"
+            f"bws returned unexpected shape: {type(payload).__name__}",
         )
 
     secrets: dict[str, str] = {}
@@ -568,7 +568,7 @@ def _run_bws_list(
             continue
         if not _is_valid_env_name(key):
             warnings.append(
-                f"Skipping secret {key!r}: not a valid env-var name"
+                f"Skipping secret {key!r}: not a valid env-var name",
             )
             continue
         secrets[key] = value

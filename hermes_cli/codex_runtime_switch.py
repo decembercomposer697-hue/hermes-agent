@@ -55,7 +55,7 @@ def parse_args(arg_string: str) -> tuple[str | None, list[str]]:
     if raw in VALID_RUNTIMES:
         return raw, []
     return None, [
-        f"Unknown runtime {raw!r}. Use one of: auto, codex_app_server, on, off"
+        f"Unknown runtime {raw!r}. Use one of: auto, codex_app_server, on, off",
     ]
 
 
@@ -78,7 +78,7 @@ def set_runtime(config: dict, new_value: str) -> str:
     Returns the previous value for callers that want to report a delta."""
     if new_value not in VALID_RUNTIMES:
         raise ValueError(
-            f"invalid runtime {new_value!r}; must be one of {VALID_RUNTIMES}"
+            f"invalid runtime {new_value!r}; must be one of {VALID_RUNTIMES}",
         )
     old = get_current_runtime(config)
     if not isinstance(config.get("model"), dict):
@@ -208,37 +208,37 @@ def apply(
             if user_servers:
                 msg_lines.append(
                     f"Migrated {len(user_servers)} MCP server(s): "
-                    f"{', '.join(user_servers)}"
+                    f"{', '.join(user_servers)}",
                 )
             # Native Codex plugin migration (Linear, GitHub, etc.)
             if mig_report.migrated_plugins:
                 msg_lines.append(
                     f"Migrated {len(mig_report.migrated_plugins)} native "
-                    f"Codex plugin(s): {', '.join(mig_report.migrated_plugins)}"
+                    f"Codex plugin(s): {', '.join(mig_report.migrated_plugins)}",
                 )
             elif mig_report.plugin_query_error:
                 msg_lines.append(
                     f"Codex plugin discovery skipped: "
-                    f"{mig_report.plugin_query_error}"
+                    f"{mig_report.plugin_query_error}",
                 )
             # Permissions + Hermes tool callback are always-on production
             # bits the user benefits from knowing about.
             if mig_report.wrote_permissions_default:
                 msg_lines.append(
                     f"Default sandbox: {mig_report.wrote_permissions_default} "
-                    f"(no approval prompt on every write)"
+                    f"(no approval prompt on every write)",
                 )
             if "hermes-tools" in mig_report.migrated:
                 msg_lines.append(
                     "Hermes tool callback registered: codex can now use "
                     "web_search, web_extract, browser_*, vision_analyze, "
                     "image_generate, skill_view, skills_list, text_to_speech, "
-                    "kanban_* (worker + orchestrator) via MCP."
+                    "kanban_* (worker + orchestrator) via MCP.",
                 )
                 msg_lines.append(
                     "  (delegate_task, memory, session_search, todo run "
                     "only on the default Hermes runtime — they need the "
-                    "agent loop context.)"
+                    "agent loop context.)",
                 )
             msg_lines.append(f"  (config: {mig_report.target_path})")
             for err in mig_report.errors:
@@ -248,11 +248,11 @@ def apply(
         msg_lines.append(
             "OpenAI/Codex turns now run through `codex app-server` "
             "(terminal/file ops/patching inside Codex; "
-            "Hermes tools available via MCP callback)."
+            "Hermes tools available via MCP callback).",
         )
         msg_lines.append(
             "Effective on next session — current cached agent keeps "
-            "the prior runtime to preserve prompt cache."
+            "the prior runtime to preserve prompt cache.",
         )
     else:
         msg_lines.append("OpenAI/Codex turns will use the default Hermes runtime.")

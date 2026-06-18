@@ -202,7 +202,7 @@ class PairingStore:
         return hashlib.sha256(salt + code.encode("utf-8")).hexdigest()
 
     def generate_code(
-        self, platform: str, user_id: str, user_name: str = ""
+        self, platform: str, user_id: str, user_name: str = "",
     ) -> str | None:
         """
         Generate a pairing code for a new user.

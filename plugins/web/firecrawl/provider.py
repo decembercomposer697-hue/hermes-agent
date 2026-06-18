@@ -155,7 +155,7 @@ def _is_tool_gateway_ready() -> bool:
     import tools.web_tools as _wt
 
     return _wt.resolve_managed_tool_gateway(
-        "firecrawl", token_reader=_wt._peek_nous_access_token
+        "firecrawl", token_reader=_wt._peek_nous_access_token,
     ) is not None
 
 
@@ -231,12 +231,12 @@ def _get_firecrawl_client() -> Any:
         kwargs, client_config = direct_config
     else:
         managed_gateway = _wt.resolve_managed_tool_gateway(
-            "firecrawl", token_reader=_wt._read_nous_access_token
+            "firecrawl", token_reader=_wt._read_nous_access_token,
         )
         if managed_gateway is None:
             logger.error(
                 "Firecrawl client initialization failed: "
-                "missing direct config and tool-gateway auth."
+                "missing direct config and tool-gateway auth.",
             )
             _raise_web_backend_configuration_error()
 
@@ -476,7 +476,7 @@ class FirecrawlWebSearchProvider(WebSearchProvider):
                             "rule": blocked["rule"],
                             "source": blocked["source"],
                         },
-                    }
+                    },
                 )
                 continue
 
@@ -502,7 +502,7 @@ class FirecrawlWebSearchProvider(WebSearchProvider):
                                 "Scrape timed out after 60s — page may be too large "
                                 "or unresponsive. Try browser_navigate instead."
                             ),
-                        }
+                        },
                     )
                     continue
 
@@ -543,7 +543,7 @@ class FirecrawlWebSearchProvider(WebSearchProvider):
                                 "rule": final_blocked["rule"],
                                 "source": final_blocked["source"],
                             },
-                        }
+                        },
                     )
                     continue
 
@@ -560,7 +560,7 @@ class FirecrawlWebSearchProvider(WebSearchProvider):
                         "content": chosen_content,
                         "raw_content": chosen_content,
                         "metadata": metadata,
-                    }
+                    },
                 )
             except Exception as scrape_err:
                 logger.debug("Firecrawl scrape failed for %s: %s", url, scrape_err)
@@ -571,7 +571,7 @@ class FirecrawlWebSearchProvider(WebSearchProvider):
                         "content": "",
                         "raw_content": "",
                         "error": str(scrape_err),
-                    }
+                    },
                 )
 
         return results

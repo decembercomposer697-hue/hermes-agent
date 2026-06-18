@@ -236,7 +236,7 @@ class TestSystemdServiceRefresh:
         assert ["systemctl", "--user", "daemon-reload"] in calls
 
     def test_refresh_refuses_to_bake_pytest_tmpdir_into_real_user_unit(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Defense in depth: ``refresh_systemd_unit_if_needed()`` runs every
         time ``run_gateway()`` starts. The user-scope unit path resolves
@@ -256,7 +256,7 @@ class TestSystemdServiceRefresh:
         unit_path.write_text("old unit\n", encoding="utf-8")
 
         monkeypatch.setattr(
-            gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
+            gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path,
         )
         # Realistic generated unit referencing a pytest tmpdir HERMES_HOME
         polluted_unit = (
@@ -722,7 +722,7 @@ class TestLaunchdServiceRecovery:
                 calls.append(cmd)
             if cmd == ["launchctl", "kickstart", target] and calls.count(cmd) == 1:
                 raise gateway_cli.subprocess.CalledProcessError(
-                    125, cmd, stderr="Domain does not support specified action"
+                    125, cmd, stderr="Domain does not support specified action",
                 )
             return SimpleNamespace(returncode=0, stdout="", stderr="")
 
@@ -752,11 +752,11 @@ class TestLaunchdServiceRecovery:
                 # First kickstart: job not loaded (125). After bootstrap also
                 # fails, this won't be reached again.
                 raise gateway_cli.subprocess.CalledProcessError(
-                    125, cmd, stderr="Domain does not support specified action"
+                    125, cmd, stderr="Domain does not support specified action",
                 )
             if cmd[:2] == ["launchctl", "bootstrap"]:
                 raise gateway_cli.subprocess.CalledProcessError(
-                    5, cmd, stderr="Input/output error"
+                    5, cmd, stderr="Input/output error",
                 )
             return SimpleNamespace(returncode=0, stdout="", stderr="")
 
@@ -764,7 +764,7 @@ class TestLaunchdServiceRecovery:
 
         spawned = []
         monkeypatch.setattr(
-            gateway_cli, "_spawn_detached_gateway", lambda: spawned.append(True) or True
+            gateway_cli, "_spawn_detached_gateway", lambda: spawned.append(True) or True,
         )
 
         gateway_cli.launchd_start()
@@ -780,7 +780,7 @@ class TestLaunchdServiceRecovery:
         def fake_run(cmd, check=False, **kwargs):
             if cmd[:2] == ["launchctl", "bootstrap"]:
                 raise gateway_cli.subprocess.CalledProcessError(
-                    5, cmd, stderr="Input/output error"
+                    5, cmd, stderr="Input/output error",
                 )
             return SimpleNamespace(returncode=0, stdout="", stderr="")
 
@@ -788,7 +788,7 @@ class TestLaunchdServiceRecovery:
 
         spawned = []
         monkeypatch.setattr(
-            gateway_cli, "_spawn_detached_gateway", lambda: spawned.append(True) or True
+            gateway_cli, "_spawn_detached_gateway", lambda: spawned.append(True) or True,
         )
 
         gateway_cli.launchd_install(force=True)
@@ -809,7 +809,7 @@ class TestLaunchdServiceRecovery:
         def fake_run(cmd, check=False, **kwargs):
             if cmd == ["launchctl", "kickstart", "-k", target]:
                 raise gateway_cli.subprocess.CalledProcessError(
-                    5, cmd, stderr="Input/output error"
+                    5, cmd, stderr="Input/output error",
                 )
             return SimpleNamespace(returncode=0, stdout="", stderr="")
 
@@ -817,7 +817,7 @@ class TestLaunchdServiceRecovery:
 
         spawned = []
         monkeypatch.setattr(
-            gateway_cli, "_spawn_detached_gateway", lambda: spawned.append(True) or True
+            gateway_cli, "_spawn_detached_gateway", lambda: spawned.append(True) or True,
         )
 
         gateway_cli.launchd_restart()
@@ -829,7 +829,7 @@ class TestLaunchdServiceRecovery:
         def fake_run(cmd, check=False, **kwargs):
             if "bootout" in cmd:
                 raise gateway_cli.subprocess.CalledProcessError(
-                    125, cmd, stderr="Domain does not support specified action"
+                    125, cmd, stderr="Domain does not support specified action",
                 )
             return SimpleNamespace(returncode=0, stdout="", stderr="")
 
@@ -1274,7 +1274,7 @@ class TestGatewaySystemServiceRouting:
         )
 
         gateway_cli.gateway_command(
-            SimpleNamespace(gateway_command="status", deep=False, system=False, full=True)
+            SimpleNamespace(gateway_command="status", deep=False, system=False, full=True),
         )
 
         assert calls == [(False, False, True)]
@@ -1286,7 +1286,7 @@ class TestGatewaySystemServiceRouting:
 
         try:
             gateway_cli.gateway_command(
-                SimpleNamespace(gateway_command="install", force=False, system=False, run_as_user=None)
+                SimpleNamespace(gateway_command="install", force=False, system=False, run_as_user=None),
             )
         except SystemExit as exc:
             assert exc.code == 1
@@ -1382,7 +1382,7 @@ class TestGatewaySystemServiceRouting:
             gateway_cli,
             "launchd_restart",
             lambda: (_ for _ in ()).throw(
-                gateway_cli.subprocess.CalledProcessError(5, ["launchctl", "kickstart", "-k", "gui/501/ai.hermes.gateway"])
+                gateway_cli.subprocess.CalledProcessError(5, ["launchctl", "kickstart", "-k", "gui/501/ai.hermes.gateway"]),
             ),
         )
 
@@ -2164,13 +2164,13 @@ class TestLegacyHermesUnitDetection:
         # Drop profile units in BOTH scopes with our ExecStart
         for base in (user_dir, system_dir):
             (base / "hermes-gateway-coder.service").write_text(
-                self._OUR_UNIT_TEXT, encoding="utf-8"
+                self._OUR_UNIT_TEXT, encoding="utf-8",
             )
             (base / "hermes-gateway-orcha.service").write_text(
-                self._OUR_UNIT_TEXT, encoding="utf-8"
+                self._OUR_UNIT_TEXT, encoding="utf-8",
             )
             (base / "hermes-gateway.service").write_text(
-                self._OUR_UNIT_TEXT, encoding="utf-8"
+                self._OUR_UNIT_TEXT, encoding="utf-8",
             )
 
         results = gateway_cli._find_legacy_hermes_units()
@@ -2324,7 +2324,7 @@ class TestRemoveLegacyHermesUnits:
         legacy.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
         removed, remaining = gateway_cli.remove_legacy_hermes_units(
-            interactive=False, dry_run=True
+            interactive=False, dry_run=True,
         )
 
         assert removed == 0
@@ -2397,7 +2397,7 @@ class TestRemoveLegacyHermesUnits:
         assert not system_legacy.exists()
 
     def test_does_not_touch_profile_units_during_migration(
-        self, tmp_path, monkeypatch, capsys
+        self, tmp_path, monkeypatch, capsys,
     ):
         """Teknium's constraint: profile units (hermes-gateway-coder.service)
         must survive a migration call, even if we somehow include them in the
@@ -2462,7 +2462,7 @@ class TestMigrateLegacyCommand:
         assert "migrate-legacy" in result.stdout
 
     def test_gateway_command_migrate_legacy_dispatches(
-        self, tmp_path, monkeypatch, capsys
+        self, tmp_path, monkeypatch, capsys,
     ):
         """gateway_command(args) with subcmd='migrate-legacy' calls the helper."""
         called = {}
@@ -2477,7 +2477,7 @@ class TestMigrateLegacyCommand:
         monkeypatch.setattr(gateway_cli, "is_macos", lambda: False)
 
         args = SimpleNamespace(
-            gateway_command="migrate-legacy", dry_run=False, yes=True
+            gateway_command="migrate-legacy", dry_run=False, yes=True,
         )
         gateway_cli.gateway_command(args)
 
@@ -2501,7 +2501,7 @@ class TestGatewayStatusParser:
         assert "unrecognized arguments" not in result.stderr
 
     def test_gateway_command_migrate_legacy_dry_run_passes_through(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         called = {}
 
@@ -2515,20 +2515,20 @@ class TestGatewayStatusParser:
         monkeypatch.setattr(gateway_cli, "is_macos", lambda: False)
 
         args = SimpleNamespace(
-            gateway_command="migrate-legacy", dry_run=True, yes=False
+            gateway_command="migrate-legacy", dry_run=True, yes=False,
         )
         gateway_cli.gateway_command(args)
 
         assert called == {"interactive": True, "dry_run": True}
 
     def test_migrate_legacy_on_unsupported_platform_prints_message(
-        self, monkeypatch, capsys
+        self, monkeypatch, capsys,
     ):
         monkeypatch.setattr(gateway_cli, "supports_systemd_services", lambda: False)
         monkeypatch.setattr(gateway_cli, "is_macos", lambda: False)
 
         args = SimpleNamespace(
-            gateway_command="migrate-legacy", dry_run=False, yes=True
+            gateway_command="migrate-legacy", dry_run=False, yes=True,
         )
         gateway_cli.gateway_command(args)
 
@@ -2540,7 +2540,7 @@ class TestSystemdInstallOffersLegacyRemoval:
     """Verify that systemd_install prompts to remove legacy units first."""
 
     def test_install_offers_removal_when_legacy_detected(
-        self, tmp_path, monkeypatch, capsys
+        self, tmp_path, monkeypatch, capsys,
     ):
         """When legacy units exist, install flow should call the removal
         helper before writing the new unit."""
@@ -2561,7 +2561,7 @@ class TestSystemdInstallOffersLegacyRemoval:
         # Mock the rest of the install flow
         unit_path = tmp_path / "hermes-gateway.service"
         monkeypatch.setattr(
-            gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
+            gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path,
         )
         monkeypatch.setattr(
             gateway_cli,
@@ -2581,7 +2581,7 @@ class TestSystemdInstallOffersLegacyRemoval:
         assert remove_called.get("interactive") is False  # prompted elsewhere
 
     def test_install_declines_legacy_removal_when_user_says_no(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """When legacy units exist and user declines, install still proceeds
         but doesn't touch them."""
@@ -2598,7 +2598,7 @@ class TestSystemdInstallOffersLegacyRemoval:
 
         unit_path = tmp_path / "hermes-gateway.service"
         monkeypatch.setattr(
-            gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
+            gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path,
         )
         monkeypatch.setattr(
             gateway_cli,
@@ -2621,7 +2621,7 @@ class TestSystemdInstallOffersLegacyRemoval:
         assert unit_path.read_text() == "unit text\n"
 
     def test_install_skips_legacy_check_when_none_present(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """No legacy → no prompt, no helper call."""
         prompt_called = {"count": 0}
@@ -2642,7 +2642,7 @@ class TestSystemdInstallOffersLegacyRemoval:
 
         unit_path = tmp_path / "hermes-gateway.service"
         monkeypatch.setattr(
-            gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
+            gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path,
         )
         monkeypatch.setattr(
             gateway_cli,

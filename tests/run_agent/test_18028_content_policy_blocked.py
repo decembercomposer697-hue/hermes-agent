@@ -29,7 +29,7 @@ class TestContentPolicyBlockedClassification:
             "This content was flagged for possible cybersecurity risk. "
             "If this seems wrong, try rephrasing your request. To get "
             "authorized for security work, join the Trusted Access for "
-            "Cyber program."
+            "Cyber program.",
         )
         result = classify_api_error(e, provider="openai-codex", model="gpt-5.5")
         # Must NOT fall into the retryable ``unknown`` bucket — that's what

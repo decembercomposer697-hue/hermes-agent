@@ -44,7 +44,7 @@ class Watermark:
     def __init__(self, name: str, *, max_seen: int = 500) -> None:
         if not name or not name.replace("-", "").replace("_", "").isalnum():
             raise ValueError(
-                f"watermark name must be alphanumeric + '-'/'_' (got {name!r})"
+                f"watermark name must be alphanumeric + '-'/'_' (got {name!r})",
             )
         self.name = name
         self.max_seen = max_seen
@@ -73,7 +73,7 @@ class Watermark:
         return list(self._data.get("seen_ids", []))
 
     def filter_new(
-        self, items: Iterable[dict[str, Any]], *, id_key: str = "id"
+        self, items: Iterable[dict[str, Any]], *, id_key: str = "id",
     ) -> list[dict[str, Any]]:
         """Return items whose id isn't in the stored set.
 

@@ -275,7 +275,7 @@ class LSPClient:
             )
         except FileNotFoundError as e:
             raise LSPProtocolError(
-                f"LSP server binary not found: {cmd[0]} ({e})"
+                f"LSP server binary not found: {cmd[0]} ({e})",
             ) from e
 
         # Drain stderr at debug level — if we don't, the pipe buffer
@@ -333,7 +333,7 @@ class LSPClient:
             "rootPath": self.workspace_root,
             "processId": os.getpid(),
             "workspaceFolders": [
-                {"name": "workspace", "uri": file_uri(self.workspace_root)}
+                {"name": "workspace", "uri": file_uri(self.workspace_root)},
             ],
             "initializationOptions": self._init_options,
             "capabilities": {
@@ -532,7 +532,7 @@ class LSPClient:
                     code=int(err.get("code", -32000)),
                     message=str(err.get("message", "unknown")),
                     data=err.get("data"),
-                )
+                ),
             )
         else:
             fut.set_result(msg.get("result"))
@@ -706,7 +706,7 @@ class LSPClient:
                             "end": _end_position(old_text),
                         },
                         "text": text,
-                    }
+                    },
                 ]
             else:
                 content_changes = [{"text": text}]
@@ -739,7 +739,7 @@ class LSPClient:
                     "languageId": language_id,
                     "version": 0,
                     "text": text,
-                }
+                },
             },
         )
         self._files[abs_path] = {"version": 0, "text": text}
@@ -767,7 +767,7 @@ class LSPClient:
         """
         try:
             params: dict[str, Any] = {
-                "textDocument": {"uri": file_uri(os.path.abspath(path))}
+                "textDocument": {"uri": file_uri(os.path.abspath(path))},
             }
             result = await self._send_request_with_retry(
                 "textDocument/diagnostic",
@@ -930,7 +930,7 @@ def _diagnostic_key(d: dict[str, Any]) -> str:
             str(d.get("source") or ""),
             str(d.get("message") or "").strip(),
             f"{start.get('line', 0)}:{start.get('character', 0)}-{end.get('line', 0)}:{end.get('character', 0)}",
-        ]
+        ],
     )
 
 

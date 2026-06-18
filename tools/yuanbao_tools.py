@@ -110,7 +110,7 @@ async def query_group_members(
                 "user_id": m.get("user_id", ""),
                 "nickname": m.get("nickname", m.get("nick_name", "")),
                 "role": _USER_TYPE_LABEL.get(
-                    m.get("user_type", m.get("role", 0)), "unknown"
+                    m.get("user_type", m.get("role", 0)), "unknown",
                 ),
             }
             for m in raw.get("members", [])

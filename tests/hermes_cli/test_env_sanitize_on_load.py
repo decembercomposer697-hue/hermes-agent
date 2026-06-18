@@ -19,7 +19,7 @@ def test_load_env_sanitizes_concatenated_lines():
     corrupted = f"TELEGRAM_BOT_TOKEN={token}ANTHROPIC_API_KEY=sk-ant-test123\n"
 
     with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".env", delete=False, encoding="utf-8"
+        mode="w", suffix=".env", delete=False, encoding="utf-8",
     ) as f:
         f.write(corrupted)
         env_path = Path(f.name)
@@ -48,7 +48,7 @@ def test_load_env_normal_file_unchanged():
     )
 
     with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".env", delete=False, encoding="utf-8"
+        mode="w", suffix=".env", delete=False, encoding="utf-8",
     ) as f:
         f.write(content)
         env_path = Path(f.name)
@@ -71,7 +71,7 @@ def test_env_loader_sanitizes_before_dotenv():
     corrupted = f"TELEGRAM_BOT_TOKEN={token}ANTHROPIC_API_KEY=sk-ant-test\n"
 
     with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".env", delete=False, encoding="utf-8"
+        mode="w", suffix=".env", delete=False, encoding="utf-8",
     ) as f:
         f.write(corrupted)
         env_path = Path(f.name)

@@ -77,14 +77,14 @@ def test_tool_counts_and_files():
             tool_calls=[
                 _tool_call("read_file", {"path": "README.md"}),
                 _tool_call("patch", {"path": "README.md"}),
-            ]
+            ],
         ),
         _tool_result(),
         _tool_result(),
         _assistant(
             tool_calls=[
                 _tool_call("terminal", {"command": "pytest"}),
-            ]
+            ],
         ),
         _tool_result("tests ok"),
         _assistant("All green."),
@@ -146,7 +146,7 @@ def test_handles_arguments_as_dict_not_string():
                         "name": "patch",
                         "arguments": {"path": "foo.py"},
                     },
-                }
+                },
             ],
         },
     ]

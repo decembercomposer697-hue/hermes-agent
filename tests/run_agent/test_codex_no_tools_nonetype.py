@@ -129,7 +129,7 @@ def test_build_kwargs_emits_tools_when_tools_present(transport, codex_messages):
                 "description": "Run a shell command.",
                 "parameters": {"type": "object", "properties": {}},
             },
-        }
+        },
     ]
 
     kwargs = transport.build_kwargs(

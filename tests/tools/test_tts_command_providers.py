@@ -123,7 +123,7 @@ class TestGetNamedProviderConfig:
     def test_legacy_tts_name_block_still_resolves(self):
         cfg = {"voxcpm": {"type": "command", "command": "legacy"}}
         assert _get_named_provider_config(cfg, "voxcpm") == {
-            "type": "command", "command": "legacy"
+            "type": "command", "command": "legacy",
         }
 
     def test_builtin_names_do_not_leak_through_legacy_path(self):

@@ -123,7 +123,7 @@ def _import_plugin_dir(plugin_dir: Path, source: str) -> None:
 
     try:
         spec = importlib.util.spec_from_file_location(
-            module_name, init_file, submodule_search_locations=[str(plugin_dir)]
+            module_name, init_file, submodule_search_locations=[str(plugin_dir)],
         )
         if spec is None or spec.loader is None:
             return
@@ -132,7 +132,7 @@ def _import_plugin_dir(plugin_dir: Path, source: str) -> None:
         spec.loader.exec_module(module)
     except Exception as exc:
         logger.warning(
-            "Failed to load %s provider plugin %s: %s", source, plugin_dir.name, exc
+            "Failed to load %s provider plugin %s: %s", source, plugin_dir.name, exc,
         )
         sys.modules.pop(module_name, None)
 
@@ -185,7 +185,7 @@ def _discover_providers() -> None:
                 importlib.import_module(f"providers.{modname}")
             except ImportError as exc:
                 logger.warning(
-                    "Failed to import legacy provider module %s: %s", modname, exc
+                    "Failed to import legacy provider module %s: %s", modname, exc,
                 )
     except Exception:
         pass

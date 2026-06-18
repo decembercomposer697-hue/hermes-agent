@@ -73,7 +73,7 @@ class GraphCredentials:
             if not required:
                 return None
             raise MicrosoftGraphConfigError(
-                f"Missing Microsoft Graph configuration: {', '.join(missing)}"
+                f"Missing Microsoft Graph configuration: {', '.join(missing)}",
             )
 
         return cls(
@@ -149,14 +149,14 @@ class MicrosoftGraphTokenProvider:
     async def get_access_token(self, *, force_refresh: bool = False) -> str:
         cached = self._cached_token
         if not force_refresh and cached and not cached.is_expired(
-            skew_seconds=self.skew_seconds
+            skew_seconds=self.skew_seconds,
         ):
             return cached.access_token
 
         async with self._lock:
             cached = self._cached_token
             if not force_refresh and cached and not cached.is_expired(
-                skew_seconds=self.skew_seconds
+                skew_seconds=self.skew_seconds,
             ):
                 return cached.access_token
 
@@ -187,14 +187,14 @@ class MicrosoftGraphTokenProvider:
             detail = _extract_error_detail(response)
             raise MicrosoftGraphTokenError(
                 "Microsoft Graph token request failed with HTTP "
-                f"{response.status_code}: {detail}"
+                f"{response.status_code}: {detail}",
             )
 
         try:
             payload = response.json()
         except ValueError as exc:
             raise MicrosoftGraphTokenError(
-                "Microsoft Graph token response was not valid JSON."
+                "Microsoft Graph token response was not valid JSON.",
             ) from exc
 
         access_token = str(payload.get("access_token") or "").strip()
@@ -203,14 +203,14 @@ class MicrosoftGraphTokenProvider:
 
         if not access_token:
             raise MicrosoftGraphTokenError(
-                "Microsoft Graph token response did not include access_token."
+                "Microsoft Graph token response did not include access_token.",
             )
 
         try:
             expires_in_seconds = int(expires_in)
         except (TypeError, ValueError) as exc:
             raise MicrosoftGraphTokenError(
-                "Microsoft Graph token response did not include a valid expires_in."
+                "Microsoft Graph token response did not include a valid expires_in.",
             ) from exc
 
         return CachedAccessToken(

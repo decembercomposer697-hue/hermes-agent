@@ -677,7 +677,7 @@ class TestChatTTSCleanupOnException:
                             return
                 pytest.fail(
                     "chat() must have a finally block cleaning up "
-                    "text_queue/stop_event/tts_thread"
+                    "text_queue/stop_event/tts_thread",
                 )
 
 
@@ -969,11 +969,11 @@ class TestVoiceBeepConfigReal:
                 "beep_enabled": False,
                 "silence_threshold": 200,
                 "silence_duration": 3.0,
-            }
+            },
         },
     )
     def test_start_recording_skips_beep_when_disabled(
-        self, _cfg, _req, mock_create, mock_beep, mock_thread, _cp
+        self, _cfg, _req, mock_create, mock_beep, mock_thread, _cp,
     ):
         recorder = MagicMock()
         recorder.supports_silence_autostop = True
@@ -1178,7 +1178,7 @@ class TestVoiceStopAndTranscribeReal:
            return_value={"success": True, "transcript": "hello world"})
     @patch("tools.voice_mode.play_beep")
     def test_successful_transcription_queues_input(
-        self, _beep, _tr, _cfg, _isf, _unl, _cp
+        self, _beep, _tr, _cfg, _isf, _unl, _cp,
     ):
         recorder = MagicMock()
         recorder.stop.return_value = "/tmp/test.wav"
@@ -1265,7 +1265,7 @@ class TestVoiceStopAndTranscribeReal:
            return_value={"success": True, "transcript": "hello"})
     @patch("tools.voice_mode.play_beep")
     def test_continuous_no_restart_on_success(
-        self, _beep, _tr, _cfg, _isf, _unl, _cp
+        self, _beep, _tr, _cfg, _isf, _unl, _cp,
     ):
         recorder = MagicMock()
         recorder.stop.return_value = "/tmp/test.wav"

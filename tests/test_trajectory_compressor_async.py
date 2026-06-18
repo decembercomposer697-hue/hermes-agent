@@ -106,7 +106,7 @@ class TestSourceLineVerification:
                 context = "\n".join(lines[max(0,i-20):i+1])
                 if "_get_async_client" not in context:
                     pytest.fail(
-                        f"Line {i}: AsyncOpenAI created eagerly outside _get_async_client()"
+                        f"Line {i}: AsyncOpenAI created eagerly outside _get_async_client()",
                     )
 
     def test_get_async_client_method_exists(self):
@@ -132,7 +132,7 @@ async def test_generate_summary_async_kimi_omits_temperature():
     compressor._use_call_llm = False
     async_client = MagicMock()
     async_client.chat.completions.create = MagicMock(return_value=SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))]
+        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))],
     ))
     compressor._get_async_client = MagicMock(return_value=async_client)
 
@@ -161,7 +161,7 @@ async def test_generate_summary_async_public_moonshot_kimi_k2_5_omits_temperatur
     compressor._use_call_llm = False
     async_client = MagicMock()
     async_client.chat.completions.create = MagicMock(return_value=SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))]
+        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))],
     ))
     compressor._get_async_client = MagicMock(return_value=async_client)
 
@@ -190,7 +190,7 @@ async def test_generate_summary_async_public_moonshot_cn_kimi_k2_5_omits_tempera
     compressor._use_call_llm = False
     async_client = MagicMock()
     async_client.chat.completions.create = MagicMock(return_value=SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))]
+        choices=[SimpleNamespace(message=SimpleNamespace(content="[CONTEXT SUMMARY]: summary"))],
     ))
     compressor._get_async_client = MagicMock(return_value=async_client)
 

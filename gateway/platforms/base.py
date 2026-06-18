@@ -545,7 +545,7 @@ async def _ssrf_redirect_guard(response):
         from tools.url_safety import is_safe_url
         if not is_safe_url(redirect_url):
             raise ValueError(
-                f"Blocked redirect to private/internal address: {safe_url_for_log(redirect_url)}"
+                f"Blocked redirect to private/internal address: {safe_url_for_log(redirect_url)}",
             )
 
 
@@ -604,7 +604,7 @@ def cache_image_from_bytes(data: bytes, ext: str = ".jpg") -> str:
         snippet = data[:80].decode("utf-8", errors="replace")
         raise ValueError(
             f"Refusing to cache non-image data as {ext} "
-            f"(starts with: {snippet!r})"
+            f"(starts with: {snippet!r})",
         )
     cache_dir = get_image_cache_dir()
     filename = f"img_{uuid.uuid4().hex[:12]}{ext}"
@@ -1208,7 +1208,7 @@ MEDIA_DELIVERY_EXTS: tuple[str, ...] = (
 # longest-first so the alternation never matches a shorter ext as a prefix of
 # a longer one (e.g. ``.tar`` before ``.tar.gz`` components).
 _MEDIA_EXT_ALTERNATION = "|".join(
-    sorted((e.lstrip(".") for e in MEDIA_DELIVERY_EXTS), key=len, reverse=True)
+    sorted((e.lstrip(".") for e in MEDIA_DELIVERY_EXTS), key=len, reverse=True),
 )
 
 # Anchored ``MEDIA:<path>`` cleanup pattern. Unlike the old loose
@@ -1858,10 +1858,10 @@ class BasePlatformAdapter(ABC):
             or "interrupt"
         )
         self._busy_text_debounce_seconds: float = _float_env(
-            "HERMES_GATEWAY_BUSY_TEXT_DEBOUNCE_SECONDS", 0.35
+            "HERMES_GATEWAY_BUSY_TEXT_DEBOUNCE_SECONDS", 0.35,
         )
         self._busy_text_hard_cap_seconds: float = _float_env(
-            "HERMES_GATEWAY_BUSY_TEXT_HARD_CAP_SECONDS", 1.0
+            "HERMES_GATEWAY_BUSY_TEXT_HARD_CAP_SECONDS", 1.0,
         )
         self._text_debounce: dict[str, TextDebounceState] = {}
         # Background message-processing tasks spawned by handle_message().
@@ -1970,7 +1970,7 @@ class BasePlatformAdapter(ABC):
         also return True from :meth:`supports_draft_streaming` must override.
         """
         raise NotImplementedError(
-            f"{type(self).__name__} does not implement send_draft"
+            f"{type(self).__name__} does not implement send_draft",
         )
 
     # ── Structured stream-event rendering ────────────────────────────────
@@ -2151,7 +2151,7 @@ class BasePlatformAdapter(ABC):
         self._platform_lock_scope = scope
         self._platform_lock_identity = identity
         acquired, existing = acquire_scoped_lock(
-            scope, identity, metadata={'platform': self.platform.value}
+            scope, identity, metadata={'platform': self.platform.value},
         )
         if acquired:
             return True
@@ -2261,7 +2261,7 @@ class BasePlatformAdapter(ABC):
         chat_id: str,
         content: str,
         reply_to: str | None = None,
-        metadata: dict[str, Any] | None = None
+        metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """
         Send a message to a chat.
@@ -3957,7 +3957,7 @@ class BasePlatformAdapter(ABC):
                     )
                     try:
                         _thread_meta = _thread_metadata_for_source(
-                            event.source, _reply_anchor_for_event(event)
+                            event.source, _reply_anchor_for_event(event),
                         )
                         response = await self._message_handler(event)
                         _text, _eph_ttl = self._unwrap_ephemeral(response)
@@ -4089,7 +4089,7 @@ class BasePlatformAdapter(ABC):
             self._keep_typing(
                 event.source.chat_id,
                 **_keep_typing_kwargs,
-            )
+            ),
         )
 
         async def _stop_typing_task() -> None:
@@ -4210,7 +4210,7 @@ class BasePlatformAdapter(ABC):
                             if not speech_text:
                                 raise ValueError("Empty text after markdown cleanup")
                             tts_result_str = await asyncio.to_thread(
-                                text_to_speech_tool, text=speech_text
+                                text_to_speech_tool, text=speech_text,
                             )
                             tts_data = _json.loads(tts_result_str)
                             _tts_path = tts_data.get("file_path")
@@ -4235,7 +4235,7 @@ class BasePlatformAdapter(ABC):
                             metadata=_thread_metadata,
                         )
                         _tts_caption_delivered = bool(
-                            telegram_tts_caption and getattr(tts_result, "success", False)
+                            telegram_tts_caption and getattr(tts_result, "success", False),
                         )
                     finally:
                         try:
@@ -4443,7 +4443,7 @@ class BasePlatformAdapter(ABC):
                 # Mirror the late-arrival drain pattern below: hand off
                 # to a new task and return so this frame can unwind.
                 drain_task = asyncio.create_task(
-                    self._process_message_background(pending_event, session_key)
+                    self._process_message_background(pending_event, session_key),
                 )
                 # Hand ownership of the session to the drain task so
                 # stale-lock detection keeps working while it runs.
@@ -4568,7 +4568,7 @@ class BasePlatformAdapter(ABC):
                     if _active is not None:
                         _active.clear()
                     drain_task = asyncio.create_task(
-                        self._process_message_background(late_pending, session_key)
+                        self._process_message_background(late_pending, session_key),
                     )
                     # Hand ownership of the session to the drain task so stale-lock
                     # detection keeps working while it runs.

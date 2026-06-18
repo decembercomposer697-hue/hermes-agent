@@ -50,7 +50,7 @@ def run() -> int:
     try:
         for i in range(10):
             parent_ids.append(
-                kb.create_task(conn, title=f"parent-{i}", assignee="a")
+                kb.create_task(conn, title=f"parent-{i}", assignee="a"),
             )
     finally:
         conn.close()
@@ -97,7 +97,7 @@ def run() -> int:
             while time.monotonic() < end and not stop.is_set():
                 row = conn.execute(
                     "SELECT id FROM tasks WHERE status='ready' "
-                    "AND claim_lock IS NULL ORDER BY RANDOM() LIMIT 1"
+                    "AND claim_lock IS NULL ORDER BY RANDOM() LIMIT 1",
                 ).fetchone()
                 if row is None:
                     time.sleep(0.002)
@@ -121,7 +121,7 @@ def run() -> int:
                 if undone:
                     violations.append(
                         f"claimed {tid} while parents not done: "
-                        + ",".join(f"{r['parent_id']}={r['status']}" for r in undone)
+                        + ",".join(f"{r['parent_id']}={r['status']}" for r in undone),
                     )
                 # Release so the run doesn't leak and the next round sees ready.
                 kb.complete_task(conn, tid, result="stress-ok")
@@ -156,10 +156,10 @@ def run() -> int:
             JOIN task_links l ON l.child_id = c.task_id
             JOIN tasks p ON p.id = l.parent_id
             WHERE p.completed_at IS NULL OR p.completed_at > c.t
-            """
+            """,
         ).fetchall()
         rejections = conn.execute(
-            "SELECT COUNT(*) FROM task_events WHERE kind='claim_rejected'"
+            "SELECT COUNT(*) FROM task_events WHERE kind='claim_rejected'",
         ).fetchone()[0]
     finally:
         conn.close()

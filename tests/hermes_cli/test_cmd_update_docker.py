@@ -31,7 +31,7 @@ from hermes_cli.main import _cmd_update_check, cmd_update
 @patch("hermes_cli.config.detect_install_method", return_value="docker")
 @patch("subprocess.run")
 def test_cmd_update_in_docker_prints_guidance_and_exits(
-    mock_run, _mock_method, _mock_managed, capsys
+    mock_run, _mock_method, _mock_managed, capsys,
 ):
     """``hermes update`` inside Docker → friendly message + exit 1, no git calls."""
     with pytest.raises(SystemExit) as excinfo:
@@ -53,7 +53,7 @@ def test_cmd_update_in_docker_prints_guidance_and_exits(
 @patch("hermes_cli.config.detect_install_method", return_value="docker")
 @patch("subprocess.run")
 def test_cmd_update_check_in_docker_prints_guidance_and_exits(
-    mock_run, _mock_method, _mock_managed, capsys
+    mock_run, _mock_method, _mock_managed, capsys,
 ):
     """``hermes update --check`` inside Docker → same message + exit 1, no fetch."""
     with pytest.raises(SystemExit) as excinfo:
@@ -72,7 +72,7 @@ def test_cmd_update_check_in_docker_prints_guidance_and_exits(
 @patch("hermes_cli.config.detect_install_method", return_value="docker")
 @patch("subprocess.run")
 def test_cmd_update_in_docker_ignores_yes_and_force(
-    mock_run, _mock_method, _mock_managed, capsys
+    mock_run, _mock_method, _mock_managed, capsys,
 ):
     """``--yes`` / ``--force`` don't bypass the Docker bail-out.
 
@@ -114,7 +114,7 @@ def test_cmd_update_check_direct_in_docker(mock_run, _mock_method, capsys):
     return_value=SimpleNamespace(returncode=0, stdout="0\n", stderr=""),
 )
 def test_cmd_update_on_git_install_does_not_print_docker_message(
-    _mock_run, _mock_method, _mock_managed, capsys
+    _mock_run, _mock_method, _mock_managed, capsys,
 ):
     """Source/git installs MUST NOT hit the Docker branch.
 
@@ -146,7 +146,7 @@ def test_cmd_update_on_git_install_does_not_print_docker_message(
 @patch("hermes_cli.config.detect_install_method", return_value="pip")
 @patch("hermes_cli.banner.check_via_pypi", return_value=0)
 def test_cmd_update_check_on_pip_install_still_uses_pypi(
-    _mock_pypi, _mock_method, capsys
+    _mock_pypi, _mock_method, capsys,
 ):
     """PyPI installs route to PyPI check, not the Docker bail-out."""
     _cmd_update_check()

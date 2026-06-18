@@ -24,7 +24,7 @@ def test_final_assistant_content_uses_markdown_renderable():
 
 def test_final_assistant_content_preserves_windows_hidden_dir_paths():
     renderable = _render_final_assistant_content(
-        r"D:\Projects\SourceCode\hermes-agent\.ai\skills" + "\\"
+        r"D:\Projects\SourceCode\hermes-agent\.ai\skills" + "\\",
     )
 
     output = _render_to_text(renderable)

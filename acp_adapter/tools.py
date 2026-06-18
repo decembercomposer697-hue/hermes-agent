@@ -503,7 +503,7 @@ def _format_web_extract_result(result: str | None) -> str | None:
         url = str(item.get("url") or "").strip()
         title = str(item.get("title") or url or "Untitled").strip()
         failures.append(
-            f"- {title}" + (f" — {url}" if url and url != title else "") + f"\n  Error: {_truncate_text(error, limit=500)}"
+            f"- {title}" + (f" — {url}" if url and url != title else "") + f"\n  Error: {_truncate_text(error, limit=500)}",
         )
 
     if not failures:
@@ -762,7 +762,7 @@ def _format_structured_value(
                     indent=indent + 1,
                     max_depth=max_depth - 1,
                     max_items=max_items,
-                )
+                ),
             )
             shown += 1
             if shown >= max_items:
@@ -793,7 +793,7 @@ def _format_structured_value(
                                 indent=indent + 2,
                                 max_depth=max_depth - 1,
                                 max_items=max_items,
-                            )
+                            ),
                         )
             elif isinstance(item, list):
                 lines.append(f"{'  ' * (indent + 1)}{idx}. {len(item)} items")
@@ -805,7 +805,7 @@ def _format_structured_value(
                             indent=indent + 2,
                             max_depth=max_depth - 1,
                             max_items=max_items,
-                        )
+                        ),
                     )
             else:
                 lines.append(f"{'  ' * (indent + 1)}{idx}. {_truncate_text(str(item), limit=240)}")
@@ -941,7 +941,7 @@ def _parse_unified_diff_content(diff_text: str) -> list[Any]:
                 path=_strip_diff_prefix(path),
                 old_text="\n".join(old_lines) if old_lines else None,
                 new_text="\n".join(new_lines),
-            )
+            ),
         )
         current_old_path = None
         current_new_path = None
@@ -1033,7 +1033,7 @@ def build_tool_start(
                     path=edit_diff.path,
                     old_text=edit_diff.old_text,
                     new_text=edit_diff.new_text,
-                )
+                ),
             ]
         else:
             mode = arguments.get("mode", "replace")
@@ -1050,7 +1050,7 @@ def build_tool_start(
                     path=edit_diff.path,
                     old_text=edit_diff.old_text,
                     new_text=edit_diff.new_text,
-                )
+                ),
             ]
         else:
             path = arguments.get("path", "")
@@ -1123,7 +1123,7 @@ def build_tool_start(
                 acp.tool_diff_content(
                     path=path,
                     new_text=str(arguments.get("content") or ""),
-                )
+                ),
             ]
         elif action == "write_file":
             target = str(arguments.get("file_path") or "file")
@@ -1131,7 +1131,7 @@ def build_tool_start(
                 acp.tool_diff_content(
                     path=f"skills/{name}/{target}",
                     new_text=str(arguments.get("file_content") or ""),
-                )
+                ),
             ]
         elif action in {"delete", "remove_file"}:
             target = str(arguments.get("file_path") or file_path or name)

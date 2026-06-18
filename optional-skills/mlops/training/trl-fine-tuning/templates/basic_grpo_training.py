@@ -54,9 +54,9 @@ def get_dataset(split="train"):
         return {
             'prompt': [
                 {'role': 'system', 'content': SYSTEM_PROMPT},
-                {'role': 'user', 'content': x['question']}
+                {'role': 'user', 'content': x['question']},
             ],
-            'answer': answer
+            'answer': answer,
         }
 
     return data.map(process_example)
@@ -129,7 +129,7 @@ def setup_model_and_tokenizer():
         MODEL_NAME,
         torch_dtype=torch.bfloat16,
         attn_implementation="flash_attention_2",
-        device_map="auto"
+        device_map="auto",
     )
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -144,7 +144,7 @@ def get_peft_config():
         lora_alpha=32,
         target_modules=[
             "q_proj", "k_proj", "v_proj", "o_proj",
-            "gate_proj", "up_proj", "down_proj"
+            "gate_proj", "up_proj", "down_proj",
         ],
         task_type="CAUSAL_LM",
         lora_dropout=0.05,

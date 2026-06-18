@@ -333,7 +333,7 @@ def test_api_gmail_search_reads_headers_case_insensitively(
             "date": "Fri, 29 May 2026 12:00:00 +0000",
             "snippet": "preview",
             "labels": ["INBOX"],
-        }
+        },
     ]
 
 

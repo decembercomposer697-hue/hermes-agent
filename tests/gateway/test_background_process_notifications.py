@@ -79,7 +79,7 @@ class TestLoadBackgroundNotificationsMode:
 
     def test_reads_config_yaml(self, monkeypatch, tmp_path):
         (tmp_path / "config.yaml").write_text(
-            "display:\n  background_process_notifications: error\n"
+            "display:\n  background_process_notifications: error\n",
         )
         import gateway.run as gw
         monkeypatch.setattr(gw, "_hermes_home", tmp_path)
@@ -88,7 +88,7 @@ class TestLoadBackgroundNotificationsMode:
 
     def test_env_var_overrides_config(self, monkeypatch, tmp_path):
         (tmp_path / "config.yaml").write_text(
-            "display:\n  background_process_notifications: error\n"
+            "display:\n  background_process_notifications: error\n",
         )
         import gateway.run as gw
         monkeypatch.setattr(gw, "_hermes_home", tmp_path)
@@ -97,7 +97,7 @@ class TestLoadBackgroundNotificationsMode:
 
     def test_false_value_maps_to_off(self, monkeypatch, tmp_path):
         (tmp_path / "config.yaml").write_text(
-            "display:\n  background_process_notifications: false\n"
+            "display:\n  background_process_notifications: false\n",
         )
         import gateway.run as gw
         monkeypatch.setattr(gw, "_hermes_home", tmp_path)
@@ -106,7 +106,7 @@ class TestLoadBackgroundNotificationsMode:
 
     def test_invalid_value_defaults_to_all(self, monkeypatch, tmp_path):
         (tmp_path / "config.yaml").write_text(
-            "display:\n  background_process_notifications: banana\n"
+            "display:\n  background_process_notifications: banana\n",
         )
         import gateway.run as gw
         monkeypatch.setattr(gw, "_hermes_home", tmp_path)
@@ -180,7 +180,7 @@ class TestLoadBackgroundNotificationsMode:
     ],
 )
 async def test_run_process_watcher_respects_notification_mode(
-    monkeypatch, tmp_path, mode, sessions, expected_calls, expected_fragment
+    monkeypatch, tmp_path, mode, sessions, expected_calls, expected_fragment,
 ):
     import tools.process_registry as pr_module
 
@@ -262,7 +262,7 @@ async def test_inject_watch_notification_routes_from_session_store_origin(monkey
             thread_id="42",
             user_id="123",
             user_name="Emiliyan",
-        )
+        ),
     )
 
     evt = {
@@ -371,7 +371,7 @@ async def test_inject_watch_notification_carries_message_id_reply_anchor(monkeyp
             thread_id="24296",
             user_id="1",
             user_name="Fabio",
-        )
+        ),
     )
 
     evt = {
@@ -413,7 +413,7 @@ def test_build_process_event_source_falls_back_to_session_key_chat_type(monkeypa
 
 
 def test_build_process_event_source_uses_cached_live_source_before_session_key_parse(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     from gateway.session import SessionSource
 
@@ -434,7 +434,7 @@ def test_build_process_event_source_uses_cached_live_source_before_session_key_p
         {
             "session_id": "proc_watch",
             "session_key": "agent:main:telegram:group:-100:42",
-        }
+        },
     )
 
     assert source is not None
@@ -463,7 +463,7 @@ async def test_inject_watch_notification_ignores_foreground_event_source(monkeyp
             thread_id="42",
             user_id="proc_owner",
             user_name="alice",
-        )
+        ),
     )
 
     # The evt dict carries the correct session_key — NOT a foreground event

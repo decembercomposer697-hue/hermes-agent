@@ -12,7 +12,7 @@ def _coerce_timeout(raw: object) -> float | None:
 
 
 def get_provider_request_timeout(
-    provider_id: str, model: str | None = None
+    provider_id: str, model: str | None = None,
 ) -> float | None:
     """Return a configured provider request timeout in seconds, if any."""
     if not provider_id:
@@ -41,7 +41,7 @@ def get_provider_request_timeout(
 
 
 def get_provider_stale_timeout(
-    provider_id: str, model: str | None = None
+    provider_id: str, model: str | None = None,
 ) -> float | None:
     """Return a configured non-stream stale timeout in seconds, if any."""
     if not provider_id:
@@ -70,7 +70,7 @@ def get_provider_stale_timeout(
 
 
 def _get_model_config(
-    provider_config: dict[str, object], model: str | None
+    provider_config: dict[str, object], model: str | None,
 ) -> dict[str, object] | None:
     if not model:
         return None

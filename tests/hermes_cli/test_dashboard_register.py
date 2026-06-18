@@ -49,7 +49,7 @@ class TestFastFails:
         err = AuthError("not logged in", provider="nous", relogin_required=True)
         with patch.object(dr, "cmd_dashboard_register", dr.cmd_dashboard_register):
             with patch(
-                "hermes_cli.auth.resolve_nous_access_token", side_effect=err
+                "hermes_cli.auth.resolve_nous_access_token", side_effect=err,
             ), patch("hermes_cli.config.is_managed", return_value=False):
                 with pytest.raises(SystemExit) as exc:
                     dr.cmd_dashboard_register(_ns())
@@ -108,15 +108,15 @@ class TestHappyPath:
             return None
 
         with patch(
-            "hermes_cli.auth.resolve_nous_access_token", return_value=account_token
+            "hermes_cli.auth.resolve_nous_access_token", return_value=account_token,
         ), patch("hermes_cli.config.is_managed", return_value=False), patch.object(
-            dr, "_resolve_portal_base_url", return_value=portal
+            dr, "_resolve_portal_base_url", return_value=portal,
         ), patch(
-            "hermes_cli.config.get_env_value", side_effect=fake_get_env
+            "hermes_cli.config.get_env_value", side_effect=fake_get_env,
         ), patch(
-            "hermes_cli.config.save_env_value", side_effect=fake_save
+            "hermes_cli.config.save_env_value", side_effect=fake_save,
         ), patch.object(
-            dr.urllib.request, "urlopen", side_effect=fake_urlopen
+            dr.urllib.request, "urlopen", side_effect=fake_urlopen,
         ):
             dr.cmd_dashboard_register(args)
         return saved
@@ -315,17 +315,17 @@ class TestCustomPortalPersistence:
             return None
 
         with patch(
-            "hermes_cli.auth.resolve_nous_access_token", return_value="tok"
+            "hermes_cli.auth.resolve_nous_access_token", return_value="tok",
         ), patch("hermes_cli.config.is_managed", return_value=False), patch.dict(
-            dr.os.environ, {}, clear=False
+            dr.os.environ, {}, clear=False,
         ), patch.object(
-            dr, "_resolve_portal_base_url", return_value=portal
+            dr, "_resolve_portal_base_url", return_value=portal,
         ), patch(
-            "hermes_cli.config.get_env_value", side_effect=fake_get_env_value
+            "hermes_cli.config.get_env_value", side_effect=fake_get_env_value,
         ), patch(
-            "hermes_cli.config.save_env_value", side_effect=fake_save
+            "hermes_cli.config.save_env_value", side_effect=fake_save,
         ), patch.object(
-            dr.urllib.request, "urlopen", return_value=_fake_http_ok(response)
+            dr.urllib.request, "urlopen", return_value=_fake_http_ok(response),
         ):
             # The ambient process env may carry HERMES_DASHBOARD_PORTAL_URL
             # (e.g. staging dev shells); drop it so `custom_portal_supplied`
@@ -437,17 +437,17 @@ class TestPublicUrlPersistence:
             return None
 
         with patch(
-            "hermes_cli.auth.resolve_nous_access_token", return_value="tok"
+            "hermes_cli.auth.resolve_nous_access_token", return_value="tok",
         ), patch("hermes_cli.config.is_managed", return_value=False), patch.dict(
-            dr.os.environ, {}, clear=False
+            dr.os.environ, {}, clear=False,
         ), patch.object(
-            dr, "_resolve_portal_base_url", return_value="https://portal.nousresearch.com"
+            dr, "_resolve_portal_base_url", return_value="https://portal.nousresearch.com",
         ), patch(
-            "hermes_cli.config.get_env_value", side_effect=fake_get_env_value
+            "hermes_cli.config.get_env_value", side_effect=fake_get_env_value,
         ), patch(
-            "hermes_cli.config.save_env_value", side_effect=fake_save
+            "hermes_cli.config.save_env_value", side_effect=fake_save,
         ), patch.object(
-            dr.urllib.request, "urlopen", return_value=_fake_http_ok(response)
+            dr.urllib.request, "urlopen", return_value=_fake_http_ok(response),
         ):
             dr.os.environ.pop("HERMES_DASHBOARD_PORTAL_URL", None)
             dr.cmd_dashboard_register(args)
@@ -531,24 +531,24 @@ class TestPublicUrlPersistence:
             saved[key] = value
 
         with patch(
-            "hermes_cli.auth.resolve_nous_access_token", return_value="tok"
+            "hermes_cli.auth.resolve_nous_access_token", return_value="tok",
         ), patch("hermes_cli.config.is_managed", return_value=False), patch.dict(
-            dr.os.environ, {}, clear=False
+            dr.os.environ, {}, clear=False,
         ), patch.object(
-            dr, "_resolve_portal_base_url", return_value="https://preview.example.com"
+            dr, "_resolve_portal_base_url", return_value="https://preview.example.com",
         ), patch(
-            "hermes_cli.config.get_env_value", return_value=None
+            "hermes_cli.config.get_env_value", return_value=None,
         ), patch(
-            "hermes_cli.config.save_env_value", side_effect=fake_save
+            "hermes_cli.config.save_env_value", side_effect=fake_save,
         ), patch.object(
-            dr.urllib.request, "urlopen", return_value=_fake_http_ok(response)
+            dr.urllib.request, "urlopen", return_value=_fake_http_ok(response),
         ):
             dr.os.environ.pop("HERMES_DASHBOARD_PORTAL_URL", None)
             dr.cmd_dashboard_register(
                 _ns(
                     portal_url="https://preview.example.com",
                     redirect_uri="https://hermes.example.com/auth/callback",
-                )
+                ),
             )
         assert saved["HERMES_DASHBOARD_PORTAL_URL"] == "https://preview.example.com"
         assert saved["HERMES_DASHBOARD_PUBLIC_URL"] == "https://hermes.example.com"
@@ -593,9 +593,9 @@ class TestPortalErrors:
         )
 
         with patch(
-            "hermes_cli.auth.resolve_nous_access_token", return_value="tok"
+            "hermes_cli.auth.resolve_nous_access_token", return_value="tok",
         ), patch("hermes_cli.config.is_managed", return_value=False), patch.object(
-            dr, "_resolve_portal_base_url", return_value="https://portal.nousresearch.com"
+            dr, "_resolve_portal_base_url", return_value="https://portal.nousresearch.com",
         ), patch.object(dr.urllib.request, "urlopen", side_effect=err):
             with pytest.raises(SystemExit) as exc:
                 dr.cmd_dashboard_register(_ns())
@@ -608,7 +608,7 @@ class TestPortalErrors:
 
     def test_403_surfaces_server_detail(self, capsys):
         code = self._run_http_error(
-            403, {"error": "access_denied", "error_description": "Not permitted here."}
+            403, {"error": "access_denied", "error_description": "Not permitted here."},
         )
         assert code == 1
         assert "Not permitted here." in capsys.readouterr().out

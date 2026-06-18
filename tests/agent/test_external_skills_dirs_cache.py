@@ -124,7 +124,7 @@ def test_cache_key_is_per_config_path(tmp_path, monkeypatch):
     ext_a = tmp_path / "ext_a"
     ext_a.mkdir()
     (home_a / "config.yaml").write_text(
-        f"skills:\n  external_dirs:\n    - {ext_a}\n", encoding="utf-8"
+        f"skills:\n  external_dirs:\n    - {ext_a}\n", encoding="utf-8",
     )
 
     home_b = tmp_path / "home_b" / ".hermes"
@@ -132,7 +132,7 @@ def test_cache_key_is_per_config_path(tmp_path, monkeypatch):
     ext_b = tmp_path / "ext_b"
     ext_b.mkdir()
     (home_b / "config.yaml").write_text(
-        f"skills:\n  external_dirs:\n    - {ext_b}\n", encoding="utf-8"
+        f"skills:\n  external_dirs:\n    - {ext_b}\n", encoding="utf-8",
     )
 
     _external_dirs_cache_clear()

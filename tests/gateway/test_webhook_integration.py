@@ -49,7 +49,7 @@ def _create_app(adapter: WebhookAdapter) -> web.Application:
 def _github_signature(body: bytes, secret: str) -> str:
     """Compute X-Hub-Signature-256 for *body* using *secret*."""
     return "sha256=" + hmac.new(
-        secret.encode(), body, hashlib.sha256
+        secret.encode(), body, hashlib.sha256,
     ).hexdigest()
 
 
@@ -97,7 +97,7 @@ class TestGitHubPRWebhook:
                     "{pull_request.title}\n\n{pull_request.body}"
                 ),
                 "deliver": "log",
-            }
+            },
         }
         adapter = _make_adapter(routes)
 
@@ -160,7 +160,7 @@ class TestSkillsInjection:
                 "events": ["pull_request"],
                 "prompt": "Review this PR: {pull_request.title}",
                 "skills": ["code-review"],
-            }
+            },
         }
         adapter = _make_adapter(routes)
 
@@ -221,7 +221,7 @@ class TestCrossPlatformDelivery:
                 "prompt": "Alert: {message}",
                 "deliver": "telegram",
                 "deliver_extra": {"chat_id": "12345"},
-            }
+            },
         }
         adapter = _make_adapter(routes)
         adapter.handle_message = AsyncMock()
@@ -233,7 +233,7 @@ class TestCrossPlatformDelivery:
         mock_runner = MagicMock()
         mock_runner.adapters = {Platform.TELEGRAM: mock_tg_adapter}
         mock_runner.config = GatewayConfig(
-            platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake")}
+            platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="fake")},
         )
         adapter.gateway_runner = mock_runner
 
@@ -256,7 +256,7 @@ class TestCrossPlatformDelivery:
 
         assert result.success is True
         mock_tg_adapter.send.assert_awaited_once_with(
-            "12345", "I've acknowledged the alert.", metadata=None
+            "12345", "I've acknowledged the alert.", metadata=None,
         )
         # Delivery info is retained after send() so interim status messages
         # don't strand the final response (TTL-based cleanup happens on POST).
@@ -282,7 +282,7 @@ class TestGitHubCommentDelivery:
                     "repo": "{repository.full_name}",
                     "pr_number": "{number}",
                 },
-            }
+            },
         }
         adapter = _make_adapter(routes)
         adapter.handle_message = AsyncMock()
@@ -319,7 +319,7 @@ class TestGitHubCommentDelivery:
             return_value=mock_result,
         ) as mock_run:
             result = await adapter.send(
-                chat_id, "LGTM! The code looks great."
+                chat_id, "LGTM! The code looks great.",
             )
 
         assert result.success is True

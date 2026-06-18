@@ -117,7 +117,7 @@ class TestBuildReplayEntry:
                 "id": "msg_123",
                 "phase": "final_answer",
                 "content": [{"type": "output_text", "text": "Done"}],
-            }
+            },
         ]
         msg = {
             "role": "assistant",
@@ -193,7 +193,7 @@ class TestBuildReplayEntry:
                 "role": "assistant",
                 "phase": "final_answer",
                 "content": [{"type": "output_text", "text": "x"}],
-            }
+            },
         ]
         msg = {
             "role": "assistant",

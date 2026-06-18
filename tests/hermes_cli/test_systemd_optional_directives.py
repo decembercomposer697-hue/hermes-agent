@@ -124,10 +124,10 @@ WantedBy=default.target
 
         # With optional-directive stripping, they match
         norm_installed = _normalize_service_definition(
-            _strip_optional_systemd_directives(installed)
+            _strip_optional_systemd_directives(installed),
         )
         norm_expected = _normalize_service_definition(
-            _strip_optional_systemd_directives(expected)
+            _strip_optional_systemd_directives(expected),
         )
         assert norm_installed == norm_expected
 

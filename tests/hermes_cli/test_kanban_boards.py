@@ -296,7 +296,7 @@ class TestBoardCRUD:
             tables = {
                 row[0]
                 for row in conn.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table'"
+                    "SELECT name FROM sqlite_master WHERE type='table'",
                 )
             }
         assert "task_events" in tables

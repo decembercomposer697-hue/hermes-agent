@@ -95,7 +95,7 @@ def test_forced_root_file_upload_list_read_delete_roundtrip(forced_files_client)
             "size": 5,
             "mtime": pytest.approx(file_path.stat().st_mtime),
             "mime_type": "text/plain",
-        }
+        },
     ]
 
     read = client.get("/api/files/read", params={"path": str(file_path)})

@@ -78,13 +78,13 @@ class _DeleteCapableAdapter(BasePlatformAdapter):
 
 def _no_delete_adapter():
     return _NoDeleteAdapter(
-        PlatformConfig(enabled=True, token="t"), Platform.TELEGRAM
+        PlatformConfig(enabled=True, token="t"), Platform.TELEGRAM,
     )
 
 
 def _delete_adapter():
     return _DeleteCapableAdapter(
-        PlatformConfig(enabled=True, token="t"), Platform.TELEGRAM
+        PlatformConfig(enabled=True, token="t"), Platform.TELEGRAM,
     )
 
 
@@ -189,7 +189,7 @@ async def test_schedule_ephemeral_delete_calls_delete_after_ttl():
 
     with patch.object(base_module.asyncio, "sleep", _fake_sleep):
         adapter._schedule_ephemeral_delete(
-            chat_id="42", message_id="m-2", ttl_seconds=5
+            chat_id="42", message_id="m-2", ttl_seconds=5,
         )
         # Let the spawned task run.
         for _ in range(5):
@@ -210,7 +210,7 @@ async def test_schedule_ephemeral_delete_swallows_errors():
     adapter.delete_message = _boom  # type: ignore[assignment]
     with patch("gateway.platforms.base.asyncio.sleep", AsyncMock()):
         adapter._schedule_ephemeral_delete(
-            chat_id="42", message_id="m-2", ttl_seconds=1
+            chat_id="42", message_id="m-2", ttl_seconds=1,
         )
         # No exception should propagate even though delete_message raised.
         for _ in range(5):
@@ -222,7 +222,7 @@ def test_schedule_ephemeral_delete_outside_event_loop_is_noop():
     adapter = _delete_adapter()
     # No pytest.mark.asyncio → no loop.  Must not raise.
     adapter._schedule_ephemeral_delete(
-        chat_id="42", message_id="m-2", ttl_seconds=1
+        chat_id="42", message_id="m-2", ttl_seconds=1,
     )
     assert adapter.deleted == []
 
@@ -237,7 +237,7 @@ async def test_process_message_unwraps_ephemeral_before_send():
     """The adapter must send the wrapper's .text, never the wrapper object."""
     adapter = _delete_adapter()
     adapter._send_with_retry = AsyncMock(
-        return_value=SendResult(success=True, message_id="sent-1")
+        return_value=SendResult(success=True, message_id="sent-1"),
     )
 
     async def _handler(evt):
@@ -253,7 +253,7 @@ async def test_process_message_unwraps_ephemeral_before_send():
     event = _make_event()
     session_key = "agent:main:telegram:private:42"
     with patch("gateway.platforms.base.asyncio.sleep", _fake_sleep), patch.object(
-        adapter, "_keep_typing", new=AsyncMock()
+        adapter, "_keep_typing", new=AsyncMock(),
     ):
         await adapter._process_message_background(event, session_key)
         # Pump until the detached delete task completes.
@@ -273,10 +273,10 @@ async def test_process_message_ephemeral_reply_does_not_auto_upload_bare_paths(t
     """Tips/system notices may mention local paths; they must remain text."""
     adapter = _delete_adapter()
     adapter._send_with_retry = AsyncMock(
-        return_value=SendResult(success=True, message_id="sent-1")
+        return_value=SendResult(success=True, message_id="sent-1"),
     )
     adapter.send_document = AsyncMock(
-        return_value=SendResult(success=True, message_id="doc-1")
+        return_value=SendResult(success=True, message_id="doc-1"),
     )
     config_path = tmp_path / "config.yaml"
     config_path.write_text("model:\n  provider: test\n", encoding="utf-8")
@@ -290,7 +290,7 @@ async def test_process_message_ephemeral_reply_does_not_auto_upload_bare_paths(t
     event = _make_event(text="/new")
     session_key = "agent:main:telegram:private:42"
     with patch("gateway.platforms.base.asyncio.sleep", AsyncMock()), patch.object(
-        adapter, "_keep_typing", new=AsyncMock()
+        adapter, "_keep_typing", new=AsyncMock(),
     ):
         await adapter._process_message_background(event, session_key)
 
@@ -303,7 +303,7 @@ async def test_process_message_ephemeral_reply_does_not_auto_upload_bare_paths(t
 async def test_process_message_incapable_platform_does_not_schedule_delete():
     adapter = _no_delete_adapter()
     adapter._send_with_retry = AsyncMock(
-        return_value=SendResult(success=True, message_id="sent-1")
+        return_value=SendResult(success=True, message_id="sent-1"),
     )
 
     async def _handler(evt):
@@ -323,7 +323,7 @@ async def test_process_message_incapable_platform_does_not_schedule_delete():
     event = _make_event()
     session_key = "agent:main:telegram:private:42"
     with patch("gateway.platforms.base.asyncio.sleep", AsyncMock()), patch.object(
-        adapter, "_keep_typing", new=AsyncMock()
+        adapter, "_keep_typing", new=AsyncMock(),
     ):
         await adapter._process_message_background(event, session_key)
         for _ in range(10):
@@ -345,7 +345,7 @@ async def test_process_message_incapable_platform_does_not_schedule_delete():
 async def test_process_message_plain_string_behaves_unchanged():
     adapter = _delete_adapter()
     adapter._send_with_retry = AsyncMock(
-        return_value=SendResult(success=True, message_id="sent-1")
+        return_value=SendResult(success=True, message_id="sent-1"),
     )
 
     async def _handler(evt):
@@ -356,7 +356,7 @@ async def test_process_message_plain_string_behaves_unchanged():
     event = _make_event()
     session_key = "agent:main:telegram:private:42"
     with patch("gateway.platforms.base.asyncio.sleep", AsyncMock()), patch.object(
-        adapter, "_keep_typing", new=AsyncMock()
+        adapter, "_keep_typing", new=AsyncMock(),
     ):
         await adapter._process_message_background(event, session_key)
         for _ in range(5):

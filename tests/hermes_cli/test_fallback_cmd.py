@@ -47,7 +47,7 @@ class TestReadChain:
             "fallback_providers": [
                 {"provider": "openrouter", "model": "anthropic/claude-sonnet-4.6"},
                 {"provider": "nous", "model": "Hermes-4-Llama-3.1-405B"},
-            ]
+            ],
         }
         assert _read_chain(cfg) == [
             {"provider": "openrouter", "model": "anthropic/claude-sonnet-4.6"},
@@ -92,7 +92,7 @@ class TestReadChain:
                 {"model": "gpt-5.4"},                  # missing provider
                 {"provider": "nous", "model": "foo"},  # valid
                 "not-a-dict",                          # noise
-            ]
+            ],
         }
         assert _read_chain(cfg) == [{"provider": "nous", "model": "foo"}]
 
@@ -225,7 +225,7 @@ class TestAddCommand:
                 "model": "anthropic/claude-sonnet-4.6",
                 "base_url": "https://openrouter.ai/api/v1",
                 "api_mode": "chat_completions",
-            }
+            },
         ]
         out = capsys.readouterr().out
         assert "Added fallback" in out

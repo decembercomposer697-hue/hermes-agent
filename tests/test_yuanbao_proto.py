@@ -374,10 +374,10 @@ class TestDecodeInboundPush:
             _encode_field, _encode_message, WT_LEN,
         )
         el1 = _encode_msg_body_element(
-            {"msg_type": "TIMTextElem", "msg_content": {"text": "part1"}}
+            {"msg_type": "TIMTextElem", "msg_content": {"text": "part1"}},
         )
         el2 = _encode_msg_body_element(
-            {"msg_type": "TIMTextElem", "msg_content": {"text": "part2"}}
+            {"msg_type": "TIMTextElem", "msg_content": {"text": "part2"}},
         )
         buf = (
             _encode_field(2, WT_LEN, b"\x05alice")
@@ -590,7 +590,7 @@ class TestEndToEnd:
 
         # 从 biz payload 中读取 to_account 和 msg_body
         from gateway.platforms.yuanbao_proto import (
-            _get_string, _get_repeated_bytes
+            _get_string, _get_repeated_bytes,
         )
         biz = dec["data"]
         fdict = _fields_to_dict(_parse_fields(biz))
@@ -611,7 +611,7 @@ class TestEndToEnd:
         )
         # 构造入站消息 biz payload
         el_bytes = _encode_msg_body_element(
-            {"msg_type": "TIMTextElem", "msg_content": {"text": "server push"}}
+            {"msg_type": "TIMTextElem", "msg_content": {"text": "server push"}},
         )
         biz_payload = (
             _encode_field(2, WT_LEN, _encode_string("alice"))

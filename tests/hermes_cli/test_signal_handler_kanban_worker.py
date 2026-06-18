@@ -74,7 +74,7 @@ def _synthetic_worker_script() -> str:
             threading.Event().wait()
         except KeyboardInterrupt:
             sys.exit(0)
-        """
+        """,
     )
 
 
@@ -161,7 +161,7 @@ def test_sigterm_with_kanban_task_env_terminates_quickly():
             time.sleep(0.02)
         pytest.fail(
             "process still alive 2s after SIGTERM with HERMES_KANBAN_TASK set "
-            "(dispatcher would keep extending claim) — fix regressed"
+            "(dispatcher would keep extending claim) — fix regressed",
         )
     finally:
         _cleanup(proc)

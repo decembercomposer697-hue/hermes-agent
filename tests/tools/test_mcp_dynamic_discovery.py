@@ -63,8 +63,8 @@ class TestRefreshTools:
         new_tool = _make_mcp_tool("new_tool", "new behavior")
         server.session = SimpleNamespace(
             list_tools=AsyncMock(
-                return_value=SimpleNamespace(tools=[new_tool])
-            )
+                return_value=SimpleNamespace(tools=[new_tool]),
+            ),
         )
 
         with patch("tools.registry.registry", mock_registry):
@@ -96,7 +96,7 @@ class TestMessageHandler:
         with patch.object(MCPServerTask, "_schedule_tools_refresh") as mock_schedule:
             handler = server._make_message_handler()
             notification = ServerNotification(
-                root=ToolListChangedNotification(method="notifications/tools/list_changed")
+                root=ToolListChangedNotification(method="notifications/tools/list_changed"),
             )
             await handler(notification)
             mock_schedule.assert_called_once()

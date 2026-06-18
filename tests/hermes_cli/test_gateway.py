@@ -25,7 +25,7 @@ def _install_fake_gateway_run(monkeypatch, start_gateway):
     # for the developer).
     monkeypatch.setattr(gateway, "supports_systemd_services", lambda: False)
     monkeypatch.setattr(
-        gateway, "refresh_systemd_unit_if_needed", lambda system=False: False
+        gateway, "refresh_systemd_unit_if_needed", lambda system=False: False,
     )
 
 

@@ -379,7 +379,7 @@ class TestPidExistsOSErrorWidening:
         # Force the psutil-first branch to miss so we exercise the fallback.
         monkeypatch.setitem(
             __import__("sys").modules, "psutil",
-            type("P", (), {"pid_exists": staticmethod(lambda pid: (_ for _ in ()).throw(ImportError()))})()
+            type("P", (), {"pid_exists": staticmethod(lambda pid: (_ for _ in ()).throw(ImportError()))})(),
         )
         monkeypatch.setattr(status, "_IS_WINDOWS", False)
 
@@ -395,7 +395,7 @@ class TestPidExistsOSErrorWidening:
 
         monkeypatch.setitem(
             __import__("sys").modules, "psutil",
-            type("P", (), {"pid_exists": staticmethod(lambda pid: (_ for _ in ()).throw(ImportError()))})()
+            type("P", (), {"pid_exists": staticmethod(lambda pid: (_ for _ in ()).throw(ImportError()))})(),
         )
         monkeypatch.setattr(status, "_IS_WINDOWS", False)
 
@@ -427,7 +427,7 @@ class TestTzdataDependencyDeclared:
         # specifier in between (==X.Y.Z, >=X.Y.Z,<W, etc.) and either quote
         # style on the marker.
         pattern = re.compile(
-            r'"tzdata[^"]*;\s*sys_platform\s*==\s*[\'"]win32[\'"]\s*"'
+            r'"tzdata[^"]*;\s*sys_platform\s*==\s*[\'"]win32[\'"]\s*"',
         )
         assert pattern.search(source), (
             "tzdata must be a Windows-only dep in pyproject.toml dependencies "
@@ -532,7 +532,7 @@ class TestSubprocessCompatHelpers:
     def test_resolve_node_command_fallback_when_absent(self):
         from hermes_cli._subprocess_compat import resolve_node_command
         argv = resolve_node_command(
-            "zzz-definitely-not-on-path-xyzzy", ["--help"]
+            "zzz-definitely-not-on-path-xyzzy", ["--help"],
         )
         # Must fall back to the bare name — NOT return None, NOT crash.
         assert argv[0] == "zzz-definitely-not-on-path-xyzzy"
@@ -601,7 +601,7 @@ class TestSubprocessCompatHelpers:
         )
 
     def test_windows_detach_flags_without_breakaway_drops_only_that_bit(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         """Fallback retry payload for restrictive job objects.
 
@@ -805,7 +805,7 @@ class TestNpmBareSpawnsResolved:
                 # Argv forms that START with a bare npm/npx are the bug.
                 raise AssertionError(
                     f"{relpath}: bare {pat!r} still present at offset {idx} — "
-                    f"resolve via shutil.which(...) so Windows can execute .cmd shims"
+                    f"resolve via shutil.which(...) so Windows can execute .cmd shims",
                 )
 
 

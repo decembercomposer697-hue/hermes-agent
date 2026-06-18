@@ -120,7 +120,7 @@ class TestOpenRouterProfile:
             openrouter_min_coding_score=0.65,
         )
         assert body["plugins"] == [
-            {"id": "pareto-router", "min_coding_score": 0.65}
+            {"id": "pareto-router", "min_coding_score": 0.65},
         ]
 
     def test_pareto_score_ignored_for_other_models(self):

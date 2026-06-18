@@ -70,7 +70,7 @@ class TestPlatformTokenPlaceholderGuard:
     def test_accepts_real_token(self, caplog):
         """A real-looking bot token should pass validation."""
         config = _make_gateway_config(
-            Platform.TELEGRAM, "7123456789:AAHdqTcvCH1vGWJxfSeOfSAs0K5PALDsaw"
+            Platform.TELEGRAM, "7123456789:AAHdqTcvCH1vGWJxfSeOfSAs0K5PALDsaw",
         )
         with caplog.at_level(logging.ERROR):
             _validate_and_return(config)
@@ -114,7 +114,7 @@ class TestAPIServerPlaceholderKeyGuard:
         from gateway.platforms.api_server import APIServerAdapter
 
         adapter = APIServerAdapter(
-            PlatformConfig(enabled=True, extra={"host": "0.0.0.0", "key": "changeme"})
+            PlatformConfig(enabled=True, extra={"host": "0.0.0.0", "key": "changeme"}),
         )
         result = await adapter.connect()
         assert result is False
@@ -124,7 +124,7 @@ class TestAPIServerPlaceholderKeyGuard:
         from gateway.platforms.api_server import APIServerAdapter
 
         adapter = APIServerAdapter(
-            PlatformConfig(enabled=True, extra={"host": "0.0.0.0", "key": "***"})
+            PlatformConfig(enabled=True, extra={"host": "0.0.0.0", "key": "***"}),
         )
         result = await adapter.connect()
         assert result is False
@@ -135,7 +135,7 @@ class TestAPIServerPlaceholderKeyGuard:
         from gateway.platforms.base import is_network_accessible
 
         adapter = APIServerAdapter(
-            PlatformConfig(enabled=True, extra={"host": "127.0.0.1", "key": "changeme"})
+            PlatformConfig(enabled=True, extra={"host": "127.0.0.1", "key": "changeme"}),
         )
         # On loopback the placeholder guard doesn't fire
         assert is_network_accessible(adapter._host) is False

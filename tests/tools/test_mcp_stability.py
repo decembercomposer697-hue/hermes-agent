@@ -334,14 +334,14 @@ class TestStdioPgroupReaping:
             "    f.write(str(os.getpid()))\n"
             f"os.replace(tmp, {str(grandchild_pid_file)!r})\n"
             "while True:\n"
-            "    time.sleep(0.5)\n"
+            "    time.sleep(0.5)\n",
         )
 
         # Parent: spawn grandchild, exit immediately (without killing it).
         parent_script = tmp_path / "parent.py"
         parent_script.write_text(
             "import subprocess, sys\n"
-            f"subprocess.Popen([sys.executable, {str(grandchild_script)!r}])\n"
+            f"subprocess.Popen([sys.executable, {str(grandchild_script)!r}])\n",
             # Parent exits — grandchild reparents to init.
         )
 

@@ -53,7 +53,7 @@ def main() -> int:
     backup_text = ", ".join(str(path) for path in backups) if backups else "none"
     print(
         f"[config-migrate] Migrating config schema {current_ver} -> {latest_ver}; "
-        f"backups: {backup_text}"
+        f"backups: {backup_text}",
     )
     migrate_config(interactive=False, quiet=False)
     return 0

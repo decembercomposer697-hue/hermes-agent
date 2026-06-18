@@ -61,7 +61,7 @@ def build_auth_methods() -> list[Any]:
                     "Authenticate Hermes using the currently configured "
                     f"{provider} runtime credentials."
                 ),
-            )
+            ),
         )
 
     methods.append(
@@ -74,6 +74,6 @@ def build_auth_methods() -> list[Any]:
             ),
             type="terminal",
             args=["--setup"],
-        )
+        ),
     )
     return methods

@@ -90,7 +90,7 @@ _PNG_1X1_B64 = (
 
 
 def _attachment_event(
-    content: dict[str, Any], msg_id: str = "spc-msg-att"
+    content: dict[str, Any], msg_id: str = "spc-msg-att",
 ) -> dict[str, Any]:
     return {
         "messageId": msg_id,
@@ -102,7 +102,7 @@ def _attachment_event(
 
 
 def _voice_event(
-    content: dict[str, Any], msg_id: str = "spc-msg-voice"
+    content: dict[str, Any], msg_id: str = "spc-msg-voice",
 ) -> dict[str, Any]:
     return {
         "messageId": msg_id,
@@ -122,7 +122,7 @@ async def test_dispatch_attachment_without_bytes_surfaces_marker(
     captured = _capture(adapter, monkeypatch)
 
     event = _attachment_event(
-        {"name": "IMG_4127.HEIC", "mimeType": "image/heic", "size": 12345}
+        {"name": "IMG_4127.HEIC", "mimeType": "image/heic", "size": 12345},
     )
     await adapter._dispatch_inbound(event)
     assert len(captured) == 1
@@ -150,7 +150,7 @@ async def test_dispatch_attachment_downloads_image(
             "size": len(raw),
             "data": _PNG_1X1_B64,
             "encoding": "base64",
-        }
+        },
     )
     await adapter._dispatch_inbound(event)
 
@@ -185,7 +185,7 @@ async def test_dispatch_voice_downloads_audio(
             "size": len(raw),
             "data": base64.b64encode(raw).decode("ascii"),
             "encoding": "base64",
-        }
+        },
     )
     await adapter._dispatch_inbound(event)
 
@@ -212,7 +212,7 @@ async def test_dispatch_voice_without_bytes_surfaces_marker(
     captured = _capture(adapter, monkeypatch)
 
     event = _voice_event(
-        {"name": "note.m4a", "mimeType": "audio/mp4", "duration": 12, "size": 12345}
+        {"name": "note.m4a", "mimeType": "audio/mp4", "duration": 12, "size": 12345},
     )
     await adapter._dispatch_inbound(event)
 
@@ -242,7 +242,7 @@ async def test_dispatch_attachment_downloads_document(
             "size": len(raw),
             "data": base64.b64encode(raw).decode("ascii"),
             "encoding": "base64",
-        }
+        },
     )
     await adapter._dispatch_inbound(event)
 

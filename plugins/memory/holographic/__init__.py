@@ -185,7 +185,7 @@ class HolographicMemoryProvider(MemoryProvider):
             return ""
         try:
             total = self._store._conn.execute(
-                "SELECT COUNT(*) FROM facts"
+                "SELECT COUNT(*) FROM facts",
             ).fetchone()[0]
         except Exception:
             total = 0

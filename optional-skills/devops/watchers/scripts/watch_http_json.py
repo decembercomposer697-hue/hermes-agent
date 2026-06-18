@@ -47,7 +47,7 @@ def _dig(obj, path: str):
 def _parse_header(s: str):
     if ":" not in s:
         raise argparse.ArgumentTypeError(
-            f"--header expects 'KEY: VALUE' (got {s!r})"
+            f"--header expects 'KEY: VALUE' (got {s!r})",
         )
     k, v = s.split(":", 1)
     return (k.strip(), v.strip())

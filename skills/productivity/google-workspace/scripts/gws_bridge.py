@@ -69,7 +69,7 @@ def refresh_token(token_data: dict) -> dict:
     ).isoformat()
 
     get_token_path().write_text(
-        json.dumps(_normalize_authorized_user_payload(token_data), indent=2)
+        json.dumps(_normalize_authorized_user_payload(token_data), indent=2),
     )
     return token_data
 

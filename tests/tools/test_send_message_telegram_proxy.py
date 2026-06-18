@@ -63,7 +63,7 @@ class TestSendTelegramStandaloneProxy:
     """
 
     def test_proxy_env_passed_to_httpx_request(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """With TELEGRAM_PROXY set, Bot() is constructed with HTTPXRequest
         instances whose ``proxy=`` kwarg is the configured URL — applied to
@@ -86,7 +86,7 @@ class TestSendTelegramStandaloneProxy:
         _install_telegram_mock_with_request(monkeypatch, bot_factory, httpx_request_factory)
 
         result: dict[str, Any] = asyncio.run(
-            _send_telegram("tok", "123", "hello world")
+            _send_telegram("tok", "123", "hello world"),
         )
 
         assert result["success"] is True
@@ -110,7 +110,7 @@ class TestSendTelegramStandaloneProxy:
         bot.send_message.assert_awaited_once()
 
     def test_no_proxy_env_uses_plain_bot(
-        self, monkeypatch: pytest.MonkeyPatch
+        self, monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Without TELEGRAM_PROXY (and no inherited HTTPS_PROXY/etc), Bot()
         is constructed plainly — no ``request``/``get_updates_request``
@@ -142,7 +142,7 @@ class TestSendTelegramStandaloneProxy:
         _install_telegram_mock_with_request(monkeypatch, bot_factory, httpx_request_factory)
 
         result: dict[str, Any] = asyncio.run(
-            _send_telegram("tok", "123", "hello world")
+            _send_telegram("tok", "123", "hello world"),
         )
 
         assert result["success"] is True

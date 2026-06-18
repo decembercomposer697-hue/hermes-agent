@@ -225,7 +225,7 @@ async def download_url(
             content_length = int(head.headers.get("content-length", 0) or 0)
             if content_length > 0 and content_length > max_bytes:
                 raise ValueError(
-                    f"文件过大: {content_length / 1024 / 1024:.1f} MB > {max_size_mb} MB"
+                    f"文件过大: {content_length / 1024 / 1024:.1f} MB > {max_size_mb} MB",
                 )
         except httpx.HTTPStatusError:
             pass  # 部分服务器不支持 HEAD，忽略
@@ -242,7 +242,7 @@ async def download_url(
                 downloaded += len(chunk)
                 if downloaded > max_bytes:
                     raise ValueError(
-                        f"文件过大: 已超过 {max_size_mb} MB 限制"
+                        f"文件过大: 已超过 {max_size_mb} MB 限制",
                     )
                 chunks.append(chunk)
 
@@ -400,7 +400,7 @@ async def get_cos_credentials(
     code = result.get("code")
     if code != 0 and code is not None:
         raise RuntimeError(
-            f"genUploadInfo 失败: code={code}, msg={result.get('msg', '')}"
+            f"genUploadInfo 失败: code={code}, msg={result.get('msg', '')}",
         )
 
     data = result.get("data") or result
@@ -408,7 +408,7 @@ async def get_cos_credentials(
     missing = [f for f in required_fields if not data.get(f)]
     if missing:
         raise RuntimeError(
-            f"genUploadInfo 返回字段不完整: 缺少字段 {missing}"
+            f"genUploadInfo 返回字段不完整: 缺少字段 {missing}",
         )
 
     return data
@@ -464,7 +464,7 @@ async def upload_to_cos(
     if not secret_id or not secret_key or not cos_key:
         raise RuntimeError(
             f"COS credentials 不完整: secretId={bool(secret_id)}, "
-            f"secretKey={bool(secret_key)}, location={bool(cos_key)}"
+            f"secretKey={bool(secret_key)}, location={bool(cos_key)}",
         )
 
     # 构建 COS 上传 URL（优先使用全球加速域名）
@@ -593,10 +593,10 @@ def build_image_msg_body(
                         "width": width,
                         "height": height,
                         "url": url,
-                    }
+                    },
                 ],
             },
-        }
+        },
     ]
 
 
@@ -630,7 +630,7 @@ def build_file_msg_body(
                 "file_size": size,
                 "url": url,
             },
-        }
+        },
     ]
 
 

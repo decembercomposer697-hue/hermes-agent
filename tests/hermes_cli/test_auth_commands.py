@@ -20,7 +20,7 @@ def _write_auth_store(tmp_path, payload: dict) -> None:
 def _jwt_with_email(email: str) -> str:
     header = base64.urlsafe_b64encode(b'{"alg":"RS256","typ":"JWT"}').rstrip(b"=").decode()
     payload = base64.urlsafe_b64encode(
-        json.dumps({"email": email}).encode()
+        json.dumps({"email": email}).encode(),
     ).rstrip(b"=").decode()
     return f"{header}.{payload}.signature"
 
@@ -443,7 +443,7 @@ def test_auth_add_codex_oauth_keeps_distinct_pool_accounts(tmp_path, monkeypatch
                 "base_url": "https://chatgpt.com/backend-api/codex",
                 "last_refresh": "2026-03-23T10:05:00Z",
             },
-        ]
+        ],
     )
     monkeypatch.setattr("hermes_cli.auth._codex_device_code_login", lambda: next(logins))
 
@@ -567,7 +567,7 @@ def test_auth_remove_reindexes_priorities(tmp_path, monkeypatch):
                         "source": "manual",
                         "access_token": "sk-ant-api-secondary",
                     },
-                ]
+                ],
             },
         },
     )
@@ -615,7 +615,7 @@ def test_auth_remove_accepts_label_target(tmp_path, monkeypatch):
                         "source": "manual:device_code",
                         "access_token": "tok-2",
                     },
-                ]
+                ],
             },
         },
     )
@@ -670,7 +670,7 @@ def test_auth_remove_prefers_exact_numeric_label_over_index(tmp_path, monkeypatc
                         "source": "manual:device_code",
                         "access_token": "tok-c",
                     },
-                ]
+                ],
             },
         },
     )
@@ -706,8 +706,8 @@ def test_auth_reset_clears_provider_statuses(tmp_path, monkeypatch, capsys):
                         "last_status": "exhausted",
                         "last_status_at": 1711230000.0,
                         "last_error_code": 402,
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -748,7 +748,7 @@ def test_clear_provider_auth_removes_provider_pool_entries(tmp_path, monkeypatch
                         "priority": 0,
                         "source": "manual:hermes_pkce",
                         "access_token": "pool-token",
-                    }
+                    },
                 ],
                 "openrouter": [
                     {
@@ -758,7 +758,7 @@ def test_clear_provider_auth_removes_provider_pool_entries(tmp_path, monkeypatch
                         "priority": 0,
                         "source": "manual",
                         "access_token": "sk-or-test",
-                    }
+                    },
                 ],
             },
         },
@@ -789,7 +789,7 @@ def test_logout_resets_codex_config_when_auth_state_already_cleared(tmp_path, mo
         "model:\n"
         "  default: gpt-5.3-codex\n"
         "  provider: openai-codex\n"
-        "  base_url: https://chatgpt.com/backend-api/codex\n"
+        "  base_url: https://chatgpt.com/backend-api/codex\n",
     )
 
     from types import SimpleNamespace
@@ -813,7 +813,7 @@ def test_logout_defaults_to_configured_codex_when_no_active_provider(tmp_path, m
         "model:\n"
         "  default: gpt-5.3-codex\n"
         "  provider: openai-codex\n"
-        "  base_url: https://chatgpt.com/backend-api/codex\n"
+        "  base_url: https://chatgpt.com/backend-api/codex\n",
     )
 
     from types import SimpleNamespace
@@ -844,7 +844,7 @@ def test_logout_clears_stale_active_codex_without_provider_credentials(tmp_path,
         "model:\n"
         "  default: gpt-5.3-codex\n"
         "  provider: openai-codex\n"
-        "  base_url: https://chatgpt.com/backend-api/codex\n"
+        "  base_url: https://chatgpt.com/backend-api/codex\n",
     )
 
     from types import SimpleNamespace
@@ -871,7 +871,7 @@ def test_reset_config_provider_uses_atomic_yaml_write(tmp_path, monkeypatch):
             "default": "gpt-5.3-codex",
             "provider": "openai-codex",
             "base_url": "https://chatgpt.com/backend-api/codex",
-        }
+        },
     }
     config_path.write_text(yaml.safe_dump(original, sort_keys=False), encoding="utf-8")
     original_text = config_path.read_text(encoding="utf-8")
@@ -1061,8 +1061,8 @@ def test_auth_remove_env_seeded_clears_env_var(tmp_path, monkeypatch):
                         "priority": 0,
                         "source": "env:OPENROUTER_API_KEY",
                         "access_token": "sk-or-test-key-12345",
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -1110,8 +1110,8 @@ def test_auth_remove_env_seeded_does_not_resurrect(tmp_path, monkeypatch):
                         "priority": 0,
                         "source": "env:OPENROUTER_API_KEY",
                         "access_token": "sk-or-test-key-12345",
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -1153,8 +1153,8 @@ def test_auth_remove_manual_entry_does_not_touch_env(tmp_path, monkeypatch):
                         "priority": 0,
                         "source": "manual",
                         "access_token": "sk-or-manual-key",
-                    }
-                ]
+                    },
+                ],
             },
         },
     )
@@ -1194,7 +1194,7 @@ def test_auth_remove_claude_code_suppresses_reseed(tmp_path, monkeypatch):
                 "priority": 0,
                 "source": "claude_code",
                 "access_token": "sk-ant-oat01-token",
-            }]
+            }],
         },
     }
     (hermes_home / "auth.json").write_text(json.dumps(auth_store))
@@ -1286,7 +1286,7 @@ def test_auth_remove_codex_device_code_suppresses_reseed(tmp_path, monkeypatch):
                 "source": "device_code",
                 "access_token": "acc-1",
                 "refresh_token": "ref-1",
-            }]
+            }],
         },
     }
     (hermes_home / "auth.json").write_text(json.dumps(auth_store))
@@ -1333,7 +1333,7 @@ def test_auth_remove_codex_manual_source_suppresses_reseed(tmp_path, monkeypatch
                 "source": "manual:device_code",
                 "access_token": "acc-2",
                 "refresh_token": "ref-2",
-            }]
+            }],
         },
     }
     (hermes_home / "auth.json").write_text(json.dumps(auth_store))
@@ -1461,7 +1461,7 @@ def test_auth_remove_env_seeded_suppresses_shell_exported_var(tmp_path, monkeypa
                     "source": "env:XAI_API_KEY",
                     "access_token": "sk-xai-shell-export",
                     "base_url": "https://api.x.ai/v1",
-                }]
+                }],
             },
         },
     )
@@ -1513,7 +1513,7 @@ def test_auth_remove_env_seeded_dotenv_only_no_shell_hint(tmp_path, monkeypatch,
                     "priority": 0,
                     "source": "env:DEEPSEEK_API_KEY",
                     "access_token": "sk-ds-only",
-                }]
+                }],
             },
         },
     )
@@ -1900,7 +1900,7 @@ def test_auth_remove_codex_manual_device_code_suppresses_canonical(tmp_path, mon
                     "priority": 0,
                     "source": "manual:device_code",
                     "access_token": "t",
-                }]
+                }],
             },
         },
     )

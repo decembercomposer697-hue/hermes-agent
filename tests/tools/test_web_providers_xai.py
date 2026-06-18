@@ -38,7 +38,7 @@ def _responses_payload(text: str, annotations=None, citations=None) -> dict:
             {
                 "type": "message",
                 "content": [chunk],
-            }
+            },
         ],
     }
     if citations is not None:
@@ -152,7 +152,7 @@ class TestXAIProviderSearchJSONPath:
             {"title": "xAI", "url": "https://x.ai", "description": "The company."},
             {"title": "Grok docs", "url": "https://docs.x.ai", "description": "API reference."},
             {"title": "Grokipedia", "url": "https://grokipedia.com", "description": "Wiki."},
-        ]
+        ],
     })
 
     def test_happy_path_normalizes_results(self):
@@ -205,7 +205,7 @@ class TestXAIProviderSearchJSONPath:
             "results": [
                 {"title": "no url", "description": "skip me"},
                 {"title": "good", "url": "https://ok.com", "description": "keep"},
-            ]
+            ],
         })
         with patch.object(xai_provider, "resolve_xai_http_credentials", return_value=_creds()), \
              patch.object(xai_provider, "_load_xai_web_config", return_value={}), \

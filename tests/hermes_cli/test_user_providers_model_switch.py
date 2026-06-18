@@ -33,7 +33,7 @@ def test_list_authenticated_providers_includes_full_models_list_from_user_provid
                 "glm-5.1:cloud",
                 "qwen3.5:cloud",
             ],
-        }
+        },
     }
     
     providers = list_authenticated_providers(
@@ -46,7 +46,7 @@ def test_list_authenticated_providers_includes_full_models_list_from_user_provid
     # Find our user provider
     user_prov = next(
         (p for p in providers if p.get("is_user_defined") and p["slug"] == "local-ollama"),
-        None
+        None,
     )
     
     assert user_prov is not None, "User provider 'local-ollama' should be in results"
@@ -67,7 +67,7 @@ def test_list_authenticated_providers_dedupes_models_when_default_in_list(monkey
             "api": "http://example.com/v1",
             "default_model": "model-a",  # Included in models list below
             "models": ["model-a", "model-b", "model-c"],
-        }
+        },
     }
     
     providers = list_authenticated_providers(
@@ -78,7 +78,7 @@ def test_list_authenticated_providers_dedupes_models_when_default_in_list(monkey
     
     user_prov = next(
         (p for p in providers if p.get("is_user_defined")),
-        None
+        None,
     )
     
     assert user_prov is not None
@@ -107,7 +107,7 @@ def test_list_authenticated_providers_enumerates_dict_format_models(monkeypatch)
                 "kimi-k2.5:cloud": {"context_length": 200000},
                 "glm-5.1:cloud": {"context_length": 202752},
             },
-        }
+        },
     }
 
     providers = list_authenticated_providers(
@@ -159,7 +159,7 @@ def test_list_authenticated_providers_uses_live_models_for_user_provider(monkeyp
             "models": {
                 "old-configured-model": {"context_length": 200000},
             },
-        }
+        },
     }
 
     providers = list_authenticated_providers(
@@ -193,7 +193,7 @@ def test_list_authenticated_providers_dict_models_without_default_model(monkeypa
                 "alpha": {"context_length": 8192},
                 "beta": {"context_length": 16384},
             },
-        }
+        },
     }
 
     providers = list_authenticated_providers(
@@ -227,7 +227,7 @@ def test_list_authenticated_providers_dict_models_dedupe_with_default(monkeypatc
                 "model-b": {"context_length": 16384},
                 "model-c": {"context_length": 32768},
             },
-        }
+        },
     }
 
     providers = list_authenticated_providers(
@@ -295,7 +295,7 @@ def test_resolve_provider_full_user_config_openai_beats_alias():
             "api": "https://api.openai.com/v1",
             "transport": "codex_responses",
             "models": {"gpt-5.4-nano": {}},
-        }
+        },
     }
     pdef = resolve_provider_full("openai", user_providers, [])
     assert pdef is not None
@@ -317,7 +317,7 @@ def test_switch_model_user_config_openai_does_not_hop_to_openrouter(monkeypatch)
             "api_key": "${CUSTOM_OPENAI_API_KEY}",
             "transport": "codex_responses",
             "models": {"gpt-5.4-nano": {}, "gpt-4o-mini": {}},
-        }
+        },
     }
     result = switch_model(
         raw_input="gpt-4o-mini",
@@ -344,7 +344,7 @@ def test_list_authenticated_providers_user_openai_official_url_fallback(monkeypa
         "openai-direct": {
             "name": "OpenAI Direct",
             "api": "https://api.openai.com/v1",
-        }
+        },
     }
     providers = list_authenticated_providers(
         current_provider="",
@@ -369,7 +369,7 @@ def test_list_authenticated_providers_fallback_to_default_only(monkeypatch):
             "api": "http://example.com/v1",
             "default_model": "single-model",
             # No 'models' key
-        }
+        },
     }
     
     providers = list_authenticated_providers(
@@ -380,7 +380,7 @@ def test_list_authenticated_providers_fallback_to_default_only(monkeypatch):
     
     user_prov = next(
         (p for p in providers if p.get("is_user_defined")),
-        None
+        None,
     )
     
     assert user_prov is not None
@@ -409,7 +409,7 @@ def test_list_authenticated_providers_accepts_base_url_and_singular_model(monkey
                 "grok-4.20-beta": {},
                 "minimax-m2.7": {},
             },
-        }
+        },
     }
 
     providers = list_authenticated_providers(
@@ -447,14 +447,14 @@ def test_list_authenticated_providers_dedupes_when_user_and_custom_overlap(monke
                     "gpt-5.4": {},
                     "grok-4.20-beta": {},
                 },
-            }
+            },
         },
         custom_providers=[
             {
                 "name": "custom",
                 "base_url": "http://example.com/v1",
                 "model": "legacy-only-model",
-            }
+            },
         ],
         max_models=50,
     )
@@ -530,7 +530,7 @@ def test_list_authenticated_providers_hides_custom_shadowing_builtin_endpoint(mo
             "alibaba": {
                 "name": "Alibaba Cloud (DashScope)",
                 "env": ["DASHSCOPE_API_KEY"],
-            }
+            },
         },
     )
     monkeypatch.setattr("hermes_cli.providers.HERMES_OVERLAYS", {})
@@ -543,7 +543,7 @@ def test_list_authenticated_providers_hides_custom_shadowing_builtin_endpoint(mo
             "api_key": "sk-sp-test",
             "model": "qwen3.6-plus",
             "models": {"qwen3.6-plus": {"context_length": 500000}},
-        }
+        },
     ]
 
     providers = list_authenticated_providers(
@@ -576,7 +576,7 @@ def test_list_authenticated_providers_keeps_custom_with_distinct_endpoint(monkey
             "alibaba": {
                 "name": "Alibaba Cloud (DashScope)",
                 "env": ["DASHSCOPE_API_KEY"],
-            }
+            },
         },
     )
     monkeypatch.setattr("hermes_cli.providers.HERMES_OVERLAYS", {})
@@ -588,7 +588,7 @@ def test_list_authenticated_providers_keeps_custom_with_distinct_endpoint(monkey
             "api_key": "sk-relay-test",
             "model": "qwen3.6-plus",
             "models": {"qwen3.6-plus": {}},
-        }
+        },
     ]
 
     providers = list_authenticated_providers(
@@ -620,7 +620,7 @@ def test_list_authenticated_providers_dedup_honors_base_url_env_override(monkeyp
             "alibaba": {
                 "name": "Alibaba Cloud (DashScope)",
                 "env": ["DASHSCOPE_API_KEY"],
-            }
+            },
         },
     )
     monkeypatch.setattr("hermes_cli.providers.HERMES_OVERLAYS", {})
@@ -632,7 +632,7 @@ def test_list_authenticated_providers_dedup_honors_base_url_env_override(monkeyp
             "base_url": "https://custom-dashscope.example.com/v1",
             "api_key": "sk-test",
             "model": "qwen3.6-plus",
-        }
+        },
     ]
 
     providers = list_authenticated_providers(
@@ -661,8 +661,8 @@ def test_get_named_custom_provider_finds_user_providers_by_key(monkeypatch, tmp_
                 "api": "http://localhost:11434/v1",
                 "name": "Local (localhost:11434)",
                 "default_model": "minimax-m2.7:cloud",
-            }
-        }
+            },
+        },
     }
     
     import yaml
@@ -686,8 +686,8 @@ def test_get_named_custom_provider_finds_by_display_name(monkeypatch, tmp_path):
                 "api": "http://ollama.example.com/v1",
                 "name": "My Production Ollama",
                 "default_model": "llama3",
-            }
-        }
+            },
+        },
     }
     
     import yaml
@@ -711,8 +711,8 @@ def test_get_named_custom_provider_falls_back_to_legacy_format(monkeypatch, tmp_
             {
                 "name": "Custom Endpoint",
                 "base_url": "http://custom.example.com/v1",
-            }
-        ]
+            },
+        ],
     }
     
     import yaml
@@ -732,8 +732,8 @@ def test_get_named_custom_provider_returns_none_for_unknown(monkeypatch, tmp_pat
         "providers": {
             "known-provider": {
                 "api": "http://known.example.com/v1",
-            }
-        }
+            },
+        },
     }
     
     import yaml
@@ -757,8 +757,8 @@ def test_get_named_custom_provider_skips_empty_base_url(monkeypatch, tmp_path):
             "incomplete-provider": {
                 "name": "Incomplete",
                 # No api/base_url field
-            }
-        }
+            },
+        },
     }
     
     import yaml
@@ -786,8 +786,8 @@ def test_switch_model_resolves_user_provider_credentials(monkeypatch, tmp_path):
                 "api": "http://localhost:11434/v1",
                 "name": "Local Ollama",
                 "default_model": "minimax-m2.7:cloud",
-            }
-        }
+            },
+        },
     }
     
     config_file = tmp_path / "config.yaml"
@@ -797,7 +797,7 @@ def test_switch_model_resolves_user_provider_credentials(monkeypatch, tmp_path):
     # Mock validation to pass
     monkeypatch.setattr(
         "hermes_cli.models.validate_requested_model",
-        lambda *a, **k: {"accepted": True, "persist": True, "recognized": True, "message": None}
+        lambda *a, **k: {"accepted": True, "persist": True, "recognized": True, "message": None},
     )
     
     result = switch_model(
@@ -936,7 +936,7 @@ def _run_user_provider_override_case(
             "api": base_url,
             "discover_models": False,
             "models": models,
-        }
+        },
     }
 
     with patch("hermes_cli.model_switch.resolve_alias", return_value=None), \

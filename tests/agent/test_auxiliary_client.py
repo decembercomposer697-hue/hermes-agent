@@ -69,7 +69,7 @@ def codex_auth_dir(tmp_path, monkeypatch):
         "tokens": {
             "access_token": "codex-test-token-abc123",
             "refresh_token": "codex-refresh-xyz",
-        }
+        },
     }))
     monkeypatch.setattr(
         "agent.auxiliary_client._read_codex_access_token",
@@ -181,7 +181,7 @@ class TestReadCodexAccessToken:
         valid_jwt = "eyJhbGciOiJSUzI1NiJ9.eyJleHAiOjk5OTk5OTk5OTl9.sig"
         with patch("agent.auxiliary_client._select_pool_entry", return_value=(True, None)), \
              patch("hermes_cli.auth._read_codex_tokens", return_value={
-                 "tokens": {"access_token": valid_jwt, "refresh_token": "refresh"}
+                 "tokens": {"access_token": valid_jwt, "refresh_token": "refresh"},
              }):
             result = _read_codex_access_token()
 
@@ -602,7 +602,7 @@ class TestResolveProviderClientUniversalModelFallback:
                 return_value="sk-ant-***",
             ),
             patch(
-                "agent.auxiliary_client._read_nous_auth", return_value=None
+                "agent.auxiliary_client._read_nous_auth", return_value=None,
             ),
         ):
             client, model = resolve_provider_client("anthropic", "")
@@ -1071,7 +1071,7 @@ class TestAuxiliaryPoolAwareness:
         stale_client = MagicMock()
         stale_client.base_url = "https://inference-api.nousresearch.com/v1"
         stale_client.chat.completions.create.side_effect = _Payment404(
-            "model_not_supported_on_free_tier: model is not available on the free tier"
+            "model_not_supported_on_free_tier: model is not available on the free tier",
         )
 
         fresh_client = MagicMock()
@@ -1142,7 +1142,7 @@ class TestAuxiliaryPoolAwareness:
         stale_client = MagicMock()
         stale_client.base_url = "https://inference-api.nousresearch.com/v1"
         stale_client.chat.completions.create = AsyncMock(side_effect=_Payment404(
-            "model_not_supported_on_free_tier: model is not available on the free tier"
+            "model_not_supported_on_free_tier: model is not available on the free tier",
         ))
 
         fresh_async_client = MagicMock()
@@ -1232,7 +1232,7 @@ class TestIsPaymentError:
     def test_404_free_tier_model_block_is_payment(self):
         exc = Exception(
             "Model 'gpt-5' is not available on the Free Tier. "
-            "Upgrade at https://portal.nousresearch.com or pick a free model."
+            "Upgrade at https://portal.nousresearch.com or pick a free model.",
         )
         exc.status_code = 404
         assert _is_payment_error(exc) is True
@@ -1309,7 +1309,7 @@ class TestIsModelNotFoundError:
         the Nous → OpenRouter catalog."""
         exc = Exception(
             "Model 'gpt-5.4-mini' not found. The requested model does not "
-            "exist in our configuration or OpenRouter catalog."
+            "exist in our configuration or OpenRouter catalog.",
         )
         exc.status_code = 404
         assert _is_model_not_found_error(exc) is True
@@ -1333,7 +1333,7 @@ class TestIsModelNotFoundError:
         """Free-tier / credit 404s belong to _is_payment_error, not here —
         the two predicates must not overlap."""
         exc = Exception(
-            "Model 'gpt-5' is not available on the free tier. Upgrade."
+            "Model 'gpt-5' is not available on the free tier. Upgrade.",
         )
         exc.status_code = 404
         assert _is_model_not_found_error(exc) is False
@@ -1341,7 +1341,7 @@ class TestIsModelNotFoundError:
 
     def test_out_of_funds_404_is_not_model_not_found(self):
         exc = Exception(
-            "Your API key is blocked or out of funds. model_not_found"
+            "Your API key is blocked or out of funds. model_not_found",
         )
         exc.status_code = 404
         # billing keyword wins — payment owns it
@@ -1587,7 +1587,7 @@ class TestCallLlmPaymentFallback:
 
         fallback_client = MagicMock()
         fallback_client.chat.completions.create.return_value = MagicMock(choices=[
-            MagicMock(message=MagicMock(content="fallback response"))
+            MagicMock(message=MagicMock(content="fallback response")),
         ])
 
         with patch("agent.auxiliary_client._get_cached_client",
@@ -1621,7 +1621,7 @@ class TestAuxiliaryFallbackLayering:
 
         chain_client = MagicMock()
         chain_client.chat.completions.create.return_value = MagicMock(choices=[
-            MagicMock(message=MagicMock(content="from configured chain"))
+            MagicMock(message=MagicMock(content="from configured chain")),
         ])
 
         main_called = MagicMock()
@@ -1652,7 +1652,7 @@ class TestAuxiliaryFallbackLayering:
 
         main_client = MagicMock()
         main_client.chat.completions.create.return_value = MagicMock(choices=[
-            MagicMock(message=MagicMock(content="from main agent"))
+            MagicMock(message=MagicMock(content="from main agent")),
         ])
 
         with patch("agent.auxiliary_client._get_cached_client",
@@ -1827,7 +1827,7 @@ class TestTransientTransportRetry:
         client.chat.completions.create.side_effect = [
             Exception(
                 "peer closed connection without sending complete message body "
-                "(incomplete chunked read)"
+                "(incomplete chunked read)",
             ),
             {"ok": True},
         ]
@@ -1870,7 +1870,7 @@ class TestTransientTransportRetry:
         primary = MagicMock()
         primary.base_url = "https://openrouter.ai/api/v1"
         primary.chat.completions.create.side_effect = Exception(
-            "peer closed connection without sending complete message body"
+            "peer closed connection without sending complete message body",
         )
 
         fb_client = MagicMock()
@@ -2109,9 +2109,9 @@ class TestAuxiliaryTaskExtraBody:
                     "extra_body": {
                         "enable_thinking": False,
                         "reasoning": {"effort": "none"},
-                    }
-                }
-            }
+                    },
+                },
+            },
         }
 
         with patch("hermes_cli.config.load_config", return_value=config), patch(
@@ -2140,9 +2140,9 @@ class TestAuxiliaryTaskExtraBody:
         config = {
             "auxiliary": {
                 "session_search": {
-                    "extra_body": {"enable_thinking": False}
-                }
-            }
+                    "extra_body": {"enable_thinking": False},
+                },
+            },
         }
 
         with patch("hermes_cli.config.load_config", return_value=config), patch(
@@ -2239,8 +2239,8 @@ class TestAnthropicCompatImageConversion:
             "role": "user",
             "content": [
                 {"type": "text", "text": "describe"},
-                {"type": "image_url", "image_url": {"url": "data:image/png;base64,iVBOR="}}
-            ]
+                {"type": "image_url", "image_url": {"url": "data:image/png;base64,iVBOR="}},
+            ],
         }]
         result = _convert_openai_images_to_anthropic(messages)
         img_block = result[0]["content"][1]
@@ -2254,8 +2254,8 @@ class TestAnthropicCompatImageConversion:
         messages = [{
             "role": "user",
             "content": [
-                {"type": "image_url", "image_url": {"url": "https://example.com/img.jpg"}}
-            ]
+                {"type": "image_url", "image_url": {"url": "https://example.com/img.jpg"}},
+            ],
         }]
         result = _convert_openai_images_to_anthropic(messages)
         img_block = result[0]["content"][0]
@@ -2274,8 +2274,8 @@ class TestAnthropicCompatImageConversion:
         messages = [{
             "role": "user",
             "content": [
-                {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,/9j/="}}
-            ]
+                {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,/9j/="}},
+            ],
         }]
         result = _convert_openai_images_to_anthropic(messages)
         assert result[0]["content"][0]["source"]["media_type"] == "image/jpeg"
@@ -2303,7 +2303,7 @@ class TestAnthropicCompatImageConversion:
         messages = [{
             "role": "user",
             "content": [
-                {"type": "video_url", "video_url": {"url": "data:video/quicktime;base64,QQ=="}}
+                {"type": "video_url", "video_url": {"url": "data:video/quicktime;base64,QQ=="}},
             ],
         }]
         result = _convert_openai_images_to_anthropic(messages)
@@ -2314,7 +2314,7 @@ class TestAnthropicCompatImageConversion:
         messages = [{
             "role": "user",
             "content": [
-                {"type": "video_url", "video_url": {"url": "https://example.com/clip.mp4"}}
+                {"type": "video_url", "video_url": {"url": "https://example.com/clip.mp4"}},
             ],
         }]
         result = _convert_openai_images_to_anthropic(messages)
@@ -2842,7 +2842,7 @@ class TestVisionAutoSkipsKimiCoding:
                 return None, None
             raise AssertionError(
                 f"strict vision backend should not be called for {provider!r} "
-                "when main provider is kimi-coding"
+                "when main provider is kimi-coding",
             )
         monkeypatch.setattr(
             "agent.auxiliary_client._resolve_strict_vision_backend",
@@ -3519,7 +3519,7 @@ class TestOpenRouterExplicitApiKey:
     """Test that explicit_api_key is correctly propagated to _try_openrouter()."""
 
     def test_resolve_provider_client_passes_explicit_api_key_to_openrouter(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         """
         When resolve_provider_client() is called with explicit_api_key for OpenRouter,
@@ -3552,7 +3552,7 @@ class TestOpenRouterExplicitApiKey:
             )
 
     def test_resolve_provider_client_without_explicit_api_key_falls_back_to_env(
-        self, monkeypatch
+        self, monkeypatch,
     ):
         """
         When resolve_provider_client() is called WITHOUT explicit_api_key for OpenRouter,
@@ -3837,7 +3837,7 @@ class TestAuxiliaryMaxTokensParam:
             patch("agent.auxiliary_client._read_nous_auth", return_value=None),
         ):
             assert auxiliary_max_tokens_param(4096, model="gpt-5.4") == {
-                "max_completion_tokens": 4096
+                "max_completion_tokens": 4096,
             }
 
     def test_openrouter_serving_gpt4o_uses_max_completion_tokens(self, monkeypatch):
@@ -3848,7 +3848,7 @@ class TestAuxiliaryMaxTokensParam:
             patch("agent.auxiliary_client._read_nous_auth", return_value=None),
         ):
             assert auxiliary_max_tokens_param(4096, model="openai/gpt-4o-mini") == {
-                "max_completion_tokens": 4096
+                "max_completion_tokens": 4096,
             }
 
     def test_custom_endpoint_serving_classic_llama_keeps_max_tokens(self):
@@ -3858,7 +3858,7 @@ class TestAuxiliaryMaxTokensParam:
             patch("agent.auxiliary_client._read_nous_auth", return_value=None),
         ):
             assert auxiliary_max_tokens_param(4096, model="llama3-70b") == {
-                "max_tokens": 4096
+                "max_tokens": 4096,
             }
 
     def test_empty_model_falls_back_to_url_only(self):

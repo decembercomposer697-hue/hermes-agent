@@ -34,7 +34,7 @@ def _completions(completer: SlashCommandCompleter, text: str):
         completer.get_completions(
             Document(text=text),
             CompleteEvent(completion_requested=True),
-        )
+        ),
     )
 
 
@@ -546,7 +546,7 @@ class TestSlashCommandCompleter:
         completer = SlashCommandCompleter(
             skill_commands_provider=lambda: {
                 "/gif-search": {"description": "Search for GIFs across providers"},
-            }
+            },
         )
 
         completions = _completions(completer, "/gif")
@@ -560,7 +560,7 @@ class TestSlashCommandCompleter:
         completer = SlashCommandCompleter(
             skill_commands_provider=lambda: {
                 "/gif-search": {"description": "Search for GIFs"},
-            }
+            },
         )
 
         completions = _completions(completer, "/gif-search")
@@ -590,7 +590,7 @@ class TestSlashCommandCompleter:
         completer = SlashCommandCompleter(
             skill_commands_provider=lambda: {
                 "/long-skill": {"description": long_desc},
-            }
+            },
         )
         completions = _completions(completer, "/long")
         assert len(completions) == 1
@@ -602,7 +602,7 @@ class TestSlashCommandCompleter:
         completer = SlashCommandCompleter(
             skill_commands_provider=lambda: {
                 "/no-desc": {},
-            }
+            },
         )
         completions = _completions(completer, "/no-desc")
         assert len(completions) == 1
@@ -1125,7 +1125,7 @@ class TestTelegramMenuCommands:
 
     def test_operational_builtins_survive_thirty_command_cap(self, tmp_path, monkeypatch):
         (tmp_path / "config.yaml").write_text(
-            "display:\n  tool_progress_command: true\n"
+            "display:\n  tool_progress_command: true\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
@@ -1155,15 +1155,15 @@ class TestTelegramMenuCommands:
         plugin_dir = tmp_path / "plugins" / "cmd-plugin"
         plugin_dir.mkdir(parents=True, exist_ok=True)
         (plugin_dir / "plugin.yaml").write_text(
-            "name: cmd-plugin\nversion: 0.1.0\ndescription: Test plugin\n"
+            "name: cmd-plugin\nversion: 0.1.0\ndescription: Test plugin\n",
         )
         (plugin_dir / "__init__.py").write_text(
             "def register(ctx):\n"
-            "    ctx.register_command('lcm', lambda args: 'ok', description='LCM status and diagnostics')\n"
+            "    ctx.register_command('lcm', lambda args: 'ok', description='LCM status and diagnostics')\n",
         )
         # Opt-in: plugins are opt-in by default, so enable in config.yaml
         (tmp_path / "config.yaml").write_text(
-            "plugins:\n  enabled:\n    - cmd-plugin\n"
+            "plugins:\n  enabled:\n    - cmd-plugin\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
@@ -1183,7 +1183,7 @@ class TestTelegramMenuCommands:
             "skills:\n"
             "  platform_disabled:\n"
             "    telegram:\n"
-            "      - my-disabled-skill\n"
+            "      - my-disabled-skill\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
@@ -1238,7 +1238,7 @@ class TestTelegramMenuCommands:
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         (tmp_path / "config.yaml").write_text(
-            f"skills:\n  external_dirs:\n    - {external_dir}\n"
+            f"skills:\n  external_dirs:\n    - {external_dir}\n",
         )
 
         fake_cmds = {
@@ -1470,7 +1470,7 @@ class TestDiscordSkillCommands:
             "skills:\n"
             "  platform_disabled:\n"
             "    discord:\n"
-            "      - secret-skill\n"
+            "      - secret-skill\n",
         )
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
 
@@ -1863,7 +1863,7 @@ class TestPluginCommandEnumeration:
         from hermes_cli import plugins as _plugins_mod
 
         monkeypatch.setattr(
-            _plugins_mod, "get_plugin_commands", lambda: dict(commands)
+            _plugins_mod, "get_plugin_commands", lambda: dict(commands),
         )
 
     def test_plugin_command_appears_in_telegram_menu(self, monkeypatch):
@@ -1874,7 +1874,7 @@ class TestPluginCommandEnumeration:
                 "description": "Metrics dashboard",
                 "args_hint": "dias:7",
                 "plugin": "metrics-plugin",
-            }
+            },
         })
         names = {name for name, _desc in telegram_bot_commands()}
         assert "metricas" in names
@@ -1887,7 +1887,7 @@ class TestPluginCommandEnumeration:
                 "description": "Run a background job",
                 "args_hint": "<prompt>",
                 "plugin": "jobs-plugin",
-            }
+            },
         })
         names = {name for name, _desc in telegram_bot_commands()}
         assert "background_job" not in names
@@ -1900,7 +1900,7 @@ class TestPluginCommandEnumeration:
                 "description": "Metrics",
                 "args_hint": "",
                 "plugin": "metrics-plugin",
-            }
+            },
         })
         mapping = slack_subcommand_map()
         assert mapping.get("metricas") == "/metricas"
@@ -1913,7 +1913,7 @@ class TestPluginCommandEnumeration:
                 "description": "Plugin status",
                 "args_hint": "",
                 "plugin": "shadow-plugin",
-            }
+            },
         })
         mapping = slack_subcommand_map()
         # Built-in /status must still be present and not overwritten.
@@ -1927,7 +1927,7 @@ class TestPluginCommandEnumeration:
                 "description": "desc",
                 "args_hint": "",
                 "plugin": "p",
-            }
+            },
         })
         names = {name for name, _desc in telegram_bot_commands()}
         assert "my_plugin_cmd" in names
@@ -1943,7 +1943,7 @@ class TestPluginCommandEnumeration:
                 "description": "Metrics",
                 "args_hint": "",
                 "plugin": "p",
-            }
+            },
         })
         assert is_gateway_known_command("metricas") is True
         assert is_gateway_known_command("definitely-not-registered") is False

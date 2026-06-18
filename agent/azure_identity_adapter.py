@@ -86,7 +86,7 @@ def _require_azure_identity():
             raise ImportError(
                 "The 'azure-identity' package is required for Azure AI "
                 "Foundry Entra ID authentication. Install it with: "
-                "pip install azure-identity"
+                "pip install azure-identity",
             ) from exc
 
         try:
@@ -94,7 +94,7 @@ def _require_azure_identity():
         except FeatureUnavailable as exc:
             raise ImportError(
                 "The 'azure-identity' package is required for Azure AI "
-                "Foundry Entra ID authentication. " + str(exc)
+                "Foundry Entra ID authentication. " + str(exc),
             ) from exc
 
         # Retry import after lazy install.
@@ -493,7 +493,7 @@ def build_bearer_http_client(token_provider: Callable[[], str], **httpx_kwargs: 
     if not is_token_provider(token_provider):
         raise ValueError(
             "build_bearer_http_client requires a zero-arg callable "
-            "token provider"
+            "token provider",
         )
 
     try:
@@ -502,7 +502,7 @@ def build_bearer_http_client(token_provider: Callable[[], str], **httpx_kwargs: 
         raise ImportError(
             "httpx is required for Entra ID bearer auth on Microsoft Foundry "
             "Anthropic-style endpoints. It is normally a transitive "
-            "dependency of the openai/anthropic SDKs."
+            "dependency of the openai/anthropic SDKs.",
         ) from exc
 
     def _inject_bearer(request: httpx.Request) -> None:

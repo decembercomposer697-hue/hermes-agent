@@ -37,8 +37,8 @@ DISTRIBUTIONS = {
             "terminal": 100,
             "file": 100,
             "moa": 100,
-            "browser": 100
-        }
+            "browser": 100,
+        },
     },
     
     # Image generation focused distribution
@@ -49,8 +49,8 @@ DISTRIBUTIONS = {
             "vision": 90,      # 60% chance of vision tools
             "web": 55,         # 40% chance of web tools
             "terminal": 45,
-            "moa": 10          # 20% chance of reasoning tools
-        }
+            "moa": 10,          # 20% chance of reasoning tools
+        },
     },
     
     # Research-focused distribution
@@ -61,8 +61,8 @@ DISTRIBUTIONS = {
             "browser": 70,   # 70% chance of browser tools for deep research
             "vision": 50,    # 50% chance of vision tools
             "moa": 40,       # 40% chance of reasoning tools
-            "terminal": 10   # 10% chance of terminal tools
-        }
+            "terminal": 10,   # 10% chance of terminal tools
+        },
     },
 
     # Scientific problem solving focused distribution
@@ -75,8 +75,8 @@ DISTRIBUTIONS = {
             "vision": 65,    # 65% chance of vision tools
             "browser": 50,   # 50% chance of browser for accessing papers/databases
             "image_gen": 15, # 15% chance of image generation tools
-            "moa": 10        # 10% chance of reasoning tools
-        }
+            "moa": 10,        # 10% chance of reasoning tools
+        },
     },
 
     # Development-focused distribution
@@ -87,8 +87,8 @@ DISTRIBUTIONS = {
             "file": 80,      # 80% chance of file tools (read, write, patch, search)
             "moa": 60,       # 60% chance of reasoning tools
             "web": 30,       # 30% chance of web tools
-            "vision": 10     # 10% chance of vision tools
-        }
+            "vision": 10,     # 10% chance of vision tools
+        },
     },
     
     # Safe mode (no terminal)
@@ -99,8 +99,8 @@ DISTRIBUTIONS = {
             "browser": 70,   # Browser is safe (no local filesystem access)
             "vision": 60,
             "image_gen": 60,
-            "moa": 50
-        }
+            "moa": 50,
+        },
     },
     
     # Balanced distribution
@@ -113,16 +113,16 @@ DISTRIBUTIONS = {
             "terminal": 50,
             "file": 50,
             "moa": 50,
-            "browser": 50
-        }
+            "browser": 50,
+        },
     },
     
     # Minimal (web only)
     "minimal": {
         "description": "Only web tools for basic research",
         "toolsets": {
-            "web": 100
-        }
+            "web": 100,
+        },
     },
     
     # Terminal only
@@ -130,8 +130,8 @@ DISTRIBUTIONS = {
         "description": "Terminal and file tools for code execution tasks",
         "toolsets": {
             "terminal": 100,
-            "file": 100
-        }
+            "file": 100,
+        },
     },
     
     # Terminal + web (common for coding tasks that need docs)
@@ -140,8 +140,8 @@ DISTRIBUTIONS = {
         "toolsets": {
             "terminal": 100,
             "file": 100,
-            "web": 100
-        }
+            "web": 100,
+        },
     },
     
     # Creative (vision + image generation)
@@ -150,8 +150,8 @@ DISTRIBUTIONS = {
         "toolsets": {
             "image_gen": 90,
             "vision": 90,
-            "web": 30
-        }
+            "web": 30,
+        },
     },
     
     # Reasoning heavy
@@ -160,8 +160,8 @@ DISTRIBUTIONS = {
         "toolsets": {
             "moa": 90,
             "web": 30,
-            "terminal": 20
-        }
+            "terminal": 20,
+        },
     },
     
     # Browser-based web interaction
@@ -170,16 +170,16 @@ DISTRIBUTIONS = {
         "toolsets": {
             "browser": 100,  # All browser tools always available
             "web": 80,       # Web search for finding URLs and quick lookups
-            "vision": 70     # Vision analysis for images found on pages
-        }
+            "vision": 70,     # Vision analysis for images found on pages
+        },
     },
     
     # Browser only (no other tools)
     "browser_only": {
         "description": "Only browser automation tools for pure web interaction tasks",
         "toolsets": {
-            "browser": 100
-        }
+            "browser": 100,
+        },
     },
     
     # Browser-focused tasks distribution (for browser-use-tasks.jsonl)
@@ -188,8 +188,8 @@ DISTRIBUTIONS = {
         "toolsets": {
             "browser": 97,   # 97% - browser tools (includes web_search) almost always available
             "vision": 12,    # 12% - vision analysis occasionally
-            "terminal": 15   # 15% - terminal occasionally for local operations
-        }
+            "terminal": 15,   # 15% - terminal occasionally for local operations
+        },
     },
     
     # Terminal-focused tasks distribution (for nous-terminal-tasks.jsonl)
@@ -201,8 +201,8 @@ DISTRIBUTIONS = {
             "web": 97,        # 15% - web search/scrape for documentation
             "browser": 75,    # 10% - browser occasionally for web interaction
             "vision": 50,      # 8% - vision analysis rarely
-            "image_gen": 10    # 3% - image generation very rarely
-        }
+            "image_gen": 10,    # 3% - image generation very rarely
+        },
     },
     
     # Mixed browser+terminal tasks distribution (for mixed-browser-terminal-tasks.jsonl)
@@ -214,9 +214,9 @@ DISTRIBUTIONS = {
             "file": 92,       # 92% - file tools highly available
             "web": 35,        # 35% - web search/scrape fairly common
             "vision": 15,     # 15% - vision analysis occasionally
-            "image_gen": 15   # 15% - image generation occasionally
-        }
-    }
+            "image_gen": 15,   # 15% - image generation occasionally
+        },
+    },
 }
 
 

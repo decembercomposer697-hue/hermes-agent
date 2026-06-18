@@ -111,7 +111,7 @@ def test_dashboard_slot_reports_up_when_enabled(
             return  # success
         time.sleep(0.5)
     raise AssertionError(
-        f"Dashboard slot never reached up state; last svstat: {last!r}"
+        f"Dashboard slot never reached up state; last svstat: {last!r}",
     )
 
 
@@ -223,7 +223,7 @@ def test_dashboard_restarts_after_crash(
         time.sleep(0.5)
 
     raise AssertionError(
-        f"Dashboard not restarted after kill (first_pid={first_pid})"
+        f"Dashboard not restarted after kill (first_pid={first_pid})",
     )
 
 
@@ -298,7 +298,7 @@ except urllib.error.HTTPError as h:
         time.sleep(0.5)
     raise AssertionError(
         f"Probe of {path} never returned HTTP within {deadline_s}s; "
-        f"last error: {last_err}"
+        f"last error: {last_err}",
     )
 
 

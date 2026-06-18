@@ -190,8 +190,8 @@ class TestSendMessageTool:
                         "action": "send",
                         "target": "ntfy:alerts-channel",
                         "message": "done",
-                    }
-                )
+                    },
+                ),
             )
 
         assert result["success"] is True
@@ -229,8 +229,8 @@ class TestSendMessageTool:
                         "action": "send",
                         "target": "telegram",
                         "message": "hello",
-                    }
-                )
+                    },
+                ),
             )
 
         assert result["success"] is True
@@ -255,8 +255,8 @@ class TestSendMessageTool:
                         "action": "send",
                         "target": "telegram:Coaching Chat / topic 17585",
                         "message": "hello",
-                    }
-                )
+                    },
+                ),
             )
 
         assert result["success"] is True
@@ -277,8 +277,8 @@ class TestSendMessageTool:
             "updated_at": "2026-01-01T00:00:00",
             "platforms": {
                 "telegram": [
-                    {"id": "-1001:17585", "name": "Coaching Chat / topic 17585", "type": "group"}
-                ]
+                    {"id": "-1001:17585", "name": "Coaching Chat / topic 17585", "type": "group"},
+                ],
             },
         }))
 
@@ -294,8 +294,8 @@ class TestSendMessageTool:
                         "action": "send",
                         "target": "telegram:Coaching Chat / topic 17585 (group)",
                         "message": "hello",
-                    }
-                )
+                    },
+                ),
             )
 
         assert result["success"] is True
@@ -328,8 +328,8 @@ class TestSendMessageTool:
                         "action": "send",
                         "target": "slack:ops / topic 171.000001",
                         "message": "hello",
-                    }
-                )
+                    },
+                ),
             )
 
         assert result["success"] is True
@@ -369,8 +369,8 @@ class TestSendMessageTool:
                         "action": "send",
                         "target": "matrix:Ops / topic $thread123",
                         "message": "hello",
-                    }
-                )
+                    },
+                ),
             )
 
         assert result["success"] is True
@@ -403,8 +403,8 @@ class TestSendMessageTool:
                         "action": "send",
                         "target": "telegram:12345",
                         "message": "hello",
-                    }
-                )
+                    },
+                ),
             )
 
         assert result["success"] is True
@@ -440,8 +440,8 @@ class TestSendMessageTool:
                         "action": "send",
                         "target": "telegram:12345",
                         "message": f"hello\nMEDIA:{secret}",
-                    }
-                )
+                    },
+                ),
             )
 
         assert result["success"] is True
@@ -462,7 +462,7 @@ class TestSendMessageTool:
         def _raise_and_close(coro):
             coro.close()
             raise RuntimeError(
-                f"transport error: https://api.example.com/send?access_token={leaked}"
+                f"transport error: https://api.example.com/send?access_token={leaked}",
             )
 
         with patch("gateway.config.load_gateway_config", return_value=config), \
@@ -474,8 +474,8 @@ class TestSendMessageTool:
                         "action": "send",
                         "target": "telegram:-1001",
                         "message": "hello",
-                    }
-                )
+                    },
+                ),
             )
 
         assert "error" in result
@@ -503,7 +503,7 @@ class TestSendTelegramMediaDelivery:
                 "12345",
                 "Hello there",
                 media_files=[(str(image_path), False)],
-            )
+            ),
         )
 
         assert result["success"] is True
@@ -533,7 +533,7 @@ class TestSendTelegramMediaDelivery:
                 "12345",
                 "",
                 media_files=[(str(voice_path), True)],
-            )
+            ),
         )
 
         assert result["success"] is True
@@ -560,7 +560,7 @@ class TestSendTelegramMediaDelivery:
                 "12345",
                 "",
                 media_files=[(str(audio_path), False)],
-            )
+            ),
         )
 
         assert result["success"] is True
@@ -583,7 +583,7 @@ class TestSendTelegramMediaDelivery:
                 "12345",
                 "",
                 media_files=[("/tmp/does-not-exist.png", False)],
-            )
+            ),
         )
 
         assert "error" in result
@@ -607,7 +607,7 @@ class TestSendToPlatformChunking:
                     Platform.DISCORD,
                     SimpleNamespace(enabled=True, token="***", extra={}),
                     "ch", long_msg,
-                )
+                ),
             )
         assert result["success"] is True
         assert send.await_count >= 3
@@ -629,7 +629,7 @@ class TestSendToPlatformChunking:
                     SimpleNamespace(enabled=True, token="***", extra={}),
                     "C123",
                     "**hello** from [Hermes](<https://example.com>)",
-                )
+                ),
             )
 
         assert result["success"] is True
@@ -654,7 +654,7 @@ class TestSendToPlatformChunking:
                     SimpleNamespace(enabled=True, token="***", extra={}),
                     "C123",
                     "***important*** update",
-                )
+                ),
             )
         assert result["success"] is True
         sent_text = send.await_args.args[2]
@@ -674,7 +674,7 @@ class TestSendToPlatformChunking:
                     SimpleNamespace(enabled=True, token="***", extra={}),
                     "C123",
                     "> important quote\n\nnormal text & stuff",
-                )
+                ),
             )
         assert result["success"] is True
         sent_text = send.await_args.args[2]
@@ -695,7 +695,7 @@ class TestSendToPlatformChunking:
                     SimpleNamespace(enabled=True, token="***", extra={}),
                     "C123",
                     "AT&amp;T &lt;tag&gt; test",
-                )
+                ),
             )
         assert result["success"] is True
         sent_text = send.await_args.args[2]
@@ -716,7 +716,7 @@ class TestSendToPlatformChunking:
                     SimpleNamespace(enabled=True, token="***", extra={}),
                     "C123",
                     "See [Foo](https://en.wikipedia.org/wiki/Foo_(bar))",
-                )
+                ),
             )
         assert result["success"] is True
         sent_text = send.await_args.args[2]
@@ -738,7 +738,7 @@ class TestSendToPlatformChunking:
                     Platform.TELEGRAM,
                     SimpleNamespace(enabled=True, token="tok", extra={}),
                     "123", long_msg, media_files=media,
-                )
+                ),
             )
         assert len(sent_calls) >= 3
         assert all(call == [] for call in sent_calls[:-1])
@@ -758,7 +758,7 @@ class TestSendToPlatformChunking:
                         "!room:example.com",
                         "here you go",
                         media_files=[(str(doc_path), False)],
-                    )
+                    ),
                 )
 
             assert result["success"] is True
@@ -782,7 +782,7 @@ class TestSendToPlatformChunking:
                     SimpleNamespace(enabled=True, token="tok", extra={"homeserver": "https://matrix.example.com"}),
                     "!room:ex.com",
                     "just text, no files",
-                )
+                ),
             )
 
         assert result["success"] is True
@@ -824,7 +824,7 @@ class TestSendToPlatformChunking:
                     "!room:example.com",
                     "report attached",
                     media_files=[(str(file_path), False)],
-                )
+                ),
             )
 
         assert result == {
@@ -858,7 +858,7 @@ class TestSendToPlatformWhatsapp:
                     SimpleNamespace(enabled=True, token=None, extra={"bridge_port": 3000}),
                     chat_id,
                     "hello from hermes",
-                )
+                ),
             )
 
         assert result["success"] is True
@@ -884,7 +884,7 @@ class TestSendTelegramHtmlDetection:
         _install_telegram_mock(monkeypatch, bot)
 
         asyncio.run(
-            _send_telegram("tok", "123", "<b>Hello</b> world")
+            _send_telegram("tok", "123", "<b>Hello</b> world"),
         )
 
         bot.send_message.assert_awaited_once()
@@ -897,7 +897,7 @@ class TestSendTelegramHtmlDetection:
         _install_telegram_mock(monkeypatch, bot)
 
         asyncio.run(
-            _send_telegram("tok", "123", "Just plain text, no tags")
+            _send_telegram("tok", "123", "Just plain text, no tags"),
         )
 
         bot.send_message.assert_awaited_once()
@@ -909,7 +909,7 @@ class TestSendTelegramHtmlDetection:
         _install_telegram_mock(monkeypatch, bot)
 
         asyncio.run(
-            _send_telegram("tok", "123", "https://example.com", disable_link_previews=True)
+            _send_telegram("tok", "123", "https://example.com", disable_link_previews=True),
         )
 
         kwargs = bot.send_message.await_args.kwargs
@@ -951,12 +951,12 @@ class TestSendTelegramHtmlDetection:
             side_effect=[
                 Exception("Bad Request: can't parse entities: unsupported html tag"),
                 SimpleNamespace(message_id=2),  # plain fallback succeeds
-            ]
+            ],
         )
         _install_telegram_mock(monkeypatch, bot)
 
         result = asyncio.run(
-            _send_telegram("tok", "123", "<invalid>broken html</invalid>")
+            _send_telegram("tok", "123", "<invalid>broken html</invalid>"),
         )
 
         assert result["success"] is True
@@ -970,7 +970,7 @@ class TestSendTelegramHtmlDetection:
             side_effect=[
                 Exception("502 Bad Gateway"),
                 SimpleNamespace(message_id=2),
-            ]
+            ],
         )
         _install_telegram_mock(monkeypatch, bot)
 
@@ -1051,7 +1051,7 @@ class TestSendTelegramThreadIdMapping:
         ])
 
         asyncio.run(
-            _send_telegram("tok", "-1001234567890", "hello", thread_id="17585")
+            _send_telegram("tok", "-1001234567890", "hello", thread_id="17585"),
         )
 
         assert bot.send_message.await_count == 2
@@ -1081,7 +1081,7 @@ class TestSendTelegramThreadIdMapping:
                 "tok", "-1001234567890", "",
                 media_files=[(str(test_file), False)],
                 thread_id="17585",
-            )
+            ),
         )
 
         assert bot.send_document.await_count == 2
@@ -1326,8 +1326,8 @@ class TestEmailHomeChannelErrorHint:
                         "action": "send",
                         "target": "email",
                         "message": "hi",
-                    }
-                )
+                    },
+                ),
             )
         assert "EMAIL_HOME_ADDRESS" in result["error"]
         assert "EMAIL_HOME_CHANNEL" not in result["error"]
@@ -1346,8 +1346,8 @@ class TestEmailHomeChannelErrorHint:
                         "action": "send",
                         "target": "telegram",
                         "message": "hi",
-                    }
-                )
+                    },
+                ),
             )
         assert "TELEGRAM_HOME_CHANNEL" in result["error"]
 
@@ -1429,7 +1429,7 @@ class TestSendToPlatformDiscordThread:
                     "-1001234567890",
                     "hello thread",
                     thread_id="17585",
-                )
+                ),
             )
 
         assert result["success"] is True
@@ -1448,7 +1448,7 @@ class TestSendToPlatformDiscordThread:
                     SimpleNamespace(enabled=True, token="tok", extra={}),
                     "9876543210",
                     "hello channel",
-                )
+                ),
             )
 
         send_mock.assert_awaited_once()
@@ -1489,7 +1489,7 @@ class TestSendDiscordMedia:
         mock_session, _ = self._build_mock(200, {"id": "msg999"})
         with patch("aiohttp.ClientSession", return_value=mock_session):
             result = asyncio.run(
-                _send_discord("tok", "111", "hello", media_files=[(str(img), False)])
+                _send_discord("tok", "111", "hello", media_files=[(str(img), False)]),
             )
 
         assert result["success"] is True
@@ -1505,7 +1505,7 @@ class TestSendDiscordMedia:
         mock_session, _ = self._build_mock(200, {"id": "media_only"})
         with patch("aiohttp.ClientSession", return_value=mock_session):
             result = asyncio.run(
-                _send_discord("tok", "222", "  ", media_files=[(str(img), False)])
+                _send_discord("tok", "222", "  ", media_files=[(str(img), False)]),
             )
 
         assert result["success"] is True
@@ -1517,7 +1517,7 @@ class TestSendDiscordMedia:
         mock_session, _ = self._build_mock(200, {"id": "txt_ok"})
         with patch("aiohttp.ClientSession", return_value=mock_session):
             result = asyncio.run(
-                _send_discord("tok", "333", "hello", media_files=[("/nonexistent/file.png", False)])
+                _send_discord("tok", "333", "hello", media_files=[("/nonexistent/file.png", False)]),
             )
 
         assert result["success"] is True
@@ -1551,7 +1551,7 @@ class TestSendDiscordMedia:
 
         with patch("aiohttp.ClientSession", return_value=mock_session):
             result = asyncio.run(
-                _send_discord("tok", "444", "hello", media_files=[(str(img), False)])
+                _send_discord("tok", "444", "hello", media_files=[(str(img), False)]),
             )
 
         assert result["success"] is True
@@ -1564,7 +1564,7 @@ class TestSendDiscordMedia:
         mock_session, _ = self._build_mock(200)
         with patch("aiohttp.ClientSession", return_value=mock_session):
             result = asyncio.run(
-                _send_discord("tok", "555", "", media_files=[])
+                _send_discord("tok", "555", "", media_files=[]),
             )
 
         # Text is empty but media_files is empty, so text POST fires
@@ -1582,8 +1582,8 @@ class TestSendDiscordMedia:
         with patch("aiohttp.ClientSession", return_value=mock_session):
             result = asyncio.run(
                 _send_discord("tok", "666", "hi", media_files=[
-                    (str(img1), False), (str(img2), False)
-                ])
+                    (str(img1), False), (str(img2), False),
+                ]),
             )
 
         assert result["success"] is True
@@ -1613,7 +1613,7 @@ class TestSendToPlatformDiscordMedia:
                     "999",
                     long_msg,
                     media_files=[("/fake/img.png", False)],
-                )
+                ),
             )
 
         assert result["success"] is True
@@ -1633,7 +1633,7 @@ class TestSendToPlatformDiscordMedia:
                     "888",
                     "short message",
                     media_files=[("/fake/img.png", False)],
-                )
+                ),
             )
 
         assert result["success"] is True
@@ -1667,7 +1667,7 @@ class TestSendMatrixUrlEncoding:
                     {"homeserver": "https://matrix.example.org"},
                     "!HLOQwxYGgFPMPJUSNR:matrix.org",
                     "hello",
-                )
+                ),
             )
 
         assert result["success"] is True
@@ -1749,7 +1749,7 @@ class TestSendDiscordForum:
         with patch("aiohttp.ClientSession", return_value=mock_session), \
              patch("gateway.channel_directory.lookup_channel_type", return_value="forum"):
             result = asyncio.run(
-                _send_discord("tok", "forum_ch", "Hello forum")
+                _send_discord("tok", "forum_ch", "Hello forum"),
             )
 
         assert result["success"] is True
@@ -1768,7 +1768,7 @@ class TestSendDiscordForum:
         with patch("aiohttp.ClientSession", return_value=mock_session), \
              patch("gateway.channel_directory.lookup_channel_type", return_value="forum"):
             asyncio.run(
-                _send_discord("tok", "forum_ch", "Hello")
+                _send_discord("tok", "forum_ch", "Hello"),
             )
 
         # get() should never be called — directory resolved the type
@@ -1781,7 +1781,7 @@ class TestSendDiscordForum:
         with patch("aiohttp.ClientSession", return_value=mock_session), \
              patch("gateway.channel_directory.lookup_channel_type", return_value="channel"):
             result = asyncio.run(
-                _send_discord("tok", "ch1", "Hello")
+                _send_discord("tok", "ch1", "Hello"),
             )
 
         assert result["success"] is True
@@ -1820,7 +1820,7 @@ class TestSendDiscordForum:
         with patch("aiohttp.ClientSession", side_effect=lambda **kw: next(session_iter)), \
              patch("gateway.channel_directory.lookup_channel_type", return_value=None):
             result = asyncio.run(
-                _send_discord("tok", "forum_ch", "Hello probe")
+                _send_discord("tok", "forum_ch", "Hello probe"),
             )
 
         assert result["success"] is True
@@ -1833,7 +1833,7 @@ class TestSendDiscordForum:
         with patch("aiohttp.ClientSession", return_value=mock_session), \
              patch("gateway.channel_directory.lookup_channel_type", side_effect=Exception("io error")):
             result = asyncio.run(
-                _send_discord("tok", "ch1", "Hello")
+                _send_discord("tok", "ch1", "Hello"),
             )
 
         assert result["success"] is True
@@ -1847,7 +1847,7 @@ class TestSendDiscordForum:
         with patch("aiohttp.ClientSession", return_value=mock_session), \
              patch("gateway.channel_directory.lookup_channel_type", return_value="forum"):
             result = asyncio.run(
-                _send_discord("tok", "forum_ch", "Hello")
+                _send_discord("tok", "forum_ch", "Hello"),
             )
 
         assert "error" in result
@@ -1869,7 +1869,7 @@ class TestSendToPlatformDiscordForum:
                     SimpleNamespace(enabled=True, token="tok", extra={}),
                     "forum_ch",
                     "Hello forum",
-                )
+                ),
             )
 
         assert result["success"] is True
@@ -1889,7 +1889,7 @@ class TestSendToPlatformDiscordForum:
                     "ch1",
                     "Hello thread",
                     thread_id="17585",
-                )
+                ),
             )
 
         assert result["success"] is True
@@ -1924,7 +1924,7 @@ class TestSendDiscordForumMedia:
 
         monkeypatch.setattr(smt, "lookup_channel_type", lambda p, cid: "forum", raising=False)
         monkeypatch.setattr(
-            "gateway.channel_directory.lookup_channel_type", lambda p, cid: "forum"
+            "gateway.channel_directory.lookup_channel_type", lambda p, cid: "forum",
         )
 
         thread_resp = self._build_thread_resp()
@@ -1944,7 +1944,7 @@ class TestSendDiscordForumMedia:
 
         with patch("aiohttp.ClientSession", return_value=session):
             result = asyncio.run(
-                _send_discord("tok", "forum_ch", "Thread title\nbody", media_files=[(str(img), False)])
+                _send_discord("tok", "forum_ch", "Thread title\nbody", media_files=[(str(img), False)]),
             )
 
         assert result["success"] is True
@@ -1960,7 +1960,7 @@ class TestSendDiscordForumMedia:
     def test_forum_without_media_still_json_only(self, tmp_path, monkeypatch):
         """Forum + no media → JSON POST (no multipart overhead)."""
         monkeypatch.setattr(
-            "gateway.channel_directory.lookup_channel_type", lambda p, cid: "forum"
+            "gateway.channel_directory.lookup_channel_type", lambda p, cid: "forum",
         )
 
         thread_resp = self._build_thread_resp("t1", "m1")
@@ -1988,7 +1988,7 @@ class TestSendDiscordForumMedia:
     def test_forum_missing_media_file_collected_as_warning(self, tmp_path, monkeypatch):
         """Missing media files produce warnings but the thread is still created."""
         monkeypatch.setattr(
-            "gateway.channel_directory.lookup_channel_type", lambda p, cid: "forum"
+            "gateway.channel_directory.lookup_channel_type", lambda p, cid: "forum",
         )
 
         thread_resp = self._build_thread_resp()
@@ -2002,7 +2002,7 @@ class TestSendDiscordForumMedia:
                 _send_discord(
                     "tok", "forum_ch", "hi",
                     media_files=[("/nonexistent/does-not-exist.png", False)],
-                )
+                ),
             )
 
         assert result["success"] is True
@@ -2032,7 +2032,7 @@ class TestForumProbeCache:
     def test_probe_result_is_memoized(self, monkeypatch):
         """An API-probed channel type is cached so subsequent sends skip the probe."""
         monkeypatch.setattr(
-            "gateway.channel_directory.lookup_channel_type", lambda p, cid: None
+            "gateway.channel_directory.lookup_channel_type", lambda p, cid: None,
         )
 
         # First probe response: type=15 (forum)
@@ -2158,10 +2158,10 @@ def _patch_sendmsg_sleep_and_time(monkeypatch, capture: list):
             await _real_sleep(0)
 
     monkeypatch.setattr(
-        "gateway.platforms.signal_rate_limit.asyncio.sleep", fake_sleep
+        "gateway.platforms.signal_rate_limit.asyncio.sleep", fake_sleep,
     )
     monkeypatch.setattr(
-        "gateway.platforms.signal_rate_limit.time.monotonic", lambda: offset[0]
+        "gateway.platforms.signal_rate_limit.time.monotonic", lambda: offset[0],
     )
 
 
@@ -2175,7 +2175,7 @@ class TestSendSignalChunking:
                 {"http_url": "http://localhost:8080", "account": "+15551234567"},
                 "+15557654321",
                 "hello",
-            )
+            ),
         )
 
         assert result == {"success": True, "platform": "signal", "chat_id": "+15557654321"}
@@ -2212,7 +2212,7 @@ class TestSendSignalChunking:
                 "+15557654321",
                 "Caption goes here",
                 media_files=paths,
-            )
+            ),
         )
 
         assert result["success"] is True
@@ -2259,7 +2259,7 @@ class TestSendSignalChunking:
                 "+15557654321",
                 "",
                 media_files=paths,
-            )
+            ),
         )
 
         assert result["success"] is True
@@ -2295,9 +2295,9 @@ class TestSendSignalChunking:
                             "results": [
                                 {"type": "RATE_LIMIT_FAILURE", "retryAfterSeconds": 42},
                             ],
-                        }
+                        },
                     },
-                }
+                },
             },
             {"result": {"timestamp": 7}},
         ])
@@ -2312,7 +2312,7 @@ class TestSendSignalChunking:
                 "+15557654321",
                 "",
                 media_files=[(str(p), False)],
-            )
+            ),
         )
 
         assert result["success"] is True
@@ -2342,7 +2342,7 @@ class TestSendSignalChunking:
                 "+15557654321",
                 "",
                 media_files=[(str(p), False)],
-            )
+            ),
         )
 
         assert result["success"] is True
@@ -2370,9 +2370,9 @@ class TestSendSignalChunking:
                         "results": [
                             {"type": "RATE_LIMIT_FAILURE", "retryAfterSeconds": 4},
                         ],
-                    }
+                    },
                 },
-            }
+            },
         }
 
         fake = _FakeSignalHttp([
@@ -2391,7 +2391,7 @@ class TestSendSignalChunking:
                 "+15557654321",
                 "many",
                 media_files=paths,
-            )
+            ),
         )
 
         # Partial success: batch 0 lost but batch 1 went through.
@@ -2417,7 +2417,7 @@ class TestSendSignalChunking:
                 "+15557654321",
                 "",
                 media_files=[(str(p), False)],
-            )
+            ),
         )
 
         assert "error" in result
@@ -2437,7 +2437,7 @@ class TestSendSignalChunking:
                 "+15557654321",
                 "msg",
                 media_files=[(str(good), False), (str(tmp_path / "missing.png"), False)],
-            )
+            ),
         )
 
         assert result["success"] is True

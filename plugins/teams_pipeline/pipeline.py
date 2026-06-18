@@ -163,16 +163,16 @@ class NotionWriter:
 
         properties: dict[str, Any] = {
             title_property: {
-                "title": [{"text": {"content": payload.title or f"Meeting {payload.meeting_ref.meeting_id}"}}]
-            }
+                "title": [{"text": {"content": payload.title or f"Meeting {payload.meeting_ref.meeting_id}"}}],
+            },
         }
         if summary_property:
             properties[summary_property] = {
-                "rich_text": [{"text": {"content": (payload.summary or "")[:1900]}}]
+                "rich_text": [{"text": {"content": (payload.summary or "")[:1900]}}],
             }
         if meeting_id_property:
             properties[meeting_id_property] = {
-                "rich_text": [{"text": {"content": payload.meeting_ref.meeting_id}}]
+                "rich_text": [{"text": {"content": payload.meeting_ref.meeting_id}}],
             }
         return properties
 
@@ -190,14 +190,14 @@ class NotionWriter:
                     "object": "block",
                     "type": "heading_2",
                     "heading_2": {"rich_text": [{"text": {"content": heading}}]},
-                }
+                },
             )
             blocks.append(
                 {
                     "object": "block",
                     "type": "paragraph",
                     "paragraph": {"rich_text": [{"text": {"content": body or "None"}}]},
-                }
+                },
             )
         return blocks
 
@@ -354,7 +354,7 @@ class TeamsMeetingPipeline:
             if self.config.transcript_preferred:
                 job = self._persist_job(job, status="fetching_transcript")
                 transcript_artifact, transcript_text = await fetch_preferred_transcript_text(
-                    self.graph_client, resolved_meeting
+                    self.graph_client, resolved_meeting,
                 )
                 if transcript_artifact and transcript_text:
                     artifacts.append(transcript_artifact)
@@ -364,18 +364,18 @@ class TeamsMeetingPipeline:
             if not transcript_text:
                 if self.config.transcript_required:
                     raise TeamsPipelineRetryableError(
-                        f"Transcript unavailable for meeting {resolved_meeting.meeting_id}."
+                        f"Transcript unavailable for meeting {resolved_meeting.meeting_id}.",
                     )
                 if not self.config.transcription_fallback:
                     raise TeamsPipelineArtifactNotFoundError(
                         "No transcript available and transcription fallback disabled "
-                        f"for {resolved_meeting.meeting_id}."
+                        f"for {resolved_meeting.meeting_id}.",
                     )
                 job = self._persist_job(job, status="downloading_recording")
                 recordings = await list_recording_artifacts(self.graph_client, resolved_meeting)
                 if not recordings:
                     raise TeamsPipelineRetryableError(
-                        f"Recording unavailable for meeting {resolved_meeting.meeting_id}."
+                        f"Recording unavailable for meeting {resolved_meeting.meeting_id}.",
                     )
                 recording = recordings[0]
                 artifacts.append(recording)
@@ -483,7 +483,7 @@ class TeamsMeetingPipeline:
         ffmpeg = shutil.which("ffmpeg")
         if not ffmpeg:
             raise TeamsPipelineRetryableError(
-                "Recording fallback requires ffmpeg for audio extraction, but ffmpeg was not found."
+                "Recording fallback requires ffmpeg for audio extraction, but ffmpeg was not found.",
             )
         audio_path = recording_path.with_suffix(".wav")
         proc = await asyncio.create_subprocess_exec(

@@ -193,7 +193,7 @@ async def test_polling_conflict_becomes_fatal_after_retries(monkeypatch):
     # complexity.  Each call simulates one 409 from Telegram.
     for i in range(6):
         await adapter._handle_polling_conflict(
-            conflict("Conflict: terminated by other getUpdates request")
+            conflict("Conflict: terminated by other getUpdates request"),
         )
 
     # After 5 failed retries (count 1-5 each enter the retry branch but
@@ -387,7 +387,7 @@ async def test_polling_conflict_reschedule_uses_running_loop(monkeypatch):
     # One conflict: count goes to 1 (< MAX), retry's start_polling raises,
     # handler reschedules via loop.create_task — the previously-broken line.
     await adapter._handle_polling_conflict(
-        conflict("Conflict: terminated by other getUpdates request")
+        conflict("Conflict: terminated by other getUpdates request"),
     )
 
     assert adapter.has_fatal_error is False

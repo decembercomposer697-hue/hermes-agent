@@ -139,7 +139,7 @@ def store_photon_token(token: str) -> None:
     """Persist a dashboard bearer token under ``credential_pool.photon``."""
     auth = _load_auth()
     auth.setdefault("credential_pool", {})["photon"] = [
-        {"access_token": token, "issued_at": int(time.time())}
+        {"access_token": token, "issued_at": int(time.time())},
     ]
     _save_auth(auth)
 
@@ -309,7 +309,7 @@ def _raise_for_status(resp: Any, action: str) -> None:
     if status < 400:
         return
     raise RuntimeError(
-        f"Photon {action} failed: HTTP {status}: {_response_error_detail(resp)}"
+        f"Photon {action} failed: HTTP {status}: {_response_error_detail(resp)}",
     )
 
 
@@ -389,7 +389,7 @@ def poll_for_token(
                 raise RuntimeError(
                     "Photon returned 200 but no token candidate in the "
                     "device-token response (expected access_token, "
-                    "data.access_token, accessToken, or set-auth-token)."
+                    "data.access_token, accessToken, or set-auth-token).",
                 )
             return candidates[0].token
         if resp.status_code == 429:
@@ -509,7 +509,7 @@ def validate_photon_token(token: str) -> dict[str, Any]:
     if resp.status_code in (401, 403):
         raise PhotonDashboardAuthError(
             "Photon issued a device token, but the dashboard session lookup "
-            "rejected it."
+            "rejected it.",
         )
     resp.raise_for_status()
     data = resp.json()
@@ -517,13 +517,13 @@ def validate_photon_token(token: str) -> dict[str, Any]:
     if not isinstance(user, dict) or not user:
         raise PhotonDashboardAuthError(
             "Photon issued a device token, but the dashboard session lookup "
-            "did not recognize it."
+            "did not recognize it.",
         )
     projects_resp = _dashboard_get("/api/projects/", token)
     if projects_resp.status_code in (401, 403):
         raise PhotonDashboardAuthError(
             "Photon device token was accepted for the session lookup but "
-            "rejected by the project API."
+            "rejected by the project API.",
         )
     projects_resp.raise_for_status()
     return user
@@ -534,7 +534,7 @@ def _validated_dashboard_token(candidates: list) -> str:
     if not candidates:
         raise RuntimeError(
             "Photon returned 200 but no token candidate in the device-token "
-            "response."
+            "response.",
         )
     dashboard_error: PhotonDashboardAuthError | None = None
     last_error: BaseException | None = None
@@ -553,7 +553,7 @@ def _validated_dashboard_token(candidates: list) -> str:
         sources = ", ".join(c.source for c in candidates) or "none"
         raise PhotonDashboardAuthError(
             f"{dashboard_error} Device login returned no project-valid "
-            f"dashboard token (tried: {sources})."
+            f"dashboard token (tried: {sources}).",
         ) from dashboard_error
     if last_error is not None:
         raise last_error
@@ -702,7 +702,7 @@ def ensure_spectrum_enabled(token: str, project_id: str) -> dict[str, Any]:
     if not proj.get("spectrumProjectId"):
         raise RuntimeError(
             "Spectrum is enabled but the project has no spectrumProjectId yet — "
-            "retry in a moment, or enable Spectrum from the dashboard."
+            "retry in a moment, or enable Spectrum from the dashboard.",
         )
     return proj
 
@@ -771,7 +771,7 @@ def create_user(
         raise RuntimeError("httpx is required for Photon user creation")
     if not E164_RE.match(phone_number):
         raise ValueError(
-            f"phone_number must be E.164 (e.g. +15551234567); got {phone_number!r}"
+            f"phone_number must be E.164 (e.g. +15551234567); got {phone_number!r}",
         )
     url = f"{_spectrum_host()}/projects/{project_id}/users/"
     body: dict[str, Any] = {"type": "shared", "phoneNumber": phone_number}
@@ -897,7 +897,7 @@ def refresh_user_numbers(
                 )
             except Exception as e:
                 logger.debug(
-                    "photon: could not refresh iMessage line for status: %s", e
+                    "photon: could not refresh iMessage line for status: %s", e,
                 )
             else:
                 if line and line.get("phoneNumber"):

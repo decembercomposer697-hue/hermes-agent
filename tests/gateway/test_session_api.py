@@ -363,7 +363,7 @@ async def test_session_chat_stream_run_completed_carries_turn_transcript(adapter
                             "id": "call_1",
                             "type": "function",
                             "function": {"name": "web_search", "arguments": "{}"},
-                        }
+                        },
                     ],
                 },
                 {"role": "tool", "content": "results", "tool_call_id": "call_1", "tool_name": "web_search"},

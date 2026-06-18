@@ -102,7 +102,7 @@ def fetch(
                     "issues": "; ".join(issues),
                     "government_entities": "; ".join(sorted(set(entities))),
                     "filing_date": (r.get("dt_posted") or "")[:10],
-                }
+                },
             )
         next_url = payload.get("next")
         if not next_url:

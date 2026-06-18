@@ -471,7 +471,7 @@ async def _wait_for_callback() -> tuple[str, str | None]:
     if _oauth_port is None:
         raise RuntimeError(
             "OAuth callback port not set — build_oauth_auth must be called "
-            "before _wait_for_oauth_callback"
+            "before _wait_for_oauth_callback",
         )
 
     # The callback server is already running (started in build_oauth_auth).
@@ -486,7 +486,7 @@ async def _wait_for_callback() -> tuple[str, str | None]:
         # Fall back to polling the server started by build_oauth_auth.
         raise OAuthNonInteractiveError(
             "OAuth callback timed out — could not bind callback port. "
-            "Complete the authorization in a browser first, then retry."
+            "Complete the authorization in a browser first, then retry.",
         )
 
     server_thread = threading.Thread(target=server.handle_request, daemon=True)
@@ -506,7 +506,7 @@ async def _wait_for_callback() -> tuple[str, str | None]:
             flush=True,
         )
         paste_thread = threading.Thread(
-            target=_paste_callback_reader, args=(result,), daemon=True
+            target=_paste_callback_reader, args=(result,), daemon=True,
         )
         paste_thread.start()
 
@@ -529,7 +529,7 @@ async def _wait_for_callback() -> tuple[str, str | None]:
     if result["auth_code"] is None:
         raise OAuthNonInteractiveError(
             "OAuth callback timed out — no authorization code received. "
-            "Ensure you completed the browser authorization flow."
+            "Ensure you completed the browser authorization flow.",
         )
 
     return result["auth_code"], result["state"]
@@ -670,7 +670,7 @@ def _build_client_metadata(cfg: dict) -> "OAuthClientMetadata":
     port = cfg.get("_resolved_port")
     if port is None:
         raise ValueError(
-            "_configure_callback_port() must be called before _build_client_metadata()"
+            "_configure_callback_port() must be called before _build_client_metadata()",
         )
     client_name = cfg.get("client_name", "Hermes Agent")
     scope = cfg.get("scope")

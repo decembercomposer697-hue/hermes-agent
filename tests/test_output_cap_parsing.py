@@ -50,7 +50,7 @@ class TestParseCharBasedOutputCap:
         chars = 77409
         available = parse_available_output_tokens_from_error(
             f"maximum context length is {ctx} tokens. However, you requested "
-            f"{ctx} output tokens and your prompt contains {chars} characters."
+            f"{ctx} output tokens and your prompt contains {chars} characters.",
         )
         assert available is not None
         assert available + (chars + 2) // 3 <= ctx

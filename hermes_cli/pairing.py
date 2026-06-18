@@ -44,7 +44,7 @@ def _cmd_list(store):
         for p in pending:
             print(
                 f"  {p['platform']:<12} {p['code']:<10} {p['user_id']:<20} "
-                f"{(p.get('user_name') or ''):<20} {p['age_minutes']}m ago"
+                f"{(p.get('user_name') or ''):<20} {p['age_minutes']}m ago",
             )
     else:
         print("\n  No pending pairing requests.")
@@ -84,12 +84,12 @@ def _cmd_approve(store, platform: str, code: str):
         mins = remaining // 60
         print(
             f"\n  Platform '{platform}' is locked out after too many failed "
-            f"approval attempts."
+            f"approval attempts.",
         )
         print(f"  Lockout clears in ~{mins} minute(s).")
         print(
             f"  To reset sooner, delete the '_lockout:{platform}' entry from "
-            "~/.hermes/platforms/pairing/_rate_limits.json\n"
+            "~/.hermes/platforms/pairing/_rate_limits.json\n",
         )
     else:
         print(f"\n  Code '{code}' not found or expired for platform '{platform}'.")

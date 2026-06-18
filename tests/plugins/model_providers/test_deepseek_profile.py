@@ -38,7 +38,7 @@ class TestDeepSeekThinkingWireShape:
     def test_v4_pro_default_enables_thinking_without_effort(self, deepseek_profile):
         """No reasoning_config → thinking enabled, server picks default effort."""
         extra_body, top_level = deepseek_profile.build_api_kwargs_extras(
-            reasoning_config=None, model="deepseek-v4-pro"
+            reasoning_config=None, model="deepseek-v4-pro",
         )
         assert extra_body == {"thinking": {"type": "enabled"}}
         assert top_level == {}
@@ -74,7 +74,7 @@ class TestDeepSeekThinkingWireShape:
         defaults to thinking-on when ``thinking`` is absent.
         """
         extra_body, top_level = deepseek_profile.build_api_kwargs_extras(
-            reasoning_config={"enabled": False}, model="deepseek-v4-pro"
+            reasoning_config={"enabled": False}, model="deepseek-v4-pro",
         )
         assert extra_body == {"thinking": {"type": "disabled"}}
         # No effort when disabled — DeepSeek rejects it.
@@ -119,7 +119,7 @@ class TestDeepSeekModelGating:
     )
     def test_thinking_capable_models_emit_thinking(self, deepseek_profile, model):
         extra_body, _ = deepseek_profile.build_api_kwargs_extras(
-            reasoning_config=None, model=model
+            reasoning_config=None, model=model,
         )
         assert extra_body == {"thinking": {"type": "enabled"}}
 
@@ -136,7 +136,7 @@ class TestDeepSeekModelGating:
     )
     def test_non_thinking_models_emit_nothing(self, deepseek_profile, model):
         extra_body, top_level = deepseek_profile.build_api_kwargs_extras(
-            reasoning_config={"enabled": True, "effort": "high"}, model=model
+            reasoning_config={"enabled": True, "effort": "high"}, model=model,
         )
         assert extra_body == {}
         assert top_level == {}

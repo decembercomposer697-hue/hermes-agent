@@ -316,7 +316,7 @@ async def test_connect_does_not_wait_for_slash_sync(monkeypatch):
 @pytest.mark.asyncio
 async def test_connect_respects_slash_commands_opt_out(monkeypatch):
     adapter = DiscordAdapter(
-        PlatformConfig(enabled=True, token="test-token", extra={"slash_commands": False})
+        PlatformConfig(enabled=True, token="test-token", extra={"slash_commands": False}),
     )
 
     monkeypatch.setenv("DISCORD_COMMAND_SYNC_POLICY", "off")

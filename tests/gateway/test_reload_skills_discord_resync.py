@@ -41,7 +41,7 @@ def _make_adapter():
 
 class TestRefreshSkillGroup:
     def test_refresh_repopulates_entries_after_catalog_change(
-        self, monkeypatch
+        self, monkeypatch,
     ) -> None:
         """The initial catalog is replaced wholesale on refresh.
 
@@ -110,7 +110,7 @@ class TestRefreshSkillGroup:
         assert names == sorted(names) == ["alpha", "zebra"]
 
     def test_refresh_handles_collector_exception_gracefully(
-        self, monkeypatch
+        self, monkeypatch,
     ) -> None:
         """A broken collector must not take down /reload-skills."""
         adapter = _make_adapter()
@@ -152,7 +152,7 @@ class TestRegisterSkillGroupUsesInstanceState:
     """
 
     def test_refresh_catalog_state_populates_instance_attrs(
-        self, monkeypatch
+        self, monkeypatch,
     ) -> None:
         adapter = _make_adapter()
         adapter._skill_group_reserved_names = set()
@@ -227,7 +227,7 @@ class TestHandleReloadSkillsCallsRefreshSkillGroup:
         # Mock reload_skills itself so no disk scan runs.
         fake_result = {"added": [], "removed": [], "total": 7}
         with patch(
-            "agent.skill_commands.reload_skills", return_value=fake_result
+            "agent.skill_commands.reload_skills", return_value=fake_result,
         ):
             event = MagicMock()
             event.source = MagicMock()
@@ -236,7 +236,7 @@ class TestHandleReloadSkillsCallsRefreshSkillGroup:
             runner._pending_skills_reload_notes = {}
 
             result = asyncio.get_event_loop().run_until_complete(
-                runner._handle_reload_skills_command(event)
+                runner._handle_reload_skills_command(event),
             )
 
         assert "Skills Reloaded" in result

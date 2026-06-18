@@ -105,7 +105,7 @@ class TestSyncExternalMemoryForTurn:
                             "name": "terminal",
                             "arguments": "{\"command\":\"pytest\"}",
                         },
-                    }
+                    },
                 ],
             },
             {
@@ -113,7 +113,7 @@ class TestSyncExternalMemoryForTurn:
                 "name": "terminal",
                 "tool_call_id": "call-1",
                 "content": "final Hermes-processed output",
-            }
+            },
         ]
 
         agent._sync_external_memory_for_turn(
@@ -178,7 +178,7 @@ class TestSyncExternalMemoryForTurn:
         response by propagating the exception up."""
         agent = _bare_agent()
         agent._memory_manager.sync_all.side_effect = RuntimeError(
-            "backend unreachable"
+            "backend unreachable",
         )
 
         # Must not raise.
@@ -195,7 +195,7 @@ class TestSyncExternalMemoryForTurn:
         failure in queue_prefetch_all must not bubble out."""
         agent = _bare_agent()
         agent._memory_manager.queue_prefetch_all.side_effect = RuntimeError(
-            "prefetch worker dead"
+            "prefetch worker dead",
         )
 
         # Must not raise.

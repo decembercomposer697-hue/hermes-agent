@@ -69,7 +69,7 @@ def test_list_prints_recent_jobs(capsys, tmp_path):
         _make_args(
             teams_pipeline_action="list",
             store_path=str(tmp_path / "teams_pipeline_store.json"),
-        )
+        ),
     )
     out = capsys.readouterr().out
     assert "job-1" in out
@@ -94,7 +94,7 @@ def test_show_prints_job_json(capsys, tmp_path):
             teams_pipeline_action="show",
             job_id="job-1",
             store_path=str(tmp_path / "teams_pipeline_store.json"),
-        )
+        ),
     )
     out = capsys.readouterr().out
     payload = json.loads(out)
@@ -118,7 +118,7 @@ def test_subscriptions_lists_graph_subscriptions(monkeypatch, capsys):
                     "resource": "communications/onlineMeetings/getAllTranscripts",
                     "changeType": "updated",
                     "expirationDateTime": "2026-05-05T00:00:00Z",
-                }
+                },
             ]
 
     monkeypatch.setattr("plugins.teams_pipeline.cli.build_graph_client", lambda: FakeClient())
@@ -150,7 +150,7 @@ def test_subscribe_defaults_to_created_for_transcript_resources(monkeypatch, cap
             resource="communications/onlineMeetings/getAllTranscripts",
             notification_url="https://example.com/webhooks/msgraph",
             change_type="",
-        )
+        ),
     )
     payload = json.loads(capsys.readouterr().out)
     assert captured["path"] == "/subscriptions"
@@ -196,7 +196,7 @@ def test_validate_accepts_msgraph_credentials_for_graph_delivery(monkeypatch, ca
                     "channel_id": "channel-1",
                 },
             ),
-        }
+        },
     )
     monkeypatch.setattr(
         "plugins.teams_pipeline.cli.load_gateway_config",
@@ -207,7 +207,7 @@ def test_validate_accepts_msgraph_credentials_for_graph_delivery(monkeypatch, ca
         _make_args(
             teams_pipeline_action="validate",
             store_path=str(tmp_path / "teams_pipeline_store.json"),
-        )
+        ),
     )
     payload = json.loads(capsys.readouterr().out)
     assert payload["ok"] is True

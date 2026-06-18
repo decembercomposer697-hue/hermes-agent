@@ -212,8 +212,8 @@ class TestExtractCacheBustingConfig:
                     "context_length": 272_000,
                     "max_tokens": 4096,
                     "provider": "openrouter",
-                }
-            }
+                },
+            },
         )
         assert out["model.context_length"] == 272_000
         assert out["model.max_tokens"] == 4096
@@ -229,8 +229,8 @@ class TestExtractCacheBustingConfig:
                     "target_ratio": 0.3,
                     "protect_last_n": 25,
                     "some_other_key": "ignored",
-                }
-            }
+                },
+            },
         )
         assert out["compression.enabled"] is False
         assert out["compression.threshold"] == 0.6
@@ -252,7 +252,7 @@ class TestExtractCacheBustingConfig:
 
         # compression is a string — should not crash, all compression.* keys None
         out = GatewayRunner._extract_cache_busting_config(
-            {"compression": "broken", "model": {"context_length": 100_000}}
+            {"compression": "broken", "model": {"context_length": 100_000}},
         )
         assert out["compression.enabled"] is None
         assert out["compression.threshold"] is None
@@ -1466,10 +1466,10 @@ class TestAgentConfigSignatureUserId:
         from gateway.run import GatewayRunner
         runtime = {"provider": "anthropic", "api_key": "k", "base_url": "", "api_mode": "chat_completions"}
         sig_a = GatewayRunner._agent_config_signature(
-            "claude-sonnet-4", runtime, ["hermes-telegram"], "", user_id="86701400"
+            "claude-sonnet-4", runtime, ["hermes-telegram"], "", user_id="86701400",
         )
         sig_b = GatewayRunner._agent_config_signature(
-            "claude-sonnet-4", runtime, ["hermes-telegram"], "", user_id="491827364"
+            "claude-sonnet-4", runtime, ["hermes-telegram"], "", user_id="491827364",
         )
         assert sig_a != sig_b
 
@@ -1477,10 +1477,10 @@ class TestAgentConfigSignatureUserId:
         from gateway.run import GatewayRunner
         runtime = {"provider": "anthropic", "api_key": "k", "base_url": "", "api_mode": "chat_completions"}
         sig_1 = GatewayRunner._agent_config_signature(
-            "claude-sonnet-4", runtime, ["hermes-telegram"], "", user_id="86701400"
+            "claude-sonnet-4", runtime, ["hermes-telegram"], "", user_id="86701400",
         )
         sig_2 = GatewayRunner._agent_config_signature(
-            "claude-sonnet-4", runtime, ["hermes-telegram"], "", user_id="86701400"
+            "claude-sonnet-4", runtime, ["hermes-telegram"], "", user_id="86701400",
         )
         assert sig_1 == sig_2
 

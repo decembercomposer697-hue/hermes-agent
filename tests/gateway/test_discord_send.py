@@ -59,7 +59,7 @@ async def test_send_retries_without_reference_when_reply_target_is_system_messag
         if len(send_calls) == 1:
             raise RuntimeError(
                 "400 Bad Request (error code: 50035): Invalid Form Body\n"
-                "In message_reference: Cannot reply to a system message"
+                "In message_reference: Cannot reply to a system message",
             )
         return sent_msg
 
@@ -96,7 +96,7 @@ async def test_send_retries_without_reference_when_reply_target_is_deleted():
         send_calls.append({"content": content, "reference": reference})
         if len(send_calls) == 1:
             raise RuntimeError(
-                "400 Bad Request (error code: 10008): Unknown Message"
+                "400 Bad Request (error code: 10008): Unknown Message",
             )
         return sent_msgs[len(send_calls) - 2]
 
@@ -138,7 +138,7 @@ async def test_send_does_not_retry_on_unrelated_errors():
     async def fake_send(*, content, reference=None):
         send_calls.append({"content": content, "reference": reference})
         raise RuntimeError(
-            "403 Forbidden (error code: 50013): Missing Permissions"
+            "403 Forbidden (error code: 50013): Missing Permissions",
         )
 
     channel = SimpleNamespace(

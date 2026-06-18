@@ -49,7 +49,7 @@ class _FakeAgent:
         self.valid_tool_names = set()
         self.compression_enabled = False
         self.context_compressor = types.SimpleNamespace(
-            protect_first_n=2, protect_last_n=2
+            protect_first_n=2, protect_last_n=2,
         )
         self._cached_system_prompt = "SYSTEM"
         self._memory_store = None

@@ -24,7 +24,7 @@ _TIMEOUT = 10  # seconds
 
 
 def check_package_for_malware(
-    command: str, args: list
+    command: str, args: list,
 ) -> str | None:
     """Check if an MCP server package has known malware advisories.
 
@@ -73,7 +73,7 @@ def _infer_ecosystem(command: str) -> str | None:
 
 
 def _parse_package_from_args(
-    args: list, ecosystem: str
+    args: list, ecosystem: str,
 ) -> tuple[str | None, str | None]:
     """Extract package name and optional version from command args.
 
@@ -143,7 +143,7 @@ def _parse_pypi_package(token: str) -> tuple[str | None, str | None]:
 
 
 def _query_osv(
-    package: str, ecosystem: str, version: str | None = None
+    package: str, ecosystem: str, version: str | None = None,
 ) -> list:
     """Query the OSV API for MAL-* advisories. Returns list of malware vulns."""
     payload = {"package": {"name": package, "ecosystem": ecosystem}}

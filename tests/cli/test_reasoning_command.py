@@ -355,7 +355,7 @@ class TestReasoningPreviewBuffering(unittest.TestCase):
         cli = self._make_cli()
 
         cli._emit_reasoning_preview(
-            "First line\nstill same thought\n\n\nSecond paragraph with more detail here."
+            "First line\nstill same thought\n\n\nSecond paragraph with more detail here.",
         )
 
         rendered = mock_cprint.call_args[0][0]

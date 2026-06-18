@@ -15,7 +15,7 @@ from agent.model_metadata import estimate_tokens_rough
 
 _QUOTED_REFERENCE_VALUE = r'(?:`[^`\n]+`|"[^"\n]+"|\'[^\'\n]+\')'
 REFERENCE_PATTERN = re.compile(
-    rf"(?<![\w/])@(?:(?P<simple>diff|staged)\b|(?P<kind>file|folder|git|url):(?P<value>{_QUOTED_REFERENCE_VALUE}(?::\d+(?:-\d+)?)?|\S+))"
+    rf"(?<![\w/])@(?:(?P<simple>diff|staged)\b|(?P<kind>file|folder|git|url):(?P<value>{_QUOTED_REFERENCE_VALUE}(?::\d+(?:-\d+)?)?|\S+))",
 )
 TRAILING_PUNCTUATION = ",.;!?"
 _SENSITIVE_HOME_DIRS = (".ssh", ".aws", ".gnupg", ".kube", ".docker", ".azure", ".config/gh")
@@ -74,7 +74,7 @@ def parse_context_references(message: str) -> list[ContextReference]:
                     target="",
                     start=match.start(),
                     end=match.end(),
-                )
+                ),
             )
             continue
 
@@ -96,7 +96,7 @@ def parse_context_references(message: str) -> list[ContextReference]:
                 end=match.end(),
                 line_start=line_start,
                 line_end=line_end,
-            )
+            ),
         )
 
     return refs
@@ -168,7 +168,7 @@ async def preprocess_context_references_async(
     soft_limit = max(1, int(context_length * 0.25))
     if injected_tokens > hard_limit:
         warnings.append(
-            f"@ context injection refused: {injected_tokens} tokens exceeds the 50% hard limit ({hard_limit})."
+            f"@ context injection refused: {injected_tokens} tokens exceeds the 50% hard limit ({hard_limit}).",
         )
         return ContextReferenceResult(
             message=message,
@@ -182,7 +182,7 @@ async def preprocess_context_references_async(
 
     if injected_tokens > soft_limit:
         warnings.append(
-            f"@ context injection warning: {injected_tokens} tokens exceeds the 25% soft limit ({soft_limit})."
+            f"@ context injection warning: {injected_tokens} tokens exceeds the 25% soft limit ({soft_limit}).",
         )
 
     stripped = _remove_reference_tokens(message, refs)

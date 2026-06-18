@@ -86,9 +86,9 @@ class TestListJobs:
         app = _create_app(adapter)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_list", return_value=[SAMPLE_JOB]
+                f"{_MOD}._cron_list", return_value=[SAMPLE_JOB],
             ):
                 resp = await cli.get("/api/jobs")
                 assert resp.status == 200
@@ -107,9 +107,9 @@ class TestListJobs:
         mock_list = MagicMock(return_value=[SAMPLE_JOB])
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_list", mock_list
+                f"{_MOD}._cron_list", mock_list,
             ):
                 resp = await cli.get("/api/jobs?include_disabled=true")
                 assert resp.status == 200
@@ -122,9 +122,9 @@ class TestListJobs:
         mock_list = MagicMock(return_value=[])
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_list", mock_list
+                f"{_MOD}._cron_list", mock_list,
             ):
                 resp = await cli.get("/api/jobs")
                 assert resp.status == 200
@@ -143,9 +143,9 @@ class TestCreateJob:
         mock_create = MagicMock(return_value=SAMPLE_JOB)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_create", mock_create
+                f"{_MOD}._cron_create", mock_create,
             ):
                 resp = await cli.post("/api/jobs", json={
                     "name": "test-job",
@@ -252,9 +252,9 @@ class TestGetJob:
         mock_get = MagicMock(return_value=SAMPLE_JOB)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_get", mock_get
+                f"{_MOD}._cron_get", mock_get,
             ):
                 resp = await cli.get(f"/api/jobs/{VALID_JOB_ID}")
                 assert resp.status == 200
@@ -269,9 +269,9 @@ class TestGetJob:
         mock_get = MagicMock(return_value=None)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_get", mock_get
+                f"{_MOD}._cron_get", mock_get,
             ):
                 resp = await cli.get(f"/api/jobs/{VALID_JOB_ID}")
                 assert resp.status == 404
@@ -324,9 +324,9 @@ class TestUpdateJob:
         mock_update = MagicMock(return_value=updated_job)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_update", mock_update
+                f"{_MOD}._cron_update", mock_update,
             ):
                 resp = await cli.patch(
                     f"/api/jobs/{VALID_JOB_ID}",
@@ -350,9 +350,9 @@ class TestUpdateJob:
         mock_update = MagicMock(return_value=updated_job)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_update", mock_update
+                f"{_MOD}._cron_update", mock_update,
             ):
                 resp = await cli.patch(
                     f"/api/jobs/{VALID_JOB_ID}",
@@ -396,9 +396,9 @@ class TestDeleteJob:
         mock_remove = MagicMock(return_value=True)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_remove", mock_remove
+                f"{_MOD}._cron_remove", mock_remove,
             ):
                 resp = await cli.delete(f"/api/jobs/{VALID_JOB_ID}")
                 assert resp.status == 200
@@ -413,9 +413,9 @@ class TestDeleteJob:
         mock_remove = MagicMock(return_value=False)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_remove", mock_remove
+                f"{_MOD}._cron_remove", mock_remove,
             ):
                 resp = await cli.delete(f"/api/jobs/{VALID_JOB_ID}")
                 assert resp.status == 404
@@ -434,9 +434,9 @@ class TestPauseJob:
         mock_pause = MagicMock(return_value=paused_job)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_pause", mock_pause
+                f"{_MOD}._cron_pause", mock_pause,
             ):
                 resp = await cli.post(f"/api/jobs/{VALID_JOB_ID}/pause")
                 assert resp.status == 200
@@ -459,9 +459,9 @@ class TestResumeJob:
         mock_resume = MagicMock(return_value=resumed_job)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_resume", mock_resume
+                f"{_MOD}._cron_resume", mock_resume,
             ):
                 resp = await cli.post(f"/api/jobs/{VALID_JOB_ID}/resume")
                 assert resp.status == 200
@@ -484,9 +484,9 @@ class TestRunJob:
         mock_trigger = MagicMock(return_value=triggered_job)
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_trigger", mock_trigger
+                f"{_MOD}._cron_trigger", mock_trigger,
             ):
                 resp = await cli.post(f"/api/jobs/{VALID_JOB_ID}/run")
                 assert resp.status == 200
@@ -545,9 +545,9 @@ class TestAuthRequired:
         mock_list = MagicMock(return_value=[])
         async with TestClient(TestServer(app)) as cli:
             with patch(
-                f"{_MOD}._CRON_AVAILABLE", True
+                f"{_MOD}._CRON_AVAILABLE", True,
             ), patch(
-                f"{_MOD}._cron_list", mock_list
+                f"{_MOD}._cron_list", mock_list,
             ):
                 resp = await cli.get(
                     "/api/jobs",
@@ -584,7 +584,7 @@ class TestCronUnavailable:
 
         async with TestClient(TestServer(app)) as cli:
             with patch(f"{_MOD}._CRON_AVAILABLE", True), patch(
-                f"{_MOD}._cron_pause", _plain_pause
+                f"{_MOD}._cron_pause", _plain_pause,
             ):
                 resp = await cli.post(f"/api/jobs/{VALID_JOB_ID}/pause")
                 assert resp.status == 200
@@ -604,7 +604,7 @@ class TestCronUnavailable:
 
         async with TestClient(TestServer(app)) as cli:
             with patch(f"{_MOD}._CRON_AVAILABLE", True), patch(
-                f"{_MOD}._cron_list", _plain_list
+                f"{_MOD}._cron_list", _plain_list,
             ):
                 resp = await cli.get("/api/jobs?include_disabled=true")
                 assert resp.status == 200
@@ -626,7 +626,7 @@ class TestCronUnavailable:
 
         async with TestClient(TestServer(app)) as cli:
             with patch(f"{_MOD}._CRON_AVAILABLE", True), patch(
-                f"{_MOD}._cron_update", _plain_update
+                f"{_MOD}._cron_update", _plain_update,
             ):
                 resp = await cli.patch(
                     f"/api/jobs/{VALID_JOB_ID}",
@@ -723,7 +723,7 @@ class TestCronPromptScanParity:
         mock_create = MagicMock(return_value=SAMPLE_JOB)
         async with TestClient(TestServer(app)) as cli:
             with patch(f"{_MOD}._CRON_AVAILABLE", True), patch(
-                f"{_MOD}._cron_create", mock_create
+                f"{_MOD}._cron_create", mock_create,
             ):
                 resp = await cli.post("/api/jobs", json={
                     "name": "health-check",
@@ -742,7 +742,7 @@ class TestCronPromptScanParity:
         mock_create = MagicMock(return_value=SAMPLE_JOB)
         async with TestClient(TestServer(app)) as cli:
             with patch(f"{_MOD}._CRON_AVAILABLE", True), patch(
-                f"{_MOD}._cron_create", mock_create
+                f"{_MOD}._cron_create", mock_create,
             ):
                 resp = await cli.post("/api/jobs", json={
                     "name": "digest",
@@ -761,7 +761,7 @@ class TestCronPromptScanParity:
         mock_update = MagicMock(return_value=SAMPLE_JOB)
         async with TestClient(TestServer(app)) as cli:
             with patch(f"{_MOD}._CRON_AVAILABLE", True), patch(
-                f"{_MOD}._cron_update", mock_update
+                f"{_MOD}._cron_update", mock_update,
             ):
                 resp = await cli.patch(f"/api/jobs/{VALID_JOB_ID}", json={
                     "prompt": self.MALICIOUS_PROMPT,
@@ -778,7 +778,7 @@ class TestCronPromptScanParity:
         mock_update = MagicMock(return_value=SAMPLE_JOB)
         async with TestClient(TestServer(app)) as cli:
             with patch(f"{_MOD}._CRON_AVAILABLE", True), patch(
-                f"{_MOD}._cron_update", mock_update
+                f"{_MOD}._cron_update", mock_update,
             ):
                 resp = await cli.patch(f"/api/jobs/{VALID_JOB_ID}", json={
                     "prompt": self.BENIGN_PROMPT,

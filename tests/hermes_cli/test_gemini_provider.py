@@ -317,8 +317,8 @@ class TestGeminiModelsDev:
                     "gemini-live-2.5-flash": {"tool_call": True},
                     "gemini-2.5-flash-preview-04-17": {"tool_call": True},
                     "gemma-4-31b-it": {"tool_call": True},
-                }
-            }
+                },
+            },
         }
         with patch("agent.models_dev.fetch_models_dev", return_value=mock_data):
             result = list_agentic_models("gemini")
@@ -340,8 +340,8 @@ class TestGeminiModelsDev:
                     "gemma-3-27b-it": {},
                     "gemini-1.5-pro": {},
                     "gemini-2.0-flash": {},
-                }
-            }
+                },
+            },
         }
         with patch("agent.models_dev.fetch_models_dev", return_value=mock_data):
             from agent.models_dev import list_provider_models

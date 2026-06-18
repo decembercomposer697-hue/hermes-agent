@@ -66,7 +66,7 @@ def iter_sync_files(container_base: str = "/root/.hermes") -> list[tuple[str, st
     files: list[tuple[str, str]] = []
     for entry in get_credential_file_mounts():
         remote = entry["container_path"].replace(
-            "/root/.hermes", container_base, 1
+            "/root/.hermes", container_base, 1,
         )
         files.append((entry["host_path"], remote))
     for entry in iter_skills_files(container_base=container_base):

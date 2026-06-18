@@ -155,7 +155,7 @@ def test_honcho_sync_turn_does_not_start_network_write_before_session_init():
     provider._session_initialized = False
     provider._start_session_init_background = background_started.set
     provider._init_thread = threading.Thread(
-        target=lambda: release_init.wait(timeout=5), daemon=True
+        target=lambda: release_init.wait(timeout=5), daemon=True,
     )
     provider._init_thread.start()
 

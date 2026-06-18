@@ -122,21 +122,21 @@ class TestMacosHasImage:
     def test_png_detected(self):
         with patch("hermes_cli.clipboard.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                stdout="«class PNGf», «class ut16»", returncode=0
+                stdout="«class PNGf», «class ut16»", returncode=0,
             )
             assert _macos_has_image() is True
 
     def test_tiff_detected(self):
         with patch("hermes_cli.clipboard.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                stdout="«class TIFF»", returncode=0
+                stdout="«class TIFF»", returncode=0,
             )
             assert _macos_has_image() is True
 
     def test_text_only(self):
         with patch("hermes_cli.clipboard.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                stdout="«class ut16», «class utf8»", returncode=0
+                stdout="«class ut16», «class utf8»", returncode=0,
             )
             assert _macos_has_image() is False
 
@@ -145,7 +145,7 @@ class TestMacosOsascript:
     def test_no_image_type_in_clipboard(self, tmp_path):
         with patch("hermes_cli.clipboard.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                stdout="«class ut16», «class utf8»", returncode=0
+                stdout="«class ut16», «class utf8»", returncode=0,
             )
             assert _macos_osascript(tmp_path / "out.png") is False
 
@@ -345,21 +345,21 @@ class TestWaylandHasImage:
     def test_has_png(self):
         with patch("hermes_cli.clipboard.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                stdout="image/png\ntext/plain\n", returncode=0
+                stdout="image/png\ntext/plain\n", returncode=0,
             )
             assert _wayland_has_image() is True
 
     def test_has_bmp_only(self):
         with patch("hermes_cli.clipboard.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                stdout="text/html\nimage/bmp\n", returncode=0
+                stdout="text/html\nimage/bmp\n", returncode=0,
             )
             assert _wayland_has_image() is True
 
     def test_text_only(self):
         with patch("hermes_cli.clipboard.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                stdout="text/plain\ntext/html\n", returncode=0
+                stdout="text/plain\ntext/html\n", returncode=0,
             )
             assert _wayland_has_image() is False
 
@@ -446,7 +446,7 @@ class TestWaylandSave:
         dest = tmp_path / "out.png"
         with patch("hermes_cli.clipboard.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                stdout="text/plain\ntext/html\n", returncode=0
+                stdout="text/plain\ntext/html\n", returncode=0,
             )
             assert _wayland_save(dest) is False
 
@@ -469,7 +469,7 @@ class TestWaylandSave:
             calls.append(cmd)
             if "--list-types" in cmd:
                 return MagicMock(
-                    stdout="image/bmp\nimage/png\ntext/plain\n", returncode=0
+                    stdout="image/bmp\nimage/png\ntext/plain\n", returncode=0,
                 )
             if "stdout" in kw and hasattr(kw["stdout"], "write"):
                 kw["stdout"].write(FAKE_PNG)
@@ -487,14 +487,14 @@ class TestXclipHasImage:
     def test_has_image(self):
         with patch("hermes_cli.clipboard.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                stdout="image/png\ntext/plain\n", returncode=0
+                stdout="image/png\ntext/plain\n", returncode=0,
             )
             assert _xclip_has_image() is True
 
     def test_no_image(self):
         with patch("hermes_cli.clipboard.subprocess.run") as mock_run:
             mock_run.return_value = MagicMock(
-                stdout="text/plain\n", returncode=0
+                stdout="text/plain\n", returncode=0,
             )
             assert _xclip_has_image() is False
 

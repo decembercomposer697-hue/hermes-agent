@@ -315,7 +315,7 @@ class TestIsGenuineNousRateLimit:
         assert is_genuine_nous_rate_limit(headers=None) is False
         assert is_genuine_nous_rate_limit(headers={}) is False
         assert is_genuine_nous_rate_limit(
-            headers={"content-type": "application/json"}
+            headers={"content-type": "application/json"},
         ) is False
 
     def test_exhausted_bucket_with_short_reset_is_not_genuine(self):
@@ -355,7 +355,7 @@ class TestIsGenuineNousRateLimit:
         }
         last_state = parse_rate_limit_headers(prior_headers, provider="nous")
         assert is_genuine_nous_rate_limit(
-            headers=None, last_known_state=last_state
+            headers=None, last_known_state=last_state,
         ) is True
 
     def test_last_known_state_all_healthy_stays_upstream(self):
@@ -380,12 +380,12 @@ class TestIsGenuineNousRateLimit:
         }
         last_state = parse_rate_limit_headers(prior_headers, provider="nous")
         assert is_genuine_nous_rate_limit(
-            headers=None, last_known_state=last_state
+            headers=None, last_known_state=last_state,
         ) is False
 
     def test_none_last_state_and_no_headers_is_upstream(self):
         from agent.nous_rate_guard import is_genuine_nous_rate_limit
 
         assert is_genuine_nous_rate_limit(
-            headers=None, last_known_state=None
+            headers=None, last_known_state=None,
         ) is False

@@ -35,7 +35,7 @@ class ProgressCaptureAdapter(BasePlatformAdapter):
                 "content": content,
                 "reply_to": reply_to,
                 "metadata": metadata,
-            }
+            },
         )
         return SendResult(success=True, message_id="progress-1")
 
@@ -45,7 +45,7 @@ class ProgressCaptureAdapter(BasePlatformAdapter):
                 "chat_id": chat_id,
                 "message_id": message_id,
                 "content": content,
-            }
+            },
         )
         return SendResult(success=True, message_id=message_id)
 
@@ -83,7 +83,7 @@ class SmallLimitProgressAdapter(ProgressCaptureAdapter):
                 "content": content,
                 "reply_to": reply_to,
                 "metadata": metadata,
-            }
+            },
         )
         return SendResult(success=True, message_id=self._mint_id())
 
@@ -95,14 +95,14 @@ class SmallLimitProgressAdapter(ProgressCaptureAdapter):
                 "chat_id": chat_id,
                 "message_id": message_id,
                 "content": content,
-            }
+            },
         )
         return SendResult(success=True, message_id=message_id)
 
 
 class MetadataEditProgressCaptureAdapter(ProgressCaptureAdapter):
     async def edit_message(
-        self, chat_id, message_id, content, *, finalize: bool = False, metadata=None
+        self, chat_id, message_id, content, *, finalize: bool = False, metadata=None,
     ) -> SendResult:
         self.edits.append(
             {
@@ -110,7 +110,7 @@ class MetadataEditProgressCaptureAdapter(ProgressCaptureAdapter):
                 "message_id": message_id,
                 "content": content,
                 "metadata": metadata,
-            }
+            },
         )
         return SendResult(success=True, message_id=message_id)
 
@@ -286,7 +286,7 @@ async def test_run_agent_progress_stays_in_originating_topic(monkeypatch, tmp_pa
             "content": '💻 terminal: "pwd"',
             "reply_to": None,
             "metadata": {"thread_id": "17585"},
-        }
+        },
     ]
     assert adapter.edits
     assert all(call["metadata"] == {"thread_id": "17585"} for call in adapter.typing)
@@ -516,7 +516,7 @@ def _run_long_preview_helper(monkeypatch, tmp_path, preview_length=0):
             source=source,
             session_id="sess-trunc",
             session_key="agent:main:telegram:dm:12345",
-        )
+        ),
     )
     return adapter, result
 
@@ -755,7 +755,7 @@ async def test_run_agent_rolls_progress_bubble_before_platform_limit(monkeypatch
                 "tool_progress": "all",
                 "interim_assistant_messages": False,
                 "tool_preview_length": 60,
-            }
+            },
         },
         adapter_cls=SmallLimitProgressAdapter,
     )
@@ -826,7 +826,7 @@ async def test_run_agent_tool_progress_does_not_control_interim_commentary(monke
 
 @pytest.mark.asyncio
 async def test_run_agent_streaming_does_not_enable_completed_interim_commentary(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     """Streaming alone with interim_assistant_messages=false should not surface commentary."""
     adapter, result = await _run_with_agent(
@@ -1050,7 +1050,7 @@ async def test_base_processing_releases_post_delivery_callback_after_main_send()
                 "content": "💾 Skill 'prospect-scanner' created.",
                 "reply_to": None,
                 "metadata": None,
-            }
+            },
         )
 
     source = SessionSource(
@@ -1116,7 +1116,7 @@ async def test_base_processing_stops_typing_before_hung_post_delivery_callback(
     adapter._post_delivery_callbacks[session_key] = _post_delivery_cb
 
     await asyncio.wait_for(
-        adapter._process_message_background(event, session_key), timeout=1.0
+        adapter._process_message_background(event, session_key), timeout=1.0,
     )
 
     assert [call["content"] for call in adapter.sent] == ["done"]
@@ -1255,7 +1255,7 @@ async def test_keep_typing_stops_immediately_when_interrupt_event_is_set():
             "dm-typing-stop",
             interval=30.0,
             stop_event=stop_event,
-        )
+        ),
     )
     await asyncio.sleep(0.05)
     stop_event.set()
@@ -1334,7 +1334,7 @@ class TerminalCommandAgent:
 
     def run_conversation(self, message, conversation_history=None, task_id=None):
         self.tool_progress_callback(
-            "tool.started", "terminal", self.CMD, {"command": self.CMD}
+            "tool.started", "terminal", self.CMD, {"command": self.CMD},
         )
         # Let the async progress task drain the queue and send before returning.
         time.sleep(0.35)

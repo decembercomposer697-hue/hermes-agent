@@ -27,7 +27,7 @@ def _load_release_module(monkeypatch, tmp_root: Path):
 
     monkeypatch.setattr(module, "REPO_ROOT", tmp_root)
     monkeypatch.setattr(
-        module, "ACP_REGISTRY_MANIFEST", tmp_root / "acp_registry" / "agent.json"
+        module, "ACP_REGISTRY_MANIFEST", tmp_root / "acp_registry" / "agent.json",
     )
     return module
 
@@ -46,7 +46,7 @@ def _write_manifest(root: Path, version: str) -> None:
                     "uvx": {
                         "package": f"hermes-agent[acp]=={version}",
                         "args": ["hermes-acp"],
-                    }
+                    },
                 },
             },
             indent=2,
@@ -63,7 +63,7 @@ def test_update_acp_registry_versions_bumps_manifest_and_pin(monkeypatch, tmp_pa
     module._update_acp_registry_versions("0.14.0")
 
     manifest = json.loads(
-        (tmp_path / "acp_registry" / "agent.json").read_text(encoding="utf-8")
+        (tmp_path / "acp_registry" / "agent.json").read_text(encoding="utf-8"),
     )
     assert manifest["version"] == "0.14.0"
     assert manifest["distribution"]["uvx"]["package"] == "hermes-agent[acp]==0.14.0"
@@ -72,7 +72,7 @@ def test_update_acp_registry_versions_bumps_manifest_and_pin(monkeypatch, tmp_pa
 
 
 def test_update_acp_registry_versions_is_silent_when_manifest_missing(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     """Older release branches predate the ACP Registry asset — must no-op."""
     module = _load_release_module(monkeypatch, tmp_path)
@@ -82,13 +82,13 @@ def test_update_acp_registry_versions_is_silent_when_manifest_missing(
 
 
 def test_update_version_files_bumps_manifest_alongside_pyproject(
-    monkeypatch, tmp_path
+    monkeypatch, tmp_path,
 ):
     """End-to-end: update_version_files() is the function release.py actually
     calls, so it must drive the manifest bump too."""
     _write_manifest(tmp_path, "0.13.0")
     (tmp_path / "pyproject.toml").write_text(
-        '[project]\nname = "hermes-agent"\nversion = "0.13.0"\n', encoding="utf-8"
+        '[project]\nname = "hermes-agent"\nversion = "0.13.0"\n', encoding="utf-8",
     )
     version_dir = tmp_path / "hermes_cli"
     version_dir.mkdir()
@@ -107,7 +107,7 @@ def test_update_version_files_bumps_manifest_alongside_pyproject(
     assert 'version = "0.14.0"' in pyproject_text
 
     manifest = json.loads(
-        (tmp_path / "acp_registry" / "agent.json").read_text(encoding="utf-8")
+        (tmp_path / "acp_registry" / "agent.json").read_text(encoding="utf-8"),
     )
     assert manifest["version"] == "0.14.0"
     assert manifest["distribution"]["uvx"]["package"] == "hermes-agent[acp]==0.14.0"

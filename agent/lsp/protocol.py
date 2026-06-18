@@ -83,7 +83,7 @@ async def read_message(reader: asyncio.StreamReader) -> dict | None:
             if not e.partial and not headers:
                 return None
             raise LSPProtocolError(
-                f"unexpected EOF while reading LSP headers (partial={e.partial!r})"
+                f"unexpected EOF while reading LSP headers (partial={e.partial!r})",
             ) from e
         # Defensive cap against a server streaming headers without ever
         # emitting CRLF-CRLF.  Caps total header bytes at 8 KiB — a
@@ -91,7 +91,7 @@ async def read_message(reader: asyncio.StreamReader) -> dict | None:
         header_bytes += len(line)
         if header_bytes > 8192:
             raise LSPProtocolError(
-                f"LSP header block exceeded 8 KiB without terminator"
+                f"LSP header block exceeded 8 KiB without terminator",
             )
         line = line[:-2]  # strip CRLF
         if not line:
@@ -118,7 +118,7 @@ async def read_message(reader: asyncio.StreamReader) -> dict | None:
         body = await reader.readexactly(n)
     except asyncio.IncompleteReadError as e:
         raise LSPProtocolError(
-            f"truncated LSP body: expected {n} bytes, got {len(e.partial)}"
+            f"truncated LSP body: expected {n} bytes, got {len(e.partial)}",
         ) from e
 
     try:

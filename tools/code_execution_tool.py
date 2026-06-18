@@ -279,7 +279,7 @@ def generate_hermes_tools_module(enabled_tools: list[str],
         stub_functions.append(
             f"def {func_name}({sig}):\n"
             f"    {doc}\n"
-            f"    return _call({func_name!r}, {args_expr})\n"
+            f"    return _call({func_name!r}, {args_expr})\n",
         )
         export_names.append(func_name)
 
@@ -520,7 +520,7 @@ def _rpc_server_loop(
                         "error": (
                             f"Tool '{tool_name}' is not available in execute_code. "
                             f"Available: {available}"
-                        )
+                        ),
                     })
                     conn.sendall((resp + "\n").encode())
                     continue
@@ -531,7 +531,7 @@ def _rpc_server_loop(
                         "error": (
                             f"Tool call limit reached ({max_tool_calls}). "
                             "No more tool calls allowed in this execution."
-                        )
+                        ),
                     })
                     conn.sendall((resp + "\n").encode())
                     continue
@@ -551,7 +551,7 @@ def _rpc_server_loop(
                         sys.stdout = devnull
                         sys.stderr = devnull
                         result = handle_function_call(
-                            tool_name, tool_args, task_id=task_id
+                            tool_name, tool_args, task_id=task_id,
                         )
                     finally:
                         sys.stdout, sys.stderr = _real_stdout, _real_stderr
@@ -800,7 +800,7 @@ def _rpc_poll_loop(
                         "error": (
                             f"Tool '{tool_name}' is not available in execute_code. "
                             f"Available: {available}"
-                        )
+                        ),
                     })
                 # Enforce tool call limit
                 elif tool_call_counter[0] >= max_tool_calls:
@@ -808,7 +808,7 @@ def _rpc_poll_loop(
                         "error": (
                             f"Tool call limit reached ({max_tool_calls}). "
                             "No more tool calls allowed in this execution."
-                        )
+                        ),
                     })
                 else:
                     # Strip forbidden terminal parameters
@@ -824,7 +824,7 @@ def _rpc_poll_loop(
                             sys.stdout = devnull
                             sys.stderr = devnull
                             tool_result = handle_function_call(
-                                tool_name, tool_args, task_id=task_id
+                                tool_name, tool_args, task_id=task_id,
                             )
                         finally:
                             sys.stdout, sys.stderr = _real_stdout, _real_stderr
@@ -846,7 +846,7 @@ def _rpc_poll_loop(
                 # Use echo piping (not stdin_data) because Modal doesn't
                 # reliably deliver stdin to chained commands.
                 encoded_result = base64.b64encode(
-                    tool_result.encode("utf-8")
+                    tool_result.encode("utf-8"),
                 ).decode("ascii")
                 env.execute(
                     f"echo '{encoded_result}' | base64 -d > {quoted_res_file}.tmp"
@@ -1087,7 +1087,7 @@ def execute_code(
     if not SANDBOX_AVAILABLE:
         return json.dumps({
             "error": "execute_code sandbox is unavailable in this environment. "
-                     "Use normal tool calls (terminal, read_file, write_file, ...) instead."
+                     "Use normal tool calls (terminal, read_file, write_file, ...) instead.",
         })
 
     if not code or not code.strip():
@@ -1356,10 +1356,10 @@ def execute_code(
             target=_drain_head_tail,
             args=(proc.stdout, stdout_head_chunks, stdout_tail_chunks,
                   _STDOUT_HEAD_BYTES, _STDOUT_TAIL_BYTES, stdout_total_bytes),
-            daemon=True
+            daemon=True,
         )
         stderr_reader = threading.Thread(
-            target=_drain, args=(proc.stderr, stderr_chunks, MAX_STDERR_BYTES), daemon=True
+            target=_drain, args=(proc.stderr, stderr_chunks, MAX_STDERR_BYTES), daemon=True,
         )
         stdout_reader.start()
         stderr_reader.start()

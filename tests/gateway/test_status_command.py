@@ -35,7 +35,7 @@ def _make_runner(session_entry: SessionEntry, *, platform: Platform = Platform.T
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={platform: PlatformConfig(enabled=True, token="***")}
+        platforms={platform: PlatformConfig(enabled=True, token="***")},
     )
     adapter = MagicMock()
     adapter.send = AsyncMock()
@@ -205,7 +205,7 @@ async def test_agents_command_reports_active_agents_and_processes(monkeypatch):
                     "status": "running",
                     "uptime_seconds": 17,
                     "command": "sleep 30",
-                }
+                },
             ]
 
     monkeypatch.setattr("tools.process_registry.process_registry", _FakeRegistry())
@@ -267,7 +267,7 @@ async def test_handle_message_persists_agent_token_counts(monkeypatch):
             "input_tokens": 120,
             "output_tokens": 45,
             "model": "openai/test-model",
-        }
+        },
     )
 
     monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
@@ -310,7 +310,7 @@ async def test_first_run_slack_home_channel_onboarding_uses_parent_command(monke
             "input_tokens": 0,
             "output_tokens": 0,
             "model": "openai/test-model",
-        }
+        },
     )
 
     monkeypatch.delenv("SLACK_HOME_CHANNEL", raising=False)
@@ -354,7 +354,7 @@ async def test_first_run_non_slack_home_channel_onboarding_keeps_direct_command(
             "input_tokens": 0,
             "output_tokens": 0,
             "model": "openai/test-model",
-        }
+        },
     )
 
     monkeypatch.delenv("TELEGRAM_HOME_CHANNEL", raising=False)
@@ -597,7 +597,7 @@ async def test_post_delivery_callback_generation_snapshot_happens_after_bind():
         async def get_chat_info(self, chat_id): return {}
 
     adapter = _ConcreteAdapter(
-        PlatformConfig(enabled=True, token="***"), Platform.TELEGRAM
+        PlatformConfig(enabled=True, token="***"), Platform.TELEGRAM,
     )
 
     async def fake_handler(event):

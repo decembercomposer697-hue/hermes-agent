@@ -91,7 +91,7 @@ class TestResolveSafeCwdWindows:
         # try to translate that (regex won't match), so emulate the
         # mapping by pointing the translator at the real native dir.
         with patch.object(
-            local_mod, "_msys_to_windows_path", return_value=native
+            local_mod, "_msys_to_windows_path", return_value=native,
         ):
             assert _resolve_safe_cwd("/c/whatever") == native
 
@@ -115,7 +115,7 @@ class TestUpdateCwdWindowsMsys:
         monkeypatch.setattr(local_mod, "_IS_WINDOWS", True)
 
         with patch.object(
-            LocalEnvironment, "init_session", autospec=True, return_value=None
+            LocalEnvironment, "init_session", autospec=True, return_value=None,
         ):
             env = LocalEnvironment(cwd=str(original), timeout=10)
 
@@ -153,7 +153,7 @@ class TestExtractCwdFromOutputWindowsMsys:
         monkeypatch.setattr(local_mod, "_IS_WINDOWS", True)
 
         with patch.object(
-            LocalEnvironment, "init_session", autospec=True, return_value=None
+            LocalEnvironment, "init_session", autospec=True, return_value=None,
         ):
             env = LocalEnvironment(cwd=str(original), timeout=10)
 
@@ -182,7 +182,7 @@ class TestExtractCwdFromOutputWindowsMsys:
         monkeypatch.setattr(local_mod, "_IS_WINDOWS", True)
 
         with patch.object(
-            LocalEnvironment, "init_session", autospec=True, return_value=None
+            LocalEnvironment, "init_session", autospec=True, return_value=None,
         ):
             env = LocalEnvironment(cwd=str(original), timeout=10)
 

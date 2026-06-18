@@ -282,7 +282,7 @@ class MemoryManager:
         if not is_builtin:
             if self._has_external:
                 existing = next(
-                    (p.name for p in self._providers if p.name != "builtin"), "unknown"
+                    (p.name for p in self._providers if p.name != "builtin"), "unknown",
                 )
                 logger.warning(
                     "Rejected memory provider '%s' — external provider '%s' is "
@@ -589,7 +589,7 @@ class MemoryManager:
         return tool_name in self._tool_to_provider
 
     def handle_tool_call(
-        self, tool_name: str, args: dict[str, Any], **kwargs
+        self, tool_name: str, args: dict[str, Any], **kwargs,
     ) -> str:
         """Route a tool call to the correct provider.
 
@@ -746,7 +746,7 @@ class MemoryManager:
                 metadata_mode = self._provider_memory_write_metadata_mode(provider)
                 if metadata_mode == "keyword":
                     provider.on_memory_write(
-                        action, target, content, metadata=dict(metadata or {})
+                        action, target, content, metadata=dict(metadata or {}),
                     )
                 elif metadata_mode == "positional":
                     provider.on_memory_write(action, target, content, dict(metadata or {}))
@@ -764,7 +764,7 @@ class MemoryManager:
         for provider in self._providers:
             try:
                 provider.on_delegation(
-                    task, result, child_session_id=child_session_id, **kwargs
+                    task, result, child_session_id=child_session_id, **kwargs,
                 )
             except Exception as e:
                 logger.debug(

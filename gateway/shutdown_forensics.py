@@ -292,7 +292,7 @@ def format_context_for_log(ctx: dict[str, Any]) -> str:
     if ctx.get("takeover_marker") is not None:
         for_self = ctx.get("takeover_marker_for_self")
         extras.append(
-            f"takeover_marker_present={'self' if for_self else 'other'}"
+            f"takeover_marker_present={'self' if for_self else 'other'}",
         )
     if ctx.get("planned_stop_marker") is not None:
         extras.append("planned_stop_marker_present=yes")

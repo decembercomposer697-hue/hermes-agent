@@ -41,7 +41,7 @@ def _make_runner():
 
     runner = object.__new__(GatewayRunner)
     runner.config = GatewayConfig(
-        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")}
+        platforms={Platform.TELEGRAM: PlatformConfig(enabled=True, token="***")},
     )
     adapter = MagicMock()
     adapter.send = AsyncMock()
@@ -72,14 +72,14 @@ def _make_skill(skills_dir, name, body="content"):
     sd = skills_dir / name
     sd.mkdir(parents=True, exist_ok=True)
     (sd / "SKILL.md").write_text(
-        f"---\nname: {name}\ndescription: desc {name}\n---\n\n# {name}\n\n{body}\n"
+        f"---\nname: {name}\ndescription: desc {name}\n---\n\n# {name}\n\n{body}\n",
     )
 
 
 def _make_bundle(bundles_dir, slug, skills):
     bundles_dir.mkdir(parents=True, exist_ok=True)
     (bundles_dir / f"{slug}.yaml").write_text(
-        f"name: {slug}\nskills:\n" + "\n".join(f"  - {s}" for s in skills) + "\n"
+        f"name: {slug}\nskills:\n" + "\n".join(f"  - {s}" for s in skills) + "\n",
     )
 
 

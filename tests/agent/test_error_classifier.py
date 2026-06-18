@@ -155,7 +155,7 @@ class TestExtractErrorCode:
                     '"type":"invalid_request_error","param":"","code":"invalid_encrypted_content"}}'
                 ),
                 "type": "400",
-            }
+            },
         }
         assert _extract_error_code(body) == "invalid_encrypted_content"
 
@@ -365,7 +365,7 @@ class TestClassifyApiError:
                         "[unknown_parameter] Unknown parameter: "
                         "'input[617]._empty_recovery_synthetic'."
                     ),
-                }
+                },
             },
         )
         result = classify_api_error(e)
@@ -381,7 +381,7 @@ class TestClassifyApiError:
                 "error": {
                     "type": "invalid_request_error",
                     "message": "Unsupported parameter: logprobs",
-                }
+                },
             },
         )
         result = classify_api_error(e)
@@ -462,7 +462,7 @@ class TestClassifyApiError:
         # via the message-pattern fallback.
         e = Exception(
             "No endpoints available matching your guardrail restrictions "
-            "and data policy"
+            "and data policy",
         )
         result = classify_api_error(e)
         assert result.reason == FailoverReason.provider_policy_blocked
@@ -483,7 +483,7 @@ class TestClassifyApiError:
         e = Exception(
             "This content was flagged for possible cybersecurity risk. If this "
             "seems wrong, try rephrasing your request. To get authorized for "
-            "security work, join the Trusted Access for Cyber program."
+            "security work, join the Trusted Access for Cyber program.",
         )
         result = classify_api_error(e, provider="openai-codex", model="gpt-5.5")
         assert result.reason == FailoverReason.content_policy_blocked
@@ -519,7 +519,7 @@ class TestClassifyApiError:
         # Anthropic safety refusal — distinct phrasing from OpenAI.
         e = Exception(
             "Your prompt was flagged by our safety system. Please rephrase "
-            "and try again."
+            "and try again.",
         )
         result = classify_api_error(e, provider="anthropic", model="claude-3-5-sonnet")
         assert result.reason == FailoverReason.content_policy_blocked
@@ -706,7 +706,7 @@ class TestClassifyApiError:
                     '"type":"invalid_request_error","param":"","code":"invalid_encrypted_content"}}'
                 ),
                 "type": "400",
-            }
+            },
         }
         e = MockAPIError(
             "Error code: 400 - invalid_encrypted_content",
@@ -908,7 +908,7 @@ class TestClassifyApiError:
                 "error": {
                     "code": "model_not_supported_on_free_tier",
                     "message": "Model 'gpt-5' is not available on the Free Tier.",
-                }
+                },
             },
         )
         result = classify_api_error(e, provider="nous", model="gpt-5")
@@ -1301,9 +1301,9 @@ class TestAdversarialEdgeCases:
                     "message": "Provider returned error",
                     "code": 400,
                     "metadata": {
-                        "raw": '{"error":{"message":"context length exceeded: 50000 > 32768"}}'
-                    }
-                }
+                        "raw": '{"error":{"message":"context length exceeded: 50000 > 32768"}}',
+                    },
+                },
             },
         )
         result = classify_api_error(e, provider="openrouter", approx_tokens=10000)
@@ -1318,9 +1318,9 @@ class TestAdversarialEdgeCases:
                 "error": {
                     "message": "Provider returned error",
                     "metadata": {
-                        "raw": '{"error":{"message":"Rate limit exceeded. Please retry after 30s."}}'
-                    }
-                }
+                        "raw": '{"error":{"message":"Rate limit exceeded. Please retry after 30s."}}',
+                    },
+                },
             },
         )
         result = classify_api_error(e, provider="openrouter")
@@ -1365,9 +1365,9 @@ class TestAdversarialEdgeCases:
                 "error": {
                     "message": "Provider returned error",
                     "metadata": {
-                        "raw": '{"error":{"message":"The model gpt-99 does not exist"}}'
-                    }
-                }
+                        "raw": '{"error":{"message":"The model gpt-99 does not exist"}}',
+                    },
+                },
             },
         )
         result = classify_api_error(e, provider="openrouter")
@@ -1394,8 +1394,8 @@ class TestAdversarialEdgeCases:
                             "type": "extra_forbidden",
                             "loc": ["body", "think"],
                             "msg": "Extra inputs are not permitted",
-                        }
-                    ]
+                        },
+                    ],
                 },
             },
         )
@@ -1416,10 +1416,10 @@ class TestAdversarialEdgeCases:
                 "error": {
                     "message": {
                         "detail": [
-                            {"type": "missing", "loc": ["body", "required"]}
-                        ]
-                    }
-                }
+                            {"type": "missing", "loc": ["body", "required"]},
+                        ],
+                    },
+                },
             },
         )
         result = classify_api_error(e, approx_tokens=1000)
@@ -1435,9 +1435,9 @@ class TestAdversarialEdgeCases:
                 "error": {
                     "message": "Provider error",
                     "metadata": {
-                        "raw": '{"error":{"message":{"detail":[{"type":"invalid"}]}}}'
-                    }
-                }
+                        "raw": '{"error":{"message":{"detail":[{"type":"invalid"}]}}}',
+                    },
+                },
             },
         )
         result = classify_api_error(e)

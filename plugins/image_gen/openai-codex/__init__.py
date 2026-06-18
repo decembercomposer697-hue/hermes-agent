@@ -265,7 +265,7 @@ def _collect_image_b64(token: str, *, prompt: str, size: str, quality: str) -> s
                 exc.response.read()
                 body = exc.response.text[:500]
                 raise RuntimeError(
-                    f"Codex Responses API returned HTTP {exc.response.status_code}: {body}"
+                    f"Codex Responses API returned HTTP {exc.response.status_code}: {body}",
                 ) from exc
             for event in _iter_sse_json(response):
                 found = _extract_image_b64(event)

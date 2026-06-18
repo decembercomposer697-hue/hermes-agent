@@ -249,7 +249,7 @@ def _resolve_browser_feature_state(
                 browser_tool_enabled
                 and browser_local_available
                 and managed_browser_available
-                and not direct_browser_use
+                and not direct_browser_use,
             )
             active = bool(browser_tool_enabled and available)
             return current_provider, available, active, managed
@@ -271,7 +271,7 @@ def _resolve_browser_feature_state(
             browser_tool_enabled
             and browser_local_available
             and managed_browser_available
-            and not direct_browser_use
+            and not direct_browser_use,
         )
         active = bool(browser_tool_enabled and available)
         return "browser-use", available, active, managed
@@ -311,7 +311,7 @@ def get_nous_subscription_features(
     managed_tools_flag = bool(
         account_info
         and account_info.logged_in
-        and account_info.tool_gateway_entitled
+        and account_info.tool_gateway_entitled,
     )
     nous_auth_present = bool(account_info and account_info.logged_in)
 
@@ -339,13 +339,13 @@ def get_nous_subscription_features(
     tts_provider = str(tts_cfg.get("provider") or "edge").strip().lower()
     browser_provider_explicit = "cloud_provider" in browser_cfg
     browser_provider = normalize_browser_cloud_provider(
-        browser_cfg.get("cloud_provider") if browser_provider_explicit else None
+        browser_cfg.get("cloud_provider") if browser_provider_explicit else None,
     )
     terminal_backend = (
         str(terminal_cfg.get("backend") or "local").strip().lower()
     )
     modal_mode = normalize_modal_mode(
-        terminal_cfg.get("modal_mode")
+        terminal_cfg.get("modal_mode"),
     )
 
     # use_gateway flags — when True, the user explicitly opted into the
@@ -453,10 +453,10 @@ def get_nous_subscription_features(
             or (web_search_backend == "firecrawl" and direct_firecrawl)
             or (web_search_backend == "parallel" and direct_parallel)
             or (web_search_backend == "tavily" and direct_tavily)
-        )
+        ),
     )
     web_available = bool(
-        managed_web_available or direct_exa or direct_firecrawl or direct_parallel or direct_tavily or direct_searxng
+        managed_web_available or direct_exa or direct_firecrawl or direct_parallel or direct_tavily or direct_searxng,
     )
 
     image_managed = image_tool_enabled and managed_image_available and not direct_fal
@@ -478,7 +478,7 @@ def get_nous_subscription_features(
         tts_current_provider in {"edge", "neutts"}
         or (tts_current_provider == "openai" and (managed_tts_available or direct_openai_tts))
         or (tts_current_provider == "elevenlabs" and direct_elevenlabs)
-        or (tts_current_provider == "mistral" and bool(get_env_value("MISTRAL_API_KEY")))
+        or (tts_current_provider == "mistral" and bool(get_env_value("MISTRAL_API_KEY"))),
     )
     tts_active = bool(tts_tool_enabled and tts_available)
 
@@ -730,17 +730,17 @@ def _get_gateway_direct_credentials() -> dict[str, bool]:
             or get_env_value("FIRECRAWL_API_URL")
             or get_env_value("PARALLEL_API_KEY")
             or get_env_value("TAVILY_API_KEY")
-            or get_env_value("EXA_API_KEY")
+            or get_env_value("EXA_API_KEY"),
         ),
         "image_gen": fal_direct,
         "video_gen": fal_direct,
         "tts": bool(
             resolve_openai_audio_api_key()
-            or get_env_value("ELEVENLABS_API_KEY")
+            or get_env_value("ELEVENLABS_API_KEY"),
         ),
         "browser": bool(
             get_env_value("BROWSER_USE_API_KEY")
-            or (get_env_value("BROWSERBASE_API_KEY") and get_env_value("BROWSERBASE_PROJECT_ID"))
+            or (get_env_value("BROWSERBASE_API_KEY") and get_env_value("BROWSERBASE_PROJECT_ID")),
         ),
     }
 
@@ -810,7 +810,7 @@ def get_gateway_eligible_tools(
         # tool pool that means image but not video; paid users are covered for
         # everything.
         if not account_info.tool_gateway_entitled_for(
-            MANAGED_FEATURE_COVERAGE_CATEGORY[key]
+            MANAGED_FEATURE_COVERAGE_CATEGORY[key],
         ):
             continue
         if opted_in.get(key):
@@ -924,7 +924,7 @@ def prompt_enable_tool_gateway(
         account_info
         and account_info.paid_service_access is not True
         and account_info.tool_access is not None
-        and account_info.tool_access.enabled
+        and account_info.tool_access.enabled,
     )
     source_label = "free tool pool" if pool_only else "Nous subscription"
 
@@ -1032,7 +1032,7 @@ def ensure_nous_portal_access(
     # guidance, do not enable. coverage_category keeps a pool user who lacks this
     # one category from being told their credits are exhausted.
     message = format_nous_portal_entitlement_message(
-        info, capability=capability, coverage_category=coverage_category
+        info, capability=capability, coverage_category=coverage_category,
     )
     if message:
         for line in message.splitlines():
@@ -1085,7 +1085,7 @@ def _run_nous_portal_login_only(*, capability: str) -> bool:
         if shared:
             try:
                 do_import = input(
-                    "  Found existing Nous OAuth credentials. Import them? [Y/n]: "
+                    "  Found existing Nous OAuth credentials. Import them? [Y/n]: ",
                 ).strip().lower()
             except (EOFError, KeyboardInterrupt):
                 do_import = "y"

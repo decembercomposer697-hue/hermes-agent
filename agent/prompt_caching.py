@@ -28,7 +28,7 @@ def _apply_cache_marker(msg: dict, cache_marker: dict, native_anthropic: bool = 
 
     if isinstance(content, str):
         msg["content"] = [
-            {"type": "text", "text": content, "cache_control": cache_marker}
+            {"type": "text", "text": content, "cache_control": cache_marker},
         ]
         return
 

@@ -45,7 +45,7 @@ def test_recent_view_activity_prevents_false_stale_transition(curator_modules, m
             "last_viewed_at": last_viewed_at,
             "view_count": 1,
             "state": "active",
-        }
+        },
     })
     monkeypatch.setattr(curator, "get_stale_after_days", lambda: 30)
     monkeypatch.setattr(curator, "get_archive_after_days", lambda: 90)

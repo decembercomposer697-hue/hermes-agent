@@ -104,7 +104,7 @@ def test_added_message_relabels_by_target():
         _tool_msg(
             "c1",
             {"success": True, "message": "Entry added to store.", "target": "memory"},
-        )
+        ),
     ]
 
     actions = _summarize(review_messages, [])

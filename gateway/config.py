@@ -446,7 +446,7 @@ class StreamingConfig:
             ),
             cursor=data.get("cursor", DEFAULT_STREAMING_CURSOR),
             fresh_final_after_seconds=_coerce_float(
-                data.get("fresh_final_after_seconds"), 60.0
+                data.get("fresh_final_after_seconds"), 60.0,
             ),
         )
 
@@ -460,7 +460,7 @@ class StreamingConfig:
 # Slack, Matrix, Mattermost, HomeAssistant) do not need an entry here.
 _PLATFORM_CONNECTED_CHECKERS: dict[Platform, Callable[[PlatformConfig], bool]] = {
     Platform.WEIXIN: lambda cfg: bool(
-        cfg.extra.get("account_id") and (cfg.token or cfg.extra.get("token"))
+        cfg.extra.get("account_id") and (cfg.token or cfg.extra.get("token")),
     ),
     Platform.WHATSAPP: lambda cfg: True,  # bridge handles auth
     Platform.SIGNAL: lambda cfg: bool(cfg.extra.get("http_url")),
@@ -469,25 +469,25 @@ _PLATFORM_CONNECTED_CHECKERS: dict[Platform, Callable[[PlatformConfig], bool]] =
     Platform.API_SERVER: lambda cfg: True,
     Platform.WEBHOOK: lambda cfg: True,
     Platform.MSGRAPH_WEBHOOK: lambda cfg: bool(
-        str(cfg.extra.get("client_state") or "").strip()
+        str(cfg.extra.get("client_state") or "").strip(),
     ),
     Platform.FEISHU: lambda cfg: bool(cfg.extra.get("app_id")),
     Platform.WECOM: lambda cfg: bool(cfg.extra.get("bot_id")),
     Platform.WECOM_CALLBACK: lambda cfg: bool(
-        cfg.extra.get("corp_id") or cfg.extra.get("apps")
+        cfg.extra.get("corp_id") or cfg.extra.get("apps"),
     ),
     Platform.BLUEBUBBLES: lambda cfg: bool(
-        cfg.extra.get("server_url") and cfg.extra.get("password")
+        cfg.extra.get("server_url") and cfg.extra.get("password"),
     ),
     Platform.QQBOT: lambda cfg: bool(
-        cfg.extra.get("app_id") and cfg.extra.get("client_secret")
+        cfg.extra.get("app_id") and cfg.extra.get("client_secret"),
     ),
     Platform.YUANBAO: lambda cfg: bool(
-        cfg.extra.get("app_id") and cfg.extra.get("app_secret")
+        cfg.extra.get("app_id") and cfg.extra.get("app_secret"),
     ),
     Platform.DINGTALK: lambda cfg: bool(
         (cfg.extra.get("client_id") or os.getenv("DINGTALK_CLIENT_ID"))
-        and (cfg.extra.get("client_secret") or os.getenv("DINGTALK_CLIENT_SECRET"))
+        and (cfg.extra.get("client_secret") or os.getenv("DINGTALK_CLIENT_SECRET")),
     ),
 }
 
@@ -564,7 +564,7 @@ class GatewayConfig:
         if platform == Platform.WEIXIN:
             return bool(
                 config.extra.get("account_id")
-                and (config.token or config.extra.get("token"))
+                and (config.token or config.extra.get("token")),
             )
 
         # Generic token/api_key auth covers Telegram, Discord, Slack, etc.
@@ -601,7 +601,7 @@ class GatewayConfig:
     def get_reset_policy(
         self, 
         platform: Platform | None = None,
-        session_type: str | None = None
+        session_type: str | None = None,
     ) -> SessionResetPolicy:
         """
         Get the appropriate reset policy for a session.
@@ -716,7 +716,7 @@ class GatewayConfig:
             sessions_dir=sessions_dir,
             always_log_local=_coerce_bool(data.get("always_log_local"), True),
             filter_silence_narration=_coerce_bool(
-                data.get("filter_silence_narration"), True
+                data.get("filter_silence_narration"), True,
             ),
             stt_enabled=_coerce_bool(stt_enabled, True),
             group_sessions_per_user=_coerce_bool(group_sessions_per_user, True),
@@ -1150,7 +1150,7 @@ def load_gateway_config() -> GatewayConfig:
                         extra[_telegram_extra_key] = telegram_cfg[_telegram_extra_key]
                 if _telegram_extra:
                     _plat_data, _plat_extra = _ensure_platform_extra_dict(
-                        platforms_data, Platform.TELEGRAM.value
+                        platforms_data, Platform.TELEGRAM.value,
                     )
                     for _telegram_extra_key, _telegram_extra_value in _telegram_extra.items():
                         _plat_extra.setdefault(_telegram_extra_key, _telegram_extra_value)
@@ -1270,7 +1270,7 @@ def _validate_gateway_config(config: "GatewayConfig") -> None:
 
     if not (0 <= policy.at_hour <= 23):
         logger.warning(
-            "Invalid at_hour=%s (must be 0-23). Using default 4.", policy.at_hour
+            "Invalid at_hour=%s (must be 0-23). Using default 4.", policy.at_hour,
         )
         policy.at_hour = 4
 
@@ -1615,7 +1615,7 @@ def _apply_env_overrides(config: GatewayConfig) -> None:
     msgraph_webhook_client_state = os.getenv("MSGRAPH_WEBHOOK_CLIENT_STATE", "")
     msgraph_webhook_resources = os.getenv("MSGRAPH_WEBHOOK_ACCEPTED_RESOURCES", "")
     msgraph_webhook_allowed_cidrs = os.getenv(
-        "MSGRAPH_WEBHOOK_ALLOWED_SOURCE_CIDRS", ""
+        "MSGRAPH_WEBHOOK_ALLOWED_SOURCE_CIDRS", "",
     )
     if (
         msgraph_webhook_enabled
@@ -1632,7 +1632,7 @@ def _apply_env_overrides(config: GatewayConfig) -> None:
         if msgraph_webhook_port:
             try:
                 config.platforms[Platform.MSGRAPH_WEBHOOK].extra["port"] = int(
-                    msgraph_webhook_port
+                    msgraph_webhook_port,
                 )
             except ValueError:
                 pass
@@ -1859,7 +1859,7 @@ def _apply_env_overrides(config: GatewayConfig) -> None:
                 qq_home_name_env = "QQ_HOME_CHANNEL_NAME"
                 logging.getLogger(__name__).warning(
                     "QQ_HOME_CHANNEL is deprecated; rename to QQBOT_HOME_CHANNEL "
-                    "in your .env for consistency with the platform key."
+                    "in your .env for consistency with the platform key.",
                 )
         if qq_home:
             config.platforms[Platform.QQBOT].home_channel = HomeChannel(
@@ -1977,7 +1977,7 @@ def _apply_env_overrides(config: GatewayConfig) -> None:
                     seed_for_probe = entry.env_enablement_fn()
                 except Exception as e:
                     logger.debug(
-                        "env_enablement_fn for %s raised: %s", entry.name, e
+                        "env_enablement_fn for %s raised: %s", entry.name, e,
                     )
                     seed_for_probe = None
 

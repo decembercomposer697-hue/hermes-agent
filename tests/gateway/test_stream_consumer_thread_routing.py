@@ -19,10 +19,10 @@ from gateway.stream_consumer import (
 def _make_adapter(send_result=None, edit_result=None, max_length=4096):
     adapter = MagicMock()
     adapter.send = AsyncMock(
-        return_value=send_result or SimpleNamespace(success=True, message_id="msg_1")
+        return_value=send_result or SimpleNamespace(success=True, message_id="msg_1"),
     )
     adapter.edit_message = AsyncMock(
-        return_value=edit_result or SimpleNamespace(success=True)
+        return_value=edit_result or SimpleNamespace(success=True),
     )
     adapter.MAX_MESSAGE_LENGTH = max_length
     return adapter
@@ -115,7 +115,7 @@ class TestOverflowFirstMessage:
         each chunk should be threaded to initial_reply_to_id, not None."""
         adapter = _make_adapter(max_length=10)
         adapter.truncate_message = MagicMock(
-            return_value=["chunk_1", "chunk_2"]
+            return_value=["chunk_1", "chunk_2"],
         )
         consumer = GatewayStreamConsumer(
             adapter,

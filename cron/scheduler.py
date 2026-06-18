@@ -418,7 +418,7 @@ def cron_delivery_targets() -> list[dict]:
                 "name": name.replace("_", " ").title(),
                 "home_target_set": bool(_get_home_target_chat_id(name)),
                 "home_env_var": env_var or None,
-            }
+            },
         )
     return targets
 
@@ -1215,7 +1215,7 @@ def _build_job_prompt(job: dict, prerun_script: tuple | None = None) -> str:
                 f'[IMPORTANT: The user has invoked the "{skill_name}" skill, indicating they want you to follow its instructions. The full skill content is loaded below.]',
                 "",
                 content,
-            ]
+            ],
         )
 
     if skipped:
@@ -1383,7 +1383,7 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
         # means "nothing to report this tick", same as empty stdout.
         if not _parse_wake_gate(output):
             logger.info(
-                "Job '%s' (no_agent): wakeAgent=false gate — silent run", job_id
+                "Job '%s' (no_agent): wakeAgent=false gate — silent run", job_id,
             )
             silent_doc = (
                 f"# Cron Job: {job_name}\n\n"
@@ -1573,7 +1573,7 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
             _VAR_MAP["HERMES_CRON_AUTO_DELIVER_THREAD_ID"].set(
                 ""
                 if delivery_target.get("thread_id") is None
-                else str(delivery_target["thread_id"])
+                else str(delivery_target["thread_id"]),
             )
 
         model = job.get("model") or os.getenv("HERMES_MODEL") or ""
@@ -1840,13 +1840,13 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
             raise TimeoutError(
                 f"Cron job '{job_name}' idle for "
                 f"{int(_secs_ago)}s (limit {int(_cron_inactivity_limit)}s) "
-                f"— last activity: {_last_desc}"
+                f"— last activity: {_last_desc}",
             )
 
         # Guard against non-dict returns from run_conversation under error conditions
         if not isinstance(result, dict):
             raise RuntimeError(
-                f"agent.run_conversation returned {type(result).__name__} instead of dict: {result!r}"
+                f"agent.run_conversation returned {type(result).__name__} instead of dict: {result!r}",
             )
 
         # If the agent itself reported failure (e.g. all retries exhausted on

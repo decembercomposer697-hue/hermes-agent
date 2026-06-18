@@ -99,7 +99,7 @@ class TestFetchSuccess:
         from hermes_cli import model_catalog
         manifest = _valid_manifest()
         with patch.object(
-            model_catalog, "_fetch_manifest", return_value=manifest
+            model_catalog, "_fetch_manifest", return_value=manifest,
         ) as fetch:
             result = model_catalog.get_catalog(force_refresh=True)
 
@@ -115,7 +115,7 @@ class TestFetchSuccess:
         from hermes_cli import model_catalog
         manifest = _valid_manifest()
         with patch.object(
-            model_catalog, "_fetch_manifest", return_value=manifest
+            model_catalog, "_fetch_manifest", return_value=manifest,
         ) as fetch:
             model_catalog.get_catalog(force_refresh=True)
             model_catalog.get_catalog()  # should not hit network again
@@ -125,7 +125,7 @@ class TestFetchSuccess:
         from hermes_cli import model_catalog
         manifest = _valid_manifest()
         with patch.object(
-            model_catalog, "_fetch_manifest", return_value=manifest
+            model_catalog, "_fetch_manifest", return_value=manifest,
         ) as fetch:
             model_catalog.get_catalog(force_refresh=True)
             model_catalog.get_catalog(force_refresh=True)
@@ -260,7 +260,7 @@ class TestCuratedAccessors:
     def test_openrouter_returns_tuples(self, isolated_home):
         from hermes_cli import model_catalog
         with patch.object(
-            model_catalog, "_fetch_manifest", return_value=_valid_manifest()
+            model_catalog, "_fetch_manifest", return_value=_valid_manifest(),
         ):
             result = model_catalog.get_curated_openrouter_models()
         assert result == [
@@ -272,7 +272,7 @@ class TestCuratedAccessors:
     def test_nous_returns_ids(self, isolated_home):
         from hermes_cli import model_catalog
         with patch.object(
-            model_catalog, "_fetch_manifest", return_value=_valid_manifest()
+            model_catalog, "_fetch_manifest", return_value=_valid_manifest(),
         ):
             result = model_catalog.get_curated_nous_models()
         assert result == ["anthropic/claude-opus-4.7", "moonshotai/kimi-k2.6"]
@@ -317,8 +317,8 @@ class TestProviderOverride:
                 "openrouter": {
                     "models": [
                         {"id": "override/model", "description": "custom"},
-                    ]
-                }
+                    ],
+                },
             },
         }
 
@@ -347,7 +347,7 @@ class TestIntegrationWithModelsModule:
     """Exercise the fallback paths via the real callers in hermes_cli.models."""
 
     def test_curated_nous_ids_falls_back_to_hardcoded_on_empty_catalog(
-        self, isolated_home
+        self, isolated_home,
     ):
         from hermes_cli import model_catalog
         from hermes_cli.models import get_curated_nous_model_ids, _PROVIDER_MODELS
@@ -362,7 +362,7 @@ class TestIntegrationWithModelsModule:
         from hermes_cli.models import get_curated_nous_model_ids
 
         with patch.object(
-            model_catalog, "_fetch_manifest", return_value=_valid_manifest()
+            model_catalog, "_fetch_manifest", return_value=_valid_manifest(),
         ):
             result = get_curated_nous_model_ids()
 
@@ -394,8 +394,8 @@ class TestIntegrationWithModelsModule:
                     {
                         "providers": {"nous": {"access_token": "fake"}},
                         "credential_pool": {},
-                    }
-                )
+                    },
+                ),
             )
 
             # Stub the Portal recommendation union so the row is deterministic
@@ -404,7 +404,7 @@ class TestIntegrationWithModelsModule:
             # (``curated["nous"] = get_curated_nous_model_ids()``), so the test
             # stays an invariant — it can't rot as the curated/manifest list grows.
             with patch.object(
-                model_catalog, "_fetch_manifest", return_value=_valid_manifest()
+                model_catalog, "_fetch_manifest", return_value=_valid_manifest(),
             ), patch("hermes_cli.models.check_nous_free_tier", return_value=False), patch(
                 "hermes_cli.models.union_with_portal_free_recommendations",
                 side_effect=lambda ids, *a, **k: (ids, {}),
@@ -414,7 +414,7 @@ class TestIntegrationWithModelsModule:
             ):
                 expected = get_curated_nous_model_ids()
                 picker = list_picker_providers(
-                    current_provider="nous", max_models=99
+                    current_provider="nous", max_models=99,
                 )
         finally:
             model_catalog.reset_cache()

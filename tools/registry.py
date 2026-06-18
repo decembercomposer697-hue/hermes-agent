@@ -485,7 +485,7 @@ class ToolRegistry:
             if ts not in toolsets:
                 toolsets[ts] = {
                     "available": self._evaluate_toolset_check(
-                        ts, toolset_checks.get(ts)
+                        ts, toolset_checks.get(ts),
                     ),
                     "tools": [],
                     "description": "",

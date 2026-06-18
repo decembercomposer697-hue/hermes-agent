@@ -289,7 +289,7 @@ class TestBlueBubblesWebhookParsing:
                 "text": "hello",
                 "handle": {"address": "user@example.com"},
                 "isFromMe": False,
-            }
+            },
         }
         record = adapter._extract_payload_record(payload) or {}
         chat_guid = adapter._value(
@@ -332,7 +332,7 @@ class TestBlueBubblesWebhookParsing:
                 "handle": {"address": "+15551234567"},
                 "isFromMe": False,
                 "chats": [
-                    {"guid": "any;-;+15551234567", "chatIdentifier": "+15551234567"}
+                    {"guid": "any;-;+15551234567", "chatIdentifier": "+15551234567"},
                 ],
             },
         }
@@ -387,7 +387,7 @@ class TestBlueBubblesWebhookParsing:
                     "text": "hello",
                     "chatGuid": "iMessage;-;user@example.com",
                     "chatIdentifier": "user@example.com",
-                }
+                },
             ],
         }
         record = adapter._extract_payload_record(payload)
@@ -413,7 +413,7 @@ class TestBlueBubblesGuidResolution:
         import asyncio
 
         result = asyncio.get_event_loop().run_until_complete(
-            adapter._resolve_chat_guid("iMessage;-;user@example.com")
+            adapter._resolve_chat_guid("iMessage;-;user@example.com"),
         )
         assert result == "iMessage;-;user@example.com"
 
@@ -422,7 +422,7 @@ class TestBlueBubblesGuidResolution:
         import asyncio
 
         result = asyncio.get_event_loop().run_until_complete(
-            adapter._resolve_chat_guid("")
+            adapter._resolve_chat_guid(""),
         )
         assert result is None
 
@@ -462,7 +462,7 @@ class TestBlueBubblesAttachmentDownload:
 
         att_meta = {"mimeType": "image/png", "transferName": "photo.png"}
         result = asyncio.get_event_loop().run_until_complete(
-            adapter._download_attachment("att-guid-123", att_meta)
+            adapter._download_attachment("att-guid-123", att_meta),
         )
         assert result == "/tmp/test_image.png"
 
@@ -497,7 +497,7 @@ class TestBlueBubblesAttachmentDownload:
 
         att_meta = {"mimeType": "audio/mpeg", "transferName": "voice.mp3"}
         result = asyncio.get_event_loop().run_until_complete(
-            adapter._download_attachment("att-guid-456", att_meta)
+            adapter._download_attachment("att-guid-456", att_meta),
         )
         assert result == "/tmp/test_audio.mp3"
 
@@ -532,7 +532,7 @@ class TestBlueBubblesAttachmentDownload:
 
         att_meta = {"mimeType": "application/pdf", "transferName": "report.pdf"}
         result = asyncio.get_event_loop().run_until_complete(
-            adapter._download_attachment("att-guid-789", att_meta)
+            adapter._download_attachment("att-guid-789", att_meta),
         )
         assert result == "/tmp/report.pdf"
 
@@ -543,7 +543,7 @@ class TestBlueBubblesAttachmentDownload:
         import asyncio
 
         result = asyncio.get_event_loop().run_until_complete(
-            adapter._download_attachment("att-guid", {"mimeType": "image/png"})
+            adapter._download_attachment("att-guid", {"mimeType": "image/png"}),
         )
         assert result is None
 
@@ -651,10 +651,10 @@ class TestBlueBubblesWebhookRegistration:
             get_response={"status": 200, "data": [
                 {"id": 1, "url": url, "events": ["new-message"]},
                 {"id": 2, "url": "http://other:9999/hook", "events": ["message"]},
-            ]}
+            ]},
         )
         result = asyncio.get_event_loop().run_until_complete(
-            adapter._find_registered_webhooks(url)
+            adapter._find_registered_webhooks(url),
         )
         assert len(result) == 1
         assert result[0]["id"] == 1
@@ -663,10 +663,10 @@ class TestBlueBubblesWebhookRegistration:
         import asyncio
         adapter = _make_adapter(monkeypatch)
         adapter.client = self._mock_client(
-            get_response={"status": 200, "data": []}
+            get_response={"status": 200, "data": []},
         )
         result = asyncio.get_event_loop().run_until_complete(
-            adapter._find_registered_webhooks(adapter._webhook_url)
+            adapter._find_registered_webhooks(adapter._webhook_url),
         )
         assert result == []
 
@@ -681,7 +681,7 @@ class TestBlueBubblesWebhookRegistration:
         adapter._api_get = bad_get
 
         result = asyncio.get_event_loop().run_until_complete(
-            adapter._find_registered_webhooks(adapter._webhook_url)
+            adapter._find_registered_webhooks(adapter._webhook_url),
         )
         assert result == []
 
@@ -696,7 +696,7 @@ class TestBlueBubblesWebhookRegistration:
             post_response={"status": 200, "data": {"id": 42}},
         )
         ok = asyncio.get_event_loop().run_until_complete(
-            adapter._register_webhook()
+            adapter._register_webhook(),
         )
         assert ok is True
 
@@ -709,7 +709,7 @@ class TestBlueBubblesWebhookRegistration:
             post_response={"status": 201, "data": {"id": 43}},
         )
         ok = asyncio.get_event_loop().run_until_complete(
-            adapter._register_webhook()
+            adapter._register_webhook(),
         )
         assert ok is True
 
@@ -734,7 +734,7 @@ class TestBlueBubblesWebhookRegistration:
         adapter._api_post = tracking_post
 
         ok = asyncio.get_event_loop().run_until_complete(
-            adapter._register_webhook()
+            adapter._register_webhook(),
         )
         assert ok is True
         assert not post_called, "Should reuse existing, not POST again"
@@ -744,7 +744,7 @@ class TestBlueBubblesWebhookRegistration:
         adapter = _make_adapter(monkeypatch)
         adapter.client = None
         ok = asyncio.get_event_loop().run_until_complete(
-            adapter._register_webhook()
+            adapter._register_webhook(),
         )
         assert ok is False
 
@@ -756,7 +756,7 @@ class TestBlueBubblesWebhookRegistration:
             post_response={"status": 500, "message": "internal error"},
         )
         ok = asyncio.get_event_loop().run_until_complete(
-            adapter._register_webhook()
+            adapter._register_webhook(),
         )
         assert ok is False
 
@@ -772,7 +772,7 @@ class TestBlueBubblesWebhookRegistration:
             ]},
         )
         ok = asyncio.get_event_loop().run_until_complete(
-            adapter._unregister_webhook()
+            adapter._unregister_webhook(),
         )
         assert ok is True
 
@@ -803,7 +803,7 @@ class TestBlueBubblesWebhookRegistration:
         adapter.client.delete = mock_delete
 
         ok = asyncio.get_event_loop().run_until_complete(
-            adapter._unregister_webhook()
+            adapter._unregister_webhook(),
         )
         assert ok is True
         assert len(deleted_ids) == 2
@@ -813,7 +813,7 @@ class TestBlueBubblesWebhookRegistration:
         adapter = _make_adapter(monkeypatch)
         adapter.client = None
         ok = asyncio.get_event_loop().run_until_complete(
-            adapter._unregister_webhook()
+            adapter._unregister_webhook(),
         )
         assert ok is False
 
@@ -827,6 +827,6 @@ class TestBlueBubblesWebhookRegistration:
         adapter._api_get = bad_get
 
         ok = asyncio.get_event_loop().run_until_complete(
-            adapter._unregister_webhook()
+            adapter._unregister_webhook(),
         )
         assert ok is False

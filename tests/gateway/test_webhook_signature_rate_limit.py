@@ -49,7 +49,7 @@ def _create_app(adapter: WebhookAdapter) -> web.Application:
 def _github_signature(body: bytes, secret: str) -> str:
     """Compute X-Hub-Signature-256 for *body* using *secret*."""
     return "sha256=" + hmac.new(
-        secret.encode(), body, hashlib.sha256
+        secret.encode(), body, hashlib.sha256,
     ).hexdigest()
 
 
@@ -78,7 +78,7 @@ class TestSignatureBeforeRateLimit:
                 "events": ["push"],
                 "prompt": "Event: {event}",
                 "deliver": "log",
-            }
+            },
         }
         rate_limit = 5
         adapter = _make_adapter(routes, rate_limit=rate_limit)
@@ -150,7 +150,7 @@ class TestSignatureBeforeRateLimit:
                 "events": ["push"],
                 "prompt": "Event: {event}",
                 "deliver": "log",
-            }
+            },
         }
         rate_limit = 3
         adapter = _make_adapter(routes, rate_limit=rate_limit)
@@ -210,7 +210,7 @@ class TestSignatureBeforeRateLimit:
                 "events": ["push"],
                 "prompt": "Event: {event}",
                 "deliver": "log",
-            }
+            },
         }
         rate_limit = 3
         adapter = _make_adapter(routes, rate_limit=rate_limit)

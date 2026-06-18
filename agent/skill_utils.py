@@ -40,7 +40,7 @@ EXCLUDED_SKILL_DIRS = frozenset(
         ".pytest_cache",
         ".mypy_cache",
         ".ruff_cache",
-    )
+    ),
 )
 
 
@@ -223,7 +223,7 @@ def _detect_environment(env: str) -> bool:
         # /package/admin/s6-overlay. Either marker means we're inside an
         # s6-supervised container.
         result = os.path.isdir("/run/s6") or os.path.isdir(
-            "/package/admin/s6-overlay"
+            "/package/admin/s6-overlay",
         )
 
     _ENV_DETECT_CACHE[env] = result
@@ -307,7 +307,7 @@ def get_disabled_skill_names(platform: str | None = None) -> set[str]:
     )
     if resolved_platform:
         platform_disabled = (skills_cfg.get("platform_disabled") or {}).get(
-            resolved_platform
+            resolved_platform,
         )
         if platform_disabled is not None:
             return _normalize_string_set(platform_disabled)

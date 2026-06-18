@@ -78,7 +78,7 @@ class TestReadClaudeCodeCredentialsFromKeychain:
                         "accessToken": "kc-access-token-abc",
                         "refreshToken": "kc-refresh-token-xyz",
                         "expiresAt": 9999999999999,
-                    }
+                    },
                 }),
                 stderr="",
             )
@@ -103,7 +103,7 @@ class TestReadClaudeCodeCredentialsPriority:
                 "accessToken": "json-token",
                 "refreshToken": "json-refresh",
                 "expiresAt": 9999999999999,
-            }
+            },
         }))
         monkeypatch.setattr("agent.anthropic_adapter.Path.home", lambda: tmp_path)
 
@@ -117,7 +117,7 @@ class TestReadClaudeCodeCredentialsPriority:
                         "accessToken": "keychain-token",
                         "refreshToken": "keychain-refresh",
                         "expiresAt": 9999999999999,
-                    }
+                    },
                 }),
                 stderr="",
             )
@@ -137,7 +137,7 @@ class TestReadClaudeCodeCredentialsPriority:
                 "accessToken": "json-fallback-token",
                 "refreshToken": "json-refresh",
                 "expiresAt": 9999999999999,
-            }
+            },
         }))
         monkeypatch.setattr("agent.anthropic_adapter.Path.home", lambda: tmp_path)
 

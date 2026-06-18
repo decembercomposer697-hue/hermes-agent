@@ -283,7 +283,7 @@ class TestEvaluateRuntimeResponseShaping:
                 "result": {
                     "type": "object",
                     "value": {"foo": "bar", "n": 7},
-                }
+                },
             },
         })
         try:
@@ -315,7 +315,7 @@ class TestEvaluateRuntimeResponseShaping:
                     "subtype": "node",
                     "description": "div#main.app",
                     # No 'value' key — returnByValue couldn't serialize it.
-                }
+                },
             },
         })
         try:
@@ -434,7 +434,7 @@ class TestEvaluateRuntimeDomNodeCrashRetry:
                 # Mirror _read_loop turning a top-level CDP error into a RuntimeError.
                 raise RuntimeError(
                     "CDP error on id=7: {'code': -32000, "
-                    "'message': 'Object reference chain is too long'}"
+                    "'message': 'Object reference chain is too long'}",
                 )
             # returnByValue=False: Chrome returns the node's description, no value.
             return {
@@ -444,7 +444,7 @@ class TestEvaluateRuntimeDomNodeCrashRetry:
                         "type": "object",
                         "subtype": "node",
                         "description": "body",
-                    }
+                    },
                 },
             }
 

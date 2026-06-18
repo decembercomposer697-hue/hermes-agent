@@ -118,7 +118,7 @@ def check_compression_model_feasibility(agent: Any) -> None:
             agent._emit_status(msg)
             logger.warning(
                 "No auxiliary LLM provider for compression — "
-                "summaries will be unavailable."
+                "summaries will be unavailable.",
             )
             return
 
@@ -160,7 +160,7 @@ def check_compression_model_feasibility(agent: Any) -> None:
                 f"{MINIMUM_CONTEXT_LENGTH // 1000}K context (set "
                 f"auxiliary.compression.model in config.yaml), or set "
                 f"auxiliary.compression.context_length to override the "
-                f"detected value if it is wrong."
+                f"detected value if it is wrong.",
             )
 
         threshold = agent.context_compressor.threshold_tokens
@@ -246,7 +246,7 @@ def check_compression_model_feasibility(agent: Any) -> None:
         raise
     except Exception as exc:
         logger.debug(
-            "Compression feasibility check failed (non-fatal): %s", exc
+            "Compression feasibility check failed (non-fatal): %s", exc,
         )
 
 
@@ -325,7 +325,7 @@ def compress_context(
         focus_topic,
     )
     agent._emit_status(
-        "🗜️ Compacting context — summarizing earlier conversation so I can continue..."
+        "🗜️ Compacting context — summarizing earlier conversation so I can continue...",
     )
 
     # ── Compression lock ────────────────────────────────────────────────
@@ -373,7 +373,7 @@ def compress_context(
         _lock_holder = _compression_lock_holder(agent)
         try:
             _lock_acquired = _lock_db.try_acquire_compression_lock(
-                _lock_sid, _lock_holder
+                _lock_sid, _lock_holder,
             )
         except Exception as _lock_err:
             # Broken/absent lock subsystem (version skew, etc.).  Log once
@@ -408,7 +408,7 @@ def compress_context(
                     agent._emit_warning(
                         "⚠ Skipping concurrent compression — another path "
                         "is already compressing this session. Will retry "
-                        "after it finishes."
+                        "after it finishes.",
                     )
                 except Exception:
                     pass
@@ -456,7 +456,7 @@ def compress_context(
             agent._emit_warning(
                 f"⚠ Compression aborted: {_err}. "
                 "No messages were dropped — conversation continues unchanged. "
-                "Run /compress to retry, or /new to start a fresh session."
+                "Run /compress to retry, or /new to start a fresh session.",
             )
         _existing_sp = getattr(agent, "_cached_system_prompt", None)
         if not _existing_sp:
@@ -470,7 +470,7 @@ def compress_context(
             agent._last_compression_summary_warning = summary_error
             agent._emit_warning(
                 f"⚠ Compression summary failed: {summary_error}. "
-                "Inserted a fallback context marker."
+                "Inserted a fallback context marker.",
             )
     else:
         # No hard failure — but did the configured aux model error out
@@ -487,7 +487,7 @@ def compress_context(
                 agent._emit_warning(
                     f"ℹ Configured compression model '{_aux_fail_model}' failed "
                     f"({_aux_fail_err or 'unknown error'}). Recovered using main model — "
-                    "check auxiliary.compression.model in config.yaml."
+                    "check auxiliary.compression.model in config.yaml.",
                 )
 
     todo_snapshot = agent._todo_store.format_for_injection()

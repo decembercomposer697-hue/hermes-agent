@@ -66,7 +66,7 @@ class TestMinimaxAuxModelM3:
         ],
     )
     def test_profile_advertises_expected_aux_model(
-        self, provider_id, expected
+        self, provider_id, expected,
     ):
         import providers
 

@@ -344,7 +344,7 @@ class TestNativeWindowsNoRawInputDeadlock:
 
         worker = threading.Thread(target=_worker, daemon=True)
         answerer = threading.Thread(
-            target=_answer_modal_when_open, args=(cli, "cancel", done), daemon=True
+            target=_answer_modal_when_open, args=(cli, "cancel", done), daemon=True,
         )
         answerer.start()
         worker.start()

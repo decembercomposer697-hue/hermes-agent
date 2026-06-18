@@ -355,7 +355,7 @@ class TrajectoryCompressor:
         logging.basicConfig(
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s',
-            datefmt='%H:%M:%S'
+            datefmt='%H:%M:%S',
         )
         self.logger = logging.getLogger(__name__)
     
@@ -365,7 +365,7 @@ class TrajectoryCompressor:
             from transformers import AutoTokenizer
             self.tokenizer = AutoTokenizer.from_pretrained(
                 self.config.tokenizer_name,
-                trust_remote_code=self.config.trust_remote_code
+                trust_remote_code=self.config.trust_remote_code,
             )
             print(f"✅ Loaded tokenizer: {self.config.tokenizer_name}")
         except Exception as e:
@@ -747,7 +747,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
     
     def compress_trajectory(
         self,
-        trajectory: list[dict[str, str]]
+        trajectory: list[dict[str, str]],
     ) -> tuple[list[dict[str, str]], TrajectoryMetrics]:
         """
         Compress a single trajectory to fit within target token budget.
@@ -843,7 +843,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
 
         # Extract content for summary
         content_to_summarize = self._extract_turn_content_for_summary(
-            trajectory, compress_start, compress_until
+            trajectory, compress_start, compress_until,
         )
 
         # Generate summary
@@ -863,7 +863,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
         # Add summary as human message
         compressed.append({
             "from": "human",
-            "value": summary
+            "value": summary,
         })
         
         # Add tail (turns after compression region)
@@ -883,7 +883,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
     
     async def compress_trajectory_async(
         self,
-        trajectory: list[dict[str, str]]
+        trajectory: list[dict[str, str]],
     ) -> tuple[list[dict[str, str]], TrajectoryMetrics]:
         """
         Compress a single trajectory to fit within target token budget (async version).
@@ -958,7 +958,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
 
         # Extract content for summary
         content_to_summarize = self._extract_turn_content_for_summary(
-            trajectory, compress_start, compress_until
+            trajectory, compress_start, compress_until,
         )
 
         # Generate summary (ASYNC)
@@ -977,7 +977,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
         # Add summary as human message
         compressed.append({
             "from": "human",
-            "value": summary
+            "value": summary,
         })
         
         # Add tail (turns after compression region)
@@ -1128,7 +1128,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
                     # Apply per-trajectory timeout
                     processed_entry, metrics = await asyncio.wait_for(
                         self.process_entry_async(entry),
-                        timeout=self.config.per_trajectory_timeout
+                        timeout=self.config.per_trajectory_timeout,
                     )
                     results[file_path][entry_idx] = (processed_entry, metrics)
                     
@@ -1149,7 +1149,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
                         progress.advance(main_task)
                         progress.update(
                             status_task,
-                            description=f"[dim]✅ {compressed_count} compressed | ⏭️ {skipped_count} skipped | ⏱️ {timeout_count} timeout | 🔄 {api_calls} API calls | ⚡ {in_flight} in-flight[/dim]"
+                            description=f"[dim]✅ {compressed_count} compressed | ⏭️ {skipped_count} skipped | ⏱️ {timeout_count} timeout | 🔄 {api_calls} API calls | ⚡ {in_flight} in-flight[/dim]",
                         )
                 
                 except TimeoutError:
@@ -1162,7 +1162,7 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
                         progress.advance(main_task)
                         progress.update(
                             status_task,
-                            description=f"[dim]✅ {compressed_count} compressed | ⏭️ {skipped_count} skipped | ⏱️ {timeout_count} timeout | 🔄 {api_calls} API calls | ⚡ {in_flight} in-flight[/dim]"
+                            description=f"[dim]✅ {compressed_count} compressed | ⏭️ {skipped_count} skipped | ⏱️ {timeout_count} timeout | 🔄 {api_calls} API calls | ⚡ {in_flight} in-flight[/dim]",
                         )
                     
                     # Skip this entry entirely (don't include in output)
@@ -1190,18 +1190,18 @@ Write only the summary, starting with "[CONTEXT SUMMARY]:" prefix."""
             TextColumn("•"),
             TimeRemainingColumn(),
             console=console,
-            refresh_per_second=10  # Higher refresh for async
+            refresh_per_second=10,  # Higher refresh for async
         ) as progress:
             # Main task for overall progress
             main_task = progress.add_task(
                 f"[cyan]Compressing {total_entries:,} trajectories",
-                total=total_entries
+                total=total_entries,
             )
             
             # Status line task
             status_task = progress.add_task(
                 "[dim]Starting...[/dim]",
-                total=None
+                total=None,
             )
             
             # Create all tasks

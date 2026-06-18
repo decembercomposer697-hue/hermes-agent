@@ -56,7 +56,7 @@ class TestSaveModelChoiceAlwaysDict:
         """When config.model is already a dict, _save_model_choice preserves it."""
         import yaml
         (config_home / "config.yaml").write_text(
-            "model:\n  default: old-model\n  provider: openrouter\n"
+            "model:\n  default: old-model\n  provider: openrouter\n",
         )
         from hermes_cli.auth import _save_model_choice
 
@@ -299,7 +299,7 @@ class TestProviderPersistsAfterModelSave:
             "  default: kimi-k2.5\n"
             "  provider: opencode-go\n"
             "  base_url: https://opencode.ai/zen/go/v1\n"
-            "  api_mode: chat_completions\n"
+            "  api_mode: chat_completions\n",
         )
 
         with patch("hermes_cli.models.fetch_api_models", return_value=["opencode-go/kimi-k2.5", "opencode-go/minimax-m2.5"]), \

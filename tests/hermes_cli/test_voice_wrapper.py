@@ -478,7 +478,7 @@ class TestContinuousLoopSimulation:
         assert voice.is_continuous_active() is False
 
     def test_auto_restart_false_retains_silent_strikes_across_starts(
-        self, fake_recorder, monkeypatch
+        self, fake_recorder, monkeypatch,
     ):
         import hermes_cli.voice as voice
 
@@ -536,7 +536,7 @@ class TestContinuousLoopSimulation:
         assert voice.is_continuous_active() is False
 
     def test_force_transcribe_empty_single_shots_hit_silent_limit(
-        self, fake_recorder, monkeypatch
+        self, fake_recorder, monkeypatch,
     ):
         import hermes_cli.voice as voice
 
@@ -570,7 +570,7 @@ class TestContinuousLoopSimulation:
         assert voice._continuous_no_speech_count == 0
 
     def test_force_transcribe_valid_single_shot_resets_silent_strikes(
-        self, fake_recorder, monkeypatch
+        self, fake_recorder, monkeypatch,
     ):
         import hermes_cli.voice as voice
 
@@ -605,7 +605,7 @@ class TestContinuousLoopSimulation:
         assert voice._continuous_no_speech_count == 0
 
     def test_force_transcribe_stop_failure_cancels_and_clears_stopping(
-        self, fake_recorder, monkeypatch
+        self, fake_recorder, monkeypatch,
     ):
         import hermes_cli.voice as voice
 

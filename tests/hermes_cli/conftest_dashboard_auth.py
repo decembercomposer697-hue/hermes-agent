@@ -102,7 +102,7 @@ class StubAuthProvider(DashboardAuthProvider):
     ) -> Session:
         if code != "stub_code":
             raise InvalidCodeError(
-                f"stub expects code='stub_code', got {code!r}"
+                f"stub expects code='stub_code', got {code!r}",
             )
         expected_verifier = self._state_to_verifier.get(state)
         if expected_verifier is None or expected_verifier != code_verifier:

@@ -50,7 +50,7 @@ class OpenCodeGoProfile(ProviderProfile):
         return self.default_max_tokens
 
     def build_api_kwargs_extras(
-        self, *, reasoning_config: dict | None = None, model: str | None = None, **context
+        self, *, reasoning_config: dict | None = None, model: str | None = None, **context,
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         extra_body: dict[str, Any] = {}
         top_level: dict[str, Any] = {}

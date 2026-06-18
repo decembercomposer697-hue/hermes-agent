@@ -60,12 +60,12 @@ def finalize_turn(
         _turn_exit_reason = f"max_iterations_reached({api_call_count}/{agent.max_iterations})"
         agent._emit_status(
             f"⚠️ Iteration budget exhausted ({api_call_count}/{agent.max_iterations}) "
-            "— asking model to summarise"
+            "— asking model to summarise",
         )
         if not agent.quiet_mode:
             agent._safe_print(
                 f"\n⚠️  Iteration budget exhausted ({api_call_count}/{agent.max_iterations}) "
-                "— requesting summary..."
+                "— requesting summary...",
             )
         final_response = agent._handle_max_iterations(messages, api_call_count)
 
@@ -243,7 +243,7 @@ def finalize_turn(
                 )
                 if _is_empty_terminal or _is_partial_fragment:
                     _explanation = agent._format_turn_completion_explanation(
-                        _turn_exit_reason
+                        _turn_exit_reason,
                     )
                     if _explanation:
                         if _is_empty_terminal:

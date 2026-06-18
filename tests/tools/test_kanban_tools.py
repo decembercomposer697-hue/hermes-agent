@@ -357,7 +357,7 @@ def test_complete_stamps_worker_session_id_from_env(monkeypatch, worker_env):
 
 
 def test_complete_does_not_stamp_worker_session_id_without_scoped_task(
-    monkeypatch, worker_env
+    monkeypatch, worker_env,
 ):
     from tools import kanban_tools as kt
 
@@ -649,7 +649,7 @@ def test_heartbeat_extends_claim_expires(worker_env):
         )
         conn.commit()
         before = conn.execute(
-            "SELECT claim_expires FROM tasks WHERE id = ?", (worker_env,)
+            "SELECT claim_expires FROM tasks WHERE id = ?", (worker_env,),
         ).fetchone()["claim_expires"]
     finally:
         conn.close()
@@ -661,7 +661,7 @@ def test_heartbeat_extends_claim_expires(worker_env):
     conn = kb.connect()
     try:
         after = conn.execute(
-            "SELECT claim_expires FROM tasks WHERE id = ?", (worker_env,)
+            "SELECT claim_expires FROM tasks WHERE id = ?", (worker_env,),
         ).fetchone()["claim_expires"]
     finally:
         conn.close()
@@ -1505,7 +1505,7 @@ def multi_board_env(monkeypatch, tmp_path):
     conn = kb.connect()
     try:
         seed_default = kb.create_task(
-            conn, title="seed-default", assignee="worker-d"
+            conn, title="seed-default", assignee="worker-d",
         )
     finally:
         conn.close()
@@ -1513,7 +1513,7 @@ def multi_board_env(monkeypatch, tmp_path):
     conn = kb.connect(board="alt")
     try:
         seed_alt = kb.create_task(
-            conn, title="seed-alt", assignee="worker-a"
+            conn, title="seed-alt", assignee="worker-a",
         )
     finally:
         conn.close()

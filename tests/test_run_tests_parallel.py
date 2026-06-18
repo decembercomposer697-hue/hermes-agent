@@ -183,7 +183,7 @@ def test_grandchild_leak_is_killed_by_runner(tmp_path: Path) -> None:
         pytest.fail(
             f"grandchild PID {grandchild_pid} survived runner exit; "
             f"diag={diag!r} test_pid={test_pid} test_pgid={test_pgid}; "
-            f"runner output:\n{proc.stdout}"
+            f"runner output:\n{proc.stdout}",
         )
 
 

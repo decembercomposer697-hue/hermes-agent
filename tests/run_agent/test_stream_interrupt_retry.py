@@ -38,7 +38,7 @@ class TestStreamInterruptBeforeRetry:
     """Verify _interrupt_requested is checked before each streaming retry."""
 
     @pytest.mark.filterwarnings(
-        "ignore::pytest.PytestUnhandledThreadExceptionWarning"
+        "ignore::pytest.PytestUnhandledThreadExceptionWarning",
     )
     @patch("run_agent.AIAgent._create_request_openai_client")
     @patch("run_agent.AIAgent._close_request_openai_client")
@@ -77,7 +77,7 @@ class TestStreamInterruptBeforeRetry:
         )
 
     @pytest.mark.filterwarnings(
-        "ignore::pytest.PytestUnhandledThreadExceptionWarning"
+        "ignore::pytest.PytestUnhandledThreadExceptionWarning",
     )
     @patch("run_agent.AIAgent._create_request_openai_client")
     @patch("run_agent.AIAgent._close_request_openai_client")
@@ -121,7 +121,7 @@ class TestStreamInterruptBeforeRetry:
                                 reasoning=None,
                             ),
                             finish_reason=None,
-                        )
+                        ),
                     ],
                     model="test/model",
                     usage=None,
@@ -137,7 +137,7 @@ class TestStreamInterruptBeforeRetry:
                                 reasoning=None,
                             ),
                             finish_reason="stop",
-                        )
+                        ),
                     ],
                     model="test/model",
                     usage=None,

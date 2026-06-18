@@ -65,13 +65,13 @@ class TestSetTokensAbsoluteExpiry:
                     token_type="Bearer",
                     expires_in=3600,
                     refresh_token="r",
-                )
-            )
+                ),
+            ),
         )
         after = time.time()
 
         on_disk = json.loads(
-            (tmp_path / "mcp-tokens" / "srv.json").read_text()
+            (tmp_path / "mcp-tokens" / "srv.json").read_text(),
         )
         assert "expires_at" in on_disk, (
             "Fix A: set_tokens must record an absolute expires_at wall-clock "
@@ -81,7 +81,7 @@ class TestSetTokensAbsoluteExpiry:
         assert before + 3600 <= on_disk["expires_at"] <= after + 3600
 
     def test_set_tokens_without_expires_in_omits_expires_at(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Tokens without a TTL must not gain a fabricated expires_at."""
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -96,19 +96,19 @@ class TestSetTokensAbsoluteExpiry:
                     access_token="a",
                     token_type="Bearer",
                     refresh_token="r",
-                )
-            )
+                ),
+            ),
         )
 
         on_disk = json.loads(
-            (tmp_path / "mcp-tokens" / "srv.json").read_text()
+            (tmp_path / "mcp-tokens" / "srv.json").read_text(),
         )
         assert "expires_at" not in on_disk
 
 
 class TestGetTokensReconstructsExpiresIn:
     def test_get_tokens_uses_expires_at_for_remaining_ttl(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Round-trip: expires_in on read must reflect time remaining."""
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -124,8 +124,8 @@ class TestGetTokensReconstructsExpiresIn:
                     token_type="Bearer",
                     expires_in=3600,
                     refresh_token="r",
-                )
-            )
+                ),
+            ),
         )
 
         # Wait briefly so the remaining TTL is measurably less than 3600.
@@ -138,7 +138,7 @@ class TestGetTokensReconstructsExpiresIn:
         assert 3500 < reloaded.expires_in <= 3600
 
     def test_get_tokens_returns_zero_ttl_for_expired_token(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """An already-expired token reloaded from disk must report expires_in=0."""
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -155,8 +155,8 @@ class TestGetTokensReconstructsExpiresIn:
                     "expires_in": 3600,
                     "expires_at": time.time() - 60,  # expired 1 min ago
                     "refresh_token": "r",
-                }
-            )
+                },
+            ),
         )
 
         storage = HermesTokenStorage("srv")
@@ -168,7 +168,7 @@ class TestGetTokensReconstructsExpiresIn:
         )
 
     def test_get_tokens_legacy_file_without_expires_at_is_loadable(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Existing on-disk files (pre-Fix-A) must still load without crashing.
 
@@ -193,8 +193,8 @@ class TestGetTokensReconstructsExpiresIn:
                     "token_type": "Bearer",
                     "expires_in": 3600,
                     "refresh_token": "r",
-                }
-            )
+                },
+            ),
         )
         stale_time = time.time() - 7200  # 2hr ago, exceeds 3600s TTL
         import os
@@ -217,7 +217,7 @@ class TestGetTokensReconstructsExpiresIn:
 
 @pytest.mark.asyncio
 async def test_initialize_seeds_token_expiry_time_from_stored_tokens(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     """Cold-load must populate context.token_expiry_time.
 
@@ -242,7 +242,7 @@ async def test_initialize_seeds_token_expiry_time_from_stored_tokens(
             token_type="Bearer",
             expires_in=7200,
             refresh_token="r",
-        )
+        ),
     )
     await storage.set_client_info(
         OAuthClientInformationFull(
@@ -251,7 +251,7 @@ async def test_initialize_seeds_token_expiry_time_from_stored_tokens(
             grant_types=["authorization_code", "refresh_token"],
             response_types=["code"],
             token_endpoint_auth_method="none",
-        )
+        ),
     )
 
     from mcp.shared.auth import OAuthClientMetadata
@@ -311,8 +311,8 @@ async def test_initialize_flags_expired_token_as_invalid(tmp_path, monkeypatch):
                 "expires_in": 3600,
                 "expires_at": time.time() - 60,
                 "refresh_token": "fresh",
-            }
-        )
+            },
+        ),
     )
 
     storage = HermesTokenStorage("srv")
@@ -323,7 +323,7 @@ async def test_initialize_flags_expired_token_as_invalid(tmp_path, monkeypatch):
             grant_types=["authorization_code", "refresh_token"],
             response_types=["code"],
             token_endpoint_auth_method="none",
-        )
+        ),
     )
 
     metadata = OAuthClientMetadata(
@@ -367,7 +367,7 @@ async def _noop_callback() -> tuple[str, str | None]:
 
 @pytest.mark.asyncio
 async def test_initialize_prefetches_oauth_metadata_when_missing(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch,
 ):
     """Cold-load must pre-flight PRM + ASM discovery so ``_refresh_token``
     has the correct ``token_endpoint`` before the first refresh attempt.
@@ -403,7 +403,7 @@ async def test_initialize_prefetches_oauth_metadata_when_missing(
             token_type="Bearer",
             expires_in=3600,
             refresh_token="r",
-        )
+        ),
     )
     await storage.set_client_info(
         OAuthClientInformationFull(
@@ -412,7 +412,7 @@ async def test_initialize_prefetches_oauth_metadata_when_missing(
             grant_types=["authorization_code", "refresh_token"],
             response_types=["code"],
             token_endpoint_auth_method="none",
-        )
+        ),
     )
 
     # Route the AsyncClient used inside _prefetch_oauth_metadata through a

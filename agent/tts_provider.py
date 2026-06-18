@@ -239,7 +239,7 @@ class TTSProvider(abc.ABC):
         raise NotImplementedError(
             f"TTS provider {self.name!r} does not implement streaming "
             "synthesis. Use synthesize() instead, or implement stream() "
-            "if your backend supports it."
+            "if your backend supports it.",
         )
 
     @property

@@ -107,7 +107,7 @@ async def test_client_handles_crashing_server(tmp_path: Path):
     # The reader loop should detect EOF and mark pending requests as failed.
     try:
         await asyncio.wait_for(
-            client.open_file(str(f), language_id="python"), timeout=2.0
+            client.open_file(str(f), language_id="python"), timeout=2.0,
         )
     except Exception:
         pass  # any exception is acceptable; the contract is "doesn't hang"

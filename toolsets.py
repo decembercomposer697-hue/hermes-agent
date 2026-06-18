@@ -93,13 +93,13 @@ TOOLSETS = {
     "web": {
         "description": "Web research and content extraction tools",
         "tools": ["web_search", "web_extract"],
-        "includes": []  # No other toolsets included
+        "includes": [],  # No other toolsets included
     },
     
     "search": {
         "description": "Web search only (no content extraction/scraping)",
         "tools": ["web_search"],
-        "includes": []
+        "includes": [],
     },
 
     "x_search": {
@@ -110,25 +110,25 @@ TOOLSETS = {
             "enable in `hermes tools` → X (Twitter) Search."
         ),
         "tools": ["x_search"],
-        "includes": []
+        "includes": [],
     },
     
     "vision": {
         "description": "Image analysis and vision tools",
         "tools": ["vision_analyze"],
-        "includes": []
+        "includes": [],
     },
 
     "video": {
         "description": "Video analysis and understanding tools (opt-in, not in default toolset)",
         "tools": ["video_analyze"],
-        "includes": []
+        "includes": [],
     },
     
     "image_gen": {
         "description": "Creative generation tools (images)",
         "tools": ["image_generate"],
-        "includes": []
+        "includes": [],
     },
 
     "video_gen": {
@@ -139,7 +139,7 @@ TOOLSETS = {
             "``hermes tools`` → Video Generation."
         ),
         "tools": ["video_generate"],
-        "includes": []
+        "includes": [],
     },
 
     "computer_use": {
@@ -149,25 +149,25 @@ TOOLSETS = {
             "or keyboard focus. Works with any tool-capable model."
         ),
         "tools": ["computer_use"],
-        "includes": []
+        "includes": [],
     },
 
     "terminal": {
         "description": "Terminal/command execution and process management tools",
         "tools": ["terminal", "process"],
-        "includes": []
+        "includes": [],
     },
     
     "moa": {
         "description": "Advanced reasoning and problem-solving tools",
         "tools": ["mixture_of_agents"],
-        "includes": []
+        "includes": [],
     },
     
     "skills": {
         "description": "Access, create, edit, and manage skill documents with specialized instructions and knowledge",
         "tools": ["skills_list", "skill_view", "skill_manage"],
-        "includes": []
+        "includes": [],
     },
     
     "browser": {
@@ -177,76 +177,76 @@ TOOLSETS = {
             "browser_type", "browser_scroll", "browser_back",
             "browser_press", "browser_get_images",
             "browser_vision", "browser_console", "browser_cdp",
-            "browser_dialog", "web_search"
+            "browser_dialog", "web_search",
         ],
-        "includes": []
+        "includes": [],
     },
     
     "cronjob": {
         "description": "Cronjob management tool - create, list, update, pause, resume, remove, and trigger scheduled tasks",
         "tools": ["cronjob"],
-        "includes": []
+        "includes": [],
     },
     
     "messaging": {
         "description": "Cross-platform messaging: send messages to Telegram, Discord, Slack, SMS, etc.",
         "tools": ["send_message"],
-        "includes": []
+        "includes": [],
     },
 
     
     "file": {
         "description": "File manipulation tools: read, write, patch (with fuzzy matching), and search (content + files)",
         "tools": ["read_file", "write_file", "patch", "search_files"],
-        "includes": []
+        "includes": [],
     },
     
     "tts": {
         "description": "Text-to-speech: convert text to audio with Edge TTS (free), ElevenLabs, OpenAI, or xAI",
         "tools": ["text_to_speech"],
-        "includes": []
+        "includes": [],
     },
     
     "todo": {
         "description": "Task planning and tracking for multi-step work",
         "tools": ["todo"],
-        "includes": []
+        "includes": [],
     },
     
     "memory": {
         "description": "Persistent memory across sessions (personal notes + user profile)",
         "tools": ["memory"],
-        "includes": []
+        "includes": [],
     },
 
     "context_engine": {
         "description": "Runtime tools exposed by the active context engine",
         "tools": [],
-        "includes": []
+        "includes": [],
     },
     
     "session_search": {
         "description": "Search and recall past conversations with summarization",
         "tools": ["session_search"],
-        "includes": []
+        "includes": [],
     },
     
     "clarify": {
         "description": "Ask the user clarifying questions (multiple-choice or open-ended)",
         "tools": ["clarify"],
-        "includes": []
+        "includes": [],
     },
     
     "code_execution": {
         "description": "Run Python scripts that call tools programmatically (reduces LLM round trips)",
         "tools": ["execute_code"],
-        "includes": []
+        "includes": [],
     },
     
     "delegation": {
         "description": "Spawn subagents with isolated context for complex subtasks",
         "tools": ["delegate_task"],
-        "includes": []
+        "includes": [],
     },
 
     # "honcho" toolset removed — Honcho is now a memory provider plugin.
@@ -255,7 +255,7 @@ TOOLSETS = {
     "homeassistant": {
         "description": "Home Assistant smart home control and monitoring",
         "tools": ["ha_list_entities", "ha_get_state", "ha_list_services", "ha_call_service"],
-        "includes": []
+        "includes": [],
     },
 
     "kanban": {
@@ -298,13 +298,13 @@ TOOLSETS = {
             "yb_search_sticker",
             "yb_send_sticker",
         ],
-        "includes": []
+        "includes": [],
     },
 
     "feishu_doc": {
         "description": "Read Feishu/Lark document content",
         "tools": ["feishu_doc_read"],
-        "includes": []
+        "includes": [],
     },
 
     "feishu_drive": {
@@ -313,7 +313,7 @@ TOOLSETS = {
             "feishu_drive_list_comments", "feishu_drive_list_comment_replies",
             "feishu_drive_reply_comment", "feishu_drive_add_comment",
         ],
-        "includes": []
+        "includes": [],
     },
 
     "spotify": {
@@ -322,7 +322,7 @@ TOOLSETS = {
             "spotify_playback", "spotify_devices", "spotify_queue", "spotify_search",
             "spotify_playlists", "spotify_albums", "spotify_library",
         ],
-        "includes": []
+        "includes": [],
     },
 
 
@@ -331,13 +331,13 @@ TOOLSETS = {
     "debugging": {
         "description": "Debugging and troubleshooting toolkit",
         "tools": ["terminal", "process"],
-        "includes": ["web", "file"]  # For searching error messages and solutions, and file operations
+        "includes": ["web", "file"],  # For searching error messages and solutions, and file operations
     },
     
     "safe": {
         "description": "Safe toolkit without terminal access",
         "tools": [],
-        "includes": ["web", "vision", "image_gen"]
+        "includes": ["web", "vision", "image_gen"],
     },
 
     # Coding posture (base Hermes — CLI/TUI/desktop/ACP). Auto-selected in a
@@ -390,7 +390,7 @@ TOOLSETS = {
             "session_search",
             "execute_code", "delegate_task",
         ],
-        "includes": []
+        "includes": [],
     },
 
     "hermes-api-server": {
@@ -423,13 +423,13 @@ TOOLSETS = {
             "ha_list_entities", "ha_get_state", "ha_list_services", "ha_call_service",
 
         ],
-        "includes": []
+        "includes": [],
     },
     
     "hermes-cli": {
         "description": "Full interactive CLI toolset - all default tools plus cronjob management",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-cron": {
@@ -440,13 +440,13 @@ TOOLSETS = {
         # the user explicitly enables them.
         "description": "Default cron toolset - same core tools as hermes-cli; gated by `hermes tools`",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-telegram": {
         "description": "Telegram bot toolset - full access for personal use (terminal has safety checks)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
     
     "hermes-discord": {
@@ -455,61 +455,61 @@ TOOLSETS = {
             "discord",
             "discord_admin",
         ],
-        "includes": []
+        "includes": [],
     },
     
     "hermes-whatsapp": {
         "description": "WhatsApp bot toolset - similar to Telegram (personal messaging, more trusted)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
     
     "hermes-slack": {
         "description": "Slack bot toolset - full access for workspace use (terminal has safety checks)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
     
     "hermes-signal": {
         "description": "Signal bot toolset - encrypted messaging platform (full access)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-bluebubbles": {
         "description": "BlueBubbles iMessage bot toolset - Apple iMessage via local BlueBubbles server",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-homeassistant": {
         "description": "Home Assistant bot toolset - smart home event monitoring and control",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-email": {
         "description": "Email bot toolset - interact with Hermes via email (IMAP/SMTP)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-mattermost": {
         "description": "Mattermost bot toolset - self-hosted team messaging (full access)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-matrix": {
         "description": "Matrix bot toolset - decentralized encrypted messaging (full access)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-dingtalk": {
         "description": "DingTalk bot toolset - enterprise messaging platform (full access)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-feishu": {
@@ -521,31 +521,31 @@ TOOLSETS = {
             "feishu_drive_reply_comment",
             "feishu_drive_add_comment",
         ],
-        "includes": []
+        "includes": [],
     },
 
     "hermes-weixin": {
         "description": "Weixin bot toolset - personal WeChat messaging via iLink (full access)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-qqbot": {
         "description": "QQBot toolset - QQ messaging via Official Bot API v2 (full access)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-wecom": {
         "description": "WeCom bot toolset - enterprise WeChat messaging (full access)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-wecom-callback": {
         "description": "WeCom callback toolset - enterprise self-built app messaging (full access)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-yuanbao": {
@@ -558,26 +558,26 @@ TOOLSETS = {
             "yb_send_sticker",
         ],
         "module": "tools.yuanbao_tools",
-        "includes": []
+        "includes": [],
     },
 
     "hermes-sms": {
         "description": "SMS bot toolset - interact with Hermes via SMS (Twilio)",
         "tools": _HERMES_CORE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-webhook": {
         "description": "Webhook toolset - receive and process external webhook events",
         "tools": _HERMES_WEBHOOK_SAFE_TOOLS,
-        "includes": []
+        "includes": [],
     },
 
     "hermes-gateway": {
         "description": "Gateway toolset - union of all messaging platform tools",
         "tools": [],
-        "includes": ["hermes-telegram", "hermes-discord", "hermes-whatsapp", "hermes-slack", "hermes-signal", "hermes-bluebubbles", "hermes-homeassistant", "hermes-email", "hermes-sms", "hermes-mattermost", "hermes-matrix", "hermes-dingtalk", "hermes-feishu", "hermes-wecom", "hermes-wecom-callback", "hermes-weixin", "hermes-qqbot", "hermes-webhook", "hermes-yuanbao"]
-    }
+        "includes": ["hermes-telegram", "hermes-discord", "hermes-whatsapp", "hermes-slack", "hermes-signal", "hermes-bluebubbles", "hermes-homeassistant", "hermes-email", "hermes-sms", "hermes-mattermost", "hermes-matrix", "hermes-dingtalk", "hermes-feishu", "hermes-wecom", "hermes-wecom-callback", "hermes-weixin", "hermes-qqbot", "hermes-webhook", "hermes-yuanbao"],
+    },
 }
 
 
@@ -603,7 +603,7 @@ def get_toolset(name: str) -> dict[str, Any] | None:
     if toolset:
         merged_tools = sorted(
             set(toolset.get("tools", []))
-            | set(registry.get_tool_names_for_toolset(name))
+            | set(registry.get_tool_names_for_toolset(name)),
         )
         return {**toolset, "tools": merged_tools}
 
@@ -824,7 +824,7 @@ def create_custom_toolset(
     name: str,
     description: str,
     tools: list[str] = None,
-    includes: list[str] = None
+    includes: list[str] = None,
 ) -> None:
     """
     Create a custom toolset at runtime.
@@ -838,7 +838,7 @@ def create_custom_toolset(
     TOOLSETS[name] = {
         "description": description,
         "tools": tools or [],
-        "includes": includes or []
+        "includes": includes or [],
     }
 
 
@@ -867,7 +867,7 @@ def get_toolset_info(name: str) -> dict[str, Any]:
         "includes": toolset["includes"],
         "resolved_tools": resolved_tools,
         "tool_count": len(resolved_tools),
-        "is_composite": bool(toolset["includes"])
+        "is_composite": bool(toolset["includes"]),
     }
 
 
@@ -904,7 +904,7 @@ if __name__ == "__main__":
         name="my_custom",
         description="My custom toolset for specific tasks",
         tools=["web_search"],
-        includes=["terminal", "vision"]
+        includes=["terminal", "vision"],
     )
     custom_info = get_toolset_info("my_custom")
     print("  Created 'my_custom' toolset:")

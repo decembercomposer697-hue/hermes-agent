@@ -154,7 +154,7 @@ class TestManagedPersistenceMode:
         def _capture_post(url, json=None, timeout=None):
             requests_seen.append(json)
             return _mock_response(
-                json_data={"tabId": "tab-1", "url": "https://example.com"}
+                json_data={"tabId": "tab-1", "url": "https://example.com"},
             )
 
         with _enable_persistence(), \
@@ -174,7 +174,7 @@ class TestManagedPersistenceMode:
         def _capture_post(url, json=None, timeout=None):
             requests_seen.append(json)
             return _mock_response(
-                json_data={"tabId": f"tab-{len(requests_seen)}", "url": "https://example.com"}
+                json_data={"tabId": f"tab-{len(requests_seen)}", "url": "https://example.com"},
             )
 
         with (
@@ -225,8 +225,8 @@ class TestConfiguredCamofoxIdentity:
                     "user_id": "config-user",
                     "session_key": "config-session",
                     "adopt_existing_tab": False,
-                }
-            }
+                },
+            },
         }
 
         with patch("tools.browser_camofox.load_config", return_value=config):
@@ -248,8 +248,8 @@ class TestConfiguredCamofoxIdentity:
                     "user_id": "config-user",
                     "session_key": "config-session",
                     "adopt_existing_tab": True,
-                }
-            }
+                },
+            },
         }
 
         with patch("tools.browser_camofox.load_config", return_value=config):
@@ -269,7 +269,7 @@ class TestConfiguredCamofoxIdentity:
             "tabs": [
                 {"tabId": "tab-other", "listItemId": "other"},
                 {"tabId": "tab-visible", "listItemId": "visible-tab"},
-            ]
+            ],
         }
 
         with patch("tools.browser_camofox._get", return_value=tabs):
@@ -346,7 +346,7 @@ class TestVncUrlDiscovery:
         mod._vnc_url_checked = True
 
         with patch("tools.browser_camofox.requests.post", return_value=_mock_response(
-            json_data={"tabId": "t1", "url": "https://example.com"}
+            json_data={"tabId": "t1", "url": "https://example.com"},
         )):
             result = json.loads(camofox_navigate("https://example.com", task_id="vnc-test"))
 

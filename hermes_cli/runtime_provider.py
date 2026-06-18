@@ -409,7 +409,7 @@ def _resolve_runtime_from_pool_entry(
     # Optional opt-in: route OpenAI/Codex turns through `codex app-server`.
     # Inert when `model.openai_runtime` is unset or "auto".
     api_mode = _maybe_apply_codex_app_server_runtime(
-        provider=provider, api_mode=api_mode, model_cfg=model_cfg
+        provider=provider, api_mode=api_mode, model_cfg=model_cfg,
     )
 
     return {
@@ -599,7 +599,7 @@ def _get_named_custom_provider(requested_provider: str) -> dict[str, Any] | None
         logger.warning(
             "custom_providers in config.yaml is a dict, not a list. "
             "Each entry must be prefixed with '-' in YAML. "
-            "Run 'hermes doctor' for details."
+            "Run 'hermes doctor' for details.",
         )
         return None
 
@@ -833,7 +833,7 @@ def _resolve_openrouter_runtime(
             if not cfg_provider or cfg_provider == "auto":
                 use_config_base_url = True
         elif requested_norm == "custom" and _config_base_url_trustworthy_for_bare_custom(
-            cfg_base_url, cfg_provider
+            cfg_base_url, cfg_provider,
         ):
             use_config_base_url = True
 
@@ -993,7 +993,7 @@ def _resolve_azure_foundry_runtime(
     if not base_url:
         raise AuthError(
             "Azure Foundry requires a base URL. Set it via 'hermes model' or "
-            "the AZURE_FOUNDRY_BASE_URL environment variable."
+            "the AZURE_FOUNDRY_BASE_URL environment variable.",
         )
 
     # Anthropic SDK appends /v1/messages itself, so strip any trailing /v1
@@ -1033,7 +1033,7 @@ def _resolve_azure_foundry_runtime(
                 raise AuthError(
                     "Azure Foundry Entra ID auth requires the 'azure-identity' "
                     "package. Install it with: pip install azure-identity "
-                    f"(import failed: {exc})"
+                    f"(import failed: {exc})",
                 ) from exc
 
             scope = (
@@ -1084,7 +1084,7 @@ def _resolve_azure_foundry_runtime(
             "~/.hermes/.env or run 'hermes model' to configure. To use "
             "keyless Microsoft Entra ID auth instead, set "
             "model.auth_mode: entra_id in config.yaml (or pick "
-            "'Microsoft Entra ID' in 'hermes model')."
+            "'Microsoft Entra ID' in 'hermes model').",
         )
 
     source = "explicit" if (explicit_api_key or explicit_base_url) else "config"
@@ -1126,7 +1126,7 @@ def _resolve_explicit_runtime(
             if not api_key:
                 raise AuthError(
                     "No Anthropic credentials found. Set ANTHROPIC_TOKEN or ANTHROPIC_API_KEY, "
-                    "run 'claude setup-token', or authenticate with 'claude /login'."
+                    "run 'claude setup-token', or authenticate with 'claude /login'.",
                 )
         return {
             "provider": "anthropic",
@@ -1339,7 +1339,7 @@ def resolve_runtime_provider(
         has_custom_endpoint = bool(
             explicit_base_url
             or env_openai_base_url
-            or env_openrouter_base_url
+            or env_openrouter_base_url,
         )
         if cfg_base_url and cfg_provider in {"auto", "custom"}:
             has_custom_endpoint = True
@@ -1561,7 +1561,7 @@ def resolve_runtime_provider(
                 raise AuthError(
                     "No Azure Anthropic API key found. Set AZURE_ANTHROPIC_KEY or "
                     "ANTHROPIC_API_KEY, or point key_env/api_key_env in your "
-                    "config.yaml model section at a custom env var."
+                    "config.yaml model section at a custom env var.",
                 )
         else:
             from agent.anthropic_adapter import resolve_anthropic_token
@@ -1569,7 +1569,7 @@ def resolve_runtime_provider(
             if not token:
                 raise AuthError(
                     "No Anthropic credentials found. Set ANTHROPIC_TOKEN or ANTHROPIC_API_KEY, "
-                    "run 'claude setup-token', or authenticate with 'claude /login'."
+                    "run 'claude setup-token', or authenticate with 'claude /login'.",
                 )
         return {
             "provider": "anthropic",

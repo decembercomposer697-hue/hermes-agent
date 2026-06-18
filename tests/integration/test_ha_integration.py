@@ -85,7 +85,7 @@ class TestGatewayWebSocket:
                         "state": "on",
                         "attributes": {"friendly_name": "Bedroom Light"},
                     },
-                }
+                },
             })
 
             # Wait for the adapter to process it
@@ -120,7 +120,7 @@ class TestGatewayWebSocket:
                         "state": "on",
                         "attributes": {"friendly_name": "Bedroom Light"},
                     },
-                }
+                },
             })
 
             await asyncio.sleep(0.5)

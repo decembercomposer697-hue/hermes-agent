@@ -33,7 +33,7 @@ def _patch_agent_bootstrap(monkeypatch):
                     "description": "Run shell commands.",
                     "parameters": {"type": "object", "properties": {}},
                 },
-            }
+            },
         ],
     )
     monkeypatch.setattr(run_agent, "check_toolset_requirements", lambda: {})
@@ -83,7 +83,7 @@ def _codex_message_response(text: str):
             SimpleNamespace(
                 type="message",
                 content=[SimpleNamespace(type="output_text", text=text)],
-            )
+            ),
         ],
         usage=SimpleNamespace(input_tokens=5, output_tokens=3, total_tokens=8),
         status="completed",
@@ -100,7 +100,7 @@ def _codex_tool_call_response():
                 call_id="call_1",
                 name="terminal",
                 arguments="{}",
-            )
+            ),
         ],
         usage=SimpleNamespace(input_tokens=12, output_tokens=4, total_tokens=16),
         status="completed",
@@ -115,7 +115,7 @@ def _codex_incomplete_message_response(text: str):
                 type="message",
                 status="in_progress",
                 content=[SimpleNamespace(type="output_text", text=text)],
-            )
+            ),
         ],
         usage=SimpleNamespace(input_tokens=4, output_tokens=2, total_tokens=6),
         status="in_progress",
@@ -131,7 +131,7 @@ def _codex_commentary_message_response(text: str):
                 phase="commentary",
                 status="completed",
                 content=[SimpleNamespace(type="output_text", text=text)],
-            )
+            ),
         ],
         usage=SimpleNamespace(input_tokens=4, output_tokens=2, total_tokens=6),
         status="completed",
@@ -146,7 +146,7 @@ def _codex_ack_message_response(text: str):
                 type="message",
                 status="completed",
                 content=[SimpleNamespace(type="output_text", text=text)],
-            )
+            ),
         ],
         usage=SimpleNamespace(input_tokens=4, output_tokens=2, total_tokens=6),
         status="completed",
@@ -275,7 +275,7 @@ def test_build_api_kwargs_codex(monkeypatch):
         [
             {"role": "system", "content": "You are Hermes."},
             {"role": "user", "content": "Ping"},
-        ]
+        ],
     )
 
     assert kwargs["model"] == "gpt-5-codex"
@@ -327,7 +327,7 @@ def test_build_api_kwargs_codex_clamps_minimal_effort(monkeypatch):
         [
             {"role": "system", "content": "You are Hermes."},
             {"role": "user", "content": "Ping"},
-        ]
+        ],
     )
 
     assert kwargs["reasoning"]["effort"] == "low"
@@ -356,7 +356,7 @@ def test_build_api_kwargs_codex_preserves_supported_efforts(monkeypatch):
             [
                 {"role": "system", "content": "sys"},
                 {"role": "user", "content": "hi"},
-            ]
+            ],
         )
         assert kwargs["reasoning"]["effort"] == effort, f"{effort} should pass through unchanged"
 
@@ -429,7 +429,7 @@ def _build_xai_agent_with_slash_enum_tool(monkeypatch):
                         },
                     },
                 },
-            }
+            },
         ]
 
     monkeypatch.setattr(run_agent, "get_tool_definitions", _fake_get_tool_definitions)
@@ -522,7 +522,7 @@ def test_build_api_kwargs_xai_is_idempotent_across_repeated_calls(monkeypatch):
 
     # Source schema still untouched after three rounds.
     assert agent.tools[0]["function"]["parameters"]["properties"]["accept"].get(
-        "enum"
+        "enum",
     ) == ["application/json", "*/*"]
 
 
@@ -600,7 +600,7 @@ def test_run_codex_stream_parses_create_stream_events(monkeypatch):
             SimpleNamespace(type="response.created"),
             SimpleNamespace(type="response.in_progress"),
             SimpleNamespace(type="response.completed", response=_codex_message_response("streamed create ok")),
-        ]
+        ],
     )
 
     def _fake_create(**kwargs):
@@ -654,7 +654,7 @@ def test_run_codex_stream_ignores_completed_response_with_null_output(monkeypatc
                     usage=SimpleNamespace(input_tokens=7, output_tokens=4, total_tokens=11),
                 ),
             ),
-        ]
+        ],
     )
 
     def _fake_create(**kwargs):
@@ -804,7 +804,7 @@ def test_build_api_kwargs_xai_oauth_sends_cache_key_via_extra_body(monkeypatch):
         [
             {"role": "system", "content": "You are Hermes."},
             {"role": "user", "content": "Ping"},
-        ]
+        ],
     )
 
     assert kwargs.get("model") == "grok-4.3"
@@ -1096,7 +1096,7 @@ def test_run_conversation_codex_tool_round_trip(monkeypatch):
                     "role": "tool",
                     "tool_call_id": call.id,
                     "content": '{"ok":true}',
-                }
+                },
             )
 
     monkeypatch.setattr(agent, "_execute_tool_calls", _fake_execute_tool_calls)
@@ -1123,11 +1123,11 @@ def test_chat_messages_to_responses_input_uses_call_id_for_function_call(monkeyp
                         "id": "call_abc123",
                         "type": "function",
                         "function": {"name": "terminal", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_abc123", "content": '{"ok":true}'},
-        ]
+        ],
     )
 
     function_call = next(item for item in items if item.get("type") == "function_call")
@@ -1152,11 +1152,11 @@ def test_chat_messages_to_responses_input_accepts_call_pipe_fc_ids(monkeypatch):
                         "id": "call_pair123|fc_pair123",
                         "type": "function",
                         "function": {"name": "terminal", "arguments": "{}"},
-                    }
+                    },
                 ],
             },
             {"role": "tool", "tool_call_id": "call_pair123|fc_pair123", "content": '{"ok":true}'},
-        ]
+        ],
     )
 
     function_call = next(item for item in items if item.get("type") == "function_call")
@@ -1186,7 +1186,7 @@ def test_preflight_codex_api_kwargs_strips_optional_function_call_id(monkeypatch
             ],
             "tools": [],
             "store": False,
-        }
+        },
     )
 
     fn_call = next(item for item in preflight["input"] if item.get("type") == "function_call")
@@ -1206,7 +1206,7 @@ def test_preflight_codex_api_kwargs_rejects_function_call_output_without_call_id
                 "input": [{"type": "function_call_output", "output": "{}"}],
                 "tools": [],
                 "store": False,
-            }
+            },
         )
 
 
@@ -1287,7 +1287,7 @@ def test_run_conversation_codex_replay_payload_keeps_call_id(monkeypatch):
                     "role": "tool",
                     "tool_call_id": call.id,
                     "content": '{"ok":true}',
-                }
+                },
             )
 
     monkeypatch.setattr(agent, "_execute_tool_calls", _fake_execute_tool_calls)
@@ -1322,7 +1322,7 @@ def test_run_conversation_codex_continues_after_incomplete_interim_message(monke
                     "role": "tool",
                     "tool_call_id": call.id,
                     "content": '{"ok":true}',
-                }
+                },
             )
 
     monkeypatch.setattr(agent, "_execute_tool_calls", _fake_execute_tool_calls)
@@ -1344,7 +1344,7 @@ def test_normalize_codex_response_marks_commentary_only_message_as_incomplete(mo
     agent = _build_agent(monkeypatch)
     from agent.codex_responses_adapter import _normalize_codex_response
     assistant_message, finish_reason = _normalize_codex_response(
-        _codex_commentary_message_response("I'll inspect the repository first.")
+        _codex_commentary_message_response("I'll inspect the repository first."),
     )
 
     assert finish_reason == "incomplete"
@@ -1364,7 +1364,7 @@ def test_normalize_codex_response_preserves_message_status_for_replay(monkeypatc
                 phase="commentary",
                 status="in_progress",
                 content=[SimpleNamespace(type="output_text", text="Still working...")],
-            )
+            ),
         ],
         usage=SimpleNamespace(input_tokens=4, output_tokens=2, total_tokens=6),
         status="in_progress",
@@ -1401,7 +1401,7 @@ def test_normalize_codex_response_detects_leaked_tool_call_text(monkeypatch):
                 type="message",
                 status="completed",
                 content=[SimpleNamespace(type="output_text", text=leaked_content)],
-            )
+            ),
         ],
         usage=SimpleNamespace(input_tokens=4, output_tokens=2, total_tokens=6),
         status="completed",
@@ -1471,7 +1471,7 @@ def test_normalize_codex_response_no_leak_passes_through(monkeypatch):
                     type="output_text",
                     text="Here is the answer with no leak.",
                 )],
-            )
+            ),
         ],
         usage=SimpleNamespace(input_tokens=4, output_tokens=2, total_tokens=6),
         status="completed",
@@ -1491,7 +1491,7 @@ def test_interim_commentary_is_not_marked_already_streamed_without_callbacks(mon
 
     agent._fire_stream_delta("short version: yes")
     agent.interim_assistant_callback = lambda text, *, already_streamed=False: observed.update(
-        {"text": text, "already_streamed": already_streamed}
+        {"text": text, "already_streamed": already_streamed},
     )
 
     agent._emit_interim_assistant_message({"role": "assistant", "content": "short version: yes"})
@@ -1512,7 +1512,7 @@ def test_interim_commentary_is_not_marked_already_streamed_when_stream_callback_
     agent.stream_delta_callback = failing_callback
     agent._fire_stream_delta("short version: yes")
     agent.interim_assistant_callback = lambda text, *, already_streamed=False: observed.update(
-        {"text": text, "already_streamed": already_streamed}
+        {"text": text, "already_streamed": already_streamed},
     )
 
     agent._emit_interim_assistant_message({"role": "assistant", "content": "short version: yes"})
@@ -1530,7 +1530,7 @@ def test_interim_commentary_preserves_assistant_content(monkeypatch):
     agent = _build_agent(monkeypatch)
     observed = {}
     agent.interim_assistant_callback = lambda text, *, already_streamed=False: observed.update(
-        {"text": text, "already_streamed": already_streamed}
+        {"text": text, "already_streamed": already_streamed},
     )
 
     content = (
@@ -1674,7 +1674,7 @@ def test_run_conversation_codex_continues_after_commentary_phase_message(monkeyp
                     "role": "tool",
                     "tool_call_id": call.id,
                     "content": '{"ok":true}',
-                }
+                },
             )
 
     monkeypatch.setattr(agent, "_execute_tool_calls", _fake_execute_tool_calls)
@@ -1696,7 +1696,7 @@ def test_run_conversation_codex_continues_after_ack_stop_message(monkeypatch):
     agent = _build_agent(monkeypatch)
     responses = [
         _codex_ack_message_response(
-            "Absolutely — I can do that. I'll inspect ~/openclaw-studio and report back with a walkthrough."
+            "Absolutely — I can do that. I'll inspect ~/openclaw-studio and report back with a walkthrough.",
         ),
         _codex_tool_call_response(),
         _codex_message_response("Architecture summary complete."),
@@ -1710,7 +1710,7 @@ def test_run_conversation_codex_continues_after_ack_stop_message(monkeypatch):
                     "role": "tool",
                     "tool_call_id": call.id,
                     "content": '{"ok":true}',
-                }
+                },
             )
 
     monkeypatch.setattr(agent, "_execute_tool_calls", _fake_execute_tool_calls)
@@ -1737,7 +1737,7 @@ def test_run_conversation_codex_continues_after_ack_for_directory_listing_prompt
     agent = _build_agent(monkeypatch)
     responses = [
         _codex_ack_message_response(
-            "I'll check what's in the current directory and call out 3 notable items."
+            "I'll check what's in the current directory and call out 3 notable items.",
         ),
         _codex_tool_call_response(),
         _codex_message_response("Directory summary complete."),
@@ -1751,7 +1751,7 @@ def test_run_conversation_codex_continues_after_ack_for_directory_listing_prompt
                     "role": "tool",
                     "tool_call_id": call.id,
                     "content": '{"ok":true}',
-                }
+                },
             )
 
     monkeypatch.setattr(agent, "_execute_tool_calls", _fake_execute_tool_calls)
@@ -1824,7 +1824,7 @@ def _codex_reasoning_only_response(*, encrypted_content="enc_abc123", summary_te
                 encrypted_content=encrypted_content,
                 summary=[SimpleNamespace(type="summary_text", text=summary_text)],
                 status="completed",
-            )
+            ),
         ],
         usage=SimpleNamespace(input_tokens=50, output_tokens=100, total_tokens=150),
         status="completed",
@@ -1841,7 +1841,7 @@ def test_normalize_codex_response_marks_reasoning_only_as_incomplete(monkeypatch
     agent = _build_agent(monkeypatch)
     from agent.codex_responses_adapter import _normalize_codex_response
     assistant_message, finish_reason = _normalize_codex_response(
-        _codex_reasoning_only_response()
+        _codex_reasoning_only_response(),
     )
 
     assert finish_reason == "incomplete"
@@ -1915,7 +1915,7 @@ def test_run_conversation_codex_preserves_encrypted_reasoning_in_interim(monkeyp
                 encrypted_content="enc_opaque_blob",
                 summary=[],
                 status="completed",
-            )
+            ),
         ],
         usage=SimpleNamespace(input_tokens=50, output_tokens=100, total_tokens=150),
         status="completed",
@@ -1993,9 +1993,9 @@ def test_codex_message_item_status_survives_conversion_and_preflight(monkeypatch
                     "id": "msg_incomplete",
                     "phase": "commentary",
                     "content": [{"type": "output_text", "text": "partial"}],
-                }
+                },
             ],
-        }
+        },
     ])
     replay_item = next(item for item in items if item.get("type") == "message")
     assert replay_item["status"] == "incomplete"
@@ -2006,7 +2006,7 @@ def test_codex_message_item_status_survives_conversion_and_preflight(monkeypatch
             "role": "assistant",
             "status": "in_progress",
             "content": [{"type": "output_text", "text": "working"}],
-        }
+        },
     ])
     assert normalized[0]["status"] == "in_progress"
 
@@ -2022,7 +2022,7 @@ def test_duplicate_detection_distinguishes_different_codex_reasoning(monkeypatch
                 SimpleNamespace(
                     type="reasoning", id="rs_001",
                     encrypted_content="enc_first", summary=[], status="completed",
-                )
+                ),
             ],
             usage=SimpleNamespace(input_tokens=50, output_tokens=100, total_tokens=150),
             status="completed", model="gpt-5-codex",
@@ -2033,7 +2033,7 @@ def test_duplicate_detection_distinguishes_different_codex_reasoning(monkeypatch
                 SimpleNamespace(
                     type="reasoning", id="rs_002",
                     encrypted_content="enc_second", summary=[], status="completed",
-                )
+                ),
             ],
             usage=SimpleNamespace(input_tokens=50, output_tokens=100, total_tokens=150),
             status="completed", model="gpt-5-codex",
@@ -2073,7 +2073,7 @@ def test_duplicate_detection_distinguishes_different_codex_message_items(monkeyp
                     phase="commentary",
                     status="in_progress",
                     content=[SimpleNamespace(type="output_text", text="Still working...")],
-                )
+                ),
             ],
             usage=SimpleNamespace(input_tokens=50, output_tokens=10, total_tokens=60),
             status="in_progress",
@@ -2087,7 +2087,7 @@ def test_duplicate_detection_distinguishes_different_codex_message_items(monkeyp
                     phase="commentary",
                     status="in_progress",
                     content=[SimpleNamespace(type="output_text", text="Still working...")],
-                )
+                ),
             ],
             usage=SimpleNamespace(input_tokens=50, output_tokens=10, total_tokens=60),
             status="in_progress",
@@ -2189,7 +2189,7 @@ def test_run_conversation_codex_disables_reasoning_replay_after_invalid_encrypte
         def __init__(self):
             super().__init__(
                 "Error code: 400 - The encrypted content for item rs_001 could not be verified. "
-                "Reason: Encrypted content could not be decrypted or parsed."
+                "Reason: Encrypted content could not be decrypted or parsed.",
             )
             self.status_code = 400
             self.body = {
@@ -2200,7 +2200,7 @@ def test_run_conversation_codex_disables_reasoning_replay_after_invalid_encrypte
                         '"type":"invalid_request_error","param":"","code":"invalid_encrypted_content"}}'
                     ),
                     "type": "400",
-                }
+                },
             }
 
     responses = [_InvalidEncryptedContentError(), _codex_message_response("Recovered without replay.")]
@@ -2222,7 +2222,7 @@ def test_run_conversation_codex_disables_reasoning_replay_after_invalid_encrypte
             "codex_reasoning_items": [
                 {"type": "reasoning", "id": "rs_001", "encrypted_content": "enc_bad", "summary": []},
             ],
-        }
+        },
     ]
 
     result = agent.run_conversation("continue", conversation_history=history)
@@ -2254,7 +2254,7 @@ def test_run_conversation_codex_invalid_encrypted_content_without_replay_state_d
                 "error": {
                     "code": "INVALID_ENCRYPTED_CONTENT",
                     "message": "Bad request",
-                }
+                },
             }
 
     responses = [_InvalidEncryptedContentError(), _codex_message_response("Recovered after generic retry.")]

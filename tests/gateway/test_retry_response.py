@@ -25,7 +25,7 @@ def gateway(tmp_path):
 async def test_retry_returns_response_not_none(gateway):
     """_handle_retry_command must return the inner handler response, not None."""
     gateway.session_store.get_or_create_session.return_value = MagicMock(
-        session_id="test-session"
+        session_id="test-session",
     )
     gateway.session_store.load_transcript.return_value = [
         {"role": "user", "content": "Hello Hermes"},
@@ -48,7 +48,7 @@ async def test_retry_returns_response_not_none(gateway):
 async def test_retry_no_previous_message(gateway):
     """If there is no previous user message, return early with a message."""
     gateway.session_store.get_or_create_session.return_value = MagicMock(
-        session_id="test-session"
+        session_id="test-session",
     )
     gateway.session_store.load_transcript.return_value = []
     event = MessageEvent(

@@ -522,7 +522,7 @@ def _capture_response(cap: CaptureResult, max_elements: int = _DEFAULT_MAX_ELEME
         and (
             image_dimensions[0] < _MIN_PROVIDER_IMAGE_DIMENSION
             or image_dimensions[1] < _MIN_PROVIDER_IMAGE_DIMENSION
-        )
+        ),
     )
 
     # Index only what's actually surfaced in the response — otherwise the
@@ -547,7 +547,7 @@ def _capture_response(cap: CaptureResult, max_elements: int = _DEFAULT_MAX_ELEME
         summary_lines.append(
             f"  (screenshot omitted: {image_dimensions[0]}x{image_dimensions[1]} "
             f"is below the {_MIN_PROVIDER_IMAGE_DIMENSION}x{_MIN_PROVIDER_IMAGE_DIMENSION} "
-            "provider minimum)"
+            "provider minimum)",
         )
     summary = "\n".join(summary_lines)
 
@@ -591,7 +591,7 @@ def _capture_response(cap: CaptureResult, max_elements: int = _DEFAULT_MAX_ELEME
     if truncated_elements:
         summary_lines.append(
             f"  (response truncated to {len(visible_elements)} of {total_elements} elements; "
-            f"raise max_elements or pass app= to narrow)"
+            f"raise max_elements or pass app= to narrow)",
         )
     summary = "\n".join(summary_lines)
     payload: dict[str, Any] = {
@@ -703,7 +703,7 @@ def _route_capture_through_aux_vision(
         )
 
         result_json = _run_async(
-            vision_analyze_tool(str(temp_image_path), prompt)
+            vision_analyze_tool(str(temp_image_path), prompt),
         )
     except Exception as exc:
         logger.warning(

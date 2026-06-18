@@ -194,7 +194,7 @@ class TestSnapshotEndToEnd:
         init_file = tmp_path / "custom-init.sh"
         init_file.write_text(
             'export HERMES_SHELL_INIT_PROBE="probe-ok"\n'
-            'export PATH="/opt/shell-init-probe/bin:$PATH"\n'
+            'export PATH="/opt/shell-init-probe/bin:$PATH"\n',
         )
 
         with patch(
@@ -204,7 +204,7 @@ class TestSnapshotEndToEnd:
             env = LocalEnvironment(cwd=str(tmp_path), timeout=15)
             try:
                 result = env.execute(
-                    'echo "PROBE=$HERMES_SHELL_INIT_PROBE"; echo "PATH=$PATH"'
+                    'echo "PROBE=$HERMES_SHELL_INIT_PROBE"; echo "PATH=$PATH"',
                 )
             finally:
                 env.cleanup()
@@ -214,7 +214,7 @@ class TestSnapshotEndToEnd:
         assert "/opt/shell-init-probe/bin" in output
 
     def test_profile_path_export_survives_bashrc_interactive_guard(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Reproduces the Debian/Ubuntu + ``n``/``nvm`` case.
 
@@ -235,7 +235,7 @@ class TestSnapshotEndToEnd:
         profile = tmp_path / ".profile"
         profile.write_text(
             f'export PATH="{fake_n_bin}:$PATH"\n'
-            'export FROM_PROFILE=profile-ok\n'
+            'export FROM_PROFILE=profile-ok\n',
         )
         bashrc = tmp_path / ".bashrc"
         bashrc.write_text(
@@ -243,7 +243,7 @@ class TestSnapshotEndToEnd:
             '    *i*) ;;\n'
             '      *) return;;\n'
             'esac\n'
-            'export FROM_BASHRC=bashrc-should-not-appear\n'
+            'export FROM_BASHRC=bashrc-should-not-appear\n',
         )
 
         monkeypatch.setenv("HOME", str(tmp_path))
@@ -257,7 +257,7 @@ class TestSnapshotEndToEnd:
                 result = env.execute(
                     'echo "PATH=$PATH"; '
                     'echo "FROM_PROFILE=$FROM_PROFILE"; '
-                    'echo "FROM_BASHRC=$FROM_BASHRC"'
+                    'echo "FROM_BASHRC=$FROM_BASHRC"',
                 )
             finally:
                 env.cleanup()

@@ -76,7 +76,7 @@ def test_parse_references_strips_trailing_punctuation():
     from agent.context_references import parse_context_references
 
     refs = parse_context_references(
-        "review @file:README.md, then see (@url:https://example.com/docs)."
+        "review @file:README.md, then see (@url:https://example.com/docs).",
     )
 
     assert [ref.kind for ref in refs] == ["file", "url"]
@@ -89,7 +89,7 @@ def test_parse_quoted_references_with_spaces_and_preserve_unquoted_ranges():
 
     refs = parse_context_references(
         'review @file:"C:\\Users\\Simba\\My Project\\main.py":7-9 '
-        'and @folder:"docs and specs" plus @file:src/main.py:1-2'
+        'and @folder:"docs and specs" plus @file:src/main.py:1-2',
     )
 
     assert [ref.kind for ref in refs] == ["file", "folder", "file"]

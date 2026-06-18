@@ -89,7 +89,7 @@ class TestBuildJobPromptContextFrom:
         output_dir = OUTPUT_DIR / job_a["id"]
         output_dir.mkdir(parents=True, exist_ok=True)
         (output_dir / "2026-04-22_10-00-00.md").write_text(
-            "Today's top story: AI is everywhere.", encoding="utf-8"
+            "Today's top story: AI is everywhere.", encoding="utf-8",
         )
 
         job_b = create_job(
@@ -118,7 +118,7 @@ class TestBuildJobPromptContextFrom:
         new_file.write_text("New output", encoding="utf-8")
 
         job_b = create_job(
-            prompt="Summarize", schedule="every 2h", context_from=job_a["id"]
+            prompt="Summarize", schedule="every 2h", context_from=job_a["id"],
         )
         prompt = _build_job_prompt(job_b)
         assert "New output" in prompt
@@ -130,7 +130,7 @@ class TestBuildJobPromptContextFrom:
 
         job_a = create_job(prompt="Find news", schedule="every 1h")
         job_b = create_job(
-            prompt="Summarize", schedule="every 2h", context_from=job_a["id"]
+            prompt="Summarize", schedule="every 2h", context_from=job_a["id"],
         )
 
         # job_a never ran — output dir does not exist
@@ -193,7 +193,7 @@ class TestBuildJobPromptContextFrom:
         (out_dir / "2026-04-22_10-00-00.md").write_text(big_output, encoding="utf-8")
 
         job_b = create_job(
-            prompt="Process", schedule="every 2h", context_from=job_a["id"]
+            prompt="Process", schedule="every 2h", context_from=job_a["id"],
         )
         prompt = _build_job_prompt(job_b)
         assert "truncated" in prompt
@@ -211,7 +211,7 @@ class TestBuildJobPromptContextFrom:
         (out_dir / "2026-04-22_10-00-00.md").write_text("Some output", encoding="utf-8")
 
         job_b = create_job(
-            prompt="Process", schedule="every 2h", context_from=job_a["id"]
+            prompt="Process", schedule="every 2h", context_from=job_a["id"],
         )
 
         # Simulate file deleted between glob() and read_text()
@@ -239,7 +239,7 @@ class TestBuildJobPromptContextFrom:
         (out_dir / "2026-04-22_10-00-00.md").write_text("Some output", encoding="utf-8")
 
         job_b = create_job(
-            prompt="Process", schedule="every 2h", context_from=job_a["id"]
+            prompt="Process", schedule="every 2h", context_from=job_a["id"],
         )
 
         # Simulate permission error on read

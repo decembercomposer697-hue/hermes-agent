@@ -80,7 +80,7 @@ class TestChatCompletionsBasic:
             msgs = self._msg_with_extra_content()
             result = transport.convert_messages(msgs, model=model)
             assert result[0]["tool_calls"][0]["extra_content"] == {
-                "google": {"thought_signature": "SIG_123"}
+                "google": {"thought_signature": "SIG_123"},
             }, model
 
     def test_convert_messages_strips_tool_name(self, transport):
@@ -183,7 +183,7 @@ class TestChatCompletionsBuildKwargs:
             openrouter_min_coding_score=0.65,
         )
         assert kw["extra_body"]["plugins"] == [
-            {"id": "pareto-router", "min_coding_score": 0.65}
+            {"id": "pareto-router", "min_coding_score": 0.65},
         ]
 
     def test_openrouter_pareto_score_ignored_for_other_models(self, transport):
@@ -232,7 +232,7 @@ class TestChatCompletionsBuildKwargs:
             openrouter_min_coding_score=0.8,
         )
         assert kw["extra_body"]["plugins"] == [
-            {"id": "pareto-router", "min_coding_score": 0.8}
+            {"id": "pareto-router", "min_coding_score": 0.8},
         ]
 
     def test_nous_tags(self, transport):
@@ -785,7 +785,7 @@ class TestChatCompletionsNormalize:
         )
         nr = transport.normalize_response(r)
         assert nr.tool_calls[0].provider_data == {
-            "extra_content": {"google": {"thought_signature": "SIG_ABC123"}}
+            "extra_content": {"google": {"thought_signature": "SIG_ABC123"}},
         }
 
     def test_reasoning_content_preserved_separately(self, transport):

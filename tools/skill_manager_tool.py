@@ -507,7 +507,7 @@ def _create_skill(name: str, content: str, category: str = None) -> dict[str, An
     if existing:
         return {
             "success": False,
-            "error": f"A skill named '{name}' already exists at {existing['path']}."
+            "error": f"A skill named '{name}' already exists at {existing['path']}.",
         }
 
     # Create the skill directory
@@ -619,7 +619,7 @@ def _patch_skill(
     from tools.fuzzy_match import fuzzy_find_and_replace
 
     new_content, match_count, _strategy, match_error = fuzzy_find_and_replace(
-        content, old_string, new_string, replace_all
+        content, old_string, new_string, replace_all,
     )
     if match_error:
         # Show a short preview of the file so the model can self-correct
@@ -826,7 +826,7 @@ def _remove_file(name: str, file_path: str) -> dict[str, Any]:
 # so skill_manage() does not re-gate (and re-stage) it.
 import contextvars as _ctxvars
 _skill_gate_bypass: "_ctxvars.ContextVar[bool]" = _ctxvars.ContextVar(
-    "skill_gate_bypass", default=False
+    "skill_gate_bypass", default=False,
 )
 
 
@@ -1026,14 +1026,14 @@ SKILL_MANAGE_SCHEMA = {
             "action": {
                 "type": "string",
                 "enum": ["create", "patch", "edit", "delete", "write_file", "remove_file"],
-                "description": "The action to perform."
+                "description": "The action to perform.",
             },
             "name": {
                 "type": "string",
                 "description": (
                     "Skill name (lowercase, hyphens/underscores, max 64 chars). "
                     "Must match an existing skill for patch/edit/delete/write_file/remove_file."
-                )
+                ),
             },
             "content": {
                 "type": "string",
@@ -1041,7 +1041,7 @@ SKILL_MANAGE_SCHEMA = {
                     "Full SKILL.md content (YAML frontmatter + markdown body). "
                     "Required for 'create' and 'edit'. For 'edit', read the skill "
                     "first with skill_view() and provide the complete updated text."
-                )
+                ),
             },
             "old_string": {
                 "type": "string",
@@ -1049,18 +1049,18 @@ SKILL_MANAGE_SCHEMA = {
                     "Text to find in the file (required for 'patch'). Must be unique "
                     "unless replace_all=true. Include enough surrounding context to "
                     "ensure uniqueness."
-                )
+                ),
             },
             "new_string": {
                 "type": "string",
                 "description": (
                     "Replacement text (required for 'patch'). Can be empty string "
                     "to delete the matched text."
-                )
+                ),
             },
             "replace_all": {
                 "type": "boolean",
-                "description": "For 'patch': replace all occurrences instead of requiring a unique match (default: false)."
+                "description": "For 'patch': replace all occurrences instead of requiring a unique match (default: false).",
             },
             "category": {
                 "type": "string",
@@ -1068,7 +1068,7 @@ SKILL_MANAGE_SCHEMA = {
                     "Optional category/domain for organizing the skill (e.g., 'devops', "
                     "'data-science', 'mlops'). Creates a subdirectory grouping. "
                     "Only used with 'create'."
-                )
+                ),
             },
             "file_path": {
                 "type": "string",
@@ -1077,11 +1077,11 @@ SKILL_MANAGE_SCHEMA = {
                     "For 'write_file'/'remove_file': required, must be under references/, "
                     "templates/, scripts/, or assets/. "
                     "For 'patch': optional, defaults to SKILL.md if omitted."
-                )
+                ),
             },
             "file_content": {
                 "type": "string",
-                "description": "Content for the file. Required for 'write_file'."
+                "description": "Content for the file. Required for 'write_file'.",
             },
             "absorbed_into": {
                 "type": "string",
@@ -1095,7 +1095,7 @@ SKILL_MANAGE_SCHEMA = {
                     "on delete is supported for backward compatibility but "
                     "downstream tooling (e.g. cron-job skill reference "
                     "rewriting) will have to guess at intent."
-                )
+                ),
             },
         },
         "required": ["action", "name"],

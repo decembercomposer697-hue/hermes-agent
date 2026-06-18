@@ -296,9 +296,9 @@ def _handle_reply_comment(args: dict, **kwargs) -> str:
                 {
                     "type": "text_run",
                     "text_run": {"text": content},
-                }
-            ]
-        }
+                },
+            ],
+        },
     }
 
     code, msg, data = _do_request(

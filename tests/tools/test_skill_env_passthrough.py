@@ -29,7 +29,7 @@ def _create_skill(tmp_path, name, frontmatter_extra=""):
         f"{frontmatter_extra}"
         f"---\n\n"
         f"# {name}\n\n"
-        f"Test content.\n"
+        f"Test content.\n",
     )
     return skill_dir
 
@@ -48,7 +48,7 @@ class TestSkillViewRegistersPassthrough:
             ),
         )
         monkeypatch.setattr(
-            "tools.skills_tool.SKILLS_DIR", tmp_path
+            "tools.skills_tool.SKILLS_DIR", tmp_path,
         )
         # Set the env var so it's "available"
         monkeypatch.setenv("TENOR_API_KEY", "test-value-123")
@@ -104,7 +104,7 @@ class TestSkillViewRegistersPassthrough:
             ),
         )
         monkeypatch.setattr(
-            "tools.skills_tool.SKILLS_DIR", tmp_path
+            "tools.skills_tool.SKILLS_DIR", tmp_path,
         )
         monkeypatch.delenv("NONEXISTENT_SKILL_KEY_XYZ", raising=False)
 
@@ -120,7 +120,7 @@ class TestSkillViewRegistersPassthrough:
         """Skills without required_environment_variables shouldn't register anything."""
         _create_skill(tmp_path, "simple-skill")
         monkeypatch.setattr(
-            "tools.skills_tool.SKILLS_DIR", tmp_path
+            "tools.skills_tool.SKILLS_DIR", tmp_path,
         )
 
         with patch("tools.skills_tool._secret_capture_callback", None):

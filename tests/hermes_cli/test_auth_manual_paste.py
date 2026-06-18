@@ -94,7 +94,7 @@ def test_is_remote_session_false_when_no_remote_envvars(monkeypatch):
 
 def test_parse_full_callback_url():
     out = auth_mod._parse_pasted_callback(
-        "http://127.0.0.1:56121/callback?code=abc123&state=deadbeef"
+        "http://127.0.0.1:56121/callback?code=abc123&state=deadbeef",
     )
     assert out == {
         "code": "abc123",
@@ -106,7 +106,7 @@ def test_parse_full_callback_url():
 
 def test_parse_callback_url_https_and_extra_params():
     out = auth_mod._parse_pasted_callback(
-        "https://127.0.0.1:56121/callback?code=abc&state=xyz&scope=openid"
+        "https://127.0.0.1:56121/callback?code=abc&state=xyz&scope=openid",
     )
     assert out["code"] == "abc"
     assert out["state"] == "xyz"
@@ -134,7 +134,7 @@ def test_parse_bare_opaque_code_value():
 def test_parse_callback_with_error_field():
     out = auth_mod._parse_pasted_callback(
         "http://127.0.0.1:56121/callback?error=access_denied"
-        "&error_description=user+rejected"
+        "&error_description=user+rejected",
     )
     assert out["code"] is None
     assert out["error"] == "access_denied"
@@ -176,7 +176,7 @@ def test_prompt_reads_stdin_and_parses(monkeypatch):
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         out = auth_mod._prompt_manual_callback_paste(
-            "http://127.0.0.1:56121/callback"
+            "http://127.0.0.1:56121/callback",
         )
     rendered = buf.getvalue()
     assert "Manual callback paste" in rendered
@@ -192,7 +192,7 @@ def test_prompt_eof_returns_all_none(monkeypatch):
     monkeypatch.setattr(builtins, "input", _raise_eof)
     with contextlib.redirect_stdout(io.StringIO()):
         out = auth_mod._prompt_manual_callback_paste(
-            "http://127.0.0.1:56121/callback"
+            "http://127.0.0.1:56121/callback",
         )
     assert out["code"] is None
 
@@ -204,7 +204,7 @@ def test_prompt_keyboard_interrupt_returns_all_none(monkeypatch):
     monkeypatch.setattr(builtins, "input", _raise_kbi)
     with contextlib.redirect_stdout(io.StringIO()):
         out = auth_mod._prompt_manual_callback_paste(
-            "http://127.0.0.1:56121/callback"
+            "http://127.0.0.1:56121/callback",
         )
     assert out["code"] is None
 
@@ -246,11 +246,11 @@ def test_xai_loopback_login_manual_paste_skips_http_server(monkeypatch):
     def _server_must_not_be_called(*_a, **_k):
         raise AssertionError(
             "manual_paste=True must skip the loopback HTTP server "
-            "(regression for #26923)"
+            "(regression for #26923)",
         )
 
     monkeypatch.setattr(
-        auth_mod, "_xai_start_callback_server", _server_must_not_be_called
+        auth_mod, "_xai_start_callback_server", _server_must_not_be_called,
     )
 
     captured_state: dict = {}
@@ -267,7 +267,7 @@ def test_xai_loopback_login_manual_paste_skips_http_server(monkeypatch):
         }
 
     monkeypatch.setattr(
-        auth_mod, "_prompt_manual_callback_paste", _fake_prompt
+        auth_mod, "_prompt_manual_callback_paste", _fake_prompt,
     )
 
     original_build = auth_mod._xai_oauth_build_authorize_url
@@ -277,7 +277,7 @@ def test_xai_loopback_login_manual_paste_skips_http_server(monkeypatch):
         return original_build(**kwargs)
 
     monkeypatch.setattr(
-        auth_mod, "_xai_oauth_build_authorize_url", _capture_state
+        auth_mod, "_xai_oauth_build_authorize_url", _capture_state,
     )
 
     def _fake_token_post(*_a, **_k):
@@ -288,7 +288,7 @@ def test_xai_loopback_login_manual_paste_skips_http_server(monkeypatch):
                 "id_token": "",
                 "expires_in": 3600,
                 "token_type": "Bearer",
-            }
+            },
         )
 
     monkeypatch.setattr(auth_mod.httpx, "post", _fake_token_post)
@@ -366,7 +366,7 @@ def test_xai_loopback_login_manual_paste_bare_code_succeeds(monkeypatch):
                 "id_token": "",
                 "expires_in": 3600,
                 "token_type": "Bearer",
-            }
+            },
         )
 
     monkeypatch.setattr(auth_mod.httpx, "post", _fake_token_post)
@@ -530,7 +530,7 @@ def test_xai_loopback_login_timeout_falls_back_to_manual_paste(monkeypatch):
 
     monkeypatch.setattr(auth_mod, "_prompt_manual_callback_paste", _fake_prompt)
     monkeypatch.setattr(
-        auth_mod.sys, "stdin", type("StubStdin", (), {"isatty": lambda self: True})()
+        auth_mod.sys, "stdin", type("StubStdin", (), {"isatty": lambda self: True})(),
     )
     monkeypatch.setattr(
         auth_mod.httpx,
@@ -542,7 +542,7 @@ def test_xai_loopback_login_timeout_falls_back_to_manual_paste(monkeypatch):
                 "id_token": "",
                 "expires_in": 3600,
                 "token_type": "Bearer",
-            }
+            },
         ),
     )
 
@@ -645,11 +645,11 @@ def test_xai_loopback_login_timeout_noninteractive_reraises(monkeypatch):
                 "xAI authorization timed out waiting for the local callback.",
                 provider="xai-oauth",
                 code="xai_callback_timeout",
-            )
+            ),
         ),
     )
     monkeypatch.setattr(
-        auth_mod.sys, "stdin", type("StubStdin", (), {"isatty": lambda self: False})()
+        auth_mod.sys, "stdin", type("StubStdin", (), {"isatty": lambda self: False})(),
     )
     monkeypatch.setattr(
         auth_mod,

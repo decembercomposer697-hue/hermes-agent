@@ -265,7 +265,7 @@ class TestGatewayRuntimeStatus:
                 target,
                 payload,
                 {"indent": None, "separators": (",", ":")},
-            )
+            ),
         ]
 
     def test_write_runtime_status_overwrites_stale_pid_on_restart(self, tmp_path, monkeypatch):
@@ -374,7 +374,7 @@ class TestTerminatePid:
         status.terminate_pid(123, force=True)
 
         assert calls == [
-            (["taskkill", "/PID", "123", "/T", "/F"], True, True, 10)
+            (["taskkill", "/PID", "123", "/T", "/F"], True, True, 10),
         ]
 
     def test_force_falls_back_to_sigterm_when_taskkill_missing(self, monkeypatch):
@@ -709,7 +709,7 @@ class TestTakeoverMarker:
         assert result is False
 
     def test_consume_returns_true_on_windows_when_start_time_unavailable(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Takeover consume must also recognise a self-marker on platforms
         without ``/proc`` (macOS / native Windows).
@@ -816,7 +816,7 @@ class TestTakeoverMarker:
         assert ok is False
 
     def test_consume_ignores_marker_for_different_process_and_prevents_stale_grief(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Regression: a stale marker from a dead replacer naming a dead
         target must not accidentally cause an unrelated future gateway to
@@ -928,7 +928,7 @@ class TestPlannedStopMarker:
         assert ok is False
 
     def test_consume_returns_true_on_windows_when_start_time_unavailable(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """Regression for #34597: a legitimate stop must be recognised on
         platforms without ``/proc``.
@@ -958,7 +958,7 @@ class TestPlannedStopMarker:
         assert not (tmp_path / ".gateway-planned-stop.json").exists()
 
     def test_consume_still_rejects_foreign_pid_when_start_time_unavailable(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """The PID-only fallback must NOT match a marker naming another PID.
 
@@ -976,7 +976,7 @@ class TestPlannedStopMarker:
         assert result is False
 
     def test_consume_still_rejects_start_time_mismatch_when_both_known(
-        self, tmp_path, monkeypatch
+        self, tmp_path, monkeypatch,
     ):
         """PID-reuse defence is preserved when BOTH start_times are present.
 
