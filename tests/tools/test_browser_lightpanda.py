@@ -306,7 +306,7 @@ class TestLightpandaFallbackWarning:
     def test_fallback_result_gets_user_visible_warning(self):
         from tools.browser_tool import _annotate_lightpanda_fallback
 
-        result = {"success": True, "data": {"snapshot": "- heading \"Hello\" [ref=e1]"}}
+        result = {"success": True, "data": {"snapshot": '- heading "Hello" [ref=e1]'}}
         annotated = _annotate_lightpanda_fallback(
             result,
             "Lightpanda returned an empty/too-short snapshot; retried with Chrome.",
@@ -339,7 +339,7 @@ class TestLightpandaFallbackWarning:
              }), \
              patch("tools.browser_tool._run_browser_command", side_effect=[
                  result,
-                 {"success": True, "data": {"snapshot": "- heading \"Fallback OK\" [ref=e1]", "refs": {"e1": {}}}},
+                 {"success": True, "data": {"snapshot": '- heading "Fallback OK" [ref=e1]', "refs": {"e1": {}}}},
              ]):
             response = json.loads(bt.browser_navigate("https://example.com", task_id="warn-test"))
 
@@ -356,7 +356,7 @@ class TestLightpandaFallbackWarning:
         import tools.browser_tool as bt
 
         snapshot_result = bt._annotate_lightpanda_fallback(
-            {"success": True, "data": {"snapshot": "- heading \"Fallback OK\" [ref=e1]", "refs": {"e1": {}}}},
+            {"success": True, "data": {"snapshot": '- heading "Fallback OK" [ref=e1]', "refs": {"e1": {}}}},
             "Lightpanda returned an empty/too-short snapshot; retried with Chrome.",
         )
 

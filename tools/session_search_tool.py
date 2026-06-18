@@ -30,7 +30,7 @@ support.
 
 import json
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 # Sources that are excluded from session browsing/searching by default.
 # Third-party integrations tag their sessions with HERMES_SESSION_SOURCE=tool
@@ -38,7 +38,7 @@ from typing import Any, Dict, List, Optional, Union
 _HIDDEN_SESSION_SOURCES = ("tool",)
 
 
-def _format_timestamp(ts: int | float | str | None) -> str:
+def _format_timestamp(ts: float | str | None) -> str:
     """Convert a Unix timestamp (float/int) or ISO string to a human-readable date.
 
     Returns "unknown" for None, str(ts) if conversion fails.
@@ -398,7 +398,7 @@ def _discover(
     current_session_id: str = None,
 ) -> str:
     """Discovery shape: FTS5 + anchored window + bookends per hit. Single call."""
-    role_list = role_filter if role_filter else ["user", "assistant"]
+    role_list = role_filter or ["user", "assistant"]
 
     try:
         raw_results = db.search_messages(
@@ -631,7 +631,7 @@ SESSION_SEARCH_SCHEMA = {
         "shape returns actual messages from the DB.\n\n"
         "FOUR CALLING SHAPES\n\n"
         "  1) DISCOVERY — pass `query`:\n"
-        "     session_search(query=\"auth refactor\", limit=3)\n"
+        '     session_search(query="auth refactor", limit=3)\n'
         "     Runs FTS5, dedupes hits by session lineage, returns the top N sessions. "
         "Each result carries:\n"
         "       - session_id, title, when, source\n"
@@ -646,7 +646,7 @@ SESSION_SEARCH_SCHEMA = {
         "     Bookends + window together let you reconstruct goal → match → resolution "
         "without paying for the whole transcript.\n\n"
         "  2) SCROLL — pass `session_id` + `around_message_id`:\n"
-        "     session_search(session_id=\"...\", around_message_id=12345, window=10)\n"
+        '     session_search(session_id="...", around_message_id=12345, window=10)\n'
         "     Returns a window of ±`window` messages centered on the anchor. No FTS5, "
         "no bookends — just the slice. Use after a discovery call when you need more "
         "context than the ±5 default window.\n"
@@ -656,7 +656,7 @@ SESSION_SEARCH_SCHEMA = {
         "       - When messages_before or messages_after is < window, you're at the "
         "start or end of the session.\n\n"
         "  3) READ — pass `session_id` only (no around_message_id):\n"
-        "     session_search(session_id=\"...\", profile=\"work\")\n"
+        '     session_search(session_id="...", profile="work")\n'
         "     Dumps the whole session by id (first 20 + last 10 messages when "
         "large). This is how you resolve an `@session:<profile>/<id>` link the "
         "user dropped into the chat: split the value on `/` into profile + id "
@@ -664,15 +664,15 @@ SESSION_SEARCH_SCHEMA = {
         "  4) BROWSE — no args:\n"
         "     session_search()\n"
         "     Returns recent sessions chronologically: titles, previews, timestamps. "
-        "Use when the user asks \"what was I working on\" without naming a topic.\n\n"
+        'Use when the user asks "what was I working on" without naming a topic.\n\n'
         "FTS5 SYNTAX\n\n"
         "  AND is the default — multi-word queries require all terms. Use OR explicitly "
         "for broader recall (`alpha OR beta OR gamma`), quoted phrases for exact match "
-        "(`\"docker networking\"`), boolean (`python NOT java`), or prefix wildcards "
+        '(`"docker networking"`), boolean (`python NOT java`), or prefix wildcards '
         "(`deploy*`).\n\n"
         "WHEN TO USE\n\n"
-        "  Reach for this on any \"what did we do about X\" / \"where did we leave Y\" / "
-        "\"find the session where Z\" question — before gh, web search, or filesystem "
+        '  Reach for this on any "what did we do about X" / "where did we leave Y" / '
+        '"find the session where Z" question — before gh, web search, or filesystem '
         "inspection. The session DB carries what was said when; external tools show "
         "current world state."
     ),
@@ -705,7 +705,7 @@ SESSION_SEARCH_SCHEMA = {
                     "to keep relevance-only ordering (suitable for exploratory recall — "
                     "\"what do we know about X\"). Set 'newest' for recency-shaped "
                     "questions (\"where did we leave X\"). Set 'oldest' for "
-                    "origin-shaped questions (\"how did X start\"). Ignored in scroll "
+                    'origin-shaped questions ("how did X start"). Ignored in scroll '
                     "and browse shapes."
                 ),
             },

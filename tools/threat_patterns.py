@@ -42,7 +42,6 @@ of "ignore all instructions").  This mirrors the fix applied to
 from __future__ import annotations
 
 import re
-from typing import List, Optional, Tuple
 
 # Each entry: (regex, pattern_id, scope)
 # scope ∈ {"all", "context", "strict"}
@@ -247,6 +246,6 @@ def first_threat_message(content: str, scope: str = "strict") -> str | None:
 
 __all__ = [
     "INVISIBLE_CHARS",
-    "scan_for_threats",
     "first_threat_message",
+    "scan_for_threats",
 ]

@@ -24,7 +24,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 _SIGNAL_NAME_BY_NUM: dict[int, str] = {}
 for _name in ("SIGTERM", "SIGINT", "SIGHUP", "SIGQUIT", "SIGUSR1", "SIGUSR2"):
@@ -47,7 +47,7 @@ def _signal_name(sig: Any) -> str:
 def _read_proc_field(pid: int, key: str) -> str | None:
     """Read a single field from /proc/<pid>/status.  Linux only; None elsewhere."""
     try:
-        with open(f"/proc/{pid}/status", encoding="utf-8") as fh:
+        with Path(f"/proc/{pid}/status").open(encoding="utf-8") as fh:
             for line in fh:
                 if line.startswith(key + ":"):
                     return line.split(":", 1)[1].strip()
@@ -59,8 +59,7 @@ def _read_proc_field(pid: int, key: str) -> str | None:
 def _read_proc_cmdline(pid: int) -> str | None:
     """Read /proc/<pid>/cmdline as a printable string.  Linux only; None elsewhere."""
     try:
-        with open(f"/proc/{pid}/cmdline", "rb") as fh:
-            data = fh.read()
+        data = Path(f"/proc/{pid}/cmdline").read_bytes()
     except (FileNotFoundError, PermissionError, OSError):
         return None
     if not data:
@@ -343,7 +342,7 @@ def check_systemd_timing_alignment(drain_timeout: float) -> dict[str, Any] | Non
     unit_name: str | None = None
     try:
         # /proc/self/cgroup gives us "0::/user.slice/.../hermes-gateway.service"
-        with open("/proc/self/cgroup", encoding="utf-8") as fh:
+        with Path("/proc/self/cgroup").open(encoding="utf-8") as fh:
             for line in fh:
                 # systemd cgroup line ends with the unit name
                 if ".service" in line:

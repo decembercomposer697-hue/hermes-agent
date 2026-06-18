@@ -10,7 +10,7 @@ import os
 import re
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
@@ -36,9 +36,10 @@ def _resolve_requests_verify() -> bool | str:
     """
     for env_var in ("HERMES_CA_BUNDLE", "REQUESTS_CA_BUNDLE", "SSL_CERT_FILE"):
         val = os.getenv(env_var)
-        if val and os.path.isfile(val):
+        if val and Path(val).is_file():
             return val
     return True
+
 
 # Provider names that can appear as a "provider:" prefix before a model ID.
 # Only these are stripped — Ollama-style "model:tag" colons (e.g. "qwen3.5:27b")
@@ -100,6 +101,7 @@ def _strip_provider_prefix(model: str) -> str:
             return model
         return suffix
     return model
+
 
 _model_metadata_cache: dict[str, dict[str, Any]] = {}
 _model_metadata_cache_time: float = 0
@@ -483,8 +485,7 @@ def detect_local_server_type(base_url: str, api_key: str = "") -> str | None:
 
     normalized = _normalize_base_url(base_url)
     server_url = normalized
-    if server_url.endswith("/v1"):
-        server_url = server_url[:-3]
+    server_url = server_url.removesuffix("/v1")
 
     headers = _auth_headers(api_key)
 
@@ -651,7 +652,7 @@ def fetch_model_metadata(force_refresh: bool = False) -> dict[str, dict[str, Any
         return cache
 
     except Exception as e:
-        logger.warning(f"Failed to fetch model metadata from OpenRouter: {e}")
+        logger.warning("Failed to fetch model metadata from OpenRouter: %s", e)
         return _model_metadata_cache or {}
 
 
@@ -834,7 +835,7 @@ def _load_context_cache() -> dict[str, int]:
     if not path.exists():
         return {}
     try:
-        with open(path, encoding="utf-8") as f:
+        with Path(path).open(encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
         return data.get("context_lengths", {})
     except Exception as e:
@@ -856,7 +857,7 @@ def save_context_length(model: str, base_url: str, length: int) -> None:
     path = _get_context_cache_path()
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "w", encoding="utf-8") as f:
+        with Path(path).open("w", encoding="utf-8") as f:
             yaml.dump({"context_lengths": cache}, f, default_flow_style=False)
         logger.info("Cached context length %s -> %s tokens", key, f"{length:,}")
     except Exception as e:
@@ -880,7 +881,7 @@ def _invalidate_cached_context_length(model: str, base_url: str) -> None:
     path = _get_context_cache_path()
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, "w", encoding="utf-8") as f:
+        with Path(path).open("w", encoding="utf-8") as f:
             yaml.dump({"context_lengths": cache}, f, default_flow_style=False)
     except Exception as e:
         logger.debug("Failed to invalidate context length cache entry %s: %s", key, e)
@@ -1062,8 +1063,7 @@ def query_ollama_num_ctx(model: str, base_url: str, api_key: str = "") -> int | 
 
     bare_model = _strip_provider_prefix(model)
     server_url = base_url.rstrip("/")
-    if server_url.endswith("/v1"):
-        server_url = server_url[:-3]
+    server_url = server_url.removesuffix("/v1")
 
     try:
         server_type = detect_local_server_type(base_url, api_key=api_key)
@@ -1125,8 +1125,7 @@ def _query_ollama_api_show(model: str, base_url: str, api_key: str = "") -> int 
     import httpx
 
     server_url = base_url.rstrip("/")
-    if server_url.endswith("/v1"):
-        server_url = server_url[:-3]
+    server_url = server_url.removesuffix("/v1")
 
     headers = _auth_headers(api_key)
 
@@ -1210,8 +1209,7 @@ def _query_local_context_length(model: str, base_url: str, api_key: str = "") ->
 
     # Strip /v1 suffix to get the server root
     server_url = base_url.rstrip("/")
-    if server_url.endswith("/v1"):
-        server_url = server_url[:-3]
+    server_url = server_url.removesuffix("/v1")
 
     headers = _auth_headers(api_key)
 
@@ -1314,8 +1312,7 @@ def _query_anthropic_context_length(model: str, base_url: str, api_key: str) -> 
         return None  # OAuth tokens can't access /v1/models
     try:
         base = base_url.rstrip("/")
-        if base.endswith("/v1"):
-            base = base[:-3]
+        base = base.removesuffix("/v1")
         url = f"{base}/v1/models?limit=1000"
         headers = {
             "x-api-key": api_key,

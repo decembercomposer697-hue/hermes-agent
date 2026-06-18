@@ -756,7 +756,7 @@ class TestFindAliasForProfile:
         from hermes_cli.profiles import _get_wrapper_dir, find_alias_for_profile
         wrapper_dir = _get_wrapper_dir()
         wrapper_dir.mkdir(parents=True, exist_ok=True)
-        (wrapper_dir / "pip").write_text("#!/bin/sh\nexec python -m pip \"$@\"\n")
+        (wrapper_dir / "pip").write_text('#!/bin/sh\nexec python -m pip "$@"\n')
         assert find_alias_for_profile("steve") is None
 
     def test_custom_alias_on_windows(self, profile_env, monkeypatch):

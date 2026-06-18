@@ -37,7 +37,7 @@ import urllib.request
 from collections import Counter
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 USER_AGENT = "HermesAgent/1.0"
 DEFAULT_USER_ENV = "HYPERLIQUID_USER_ADDRESS"
@@ -244,8 +244,7 @@ def _render_table(headers: list[tuple[str, str]], rows: list[dict[str, Any]]) ->
             value = row.get(key, "")
             text = str(value)
             rendered.append(text)
-            if len(text) > widths[index]:
-                widths[index] = len(text)
+            widths[index] = max(widths[index], len(text))
         prepared_rows.append(rendered)
 
     lines = []

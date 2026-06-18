@@ -29,7 +29,7 @@ import tempfile
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from hermes_constants import get_hermes_home
 from utils import atomic_replace
@@ -55,6 +55,7 @@ logger = logging.getLogger(__name__)
 def get_memory_dir() -> Path:
     """Return the profile-scoped memories directory."""
     return get_hermes_home() / "memories"
+
 
 ENTRY_DELIMITER = "\n§\n"
 
@@ -219,7 +220,7 @@ class MemoryStore:
             yield
             return
 
-        fd = open(lock_path, "a+", encoding="utf-8")
+        fd = Path(lock_path).open("a+", encoding="utf-8")
         try:
             if fcntl:
                 fcntl.flock(fd, fcntl.LOCK_EX)
@@ -456,7 +457,7 @@ class MemoryStore:
         Returns None if the snapshot is empty (no entries at load time).
         """
         block = self._system_prompt_snapshot.get(target, "")
-        return block if block else None
+        return block or None
 
     # -- Internal helpers --
 
@@ -596,7 +597,7 @@ class MemoryStore:
             except BaseException:
                 # Clean up temp file on any failure
                 try:
-                    os.unlink(tmp_path)
+                    Path(tmp_path).unlink()
                 except OSError:
                     pass
                 raise
@@ -734,6 +735,7 @@ def apply_memory_pending(payload: dict[str, Any], store: "MemoryStore") -> dict[
 # OpenAI Function-Calling Schema
 # =============================================================================
 
+
 MEMORY_SCHEMA = {
     "name": "memory",
     "description": (
@@ -802,7 +804,3 @@ registry.register(
     check_fn=check_memory_requirements,
     emoji="🧠",
 )
-
-
-
-

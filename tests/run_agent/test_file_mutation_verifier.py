@@ -20,6 +20,7 @@ list of files that did NOT change.
 from __future__ import annotations
 
 import json
+import pathlib
 
 import pytest
 
@@ -335,8 +336,7 @@ class TestFormatFooter:
         tmp = tempfile.mkdtemp(prefix="hermes_footer_")
         try:
             cfg = os.path.join(tmp, "config.yaml")
-            with open(cfg, "w") as fh:
-                fh.write("openrouter_api_key: sk-LEAK\n")
+            pathlib.Path(cfg).write_text("openrouter_api_key: sk-LEAK\n")
             footer = AIAgent._format_file_mutation_failure_footer(
                 {cfg: {
                     "tool": "patch",
@@ -366,7 +366,7 @@ class TestVerifierEnabled:
         # With no env and no config present, safe default is True.
         # load_config may surface a user config.yaml in some envs — stub it.
         import hermes_cli.config as _cfg_mod
-        monkeypatch.setattr(_cfg_mod, "load_config", lambda: {})
+        monkeypatch.setattr(_cfg_mod, "load_config", dict)
         assert agent._file_mutation_verifier_enabled() is True
 
     @pytest.mark.parametrize("value", ["0", "false", "FALSE", "no", "off"])
@@ -408,4 +408,4 @@ def test_file_mutating_tools_set_shape():
     ``append_file``), they should also audit whether the verifier should
     track it.  This test fails loudly on unilateral additions.
     """
-    assert _FILE_MUTATING_TOOLS == frozenset({"write_file", "patch"})
+    assert frozenset({"write_file", "patch"}) == _FILE_MUTATING_TOOLS

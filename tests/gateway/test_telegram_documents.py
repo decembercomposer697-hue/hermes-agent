@@ -8,7 +8,6 @@ We mock the telegram module at import time to avoid collection errors.
 """
 
 import asyncio
-import os
 import sys
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -50,6 +49,8 @@ def _ensure_telegram_mock():
 _ensure_telegram_mock()
 
 # Now we can safely import
+import pathlib
+
 from gateway.platforms.telegram import TelegramAdapter
 
 # ---------------------------------------------------------------------------
@@ -197,7 +198,7 @@ class TestDocumentDownloadBlock:
         await adapter._handle_media_message(update, MagicMock())
         event = adapter.handle_message.call_args[0][0]
         assert len(event.media_urls) == 1
-        assert os.path.exists(event.media_urls[0])
+        assert pathlib.Path(event.media_urls[0]).exists()
         assert event.media_types == ["application/pdf"]
 
     @pytest.mark.asyncio
@@ -360,7 +361,7 @@ class TestDocumentDownloadBlock:
         event = adapter.handle_message.call_args[0][0]
         # File should still be cached
         assert len(event.media_urls) == 1
-        assert os.path.exists(event.media_urls[0])
+        assert pathlib.Path(event.media_urls[0]).exists()
         # Content NOT injected — text should be empty (no caption set)
         assert "[Content of" not in (event.text or "")
 
@@ -410,7 +411,7 @@ class TestVideoDownloadBlock:
         event = adapter.handle_message.call_args[0][0]
         assert event.message_type == MessageType.VIDEO
         assert len(event.media_urls) == 1
-        assert os.path.exists(event.media_urls[0])
+        assert pathlib.Path(event.media_urls[0]).exists()
         assert event.media_types == [SUPPORTED_VIDEO_TYPES[".mp4"]]
 
     @pytest.mark.asyncio
@@ -424,7 +425,7 @@ class TestVideoDownloadBlock:
         event = adapter.handle_message.call_args[0][0]
         assert event.message_type == MessageType.VIDEO
         assert len(event.media_urls) == 1
-        assert os.path.exists(event.media_urls[0])
+        assert pathlib.Path(event.media_urls[0]).exists()
         assert event.media_types == [SUPPORTED_VIDEO_TYPES[".mp4"]]
 
 

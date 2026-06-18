@@ -64,10 +64,10 @@ def _diff_ansi() -> dict[str, str]:
         if err_h and len(err_h) == 7:
             er, eg, eb = int(err_h[1:3], 16), int(err_h[3:5], 16), int(err_h[5:7], 16)
             # Use a dark tinted version as background
-            minus = f"\033[38;2;255;255;255;48;2;{max(er//2,20)};{max(eg//4,10)};{max(eb//4,10)}m"
+            minus = f"\033[38;2;255;255;255;48;2;{max(er // 2, 20)};{max(eg // 4, 10)};{max(eb // 4, 10)}m"
         if ok_h and len(ok_h) == 7:
             or_, og, ob = int(ok_h[1:3], 16), int(ok_h[3:5], 16), int(ok_h[5:7], 16)
-            plus = f"\033[38;2;255;255;255;48;2;{max(or_//4,10)};{max(og//2,20)};{max(ob//4,10)}m"
+            plus = f"\033[38;2;255;255;255;48;2;{max(or_ // 4, 10)};{max(og // 2, 20)};{max(ob // 4, 10)}m"
     except Exception:
         pass
 
@@ -79,11 +79,13 @@ def _diff_ansi() -> dict[str, str]:
 
 
 # Module-level helpers — each call resolves from the active skin lazily.
-def _diff_dim():   return _diff_ansi()["dim"]
-def _diff_file():  return _diff_ansi()["file"]
-def _diff_hunk():  return _diff_ansi()["hunk"]
+def _diff_dim(): return _diff_ansi()["dim"]
+def _diff_file(): return _diff_ansi()["file"]
+def _diff_hunk(): return _diff_ansi()["hunk"]
 def _diff_minus(): return _diff_ansi()["minus"]
-def _diff_plus():  return _diff_ansi()["plus"]
+def _diff_plus(): return _diff_ansi()["plus"]
+
+
 _MAX_INLINE_DIFF_FILES = 6
 _MAX_INLINE_DIFF_LINES = 80
 
@@ -91,8 +93,10 @@ _MAX_INLINE_DIFF_LINES = 80
 @dataclass
 class LocalEditSnapshot:
     """Pre-tool filesystem snapshot used to render diffs locally after writes."""
+
     paths: list[Path] = field(default_factory=list)
     before: dict[str, str | None] = field(default_factory=dict)
+
 
 # =========================================================================
 # Configurable tool preview length (0 = no limit)
@@ -210,10 +214,9 @@ def build_tool_preview(tool_name: str, args: dict, max_len: int | None = None) -
         merge = args.get("merge", False)
         if todos_arg is None:
             return "reading task list"
-        elif merge:
+        if merge:
             return f"updating {len(todos_arg)} task(s)"
-        else:
-            return f"planning {len(todos_arg)} task(s)"
+        return f"planning {len(todos_arg)} task(s)"
 
     if tool_name == "session_search":
         query = _oneline(args.get("query", ""))
@@ -225,12 +228,12 @@ def build_tool_preview(tool_name: str, args: dict, max_len: int | None = None) -
         if action == "add":
             content = _oneline(args.get("content", ""))
             return f"+{target}: \"{content[:25]}{'...' if len(content) > 25 else ''}\""
-        elif action == "replace":
+        if action == "replace":
             old = _oneline(args.get("old_text") or "") or "<missing old_text>"
-            return f"~{target}: \"{old[:20]}\""
-        elif action == "remove":
+            return f'~{target}: "{old[:20]}"'
+        if action == "remove":
             old = _oneline(args.get("old_text") or "") or "<missing old_text>"
-            return f"-{target}: \"{old[:20]}\""
+            return f'-{target}: "{old[:20]}"'
         return action
 
     if tool_name == "send_message":
@@ -238,7 +241,7 @@ def build_tool_preview(tool_name: str, args: dict, max_len: int | None = None) -
         msg = _oneline(args.get("message", ""))
         if len(msg) > 20:
             msg = msg[:17] + "..."
-        return f"to {target}: \"{msg}\""
+        return f'to {target}: "{msg}"'
 
     key = primary_args.get(tool_name)
     if not key:
@@ -835,10 +838,9 @@ def _detect_tool_failure(tool_name: str, result: str | None) -> tuple[bool, str]
         return False, ""
 
     # Memory: distinguish "store full" from real errors.
-    if tool_name == "memory":
-        if isinstance(data, dict):
-            if data.get("success") is False and "exceed the limit" in data.get("error", ""):
-                return True, " [full]"
+    if tool_name == "memory" and isinstance(data, dict):
+        if data.get("success") is False and "exceed the limit" in data.get("error", ""):
+            return True, " [full]"
 
     # Structured error in JSON result (any tool that surfaces {"error": ...}).
     if isinstance(data, dict):
@@ -891,14 +893,14 @@ def get_cute_tool_message(
         if _tool_preview_max_len == 0:
             return s  # no limit
         limit = _tool_preview_max_len
-        return (s[:limit-3] + "...") if len(s) > limit else s
+        return (s[:limit - 3] + "...") if len(s) > limit else s
 
     def _path(p, n=35):
         p = str(p)
         if _tool_preview_max_len == 0:
             return p  # no limit
         limit = _tool_preview_max_len
-        return ("..." + p[-(limit-3):]) if len(p) > limit else p
+        return ("..." + p[-(limit - 3):]) if len(p) > limit else p
 
     def _wrap(line: str) -> str:
         """Apply skin tool prefix and failure suffix."""
@@ -917,7 +919,7 @@ def get_cute_tool_message(
         if urls:
             url = urls[0] if isinstance(urls, list) else str(urls)
             domain = url.replace("https://", "").replace("http://", "").split("/")[0]
-            extra = f" +{len(urls)-1}" if len(urls) > 1 else ""
+            extra = f" +{len(urls) - 1}" if len(urls) > 1 else ""
             return _wrap(f"┊ 📄 {verb:<9} {_trunc(domain, 35)}{extra}  {dur}")
         return _wrap(f"┊ 📄 {verb:<9} pages  {dur}")
     if tool_name == "terminal":
@@ -981,14 +983,13 @@ def get_cute_tool_message(
             if total > 0:
                 return _wrap(f"┊ 📋 plan      {done}/{total} task(s)  {dur}")
             return _wrap(f"┊ 📋 plan      reading tasks  {dur}")
-        elif merge:
+        if merge:
             if total > 0 and done > 0:
                 return _wrap(f"┊ 📋 plan      update {done}/{total} ✓  {dur}")
             return _wrap(f"┊ 📋 plan      update {len(todos_arg)} task(s)  {dur}")
-        else:
-            if total > 0 and done > 0:
-                return _wrap(f"┊ 📋 plan      {done}/{total} task(s)  {dur}")
-            return _wrap(f"┊ 📋 plan      {len(todos_arg)} task(s)  {dur}")
+        if total > 0 and done > 0:
+            return _wrap(f"┊ 📋 plan      {done}/{total} task(s)  {dur}")
+        return _wrap(f"┊ 📋 plan      {len(todos_arg)} task(s)  {dur}")
     if tool_name == "session_search":
         return _wrap(f"┊ 🔍 recall    \"{_trunc(args.get('query', ''), 35)}\"  {dur}")
     if tool_name == "memory":
@@ -996,14 +997,14 @@ def get_cute_tool_message(
         target = args.get("target", "")
         if action == "add":
             return _wrap(f"┊ 🧠 memory    +{target}: \"{_trunc(args.get('content', ''), 30)}\"  {dur}")
-        elif action == "replace":
+        if action == "replace":
             old = args.get("old_text") or ""
-            old = old if old else "<missing old_text>"
-            return _wrap(f"┊ 🧠 memory    ~{target}: \"{_trunc(old, 20)}\"  {dur}")
-        elif action == "remove":
+            old = old or "<missing old_text>"
+            return _wrap(f'┊ 🧠 memory    ~{target}: "{_trunc(old, 20)}"  {dur}')
+        if action == "remove":
             old = args.get("old_text") or ""
-            old = old if old else "<missing old_text>"
-            return _wrap(f"┊ 🧠 memory    -{target}: \"{_trunc(old, 20)}\"  {dur}")
+            old = old or "<missing old_text>"
+            return _wrap(f'┊ 🧠 memory    -{target}: "{_trunc(old, 20)}"  {dur}')
         return _wrap(f"┊ 🧠 memory    {action}  {dur}")
     if tool_name == "skills_list":
         return _wrap(f"┊ 📚 skills    list {args.get('category', 'all')}  {dur}")
@@ -1045,5 +1046,3 @@ def get_cute_tool_message(
 # =========================================================================
 # Honcho session line (one-liner with clickable OSC 8 hyperlink)
 # =========================================================================
-
-

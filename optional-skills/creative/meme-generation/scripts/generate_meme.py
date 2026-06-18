@@ -17,7 +17,6 @@ unknown templates get smart default text positioning based on their box_count.
 """
 
 import json
-import os
 import sys
 from io import BytesIO
 from pathlib import Path
@@ -49,7 +48,7 @@ def _fetch_url(url: str, timeout: int = 15) -> bytes:
 
 def load_curated_templates() -> dict:
     """Load templates with hand-tuned text field positions."""
-    with open(TEMPLATES_FILE) as f:
+    with Path(TEMPLATES_FILE).open() as f:
         return json.load(f)
 
 
@@ -69,7 +68,7 @@ def _default_fields(box_count: int) -> list:
     for i in range(box_count):
         y = 0.08 + (0.84 * i / (box_count - 1)) if box_count > 1 else 0.5
         fields.append({
-            "name": f"text{i+1}",
+            "name": f"text{i + 1}",
             "x_pct": 0.5,
             "y_pct": round(y, 2),
             "w_pct": 0.90,
@@ -87,19 +86,19 @@ def fetch_imgflip_templates() -> list:
     if IMGFLIP_CACHE_FILE.exists():
         age = time.time() - IMGFLIP_CACHE_FILE.stat().st_mtime
         if age < IMGFLIP_CACHE_MAX_AGE:
-            with open(IMGFLIP_CACHE_FILE) as f:
+            with Path(IMGFLIP_CACHE_FILE).open() as f:
                 return json.load(f)
 
     try:
         data = json.loads(_fetch_url(IMGFLIP_API))
         memes = data.get("data", {}).get("memes", [])
-        with open(IMGFLIP_CACHE_FILE, "w") as f:
+        with Path(IMGFLIP_CACHE_FILE).open("w") as f:
             json.dump(memes, f)
         return memes
     except Exception as e:
         # If fetch fails and we have stale cache, use it
         if IMGFLIP_CACHE_FILE.exists():
-            with open(IMGFLIP_CACHE_FILE) as f:
+            with Path(IMGFLIP_CACHE_FILE).open() as f:
                 return json.load(f)
         print(f"Warning: could not fetch imgflip templates: {e}", file=sys.stderr)
         return []
@@ -107,7 +106,7 @@ def fetch_imgflip_templates() -> list:
 
 def _slugify(name: str) -> str:
     """Convert a template name to a slug for matching."""
-    return name.lower().replace(" ", "-").replace("'", "").replace("\"", "")
+    return name.lower().replace(" ", "-").replace("'", "").replace('"', "")
 
 
 def resolve_template(identifier: str) -> dict:
@@ -156,7 +155,7 @@ def get_template_image(url: str) -> Image.Image:
     """Download a template image, caching it locally."""
     CACHE_DIR.mkdir(exist_ok=True)
     # Use URL hash as cache key
-    cache_name = url.split("/")[-1]
+    cache_name = url.rsplit("/", maxsplit=1)[-1]
     cache_path = CACHE_DIR / cache_name
 
     # Always cache as PNG to avoid JPEG/RGBA conflicts
@@ -183,7 +182,7 @@ def find_font(size: int) -> ImageFont.FreeTypeFont:
         "/System/Library/Fonts/SFCompact.ttf",
     ]
     for path in candidates:
-        if os.path.exists(path):
+        if Path(path).exists():
             try:
                 return ImageFont.truetype(path, size)
             except OSError:

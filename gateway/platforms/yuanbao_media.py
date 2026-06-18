@@ -24,7 +24,7 @@ import secrets
 import struct
 import time
 import urllib.parse
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -186,11 +186,10 @@ def _parse_webp_size(buf: bytes) -> dict[str, int] | None:
             w = (bits & 0x3FFF) + 1
             h = ((bits >> 14) & 0x3FFF) + 1
             return {"width": w, "height": h}
-    elif chunk == "VP8X":
-        if len(buf) >= 30:
-            w = (buf[24] | (buf[25] << 8) | (buf[26] << 16)) + 1
-            h = (buf[27] | (buf[28] << 8) | (buf[29] << 16)) + 1
-            return {"width": w, "height": h}
+    elif chunk == "VP8X" and len(buf) >= 30:
+        w = (buf[24] | (buf[25] << 8) | (buf[26] << 16)) + 1
+        h = (buf[27] | (buf[28] << 8) | (buf[29] << 16)) + 1
+        return {"width": w, "height": h}
     return None
 
 
@@ -288,8 +287,8 @@ def _cos_sign(
 
     # Step 2: HttpString
     # 参数和头部需按字典序排列，key 小写
-    sorted_params = sorted((k.lower(), urllib.parse.quote(str(v), safe="") ) for k, v in params.items())
-    sorted_headers = sorted((k.lower(), urllib.parse.quote(str(v), safe="") ) for k, v in headers.items())
+    sorted_params = sorted((k.lower(), urllib.parse.quote(str(v), safe="")) for k, v in params.items())
+    sorted_headers = sorted((k.lower(), urllib.parse.quote(str(v), safe="")) for k, v in headers.items())
 
     url_param_list = ";".join(k for k, _ in sorted_params)
     url_params = "&".join(f"{k}={v}" for k, v in sorted_params)
@@ -494,7 +493,7 @@ async def upload_to_cos(
 
     # 计算签名有效期
     now = int(time.time())
-    sign_start = start_time if start_time else now
+    sign_start = start_time or now
     sign_expire = (expired_time - now) if expired_time and expired_time > now else 3600
 
     authorization = _cos_sign(

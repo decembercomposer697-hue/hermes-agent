@@ -9,7 +9,6 @@ import unittest
 from collections import OrderedDict
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Dict
 from unittest.mock import AsyncMock, Mock, patch
 
 from gateway.platforms.base import ProcessingOutcome
@@ -360,7 +359,7 @@ class TestFeishuAdapterMessaging(unittest.TestCase):
                 adapter.edit_message(
                     chat_id="oc_chat",
                     message_id="om_progress",
-                    content="📖 read_file: \"/tmp/image.png\"",
+                    content='📖 read_file: "/tmp/image.png"',
                 ),
             )
 
@@ -370,7 +369,7 @@ class TestFeishuAdapterMessaging(unittest.TestCase):
         self.assertEqual(captured["request"].request_body.msg_type, "text")
         self.assertEqual(
             captured["request"].request_body.content,
-            json.dumps({"text": "📖 read_file: \"/tmp/image.png\""}, ensure_ascii=False),
+            json.dumps({"text": '📖 read_file: "/tmp/image.png"'}, ensure_ascii=False),
         )
 
     @patch.dict(os.environ, {}, clear=True)
@@ -1479,7 +1478,7 @@ class TestAdapterBehavior(unittest.TestCase):
         try:
             text = asyncio.run(adapter._maybe_extract_text_document(path, "text/plain"))
         finally:
-            os.unlink(path)
+            Path(path).unlink()
 
         self.assertIn("hello from feishu", text)
         self.assertIn("[Content of", text)
@@ -2173,7 +2172,7 @@ class TestAdapterBehavior(unittest.TestCase):
                     ),
                 )
         finally:
-            os.unlink(file_path)
+            Path(file_path).unlink()
 
         self.assertTrue(result.success)
         self.assertTrue(captured["request"].request_body.reply_in_thread)
@@ -2222,7 +2221,7 @@ class TestAdapterBehavior(unittest.TestCase):
             with patch("gateway.platforms.feishu.asyncio.to_thread", side_effect=_direct):
                 result = asyncio.run(adapter.send_document(chat_id="oc_chat", file_path=file_path))
         finally:
-            os.unlink(file_path)
+            Path(file_path).unlink()
 
         self.assertTrue(result.success)
         self.assertEqual(result.message_id, "om_file_msg")
@@ -2277,7 +2276,7 @@ class TestAdapterBehavior(unittest.TestCase):
                     adapter.send_document(chat_id="oc_chat", file_path=file_path, caption="报告请看"),
                 )
         finally:
-            os.unlink(file_path)
+            Path(file_path).unlink()
 
         self.assertTrue(result.success)
         self.assertEqual(captured["message_request"].request_body.msg_type, "post")
@@ -2329,7 +2328,7 @@ class TestAdapterBehavior(unittest.TestCase):
             with patch("gateway.platforms.feishu.asyncio.to_thread", side_effect=_direct):
                 result = asyncio.run(adapter.send_image_file(chat_id="oc_chat", image_path=image_path))
         finally:
-            os.unlink(image_path)
+            Path(image_path).unlink()
 
         self.assertTrue(result.success)
         self.assertEqual(result.message_id, "om_image_msg")
@@ -2384,7 +2383,7 @@ class TestAdapterBehavior(unittest.TestCase):
                     adapter.send_image_file(chat_id="oc_chat", image_path=image_path, caption="截图说明"),
                 )
         finally:
-            os.unlink(image_path)
+            Path(image_path).unlink()
 
         self.assertTrue(result.success)
         self.assertEqual(captured["message_request"].request_body.msg_type, "post")
@@ -2436,7 +2435,7 @@ class TestAdapterBehavior(unittest.TestCase):
             with patch("gateway.platforms.feishu.asyncio.to_thread", side_effect=_direct):
                 result = asyncio.run(adapter.send_video(chat_id="oc_chat", video_path=video_path))
         finally:
-            os.unlink(video_path)
+            Path(video_path).unlink()
 
         self.assertTrue(result.success)
         self.assertEqual(captured["upload_request"].request_body.file_type, "mp4")
@@ -2487,7 +2486,7 @@ class TestAdapterBehavior(unittest.TestCase):
             with patch("gateway.platforms.feishu.asyncio.to_thread", side_effect=_direct):
                 result = asyncio.run(adapter.send_voice(chat_id="oc_chat", audio_path=audio_path))
         finally:
-            os.unlink(audio_path)
+            Path(audio_path).unlink()
 
         self.assertTrue(result.success)
         self.assertEqual(captured["upload_request"].request_body.file_type, "opus")
@@ -2640,7 +2639,7 @@ class TestAdapterBehavior(unittest.TestCase):
                         "text": "确认已入库 ✓\n文件路径：`/root/.hermes/profiles/agent_cto/cron/jobs.json`\n**解码后的内容：**",
                     },
                 ],
-                [{"tag": "md", "text": "```json\n{\"cron\": \"list\"}\n```"}],
+                [{"tag": "md", "text": '```json\n{"cron": "list"}\n```'}],
                 [{"tag": "md", "text": "后续说明仍应保留。"}],
             ],
         )

@@ -81,8 +81,7 @@ def remove_orphaned_slides(unpacked_dir: Path) -> list[str]:
                         changed = True
 
         if changed:
-            with open(pres_rels_path, "wb") as f:
-                f.write(rels_dom.toxml(encoding="utf-8"))
+            Path(pres_rels_path).write_bytes(rels_dom.toxml(encoding="utf-8"))
 
     return removed
 
@@ -227,14 +226,12 @@ def update_content_types(unpacked_dir: Path, removed_files: list[str]) -> None:
 
     for override in list(dom.getElementsByTagName("Override")):
         part_name = override.getAttribute("PartName").lstrip("/")
-        if part_name in removed_files:
-            if override.parentNode:
-                override.parentNode.removeChild(override)
-                changed = True
+        if part_name in removed_files and override.parentNode:
+            override.parentNode.removeChild(override)
+            changed = True
 
     if changed:
-        with open(ct_path, "wb") as f:
-            f.write(dom.toxml(encoding="utf-8"))
+        Path(ct_path).write_bytes(dom.toxml(encoding="utf-8"))
 
 
 def clean_unused_files(unpacked_dir: Path) -> list[str]:

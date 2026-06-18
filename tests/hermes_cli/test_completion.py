@@ -1,7 +1,7 @@
 """Tests for hermes_cli/completion.py — shell completion script generation."""
 
 import argparse
-import os
+import pathlib
 import re
 import shutil
 import subprocess
@@ -117,7 +117,7 @@ class TestGenerateBash:
             result = subprocess.run(["bash", "-n", path], capture_output=True)
             assert result.returncode == 0, result.stderr.decode()
         finally:
-            os.unlink(path)
+            pathlib.Path(path).unlink()
 
 
 # ---------------------------------------------------------------------------
@@ -164,7 +164,7 @@ class TestGenerateZsh:
             result = subprocess.run(["zsh", "-n", path], capture_output=True, text=True)
             assert result.returncode == 0, result.stderr
         finally:
-            os.unlink(path)
+            pathlib.Path(path).unlink()
 
     def test_zsh_eval_style_source_registers_after_compinit(self):
         if not shutil.which("zsh"):
@@ -186,7 +186,7 @@ class TestGenerateZsh:
             assert result.returncode == 0, result.stderr
             assert result.stderr == ""
         finally:
-            os.unlink(path)
+            pathlib.Path(path).unlink()
 
 
 # ---------------------------------------------------------------------------
@@ -219,7 +219,7 @@ class TestGenerateFish:
             result = subprocess.run(["fish", path], capture_output=True)
             assert result.returncode == 0, result.stderr.decode()
         finally:
-            os.unlink(path)
+            pathlib.Path(path).unlink()
 
 
 # ---------------------------------------------------------------------------
@@ -264,7 +264,7 @@ class TestProfileCompletion:
 
     def test_bash_completes_profiles_after_p_flag(self):
         out = generate_bash(_make_parser())
-        assert '"-p"' in out or "== \"-p\"" in out
+        assert '"-p"' in out or '== "-p"' in out
         assert '"--profile"' in out or '== "--profile"' in out
         assert "_hermes_profiles" in out
 

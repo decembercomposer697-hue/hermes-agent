@@ -7,7 +7,6 @@ adds latency to the user-facing reply.
 import logging
 import threading
 from collections.abc import Callable
-from typing import Optional
 
 from agent.auxiliary_client import call_llm
 
@@ -71,7 +70,7 @@ def generate_title(
         # Enforce reasonable length
         if len(title) > 80:
             title = title[:77] + "..."
-        return title if title else None
+        return title or None
     except Exception as e:
         # Log at WARNING so this shows up in agent.log without debug mode.
         # Full detail at debug level for operators who need the stack.

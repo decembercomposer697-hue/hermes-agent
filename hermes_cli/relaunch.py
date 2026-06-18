@@ -8,10 +8,10 @@ Also works when ``hermes`` is not on PATH (e.g. ``nix run`` or ``python -m``).
 """
 
 import os
+import pathlib
 import shutil
 import sys
 from collections.abc import Sequence
-from typing import Optional
 
 from hermes_cli._parser import (
     PRE_ARGPARSE_INHERITED_FLAGS,
@@ -102,12 +102,12 @@ def resolve_hermes_bin() -> str | None:
         return p.lower().endswith((".py", ".pyc"))
 
     # Absolute path to an executable (covers nix store, venv wrappers, etc.)
-    if os.path.isabs(argv0) and os.path.isfile(argv0) and os.access(argv0, os.X_OK):
+    if pathlib.Path(argv0).is_absolute() and pathlib.Path(argv0).is_file() and os.access(argv0, os.X_OK):
         if not (_is_windows and _is_python_script(argv0)):
             return argv0
 
     # Relative path — resolve against CWD
-    if not argv0.startswith("-") and os.path.isfile(argv0):
+    if not argv0.startswith("-") and pathlib.Path(argv0).is_file():
         abs_path = os.path.abspath(argv0)
         if os.access(abs_path, os.X_OK):
             if not (_is_windows and _is_python_script(abs_path)):

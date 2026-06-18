@@ -1,5 +1,7 @@
 """Tests for ${ENV_VAR} substitution in config.yaml values."""
 
+import math
+
 import pytest
 
 from hermes_cli.config import _expand_env_vars, load_config
@@ -39,7 +41,7 @@ class TestExpandEnvVars:
 
     def test_non_string_values_untouched(self):
         assert _expand_env_vars(42) == 42
-        assert _expand_env_vars(3.14) == 3.14
+        assert _expand_env_vars(math.pi) == math.pi
         assert _expand_env_vars(True) is True
         assert _expand_env_vars(None) is None
 

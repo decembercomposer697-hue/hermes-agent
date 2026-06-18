@@ -25,7 +25,6 @@ import tempfile
 import threading
 import time
 from pathlib import Path
-from typing import Optional
 
 from gateway.whatsapp_identity import (
     expand_whatsapp_aliases,
@@ -65,12 +64,12 @@ def _secure_write(path: Path, data: str) -> None:
             os.fsync(f.fileno())
         atomic_replace(tmp_path, path)
         try:
-            os.chmod(path, 0o600)
+            Path(path).chmod(0o600)
         except OSError:
             pass  # Windows doesn't support chmod the same way
     except BaseException:
         try:
-            os.unlink(tmp_path)
+            Path(tmp_path).unlink()
         except OSError:
             pass
         raise

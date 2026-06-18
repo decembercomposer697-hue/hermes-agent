@@ -25,7 +25,7 @@ import hmac
 import logging
 import os
 import urllib.parse
-from typing import Any, Dict, Optional
+from typing import Any
 
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import (
@@ -273,7 +273,7 @@ class SmsAdapter(BasePlatformAdapter):
                 (parsed.scheme, parsed.hostname, parsed.path,
                  parsed.params, parsed.query, parsed.fragment),
             )
-        elif parsed.port is None:
+        if parsed.port is None:
             # No port → add default
             netloc = f"{parsed.hostname}:{default_port}"
             return urllib.parse.urlunparse(

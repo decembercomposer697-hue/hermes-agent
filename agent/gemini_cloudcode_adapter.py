@@ -34,7 +34,7 @@ import time
 import uuid
 from collections.abc import Iterator
 from types import SimpleNamespace
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import httpx
 
@@ -440,7 +440,6 @@ def _map_gemini_finish_reason(reason: str) -> str:
 
 class _GeminiStreamChunk(SimpleNamespace):
     """Mimics an OpenAI ChatCompletionChunk with .choices[0].delta."""
-    pass
 
 
 def _make_stream_chunk(

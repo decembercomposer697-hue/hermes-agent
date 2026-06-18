@@ -46,7 +46,6 @@ _DEPRECATION_MARKERS = (
 
 def _is_gh_copilot_deprecation_message(stderr_text: str) -> bool:
     """True iff stderr looks like the deprecated gh-copilot extension's banner."""
-
     lower = stderr_text.lower()
     if not any(req in lower for req in _DEPRECATION_REQUIRED):
         return False
@@ -70,7 +69,6 @@ def _resolve_args() -> list[str]:
 
 def _resolve_home_dir() -> str:
     """Return a stable HOME for child ACP processes."""
-
     try:
         from hermes_constants import get_subprocess_home
 
@@ -256,7 +254,7 @@ def _extract_tool_calls_from_text(text: str) -> tuple[list[SimpleNamespace], str
             fn_args = json.dumps(fn_args, ensure_ascii=False)
         call_id = obj.get("id")
         if not isinstance(call_id, str) or not call_id.strip():
-            call_id = f"acp_call_{len(extracted)+1}"
+            call_id = f"acp_call_{len(extracted) + 1}"
 
         extracted.append(
             SimpleNamespace(

@@ -30,7 +30,6 @@ Inspired by Clawdbot's ``normalizeAnthropicModelId`` pattern.
 from __future__ import annotations
 
 import re
-from typing import Optional
 
 # ---------------------------------------------------------------------------
 # Vendor prefix mapping
@@ -472,4 +471,3 @@ def normalize_model_for_provider(model_input: str, target_provider: str) -> str:
 # ---------------------------------------------------------------------------
 # Batch / convenience helpers
 # ---------------------------------------------------------------------------
-

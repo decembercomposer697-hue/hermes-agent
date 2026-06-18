@@ -152,6 +152,7 @@ class FakeAgent:
 
 class LongPreviewAgent:
     """Agent that emits a tool call with a very long preview string."""
+
     LONG_CMD = "cd /home/teknium/.hermes/hermes-agent/.worktrees/hermes-d8860339 && source .venv/bin/activate && python -m pytest tests/gateway/test_run_progress_topics.py -n0 -q"
 
     def __init__(self, **kwargs):
@@ -661,6 +662,7 @@ class BackgroundReviewAgent:
 
 class VerboseAgent:
     """Agent that emits a tool call with args whose JSON exceeds 200 chars."""
+
     LONG_CODE = "x" * 300
 
     def __init__(self, **kwargs):

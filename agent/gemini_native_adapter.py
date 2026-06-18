@@ -24,7 +24,7 @@ import time
 import uuid
 from collections.abc import Iterator
 from types import SimpleNamespace
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import httpx
 
@@ -844,8 +844,7 @@ class GeminiNativeClient:
             )
         self.api_key = api_key
         normalized_base = (base_url or DEFAULT_GEMINI_BASE_URL).rstrip("/")
-        if normalized_base.endswith("/openai"):
-            normalized_base = normalized_base[: -len("/openai")]
+        normalized_base = normalized_base.removesuffix("/openai")
         self.base_url = normalized_base
         self._default_headers = dict(default_headers or {})
         self.chat = _GeminiChatNamespace(self)

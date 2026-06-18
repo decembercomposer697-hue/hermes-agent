@@ -42,7 +42,7 @@ import logging
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 from urllib import request as urllib_request
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
@@ -282,7 +282,7 @@ def _probe_anthropic_messages(base_url: str,
         try:
             body = exc.read().decode("utf-8", errors="replace")
             lowered = body.lower()
-            if "anthropic" in lowered or '"type"' in lowered and '"error"' in lowered:
+            if "anthropic" in lowered or ('"type"' in lowered and '"error"' in lowered):
                 return True
             # Pre-Azure-v1 Azure Foundry returns a plain 404 for
             # Anthropic-style calls on non-Anthropic deployments.  A

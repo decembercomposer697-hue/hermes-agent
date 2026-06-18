@@ -15,7 +15,6 @@ import logging
 import os
 import re
 import urllib.request
-from typing import Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +111,7 @@ def _parse_package_from_args(
 
     if ecosystem == "npm":
         return _parse_npm_package(package_token)
-    elif ecosystem == "PyPI":
+    if ecosystem == "PyPI":
         return _parse_pypi_package(package_token)
     return package_token, None
 

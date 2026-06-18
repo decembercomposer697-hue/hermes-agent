@@ -12,7 +12,7 @@ import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -93,7 +93,7 @@ class TeamsPipelineConfig:
         tmp_dir = data.get("tmp_dir") or data.get("tmpDir")
         return cls(
             transcript_preferred=bool(data.get("transcript_preferred", True)),
-            transcript_required=bool(data.get("transcript_required", False)),
+            transcript_required=bool(data.get("transcript_required")),
             transcription_fallback=bool(data.get("transcription_fallback", True)),
             stt_model=data.get("stt_model") or data.get("sttModel"),
             ffmpeg_extract_audio=bool(data.get("ffmpeg_extract_audio", True)),

@@ -38,7 +38,6 @@ import sys
 import termios
 import time
 from collections.abc import Sequence
-from typing import Optional
 
 try:
     import ptyprocess  # type: ignore

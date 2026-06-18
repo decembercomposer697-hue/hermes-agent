@@ -2,6 +2,7 @@
 
 import json
 import os
+import pathlib
 import time
 
 import pytest
@@ -11,7 +12,7 @@ import pytest
 def rate_guard_env(tmp_path, monkeypatch):
     """Isolate rate guard state to a temp directory."""
     hermes_home = str(tmp_path / ".hermes")
-    os.makedirs(hermes_home, exist_ok=True)
+    pathlib.Path(hermes_home).mkdir(exist_ok=True, parents=True)
     monkeypatch.setenv("HERMES_HOME", hermes_home)
     # Clear any cached module-level imports
     return hermes_home
@@ -27,8 +28,8 @@ class TestRecordNousRateLimit:
         record_nous_rate_limit(headers=headers)
 
         path = _state_path()
-        assert os.path.exists(path)
-        with open(path) as f:
+        assert pathlib.Path(path).exists()
+        with pathlib.Path(path).open() as f:
             state = json.load(f)
         assert state["reset_seconds"] == pytest.approx(1800, abs=2)
         assert state["reset_at"] > time.time()
@@ -39,7 +40,7 @@ class TestRecordNousRateLimit:
         headers = {"x-ratelimit-reset-requests": "45"}
         record_nous_rate_limit(headers=headers)
 
-        with open(_state_path()) as f:
+        with pathlib.Path(_state_path()).open() as f:
             state = json.load(f)
         assert state["reset_seconds"] == pytest.approx(45, abs=2)
 
@@ -49,7 +50,7 @@ class TestRecordNousRateLimit:
         headers = {"retry-after": "60"}
         record_nous_rate_limit(headers=headers)
 
-        with open(_state_path()) as f:
+        with pathlib.Path(_state_path()).open() as f:
             state = json.load(f)
         assert state["reset_seconds"] == pytest.approx(60, abs=2)
 
@@ -62,7 +63,7 @@ class TestRecordNousRateLimit:
         }
         record_nous_rate_limit(headers=headers)
 
-        with open(_state_path()) as f:
+        with pathlib.Path(_state_path()).open() as f:
             state = json.load(f)
         # Should use the hourly value, not the per-minute one
         assert state["reset_seconds"] == pytest.approx(1800, abs=2)
@@ -76,7 +77,7 @@ class TestRecordNousRateLimit:
             error_context={"reset_at": future_reset},
         )
 
-        with open(_state_path()) as f:
+        with pathlib.Path(_state_path()).open() as f:
             state = json.load(f)
         assert state["reset_at"] == pytest.approx(future_reset, abs=1)
 
@@ -85,7 +86,7 @@ class TestRecordNousRateLimit:
 
         record_nous_rate_limit(headers=None)
 
-        with open(_state_path()) as f:
+        with pathlib.Path(_state_path()).open() as f:
             state = json.load(f)
         # Default is 300 seconds (5 minutes)
         assert state["reset_seconds"] == pytest.approx(300, abs=2)
@@ -95,7 +96,7 @@ class TestRecordNousRateLimit:
 
         record_nous_rate_limit(headers=None, default_cooldown=120.0)
 
-        with open(_state_path()) as f:
+        with pathlib.Path(_state_path()).open() as f:
             state = json.load(f)
         assert state["reset_seconds"] == pytest.approx(120, abs=2)
 
@@ -103,7 +104,7 @@ class TestRecordNousRateLimit:
         from agent.nous_rate_guard import _state_path, record_nous_rate_limit
 
         record_nous_rate_limit(headers={"retry-after": "10"})
-        assert os.path.exists(_state_path())
+        assert pathlib.Path(_state_path()).exists()
 
 
 class TestNousRateLimitRemaining:
@@ -130,21 +131,20 @@ class TestNousRateLimitRemaining:
 
         # Write an already-expired state
         state_dir = os.path.dirname(_state_path())
-        os.makedirs(state_dir, exist_ok=True)
-        with open(_state_path(), "w") as f:
+        pathlib.Path(state_dir).mkdir(exist_ok=True, parents=True)
+        with pathlib.Path(_state_path()).open("w") as f:
             json.dump({"reset_at": time.time() - 10, "recorded_at": time.time() - 100}, f)
 
         assert nous_rate_limit_remaining() is None
         # File should be cleaned up
-        assert not os.path.exists(_state_path())
+        assert not pathlib.Path(_state_path()).exists()
 
     def test_handles_corrupt_file(self, rate_guard_env):
         from agent.nous_rate_guard import _state_path, nous_rate_limit_remaining
 
         state_dir = os.path.dirname(_state_path())
-        os.makedirs(state_dir, exist_ok=True)
-        with open(_state_path(), "w") as f:
-            f.write("not valid json{{{")
+        pathlib.Path(state_dir).mkdir(exist_ok=True, parents=True)
+        pathlib.Path(_state_path()).write_text("not valid json{{{")
 
         assert nous_rate_limit_remaining() is None
 
@@ -165,7 +165,7 @@ class TestClearNousRateLimit:
 
         clear_nous_rate_limit()
         assert nous_rate_limit_remaining() is None
-        assert not os.path.exists(_state_path())
+        assert not pathlib.Path(_state_path()).exists()
 
     def test_clear_when_no_file(self, rate_guard_env):
         from agent.nous_rate_guard import clear_nous_rate_limit

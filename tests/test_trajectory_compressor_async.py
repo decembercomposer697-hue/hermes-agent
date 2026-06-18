@@ -10,6 +10,7 @@ The fix creates the AsyncOpenAI client lazily via _get_async_client() so
 each asyncio.run() gets a client bound to the current loop.
 """
 
+import pathlib
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -91,7 +92,7 @@ class TestSourceLineVerification:
     def _read_file() -> str:
         import os
         base = os.path.dirname(os.path.dirname(__file__))
-        with open(os.path.join(base, "trajectory_compressor.py")) as f:
+        with pathlib.Path(os.path.join(base, "trajectory_compressor.py")).open() as f:
             return f.read()
 
     def test_no_eager_async_openai_in_init(self):
@@ -101,10 +102,10 @@ class TestSourceLineVerification:
         # should not exist — only self.async_client = None
         lines = src.split("\n")
         for i, line in enumerate(lines, 1):
-            if "self.async_client = AsyncOpenAI(" in line and "_get_async_client" not in lines[max(0,i-3):i+1]:
+            if "self.async_client = AsyncOpenAI(" in line and "_get_async_client" not in lines[max(0, i - 3):i + 1]:
                 # Allow it inside _get_async_client method
                 # Check if we're inside _get_async_client by looking at context
-                context = "\n".join(lines[max(0,i-20):i+1])
+                context = "\n".join(lines[max(0, i - 20):i + 1])
                 if "_get_async_client" not in context:
                     pytest.fail(
                         f"Line {i}: AsyncOpenAI created eagerly outside _get_async_client()",

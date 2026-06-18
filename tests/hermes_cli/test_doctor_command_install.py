@@ -40,8 +40,8 @@ def _setup_doctor_env(monkeypatch, tmp_path, venv_name="venv"):
     # Stub auth checks
     try:
         from hermes_cli import auth as _auth_mod
-        monkeypatch.setattr(_auth_mod, "get_nous_auth_status", lambda: {})
-        monkeypatch.setattr(_auth_mod, "get_codex_auth_status", lambda: {})
+        monkeypatch.setattr(_auth_mod, "get_nous_auth_status", dict)
+        monkeypatch.setattr(_auth_mod, "get_codex_auth_status", dict)
     except Exception:
         pass
 
@@ -175,8 +175,8 @@ class TestDoctorCommandInstallation:
         monkeypatch.setitem(sys.modules, "model_tools", fake_model_tools)
         try:
             from hermes_cli import auth as _auth_mod
-            monkeypatch.setattr(_auth_mod, "get_nous_auth_status", lambda: {})
-            monkeypatch.setattr(_auth_mod, "get_codex_auth_status", lambda: {})
+            monkeypatch.setattr(_auth_mod, "get_nous_auth_status", dict)
+            monkeypatch.setattr(_auth_mod, "get_codex_auth_status", dict)
         except Exception:
             pass
         try:
@@ -215,7 +215,7 @@ class TestDoctorCommandInstallation:
         cmd_link_dir = tmp_path / ".local" / "bin"
         cmd_link_dir.mkdir(parents=True)
         cmd_link = cmd_link_dir / "hermes"
-        cmd_link.write_text("#!/bin/sh\nexec python -m hermes_cli.main \"$@\"\n")
+        cmd_link.write_text('#!/bin/sh\nexec python -m hermes_cli.main "$@"\n')
 
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
@@ -260,8 +260,8 @@ class TestDoctorCommandInstallation:
         monkeypatch.setitem(sys.modules, "model_tools", fake_model_tools)
         try:
             from hermes_cli import auth as _auth_mod
-            monkeypatch.setattr(_auth_mod, "get_nous_auth_status", lambda: {})
-            monkeypatch.setattr(_auth_mod, "get_codex_auth_status", lambda: {})
+            monkeypatch.setattr(_auth_mod, "get_nous_auth_status", dict)
+            monkeypatch.setattr(_auth_mod, "get_codex_auth_status", dict)
         except Exception:
             pass
         try:

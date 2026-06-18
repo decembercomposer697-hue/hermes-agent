@@ -2,7 +2,6 @@
 
 import json
 import time
-from typing import List, Optional
 from unittest.mock import MagicMock, patch
 
 import httpx
@@ -318,11 +317,11 @@ class TestSkillsShSource:
     def test_empty_search_uses_featured_homepage_links(self, mock_get, _mock_read_cache, _mock_write_cache):
         mock_get.return_value = MagicMock(
             status_code=200,
-            text='''
+            text="""
                 <a href="/vercel-labs/agent-skills/vercel-react-best-practices">React</a>
                 <a href="/anthropics/skills/pdf">PDF</a>
                 <a href="/vercel-labs/agent-skills/vercel-react-best-practices">React again</a>
-            ''',
+            """,
         )
 
         results = self._source().search("", limit=10)
@@ -384,13 +383,13 @@ class TestSkillsShSource:
         )
         mock_get.return_value = MagicMock(
             status_code=200,
-            text='''
+            text="""
                 <h1>vercel-react-best-practices</h1>
                 <code>$ npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices</code>
                 <div class="prose"><h1>Vercel React Best Practices</h1><p>React rules.</p></div>
                 <a href="/vercel-labs/agent-skills/vercel-react-best-practices/security/socket">Socket</a> Pass
                 <a href="/vercel-labs/agent-skills/vercel-react-best-practices/security/snyk">Snyk</a> Pass
-            ''',
+            """,
         )
 
         meta = self._source().inspect("skills-sh/vercel-labs/agent-skills/vercel-react-best-practices")
@@ -462,11 +461,11 @@ class TestSkillsShSource:
         mock_list_skills.return_value = [resolved]
         mock_get.return_value = MagicMock(
             status_code=200,
-            text='''
+            text="""
                 <h1>json-render-react</h1>
                 <code>$ npx skills add https://github.com/vercel-labs/json-render --skill json-render-react</code>
                 <div class="prose"><h1>@json-render/react</h1><p>React renderer.</p></div>
-            ''',
+            """,
         )
 
         meta = self._source().inspect("skills-sh/vercel-labs/json-render/json-render-react")
@@ -502,11 +501,11 @@ class TestSkillsShSource:
         mock_list_skills.return_value = [resolved_meta]
         mock_get.return_value = MagicMock(
             status_code=200,
-            text='''
+            text="""
                 <h1>json-render-react</h1>
                 <code>$ npx skills add https://github.com/vercel-labs/json-render --skill json-render-react</code>
                 <div class="prose"><h1>@json-render/react</h1><p>React renderer.</p></div>
-            ''',
+            """,
         )
 
         bundle = self._source().fetch("skills-sh/vercel-labs/json-render/json-render-react")
@@ -573,7 +572,7 @@ class TestSkillsShSource:
             if url.endswith("/contents/"):
                 # Root listing for shallow scan — return empty so it falls through
                 resp.status_code = 200
-                resp.json = lambda: []
+                resp.json = list
                 return resp
             if "/contents/" in url:
                 # All contents API calls fail (candidate paths miss)
@@ -629,7 +628,7 @@ class TestSkillsShSource:
             resp = MagicMock()
             if url == root_url:
                 resp.status_code = 200
-                resp.json = lambda: []
+                resp.json = list
                 return resp
             resp.status_code = 404
             return resp

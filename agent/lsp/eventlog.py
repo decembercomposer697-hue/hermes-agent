@@ -40,7 +40,6 @@ from __future__ import annotations
 import logging
 import os
 import threading
-from typing import Tuple
 
 # Dedicated logger name so the documented grep recipe survives a
 # ``logging.getLogger(__name__)`` rename of any internal module.
@@ -204,15 +203,15 @@ def reset_announce_caches() -> None:
 
 __all__ = [
     "event_log",
-    "log_clean",
-    "log_disabled",
     "log_active",
+    "log_clean",
     "log_diagnostics",
+    "log_disabled",
     "log_no_project_root",
-    "log_server_unavailable",
     "log_no_server_configured",
-    "log_timeout",
     "log_server_error",
+    "log_server_unavailable",
     "log_spawn_failed",
+    "log_timeout",
     "reset_announce_caches",
 ]

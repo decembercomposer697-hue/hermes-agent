@@ -36,7 +36,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any, FrozenSet, Optional, Tuple
+from typing import Any
 
 # Slash commands that MUST stay reachable for any allowed user, even when
 # slash gating is enabled and the user has no commands listed. Without this
@@ -224,6 +224,6 @@ def policy_for_source(gateway_config: Any, source: Any) -> SlashAccessPolicy:
 
 __all__ = [
     "SlashAccessPolicy",
-    "policy_from_extra",
     "policy_for_source",
+    "policy_from_extra",
 ]

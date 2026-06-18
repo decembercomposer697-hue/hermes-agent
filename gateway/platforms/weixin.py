@@ -27,7 +27,7 @@ import time
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from urllib.parse import quote, urlparse
 
 logger = logging.getLogger(__name__)
@@ -53,6 +53,8 @@ except ImportError:  # pragma: no cover - dependency gate
     algorithms = None  # type: ignore[assignment]
     modes = None  # type: ignore[assignment]
     CRYPTO_AVAILABLE = False
+
+import string
 
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import (
@@ -134,6 +136,7 @@ def _make_ssl_connector() -> aiohttp.TCPConnector | None:
         return None
     ssl_ctx = ssl.create_default_context(cafile=certifi.where())
     return aiohttp.TCPConnector(ssl=ssl_ctx)
+
 
 ITEM_TEXT = 1
 ITEM_IMAGE = 2
@@ -354,7 +357,7 @@ def _parse_aes_key(aes_key_b64: str) -> bytes:
         return decoded
     if len(decoded) == 32:
         text = decoded.decode("ascii", errors="ignore")
-        if text and all(ch in "0123456789abcdefABCDEF" for ch in text):
+        if text and all(ch in string.hexdigits for ch in text):
             return bytes.fromhex(text)
     raise ValueError(f"unexpected aes_key format ({len(decoded)} decoded bytes)")
 
@@ -662,10 +665,8 @@ def _mime_from_filename(filename: str) -> str:
 
 def _split_table_row(line: str) -> list[str]:
     row = line.strip()
-    if row.startswith("|"):
-        row = row[1:]
-    if row.endswith("|"):
-        row = row[:-1]
+    row = row.removeprefix("|")
+    row = row.removesuffix("|")
     return [cell.strip() for cell in row.split("|")]
 
 
@@ -1036,7 +1037,7 @@ async def qr_login(
 
         # qrcode_url is the full scannable liteapp URL; qrcode_value is just the hex token
         # WeChat needs to scan the full URL, not the raw hex string
-        qr_scan_data = qrcode_url if qrcode_url else qrcode_value
+        qr_scan_data = qrcode_url or qrcode_value
 
         print("\n请使用微信扫描以下二维码：")
         if qrcode_url:
@@ -1095,7 +1096,7 @@ async def qr_login(
                     )
                     qrcode_value = str(qr_resp.get("qrcode") or "")
                     qrcode_url = str(qr_resp.get("qrcode_img_content") or "")
-                    qr_scan_data = qrcode_url if qrcode_url else qrcode_value
+                    qr_scan_data = qrcode_url or qrcode_value
                     if qrcode_url:
                         print(qrcode_url)
                     try:
@@ -1578,8 +1579,8 @@ class WeixinAdapter(BasePlatformAdapter):
                 self._poll_session,
                 cdn_base_url=self._cdn_base_url,
                 encrypted_query_param=media.get("encrypt_query_param"),
-                aes_key_b64=(item.get("image_item") or {}).get("aeskey")
-                and base64.b64encode(bytes.fromhex(str((item.get("image_item") or {}).get("aeskey")))).decode("ascii")
+                aes_key_b64=((item.get("image_item") or {}).get("aeskey")
+                and base64.b64encode(bytes.fromhex(str((item.get("image_item") or {}).get("aeskey")))).decode("ascii"))
                 or media.get("aes_key"),
                 full_url=media.get("full_url"),
                 timeout_seconds=30.0,
@@ -1970,15 +1971,15 @@ class WeixinAdapter(BasePlatformAdapter):
             cleanup = True
         else:
             file_path = image_url.replace("file://", "")
-            if not os.path.isabs(file_path):
+            if not Path(file_path).is_absolute():
                 file_path = os.path.abspath(file_path)
             cleanup = False
         try:
             return await self.send_document(chat_id, file_path, caption=caption, metadata=metadata)
         finally:
-            if cleanup and file_path and os.path.exists(file_path):
+            if cleanup and file_path and Path(file_path).exists():
                 try:
-                    os.unlink(file_path)
+                    Path(file_path).unlink()
                 except OSError:
                     pass
 

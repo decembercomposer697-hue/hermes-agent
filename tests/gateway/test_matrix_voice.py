@@ -2,7 +2,6 @@
 
 Updated for the mautrix-python SDK (no more matrix-nio / nio imports).
 """
-import os
 import tempfile
 import types
 from types import SimpleNamespace
@@ -17,6 +16,8 @@ try:
         pytest.skip("mautrix in sys.modules is a mock, not the real package", allow_module_level=True)
 except ImportError:
     pytest.skip("mautrix not installed", allow_module_level=True)
+
+import pathlib
 
 from gateway.platforms.base import MessageType
 
@@ -330,4 +331,4 @@ class TestMatrixSendVoiceMSC3245:
             assert self.upload_call["filename"].endswith(".ogg")
 
         finally:
-            os.unlink(temp_path)
+            pathlib.Path(temp_path).unlink()

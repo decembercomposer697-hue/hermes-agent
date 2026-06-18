@@ -50,7 +50,6 @@ def _make_dummy_env(**kwargs):
 
 def test_ensure_docker_available_logs_and_raises_when_not_found(monkeypatch, caplog):
     """When docker cannot be found, raise a clear error before container setup."""
-
     monkeypatch.setattr(docker_env, "find_docker", lambda: None)
     monkeypatch.setattr(
         docker_env.subprocess,
@@ -58,9 +57,8 @@ def test_ensure_docker_available_logs_and_raises_when_not_found(monkeypatch, cap
         lambda *args, **kwargs: pytest.fail("subprocess.run should not be called when docker is missing"),
     )
 
-    with caplog.at_level(logging.ERROR):
-        with pytest.raises(RuntimeError) as excinfo:
-            _make_dummy_env()
+    with caplog.at_level(logging.ERROR), pytest.raises(RuntimeError) as excinfo:
+        _make_dummy_env()
 
     assert "Docker executable not found in PATH or known install locations" in str(excinfo.value)
     assert any(
@@ -79,9 +77,8 @@ def test_ensure_docker_available_logs_and_raises_on_timeout(monkeypatch, caplog)
     monkeypatch.setattr(docker_env, "find_docker", lambda: "/custom/docker")
     monkeypatch.setattr(docker_env.subprocess, "run", _raise_timeout)
 
-    with caplog.at_level(logging.ERROR):
-        with pytest.raises(RuntimeError) as excinfo:
-            _make_dummy_env()
+    with caplog.at_level(logging.ERROR), pytest.raises(RuntimeError) as excinfo:
+        _make_dummy_env()
 
     assert "Docker daemon is not responding" in str(excinfo.value)
     assert any(
@@ -92,7 +89,6 @@ def test_ensure_docker_available_logs_and_raises_on_timeout(monkeypatch, caplog)
 
 def test_ensure_docker_available_uses_resolved_executable(monkeypatch):
     """When docker is found outside PATH, preflight should use that resolved path."""
-
     calls = []
 
     def _run(cmd, **kwargs):
@@ -329,7 +325,7 @@ def test_init_env_args_never_forwards_blank_secret(monkeypatch):
     env = _make_execute_only_env(["MY_SECRET"])
 
     monkeypatch.setenv("MY_SECRET", "")
-    monkeypatch.setattr(docker_env, "_load_hermes_env_vars", lambda: {})
+    monkeypatch.setattr(docker_env, "_load_hermes_env_vars", dict)
 
     args = env._build_init_env_args()
 
@@ -373,7 +369,7 @@ def test_forward_env_overrides_docker_env_in_init_args(monkeypatch):
     env._env = {"MY_KEY": "static_value"}
 
     monkeypatch.setenv("MY_KEY", "dynamic_value")
-    monkeypatch.setattr(docker_env, "_load_hermes_env_vars", lambda: {})
+    monkeypatch.setattr(docker_env, "_load_hermes_env_vars", dict)
 
     args = env._build_init_env_args()
     args_str = " ".join(args)
@@ -388,7 +384,7 @@ def test_docker_env_and_forward_env_merge_in_init_args(monkeypatch):
     env._env = {"SSH_AUTH_SOCK": "/run/user/1000/agent.sock"}
 
     monkeypatch.setenv("TOKEN", "secret123")
-    monkeypatch.setattr(docker_env, "_load_hermes_env_vars", lambda: {})
+    monkeypatch.setattr(docker_env, "_load_hermes_env_vars", dict)
 
     args = env._build_init_env_args()
     args_str = " ".join(args)
@@ -1530,11 +1526,11 @@ def test_credential_mount_skipped_when_source_is_directory(monkeypatch, tmp_path
     )
     monkeypatch.setattr(
         "tools.credential_files.get_skills_directory_mount",
-        lambda: [],
+        list,
     )
     monkeypatch.setattr(
         "tools.credential_files.get_cache_directory_mounts",
-        lambda: [],
+        list,
     )
 
     with caplog.at_level(logging.WARNING):
@@ -1570,11 +1566,11 @@ def test_credential_mount_skipped_when_source_missing(monkeypatch, tmp_path, cap
     )
     monkeypatch.setattr(
         "tools.credential_files.get_skills_directory_mount",
-        lambda: [],
+        list,
     )
     monkeypatch.setattr(
         "tools.credential_files.get_cache_directory_mounts",
-        lambda: [],
+        list,
     )
 
     with caplog.at_level(logging.WARNING):
@@ -1608,11 +1604,11 @@ def test_credential_mount_works_when_source_is_valid_file(monkeypatch, tmp_path)
     )
     monkeypatch.setattr(
         "tools.credential_files.get_skills_directory_mount",
-        lambda: [],
+        list,
     )
     monkeypatch.setattr(
         "tools.credential_files.get_cache_directory_mounts",
-        lambda: [],
+        list,
     )
 
     _make_dummy_env()

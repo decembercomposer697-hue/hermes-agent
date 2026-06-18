@@ -512,7 +512,7 @@ def test_agent_created_report_excludes_bundled_and_hub(skills_home):
 
 
 def test_agent_created_report_derives_activity_from_view_and_patch(skills_home, monkeypatch):
-    import tools.skill_usage as skill_usage
+    from tools import skill_usage
 
     skills_dir = skills_home / "skills"
     _write_skill(skills_dir, "mine")
@@ -669,7 +669,7 @@ def test_end_to_end_telemetry_tracked_but_lifecycle_refused(skills_home):
         set_state(name, STATE_ARCHIVED)
         set_pinned(name, True)
         ok, _msg = archive_skill(name)
-        assert not ok, f"archive_skill(\"{name}\") should refuse"
+        assert not ok, f'archive_skill("{name}") should refuse'
 
     data = load_usage()
     # Telemetry landed for both.

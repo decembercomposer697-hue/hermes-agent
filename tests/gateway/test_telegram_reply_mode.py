@@ -279,7 +279,7 @@ class TestTelegramYamlConfigLoading:
     def test_extra_reply_to_mode_off(self, tmp_path, monkeypatch):
         """telegram.extra.reply_to_mode is also honoured."""
         hermes_home = self._write_config(
-            tmp_path, "telegram:\n  extra:\n    reply_to_mode: \"off\"\n",
+            tmp_path, 'telegram:\n  extra:\n    reply_to_mode: "off"\n',
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
         monkeypatch.delenv("TELEGRAM_REPLY_TO_MODE", raising=False)
@@ -302,7 +302,7 @@ class TestTelegramYamlConfigLoading:
         """telegram.reply_to_mode wins over telegram.extra.reply_to_mode."""
         hermes_home = self._write_config(
             tmp_path,
-            "telegram:\n  reply_to_mode: all\n  extra:\n    reply_to_mode: \"off\"\n",
+            'telegram:\n  reply_to_mode: all\n  extra:\n    reply_to_mode: "off"\n',
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
         monkeypatch.delenv("TELEGRAM_REPLY_TO_MODE", raising=False)

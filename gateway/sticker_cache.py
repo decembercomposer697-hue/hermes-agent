@@ -9,9 +9,9 @@ Cache location: ~/.hermes/sticker_cache.json
 
 import json
 import os
+import pathlib
 import tempfile
 import time
-from typing import Optional
 
 from hermes_cli.config import get_hermes_home
 
@@ -45,10 +45,10 @@ def _save_cache(cache: dict) -> None:
             json.dump(cache, f, indent=2, ensure_ascii=False)
             f.flush()
             os.fsync(f.fileno())
-        os.replace(tmp_path, str(CACHE_PATH))
+        pathlib.Path(tmp_path).replace(str(CACHE_PATH))
     except BaseException:
         try:
-            os.unlink(tmp_path)
+            pathlib.Path(tmp_path).unlink()
         except OSError:
             pass
         raise
@@ -102,11 +102,11 @@ def build_sticker_injection(
     """
     context = ""
     if set_name and emoji:
-        context = f" {emoji} from \"{set_name}\""
+        context = f' {emoji} from "{set_name}"'
     elif emoji:
         context = f" {emoji}"
 
-    return f"[The user sent a sticker{context}~ It shows: \"{description}\" (=^.w.^=)]"
+    return f'[The user sent a sticker{context}~ It shows: "{description}" (=^.w.^=)]'
 
 
 def build_animated_sticker_injection(emoji: str = "") -> str:

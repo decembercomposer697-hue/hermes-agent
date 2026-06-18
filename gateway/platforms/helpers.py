@@ -11,7 +11,7 @@ import logging
 import re
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict
+from typing import TYPE_CHECKING
 
 from utils import atomic_json_write
 
@@ -95,7 +95,8 @@ class TextBatchAggregator:
         # In message dispatch:
         if msg_type == MessageType.TEXT and self._text_batcher.is_enabled():
             self._text_batcher.enqueue(event, session_key)
-            return
+
+    Return:
 
     """
 

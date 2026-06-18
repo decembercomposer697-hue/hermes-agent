@@ -80,7 +80,7 @@ def fetch(
             # and tell the user clearly.
             print(f"SEC EDGAR: {e}", file=sys.stderr)
             Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-            with open(out_path, "w", newline="", encoding="utf-8") as fh:
+            with Path(out_path).open("w", newline="", encoding="utf-8") as fh:
                 csv.DictWriter(fh, fieldnames=COLUMNS).writeheader()
             return 0
         if resolved_name:
@@ -139,7 +139,7 @@ def fetch(
         )
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w", newline="", encoding="utf-8") as fh:
+    with Path(out_path).open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=COLUMNS)
         w.writeheader()
         w.writerows(rows)

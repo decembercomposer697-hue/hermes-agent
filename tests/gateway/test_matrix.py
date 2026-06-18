@@ -2111,7 +2111,6 @@ class TestMatrixReactions:
     @pytest.mark.asyncio
     async def test_approval_reaction_cleanup_is_delayed(self):
         """Bot approval reaction redactions should not run inline."""
-
         self.adapter._reaction_redaction_delay_seconds = 0.01
         self.adapter._redact_reaction = AsyncMock(return_value=True)
         prompt = MagicMock()

@@ -22,7 +22,7 @@ import threading
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, TypeVar
+from typing import Any, TypeVar
 
 from agent.memory_manager import sanitize_context
 from hermes_constants import get_hermes_home
@@ -225,6 +225,7 @@ def _log_wal_fallback_once(db_label: str, exc: Exception) -> None:
         db_label,
         exc,
     )
+
 
 # ---------------------------------------------------------------------------
 # Malformed-schema recovery
@@ -1206,6 +1207,7 @@ class SessionDB:
         """Create a new session record. Returns the session_id."""
         self._insert_session_row(session_id, source, **kwargs)
         return session_id
+
     def end_session(self, session_id: str, end_reason: str) -> None:
         """Mark a session as ended.
 
@@ -1242,6 +1244,7 @@ class SessionDB:
             conn.execute("UPDATE sessions SET cwd = ? WHERE id = ?", (cwd, session_id))
 
         self._execute_write(_do)
+
     # ──────────────────────────────────────────────────────────────────────
     # Compression locks
     # ──────────────────────────────────────────────────────────────────────
@@ -1798,7 +1801,7 @@ class SessionDB:
         if numbered:
             # Return the most recent numbered variant
             return numbered[0]["id"]
-        elif exact:
+        if exact:
             return exact["id"]
         return None
 
@@ -2506,8 +2509,7 @@ class SessionDB:
         Returns an empty window when ``around_message_id`` is not a real id in
         ``session_id`` — callers decide how to surface that.
         """
-        if window < 0:
-            window = 0
+        window = max(window, 0)
         with self._lock:
             # Confirm the anchor exists in this session.
             anchor_exists = self._conn.execute(
@@ -2593,8 +2595,7 @@ class SessionDB:
         ``keep_roles=None`` disables role filtering (raw window + raw
         bookends).
         """
-        if bookend < 0:
-            bookend = 0
+        bookend = max(bookend, 0)
 
         # Reuse the primitive — handles anchor-existence, content decoding,
         # tool_calls deserialisation, and boundary counts.
@@ -2899,7 +2900,6 @@ class SessionDB:
         Idempotent on the ``active`` flag: re-rewinding past the same
         target is a no-op on row state but still bumps the counter.
         """
-
         # 1) Validate target up-front (read-only, outside the write txn).
         with self._lock:
             row = self._conn.execute(

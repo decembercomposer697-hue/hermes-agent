@@ -86,7 +86,7 @@ def test_write_file_populates_lsp_diagnostics_when_layer_returns_block(tmp_path)
     fops = ShellFileOperations(LocalEnvironment(cwd=str(tmp_path)))
     target = tmp_path / "x.py"
 
-    block = "<diagnostics file=\"x.py\">\nERROR [1:1] problem\n</diagnostics>"
+    block = '<diagnostics file="x.py">\nERROR [1:1] problem\n</diagnostics>'
 
     with patch.object(fops, "_maybe_lsp_diagnostics", return_value=block):
         res = fops.write_file(str(target), "x = 1\n")

@@ -5,7 +5,7 @@ import json
 import os
 from base64 import b64encode
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 

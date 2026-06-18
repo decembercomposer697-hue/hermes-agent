@@ -232,7 +232,7 @@ class TestMtimeCache(unittest.TestCase):
             self.assertEqual(cache.load(), {"v": 1})
             # Modify file
             time.sleep(0.05)
-            with open(path, "w") as f2:
+            with Path(path).open("w") as f2:
                 json.dump({"v": 2}, f2)
             # Force mtime change detection
             os.utime(path, (time.time() + 1, time.time() + 1))
@@ -281,7 +281,7 @@ class TestPairingStore(unittest.TestCase):
     def setUp(self):
         self._tmpdir = tempfile.mkdtemp()
         self._pairing_file = Path(self._tmpdir) / "pairing.json"
-        with open(self._pairing_file, "w") as f:
+        with Path(self._pairing_file).open("w") as f:
             json.dump({"approved": {}}, f)
         self._patcher_file = patch("gateway.platforms.feishu_comment_rules.PAIRING_FILE", self._pairing_file)
         self._patcher_cache = patch(
@@ -296,7 +296,7 @@ class TestPairingStore(unittest.TestCase):
         self._patcher_file.stop()
         if self._pairing_file.exists():
             self._pairing_file.unlink()
-        os.rmdir(self._tmpdir)
+        Path(self._tmpdir).rmdir()
 
     def test_add_and_list(self):
         self.assertTrue(pairing_add("ou_new"))

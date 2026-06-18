@@ -7,6 +7,7 @@ tests verify the config-driven prelude that fixes that.
 """
 
 import os
+import pathlib
 from unittest.mock import patch
 
 import pytest
@@ -183,7 +184,7 @@ class TestPrependShellInit:
 
 
 @pytest.mark.skipif(
-    os.environ.get("CI") == "true" and not os.path.isfile("/bin/bash"),
+    os.environ.get("CI") == "true" and not pathlib.Path("/bin/bash").is_file(),
     reason="Requires bash; CI sandbox may strip it.",
 )
 class TestSnapshotEndToEnd:

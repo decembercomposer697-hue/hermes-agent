@@ -33,7 +33,7 @@ import logging
 import re
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +58,7 @@ _UPDATE_PROMPT_RE = re.compile(r"^update_prompt:(y|n)$")
 @dataclass
 class KeyboardButtonPermission:
     """Button permission metadata. ``type=2`` means all users can click."""
+
     type: int = 2
 
     def to_dict(self) -> dict[str, Any]:
@@ -75,6 +76,7 @@ class KeyboardButtonAction:
     :param permission: :class:`KeyboardButtonPermission`.
     :param click_limit: Max clicks per user (``1`` = single-use).
     """
+
     type: int
     data: str
     permission: KeyboardButtonPermission = field(
@@ -99,6 +101,7 @@ class KeyboardButtonRenderData:
     :param visited_label: Post-click label (button stays greyed in place).
     :param style: ``0`` = grey, ``1`` = blue.
     """
+
     label: str
     visited_label: str
     style: int = 1
@@ -118,6 +121,7 @@ class KeyboardButton:
     :param group_id: Buttons sharing a ``group_id`` are mutually exclusive —
         clicking one greys the rest.
     """
+
     id: str
     render_data: KeyboardButtonRenderData
     action: KeyboardButtonAction
@@ -151,6 +155,7 @@ class KeyboardContent:
 @dataclass
 class InlineKeyboard:
     """Top-level keyboard payload — goes into ``MessageToCreate.keyboard``."""
+
     content: KeyboardContent = field(default_factory=KeyboardContent)
 
     def to_dict(self) -> dict[str, Any]:
@@ -288,6 +293,7 @@ class ApprovalRequest:
     :param severity: ``'critical' | 'info' | ''``.
     :param timeout_sec: Seconds until the approval expires.
     """
+
     session_key: str
     title: str
     description: str = ""
@@ -420,6 +426,7 @@ class InteractionEvent:
 
     See https://bot.q.qq.com/wiki/develop/api-v2/dev-prepare/interface-framework/event-emit.html
     """
+
     id: str = ""
     """Interaction event id — required for the ``PUT /interactions/{id}`` ACK."""
 

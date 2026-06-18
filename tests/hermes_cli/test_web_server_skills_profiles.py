@@ -118,11 +118,11 @@ class TestProfileScopedSkills:
         """The SKILLS_DIR swap is per-request; the module global must be
         restored even after a scoped call (cron-style locked swap).
         """
-        import tools.skills_tool as skills_tool
+        from tools import skills_tool
 
         before = skills_tool.SKILLS_DIR
         client.get("/api/skills", params={"profile": "worker_alpha"})
-        assert skills_tool.SKILLS_DIR == before
+        assert before == skills_tool.SKILLS_DIR
 
 
 class TestProfileScopedToolsets:
@@ -162,7 +162,7 @@ class TestProfileScopedHubActions:
         subprocess — the in-process scope can't reach skills_hub's
         import-time SKILLS_DIR binding.
         """
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
 
         calls = []
 
@@ -186,7 +186,7 @@ class TestProfileScopedHubActions:
     def test_hub_install_without_profile_keeps_legacy_argv(
         self, client, isolated_profiles, monkeypatch,
     ):
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
 
         calls = []
 

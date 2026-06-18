@@ -17,6 +17,7 @@ images natively.
 from __future__ import annotations
 
 import base64
+import pathlib
 from types import SimpleNamespace
 
 
@@ -74,7 +75,7 @@ class TestCacheMcpImageBlock:
         )
         # And it should exist + have the PNG bytes
         path = tag[len("MEDIA:"):]
-        with open(path, "rb") as fh:
+        with pathlib.Path(path).open("rb") as fh:
             assert fh.read() == _png_bytes()
 
     def test_returns_empty_when_block_is_not_an_image(self, tmp_path, monkeypatch):

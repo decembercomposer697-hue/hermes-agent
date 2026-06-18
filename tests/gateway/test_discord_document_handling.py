@@ -5,11 +5,9 @@ the `else` clause of the attachment content-type loop that was added
 to download, cache, and optionally inject text from non-image/audio files.
 """
 
-import os
 import sys
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
-from typing import Optional
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -56,6 +54,8 @@ def _ensure_discord_mock():
 
 
 _ensure_discord_mock()
+
+import pathlib
 
 import plugins.platforms.discord.adapter as discord_platform
 from plugins.platforms.discord.adapter import DiscordAdapter
@@ -171,7 +171,7 @@ class TestIncomingDocumentHandling:
         event = adapter.handle_message.call_args[0][0]
         assert event.message_type == MessageType.DOCUMENT
         assert len(event.media_urls) == 1
-        assert os.path.exists(event.media_urls[0])
+        assert pathlib.Path(event.media_urls[0]).exists()
         assert event.media_types == ["application/pdf"]
         assert "[Content of" not in (event.text or "")
 
@@ -314,7 +314,7 @@ class TestIncomingDocumentHandling:
 
         event = adapter.handle_message.call_args[0][0]
         assert len(event.media_urls) == 1
-        assert os.path.exists(event.media_urls[0])
+        assert pathlib.Path(event.media_urls[0]).exists()
         assert "[Content of" not in (event.text or "")
 
     @pytest.mark.asyncio
@@ -426,7 +426,7 @@ class TestAllowAnyAttachment:
 
         event = adapter.handle_message.call_args[0][0]
         assert len(event.media_urls) == 1
-        assert os.path.exists(event.media_urls[0])
+        assert pathlib.Path(event.media_urls[0]).exists()
         # Falls back to the source content_type when we have one.
         assert event.media_types == ["application/x-custom"]
         assert event.message_type == MessageType.DOCUMENT
@@ -528,4 +528,3 @@ class TestAllowAnyAttachment:
         """Garbage in max_attachment_bytes config falls back to 32 MiB."""
         adapter.config.extra["max_attachment_bytes"] = "not-a-number"
         assert adapter._discord_max_attachment_bytes() == 32 * 1024 * 1024
-

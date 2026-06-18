@@ -50,19 +50,16 @@ AUTO_APPROVE_SESSION = "session"
 
 def set_edit_approval_requester(requester: EditApprovalRequester | None) -> Token:
     """Bind an ACP edit approval requester for the current context."""
-
     return _EDIT_APPROVAL_REQUESTER.set(requester)
 
 
 def reset_edit_approval_requester(token: Token) -> None:
     """Restore a previous edit approval requester binding."""
-
     _EDIT_APPROVAL_REQUESTER.reset(token)
 
 
 def clear_edit_approval_requester() -> None:
     """Clear the current requester; primarily used by tests."""
-
     _EDIT_APPROVAL_REQUESTER.set(None)
 
 
@@ -114,7 +111,7 @@ def _proposal_for_patch_replace(arguments: dict[str, Any]) -> EditProposal:
         old_text,
         str(old_string),
         str(new_string),
-        bool(arguments.get("replace_all", False)),
+        bool(arguments.get("replace_all")),
     )
     if error or match_count == 0:
         raise ValueError(error or f"Could not find match for old_string in {path}")
@@ -130,7 +127,6 @@ def _proposal_for_patch_replace(arguments: dict[str, Any]) -> EditProposal:
 
 def build_edit_proposal(tool_name: str, arguments: dict[str, Any]) -> EditProposal | None:
     """Return an edit proposal for supported file mutation calls."""
-
     if tool_name == "write_file":
         return _proposal_for_write_file(arguments)
     if tool_name == "patch" and arguments.get("mode", "replace") == "replace":
@@ -152,7 +148,6 @@ def should_auto_approve_edit(proposal: EditProposal, policy: str, cwd: str | Non
     This is intentionally session-scoped and conservative: sensitive paths still
     ask even under autonomous policies.
     """
-
     policy = str(policy or AUTO_APPROVE_ASK).strip()
     if policy == AUTO_APPROVE_ASK or _is_sensitive_auto_approve_path(proposal.path):
         return False
@@ -185,7 +180,6 @@ def maybe_require_edit_approval(tool_name: str, arguments: dict[str, Any]) -> st
     Returns a JSON tool-error string when the edit must be blocked, otherwise
     ``None`` so dispatch can continue.  Requester exceptions deny by default.
     """
-
     requester = get_edit_approval_requester()
     if requester is None:
         return None
@@ -212,7 +206,6 @@ def maybe_require_edit_approval(tool_name: str, arguments: dict[str, Any]) -> st
 
 def build_acp_edit_tool_call(proposal: EditProposal):
     """Build the ToolCallUpdate payload for ACP request_permission."""
-
     import acp
 
     tool_call_id = f"edit-approval-{next(_PERMISSION_REQUEST_IDS)}"

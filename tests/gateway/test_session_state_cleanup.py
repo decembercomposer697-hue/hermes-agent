@@ -143,10 +143,9 @@ class TestNoMoreBareDeleteSites:
                     continue
                 if re.search(r"\bdel\s+self\._running_agents\[", line):
                     offenders.append((idx, line.rstrip()))
-            else:
-                if docstring_delim and docstring_delim in stripped:
-                    in_docstring = False
-                    docstring_delim = None
+            elif docstring_delim and docstring_delim in stripped:
+                in_docstring = False
+                docstring_delim = None
 
         assert offenders == [], (
             "Found bare `del self._running_agents[...]` sites in gateway/run.py. "

@@ -58,7 +58,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sys
 from pathlib import Path
@@ -120,10 +119,9 @@ def validate_plan(plan: dict) -> list[str]:
                         f"team[{i}].skills must be a list of strings",
                     )
 
-    if "slug" in plan:
-        if not SLUG_RE.match(plan["slug"]):
-            errors.append("slug must be lowercase, hyphenated, "
-                          "starting with [a-z0-9]")
+    if "slug" in plan and not SLUG_RE.match(plan["slug"]):
+        errors.append("slug must be lowercase, hyphenated, "
+                      "starting with [a-z0-9]")
 
     return errors
 
@@ -310,12 +308,12 @@ def render_team_md(plan: dict) -> str:
         "",
         "## Per-task workspace requirement",
         "",
-        f"All `kanban_create` calls MUST pass:",
-        f"```",
-        f'workspace_kind="dir"',
+        "All `kanban_create` calls MUST pass:",
+        "```",
+        'workspace_kind="dir"',
         f'workspace_path="$HOME/projects/video-pipeline/{plan["slug"]}"',
         f'tenant="{plan["tenant"]}"',
-        f"```",
+        "```",
     ])
     return "\n".join(lines)
 
@@ -406,7 +404,7 @@ def render_soul_md(team_member: dict, plan: dict) -> str:
 
     common_rules = (
         "- **Read the brief and team graph** before doing anything else.\n"
-        "- **Pass `workspace_kind=\"dir\"` and `workspace_path` on every "
+        '- **Pass `workspace_kind="dir"` and `workspace_path` on every '
         "`kanban_create` call.** This keeps the team in one shared workspace.\n"
         f"- **Use tenant `{plan['tenant']}`** on every kanban call.\n"
         "- **Write outputs to predictable paths.** Other profiles depend on "
@@ -485,7 +483,7 @@ def main():
     setup = render_setup_sh(plan, brief, team)
 
     Path(args.out).write_text(setup)
-    os.chmod(args.out, 0o755)
+    Path(args.out).chmod(0o755)
     print(f"Wrote {args.out}")
 
     if args.brief_out:

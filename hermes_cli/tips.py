@@ -15,7 +15,7 @@ TIPS = [
     "/rollback lists filesystem checkpoints — restore files the agent modified to any prior state.",
     "/rollback diff 2 previews what changed since checkpoint 2 without restoring anything.",
     "/rollback 2 src/file.py restores a single file from a specific checkpoint.",
-    "/title \"my project\" names your session — resume it later with /resume or hermes -c.",
+    '/title "my project" names your session — resume it later with /resume or hermes -c.',
     "/resume picks up where you left off in a previously named session.",
     "/queue <prompt> queues a message for the next turn without interrupting the current one.",
     "/undo removes the last user/assistant exchange from the conversation.",
@@ -50,7 +50,7 @@ TIPS = [
     "@git:5 injects the last 5 commits with full patches.",
     "@url:https://example.com fetches and injects a web page's content.",
     "Typing @ triggers filesystem path completion — navigate to any file interactively.",
-    "Combine multiple references: \"Review @file:main.py and @file:test.py for consistency.\"",
+    'Combine multiple references: "Review @file:main.py and @file:test.py for consistency."',
 
     # --- Keybindings ---
     "Alt+Enter inserts a newline for multi-line input. (Windows Terminal intercepts Alt+Enter — use Ctrl+Enter instead.)",
@@ -62,12 +62,12 @@ TIPS = [
     "Pasting 5+ lines auto-saves to a file and inserts a compact reference instead.",
 
     # --- CLI Flags ---
-    "hermes -c resumes your most recent CLI session. hermes -c \"project name\" resumes by title.",
+    'hermes -c resumes your most recent CLI session. hermes -c "project name" resumes by title.',
     "hermes -w creates an isolated git worktree — perfect for parallel agent workflows.",
-    "hermes -w -q \"Fix issue #42\" combines worktree isolation with a one-shot query.",
+    'hermes -w -q "Fix issue #42" combines worktree isolation with a one-shot query.',
     "hermes chat -t web,terminal enables only specific toolsets for a focused session.",
     "hermes chat -s github-pr-workflow preloads a skill at launch.",
-    "hermes chat -q \"query\" runs a single non-interactive query and exits.",
+    'hermes chat -q "query" runs a single non-interactive query and exits.',
     "hermes chat --max-turns 200 overrides the default 90-iteration limit per turn.",
     "hermes chat --checkpoints enables filesystem snapshots before every destructive file change.",
     "hermes --yolo bypasses all dangerous command approval prompts for the entire session.",
@@ -156,7 +156,7 @@ TIPS = [
 
     # --- Sessions ---
     "Sessions auto-generate descriptive titles after the first exchange — no manual naming needed.",
-    "Session titles support lineage: \"my project\" → \"my project #2\" → \"my project #3\".",
+    'Session titles support lineage: "my project" → "my project #2" → "my project #3".',
     "When exiting, Hermes prints a resume command with session ID and stats.",
     "hermes sessions export backup.jsonl exports all sessions for backup or analysis.",
     "hermes -r SESSION_ID resumes any specific past session by its ID.",
@@ -165,7 +165,7 @@ TIPS = [
     "Memory is a frozen snapshot — changes appear in the system prompt only at next session start.",
     "Memory entries are automatically scanned for prompt injection and exfiltration patterns.",
     "The agent has two memory stores: personal notes (~2200 chars) and user profile (~1375 chars).",
-    "Corrections you give the agent (\"no, do it this way\") are often auto-saved to memory.",
+    'Corrections you give the agent ("no, do it this way") are often auto-saved to memory.',
 
     # --- Skills ---
     "Over 80 bundled skills covering github, creative, mlops, productivity, research, and more.",
@@ -177,7 +177,7 @@ TIPS = [
     "The plan skill saves markdown plans under .hermes/plans/ in the active workspace.",
 
     # --- Cron & Scheduling ---
-    "Cron jobs can attach skills: hermes cron add --skill blogwatcher \"Check for new posts\".",
+    'Cron jobs can attach skills: hermes cron add --skill blogwatcher "Check for new posts".',
     "Cron delivery targets include telegram, discord, slack, email, sms, and 12+ more platforms.",
     "If a cron response starts with [SILENT], delivery is suppressed — useful for monitoring-only jobs.",
     "Cron supports relative delays (30m), intervals (every 2h), cron expressions, and ISO timestamps.",

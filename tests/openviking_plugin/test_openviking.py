@@ -12,7 +12,7 @@ class FakeVikingClient:
 
     def get(self, path, params=None, **kwargs):
         self.calls.append((path, params or {}))
-        response = self.responses[(path, tuple(sorted((params or {}).items())))]
+        response = self.responses[path, tuple(sorted((params or {}).items()))]
         if isinstance(response, Exception):
             raise response
         return response

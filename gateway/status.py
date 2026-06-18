@@ -16,9 +16,9 @@ import os
 import signal
 import subprocess
 import sys
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from hermes_constants import get_hermes_home
 from utils import atomic_json_write
@@ -433,7 +433,7 @@ def acquire_gateway_runtime_lock() -> bool:
 
     path = _get_gateway_lock_path()
     path.parent.mkdir(parents=True, exist_ok=True)
-    handle = open(path, "a+", encoding="utf-8")
+    handle = Path(path).open("a+", encoding="utf-8")
     if not _try_acquire_file_lock(handle):
         handle.close()
         return False
@@ -466,7 +466,7 @@ def is_gateway_runtime_lock_active(lock_path: Path | None = None) -> bool:
     if not resolved_lock_path.exists():
         return False
 
-    handle = open(resolved_lock_path, "a+", encoding="utf-8")
+    handle = Path(resolved_lock_path).open("a+", encoding="utf-8")
     try:
         if _try_acquire_file_lock(handle):
             _release_file_lock(handle)

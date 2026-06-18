@@ -33,7 +33,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 from urllib.parse import urljoin
 
 from tools.managed_tool_gateway import resolve_managed_tool_gateway
@@ -64,6 +64,7 @@ def get_env_value(name, default=None):
 # ---------------------------------------------------------------------------
 # Optional imports — graceful degradation
 # ---------------------------------------------------------------------------
+
 
 import importlib.util as _ilu
 
@@ -1021,7 +1022,7 @@ def _validate_audio_file(file_path: str) -> dict[str, Any] | None:
     """Validate the audio file.  Returns an error dict or None if OK."""
     audio_path = Path(file_path)
 
-    if os.path.islink(audio_path):
+    if Path(audio_path).is_symlink():
         return {"success": False, "transcript": "", "error": f"Path is a symbolic link: {file_path}"}
     if not audio_path.exists():
         return {"success": False, "transcript": "", "error": f"Audio file not found: {file_path}"}
@@ -1039,7 +1040,7 @@ def _validate_audio_file(file_path: str) -> dict[str, Any] | None:
             return {
                 "success": False,
                 "transcript": "",
-                "error": f"File too large: {file_size / (1024*1024):.1f}MB (max {MAX_FILE_SIZE / (1024*1024):.0f}MB)",
+                "error": f"File too large: {file_size / (1024 * 1024):.1f}MB (max {MAX_FILE_SIZE / (1024 * 1024):.0f}MB)",
             }
     except OSError as e:
         return {"success": False, "transcript": "", "error": f"Failed to access file: {e}"}
@@ -1235,7 +1236,7 @@ def _transcribe_local_command(file_path: str, model_name: str) -> dict[str, Any]
                 subprocess.run(command, shell=True, check=True, capture_output=True, text=True, timeout=300, stdin=subprocess.DEVNULL)
             else:
                 subprocess.run(shlex.split(command), check=True, capture_output=True, text=True, timeout=300, stdin=subprocess.DEVNULL)
-            
+
             txt_files = sorted(Path(output_dir).glob("*.txt"))
             if not txt_files:
                 return {
@@ -1290,7 +1291,7 @@ def _transcribe_groq(file_path: str, model_name: str) -> dict[str, Any]:
         from openai import APIConnectionError, APIError, APITimeoutError, OpenAI
         client = OpenAI(api_key=api_key, base_url=GROQ_BASE_URL, timeout=30, max_retries=0)
         try:
-            with open(file_path, "rb") as audio_file:
+            with Path(file_path).open("rb") as audio_file:
                 transcription = client.audio.transcriptions.create(
                     model=model_name,
                     file=audio_file,
@@ -1347,7 +1348,7 @@ def _transcribe_openai(file_path: str, model_name: str) -> dict[str, Any]:
         from openai import APIConnectionError, APIError, APITimeoutError, OpenAI
         client = OpenAI(api_key=api_key, base_url=base_url, timeout=30, max_retries=0)
         try:
-            with open(file_path, "rb") as audio_file:
+            with Path(file_path).open("rb") as audio_file:
                 transcription = client.audio.transcriptions.create(
                     model=model_name,
                     file=audio_file,
@@ -1400,7 +1401,7 @@ def _transcribe_mistral(file_path: str, model_name: str) -> dict[str, Any]:
         from mistralai.client import Mistral
 
         with Mistral(api_key=api_key) as client:
-            with open(file_path, "rb") as audio_file:
+            with Path(file_path).open("rb") as audio_file:
                 result = client.audio.transcriptions.complete(
                     model=model_name,
                     file={"content": audio_file, "file_name": Path(file_path).name},
@@ -1474,7 +1475,7 @@ def _transcribe_xai(file_path: str, model_name: str) -> dict[str, Any]:
         if use_diarize:
             data["diarize"] = "true"
 
-        with open(file_path, "rb") as audio_file:
+        with Path(file_path).open("rb") as audio_file:
             response = requests.post(
                 f"{base_url}/stt",
                 headers={
@@ -1561,7 +1562,7 @@ def _transcribe_elevenlabs(file_path: str, model_name: str) -> dict[str, Any]:
         if language_code:
             data["language_code"] = language_code
 
-        with open(file_path, "rb") as audio_file:
+        with Path(file_path).open("rb") as audio_file:
             response = requests.post(
                 f"{base_url}/speech-to-text",
                 headers={"xi-api-key": api_key},

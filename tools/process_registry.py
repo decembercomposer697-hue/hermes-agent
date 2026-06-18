@@ -41,7 +41,7 @@ import uuid
 
 _IS_WINDOWS = platform.system() == "Windows"
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from hermes_cli._subprocess_compat import windows_hide_flags
 from hermes_cli.config import get_hermes_home
@@ -92,6 +92,7 @@ def format_uptime_short(seconds: int) -> str:
 @dataclass
 class ProcessSession:
     """A tracked background process with output buffering."""
+
     id: str                                     # Unique session ID ("proc_xxxxxxxxxxxx")
     command: str                                 # Original command string
     task_id: str = ""                           # Task/sandbox isolation key
@@ -120,7 +121,7 @@ class ProcessSession:
     watch_patterns: list[str] = field(default_factory=list)
     _watch_hits: int = field(default=0, repr=False)          # total matches delivered
     _watch_suppressed: int = field(default=0, repr=False)    # matches dropped by rate limit
-    _watch_disabled: bool = field(default=False, repr=False) # permanently killed after strike limit
+    _watch_disabled: bool = field(default=False, repr=False)  # permanently killed after strike limit
     # Per-session rate limit state: at most one match every WATCH_MIN_INTERVAL_SECONDS.
     # When an emission happens, _watch_cooldown_until is set to now + interval and
     # _watch_strike_candidate becomes True. The next match to arrive before that
@@ -804,7 +805,7 @@ class ProcessRegistry:
 
                 # Check if process is still running
                 check = env.execute(
-                    f"kill -0 \"$(cat {quoted_pid_path} 2>/dev/null)\" 2>/dev/null; echo $?",
+                    f'kill -0 "$(cat {quoted_pid_path} 2>/dev/null)" 2>/dev/null; echo $?',
                     timeout=5,
                 )
                 check_output = check.get("output", "").strip()
@@ -1403,7 +1404,7 @@ class ProcessRegistry:
                             "notify_on_complete": s.notify_on_complete,
                             "watch_patterns": s.watch_patterns,
                         })
-            
+
             # Atomic write to avoid corruption on crash
             from utils import atomic_json_write
             atomic_json_write(CHECKPOINT_PATH, entries)
@@ -1514,7 +1515,7 @@ def format_process_notification(evt: dict) -> "str | None":
         _sup = evt.get("suppressed", 0)
         text = (
             f"[IMPORTANT: Background process {_sid} matched "
-            f"watch pattern \"{_pat}\".\n"
+            f'watch pattern "{_pat}".\n'
             f"Command: {_cmd}\n"
             f"Matched output:\n{_out}"
         )
@@ -1591,23 +1592,23 @@ def _handle_process(args, **kw):
 
     if action == "list":
         return json.dumps({"processes": process_registry.list_sessions(task_id=task_id)}, ensure_ascii=False)
-    elif action in {"poll", "log", "wait", "kill", "write", "submit", "close"}:
+    if action in {"poll", "log", "wait", "kill", "write", "submit", "close"}:
         if not session_id:
             return tool_error(f"session_id is required for {action}")
         if action == "poll":
             return json.dumps(process_registry.poll(session_id), ensure_ascii=False)
-        elif action == "log":
+        if action == "log":
             return json.dumps(process_registry.read_log(
                 session_id, offset=args.get("offset", 0), limit=args.get("limit", 200)), ensure_ascii=False)
-        elif action == "wait":
+        if action == "wait":
             return json.dumps(process_registry.wait(session_id, timeout=args.get("timeout")), ensure_ascii=False)
-        elif action == "kill":
+        if action == "kill":
             return json.dumps(process_registry.kill_process(session_id), ensure_ascii=False)
-        elif action == "write":
+        if action == "write":
             return json.dumps(process_registry.write_stdin(session_id, str(args.get("data", ""))), ensure_ascii=False)
-        elif action == "submit":
+        if action == "submit":
             return json.dumps(process_registry.submit_stdin(session_id, str(args.get("data", ""))), ensure_ascii=False)
-        elif action == "close":
+        if action == "close":
             return json.dumps(process_registry.close_stdin(session_id), ensure_ascii=False)
     return tool_error(f"Unknown process action: {action}. Use: list, poll, log, wait, kill, write, submit, close")
 

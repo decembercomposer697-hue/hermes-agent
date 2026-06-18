@@ -16,7 +16,6 @@ import logging
 import os
 import sys
 import time
-from typing import Optional, Tuple
 
 import requests
 
@@ -256,7 +255,7 @@ def dingtalk_qr_auth() -> tuple[str, str] | None:
     print()
 
     if not render_qr_to_terminal(url):
-        print_warning(f"  QR code render failed, please open the link below to authorize:")
+        print_warning("  QR code render failed, please open the link below to authorize:")
 
     print()
     print_info(f"  Or open this link manually: {url}")

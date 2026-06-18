@@ -20,7 +20,7 @@ import tempfile
 import threading
 import time
 import wave
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +49,8 @@ def _audio_available() -> bool:
     except (ImportError, OSError):
         return False
 
+
+import pathlib
 
 from hermes_constants import is_termux as _is_termux_environment
 
@@ -193,7 +195,7 @@ def detect_audio_environment() -> dict:
     # WSL detection — PulseAudio bridge makes audio work in WSL.
     # Only block if PULSE_SERVER is not configured.
     try:
-        with open("/proc/version", encoding="utf-8") as f:
+        with pathlib.Path("/proc/version").open(encoding="utf-8") as f:
             if "microsoft" in f.read().lower():
                 if os.environ.get("PULSE_SERVER"):
                     notices.append("Running in WSL with PulseAudio bridge")
@@ -268,6 +270,7 @@ def detect_audio_environment() -> dict:
         "warnings": warnings,
         "notices": notices,
     }
+
 
 # ---------------------------------------------------------------------------
 # Recording parameters
@@ -377,7 +380,7 @@ class TermuxAudioRecorder:
         with self._lock:
             if self._recording:
                 return
-            os.makedirs(_TEMP_DIR, exist_ok=True)
+            pathlib.Path(_TEMP_DIR).mkdir(exist_ok=True, parents=True)
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             self._recording_path = os.path.join(_TEMP_DIR, f"recording_{timestamp}.aac")
 
@@ -420,17 +423,17 @@ class TermuxAudioRecorder:
             self._current_rms = 0
 
         self._stop_termux_recording()
-        if not path or not os.path.isfile(path):
+        if not path or not pathlib.Path(path).is_file():
             return None
         if time.monotonic() - started_at < 0.3:
             try:
-                os.unlink(path)
+                pathlib.Path(path).unlink()
             except OSError:
                 pass
             return None
-        if os.path.getsize(path) <= 0:
+        if pathlib.Path(path).stat().st_size <= 0:
             try:
-                os.unlink(path)
+                pathlib.Path(path).unlink()
             except OSError:
                 pass
             return None
@@ -447,9 +450,9 @@ class TermuxAudioRecorder:
             self._stop_termux_recording()
         except Exception:
             pass
-        if path and os.path.isfile(path):
+        if path and pathlib.Path(path).is_file():
             try:
-                os.unlink(path)
+                pathlib.Path(path).unlink()
             except OSError:
                 pass
         logger.info("Termux voice recording cancelled")
@@ -798,7 +801,7 @@ class AudioRecorder:
 
         Returns the file path.
         """
-        os.makedirs(_TEMP_DIR, exist_ok=True)
+        pathlib.Path(_TEMP_DIR).mkdir(exist_ok=True, parents=True)
         timestamp = time.strftime("%Y%m%d_%H%M%S")
         wav_path = os.path.join(_TEMP_DIR, f"recording_{timestamp}.wav")
 
@@ -808,7 +811,7 @@ class AudioRecorder:
             wf.setframerate(SAMPLE_RATE)
             wf.writeframes(audio_data.tobytes())
 
-        file_size = os.path.getsize(wav_path)
+        file_size = pathlib.Path(wav_path).stat().st_size
         logger.info("WAV written: %s (%d bytes)", wav_path, file_size)
         return wav_path
 
@@ -912,7 +915,7 @@ def _should_chunk_for_transcription(file_path: str, max_file_size: int) -> bool:
     if not file_path.lower().endswith(".wav"):
         return False
     try:
-        return os.path.getsize(file_path) > max_file_size
+        return pathlib.Path(file_path).stat().st_size > max_file_size
     except OSError:
         return False
 
@@ -961,15 +964,15 @@ def _transcribe_wav_in_chunks(
     finally:
         for chunk_path in chunk_paths:
             try:
-                if os.path.isfile(chunk_path):
-                    os.unlink(chunk_path)
+                if pathlib.Path(chunk_path).is_file():
+                    pathlib.Path(chunk_path).unlink()
             except OSError:
                 pass
 
 
 def _split_wav_for_transcription(wav_path: str, *, max_file_size: int) -> list[str]:
     """Write WAV chunks small enough to pass the shared STT file-size gate."""
-    os.makedirs(_TEMP_DIR, exist_ok=True)
+    pathlib.Path(_TEMP_DIR).mkdir(exist_ok=True, parents=True)
     chunk_paths: list[str] = []
     header_reserve = 64 * 1024
 
@@ -1007,7 +1010,7 @@ def _split_wav_for_transcription(wav_path: str, *, max_file_size: int) -> list[s
                 chunk_paths.append(chunk_path)
             except Exception:
                 try:
-                    os.unlink(chunk_path)
+                    pathlib.Path(chunk_path).unlink()
                 except OSError:
                     pass
                 raise
@@ -1060,7 +1063,7 @@ def play_audio_file(file_path: str) -> bool:
     """
     global _active_playback
 
-    if not os.path.isfile(file_path):
+    if not pathlib.Path(file_path).is_file():
         logger.warning("Audio file not found: %s", file_path)
         return False
 
@@ -1208,7 +1211,7 @@ def cleanup_temp_recordings(max_age_seconds: int = 3600) -> int:
         Number of files deleted.
 
     """
-    if not os.path.isdir(_TEMP_DIR):
+    if not pathlib.Path(_TEMP_DIR).is_dir():
         return 0
 
     deleted = 0
@@ -1219,7 +1222,7 @@ def cleanup_temp_recordings(max_age_seconds: int = 3600) -> int:
             try:
                 age = now - entry.stat().st_mtime
                 if age > max_age_seconds:
-                    os.unlink(entry.path)
+                    pathlib.Path(entry.path).unlink()
                     deleted += 1
             except OSError:
                 pass

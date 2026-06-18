@@ -45,9 +45,7 @@ def _refresh_bindings_against_live_module():
     ordering within the worker.  The fix lives in the test module because
     the two pollutants above are load-bearing for their own tests.
     """
-    global _find_stale_dashboard_pids
-    global _kill_stale_dashboard_processes
-    global _warn_stale_dashboard_processes
+    global _find_stale_dashboard_pids, _kill_stale_dashboard_processes, _warn_stale_dashboard_processes
 
     live = sys.modules.get("hermes_cli.main")
     if live is None:
@@ -56,7 +54,6 @@ def _refresh_bindings_against_live_module():
     _find_stale_dashboard_pids = live._find_stale_dashboard_pids
     _kill_stale_dashboard_processes = live._kill_stale_dashboard_processes
     _warn_stale_dashboard_processes = live._warn_stale_dashboard_processes
-    return
 
 
 def _ps_line(pid: int, cmd: str) -> str:

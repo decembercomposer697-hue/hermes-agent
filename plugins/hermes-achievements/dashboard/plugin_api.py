@@ -10,7 +10,7 @@ import re
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 try:
     from hermes_constants import get_hermes_home
@@ -26,6 +26,7 @@ except Exception:  # Allows local unit tests without dashboard dependencies.
     class APIRouter:  # type: ignore
         def get(self, *_args, **_kwargs):
             return lambda fn: fn
+
         def post(self, *_args, **_kwargs):
             return lambda fn: fn
 
@@ -44,10 +45,10 @@ _SCAN_STATUS: dict[str, Any] = {
     "run_count": 0,
 }
 
-ERROR_RE = re.compile(r"\b(error|failed|failure|traceback|exception|permission denied|not found|eaddrinuse|already in use|timed out|blocked)\b", re.I)
-PORT_RE = re.compile(r"\b(port\s+)?(3000|5173|8000|8080|9119)\b.*\b(in use|already|taken|eaddrinuse)\b|\beaddrinuse\b", re.I)
-INSTALL_RE = re.compile(r"\b(npm|pnpm|yarn|pip|uv)\b.*\b(install|add)\b", re.I)
-SUCCESS_RE = re.compile(r"\b(success|passed|built|compiled|done|exit_code[\"']?\s*[:=]\s*0|verified|ok)\b", re.I)
+ERROR_RE = re.compile(r"\b(error|failed|failure|traceback|exception|permission denied|not found|eaddrinuse|already in use|timed out|blocked)\b", re.IGNORECASE)
+PORT_RE = re.compile(r"\b(port\s+)?(3000|5173|8000|8080|9119)\b.*\b(in use|already|taken|eaddrinuse)\b|\beaddrinuse\b", re.IGNORECASE)
+INSTALL_RE = re.compile(r"\b(npm|pnpm|yarn|pip|uv)\b.*\b(install|add)\b", re.IGNORECASE)
+SUCCESS_RE = re.compile(r"\b(success|passed|built|compiled|done|exit_code[\"']?\s*[:=]\s*0|verified|ok)\b", re.IGNORECASE)
 FILE_RE = re.compile(r"(?:/home/|~/?|\./|/mnt/)[\w./-]+\.(?:py|js|ts|tsx|jsx|css|html|md|json|yaml|yml|svg|sql|sh)")
 
 TIER_NAMES = ["Copper", "Silver", "Gold", "Diamond", "Olympian"]
@@ -347,7 +348,7 @@ def analyze_messages(session_id: str, title: str, messages: list[dict[str, Any]]
     file_reads_searches = _count_tool(tool_sequence, "read_file", "search_files")
     file_tool_calls = _count_tool(tool_sequence, "read_file", "write_file", "patch", "search_files")
     delegate_calls = _count_tool(tool_sequence, "delegate_task")
-    process_calls = _count_tool(tool_sequence, "process") + len(re.findall(r"background\s*=\s*true", full_text, re.I))
+    process_calls = _count_tool(tool_sequence, "process") + len(re.findall(r"background\s*=\s*true", full_text, re.IGNORECASE))
     cron_calls = _count_tool(tool_sequence, "cronjob")
     image_vision_calls = _count_tool(tool_sequence, "image", "vision")
     tts_calls = _count_tool(tool_sequence, "tts", "text_to_speech")
@@ -384,37 +385,37 @@ def analyze_messages(session_id: str, title: str, messages: list[dict[str, Any]]
         "memory_write_events": memory_write_events,
         "port_conflict": bool(PORT_RE.search(full_text)),
         "port_conflict_events": 1 if PORT_RE.search(full_text) else 0,
-        "traceback_events": len(re.findall(r"traceback|exception", full_text, re.I)),
-        "log_read_events": len(re.findall(r"gateway\.log|errors\.log|agent\.log|/api/logs|\blogs\b", full_text, re.I)),
-        "permission_denied_events": len(re.findall(r"permission denied|eacces|operation not permitted", full_text, re.I)),
+        "traceback_events": len(re.findall(r"traceback|exception", full_text, re.IGNORECASE)),
+        "log_read_events": len(re.findall(r"gateway\.log|errors\.log|agent\.log|/api/logs|\blogs\b", full_text, re.IGNORECASE)),
+        "permission_denied_events": len(re.findall(r"permission denied|eacces|operation not permitted", full_text, re.IGNORECASE)),
         "install_error_events": 1 if INSTALL_RE.search(full_text) and ERROR_RE.search(full_text) else 0,
         "install_success_events": 1 if INSTALL_RE.search(full_text) and SUCCESS_RE.search(full_text) else 0,
-        "restart_after_error_events": 1 if error_count and re.search(r"\brestart|reload|kill|start\b", full_text, re.I) else 0,
-        "env_var_error_events": len(re.findall(r"missing .*env|api key|environment variable|not configured|unauthorized|auth", full_text, re.I)),
-        "yaml_error_events": len(re.findall(r"yaml|yml|colon|parse error", full_text, re.I)) if ERROR_RE.search(full_text) else 0,
-        "docker_conflict_events": len(re.findall(r"docker.*(name|container).*already|container name conflict|Conflict\. The container", full_text, re.I)),
-        "frontend_activity_events": len(re.findall(r"\.(css|svg|tsx|jsx)|frontend|tailwind|react", full_text, re.I)),
-        "css_activity_events": len(re.findall(r"\.css|tailwind|style|className|visual", full_text, re.I)),
-        "git_events": len(re.findall(r"\bgit\s+(commit|push|merge|rebase|status|diff)", full_text, re.I)),
-        "tiny_patch_after_errors_events": 1 if error_count >= 5 and re.search(r"one character|single character|typo", full_text, re.I) else 0,
-        "context_events": len(re.findall(r"compress|context window|token|cache", full_text, re.I)),
-        "gateway_events": len(re.findall(r"gateway|discord|telegram|slack|api_server", full_text, re.I)),
-        "plugin_events": len(re.findall(r"plugin|dashboard-plugins|__HERMES_PLUGIN|manifest\.json", full_text, re.I)),
-        "rollback_events": len(re.findall(r"rollback|checkpoint", full_text, re.I)),
-        "docs_activity_events": len(re.findall(r"docs|documentation|docusaurus|README", full_text, re.I)),
-        "model_events": len(re.findall(r"model|provider|openrouter|codex|gemini|claude|anthropic|openai|mistral|qwen|deepseek|llama|ollama|vllm|gguf", full_text, re.I)),
-        "openrouter_events": len(re.findall(r"openrouter", full_text, re.I)),
-        "codex_events": len(re.findall(r"codex", full_text, re.I)),
-        "claude_events": len(re.findall(r"claude|anthropic", full_text, re.I)),
-        "gemini_events": len(re.findall(r"gemini|google ai|google model", full_text, re.I)),
-        "local_model_events": len(re.findall(r"ollama|llama\.cpp|gguf|vllm|local model|open[- ]weight|open weights", full_text, re.I)),
-        "toolset_events": len(re.findall(r"toolset|enabled_toolsets|browser tool|terminal tool|file tool|web tool", full_text, re.I)),
-        "config_events": len(re.findall(r"config\.ya?ml|\b[a-z0-9_-]+config\.(?:js|ts|json|ya?ml)|\.env(?:\b|\.)|manifest\.json|settings\.json|pyproject\.toml|package\.json", full_text, re.I)),
-        "git_history_events": len(re.findall(r"\bgit\s+(rebase|merge|fetch|pull|push|tag|checkout)|merge conflict|conflict\s*\(|rebase --continue", full_text, re.I)),
-        "test_events": len(re.findall(r"pytest|unittest|vitest|playwright|npm test|pnpm test|node --check|py_compile|tests? passed|\bOK\b", full_text, re.I)),
-        "screenshot_events": len(re.findall(r"screenshot|playwright|vision_analyze|browser_vision|\.png|image data", full_text, re.I)),
-        "release_events": len(re.findall(r"\bgit\s+tag|release|version bump|changelog|publish|pushed? tag", full_text, re.I)),
-        "cache_events": len(re.findall(r"cache hit|prompt caching|cache_read", full_text, re.I)),
+        "restart_after_error_events": 1 if error_count and re.search(r"\brestart|reload|kill|start\b", full_text, re.IGNORECASE) else 0,
+        "env_var_error_events": len(re.findall(r"missing .*env|api key|environment variable|not configured|unauthorized|auth", full_text, re.IGNORECASE)),
+        "yaml_error_events": len(re.findall(r"yaml|yml|colon|parse error", full_text, re.IGNORECASE)) if ERROR_RE.search(full_text) else 0,
+        "docker_conflict_events": len(re.findall(r"docker.*(name|container).*already|container name conflict|Conflict\. The container", full_text, re.IGNORECASE)),
+        "frontend_activity_events": len(re.findall(r"\.(css|svg|tsx|jsx)|frontend|tailwind|react", full_text, re.IGNORECASE)),
+        "css_activity_events": len(re.findall(r"\.css|tailwind|style|className|visual", full_text, re.IGNORECASE)),
+        "git_events": len(re.findall(r"\bgit\s+(commit|push|merge|rebase|status|diff)", full_text, re.IGNORECASE)),
+        "tiny_patch_after_errors_events": 1 if error_count >= 5 and re.search(r"one character|single character|typo", full_text, re.IGNORECASE) else 0,
+        "context_events": len(re.findall(r"compress|context window|token|cache", full_text, re.IGNORECASE)),
+        "gateway_events": len(re.findall(r"gateway|discord|telegram|slack|api_server", full_text, re.IGNORECASE)),
+        "plugin_events": len(re.findall(r"plugin|dashboard-plugins|__HERMES_PLUGIN|manifest\.json", full_text, re.IGNORECASE)),
+        "rollback_events": len(re.findall(r"rollback|checkpoint", full_text, re.IGNORECASE)),
+        "docs_activity_events": len(re.findall(r"docs|documentation|docusaurus|README", full_text, re.IGNORECASE)),
+        "model_events": len(re.findall(r"model|provider|openrouter|codex|gemini|claude|anthropic|openai|mistral|qwen|deepseek|llama|ollama|vllm|gguf", full_text, re.IGNORECASE)),
+        "openrouter_events": len(re.findall(r"openrouter", full_text, re.IGNORECASE)),
+        "codex_events": len(re.findall(r"codex", full_text, re.IGNORECASE)),
+        "claude_events": len(re.findall(r"claude|anthropic", full_text, re.IGNORECASE)),
+        "gemini_events": len(re.findall(r"gemini|google ai|google model", full_text, re.IGNORECASE)),
+        "local_model_events": len(re.findall(r"ollama|llama\.cpp|gguf|vllm|local model|open[- ]weight|open weights", full_text, re.IGNORECASE)),
+        "toolset_events": len(re.findall(r"toolset|enabled_toolsets|browser tool|terminal tool|file tool|web tool", full_text, re.IGNORECASE)),
+        "config_events": len(re.findall(r"config\.ya?ml|\b[a-z0-9_-]+config\.(?:js|ts|json|ya?ml)|\.env(?:\b|\.)|manifest\.json|settings\.json|pyproject\.toml|package\.json", full_text, re.IGNORECASE)),
+        "git_history_events": len(re.findall(r"\bgit\s+(rebase|merge|fetch|pull|push|tag|checkout)|merge conflict|conflict\s*\(|rebase --continue", full_text, re.IGNORECASE)),
+        "test_events": len(re.findall(r"pytest|unittest|vitest|playwright|npm test|pnpm test|node --check|py_compile|tests? passed|\bOK\b", full_text, re.IGNORECASE)),
+        "screenshot_events": len(re.findall(r"screenshot|playwright|vision_analyze|browser_vision|\.png|image data", full_text, re.IGNORECASE)),
+        "release_events": len(re.findall(r"\bgit\s+tag|release|version bump|changelog|publish|pushed? tag", full_text, re.IGNORECASE)),
+        "cache_events": len(re.findall(r"cache hit|prompt caching|cache_read", full_text, re.IGNORECASE)),
         "model_names": set(),
     }
 
@@ -841,7 +842,7 @@ def _build_pending_snapshot(now: int) -> dict[str, Any]:
     Returns a structurally-complete response so the dashboard UI can render
     an empty achievement list + spinner without special-casing "no data yet".
     """
-    evaluated = [display_achievement({**d, **{"unlocked": False, "discovered": False, "state": "secret" if d.get("secret") else "discovered", "progress": 0, "progress_pct": 0, "next_tier": (d.get("tiers") or [{}])[0].get("name"), "next_threshold": (d.get("tiers") or [{}])[0].get("threshold", 1), "tier": None}}) for d in ACHIEVEMENTS]
+    evaluated = [display_achievement({**d, "unlocked": False, "discovered": False, "state": "secret" if d.get("secret") else "discovered", "progress": 0, "progress_pct": 0, "next_tier": (d.get("tiers") or [{}])[0].get("name"), "next_threshold": (d.get("tiers") or [{}])[0].get("threshold", 1), "tier": None}) for d in ACHIEVEMENTS]
     return {
         "achievements": evaluated,
         "sessions": [],

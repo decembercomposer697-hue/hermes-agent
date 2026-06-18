@@ -27,7 +27,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Iterable
-from typing import Any, Optional
+from typing import Any
 
 _DEFAULT_FIELDS: tuple[str, ...] = ("model", "context_pct", "cwd")
 _SEP = " · "

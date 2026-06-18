@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 TERMINAL_SETUP_AUTH_METHOD_ID = "hermes-setup"
 

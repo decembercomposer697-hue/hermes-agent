@@ -15,10 +15,11 @@ from __future__ import annotations
 import json
 import logging
 import os
+import pathlib
 import tempfile
 import time
 from collections.abc import Mapping
-from typing import Any, Optional
+from typing import Any
 
 from utils import atomic_replace
 
@@ -109,7 +110,7 @@ def record_nous_rate_limit(
     path = _state_path()
     try:
         state_dir = os.path.dirname(path)
-        os.makedirs(state_dir, exist_ok=True)
+        pathlib.Path(state_dir).mkdir(exist_ok=True, parents=True)
 
         state = {
             "reset_at": reset_at,
@@ -126,7 +127,7 @@ def record_nous_rate_limit(
         except Exception:
             # Clean up temp file on failure
             try:
-                os.unlink(tmp_path)
+                pathlib.Path(tmp_path).unlink()
             except OSError:
                 pass
             raise
@@ -148,7 +149,7 @@ def nous_rate_limit_remaining() -> float | None:
     """
     path = _state_path()
     try:
-        with open(path, encoding="utf-8") as f:
+        with pathlib.Path(path).open(encoding="utf-8") as f:
             state = json.load(f)
         reset_at = state.get("reset_at", 0)
         remaining = reset_at - time.time()
@@ -156,7 +157,7 @@ def nous_rate_limit_remaining() -> float | None:
             return remaining
         # Expired — clean up
         try:
-            os.unlink(path)
+            pathlib.Path(path).unlink()
         except OSError:
             pass
         return None
@@ -167,7 +168,7 @@ def nous_rate_limit_remaining() -> float | None:
 def clear_nous_rate_limit() -> None:
     """Clear the rate limit state (e.g., after a successful Nous request)."""
     try:
-        os.unlink(_state_path())
+        pathlib.Path(_state_path()).unlink()
     except FileNotFoundError:
         pass
     except OSError as exc:

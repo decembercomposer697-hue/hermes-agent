@@ -13,7 +13,6 @@ readable, and that the existing ``skills/.hub`` deny still applies.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
@@ -128,7 +127,7 @@ def test_symlink_to_auth_json_blocked(fake_home, tmp_path):
     target = _create(fake_home, "auth.json")
     link = tmp_path / "shim.json"
     try:
-        os.symlink(target, link)
+        Path(link).symlink_to(target)
     except (OSError, NotImplementedError):
         pytest.skip("symlinks not supported on this platform/filesystem")
     err = get_read_block_error(str(link))

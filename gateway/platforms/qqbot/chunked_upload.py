@@ -40,7 +40,7 @@ import logging
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from gateway.platforms.qqbot.constants import FILE_UPLOAD_TIMEOUT
 
@@ -546,7 +546,7 @@ def _read_file_chunk(file_path: str, offset: int, length: int) -> bytes:
 
     :raises IOError: If fewer bytes were read than expected (truncated file).
     """
-    with open(file_path, "rb") as fh:
+    with Path(file_path).open("rb") as fh:
         fh.seek(offset)
         data = fh.read(length)
         if len(data) != length:
@@ -566,7 +566,7 @@ def _compute_file_hashes(file_path: str, file_size: int) -> dict[str, str]:
     need_10m = file_size > _MD5_10M_SIZE
     bytes_read = 0
 
-    with open(file_path, "rb") as fh:
+    with Path(file_path).open("rb") as fh:
         while True:
             chunk = fh.read(65536)
             if not chunk:

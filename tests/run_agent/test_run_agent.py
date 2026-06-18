@@ -3029,7 +3029,7 @@ class TestAgentRuntimePostHookOwnershipSync:
             tool_executor.execute_tool_calls_sequential,
         )
         assert invoke_tool_names == inline_names, (
-            "Static `function_name == \"...\"` branches diverged between "
+            'Static `function_name == "..."` branches diverged between '
             "agent/agent_runtime_helpers.py:invoke_tool (concurrent path) "
             "and agent/tool_executor.py:execute_tool_calls_sequential "
             "(sequential path).\n"
@@ -3063,12 +3063,12 @@ class TestPathsOverlap:
 
     def test_empty_paths_do_not_overlap(self):
         from run_agent import _paths_overlap
-        assert not _paths_overlap(Path(""), Path(""))
+        assert not _paths_overlap(Path(), Path())
 
     def test_one_empty_path_does_not_overlap(self):
         from run_agent import _paths_overlap
-        assert not _paths_overlap(Path(""), Path("src/a.py"))
-        assert not _paths_overlap(Path("src/a.py"), Path(""))
+        assert not _paths_overlap(Path(), Path("src/a.py"))
+        assert not _paths_overlap(Path("src/a.py"), Path())
 
 
 class TestParallelScopePathNormalization:
@@ -3963,7 +3963,7 @@ class TestRunConversation:
         def _fake_api_call(api_kwargs):
             calls["api"] += 1
             if calls["api"] == 1:
-                raise _UnauthorizedError()
+                raise _UnauthorizedError
             return _mock_response(
                 content="Recovered after remint", finish_reason="stop",
             )
@@ -4956,7 +4956,6 @@ class TestCredentialPoolRecovery:
 
             def mark_exhausted_and_rotate(self, *, status_code, error_context=None):
                 assert error_context is None
-                return None  # no more credentials
 
         agent._credential_pool = _Pool()
         agent._swap_credential = MagicMock()
@@ -6243,7 +6242,7 @@ class TestReasoningReplayForStrictProviders:
                 {
                     "id": "c1",
                     "type": "function",
-                    "function": {"name": "terminal", "arguments": "{\"command\":\"date\"}"},
+                    "function": {"name": "terminal", "arguments": '{"command":"date"}'},
                 },
             ],
         }
@@ -6278,7 +6277,7 @@ class TestReasoningReplayForStrictProviders:
                 {
                     "id": "c1",
                     "type": "function",
-                    "function": {"name": "web_search", "arguments": "{\"q\":\"test\"}"},
+                    "function": {"name": "web_search", "arguments": '{"q":"test"}'},
                 },
             ],
             "reasoning": "summary reasoning",

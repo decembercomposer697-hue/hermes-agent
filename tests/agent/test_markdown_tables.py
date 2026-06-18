@@ -20,7 +20,6 @@ from agent.markdown_tables import (
 
 def _column_offsets(line: str) -> list[int]:
     """Return the display-cell index of every ``|`` in ``line``."""
-
     cells: list[int] = []
     width = 0
     for ch in line:
@@ -166,7 +165,6 @@ def test_overflow_falls_back_to_vertical_when_table_wider_than_terminal():
     drop to vertical key-value rendering so the terminal does not
     soft-wrap mid-cell (which destroys column alignment visually).
     """
-
     src = dedent(
         """\
         | Item | Description | Notes |
@@ -198,7 +196,6 @@ def test_horizontal_kept_when_table_fits():
     pipe-bordered rendering — vertical fallback only kicks in when
     soft-wrap is unavoidable.
     """
-
     src = dedent(
         """\
         | Name | Age |
@@ -242,7 +239,6 @@ def test_overflow_falls_back_to_vertical_for_cjk_too():
     """CJK content can also push a table over the terminal budget;
     the vertical fallback should kick in regardless of script.
     """
-
     src = dedent(
         """\
         | 模型 | 描述 | 备注 |

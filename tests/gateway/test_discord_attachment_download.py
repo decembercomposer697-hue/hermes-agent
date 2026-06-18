@@ -336,7 +336,7 @@ class TestHandleMessageUsesAuthenticatedRead:
                 read=AsyncMock(return_value=_PNG_BYTES),
             )
             # Minimal Discord message stub for _handle_message.
-            from datetime import datetime, timezone
+            from datetime import datetime
 
             class _FakeDMChannel:
                 id = 100
@@ -381,7 +381,7 @@ class TestHandleMessageUsesAuthenticatedRead:
                 read=AsyncMock(return_value=_OGG_BYTES),
                 is_voice_message=lambda: True,
             )
-            from datetime import datetime, timezone
+            from datetime import datetime
 
             class _FakeDMChannel:
                 id = 100
@@ -425,7 +425,7 @@ class TestHandleMessageUsesAuthenticatedRead:
                 read=AsyncMock(return_value=_OGG_BYTES),
                 is_voice_message=lambda: False,
             )
-            from datetime import datetime, timezone
+            from datetime import datetime
 
             class _FakeDMChannel:
                 id = 100

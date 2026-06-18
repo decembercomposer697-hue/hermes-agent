@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import threading
 from types import SimpleNamespace
-from typing import Any, Optional
+from typing import Any
 
 
 def make_sender(sender_type: str = "user", open_id: str = "ou_human",

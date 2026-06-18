@@ -398,7 +398,7 @@ def _hermetic_environment(tmp_path, monkeypatch):
 @pytest.fixture(autouse=True)
 def _isolate_hermes_home(_hermetic_environment):
     """Alias preserved for any test that yields this name explicitly."""
-    return None
+    return
 
 
 # ── Module-level state reset — replaced by per-file process isolation ──────

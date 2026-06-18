@@ -438,8 +438,8 @@ class TestLoadGatewayConfig:
         config_path.write_text(
             "discord:\n"
             "  allow_from:\n"
-            "    - \"123456789012345678\"\n"
-            "    - \"999888777666555444\"\n",
+            '    - "123456789012345678"\n'
+            '    - "999888777666555444"\n',
             encoding="utf-8",
         )
 
@@ -466,7 +466,7 @@ class TestLoadGatewayConfig:
             "  discord:\n"
             "    extra:\n"
             "      allow_from:\n"
-            "        - \"123456789012345678\"\n",
+            '        - "123456789012345678"\n',
             encoding="utf-8",
         )
 
@@ -487,7 +487,7 @@ class TestLoadGatewayConfig:
         config_path.write_text(
             "platforms:\n"
             "  api_server:\n"
-            "    enabled: \"false\"\n",
+            '    enabled: "false"\n',
             encoding="utf-8",
         )
 
@@ -510,7 +510,7 @@ class TestLoadGatewayConfig:
             "      token: nested-token\n"
             "      home_channel:\n"
             "        platform: telegram\n"
-            "        chat_id: \"123\"\n"
+            '        chat_id: "123"\n'
             "        name: Nested Home\n"
             "      extra:\n"
             "        reply_prefix: nested\n",
@@ -578,8 +578,8 @@ class TestLoadGatewayConfig:
             "platforms:\n"
             "  telegram:\n"
             "    allow_from:\n"
-            "      - \"111222333\"\n"
-            "      - \"444555666\"\n"
+            '      - "111222333"\n'
+            '      - "444555666"\n'
             "    require_mention: true\n",
             encoding="utf-8",
         )
@@ -608,7 +608,7 @@ class TestLoadGatewayConfig:
             "  platforms:\n"
             "    telegram:\n"
             "      allow_from:\n"
-            "        - \"777888999\"\n"
+            '        - "777888999"\n'
             "      require_mention: false\n",
             encoding="utf-8",
         )
@@ -630,7 +630,7 @@ class TestLoadGatewayConfig:
         config_path = hermes_home / "config.yaml"
         config_path.write_text(
             "session_reset:\n"
-            "  notify: \"false\"\n",
+            '  notify: "false"\n',
             encoding="utf-8",
         )
 
@@ -645,7 +645,7 @@ class TestLoadGatewayConfig:
         hermes_home.mkdir()
         config_path = hermes_home / "config.yaml"
         config_path.write_text(
-            "always_log_local: \"false\"\n",
+            'always_log_local: "false"\n',
             encoding="utf-8",
         )
 
@@ -662,7 +662,7 @@ class TestLoadGatewayConfig:
         config_path.write_text(
             "discord:\n"
             "  channel_prompts:\n"
-            "    \"123\": Research mode\n"
+            '    "123": Research mode\n'
             "    456: Therapist mode\n",
             encoding="utf-8",
         )

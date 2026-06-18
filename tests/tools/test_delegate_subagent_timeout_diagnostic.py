@@ -34,6 +34,7 @@ def hermes_home(tmp_path, monkeypatch):
 
 class _StubChild:
     """Minimal stand-in for an AIAgent subagent."""
+
     def __init__(
         self,
         *,

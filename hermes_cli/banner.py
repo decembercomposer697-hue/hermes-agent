@@ -11,7 +11,7 @@ import subprocess
 import threading
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING
 
 from hermes_constants import get_hermes_home
 
@@ -58,6 +58,7 @@ def _skin_color(key: str, fallback: str) -> str:
 # =========================================================================
 # ASCII Art & Branding
 # =========================================================================
+
 
 from hermes_cli import __release_date__ as RELEASE_DATE
 from hermes_cli import __version__ as VERSION
@@ -475,7 +476,7 @@ def _format_context_length(tokens: int) -> str:
         if abs(val - rounded) < 0.05:
             return f"{rounded}M"
         return f"{val:.1f}M"
-    elif tokens >= 1_000:
+    if tokens >= 1_000:
         val = tokens / 1_000
         rounded = round(val)
         if abs(val - rounded) < 0.05:
@@ -489,9 +490,7 @@ def _display_toolset_name(toolset_name: str) -> str:
     if not toolset_name:
         return "unknown"
     return (
-        toolset_name[:-6]
-        if toolset_name.endswith("_tools")
-        else toolset_name
+        toolset_name.removesuffix("_tools")
     )
 
 
@@ -558,9 +557,8 @@ def build_welcome_banner(console: "Console", model: str, cwd: str,
         _bskin = None
         _hero = HERMES_CADUCEUS
     left_lines = ["", _hero, ""]
-    model_short = model.split("/")[-1] if "/" in model else model
-    if model_short.endswith(".gguf"):
-        model_short = model_short[:-5]
+    model_short = model.rsplit("/", maxsplit=1)[-1] if "/" in model else model
+    model_short = model_short.removesuffix(".gguf")
     if len(model_short) > 28:
         model_short = model_short[:25] + "..."
     ctx_str = f" [dim {dim}]·[/] [dim {dim}]{_format_context_length(context_length)} context[/]" if context_length else ""

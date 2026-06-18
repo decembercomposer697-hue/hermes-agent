@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 import os
+import pathlib
 import re
 import shutil
 import subprocess
@@ -1277,12 +1278,12 @@ class SlashCommandCompleter(Completer):
                 break
 
             full_path = os.path.join(search_dir, entry)
-            is_dir = os.path.isdir(full_path)
+            is_dir = pathlib.Path(full_path).is_dir()
 
             # Build the completion text (what replaces the typed word)
             if word.startswith("~"):
                 display_path = "~/" + os.path.relpath(full_path, os.path.expanduser("~"))
-            elif os.path.isabs(word):
+            elif pathlib.Path(word).is_absolute():
                 display_path = full_path
             else:
                 # Keep relative
@@ -1375,7 +1376,7 @@ class SlashCommandCompleter(Completer):
                     if match_prefix and not entry.lower().startswith(prefix_lower):
                         continue
                     full_path = os.path.join(search_dir, entry)
-                    is_dir = os.path.isdir(full_path)
+                    is_dir = pathlib.Path(full_path).is_dir()
                     # `@folder:` must only surface directories; `@file:` only
                     # regular files.  Without this filter `@folder:` listed
                     # every .env / .gitignore in the cwd, defeating the
@@ -1432,7 +1433,7 @@ class SlashCommandCompleter(Completer):
                     raw = proc.stdout.strip().split("\n")
                     # Store relative paths
                     for p in raw[:5000]:
-                        rel = os.path.relpath(p, cwd) if os.path.isabs(p) else p
+                        rel = os.path.relpath(p, cwd) if pathlib.Path(p).is_absolute() else p
                         files.append(rel)
                     break
             except (subprocess.TimeoutExpired, OSError):
@@ -1682,7 +1683,7 @@ class SlashCommandCompleter(Completer):
             from cli import load_cli_config
 
             personalities = (load_cli_config().get("agent") or {}).get("personalities", {}) or {}
-            if "none".startswith(sub_lower) and "none" != sub_lower:
+            if "none".startswith(sub_lower) and sub_lower != "none":
                 yield Completion(
                     "none",
                     start_position=-len(sub_text),
@@ -1862,11 +1863,10 @@ class SlashCommandAutoSuggest(AutoSuggest):
         # Static subcommands
         if self._completer is not None and not self._completer._command_allowed(base_cmd):
             return None
-        if base_cmd in SUBCOMMANDS and SUBCOMMANDS[base_cmd]:
-            if " " not in sub_text:
-                for sub in SUBCOMMANDS[base_cmd]:
-                    if sub.startswith(sub_lower) and sub != sub_lower:
-                        return Suggestion(sub[len(sub_text):])
+        if SUBCOMMANDS.get(base_cmd) and " " not in sub_text:
+            for sub in SUBCOMMANDS[base_cmd]:
+                if sub.startswith(sub_lower) and sub != sub_lower:
+                    return Suggestion(sub[len(sub_text):])
 
         # Fall back to history
         if self._history:
@@ -1877,7 +1877,7 @@ class SlashCommandAutoSuggest(AutoSuggest):
 def _file_size_label(path: str) -> str:
     """Return a compact human-readable file size, or '' on error."""
     try:
-        size = os.path.getsize(path)
+        size = pathlib.Path(path).stat().st_size
     except OSError:
         return ""
     if size < 1024:

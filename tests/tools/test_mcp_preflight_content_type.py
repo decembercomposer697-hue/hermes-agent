@@ -186,9 +186,8 @@ def test_head_405_falls_back_to_get_and_rejects_html():
     with _serve(_handler(
         status=200, content_type="text/html",
         head_status=405, record=record,
-    )) as base:
-        with pytest.raises(NonMcpEndpointError):
-            asyncio.run(task._preflight_content_type(f"{base}/", timeout=5.0))
+    )) as base, pytest.raises(NonMcpEndpointError):
+        asyncio.run(task._preflight_content_type(f"{base}/", timeout=5.0))
     assert record == ["HEAD", "GET"]
 
 

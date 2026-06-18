@@ -26,7 +26,7 @@ import re
 import shutil
 import sys
 import threading
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from tools.computer_use.backend import (
     ActionResult,
@@ -65,7 +65,7 @@ _WINDOW_LINE_RE = re.compile(
 # Group 3: quoted label (classic format)
 # Group 4: id= label (new format)
 _ELEMENT_LINE_RE = re.compile(
-    r'^\s*(?:-\s+)?\[(\d+)\]\s+(\w+)(?:\s+"([^"]*)"|(?:\s+\(\d+\))?\s+id=([^\s\[\]]*))?' ,
+    r'^\s*(?:-\s+)?\[(\d+)\]\s+(\w+)(?:\s+"([^"]*)"|(?:\s+\(\d+\))?\s+id=([^\s\[\]]*))?',
     re.MULTILINE,
 )
 
@@ -672,8 +672,7 @@ class CuaDriverBackend(ComputerUseBackend):
         if modifiers:
             # hotkey requires at least one modifier + one key.
             return self._action("hotkey", {"pid": pid, "keys": modifiers + [key_name]})
-        else:
-            return self._action("press_key", {"pid": pid, "key": key_name})
+        return self._action("press_key", {"pid": pid, "key": key_name})
 
     # ── Value setter ────────────────────────────────────────────────
     def set_value(self, value: str, element: int | None = None) -> ActionResult:

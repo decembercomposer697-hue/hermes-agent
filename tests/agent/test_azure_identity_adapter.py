@@ -217,9 +217,9 @@ class TestBuildBearerHttpClient:
     def test_rejects_non_callable_provider(self):
         from agent.azure_identity_adapter import build_bearer_http_client
         with pytest.raises(ValueError):
-            build_bearer_http_client(cast(Callable[[], str], "plain-string-not-callable"))
+            build_bearer_http_client(cast("Callable[[], str]", "plain-string-not-callable"))
         with pytest.raises(ValueError):
-            build_bearer_http_client(cast(Callable[[], str], None))
+            build_bearer_http_client(cast("Callable[[], str]", None))
 
     def test_forwards_httpx_kwargs(self):
         import httpx
@@ -311,7 +311,7 @@ class TestEntraIdentityConfig:
         from agent.azure_identity_adapter import EntraIdentityConfig
         cfg = EntraIdentityConfig()
         with pytest.raises((AttributeError, Exception)):
-            setattr(cfg, "scope", "mutated")
+            cfg.scope = "mutated"
 
 
 # ---------------------------------------------------------------------------

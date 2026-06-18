@@ -301,14 +301,12 @@ def _windows_save(dest: Path) -> bool:
 
 def _linux_save(dest: Path) -> bool:
     """Try clipboard backends in priority order: WSL → Wayland → X11."""
-    if _is_wsl():
-        if _wsl_save(dest):
-            return True
+    if _is_wsl() and _wsl_save(dest):
+        return True
         # Fall through — WSLg might have wl-paste or xclip working
 
-    if os.environ.get("WAYLAND_DISPLAY"):
-        if _wayland_save(dest):
-            return True
+    if os.environ.get("WAYLAND_DISPLAY") and _wayland_save(dest):
+        return True
 
     return _xclip_save(dest)
 
@@ -369,7 +367,7 @@ def _wayland_save(dest: Path) -> bool:
             return False
 
         # Extract the image data
-        with open(dest, "wb") as f:
+        with Path(dest).open("wb") as f:
             subprocess.run(
                 ["wl-paste", "--type", mime],
                 stdout=f, stderr=subprocess.DEVNULL, timeout=5, check=True,
@@ -421,9 +419,8 @@ def _convert_to_png(path: Path) -> bool:
         if r.returncode == 0 and path.exists() and path.stat().st_size > 0:
             tmp.unlink(missing_ok=True)
             return True
-        else:
-            # Convert failed — restore the original file
-            tmp.rename(path)
+        # Convert failed — restore the original file
+        tmp.rename(path)
     except FileNotFoundError:
         logger.debug("ImageMagick not installed — cannot convert BMP to PNG")
         if tmp.exists() and not path.exists():
@@ -481,7 +478,7 @@ def _xclip_save(dest: Path) -> bool:
 
     # Extract PNG data
     try:
-        with open(dest, "wb") as f:
+        with Path(dest).open("wb") as f:
             subprocess.run(
                 ["xclip", "-selection", "clipboard", "-t", "image/png", "-o"],
                 stdout=f, stderr=subprocess.DEVNULL, timeout=5, check=True,

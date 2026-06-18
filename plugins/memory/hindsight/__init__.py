@@ -34,6 +34,7 @@ import importlib
 import json
 import logging
 import os
+import pathlib
 import queue
 import threading
 from datetime import UTC, datetime, timezone
@@ -471,10 +472,9 @@ def _sanitize_bank_segment(value: str) -> str:
         if ch.isalnum() or ch == "-" or ch == "_":
             out.append(ch)
             prev_dash = False
-        else:
-            if not prev_dash:
-                out.append("-")
-                prev_dash = True
+        elif not prev_dash:
+            out.append("-")
+            prev_dash = True
     return "".join(out).strip("-_")
 
 
@@ -873,7 +873,7 @@ class HindsightMemoryProvider(MemoryProvider):
             {"key": "auto_recall", "description": "Automatically recall memories before each turn", "default": True},
             {"key": "auto_retain", "description": "Automatically retain conversation turns", "default": True},
             {"key": "retain_every_n_turns", "description": "Retain every N turns (1 = every turn)", "default": 1},
-            {"key": "retain_async","description": "Process retain asynchronously on the Hindsight server", "default": True},
+            {"key": "retain_async", "description": "Process retain asynchronously on the Hindsight server", "default": True},
             {"key": "retain_context", "description": "Context label for retained memories", "default": "conversation between Hermes Agent and the User"},
             {"key": "recall_max_tokens", "description": "Maximum tokens for recall results", "default": 4096},
             {"key": "recall_max_input_chars", "description": "Maximum input query length for auto-recall", "default": 800},
@@ -1252,7 +1252,7 @@ class HindsightMemoryProvider(MemoryProvider):
                     # would capture output from other threads.
                     import hindsight_embed.daemon_embed_manager as dem
                     from rich.console import Console
-                    dem.console = Console(file=open(log_path, "a", encoding="utf-8"), force_terminal=False)
+                    dem.console = Console(file=pathlib.Path(log_path).open("a", encoding="utf-8"), force_terminal=False)
 
                     client = self._get_client()
                     profile = self._config.get("profile", "hermes")
@@ -1268,15 +1268,15 @@ class HindsightMemoryProvider(MemoryProvider):
                     if config_changed:
                         profile_env = _materialize_embedded_profile_env(self._config)
                         if client._manager.is_running(profile):
-                            with open(log_path, "a", encoding="utf-8") as f:
+                            with pathlib.Path(log_path).open("a", encoding="utf-8") as f:
                                 f.write("\n=== Config changed, restarting daemon ===\n")
                             client._manager.stop(profile)
 
                     client._ensure_started()
-                    with open(log_path, "a", encoding="utf-8") as f:
+                    with pathlib.Path(log_path).open("a", encoding="utf-8") as f:
                         f.write("\n=== Daemon started successfully ===\n")
                 except Exception as e:
-                    with open(log_path, "a", encoding="utf-8") as f:
+                    with pathlib.Path(log_path).open("a", encoding="utf-8") as f:
                         f.write(f"\n=== Daemon startup failed: {e} ===\n")
                         traceback.print_exc(file=f)
 

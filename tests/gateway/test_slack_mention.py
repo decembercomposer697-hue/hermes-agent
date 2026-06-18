@@ -258,13 +258,12 @@ def _would_process(adapter, *, is_dm=False, channel_id=CHANNEL_ID,
 
         if channel_id in adapter._slack_free_response_channels():
             return True
-        elif not adapter._slack_require_mention():
+        if not adapter._slack_require_mention():
             return True
-        elif not is_mentioned:
+        if not is_mentioned:
             if thread_reply and active_session:
                 return True
-            else:
-                return False
+            return False
     return True
 
 

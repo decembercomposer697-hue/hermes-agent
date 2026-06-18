@@ -29,7 +29,7 @@ import re
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from agent.credential_pool import STATUS_EXHAUSTED
 from agent.error_classifier import FailoverReason
@@ -88,7 +88,7 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
     # embedding ~1MB base64 blobs into every saved trajectory.
     messages = [_trajectory_normalize_msg(m) for m in messages]
     trajectory = []
-    
+
     # Add system message with tool definitions
     system_msg = (
         "You are a function calling AI model. You are provided with function signatures within <tools> </tools> XML tags. "
@@ -103,42 +103,42 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
         "Each function call should be enclosed within <tool_call> </tool_call> XML tags.\n"
         "Example:\n<tool_call>\n{'name': <function-name>,'arguments': <args-dict>}\n</tool_call>"
     )
-    
+
     trajectory.append({
         "from": "system",
         "value": system_msg,
     })
-    
+
     # Add the actual user prompt (from the dataset) as the first human message
     trajectory.append({
         "from": "human",
         "value": user_query,
     })
-    
+
     # Skip the first message (the user query) since we already added it above.
     # Prefill messages are injected at API-call time only (not in the messages
     # list), so no offset adjustment is needed here.
     i = 1
-    
+
     while i < len(messages):
         msg = messages[i]
-        
+
         if msg["role"] == "assistant":
             # Check if this message has tool calls
-            if "tool_calls" in msg and msg["tool_calls"]:
+            if msg.get("tool_calls"):
                 # Format assistant message with tool calls
                 # Add <think> tags around reasoning for trajectory storage
                 content = ""
-                
+
                 # Prepend reasoning in <think> tags if available (native thinking tokens)
                 if msg.get("reasoning") and msg["reasoning"].strip():
                     content = f"<think>\n{msg['reasoning']}\n</think>\n"
-                
+
                 if msg.get("content") and msg["content"].strip():
                     # Convert any <REASONING_SCRATCHPAD> tags to <think> tags
                     # (used when native thinking is disabled and model reasons via XML)
                     content += convert_scratchpad_to_think(msg["content"]) + "\n"
-                
+
                 # Add tool calls wrapped in XML tags
                 for tool_call in msg["tool_calls"]:
                     if not tool_call or not isinstance(tool_call, dict): continue
@@ -151,23 +151,23 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
                         # but if it does, log warning and use empty dict
                         logger.warning(f"Unexpected invalid JSON in trajectory conversion: {tool_call['function']['arguments'][:100]}")
                         arguments = {}
-                    
+
                     tool_call_json = {
                         "name": tool_call["function"]["name"],
                         "arguments": arguments,
                     }
                     content += f"<tool_call>\n{json.dumps(tool_call_json, ensure_ascii=False)}\n</tool_call>\n"
-                
+
                 # Ensure every gpt turn has a <think> block (empty if no reasoning)
                 # so the format is consistent for training data
                 if "<think>" not in content:
                     content = "<think>\n</think>\n" + content
-                
+
                 trajectory.append({
                     "from": "gpt",
                     "value": content.rstrip(),
                 })
-                
+
                 # Collect all subsequent tool responses
                 tool_responses = []
                 j = i + 1
@@ -175,7 +175,7 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
                     tool_msg = messages[j]
                     # Format tool response with XML tags
                     tool_response = "<tool_response>\n"
-                    
+
                     # Try to parse tool content as JSON if it looks like JSON
                     tool_content = tool_msg["content"]
                     try:
@@ -183,7 +183,7 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
                             tool_content = json.loads(tool_content)
                     except (json.JSONDecodeError, AttributeError):
                         pass  # Keep as string if not valid JSON
-                    
+
                     tool_index = len(tool_responses)
                     tool_name = (
                         msg["tool_calls"][tool_index]["function"]["name"]
@@ -198,7 +198,7 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
                     tool_response += "\n</tool_response>"
                     tool_responses.append(tool_response)
                     j += 1
-                
+
                 # Add all tool responses as a single message
                 if tool_responses:
                     trajectory.append({
@@ -206,38 +206,38 @@ def convert_to_trajectory_format(agent, messages: list[dict[str, Any]], user_que
                         "value": "\n".join(tool_responses),
                     })
                     i = j - 1  # Skip the tool messages we just processed
-            
+
             else:
                 # Regular assistant message without tool calls
                 # Add <think> tags around reasoning for trajectory storage
                 content = ""
-                
+
                 # Prepend reasoning in <think> tags if available (native thinking tokens)
                 if msg.get("reasoning") and msg["reasoning"].strip():
                     content = f"<think>\n{msg['reasoning']}\n</think>\n"
-                
+
                 # Convert any <REASONING_SCRATCHPAD> tags to <think> tags
                 # (used when native thinking is disabled and model reasons via XML)
                 raw_content = msg["content"] or ""
                 content += convert_scratchpad_to_think(raw_content)
-                
+
                 # Ensure every gpt turn has a <think> block (empty if no reasoning)
                 if "<think>" not in content:
                     content = "<think>\n</think>\n" + content
-                
+
                 trajectory.append({
                     "from": "gpt",
                     "value": content.strip(),
                 })
-        
+
         elif msg["role"] == "user":
             trajectory.append({
                 "from": "human",
                 "value": msg["content"],
             })
-        
+
         i += 1
-    
+
     return trajectory
 
 
@@ -979,6 +979,7 @@ def restore_primary_runtime(agent) -> bool:
         logger.warning("Failed to restore primary runtime: %s", e)
         return False
 
+
 # Which error types indicate a transient transport failure worth
 # one more attempt with a rebuilt client / connection pool.
 _TRANSIENT_TRANSPORT_ERRORS = frozenset({
@@ -1004,17 +1005,17 @@ def extract_reasoning(agent, assistant_message) -> str | None:
 
     """
     reasoning_parts = []
-    
+
     # Check direct reasoning field
     if hasattr(assistant_message, "reasoning") and assistant_message.reasoning:
         reasoning_parts.append(assistant_message.reasoning)
-    
+
     # Check reasoning_content field (alternative name used by some providers)
     if hasattr(assistant_message, "reasoning_content") and assistant_message.reasoning_content:
         # Don't duplicate if same as reasoning
         if assistant_message.reasoning_content not in reasoning_parts:
             reasoning_parts.append(assistant_message.reasoning_content)
-    
+
     # Check reasoning_details array (OpenRouter unified format)
     # Format: [{"type": "reasoning.summary", "summary": "...", ...}, ...]
     if hasattr(assistant_message, "reasoning_details") and assistant_message.reasoning_details:
@@ -1061,11 +1062,11 @@ def extract_reasoning(agent, assistant_message) -> str | None:
                 cleaned = block.strip()
                 if cleaned and cleaned not in reasoning_parts:
                     reasoning_parts.append(cleaned)
-    
+
     # Combine all reasoning parts
     if reasoning_parts:
         return "\n\n".join(reasoning_parts)
-    
+
     return None
 
 
@@ -1144,7 +1145,7 @@ def dump_api_request_debug(
         return dump_file
     except Exception as dump_error:
         if agent.verbose_logging:
-            logger.warning(f"Failed to dump API request debug payload: {dump_error}")
+            logger.warning("Failed to dump API request debug payload: %s", dump_error)
         return None
 
 
@@ -2480,27 +2481,27 @@ def force_close_tcp_sockets(client: Any) -> int:
 
 
 __all__ = [
-    "convert_to_trajectory_format",
-    "sanitize_tool_call_arguments",
-    "repair_message_sequence",
-    "strip_think_blocks",
-    "recover_with_credential_pool",
-    "try_recover_primary_transport",
-    "drop_thinking_only_and_merge_users",
-    "restore_primary_runtime",
-    "extract_reasoning",
-    "dump_api_request_debug",
-    "anthropic_prompt_cache_policy",
-    "create_openai_client",
-    "switch_model",
-    "invoke_tool",
-    "repair_tool_call",
-    "sanitize_api_messages",
-    "looks_like_codex_intermediate_ack",
-    "copy_reasoning_content_for_api",
-    "cleanup_dead_connections",
-    "extract_api_error_context",
-    "apply_pending_steer_to_tool_results",
     "_iter_pool_sockets",
+    "anthropic_prompt_cache_policy",
+    "apply_pending_steer_to_tool_results",
+    "cleanup_dead_connections",
+    "convert_to_trajectory_format",
+    "copy_reasoning_content_for_api",
+    "create_openai_client",
+    "drop_thinking_only_and_merge_users",
+    "dump_api_request_debug",
+    "extract_api_error_context",
+    "extract_reasoning",
     "force_close_tcp_sockets",
+    "invoke_tool",
+    "looks_like_codex_intermediate_ack",
+    "recover_with_credential_pool",
+    "repair_message_sequence",
+    "repair_tool_call",
+    "restore_primary_runtime",
+    "sanitize_api_messages",
+    "sanitize_tool_call_arguments",
+    "strip_think_blocks",
+    "switch_model",
+    "try_recover_primary_transport",
 ]

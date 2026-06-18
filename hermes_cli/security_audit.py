@@ -29,7 +29,6 @@ import urllib.request
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 from hermes_constants import get_hermes_home
 

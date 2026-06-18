@@ -61,7 +61,7 @@ def prompt(
         else:
             value = input(display)
         value = value.strip()
-        return value if value else (default or "")
+        return value or (default or "")
     except (KeyboardInterrupt, EOFError):
         print()
         return ""

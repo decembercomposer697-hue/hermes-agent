@@ -18,7 +18,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from hermes_constants import get_hermes_home
 
@@ -158,7 +158,7 @@ def start(
     log_path = out / "bot.log"
     # Detach: stdin=devnull, stdout/stderr → log file, new session so parent
     # signals don't propagate.
-    log_fh = open(log_path, "ab", buffering=0)
+    log_fh = Path(log_path).open("ab", buffering=0)
     try:
         proc = subprocess.Popen(
             [sys.executable, "-m", "plugins.google_meet.meet_bot"],

@@ -11,7 +11,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from http.cookiejar import CookieJar
 
 # ---------------------------------------------------------------------------

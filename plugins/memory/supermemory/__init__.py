@@ -109,7 +109,7 @@ def _load_supermemory_config(hermes_home: str) -> dict:
     # Keep raw container_tag — template variables like {identity} are resolved
     # in initialize(), and _sanitize_tag runs AFTER resolution.
     raw_tag = str(config.get("container_tag", _DEFAULT_CONTAINER_TAG)).strip()
-    config["container_tag"] = raw_tag if raw_tag else _DEFAULT_CONTAINER_TAG
+    config["container_tag"] = raw_tag or _DEFAULT_CONTAINER_TAG
     config["auto_recall"] = _as_bool(config.get("auto_recall"), True)
     config["auto_capture"] = _as_bool(config.get("auto_capture"), True)
     try:

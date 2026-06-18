@@ -14,7 +14,6 @@ import subprocess
 import sys
 import uuid
 from pathlib import Path
-from typing import Optional
 
 from tools.environments.base import BaseEnvironment, _popen_bash
 from tools.environments.local import _HERMES_PROVIDER_ENV_BLOCKLIST
@@ -281,7 +280,7 @@ def find_docker() -> str | None:
 
     # 1. Explicit override via env var (e.g. for Podman on immutable distros)
     override = os.getenv("HERMES_DOCKER_BINARY")
-    if override and os.path.isfile(override) and os.access(override, os.X_OK):
+    if override and Path(override).is_file() and os.access(override, os.X_OK):
         _docker_executable = override
         logger.info("Using HERMES_DOCKER_BINARY override: %s", override)
         return override
@@ -301,7 +300,7 @@ def find_docker() -> str | None:
 
     # 4. Well-known macOS Docker Desktop locations
     for path in _DOCKER_SEARCH_PATHS:
-        if os.path.isfile(path) and os.access(path, os.X_OK):
+        if Path(path).is_file() and os.access(path, os.X_OK):
             _docker_executable = path
             logger.info("Found docker at non-PATH location: %s", path)
             return path
@@ -546,7 +545,7 @@ class DockerEnvironment(BaseEnvironment):
         self._container_name: str = ""
         self._image_uses_s6_init: bool = False
         self._all_run_args: list[str] = []
-        logger.info(f"DockerEnvironment volumes: {volumes}")
+        logger.info("DockerEnvironment volumes: %s", volumes)
         # Ensure volumes is a list (config.yaml could be malformed)
         if volumes is not None and not isinstance(volumes, list):
             logger.warning(f"docker_volumes config is not a list: {volumes!r}")
@@ -592,17 +591,17 @@ class DockerEnvironment(BaseEnvironment):
                 if ":/workspace" in vol:
                     workspace_explicitly_mounted = True
             else:
-                logger.warning(f"Docker volume '{vol}' missing colon, skipping")
+                logger.warning("Docker volume '%s' missing colon, skipping", vol)
 
         host_cwd_abs = os.path.abspath(os.path.expanduser(host_cwd)) if host_cwd else ""
         bind_host_cwd = (
             auto_mount_cwd
             and bool(host_cwd_abs)
-            and os.path.isdir(host_cwd_abs)
+            and Path(host_cwd_abs).is_dir()
             and not workspace_explicitly_mounted
         )
-        if auto_mount_cwd and host_cwd and not os.path.isdir(host_cwd_abs):
-            logger.debug(f"Skipping docker cwd mount: host_cwd is not a valid directory: {host_cwd}")
+        if auto_mount_cwd and host_cwd and not Path(host_cwd_abs).is_dir():
+            logger.debug("Skipping docker cwd mount: host_cwd is not a valid directory: %s", host_cwd)
 
         self._workspace_dir: str | None = None
         self._home_dir: str | None = None
@@ -610,13 +609,13 @@ class DockerEnvironment(BaseEnvironment):
         if self._persistent:
             sandbox = get_sandbox_dir() / "docker" / task_id
             self._home_dir = str(sandbox / "home")
-            os.makedirs(self._home_dir, exist_ok=True)
+            Path(self._home_dir).mkdir(exist_ok=True, parents=True)
             writable_args.extend([
                 "-v", f"{self._home_dir}:/root",
             ])
             if not bind_host_cwd and not workspace_explicitly_mounted:
                 self._workspace_dir = str(sandbox / "workspace")
-                os.makedirs(self._workspace_dir, exist_ok=True)
+                Path(self._workspace_dir).mkdir(exist_ok=True, parents=True)
                 writable_args.extend([
                     "-v", f"{self._workspace_dir}:/workspace",
                 ])
@@ -631,7 +630,7 @@ class DockerEnvironment(BaseEnvironment):
             ])
 
         if bind_host_cwd:
-            logger.info(f"Mounting configured host cwd to /workspace: {host_cwd_abs}")
+            logger.info("Mounting configured host cwd to /workspace: %s", host_cwd_abs)
             volume_args = ["-v", f"{host_cwd_abs}:/workspace", *volume_args]
         elif workspace_explicitly_mounted:
             logger.debug("Skipping docker cwd mount: /workspace already mounted by user config")
@@ -763,7 +762,7 @@ class DockerEnvironment(BaseEnvironment):
             run_exec=image_uses_s6_init,
         )
 
-        logger.info(f"Docker volume_args: {volume_args}")
+        logger.info("Docker volume_args: %s", volume_args)
         # User-supplied extra docker run flags (docker_extra_args in config.yaml).
         # Appended last so they can override defaults if needed.
         validated_extra = []
@@ -782,7 +781,7 @@ class DockerEnvironment(BaseEnvironment):
             + env_args
             + validated_extra
         )
-        logger.info(f"Docker run_args: {all_run_args}")
+        logger.info("Docker run_args: %s", all_run_args)
 
         # Start the container directly via `docker run -d`.
         container_name = f"hermes-{uuid.uuid4().hex[:8]}"
@@ -1071,9 +1070,8 @@ class DockerEnvironment(BaseEnvironment):
             result.get("returncode", 0) != 0
             and self._is_container_gone(result.get("output", ""))
             and self._persist_across_processes
-        ):
-            if self._recreate_container():
-                result = super().execute(command, cwd, **kwargs)
+        ) and self._recreate_container():
+            result = super().execute(command, cwd, **kwargs)
         return result
 
     @staticmethod

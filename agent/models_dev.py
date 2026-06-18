@@ -23,7 +23,7 @@ import logging
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import requests
 
@@ -194,7 +194,7 @@ def _load_disk_cache() -> dict[str, Any]:
     try:
         cache_path = _get_cache_path()
         if cache_path.exists():
-            with open(cache_path, encoding="utf-8") as f:
+            with Path(cache_path).open(encoding="utf-8") as f:
                 return json.load(f)
     except Exception as e:
         logger.debug("Failed to load models.dev disk cache: %s", e)
@@ -514,7 +514,7 @@ def list_provider_models(provider: str) -> list[str]:
     """
     from hermes_cli.models import normalize_provider
     provider = normalize_provider(provider) or provider
-    
+
     models = _get_provider_models(provider)
     if models is None:
         return []
@@ -630,12 +630,12 @@ def _parse_model_info(model_id: str, raw: dict[str, Any], provider_id: str) -> M
         name=raw.get("name", "") or model_id,
         family=raw.get("family", "") or "",
         provider_id=provider_id,
-        reasoning=bool(raw.get("reasoning", False)),
-        tool_call=bool(raw.get("tool_call", False)),
-        attachment=bool(raw.get("attachment", False)),
-        temperature=bool(raw.get("temperature", False)),
-        structured_output=bool(raw.get("structured_output", False)),
-        open_weights=bool(raw.get("open_weights", False)),
+        reasoning=bool(raw.get("reasoning")),
+        tool_call=bool(raw.get("tool_call")),
+        attachment=bool(raw.get("attachment")),
+        temperature=bool(raw.get("temperature")),
+        structured_output=bool(raw.get("structured_output")),
+        open_weights=bool(raw.get("open_weights")),
         input_modalities=tuple(input_mods) if isinstance(input_mods, list) else (),
         output_modalities=tuple(output_mods) if isinstance(output_mods, list) else (),
         context_window=ctx_int,

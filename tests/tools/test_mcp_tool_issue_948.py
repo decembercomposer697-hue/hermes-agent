@@ -74,7 +74,6 @@ def test_resolve_stdio_command_respects_explicit_empty_path():
 
     def _fake_which(_cmd, path=None):
         seen_paths.append(path)
-        return None
 
     with patch("tools.mcp_tool.shutil.which", side_effect=_fake_which):
         command, env = _resolve_stdio_command("python", {"PATH": ""})

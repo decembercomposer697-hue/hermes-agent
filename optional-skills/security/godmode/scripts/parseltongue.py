@@ -305,7 +305,7 @@ def _apply_unicodezwj(word):
     result = []
     for c in word:
         mapped = UNICODE_MAP.get(c.lower())
-        result.append(mapped if mapped else c)
+        result.append(mapped or c)
     return "\u200C".join(result)
 
 
@@ -339,7 +339,7 @@ def _apply_dottedunicode(word):
     result = []
     for c in word:
         mapped = UNICODE_MAP.get(c.lower())
-        result.append(mapped if mapped else c)
+        result.append(mapped or c)
     return ".".join(result)
 
 
@@ -397,13 +397,13 @@ TECHNIQUES = [
     {"name": "brackets", "label": "[B.r.a.c.k]", "tier": 2, "fn": _apply_brackets},
     {"name": "mathbold", "label": "MathBold", "tier": 2, "fn": _apply_mathbold},
     {"name": "mathitalic", "label": "MathItalic", "tier": 2, "fn": _apply_mathitalic},
-    {"name": "strikethrough","label": "Strike", "tier": 2, "fn": _apply_strikethrough},
+    {"name": "strikethrough", "label": "Strike", "tier": 2, "fn": _apply_strikethrough},
     {"name": "leetheavy", "label": "L33t+", "tier": 2, "fn": _apply_leetheavy},
     {"name": "hyphenated", "label": "Hyphen", "tier": 2, "fn": _apply_hyphenated},
 
     # TIER 3: MULTI-LAYER COMBOS (23-33)
     {"name": "leetunicode", "label": "L33t+Uni", "tier": 3, "fn": _apply_leetunicode},
-    {"name": "spacedmixed", "label": "S p A c E d","tier": 3, "fn": _apply_spacedmixed},
+    {"name": "spacedmixed", "label": "S p A c E d", "tier": 3, "fn": _apply_spacedmixed},
     {"name": "reversedleet", "label": "Rev+L33t", "tier": 3, "fn": _apply_reversedleet},
     {"name": "bubblespaced", "label": "Bub Spcd", "tier": 3, "fn": _apply_bubblespaced},
     {"name": "unicodezwj", "label": "Uni+ZWJ", "tier": 3, "fn": _apply_unicodezwj},
@@ -457,6 +457,7 @@ def to_morse(text):
     }
     return " ".join(morse.get(c.lower(), c) for c in text)
 
+
 ENCODING_ESCALATION = [
     {"name": "plain", "label": "PLAIN", "fn": lambda q: q},
     {"name": "leetspeak", "label": "L33T", "fn": to_leetspeak},
@@ -496,22 +497,22 @@ def obfuscate_query(query, technique_name, triggers=None):
     """
     if triggers is None:
         triggers = detect_triggers(query)
-    
+
     if not triggers or technique_name == "raw":
         return query
-    
+
     # Find the technique function
     tech = next((t for t in TECHNIQUES if t["name"] == technique_name), None)
     if not tech:
         return query
-    
+
     result = query
     # Sort longest-first to avoid partial replacements
     sorted_triggers = sorted(triggers, key=len, reverse=True)
     for trigger in sorted_triggers:
         pattern = re.compile(r"\b(" + re.escape(trigger) + r")\b", re.IGNORECASE)
         result = pattern.sub(lambda m: tech["fn"](m.group()), result)
-    
+
     return result
 
 
@@ -529,7 +530,7 @@ def generate_variants(query, tier="standard", custom_triggers=None):
     """
     triggers = detect_triggers(query, custom_triggers)
     max_variants = TIER_SIZES.get(tier, TIER_SIZES["standard"])
-    
+
     variants = []
     for i, tech in enumerate(TECHNIQUES[:max_variants]):
         variants.append({
@@ -538,7 +539,7 @@ def generate_variants(query, tier="standard", custom_triggers=None):
             "label": tech["label"],
             "tier": tech["tier"],
         })
-    
+
     return variants
 
 

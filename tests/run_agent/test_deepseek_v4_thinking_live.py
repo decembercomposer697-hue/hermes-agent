@@ -125,7 +125,6 @@ def test_deepseek_v4_thinking_tool_call_replay_round_trip(live_model: str):
     and tool_calls, then appends the tool result. DeepSeek accepting the
     second request is the live guardrail for the V4 thinking replay contract.
     """
-
     client = _make_live_client()
     agent = _make_agent_for_message_building(live_model)
 

@@ -909,7 +909,6 @@ class TestSignalTypingBackoff:
 
         async def _fake_rpc(method, params, rpc_id=None, *, log_failures=True):
             calls.append({"log_failures": log_failures})
-            return None  # simulate NETWORK_FAILURE
 
         adapter._rpc = _fake_rpc
 
@@ -929,7 +928,6 @@ class TestSignalTypingBackoff:
 
         async def _fake_rpc(method, params, rpc_id=None, *, log_failures=True):
             call_count["n"] += 1
-            return None
 
         adapter._rpc = _fake_rpc
 
@@ -953,7 +951,6 @@ class TestSignalTypingBackoff:
 
         async def _fake_rpc(method, params, rpc_id=None, *, log_failures=True):
             call_log.append(params.get("recipient") or params.get("groupId"))
-            return None
 
         adapter._rpc = _fake_rpc
 
@@ -993,7 +990,6 @@ class TestSignalTypingBackoff:
         # Next failure after recovery logs at WARNING again (fresh counter).
         async def _fail(method, params, rpc_id=None, *, log_failures=True):
             call_log.append(log_failures)
-            return None
 
         adapter._rpc = _fail
         await adapter.send_typing("+155****4567")

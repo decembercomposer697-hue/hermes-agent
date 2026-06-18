@@ -36,7 +36,7 @@ import time
 from dataclasses import dataclass
 from html import escape as _html_escape
 from pathlib import Path
-from typing import Any, Dict, Optional, Set
+from typing import Any
 
 try:
     from mautrix.types import (
@@ -186,6 +186,7 @@ class _MatrixApprovalPrompt:
         self.message_id = message_id
         self.resolved = resolved
         self.bot_reaction_events: dict[str, str] = {}  # emoji -> event_id
+
 
 # Matrix message size limit (4000 chars practical, spec has no hard limit
 # but clients render poorly above this).
@@ -1088,7 +1089,6 @@ class MatrixAdapter(BasePlatformAdapter):
         metadata: dict[str, Any] | None = None,
     ) -> SendResult:
         """Send a message to a Matrix room."""
-
         if not content:
             return SendResult(success=True)
 
@@ -1201,7 +1201,6 @@ class MatrixAdapter(BasePlatformAdapter):
         self, chat_id: str, message_id: str, content: str, *, finalize: bool = False,
     ) -> SendResult:
         """Edit an existing message (via m.replace)."""
-
         formatted = self.format_message(content)
         new_content = self._build_text_message_content(formatted)
         msg_content: dict[str, Any] = {
@@ -1261,7 +1260,7 @@ class MatrixAdapter(BasePlatformAdapter):
                         data = await resp.read()
                         ct = resp.content_type or "image/png"
                         fname = (
-                            image_url.rsplit("/", 1)[-1].split("?")[0] or "image.png"
+                            image_url.rsplit("/", 1)[-1].split("?", maxsplit=1)[0] or "image.png"
                         )
             except ImportError:
                 import httpx
@@ -1273,7 +1272,7 @@ class MatrixAdapter(BasePlatformAdapter):
                     resp.raise_for_status()
                     data = resp.content
                     ct = resp.headers.get("content-type", "image/png")
-                    fname = image_url.rsplit("/", 1)[-1].split("?")[0] or "image.png"
+                    fname = image_url.rsplit("/", 1)[-1].split("?", maxsplit=1)[0] or "image.png"
         except Exception as exc:
             logger.warning("Matrix: failed to download image %s: %s", image_url, exc)
             return await self.send(
@@ -1416,7 +1415,6 @@ class MatrixAdapter(BasePlatformAdapter):
         is_voice: bool = False,
     ) -> SendResult:
         """Upload bytes to Matrix and send as a media message."""
-
         upload_data = data
         encrypted_file = None
         if self._encryption and getattr(self._client, "crypto", None):
@@ -1640,8 +1638,7 @@ class MatrixAdapter(BasePlatformAdapter):
         if not s:
             return True
         # Localpart is everything between leading '@' and ':'
-        if s.startswith("@"):
-            s = s[1:]
+        s = s.removeprefix("@")
         if ":" in s:
             localpart, _, _ = s.partition(":")
         else:
@@ -1844,15 +1841,14 @@ class MatrixAdapter(BasePlatformAdapter):
             # Prevents infinite reply loops in multi-agent shared rooms
             # where multiple bots all participate in the same thread.
             elif (self._thread_require_mention and in_bot_thread
-                  and not is_free_room):
-                if not is_mentioned:
-                    logger.debug(
-                        "Matrix: ignoring message %s in thread %s — "
-                        "no @mention (thread_require_mention=true)",
-                        event_id,
-                        thread_id,
-                    )
-                    return None
+                  and not is_free_room) and not is_mentioned:
+                logger.debug(
+                    "Matrix: ignoring message %s in thread %s — "
+                    "no @mention (thread_require_mention=true)",
+                    event_id,
+                    thread_id,
+                )
+                return None
 
         # DM mention-thread.
         if is_dm and not thread_id and self._dm_mention_threads and is_mentioned:
@@ -2137,7 +2133,6 @@ class MatrixAdapter(BasePlatformAdapter):
 
     async def _on_invite(self, event: Any) -> None:
         """Auto-join rooms when invited."""
-
         room_id = str(getattr(event, "room_id", ""))
 
         logger.info(
@@ -2187,7 +2182,6 @@ class MatrixAdapter(BasePlatformAdapter):
         """Send an emoji reaction to a message in a room.
         Returns the reaction event_id on success, None on failure.
         """
-
         if not self._client:
             return None
         content = {
@@ -2256,7 +2250,7 @@ class MatrixAdapter(BasePlatformAdapter):
         if msg_id and room_id:
             reaction_event_id = await self._send_reaction(room_id, msg_id, "\U0001f440")
             if reaction_event_id:
-                self._pending_reactions[(room_id, msg_id)] = reaction_event_id
+                self._pending_reactions[room_id, msg_id] = reaction_event_id
 
     async def on_processing_complete(
         self,
@@ -2798,7 +2792,7 @@ class MatrixAdapter(BasePlatformAdapter):
                 pass
         # Strip the @...:server format to just the localpart.
         if user_id.startswith("@") and ":" in user_id:
-            return user_id[1:].split(":")[0]
+            return user_id[1:].split(":", maxsplit=1)[0]
         return user_id
 
     def _mxc_to_http(self, mxc_url: str) -> str:

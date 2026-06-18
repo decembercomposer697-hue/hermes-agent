@@ -89,7 +89,7 @@ def test_finalize_single_query_signal_window_does_not_reemit_during_atexit(monke
         calls.append((name, kwargs))
 
     def interrupted_cleanup(**_kwargs):
-        raise KeyboardInterrupt()
+        raise KeyboardInterrupt
 
     expected_finalize = (
         "on_session_finalize",

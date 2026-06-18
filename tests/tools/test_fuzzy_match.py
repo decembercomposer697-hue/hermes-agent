@@ -262,7 +262,7 @@ class TestEscapeDriftGuard:
         tool-call drift. Guard must block with a helpful error instead of
         writing \\' literals into source code.
         """
-        content = "x = \"hello there\"\n"
+        content = 'x = "hello there"\n'
         # Simulate transport-corrupted old_string and new_string where an
         # apostrophe-like context got prefixed with a backslash. The content
         # itself has no apostrophe, but both strings do — matching via
@@ -457,14 +457,14 @@ class TestEscapeNormalizedNewString:
 
         Match strategy is ``escape_normalized``.
         """
-        content = "def hello():\n\tprint(\"before\")\n"
-        old_string = "def hello():\n\\tprint(\"before\")\n"
-        new_string = "def hello():\n\\tprint(\"after\")\n"
+        content = 'def hello():\n\tprint("before")\n'
+        old_string = 'def hello():\n\\tprint("before")\n'
+        new_string = 'def hello():\n\\tprint("after")\n'
         new, count, strategy, err = fuzzy_find_and_replace(content, old_string, new_string)
         assert err is None, f"Unexpected error: {err}"
         assert count == 1
         assert strategy == "escape_normalized"
-        assert "\tprint(\"after\")" in new
+        assert '\tprint("after")' in new
         assert "\\t" not in new
 
     def test_tab_in_new_string_unescaped_under_exact(self):
@@ -474,14 +474,14 @@ class TestEscapeNormalizedNewString:
         This is the issue's headline reproduction — the previous fix that
         gated on ``strategy_name == "escape_normalized"`` missed this case.
         """
-        content = "def hello():\n\tprint(\"before\")\n"
-        old_string = "\tprint(\"before\")"           # real tab
-        new_string = "\\tprint(\"after\")"           # literal backslash + t
+        content = 'def hello():\n\tprint("before")\n'
+        old_string = '\tprint("before")'           # real tab
+        new_string = '\\tprint("after")'           # literal backslash + t
         new, count, strategy, err = fuzzy_find_and_replace(content, old_string, new_string)
         assert err is None, f"Unexpected error: {err}"
         assert count == 1
         assert strategy == "exact"
-        assert "\tprint(\"after\")" in new
+        assert '\tprint("after")' in new
         assert "\\t" not in new
 
     def test_carriage_return_in_new_string_unescaped(self):
@@ -550,4 +550,3 @@ class TestEscapeNormalizedNewString:
         assert err is None
         assert count == 1
         assert "return 2" in new
-

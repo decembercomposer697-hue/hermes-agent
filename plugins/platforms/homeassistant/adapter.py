@@ -18,7 +18,7 @@ import os
 import time
 import uuid
 from datetime import datetime
-from typing import Any, Dict, Optional, Set
+from typing import Any
 
 try:
     import aiohttp
@@ -271,7 +271,7 @@ class HomeAssistantAdapter(BasePlatformAdapter):
 
         # Apply domain/entity watch filters (closed by default — require
         # explicit watch_domains, watch_entities, or watch_all to forward)
-        domain = entity_id.split(".")[0] if "." in entity_id else ""
+        domain = entity_id.split(".", maxsplit=1)[0] if "." in entity_id else ""
         if self._watch_domains or self._watch_entities:
             domain_match = domain in self._watch_domains if self._watch_domains else False
             entity_match = entity_id in self._watch_entities if self._watch_entities else False
@@ -333,7 +333,7 @@ class HomeAssistantAdapter(BasePlatformAdapter):
             return None
 
         friendly_name = new_state.get("attributes", {}).get("friendly_name", entity_id)
-        domain = entity_id.split(".")[0] if "." in entity_id else ""
+        domain = entity_id.split(".", maxsplit=1)[0] if "." in entity_id else ""
 
         # Domain-specific formatting
         if domain == "climate":
@@ -413,9 +413,8 @@ class HomeAssistantAdapter(BasePlatformAdapter):
                 ) as resp:
                     if resp.status < 300:
                         return SendResult(success=True, message_id=uuid.uuid4().hex[:12])
-                    else:
-                        body = await resp.text()
-                        return SendResult(success=False, error=f"HTTP {resp.status}: {body}")
+                    body = await resp.text()
+                    return SendResult(success=False, error=f"HTTP {resp.status}: {body}")
             else:
                 async with aiohttp.ClientSession() as session:
                     async with session.post(
@@ -426,9 +425,8 @@ class HomeAssistantAdapter(BasePlatformAdapter):
                     ) as resp:
                         if resp.status < 300:
                             return SendResult(success=True, message_id=uuid.uuid4().hex[:12])
-                        else:
-                            body = await resp.text()
-                            return SendResult(success=False, error=f"HTTP {resp.status}: {body}")
+                        body = await resp.text()
+                        return SendResult(success=False, error=f"HTTP {resp.status}: {body}")
 
         except TimeoutError:
             return SendResult(success=False, error="Timeout sending notification to HA")
@@ -503,15 +501,14 @@ async def _standalone_send(
     try:
         async with aiohttp.ClientSession(
             timeout=aiohttp.ClientTimeout(total=30),
-        ) as session:
-            async with session.post(url, headers=headers, json=payload) as resp:
-                if resp.status not in {200, 201}:
-                    body = await resp.text()
-                    return {
-                        "error": (
-                            f"Home Assistant API error ({resp.status}): {body}"
-                        ),
-                    }
+        ) as session, session.post(url, headers=headers, json=payload) as resp:
+            if resp.status not in {200, 201}:
+                body = await resp.text()
+                return {
+                    "error": (
+                        f"Home Assistant API error ({resp.status}): {body}"
+                    ),
+                }
         return {
             "success": True,
             "platform": "homeassistant",

@@ -78,7 +78,7 @@ def _setup_isolated_home(tmp_path, monkeypatch, *, warn):
     )
 
     monkeypatch.setattr(gateway_run, "_hermes_home", hermes_home)
-    monkeypatch.setattr("agent.models_dev.fetch_models_dev", lambda: {})
+    monkeypatch.setattr("agent.models_dev.fetch_models_dev", dict)
     monkeypatch.setattr(
         "hermes_cli.model_switch.switch_model",
         lambda **kw: _fake_switch_result(),
@@ -126,7 +126,6 @@ async def test_typed_model_expensive_confirm_once_applies_switch(tmp_path, monke
 
     async def _fake_request_slash_confirm(**kwargs):
         captured.update(kwargs)
-        return None  # buttons rendered
 
     runner._request_slash_confirm = _fake_request_slash_confirm
 
@@ -151,7 +150,6 @@ async def test_typed_model_expensive_cancel_keeps_current_model(tmp_path, monkey
 
     async def _fake_request_slash_confirm(**kwargs):
         captured.update(kwargs)
-        return None
 
     runner._request_slash_confirm = _fake_request_slash_confirm
 

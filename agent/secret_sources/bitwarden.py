@@ -44,7 +44,6 @@ import urllib.request
 import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +111,7 @@ def _read_disk_cache(cache_key: _CacheKey, ttl_seconds: float,
         return None
     path = _disk_cache_path(home_path)
     try:
-        with open(path, encoding="utf-8") as f:
+        with Path(path).open(encoding="utf-8") as f:
             payload = json.load(f)
     except (OSError, json.JSONDecodeError):
         return None
@@ -157,11 +156,11 @@ def _write_disk_cache(cache_key: _CacheKey, entry: _CachedFetch,
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
                 json.dump(payload, f)
-            os.chmod(tmp, 0o600)
-            os.replace(tmp, path)
+            Path(tmp).chmod(0o600)
+            Path(tmp).replace(path)
         except BaseException:
             try:
-                os.unlink(tmp)
+                Path(tmp).unlink()
             except OSError:
                 pass
             raise
@@ -336,13 +335,10 @@ def install_bws(*, force: bool = False) -> Path:
         fd, staged = tempfile.mkstemp(dir=str(bin_dir), prefix=".bws_")
         os.close(fd)
         shutil.copy2(extracted, staged)
-        os.chmod(
-            staged,
-            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
+        Path(staged).chmod(stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
             | stat.S_IRGRP | stat.S_IXGRP
-            | stat.S_IROTH | stat.S_IXOTH,
-        )
-        os.replace(staged, target)
+            | stat.S_IROTH | stat.S_IXOTH)
+        Path(staged).replace(target)
 
     logger.info("Installed bws %s at %s", _BWS_VERSION, target)
     return target
@@ -352,7 +348,7 @@ def _http_download(url: str, dest: Path) -> None:
     req = urllib.request.Request(url, headers={"User-Agent": "hermes-agent"})
     try:
         with urllib.request.urlopen(req, timeout=_BWS_DOWNLOAD_TIMEOUT) as resp:
-            with open(dest, "wb") as f:
+            with Path(dest).open("wb") as f:
                 shutil.copyfileobj(resp, f)
     except urllib.error.URLError as exc:
         raise RuntimeError(f"Failed to download {url}: {exc}") from exc
@@ -376,7 +372,7 @@ def _expected_sha256(checksum_file: Path, asset_name: str) -> str:
 
 def _sha256_file(path: Path) -> str:
     h = hashlib.sha256()
-    with open(path, "rb") as f:
+    with Path(path).open("rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
             h.update(chunk)
     return h.hexdigest()

@@ -20,7 +20,7 @@ import pytest
 def _make_setup_args(**overrides):
     return Namespace(
         non_interactive=overrides.get("non_interactive", False),
-        section=overrides.get("section", None),
+        section=overrides.get("section"),
         reset=overrides.get("reset", False),
         reconfigure=overrides.get("reconfigure", False),
         quick=overrides.get("quick", False),

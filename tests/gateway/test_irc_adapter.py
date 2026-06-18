@@ -623,7 +623,7 @@ class TestIRCStandaloneSend:
             try:
                 return await coro
             except asyncio.IncompleteReadError:
-                raise TimeoutError()
+                raise TimeoutError
 
         monkeypatch.setattr(_irc_mod.asyncio, "wait_for", _fast_timeout)
 

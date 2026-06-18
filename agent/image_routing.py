@@ -40,7 +40,7 @@ import mimetypes
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +117,7 @@ def extract_image_refs(text: str) -> tuple[list[str], list[str]]:
         raw = match.group(0)
         expanded = os.path.expanduser(raw)
         try:
-            if not os.path.isfile(expanded):
+            if not Path(expanded).is_file():
                 continue
         except OSError:
             # ENAMETOOLONG / EINVAL on pathological inputs — skip rather than crash.
@@ -535,7 +535,7 @@ def build_native_content_parts(
 
 
 __all__ = [
-    "decide_image_input_mode",
     "build_native_content_parts",
+    "decide_image_input_mode",
     "extract_image_refs",
 ]

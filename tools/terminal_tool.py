@@ -42,7 +42,7 @@ import subprocess
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from utils import env_var_enabled
 
@@ -60,7 +60,6 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 # Singularity helpers (scratch dir, SIF cache) now live in tools/environments/singularity.py
 from tools.environments.singularity import _get_scratch_dir
-from tools.interrupt import _interrupt_event, is_interrupted
 from tools.tool_backend_helpers import (
     coerce_modal_mode,
     has_direct_modal_credentials,
@@ -129,14 +128,14 @@ def _check_disk_usage_warning():
                         total_bytes += f.stat().st_size
                     except OSError as e:
                         logger.debug("Could not stat file %s: %s", f, e)
-        
+
         total_gb = total_bytes / (1024 ** 3)
-        
+
         if total_gb > DISK_USAGE_WARNING_THRESHOLD_GB:
             logger.warning("Disk usage (%.1fGB) exceeds threshold (%.0fGB). Consider running cleanup_all_environments().",
                            total_gb, DISK_USAGE_WARNING_THRESHOLD_GB)
             return True
-        
+
         return False
     except Exception as e:
         logger.debug("Disk usage warning check failed: %s", e, exc_info=True)
@@ -241,6 +240,7 @@ def _reset_cached_sudo_passwords() -> None:
     with _sudo_password_cache_lock:
         _sudo_password_cache.clear()
 
+
 # =============================================================================
 # Dangerous Command Approval System
 # =============================================================================
@@ -279,7 +279,7 @@ def _validate_workdir(workdir: str) -> str | None:
         for ch in workdir:
             if not _WORKDIR_SAFE_RE.match(ch):
                 return (
-                    f"Blocked: workdir contains disallowed character {repr(ch)}. "
+                    f"Blocked: workdir contains disallowed character {ch!r}. "
                     "Use a simple filesystem path without shell metacharacters."
                 )
         return "Blocked: workdir contains disallowed characters."
@@ -292,22 +292,22 @@ def _handle_sudo_failure(output: str, env_type: str) -> str:
     Returns enhanced output if sudo failed in messaging context, else original.
     """
     is_gateway = env_var_enabled("HERMES_GATEWAY_SESSION")
-    
+
     if not is_gateway:
         return output
-    
+
     # Check for sudo failure indicators
     sudo_failures = [
         "sudo: a password is required",
         "sudo: no tty present",
         "sudo: a terminal is required",
     ]
-    
+
     for failure in sudo_failures:
         if failure in output:
             from hermes_constants import display_hermes_home as _dhh
             return output + f"\n\n💡 Tip: To enable sudo over messaging, add SUDO_PASSWORD to {_dhh()}/.env on the agent machine."
-    
+
     return output
 
 
@@ -325,7 +325,7 @@ def _prompt_for_sudo_password(timeout_seconds: int = 45) -> str:
     directly from /dev/tty with echo disabled.
     """
     import sys
-    
+
     # Use the registered callback when available (prompt_toolkit-compatible)
     _sudo_cb = _get_sudo_password_callback()
     if _sudo_cb is not None:
@@ -335,7 +335,7 @@ def _prompt_for_sudo_password(timeout_seconds: int = 45) -> str:
             return ""
 
     result = {"password": None, "done": False}
-    
+
     def read_password_thread():
         """Read password with echo disabled. Uses msvcrt on Windows, /dev/tty on Unix."""
         tty_fd = None
@@ -383,11 +383,11 @@ def _prompt_for_sudo_password(timeout_seconds: int = 45) -> str:
                 except Exception as e:
                     logger.debug("Failed to close tty fd: %s", e)
             result["done"] = True
-    
+
     try:
         os.environ["HERMES_SPINNER_PAUSE"] = "1"
         time.sleep(0.2)
-        
+
         print()
         print("┌" + "─" * 58 + "┐")
         print("│  🔐 SUDO PASSWORD REQUIRED" + " " * 30 + "│")
@@ -398,11 +398,11 @@ def _prompt_for_sudo_password(timeout_seconds: int = 45) -> str:
         print("└" + "─" * 58 + "┘")
         print()
         print("  Password (hidden): ", end="", flush=True)
-        
+
         password_thread = threading.Thread(target=read_password_thread, daemon=True)
         password_thread.start()
         password_thread.join(timeout=timeout_seconds)
-        
+
         if result["done"]:
             password = result["password"] or ""
             print()  # newline after hidden input
@@ -413,13 +413,12 @@ def _prompt_for_sudo_password(timeout_seconds: int = 45) -> str:
             print()
             sys.stdout.flush()
             return password
-        else:
-            print("\n  ⏱ Timeout - continuing without sudo")
-            print("    (Press Enter to dismiss)")
-            print()
-            sys.stdout.flush()
-            return ""
-            
+        print("\n  ⏱ Timeout - continuing without sudo")
+        print("    (Press Enter to dismiss)")
+        print()
+        sys.stdout.flush()
+        return ""
+
     except (EOFError, KeyboardInterrupt):
         print()
         print("  ⏭ Cancelled - continuing without sudo")
@@ -1067,7 +1066,7 @@ def _get_env_config() -> dict[str, Any]:
     # Default image with Python and Node.js for maximum compatibility
     default_image = "nikolaik/python-nodejs:python3.11-nodejs20"
     env_type = os.getenv("TERMINAL_ENV", "local")
-    
+
     mount_docker_cwd = os.getenv("TERMINAL_DOCKER_MOUNT_CWD_TO_WORKSPACE", "false").lower() in {"true", "1", "yes"}
     container_backend = env_type in {"docker", "singularity", "modal", "daytona"}
     docker_backend = env_type == "docker"
@@ -1120,14 +1119,14 @@ def _get_env_config() -> dict[str, Any]:
         candidate = os.path.abspath(os.path.expanduser(docker_cwd_source))
         if (
             any(candidate.startswith(p) for p in host_prefixes)
-            or (os.path.isabs(candidate) and os.path.isdir(candidate) and not candidate.startswith(("/workspace", "/root")))
+            or (Path(candidate).is_absolute() and Path(candidate).is_dir() and not candidate.startswith(("/workspace", "/root")))
         ):
             host_cwd = candidate
             cwd = "/workspace"
     elif env_type in {"modal", "docker", "singularity", "daytona"} and cwd:
         # Host paths and relative paths that won't work inside containers
         is_host_path = any(cwd.startswith(p) for p in host_prefixes)
-        is_relative = not os.path.isabs(cwd)  # e.g. "." or "src/"
+        is_relative = not Path(cwd).is_absolute()  # e.g. "." or "src/"
         if (is_host_path or is_relative) and cwd != default_cwd:
             logger.info("Ignoring TERMINAL_CWD=%r for %s backend "
                         "(host/relative path won't work in sandbox). Using %r instead.",
@@ -1232,8 +1231,8 @@ def _create_environment(env_type: str, image: str, cwd: str, timeout: int,
 
     if env_type == "local":
         return _LocalEnvironment(cwd=cwd, timeout=timeout)
-    
-    elif env_type == "docker":
+
+    if env_type == "docker":
         # One-shot orphan reaper: clean up labeled containers left behind by
         # prior Hermes processes that hit SIGKILL / OOM / a closed terminal
         # before the atexit cleanup hook could run.  Gated to once per
@@ -1254,15 +1253,15 @@ def _create_environment(env_type: str, image: str, cwd: str, timeout: int,
             extra_args=docker_extra_args,
             persist_across_processes=cc.get("docker_persist_across_processes", True),
         )
-    
-    elif env_type == "singularity":
+
+    if env_type == "singularity":
         return _SingularityEnvironment(
             image=image, cwd=cwd, timeout=timeout,
             cpu=cpu, memory=memory, disk=disk,
             persistent_filesystem=persistent, task_id=task_id,
         )
-    
-    elif env_type == "modal":
+
+    if env_type == "modal":
         sandbox_kwargs = {}
         if cpu > 0:
             sandbox_kwargs["cpu"] = cpu
@@ -1321,8 +1320,8 @@ def _create_environment(env_type: str, image: str, cwd: str, timeout: int,
             modal_sandbox_kwargs=sandbox_kwargs,
             persistent_filesystem=persistent, task_id=task_id,
         )
-    
-    elif env_type == "daytona":
+
+    if env_type == "daytona":
         # Lazy import so daytona SDK is only required when backend is selected.
         from tools.environments.daytona import DaytonaEnvironment as _DaytonaEnvironment
         return _DaytonaEnvironment(
@@ -1331,7 +1330,7 @@ def _create_environment(env_type: str, image: str, cwd: str, timeout: int,
             persistent_filesystem=persistent, task_id=task_id,
         )
 
-    elif env_type == "ssh":
+    if env_type == "ssh":
         if not ssh_config or not ssh_config.get("host") or not ssh_config.get("user"):
             raise ValueError("SSH environment requires ssh_host and ssh_user to be configured")
         return _SSHEnvironment(
@@ -1343,11 +1342,10 @@ def _create_environment(env_type: str, image: str, cwd: str, timeout: int,
             timeout=timeout,
         )
 
-    else:
-        raise ValueError(
-            f"Unknown environment type: {env_type}. Use 'local', 'docker', "
-            f"'singularity', 'modal', 'daytona', or 'ssh'",
-        )
+    raise ValueError(
+        f"Unknown environment type: {env_type}. Use 'local', 'docker', "
+        f"'singularity', 'modal', 'daytona', or 'ssh'",
+    )
 
 
 def _cleanup_inactive_envs(lifetime_seconds: int = 300):
@@ -1477,14 +1475,14 @@ def cleanup_all_environments():
     """Clean up ALL active environments. Use with caution."""
     task_ids = list(_active_environments.keys())
     cleaned = 0
-    
+
     for task_id in task_ids:
         try:
             cleanup_vm(task_id)
             cleaned += 1
         except Exception as e:
             logger.error("Error cleaning %s: %s", task_id, e, exc_info=True)
-    
+
     # Also clean any orphaned directories
     scratch_dir = _get_scratch_dir()
     import glob
@@ -1494,7 +1492,7 @@ def cleanup_all_environments():
             logger.info("Removed orphaned: %s", path)
         except OSError as e:
             logger.debug("Failed to remove orphaned path %s: %s", path, e)
-    
+
     if cleaned > 0:
         logger.info("Cleaned %d environments", cleaned)
     return cleaned
@@ -1591,6 +1589,7 @@ def _atexit_cleanup():
                 wait_fn(timeout=15.0)
             except Exception as e:  # never block shutdown on a bad backend
                 logger.debug("wait_for_cleanup raised on exit: %s", e)
+
 
 atexit.register(_atexit_cleanup)
 
@@ -1896,7 +1895,7 @@ def terminal_tool(
             (_task_env_overrides.get(task_id) if task_id else None)
             or _task_env_overrides.get(effective_task_id, {})
         )
-        
+
         # Select image based on env type, with per-task override support
         if env_type == "docker":
             image = overrides.get("docker_image") or config["docker_image"]
@@ -2239,7 +2238,7 @@ def terminal_tool(
                             "(rc 0 = green, 8 = pending, else fail) for "
                             "exit-on-first-fail behavior, or the column-2 "
                             "awk-on-tabs poller "
-                            "(`awk -F\"\\t\" \"$2==\\\"pending\\\"\"`) for "
+                            '(`awk -F"\\t" "$2==\\"pending\\""`) for '
                             "sharded matrices. Load skill_view("
                             "name='github/hermes-agent-dev', "
                             "file_path='references/green-ci-policy.md') for "
@@ -2323,14 +2322,14 @@ def terminal_tool(
                 return json.dumps({
                     "output": "",
                     "exit_code": -1,
-                    "error": f"Failed to start background process: {str(e)}",
+                    "error": f"Failed to start background process: {e!s}",
                 }, ensure_ascii=False)
         else:
             # Run foreground command with retry logic
             max_retries = 3
             retry_count = 0
             result = None
-            
+
             while retry_count <= max_retries:
                 try:
                     execute_kwargs = {
@@ -2350,7 +2349,7 @@ def terminal_tool(
                             "exit_code": 124,
                             "error": f"Command timed out after {effective_timeout} seconds",
                         }, ensure_ascii=False)
-                    
+
                     # Retry on transient errors
                     if retry_count < max_retries:
                         retry_count += 1
@@ -2359,18 +2358,18 @@ def terminal_tool(
                                        wait_time, retry_count, max_retries, _safe_command_preview(command), type(e).__name__, e, effective_task_id, env_type)
                         time.sleep(wait_time)
                         continue
-                    
+
                     logger.error("Execution failed after %d retries - Command: %s - Error: %s: %s - Task: %s, Backend: %s",
                                  max_retries, _safe_command_preview(command), type(e).__name__, e, effective_task_id, env_type)
                     return json.dumps({
                         "output": "",
                         "exit_code": -1,
-                        "error": f"Command execution failed: {type(e).__name__}: {str(e)}",
+                        "error": f"Command execution failed: {type(e).__name__}: {e!s}",
                     }, ensure_ascii=False)
-                
+
                 # Got a result
                 break
-            
+
             # Extract output
             output = result.get("output", "")
             returncode = result.get("returncode", 0)
@@ -2398,7 +2397,7 @@ def terminal_tool(
                         break
             except Exception:
                 pass
-            
+
             # Truncate output if too long, keeping both head and tail
             from tools.tool_output_limits import get_max_bytes
             MAX_OUTPUT_CHARS = get_max_bytes()
@@ -2444,7 +2443,7 @@ def terminal_tool(
         return json.dumps({
             "output": "",
             "exit_code": -1,
-            "error": f"Failed to execute command: {str(e)}",
+            "error": f"Failed to execute command: {e!s}",
             "traceback": tb_str,
             "status": "error",
         }, ensure_ascii=False)
@@ -2459,7 +2458,7 @@ def check_terminal_requirements() -> bool:
         if env_type == "local":
             return True
 
-        elif env_type == "docker":
+        if env_type == "docker":
             from tools.environments.docker import find_docker
             docker = find_docker()
             if not docker:
@@ -2468,14 +2467,14 @@ def check_terminal_requirements() -> bool:
             result = subprocess.run([docker, "version"], capture_output=True, timeout=5, stdin=subprocess.DEVNULL)
             return result.returncode == 0
 
-        elif env_type == "singularity":
+        if env_type == "singularity":
             executable = shutil.which("apptainer") or shutil.which("singularity")
             if executable:
                 result = subprocess.run([executable, "--version"], capture_output=True, timeout=5, stdin=subprocess.DEVNULL)
                 return result.returncode == 0
             return False
 
-        elif env_type == "ssh":
+        if env_type == "ssh":
             if not config.get("ssh_host") or not config.get("ssh_user"):
                 logger.error(
                     "SSH backend selected but TERMINAL_SSH_HOST and TERMINAL_SSH_USER "
@@ -2484,7 +2483,7 @@ def check_terminal_requirements() -> bool:
                 return False
             return True
 
-        elif env_type == "modal":
+        if env_type == "modal":
             modal_state = _get_modal_backend_state(config.get("modal_mode"))
             if modal_state["selected_backend"] == "managed":
                 return True
@@ -2510,7 +2509,7 @@ def check_terminal_requirements() -> bool:
                         ),
                     )
                     return False
-                elif modal_state["mode"] == "direct":
+                if modal_state["mode"] == "direct":
                     if managed_nous_tools_enabled():
                         logger.error(
                             "Modal backend selected with TERMINAL_MODAL_MODE=direct, but no direct "
@@ -2524,19 +2523,18 @@ def check_terminal_requirements() -> bool:
                             "TERMINAL_MODAL_MODE=auto.",
                         )
                     return False
+                if managed_nous_tools_enabled():
+                    logger.error(
+                        "Modal backend selected but no direct Modal credentials/config or managed "
+                        "tool gateway was found. Configure Modal, set up the managed gateway, "
+                        "or choose a different TERMINAL_ENV.",
+                    )
                 else:
-                    if managed_nous_tools_enabled():
-                        logger.error(
-                            "Modal backend selected but no direct Modal credentials/config or managed "
-                            "tool gateway was found. Configure Modal, set up the managed gateway, "
-                            "or choose a different TERMINAL_ENV.",
-                        )
-                    else:
-                        logger.error(
-                            "Modal backend selected but no direct Modal credentials/config was found. "
-                            "Configure Modal or choose a different TERMINAL_ENV.",
-                        )
-                    return False
+                    logger.error(
+                        "Modal backend selected but no direct Modal credentials/config was found. "
+                        "Configure Modal or choose a different TERMINAL_ENV.",
+                    )
+                return False
 
             if importlib.util.find_spec("modal") is None:
                 logger.error("modal is required for direct modal terminal backend: pip install modal")
@@ -2544,17 +2542,15 @@ def check_terminal_requirements() -> bool:
 
             return True
 
-        elif env_type == "daytona":
-            from daytona import Daytona
+        if env_type == "daytona":
             return os.getenv("DAYTONA_API_KEY") is not None
 
-        else:
-            logger.error(
-                "Unknown TERMINAL_ENV '%s'. Use one of: local, docker, singularity, "
-                "modal, daytona, ssh.",
-                env_type,
-            )
-            return False
+        logger.error(
+            "Unknown TERMINAL_ENV '%s'. Use one of: local, docker, singularity, "
+            "modal, daytona, ssh.",
+            env_type,
+        )
+        return False
     except Exception as e:
         logger.error("Terminal requirements check failed: %s", e, exc_info=True)
         return False
@@ -2564,7 +2560,7 @@ if __name__ == "__main__":
     # Simple test when run directly
     print("Terminal Tool Module")
     print("=" * 50)
-    
+
     config = _get_env_config()
     print("\nCurrent Configuration:")
     print(f"  Environment type: {config['env_type']}")

@@ -78,7 +78,7 @@ class TestCmdSetupNonTtyGuard:
         monkeypatch.setattr(
             "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0",
         )
-        monkeypatch.setattr("hermes_cli.secrets_cli.load_config", lambda: {})
+        monkeypatch.setattr("hermes_cli.secrets_cli.load_config", dict)
         monkeypatch.setattr("hermes_cli.secrets_cli.save_env_value", lambda *a: None)
         monkeypatch.setattr("hermes_cli.secrets_cli.get_env_path", lambda: "/tmp/.env")
         monkeypatch.setattr(
@@ -103,7 +103,7 @@ class TestCmdSetupNonTtyGuard:
         monkeypatch.setattr(
             "hermes_cli.secrets_cli._bws_version", lambda _: "2.0.0",
         )
-        monkeypatch.setattr("hermes_cli.secrets_cli.load_config", lambda: {})
+        monkeypatch.setattr("hermes_cli.secrets_cli.load_config", dict)
         monkeypatch.setattr("hermes_cli.secrets_cli.save_env_value", lambda *a: None)
         monkeypatch.setattr("hermes_cli.secrets_cli.get_env_path", lambda: "/tmp/.env")
         monkeypatch.setattr(
@@ -132,7 +132,7 @@ class TestCmdSetupNonTtyGuard:
         monkeypatch.setattr(
             "hermes_cli.secrets_cli.masked_secret_prompt", lambda prompt: "0.valid-token",
         )
-        monkeypatch.setattr("hermes_cli.secrets_cli.load_config", lambda: {})
+        monkeypatch.setattr("hermes_cli.secrets_cli.load_config", dict)
         monkeypatch.setattr("hermes_cli.secrets_cli.save_env_value", lambda *a: None)
         monkeypatch.setattr("hermes_cli.secrets_cli.get_env_path", lambda: "/tmp/.env")
         monkeypatch.setattr(

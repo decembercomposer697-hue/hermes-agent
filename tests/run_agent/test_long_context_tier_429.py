@@ -132,8 +132,7 @@ class TestContextReduction:
         reduced_ctx = 200_000
 
         original = comp.context_length
-        if comp.context_length > reduced_ctx:
-            comp.context_length = reduced_ctx
+        comp.context_length = min(comp.context_length, reduced_ctx)
 
         assert comp.context_length == original  # unchanged
 
@@ -142,8 +141,7 @@ class TestContextReduction:
         reduced_ctx = 200_000
 
         original = comp.context_length
-        if comp.context_length > reduced_ctx:
-            comp.context_length = reduced_ctx
+        comp.context_length = min(comp.context_length, reduced_ctx)
 
         assert comp.context_length == original  # unchanged
 

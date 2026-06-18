@@ -183,7 +183,6 @@ def test_close_from_stranger_thread_aborts_only_no_close():
     the worker's eventual ``finally`` must still see the client in the
     holder so IT can be the one releasing the FD.
     """
-
     # We can't easily invoke just `_close_request_client_once` because it's
     # a closure local to ``interruptible_api_call``. Re-extract the same
     # logic by exercising it through a fake worker that lets us drive the

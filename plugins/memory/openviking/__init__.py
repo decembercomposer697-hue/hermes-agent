@@ -672,13 +672,13 @@ class OpenVikingMemoryProvider(MemoryProvider):
         try:
             if tool_name == "viking_search":
                 return self._tool_search(args)
-            elif tool_name == "viking_read":
+            if tool_name == "viking_read":
                 return self._tool_read(args)
-            elif tool_name == "viking_browse":
+            if tool_name == "viking_browse":
                 return self._tool_browse(args)
-            elif tool_name == "viking_remember":
+            if tool_name == "viking_remember":
                 return self._tool_remember(args)
-            elif tool_name == "viking_add_resource":
+            if tool_name == "viking_add_resource":
                 return self._tool_add_resource(args)
             return tool_error(f"Unknown tool: {tool_name}")
         except Exception as e:

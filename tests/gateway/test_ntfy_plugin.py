@@ -605,7 +605,6 @@ class TestOnMessage:
         assert len(calls) == 1
 
     def test_timestamp_parsed_from_event(self):
-        from datetime import timezone
         adapter = self._make_adapter()
         captured = []
 

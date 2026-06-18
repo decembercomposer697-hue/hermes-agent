@@ -31,6 +31,7 @@ class _FakeModelInfo:
 
 class _StubCLI:
     """Minimum attrs ``_apply_model_switch_result`` reads on ``self``."""
+
     agent = None
     model = ""
     provider = ""

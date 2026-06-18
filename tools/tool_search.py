@@ -33,7 +33,7 @@ import math
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger("tools.tool_search")
 
@@ -712,25 +712,25 @@ def resolve_underlying_call(args: dict[str, Any]) -> tuple[str | None, dict[str,
 
 
 __all__ = [
-    "TOOL_SEARCH_NAME",
-    "TOOL_DESCRIBE_NAME",
-    "TOOL_CALL_NAME",
     "BRIDGE_TOOL_NAMES",
-    "ToolSearchConfig",
-    "CatalogEntry",
+    "TOOL_CALL_NAME",
+    "TOOL_DESCRIBE_NAME",
+    "TOOL_SEARCH_NAME",
     "AssemblyResult",
-    "load_config",
-    "is_deferrable_tool_name",
-    "classify_tools",
-    "estimate_tokens_from_schemas",
-    "should_activate",
-    "build_catalog",
-    "search_catalog",
-    "bridge_tool_schemas",
+    "CatalogEntry",
+    "ToolSearchConfig",
     "assemble_tool_defs",
-    "is_bridge_tool",
-    "dispatch_tool_search",
+    "bridge_tool_schemas",
+    "build_catalog",
+    "classify_tools",
     "dispatch_tool_describe",
+    "dispatch_tool_search",
+    "estimate_tokens_from_schemas",
+    "is_bridge_tool",
+    "is_deferrable_tool_name",
+    "load_config",
     "resolve_underlying_call",
     "scoped_deferrable_names",
+    "search_catalog",
+    "should_activate",
 ]

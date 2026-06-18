@@ -56,7 +56,7 @@ logger = logging.getLogger(__name__)
 # Lazy imports -- MCP SDK with OAuth support is optional
 # ---------------------------------------------------------------------------
 
-_OAUTH_AVAILABLE=False
+_OAUTH_AVAILABLE = False
 try:
     from mcp.client.auth import OAuthClientProvider
     from mcp.shared.auth import (
@@ -66,7 +66,7 @@ try:
         OAuthToken,
     )
 
-    _OAUTH_AVAILABLE=True
+    _OAUTH_AVAILABLE = True
 except ImportError:
     logger.debug("MCP OAuth types not available -- OAuth MCP auth disabled")
 
@@ -201,7 +201,7 @@ def _write_json(path: Path, data: dict) -> None:
             json.dump(data, fh, indent=2, default=str)
             fh.flush()
             os.fsync(fh.fileno())
-        os.replace(tmp, path)
+        Path(tmp).replace(path)
     except OSError:
         try:
             tmp.unlink(missing_ok=True)
@@ -586,8 +586,7 @@ def _paste_callback_reader(result: dict) -> None:
     if "?" in line:
         # Either a full URL or "?code=...". Take everything after the first "?".
         query = line.split("?", 1)[1]
-    if query.startswith("?"):
-        query = query[1:]
+    query = query.removeprefix("?")
 
     try:
         params = parse_qs(query)

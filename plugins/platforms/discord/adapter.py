@@ -21,7 +21,7 @@ import threading
 import time
 from collections import defaultdict
 from collections.abc import Callable
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -528,7 +528,7 @@ class VoiceReceiver:
             )
         finally:
             try:
-                os.unlink(pcm_path)
+                _Path(pcm_path).unlink()
             except OSError:
                 pass
 
@@ -662,7 +662,7 @@ class DiscordAdapter(BasePlatformAdapter):
                 )
                 if sys.platform == "darwin":
                     for _hp in _homebrew_paths:
-                        if os.path.isfile(_hp):
+                        if _Path(_hp).is_file():
                             opus_candidates.append(_hp)
                             break
             for opus_path in opus_candidates:
@@ -802,7 +802,7 @@ class DiscordAdapter(BasePlatformAdapter):
                     allow_bots = os.getenv("DISCORD_ALLOW_BOTS", "none").lower().strip()
                     if allow_bots == "none":
                         return
-                    elif allow_bots == "mentions":
+                    if allow_bots == "mentions":
                         if not self._client.user or self._client.user not in message.mentions:
                             return
                     # "all" falls through; bot is permitted — skip the
@@ -822,7 +822,7 @@ class DiscordAdapter(BasePlatformAdapter):
                     ):
                         return
                     _role_authorized = bool(getattr(self, "_allowed_role_ids", set()))
-                
+
                 # Multi-agent filtering: if the message mentions specific bots
                 # but NOT this bot, the sender is talking to another agent —
                 # stay silent.  Messages with no bot mentions (general chat)
@@ -1213,7 +1213,7 @@ class DiscordAdapter(BasePlatformAdapter):
                 payload.get("default_member_permissions"),
             ),
             "dm_permission": bool(payload.get("dm_permission", True)),
-            "nsfw": bool(payload.get("nsfw", False)),
+            "nsfw": bool(payload.get("nsfw")),
             "contexts": sorted(int(c) for c in contexts) if contexts else None,
             "integration_types": (
                 sorted(int(i) for i in integration_types) if integration_types else None
@@ -1262,8 +1262,8 @@ class DiscordAdapter(BasePlatformAdapter):
             "type": int(payload.get("type", 0) or 0),
             "name": str(payload.get("name", "") or ""),
             "description": str(payload.get("description", "") or ""),
-            "required": bool(payload.get("required", False)),
-            "autocomplete": bool(payload.get("autocomplete", False)),
+            "required": bool(payload.get("required")),
+            "autocomplete": bool(payload.get("autocomplete")),
             "choices": [
                 {
                     "name": str(choice.get("name", "") or ""),
@@ -1697,7 +1697,7 @@ class DiscordAdapter(BasePlatformAdapter):
             return SendResult(success=False, error=f"Channel {chat_id} not found")
 
         filename = file_name or os.path.basename(file_path)
-        with open(file_path, "rb") as fh:
+        with _Path(file_path).open("rb") as fh:
             file = discord.File(fh, filename=filename)
             if self._is_forum_parent(channel):
                 return await self._forum_post_file(
@@ -1705,7 +1705,7 @@ class DiscordAdapter(BasePlatformAdapter):
                     content=(caption or "").strip(),
                     file=file,
                 )
-            msg = await channel.send(content=caption if caption else None, file=file)
+            msg = await channel.send(content=caption or None, file=file)
         return SendResult(success=True, message_id=str(msg.id))
 
     async def send_multiple_images(
@@ -1766,7 +1766,7 @@ class DiscordAdapter(BasePlatformAdapter):
                         captions.append(alt_text)
                     if image_url.startswith("file://"):
                         local_path = _unquote(image_url[7:])
-                        if not os.path.exists(local_path):
+                        if not _Path(local_path).exists():
                             logger.warning("[%s] Skipping missing image: %s", self.name, local_path)
                             continue
                         files.append(_discord_mod.File(local_path, filename=os.path.basename(local_path)))
@@ -1878,13 +1878,12 @@ class DiscordAdapter(BasePlatformAdapter):
             if not channel:
                 return SendResult(success=False, error=f"Channel {chat_id} not found")
 
-            if not os.path.exists(audio_path):
+            if not _Path(audio_path).exists():
                 return SendResult(success=False, error=f"Audio file not found: {audio_path}")
 
             filename = os.path.basename(audio_path)
 
-            with open(audio_path, "rb") as f:
-                file_data = f.read()
+            file_data = _Path(audio_path).read_bytes()
 
             # Forum channels (type 15) reject direct POST /messages — the
             # native voice flag path also targets /messages so it would fail
@@ -1961,7 +1960,7 @@ class DiscordAdapter(BasePlatformAdapter):
         """
         defaults: dict[str, Any] = {
             "enabled": False,        # master switch for the mixer subsystem
-            "ambient_enabled": True, # idle "thinking" bed while tools run
+            "ambient_enabled": True,  # idle "thinking" bed while tools run
             "ambient_path": "",      # optional custom loop file; "" = synthesised
             "ambient_gain": 0.18,    # idle bed loudness (0..1)
             "duck_gain": 0.06,       # ambient loudness while speech plays
@@ -2004,7 +2003,7 @@ class DiscordAdapter(BasePlatformAdapter):
 
         pcm: bytes | None = None
         path = (self._voice_fx_cfg.get("ambient_path") or "").strip()
-        if path and os.path.isfile(path):
+        if path and _Path(path).is_file():
             pcm = decode_to_pcm(path)
             if not pcm:
                 logger.warning("Ambient file %s failed to decode; using synth bed", path)
@@ -2066,7 +2065,7 @@ class DiscordAdapter(BasePlatformAdapter):
             tempfile.gettempdir(), "hermes_voice",
             f"ack_{_uuid.uuid4().hex[:12]}.mp3",
         )
-        os.makedirs(os.path.dirname(audio_path), exist_ok=True)
+        _Path(os.path.dirname(audio_path)).mkdir(exist_ok=True, parents=True)
         try:
             from tools.tts_tool import text_to_speech_tool
             result_json = await asyncio.to_thread(
@@ -2074,7 +2073,7 @@ class DiscordAdapter(BasePlatformAdapter):
             )
             result = json.loads(result_json)
             actual = result.get("file_path", audio_path)
-            if not result.get("success") or not os.path.isfile(actual):
+            if not result.get("success") or not _Path(actual).is_file():
                 return False
             try:
                 from voice_mixer import decode_to_pcm
@@ -2093,9 +2092,9 @@ class DiscordAdapter(BasePlatformAdapter):
             return False
         finally:
             for p in {audio_path, locals().get("actual")}:
-                if p and os.path.isfile(p):
+                if p and _Path(p).is_file():
                     try:
-                        os.unlink(p)
+                        _Path(p).unlink()
                     except OSError:
                         pass
 
@@ -2468,7 +2467,7 @@ class DiscordAdapter(BasePlatformAdapter):
             logger.warning("Voice input processing failed: %s", e, exc_info=True)
         finally:
             try:
-                os.unlink(wav_path)
+                _Path(wav_path).unlink()
             except OSError:
                 pass
 
@@ -2864,7 +2863,7 @@ class DiscordAdapter(BasePlatformAdapter):
                         )
 
                     msg = await channel.send(
-                        content=caption if caption else None,
+                        content=caption or None,
                         file=file,
                     )
                     return SendResult(success=True, message_id=str(msg.id))
@@ -2936,7 +2935,7 @@ class DiscordAdapter(BasePlatformAdapter):
                         )
 
                     msg = await channel.send(
-                        content=caption if caption else None,
+                        content=caption or None,
                         file=file,
                     )
                     return SendResult(success=True, message_id=str(msg.id))
@@ -4737,15 +4736,14 @@ class DiscordAdapter(BasePlatformAdapter):
         from gateway.platforms.base import proxy_kwargs_for_aiohttp, resolve_proxy_url
         _proxy = resolve_proxy_url(platform_env_var="DISCORD_PROXY")
         _sess_kw, _req_kw = proxy_kwargs_for_aiohttp(_proxy)
-        async with aiohttp.ClientSession(**_sess_kw) as session:
-            async with session.get(
-                att.url,
-                timeout=aiohttp.ClientTimeout(total=30),
-                **_req_kw,
-            ) as resp:
-                if resp.status != 200:
-                    raise Exception(f"HTTP {resp.status}")
-                return await resp.read()
+        async with aiohttp.ClientSession(**_sess_kw) as session, session.get(
+            att.url,
+            timeout=aiohttp.ClientTimeout(total=30),
+            **_req_kw,
+        ) as resp:
+            if resp.status != 200:
+                raise Exception(f"HTTP {resp.status}")
+            return await resp.read()
 
     async def _handle_message(self, message: DiscordMessage, role_authorized: bool = False) -> None:
         """Handle incoming Discord messages."""
@@ -4889,7 +4887,7 @@ class DiscordAdapter(BasePlatformAdapter):
                         if doc_ext in SUPPORTED_DOCUMENT_TYPES or _allow_any:
                             msg_type = MessageType.DOCUMENT
                     break
-                elif _allow_any:
+                if _allow_any:
                     # No content_type at all (rare — discord usually fills it
                     # in). Treat as a document so downstream pipelines surface
                     # the path to the agent.
@@ -6144,6 +6142,8 @@ def _define_discord_view_classes() -> None:
                     await msg.edit(embed=embed, view=self)
                 except Exception:
                     pass
+
+
 if DISCORD_AVAILABLE:
     _define_discord_view_classes()
 
@@ -6287,7 +6287,7 @@ async def _standalone_send(
                 # right code path (JSON vs multipart) before opening a session.
                 valid_media = []
                 for media_path, _is_voice in media_files:
-                    if not os.path.exists(media_path):
+                    if not _Path(media_path).exists():
                         warning = f"Media file not found, skipping: {media_path}"
                         logger.warning(warning)
                         warnings.append(warning)
@@ -6311,7 +6311,7 @@ async def _standalone_send(
 
                         try:
                             for idx, media_path in enumerate(valid_media):
-                                with open(media_path, "rb") as fh:
+                                with _Path(media_path).open("rb") as fh:
                                     form.add_field(
                                         f"files[{idx}]",
                                         fh.read(),
@@ -6367,7 +6367,7 @@ async def _standalone_send(
 
             # Send each media file as a separate multipart upload
             for media_path, _is_voice in media_files:
-                if not os.path.exists(media_path):
+                if not _Path(media_path).exists():
                     warning = f"Media file not found, skipping: {media_path}"
                     logger.warning(warning)
                     warnings.append(warning)
@@ -6375,7 +6375,7 @@ async def _standalone_send(
                 try:
                     form = aiohttp.FormData()
                     filename = os.path.basename(media_path)
-                    with open(media_path, "rb") as f:
+                    with _Path(media_path).open("rb") as f:
                         form.add_field("files[0]", f, filename=filename)
                         async with session.post(url, headers=auth_headers, data=form, **_req_kw) as resp:
                             if resp.status not in {200, 201}:

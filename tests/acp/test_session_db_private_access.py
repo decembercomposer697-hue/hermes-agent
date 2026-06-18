@@ -9,6 +9,7 @@ Verifies that:
 
 import ast
 import json
+import pathlib
 from unittest.mock import MagicMock
 
 from acp_adapter.session import SessionManager
@@ -101,8 +102,7 @@ class TestNoPrviateDBAccess:
     """_persist() in session.py must not access db._lock or db._conn."""
 
     def test_no_db_private_lock_access(self):
-        with open("acp_adapter/session.py", encoding="utf-8") as f:
-            source = f.read()
+        source = pathlib.Path("acp_adapter/session.py").read_text(encoding="utf-8")
 
         tree = ast.parse(source)
 
@@ -124,7 +124,7 @@ class TestNoPrviateDBAccess:
 
     def test_persist_calls_update_session_meta(self):
         """AST check: _persist must call db.update_session_meta()."""
-        with open("acp_adapter/session.py", encoding="utf-8") as f:
+        with pathlib.Path("acp_adapter/session.py").open(encoding="utf-8") as f:
             tree = ast.parse(f.read())
 
         found = False

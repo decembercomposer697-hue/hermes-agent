@@ -43,7 +43,8 @@ import time
 import uuid
 
 _IS_WINDOWS = platform.system() == "Windows"
-from typing import Any, Dict, List, Optional
+import pathlib
+from typing import Any
 
 from tools.thread_context import propagate_context_to_thread
 
@@ -544,7 +545,7 @@ def _rpc_server_loop(
                 # their status prints don't leak into the CLI spinner.
                 try:
                     _real_stdout, _real_stderr = sys.stdout, sys.stderr
-                    devnull = open(os.devnull, "w", encoding="utf-8")
+                    devnull = pathlib.Path(os.devnull).open("w", encoding="utf-8")
                     try:
                         sys.stdout = devnull
                         sys.stderr = devnull
@@ -823,7 +824,7 @@ def _rpc_poll_loop(
                     # Dispatch through the standard tool handler
                     try:
                         _real_stdout, _real_stderr = sys.stdout, sys.stderr
-                        devnull = open(os.devnull, "w", encoding="utf-8")
+                        devnull = pathlib.Path(os.devnull).open("w", encoding="utf-8")
                         try:
                             sys.stdout = devnull
                             sys.stderr = devnull
@@ -881,7 +882,6 @@ def _execute_remote(
     the remote environment, and tool calls are proxied through a polling
     thread that communicates via request/response files.
     """
-
     _cfg = _load_config()
     timeout = _cfg.get("timeout", DEFAULT_TIMEOUT)
     max_tool_calls = _cfg.get("max_tool_calls", DEFAULT_MAX_TOOL_CALLS)
@@ -1174,12 +1174,10 @@ def execute_code(
         # sandbox_tools is already the correct set (intersection with session
         # tools, or SANDBOX_ALLOWED_TOOLS as fallback — see lines above).
         tools_src = generate_hermes_tools_module(list(sandbox_tools))
-        with open(os.path.join(tmpdir, "hermes_tools.py"), "w", encoding="utf-8") as f:
-            f.write(tools_src)
+        pathlib.Path(os.path.join(tmpdir, "hermes_tools.py")).write_text(tools_src, encoding="utf-8")
 
         # Write the user's script
-        with open(os.path.join(tmpdir, "script.py"), "w", encoding="utf-8") as f:
-            f.write(code)
+        pathlib.Path(os.path.join(tmpdir, "script.py")).write_text(code, encoding="utf-8")
 
         # --- Start RPC server ---
         # Two transports:
@@ -1198,7 +1196,7 @@ def execute_code(
         else:
             server_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             server_sock.bind(sock_path)
-            os.chmod(sock_path, 0o600)
+            pathlib.Path(sock_path).chmod(0o600)
         server_sock.listen(1)
 
         # Wrapped so the thread inherits the turn's approval context + callbacks
@@ -1497,7 +1495,7 @@ def execute_code(
             # Only UDS has a filesystem socket to unlink; TCP sockets are
             # freed by server_sock.close() above.
             if sock_path:
-                os.unlink(sock_path)
+                pathlib.Path(sock_path).unlink()
         except OSError:
             pass  # already cleaned up or never created
 
@@ -1657,7 +1655,7 @@ def _resolve_child_python(mode: str) -> str:
         for subdir in subdirs:
             for exe in exe_names:
                 candidate = os.path.join(root, subdir, exe)
-                if not (os.path.isfile(candidate) and os.access(candidate, os.X_OK)):
+                if not (pathlib.Path(candidate).is_file() and os.access(candidate, os.X_OK)):
                     continue
                 if _is_usable_python(candidate):
                     return candidate
@@ -1686,10 +1684,10 @@ def _resolve_child_cwd(mode: str, staging_dir: str) -> str:
     raw = os.environ.get("TERMINAL_CWD", "").strip()
     if raw:
         expanded = os.path.expanduser(raw)
-        if os.path.isdir(expanded):
+        if pathlib.Path(expanded).is_dir():
             return expanded
     here = os.getcwd()
-    if os.path.isdir(here):
+    if pathlib.Path(here).is_dir():
         return here
     return staging_dir
 
@@ -1703,25 +1701,25 @@ def _resolve_child_cwd(mode: str, staging_dir: str) -> str:
 _TOOL_DOC_LINES = [
     ("web_search",
      "  web_search(query: str, limit: int = 5) -> dict\n"
-     "    Returns {\"data\": {\"web\": [{\"url\", \"title\", \"description\"}, ...]}}"),
+     '    Returns {"data": {"web": [{"url", "title", "description"}, ...]}}'),
     ("web_extract",
      "  web_extract(urls: list[str]) -> dict\n"
-     "    Returns {\"results\": [{\"url\", \"title\", \"content\", \"error\"}, ...]} where content is markdown"),
+     '    Returns {"results": [{"url", "title", "content", "error"}, ...]} where content is markdown'),
     ("read_file",
      "  read_file(path: str, offset: int = 1, limit: int = 500) -> dict\n"
-     "    Lines are 1-indexed. Returns {\"content\": \"...\", \"total_lines\": N}"),
+     '    Lines are 1-indexed. Returns {"content": "...", "total_lines": N}'),
     ("write_file",
      "  write_file(path: str, content: str) -> dict\n"
      "    Always overwrites the entire file."),
     ("search_files",
-     "  search_files(pattern: str, target=\"content\", path=\".\", file_glob=None, limit=50) -> dict\n"
-     "    target: \"content\" (search inside files) or \"files\" (find files by name). Returns {\"matches\": [...]}"),
+     '  search_files(pattern: str, target="content", path=".", file_glob=None, limit=50) -> dict\n'
+     '    target: "content" (search inside files) or "files" (find files by name). Returns {"matches": [...]}'),
     ("patch",
      "  patch(path: str, old_string: str, new_string: str, replace_all: bool = False) -> dict\n"
      "    Replaces old_string with new_string in the file."),
     ("terminal",
      "  terminal(command: str, timeout=None, workdir=None) -> dict\n"
-     "    Foreground only (no background/pty). Returns {\"output\": \"...\", \"exit_code\": N}"),
+     '    Foreground only (no background/pty). Returns {"output": "...", "exit_code": N}'),
 ]
 
 

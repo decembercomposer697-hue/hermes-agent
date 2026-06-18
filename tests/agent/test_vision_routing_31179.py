@@ -26,6 +26,7 @@ The three fixes covered here:
 from __future__ import annotations
 
 import os
+import pathlib
 import shutil
 import sys
 import tempfile
@@ -42,7 +43,7 @@ def isolated_home(monkeypatch):
     """Temp HERMES_HOME with config + clean credential env vars."""
     test_home = tempfile.mkdtemp(prefix="hermes_test_31179_")
     hermes_home = os.path.join(test_home, ".hermes")
-    os.makedirs(hermes_home)
+    pathlib.Path(hermes_home).mkdir(parents=True)
     monkeypatch.setenv("HERMES_HOME", hermes_home)
 
     # Strip all credential-shaped env vars so each scenario starts hermetic.
@@ -55,8 +56,7 @@ def isolated_home(monkeypatch):
 
 
 def _write_config(home: str, text: str) -> None:
-    with open(os.path.join(home, "config.yaml"), "w") as fp:
-        fp.write(text)
+    pathlib.Path(os.path.join(home, "config.yaml")).write_text(text)
 
 
 def _fresh_modules():

@@ -61,7 +61,7 @@ import tempfile
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 import requests
 
@@ -147,13 +147,13 @@ def _discover_homebrew_node_dirs() -> tuple[str, ...]:
     """
     dirs: list[str] = []
     homebrew_opt = "/opt/homebrew/opt"
-    if not os.path.isdir(homebrew_opt):
+    if not Path(homebrew_opt).is_dir():
         return tuple(dirs)
     try:
         for entry in os.listdir(homebrew_opt):
             if entry.startswith("node") and entry != "node":
                 bin_dir = os.path.join(homebrew_opt, entry, "bin")
-                if os.path.isdir(bin_dir):
+                if Path(bin_dir).is_dir():
                     dirs.append(bin_dir)
     except OSError:
         pass
@@ -178,10 +178,11 @@ def _merge_browser_path(existing_path: str = "") -> str:
     for part in _browser_candidate_path_dirs():
         if not part or part in existing_parts or part in prefix_parts:
             continue
-        if os.path.isdir(part):
+        if Path(part).is_dir():
             prefix_parts.append(part)
 
     return os.pathsep.join(prefix_parts + path_parts)
+
 
 # Throttle screenshot cleanup to avoid repeated full directory scans.
 _last_screenshot_cleanup_by_dir: dict[str, float] = {}
@@ -749,7 +750,7 @@ def _lightpanda_fallback_reason(engine: str, command: str, result: dict[str, Any
         path = data.get("path", "")
         if path:
             try:
-                size = os.path.getsize(path)
+                size = Path(path).stat().st_size
                 if size < 20480:
                     logger.debug("Lightpanda screenshot is suspiciously small (%d bytes), "
                                  "triggering Chrome fallback", size)
@@ -868,7 +869,7 @@ def _run_chrome_fallback_command(
     base_args = cmd_prefix + ["--engine", "chrome", "--session", tmp_session, "--json"]
 
     task_socket_dir = os.path.join(_socket_safe_tmpdir(), f"agent-browser-{tmp_session}")
-    os.makedirs(task_socket_dir, mode=0o700, exist_ok=True)
+    Path(task_socket_dir).mkdir(mode=0o700, exist_ok=True, parents=True)
     browser_env = {**os.environ, "AGENT_BROWSER_SOCKET_DIR": task_socket_dir}
     browser_env["PATH"] = _merge_browser_path(browser_env.get("PATH", ""))
 
@@ -934,7 +935,7 @@ def _run_chrome_fallback_command(
             proc.wait()
             return {"success": False, "error": f"Chrome fallback '{cmd}' timed out"}
         try:
-            with open(stdout_path, encoding="utf-8") as f:
+            with Path(stdout_path).open(encoding="utf-8") as f:
                 stdout = f.read().strip()
             if stdout:
                 return json.loads(stdout.split("\n")[-1])
@@ -943,7 +944,7 @@ def _run_chrome_fallback_command(
         finally:
             for pth in (stdout_path, stderr_path):
                 try:
-                    os.unlink(pth)
+                    Path(pth).unlink()
                 except OSError:
                     pass
         return {"success": False, "error": f"Chrome fallback '{cmd}' failed"}
@@ -1290,8 +1291,7 @@ def _write_owner_pid(socket_dir: str, session_name: str) -> None:
     """
     try:
         path = os.path.join(socket_dir, f"{session_name}.owner_pid")
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(str(os.getpid()))
+        Path(path).write_text(str(os.getpid()), encoding="utf-8")
     except OSError as exc:
         logger.debug("Could not write owner_pid file for %s: %s",
                      session_name, exc)
@@ -1352,7 +1352,7 @@ def _reap_orphaned_browser_sessions():
         # Ownership check: prefer owner_pid file (cross-process safe).
         owner_pid_file = os.path.join(socket_dir, f"{session_name}.owner_pid")
         owner_alive: bool | None = None  # None = owner_pid missing/unreadable
-        if os.path.isfile(owner_pid_file):
+        if Path(owner_pid_file).is_file():
             try:
                 owner_pid = int(Path(owner_pid_file).read_text(encoding="utf-8").strip())
                 # ``os.kill(pid, 0)`` is NOT a no-op on Windows (bpo-14484).
@@ -1374,7 +1374,7 @@ def _reap_orphaned_browser_sessions():
 
         # owner_alive is False (dead owner) OR legacy daemon not tracked here.
         pid_file = os.path.join(socket_dir, f"{session_name}.pid")
-        if not os.path.isfile(pid_file):
+        if not Path(pid_file).is_file():
             # No daemon PID file — just a stale dir, remove it
             shutil.rmtree(socket_dir, ignore_errors=True)
             continue
@@ -1946,7 +1946,7 @@ def _run_browser_command(
         session_info = _get_session_info(task_id)
     except Exception as e:
         logger.warning("Failed to create browser session for task=%s: %s", task_id, e)
-        return {"success": False, "error": f"Failed to create browser session: {str(e)}"}
+        return {"success": False, "error": f"Failed to create browser session: {e!s}"}
 
     # Build the command with the appropriate backend flag.
     # Cloud mode: --cdp <websocket_url> connects to Browserbase.
@@ -1991,7 +1991,7 @@ def _run_browser_command(
             _socket_safe_tmpdir(),
             f"agent-browser-{session_info['session_name']}",
         )
-        os.makedirs(task_socket_dir, mode=0o700, exist_ok=True)
+        Path(task_socket_dir).mkdir(mode=0o700, exist_ok=True, parents=True)
         # Record this hermes PID as the session owner (cross-process safe
         # orphan detection — see _write_owner_pid).
         _write_owner_pid(task_socket_dir, session_info["session_name"])
@@ -2034,7 +2034,7 @@ def _run_browser_command(
                 # Detect AppArmor user namespace restrictions (Ubuntu 23.10+)
                 _userns_restrict = "/proc/sys/kernel/apparmor_restrict_unprivileged_userns"
                 try:
-                    with open(_userns_restrict, encoding="utf-8") as _f:
+                    with Path(_userns_restrict).open(encoding="utf-8") as _f:
                         if _f.read().strip() == "1":
                             _needs_sandbox_bypass = True
                             logger.debug(
@@ -2097,16 +2097,14 @@ def _run_browser_command(
             result = {"success": False, "error": f"Command timed out after {timeout} seconds"}
             # Fall through to fallback check below
         else:
-            with open(stdout_path, encoding="utf-8") as f:
-                stdout = f.read()
-            with open(stderr_path, encoding="utf-8") as f:
-                stderr = f.read()
+            stdout = Path(stdout_path).read_text(encoding="utf-8")
+            stderr = Path(stderr_path).read_text(encoding="utf-8")
             returncode = proc.returncode
 
             # Clean up temp files (best-effort)
             for p in (stdout_path, stderr_path):
                 try:
-                    os.unlink(p)
+                    Path(p).unlink()
                 except OSError:
                     pass
 
@@ -2496,11 +2494,10 @@ def browser_navigate(url: str, task_id: str | None = None) -> str:
             logger.debug("Auto-snapshot after navigate failed: %s", e)
 
         return json.dumps(response, ensure_ascii=False)
-    else:
-        return json.dumps({
-            "success": False,
-            "error": result.get("error", "Navigation failed"),
-        }, ensure_ascii=False)
+    return json.dumps({
+        "success": False,
+        "error": result.get("error", "Navigation failed"),
+    }, ensure_ascii=False)
 
 
 def browser_snapshot(
@@ -2566,12 +2563,11 @@ def browser_snapshot(
             logger.debug("supervisor snapshot merge failed: %s", _sv_exc)
 
         return json.dumps(response, ensure_ascii=False)
-    else:
-        response = {
-            "success": False,
-            "error": result.get("error", "Failed to get snapshot"),
-        }
-        return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
+    response = {
+        "success": False,
+        "error": result.get("error", "Failed to get snapshot"),
+    }
+    return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
 
 def browser_click(ref: str, task_id: str | None = None) -> str:
@@ -2603,12 +2599,11 @@ def browser_click(ref: str, task_id: str | None = None) -> str:
             "clicked": ref,
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
-    else:
-        response = {
-            "success": False,
-            "error": result.get("error", f"Failed to click {ref}"),
-        }
-        return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
+    response = {
+        "success": False,
+        "error": result.get("error", f"Failed to click {ref}"),
+    }
+    return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
 
 def browser_type(ref: str, text: str, task_id: str | None = None) -> str:
@@ -2643,12 +2638,11 @@ def browser_type(ref: str, text: str, task_id: str | None = None) -> str:
             "element": ref,
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
-    else:
-        response = {
-            "success": False,
-            "error": result.get("error", f"Failed to type into {ref}"),
-        }
-        return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
+    response = {
+        "success": False,
+        "error": result.get("error", f"Failed to type into {ref}"),
+    }
+    return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
 
 def browser_scroll(direction: str, task_id: str | None = None) -> str:
@@ -2724,12 +2718,11 @@ def browser_back(task_id: str | None = None) -> str:
             "url": data.get("url", ""),
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
-    else:
-        response = {
-            "success": False,
-            "error": result.get("error", "Failed to go back"),
-        }
-        return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
+    response = {
+        "success": False,
+        "error": result.get("error", "Failed to go back"),
+    }
+    return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
 
 def browser_press(key: str, task_id: str | None = None) -> str:
@@ -2756,12 +2749,11 @@ def browser_press(key: str, task_id: str | None = None) -> str:
             "pressed": key,
         }
         return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
-    else:
-        response = {
-            "success": False,
-            "error": result.get("error", f"Failed to press {key}"),
-        }
-        return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
+    response = {
+        "success": False,
+        "error": result.get("error", f"Failed to press {key}"),
+    }
+    return json.dumps(_copy_fallback_warning(response, result), ensure_ascii=False)
 
 
 def browser_console(clear: bool = False, expression: str | None = None, task_id: str | None = None) -> str:
@@ -3136,7 +3128,7 @@ def browser_vision(question: str, annotate: bool = False, task_id: str | None = 
             _lp_prerouted = True
             _lp_fallback_warning = fb_result.get("fallback_warning")
             fb_path = fb_result.get("data", {}).get("path", "")
-            if fb_path and os.path.exists(fb_path):
+            if fb_path and Path(fb_path).exists():
                 from hermes_constants import get_hermes_dir
                 screenshots_dir = get_hermes_dir("cache/screenshots", "browser_screenshots")
                 screenshots_dir.mkdir(parents=True, exist_ok=True)
@@ -3348,7 +3340,7 @@ def browser_vision(question: str, annotate: bool = False, task_id: str | None = 
         # screenshot loses evidence the user might need.  The 24-hour cleanup
         # in _cleanup_old_screenshots prevents unbounded disk growth.
         logger.warning("browser_vision failed: %s", e, exc_info=True)
-        error_info = {"success": False, "error": f"Error during vision analysis: {str(e)}"}
+        error_info = {"success": False, "error": f"Error during vision analysis: {e!s}"}
         if screenshot_path.exists():
             error_info["screenshot_path"] = str(screenshot_path)
             error_info["note"] = "Screenshot was captured but vision analysis failed. You can still share it via MEDIA:<path>."
@@ -3502,10 +3494,10 @@ def _cleanup_single_browser_session(task_id: str) -> None:
         session_name = session_info.get("session_name", "")
         if session_name:
             socket_dir = os.path.join(_socket_safe_tmpdir(), f"agent-browser-{session_name}")
-            if os.path.exists(socket_dir):
+            if Path(socket_dir).exists():
                 # agent-browser writes {session}.pid in the socket dir
                 pid_file = os.path.join(socket_dir, f"{session_name}.pid")
-                if os.path.isfile(pid_file):
+                if Path(pid_file).is_file():
                     try:
                         from tools.process_registry import ProcessRegistry
                         daemon_pid = int(Path(pid_file).read_text(encoding="utf-8").strip())
@@ -3540,10 +3532,7 @@ def cleanup_all_browsers() -> None:
         pass
 
     # Reset cached lookups so they are re-evaluated on next use.
-    global _cached_agent_browser, _agent_browser_resolved
-    global _cached_command_timeout, _command_timeout_resolved
-    global _cached_chromium_installed
-    global _cached_browser_engine, _browser_engine_resolved
+    global _cached_agent_browser, _agent_browser_resolved, _cached_command_timeout, _command_timeout_resolved, _cached_chromium_installed, _cached_browser_engine, _browser_engine_resolved
     _cached_agent_browser = None
     _agent_browser_resolved = False
     _discover_homebrew_node_dirs.cache_clear()
@@ -3615,10 +3604,9 @@ def _chromium_installed() -> bool:
 
     # 1. AGENT_BROWSER_EXECUTABLE_PATH — explicit user-configured browser
     ab_path = os.environ.get("AGENT_BROWSER_EXECUTABLE_PATH", "").strip()
-    if ab_path:
-        if os.path.isfile(ab_path) or shutil.which(ab_path):
-            _cached_chromium_installed = True
-            return True
+    if ab_path and (Path(ab_path).is_file() or shutil.which(ab_path)):
+        _cached_chromium_installed = True
+        return True
 
     # 2. System Chrome/Chromium in PATH (common names)
     system_chrome = (
@@ -3633,7 +3621,7 @@ def _chromium_installed() -> bool:
 
     # 3. Playwright browser cache (legacy — chromium-* / chromium_headless_shell-* dirs)
     for root in _chromium_search_roots():
-        if not root or not os.path.isdir(root):
+        if not root or not Path(root).is_dir():
             continue
         try:
             entries = os.listdir(root)
@@ -3654,10 +3642,10 @@ def _chromium_installed() -> bool:
 
 def _running_in_docker() -> bool:
     """Best-effort detection of whether we're inside a Docker container."""
-    if os.path.exists("/.dockerenv"):
+    if Path("/.dockerenv").exists():
         return True
     try:
-        with open("/proc/1/cgroup", encoding="utf-8") as fp:
+        with Path("/proc/1/cgroup").open(encoding="utf-8") as fp:
             return "docker" in fp.read()
     except OSError:
         return False

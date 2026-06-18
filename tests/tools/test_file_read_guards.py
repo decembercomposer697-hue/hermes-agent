@@ -8,6 +8,7 @@ Run with:  python -m pytest tests/tools/test_file_read_guards.py -v
 
 import json
 import os
+import pathlib
 import tempfile
 import time
 import unittest
@@ -32,6 +33,7 @@ from tools.file_tools import (
 
 class _FakeReadResult:
     """Minimal stand-in for FileOperations.read_file return value."""
+
     def __init__(self, content="line1\nline2\n", total_lines=2, file_size=100):
         self.content = content
         self._total_lines = total_lines
@@ -116,7 +118,7 @@ class TestDevicePathBlocking(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             link_path = os.path.join(tmpdir, "zero-link")
             try:
-                os.symlink("/dev/zero", link_path)
+                pathlib.Path(link_path).symlink_to("/dev/zero")
             except OSError as exc:
                 self.skipTest(f"symlink unavailable: {exc}")
             self.assertTrue(_is_blocked_device(link_path))
@@ -125,10 +127,9 @@ class TestDevicePathBlocking(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             target_path = os.path.join(tmpdir, "regular.txt")
             link_path = os.path.join(tmpdir, "regular-link")
-            with open(target_path, "w", encoding="utf-8") as handle:
-                handle.write("safe\n")
+            pathlib.Path(target_path).write_text("safe\n", encoding="utf-8")
             try:
-                os.symlink(target_path, link_path)
+                pathlib.Path(link_path).symlink_to(target_path)
             except OSError as exc:
                 self.skipTest(f"symlink unavailable: {exc}")
             self.assertFalse(_is_blocked_device(link_path))
@@ -144,7 +145,7 @@ class TestDevicePathBlocking(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             link_path = os.path.join(tmpdir, "zero-link")
             try:
-                os.symlink("/dev/zero", link_path)
+                pathlib.Path(link_path).symlink_to("/dev/zero")
             except OSError as exc:
                 self.skipTest(f"symlink unavailable: {exc}")
 
@@ -216,14 +217,13 @@ class TestFileDedup(unittest.TestCase):
         _read_tracker.clear()
         self._tmpdir = _make_safe_tempdir("hermes-dedup-")
         self._tmpfile = os.path.join(self._tmpdir, "dedup_test.txt")
-        with open(self._tmpfile, "w") as f:
-            f.write("line one\nline two\n")
+        pathlib.Path(self._tmpfile).write_text("line one\nline two\n")
 
     def tearDown(self):
         _read_tracker.clear()
         try:
-            os.unlink(self._tmpfile)
-            os.rmdir(self._tmpdir)
+            pathlib.Path(self._tmpfile).unlink()
+            pathlib.Path(self._tmpdir).rmdir()
         except OSError:
             pass
 
@@ -328,8 +328,7 @@ class TestFileDedup(unittest.TestCase):
 
         # Modify the file — ensure mtime changes
         time.sleep(0.05)
-        with open(self._tmpfile, "w") as f:
-            f.write("changed content\n")
+        pathlib.Path(self._tmpfile).write_text("changed content\n")
 
         r2 = json.loads(read_file_tool(self._tmpfile, task_id="mod"))
         self.assertNotEqual(r2.get("dedup"), True, "Modified file should not dedup")
@@ -373,14 +372,13 @@ class TestDedupStubLoopGuard(unittest.TestCase):
         _read_tracker.clear()
         self._tmpdir = tempfile.mkdtemp()
         self._tmpfile = os.path.join(self._tmpdir, "loop_test.txt")
-        with open(self._tmpfile, "w") as f:
-            f.write("line one\nline two\n")
+        pathlib.Path(self._tmpfile).write_text("line one\nline two\n")
 
     def tearDown(self):
         _read_tracker.clear()
         try:
-            os.unlink(self._tmpfile)
-            os.rmdir(self._tmpdir)
+            pathlib.Path(self._tmpfile).unlink()
+            pathlib.Path(self._tmpdir).rmdir()
         except OSError:
             pass
 
@@ -441,8 +439,7 @@ class TestDedupStubLoopGuard(unittest.TestCase):
 
         # File changes — mtime updates
         time.sleep(0.05)
-        with open(self._tmpfile, "w") as f:
-            f.write("brand new content\n")
+        pathlib.Path(self._tmpfile).write_text("brand new content\n")
 
         r4 = json.loads(read_file_tool(self._tmpfile, task_id="loop"))
         self.assertNotIn("error", r4)
@@ -524,14 +521,13 @@ class TestDedupResetOnCompression(unittest.TestCase):
         _read_tracker.clear()
         self._tmpdir = tempfile.mkdtemp()
         self._tmpfile = os.path.join(self._tmpdir, "compress_test.txt")
-        with open(self._tmpfile, "w") as f:
-            f.write("original content\n")
+        pathlib.Path(self._tmpfile).write_text("original content\n")
 
     def tearDown(self):
         _read_tracker.clear()
         try:
-            os.unlink(self._tmpfile)
-            os.rmdir(self._tmpdir)
+            pathlib.Path(self._tmpfile).unlink()
+            pathlib.Path(self._tmpdir).rmdir()
         except OSError:
             pass
 
@@ -689,14 +685,13 @@ class TestWriteInvalidatesDedup(unittest.TestCase):
         _read_tracker.clear()
         self._tmpdir = _make_safe_tempdir("hermes-write-dedup-")
         self._tmpfile = os.path.join(self._tmpdir, "write_dedup.txt")
-        with open(self._tmpfile, "w") as f:
-            f.write("original content\n")
+        pathlib.Path(self._tmpfile).write_text("original content\n")
 
     def tearDown(self):
         _read_tracker.clear()
         try:
-            os.unlink(self._tmpfile)
-            os.rmdir(self._tmpdir)
+            pathlib.Path(self._tmpfile).unlink()
+            pathlib.Path(self._tmpdir).rmdir()
         except OSError:
             pass
 
@@ -766,8 +761,7 @@ class TestWriteInvalidatesDedup(unittest.TestCase):
     def test_write_does_not_invalidate_other_files(self, mock_ops):
         """Writing file A should not invalidate dedup for file B."""
         other = os.path.join(self._tmpdir, "other.txt")
-        with open(other, "w") as f:
-            f.write("other content\n")
+        pathlib.Path(other).write_text("other content\n")
 
         fake = MagicMock()
         fake.read_file = lambda path, offset=1, limit=500: _FakeReadResult(
@@ -790,7 +784,7 @@ class TestWriteInvalidatesDedup(unittest.TestCase):
                         "Unrelated file should still dedup after writing another file")
 
         try:
-            os.unlink(other)
+            pathlib.Path(other).unlink()
         except OSError:
             pass
 

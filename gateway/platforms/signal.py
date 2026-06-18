@@ -19,9 +19,9 @@ import os
 import random
 import time
 import uuid
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from urllib.parse import quote, unquote
 
 import httpx
@@ -591,7 +591,7 @@ class SignalAdapter(BasePlatformAdapter):
             chat_type=chat_type,
             user_id=sender,
             user_name=sender_name or sender,
-            user_id_alt=sender_uuid if sender_uuid else None,
+            user_id_alt=sender_uuid or None,
             chat_id_alt=group_id if is_group else None,
         )
 

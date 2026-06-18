@@ -43,6 +43,8 @@ def _make_voice_cli(**overrides):
 # Markdown stripping — import real function from tts_tool
 # ============================================================================
 
+import pathlib
+
 from tools.tts_tool import _strip_markdown_for_tts
 
 
@@ -478,8 +480,7 @@ class TestVprintForceParameter:
         """Verify that critical error _vprint calls in run_agent.py
         include force=True.
         """
-        with open("run_agent.py") as f:
-            source = f.read()
+        source = pathlib.Path("run_agent.py").read_text()
 
         tree = ast.parse(source)
 
@@ -538,7 +539,7 @@ class TestEdgeTTSLazyImport:
         """
         import ast as _ast
 
-        with open("tools/tts_tool.py") as f:
+        with pathlib.Path("tools/tts_tool.py").open() as f:
             tree = _ast.parse(f.read())
 
         for node in _ast.walk(tree):
@@ -577,7 +578,7 @@ class TestStreamingTTSOutputStreamCleanup:
         """
         import ast as _ast
 
-        with open("tools/tts_tool.py") as f:
+        with pathlib.Path("tools/tts_tool.py").open() as f:
             tree = _ast.parse(f.read())
 
         for node in _ast.walk(tree):
@@ -603,8 +604,7 @@ class TestCtrlCResetsContinuousMode:
         """Source check: Ctrl+C voice cancel block must set
         _voice_continuous = False.
         """
-        with open("cli.py") as f:
-            source = f.read()
+        source = pathlib.Path("cli.py").read_text()
 
         # Find the Ctrl+C handler's voice cancel block
         lines = source.split("\n")
@@ -649,8 +649,7 @@ class TestVoiceStatusUsesConfigKey:
 
     def test_show_voice_status_not_hardcoded(self):
         """Source check: _show_voice_status must not hardcode Ctrl+B."""
-        with open("cli.py") as f:
-            source = f.read()
+        source = pathlib.Path("cli.py").read_text()
 
         lines = source.split("\n")
         in_method = False
@@ -667,8 +666,7 @@ class TestVoiceStatusUsesConfigKey:
 
     def test_show_voice_status_reads_config(self):
         """Source check: _show_voice_status must use load_config()."""
-        with open("cli.py") as f:
-            source = f.read()
+        source = pathlib.Path("cli.py").read_text()
 
         lines = source.split("\n")
         in_method = False
@@ -696,7 +694,7 @@ class TestChatTTSCleanupOnException:
         """
         import ast as _ast
 
-        with open("cli.py") as f:
+        with pathlib.Path("cli.py").open() as f:
             tree = _ast.parse(f.read())
 
         for node in _ast.walk(tree):
@@ -731,8 +729,7 @@ class TestBrowserToolSignalHandlerRemoved:
         """Source check: browser_tool.py must not call signal.signal()
         for SIGINT or SIGTERM.
         """
-        with open("tools/browser_tool.py") as f:
-            source = f.read()
+        source = pathlib.Path("tools/browser_tool.py").read_text()
 
         lines = source.split("\n")
         for i, line in enumerate(lines, 1):
@@ -764,7 +761,7 @@ class TestKeyHandlerNeverBlocks:
         """
         import ast as _ast
 
-        with open("cli.py") as f:
+        with pathlib.Path("cli.py").open() as f:
             tree = _ast.parse(f.read())
 
         for node in _ast.walk(tree):
@@ -785,8 +782,7 @@ class TestKeyHandlerNeverBlocks:
         """Source check: key handler must check _voice_processing before
         starting a new recording.
         """
-        with open("cli.py") as f:
-            source = f.read()
+        source = pathlib.Path("cli.py").read_text()
 
         lines = source.split("\n")
         in_handler = False
@@ -812,8 +808,7 @@ class TestKeyHandlerNeverBlocks:
         """Source check: _voice_stop_and_transcribe must set _voice_processing = True
         in the same lock block where it sets _voice_recording = False.
         """
-        with open("cli.py") as f:
-            source = f.read()
+        source = pathlib.Path("cli.py").read_text()
 
         lines = source.split("\n")
         in_method = False

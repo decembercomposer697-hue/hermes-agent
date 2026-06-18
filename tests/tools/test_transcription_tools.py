@@ -6,6 +6,7 @@ end-to-end dispatch.  All external dependencies are mocked.
 """
 
 import os
+import pathlib
 import struct
 import subprocess
 import sys
@@ -408,8 +409,7 @@ class TestTranscribeLocalCommand:
         def fake_run(cmd, *args, **kwargs):
             if isinstance(cmd, list):
                 output_path = cmd[-1]
-                with open(output_path, "wb") as handle:
-                    handle.write(b"RIFF....WAVEfmt ")
+                pathlib.Path(output_path).write_bytes(b"RIFF....WAVEfmt ")
                 return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
 
             (out_dir / "test.txt").write_text("hello from local command\n", encoding="utf-8")
@@ -790,7 +790,7 @@ class TestValidateAudioFileEdgeCases:
         target.write_bytes(b"not audio")
         link = tmp_path / "linked.wav"
         try:
-            os.symlink(target, link)
+            pathlib.Path(link).symlink_to(target)
         except (OSError, NotImplementedError) as exc:
             pytest.skip(f"symlink creation unavailable: {exc}")
 

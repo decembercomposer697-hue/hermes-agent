@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import os
+import pathlib
 import platform
 import re
 import shutil
@@ -67,7 +68,7 @@ def is_wsl() -> bool:
     if "microsoft" in platform.release().lower() or "wsl" in platform.release().lower():
         return True
     try:
-        with open("/proc/version") as fh:
+        with pathlib.Path("/proc/version").open() as fh:
             return "microsoft" in fh.read().lower()
     except OSError:
         return False
@@ -226,7 +227,7 @@ def total_system_ram_gb() -> float:
             return 0.0
     if sysname == "Linux":
         try:
-            with open("/proc/meminfo") as fh:
+            with pathlib.Path("/proc/meminfo").open() as fh:
                 for line in fh:
                     if line.startswith("MemTotal:"):
                         kb = int(line.split()[1])

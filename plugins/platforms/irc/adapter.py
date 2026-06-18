@@ -32,7 +32,7 @@ import os
 import re
 import ssl
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +84,7 @@ def _parse_irc_message(raw: str) -> dict:
 
 def _extract_nick(prefix: str) -> str:
     """Extract nickname from IRC prefix (nick!user@host)."""
-    return prefix.split("!")[0] if "!" in prefix else prefix
+    return prefix.split("!", maxsplit=1)[0] if "!" in prefix else prefix
 
 
 # ---------------------------------------------------------------------------
@@ -279,7 +279,6 @@ class IRCAdapter(BasePlatformAdapter):
 
     async def send_typing(self, chat_id: str, metadata=None) -> None:
         """IRC has no typing indicator — no-op."""
-        pass
 
     async def get_chat_info(self, chat_id: str) -> dict[str, Any]:
         is_channel = chat_id.startswith("#") or chat_id.startswith("&")
@@ -332,7 +331,7 @@ class IRCAdapter(BasePlatformAdapter):
                 lines.append(paragraph[:split_at].rstrip())
                 paragraph = paragraph[split_at:].lstrip()
 
-        return lines if lines else [""]
+        return lines or [""]
 
     @staticmethod
     def _strip_markdown(text: str) -> str:

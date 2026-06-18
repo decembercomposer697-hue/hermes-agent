@@ -37,7 +37,6 @@ import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional
 
 logger = logging.getLogger("hermes.mcp_serve")
 
@@ -87,7 +86,7 @@ def _load_sessions_index() -> dict:
     if not sessions_file.exists():
         return {}
     try:
-        with open(sessions_file, encoding="utf-8") as f:
+        with Path(sessions_file).open(encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
         logger.debug("Failed to load sessions.json: %s", e)
@@ -107,7 +106,7 @@ def _load_channel_directory() -> dict:
     if not directory_file.exists():
         return {}
     try:
-        with open(directory_file, encoding="utf-8") as f:
+        with Path(directory_file).open(encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
         logger.debug("Failed to load channel_directory.json: %s", e)
@@ -194,6 +193,7 @@ POLL_INTERVAL = 0.2  # seconds between DB polls (200ms)
 @dataclass
 class QueueEvent:
     """An event in the bridge's in-memory queue."""
+
     cursor: int
     type: str  # "message", "approval_requested", "approval_resolved"
     session_key: str = ""

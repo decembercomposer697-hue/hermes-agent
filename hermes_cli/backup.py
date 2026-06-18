@@ -16,9 +16,9 @@ import sys
 import tempfile
 import time
 import zipfile
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from hermes_constants import (
     display_hermes_home,
@@ -190,14 +190,13 @@ def run_backup(args) -> None:
         # Prune excluded directories in-place so os.walk doesn't descend
         # ``hermes-agent`` is only pruned at the root level; nested dirs
         # with the same name (e.g. in skills/) must be preserved.
-        is_root = rel_dir == Path(".")
+        is_root = rel_dir == Path()
         orig_dirnames = dirnames[:]
         dirnames[:] = [
             d for d in dirnames
             if d not in _EXCLUDED_DIRS or (d == "hermes-agent" and not is_root)
         ]
-        for removed in set(orig_dirnames) - set(dirnames):
-            skipped_dirs.add(str(rel_dir / removed))
+        skipped_dirs.update(str(rel_dir / removed) for removed in set(orig_dirnames) - set(dirnames))
 
         for fname in filenames:
             fpath = dp / fname
@@ -264,7 +263,7 @@ def run_backup(args) -> None:
     print(f"  Time:        {elapsed:.1f}s")
 
     if skipped_dirs:
-        print(f"\n  Excluded directories:")
+        print("\n  Excluded directories:")
         for d in sorted(skipped_dirs):
             print(f"    {d}/")
 
@@ -411,10 +410,10 @@ def run_import(args) -> None:
 
             try:
                 target.parent.mkdir(parents=True, exist_ok=True)
-                with zf.open(member) as src, open(target, "wb") as dst:
+                with zf.open(member) as src, Path(target).open("wb") as dst:
                     dst.write(src.read())
                 if target.name in _SECRET_FILE_NAMES:
-                    os.chmod(target, 0o600)
+                    Path(target).chmod(0o600)
                 restored += 1
             except (PermissionError, OSError) as exc:
                 errors.append(f"  {rel}: {exc}")
@@ -476,8 +475,8 @@ def run_import(args) -> None:
             except ImportError:
                 # hermes_cli.profiles might not be available (fresh install)
                 if any(profiles_dir.iterdir()):
-                    print(f"\n  Profiles detected but aliases could not be created.")
-                    print(f"  Run: hermes profile list  (after installing hermes)")
+                    print("\n  Profiles detected but aliases could not be created.")
+                    print("  Run: hermes profile list  (after installing hermes)")
 
         # Guidance
         print()
@@ -606,7 +605,7 @@ def create_quick_snapshot(
         "total_size": sum(manifest.values()),
         "files": manifest,
     }
-    with open(snap_dir / "manifest.json", "w", encoding="utf-8") as f:
+    with Path(snap_dir / "manifest.json").open("w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
 
     # Auto-prune. Defaults preserve historical manual /snapshot behavior; callers
@@ -634,7 +633,7 @@ def list_quick_snapshots(
         manifest_path = d / "manifest.json"
         if manifest_path.exists():
             try:
-                with open(manifest_path, encoding="utf-8") as f:
+                with Path(manifest_path).open(encoding="utf-8") as f:
                     results.append(json.load(f))
             except (json.JSONDecodeError, OSError):
                 results.append({"id": d.name, "file_count": 0, "total_size": 0})
@@ -664,7 +663,7 @@ def restore_quick_snapshot(
     if not manifest_path.exists():
         return False
 
-    with open(manifest_path, encoding="utf-8") as f:
+    with Path(manifest_path).open(encoding="utf-8") as f:
         meta = json.load(f)
 
     restored = 0
@@ -714,7 +713,7 @@ def _count_cron_jobs(path: Path) -> int | None:
     if not path.is_file():
         return None
     try:
-        with open(path, encoding="utf-8") as f:
+        with Path(path).open(encoding="utf-8") as f:
             data = json.load(f)
     except (OSError, json.JSONDecodeError):
         return None

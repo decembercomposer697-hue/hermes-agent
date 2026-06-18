@@ -24,7 +24,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -722,7 +722,7 @@ async def _reverse_lookup_wiki_token(
     if code == 0:
         node = data.get("node", {})
         wiki_token = node.get("node_token", "")
-        return wiki_token if wiki_token else None
+        return wiki_token or None
     # code != 0: either not a wiki doc or service error — log and return None
     logger.warning("[Feishu-Comment] Wiki reverse lookup failed: code=%s msg=%s obj=%s:%s", code, msg, obj_type, obj_token)
     return None
@@ -1098,7 +1098,7 @@ def _run_comment_agent(prompt: str, client: Any, session_key: str = "") -> str:
                 _save_session_history(session_key, new_messages)
 
         return response
-    except Exception as e:
+    except Exception:
         logger.exception("[Feishu-Comment] _run_comment_agent: agent failed")
         return ""
     finally:

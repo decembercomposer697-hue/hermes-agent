@@ -5,6 +5,7 @@ dispatch.  All external dependencies (faster_whisper, openai) are mocked.
 """
 
 import os
+import pathlib
 import tempfile
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
@@ -299,7 +300,6 @@ class TestNormalizeLocalModel:
 
     def test_local_transcribe_normalises_model(self):
         """transcribe_audio with local provider must not pass 'whisper-1' to WhisperModel."""
-        import os
         from unittest.mock import MagicMock, patch
 
         with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
@@ -327,4 +327,4 @@ class TestNormalizeLocalModel:
                     "WhisperModel was called with the cloud-only name 'whisper-1'"
                 )
         finally:
-            os.unlink(audio_file)
+            pathlib.Path(audio_file).unlink()

@@ -22,7 +22,8 @@ import contextlib
 import json
 import logging
 import os
-from typing import Any, Dict, List, Optional
+import pathlib
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -280,17 +281,9 @@ def summarize_background_review_actions(
             continue
         message = data.get("message", "")
         target = data.get("target", "")
-        if "created" in message.lower():
+        if "created" in message.lower() or "updated" in message.lower():
             actions.append(message)
-        elif "updated" in message.lower():
-            actions.append(message)
-        elif "added" in message.lower() or (target and "add" in message.lower()):
-            label = "Memory" if target == "memory" else "User profile" if target == "user" else target
-            actions.append(f"{label} updated")
-        elif "Entry added" in message:
-            label = "Memory" if target == "memory" else "User profile" if target == "user" else target
-            actions.append(f"{label} updated")
-        elif "removed" in message.lower() or "replaced" in message.lower():
+        elif "added" in message.lower() or (target and "add" in message.lower()) or "Entry added" in message or "removed" in message.lower() or "replaced" in message.lower():
             label = "Memory" if target == "memory" else "User profile" if target == "user" else target
             actions.append(f"{label} updated")
     return actions
@@ -357,7 +350,7 @@ def _run_review_in_thread(
     review_agent = None
     review_messages: list[dict] = []
     try:
-        with open(os.devnull, "w", encoding="utf-8") as _devnull, \
+        with pathlib.Path(os.devnull).open("w", encoding="utf-8") as _devnull, \
              contextlib.redirect_stdout(_devnull), \
              contextlib.redirect_stderr(_devnull):
             # Inherit the parent agent's live runtime (provider, model,
@@ -548,7 +541,7 @@ def _run_review_in_thread(
         # on the exception path where redirect_stdout already exited.
         if review_agent is not None:
             try:
-                with open(os.devnull, "w", encoding="utf-8") as _fn, \
+                with pathlib.Path(os.devnull).open("w", encoding="utf-8") as _fn, \
                      contextlib.redirect_stdout(_fn), \
                      contextlib.redirect_stderr(_fn):
                     try:
@@ -598,10 +591,10 @@ def spawn_background_review_thread(
 
 
 __all__ = [
+    "_COMBINED_REVIEW_PROMPT",
     "_MEMORY_REVIEW_PROMPT",
     "_SKILL_REVIEW_PROMPT",
-    "_COMBINED_REVIEW_PROMPT",
+    "build_memory_write_metadata",
     "spawn_background_review_thread",
     "summarize_background_review_actions",
-    "build_memory_write_metadata",
 ]

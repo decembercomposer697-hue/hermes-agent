@@ -22,7 +22,7 @@ def _patch_bootstrap(monkeypatch):
         "type": "function",
         "function": {"name": "t", "description": "t", "parameters": {"type": "object", "properties": {}}},
     }])
-    monkeypatch.setattr(run_agent, "check_toolset_requirements", lambda: {})
+    monkeypatch.setattr(run_agent, "check_toolset_requirements", dict)
 
 
 class _FakeAnthropicClient:
@@ -32,6 +32,7 @@ class _FakeAnthropicClient:
 
 class _FakeOpenAIClient:
     """Fake OpenAI client returned by mocked resolve_provider_client."""
+
     api_key = "fake-codex-key"
     base_url = "https://api.openai.com/v1"
     _default_headers = None

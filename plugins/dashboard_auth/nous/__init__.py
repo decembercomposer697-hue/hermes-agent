@@ -376,7 +376,6 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
         # invalidates the RT server-side immediately rather than waiting out
         # the TTL.
         _ = refresh_token
-        return None
 
     # ---- internals --------------------------------------------------------
 

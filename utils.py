@@ -6,7 +6,7 @@ import os
 import stat
 import tempfile
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 from urllib.parse import urlparse
 
 import yaml
@@ -53,7 +53,7 @@ def _restore_file_mode(path: Path, mode: "int | None") -> None:
     if mode is None:
         return
     try:
-        os.chmod(path, mode)
+        Path(path).chmod(mode)
     except OSError:
         pass
 
@@ -77,8 +77,8 @@ def atomic_replace(tmp_path: str | Path, target: str | Path) -> str:
     need to re-apply permissions can target it instead of the symlink.
     """
     target_str = str(target)
-    real_path = os.path.realpath(target_str) if os.path.islink(target_str) else target_str
-    os.replace(str(tmp_path), real_path)
+    real_path = os.path.realpath(target_str) if Path(target_str).is_symlink() else target_str
+    Path(str(tmp_path)).replace(real_path)
     return real_path
 
 
@@ -137,7 +137,7 @@ def atomic_json_write(
         real_path = atomic_replace(tmp_path, path)
         if mode is not None:
             try:
-                os.chmod(real_path, mode)
+                Path(real_path).chmod(mode)
             except OSError:
                 pass
         else:
@@ -146,7 +146,7 @@ def atomic_json_write(
         # Intentionally catch BaseException so temp-file cleanup still runs for
         # KeyboardInterrupt/SystemExit before re-raising the original signal.
         try:
-            os.unlink(tmp_path)
+            Path(tmp_path).unlink()
         except OSError:
             pass
         raise
@@ -199,7 +199,7 @@ def atomic_yaml_write(
         # Match atomic_json_write: cleanup must also happen for process-level
         # interruptions before we re-raise them.
         try:
-            os.unlink(tmp_path)
+            Path(tmp_path).unlink()
         except OSError:
             pass
         raise
@@ -263,7 +263,7 @@ def atomic_roundtrip_yaml_update(
         _restore_file_mode(real_path, original_mode)
     except BaseException:
         try:
-            os.unlink(tmp_path)
+            Path(tmp_path).unlink()
         except OSError:
             pass
         raise

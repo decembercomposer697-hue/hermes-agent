@@ -202,9 +202,8 @@ class TestFindAgentBrowser:
              patch(
                  "tools.browser_tool._discover_homebrew_node_dirs",
                  return_value=[],
-             ):
-            with pytest.raises(FileNotFoundError, match="agent-browser CLI not found"):
-                _find_agent_browser()
+             ), pytest.raises(FileNotFoundError, match="agent-browser CLI not found"):
+            _find_agent_browser()
 
 
 class TestBrowserRequirements:

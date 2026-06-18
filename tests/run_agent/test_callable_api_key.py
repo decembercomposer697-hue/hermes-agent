@@ -167,7 +167,7 @@ class TestTruncateTokenCallable:
             invoked["count"] += 1
             return "should-not-appear-in-ui"
 
-        token_provider = cast(str | None, provider)
+        token_provider = cast("str | None", provider)
         rendered = _truncate_token(token_provider)
         assert rendered == "<entra-id-bearer>"
         assert invoked["count"] == 0

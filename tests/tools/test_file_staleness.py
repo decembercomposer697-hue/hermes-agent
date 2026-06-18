@@ -9,6 +9,7 @@ Run with:  python -m pytest tests/tools/test_file_staleness.py -v
 
 import json
 import os
+import pathlib
 import tempfile
 import time
 import unittest
@@ -80,15 +81,14 @@ class TestStalenessCheck(unittest.TestCase):
         file_state.get_registry().clear()
         self._tmpdir = tempfile.mkdtemp()
         self._tmpfile = os.path.join(self._tmpdir, "stale_test.txt")
-        with open(self._tmpfile, "w") as f:
-            f.write("original content\n")
+        pathlib.Path(self._tmpfile).write_text("original content\n")
 
     def tearDown(self):
         _read_tracker.clear()
         file_state.get_registry().clear()
         try:
-            os.unlink(self._tmpfile)
-            os.rmdir(self._tmpdir)
+            pathlib.Path(self._tmpfile).unlink()
+            pathlib.Path(self._tmpdir).rmdir()
         except OSError:
             pass
 
@@ -109,8 +109,7 @@ class TestStalenessCheck(unittest.TestCase):
 
         # Simulate external modification
         time.sleep(0.05)
-        with open(self._tmpfile, "w") as f:
-            f.write("someone else changed this\n")
+        pathlib.Path(self._tmpfile).write_text("someone else changed this\n")
 
         result = json.loads(write_file_tool(self._tmpfile, "new content", task_id="t1"))
         self.assertIn("_warning", result)
@@ -131,7 +130,7 @@ class TestStalenessCheck(unittest.TestCase):
         result = json.loads(write_file_tool(new_path, "content", task_id="t3"))
         self.assertNotIn("_warning", result)
         try:
-            os.unlink(new_path)
+            pathlib.Path(new_path).unlink()
         except OSError:
             pass
 
@@ -142,8 +141,7 @@ class TestStalenessCheck(unittest.TestCase):
         read_file_tool(self._tmpfile, task_id="task_a")
 
         time.sleep(0.05)
-        with open(self._tmpfile, "w") as f:
-            f.write("changed\n")
+        pathlib.Path(self._tmpfile).write_text("changed\n")
 
         result = json.loads(write_file_tool(self._tmpfile, "new", task_id="task_b"))
         self.assertNotIn("_warning", result)
@@ -153,15 +151,13 @@ class TestStalenessCheck(unittest.TestCase):
         """Relative-path stale tracking must follow the live terminal cwd."""
         start_dir = os.path.join(self._tmpdir, "start")
         live_dir = os.path.join(self._tmpdir, "worktree")
-        os.makedirs(start_dir, exist_ok=True)
-        os.makedirs(live_dir, exist_ok=True)
+        pathlib.Path(start_dir).mkdir(exist_ok=True, parents=True)
+        pathlib.Path(live_dir).mkdir(exist_ok=True, parents=True)
 
         start_file = os.path.join(start_dir, "shared.txt")
         live_file = os.path.join(live_dir, "shared.txt")
-        with open(start_file, "w") as f:
-            f.write("start copy\n")
-        with open(live_file, "w") as f:
-            f.write("live copy\n")
+        pathlib.Path(start_file).write_text("start copy\n")
+        pathlib.Path(live_file).write_text("live copy\n")
 
         fake_ops = _make_fake_ops("live copy\n", 10)
         fake_ops.env = SimpleNamespace(cwd=live_dir)
@@ -179,8 +175,7 @@ class TestStalenessCheck(unittest.TestCase):
                 read_file_tool("shared.txt", task_id="live_task")
 
                 time.sleep(0.05)
-                with open(live_file, "w") as f:
-                    f.write("live copy modified elsewhere\n")
+                pathlib.Path(live_file).write_text("live copy modified elsewhere\n")
 
                 result = json.loads(
                     write_file_tool("shared.txt", "replacement", task_id="live_task"),
@@ -207,15 +202,14 @@ class TestPatchStaleness(unittest.TestCase):
         file_state.get_registry().clear()
         self._tmpdir = tempfile.mkdtemp()
         self._tmpfile = os.path.join(self._tmpdir, "patch_test.txt")
-        with open(self._tmpfile, "w") as f:
-            f.write("original line\n")
+        pathlib.Path(self._tmpfile).write_text("original line\n")
 
     def tearDown(self):
         _read_tracker.clear()
         file_state.get_registry().clear()
         try:
-            os.unlink(self._tmpfile)
-            os.rmdir(self._tmpdir)
+            pathlib.Path(self._tmpfile).unlink()
+            pathlib.Path(self._tmpdir).rmdir()
         except OSError:
             pass
 
@@ -226,8 +220,7 @@ class TestPatchStaleness(unittest.TestCase):
         read_file_tool(self._tmpfile, task_id="p1")
 
         time.sleep(0.05)
-        with open(self._tmpfile, "w") as f:
-            f.write("externally modified\n")
+        pathlib.Path(self._tmpfile).write_text("externally modified\n")
 
         result = json.loads(patch_tool(
             mode="replace", path=self._tmpfile,

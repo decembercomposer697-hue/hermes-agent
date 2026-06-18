@@ -2124,7 +2124,7 @@ class TestRunJobWakeGate:
         is not invoked and run_job returns the SILENT marker so delivery is
         suppressed.
         """
-        import cron.scheduler as scheduler
+        from cron import scheduler
         from cron.scheduler import SILENT_MARKER
 
         with patch.object(scheduler, "_run_job_script",
@@ -2142,7 +2142,7 @@ class TestRunJobWakeGate:
         """When the script returns {wakeAgent: true, data: ...}, the agent is
         invoked and the data line still shows up in the prompt.
         """
-        import cron.scheduler as scheduler
+        from cron import scheduler
 
         script_output = '{"wakeAgent": true, "data": {"new": 3}}'
         agent = MagicMock()
@@ -2168,7 +2168,7 @@ class TestRunJobWakeGate:
         (script would execute twice otherwise, wasting work and risking
         double-side-effects).
         """
-        import cron.scheduler as scheduler
+        from cron import scheduler
 
         call_count = 0
 
@@ -2191,7 +2191,7 @@ class TestRunJobWakeGate:
         """If _run_job_script returns success=False, the gate is NOT evaluated
         and the agent still runs (the failure is reported as context).
         """
-        import cron.scheduler as scheduler
+        from cron import scheduler
 
         # Malicious or broken script whose stderr happens to contain the
         # gate JSON — we must NOT honor it because ran_ok is False.
@@ -2208,7 +2208,7 @@ class TestRunJobWakeGate:
 
     def test_no_script_path_runs_agent_normally(self):
         """Regression: jobs without a script still work."""
-        import cron.scheduler as scheduler
+        from cron import scheduler
 
         agent = MagicMock()
         agent.run_conversation = MagicMock(return_value={

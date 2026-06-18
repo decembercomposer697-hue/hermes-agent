@@ -770,8 +770,8 @@ def _model_flow_custom(config):
     )
     if _looks_local and not _url_lower.endswith("/v1"):
         print()
-        print(f"  Hint: Did you mean to add /v1 at the end?")
-        print(f"  Most local model servers (Ollama, vLLM, llama.cpp) require it.")
+        print("  Hint: Did you mean to add /v1 at the end?")
+        print("  Most local model servers (Ollama, vLLM, llama.cpp) require it.")
         print(f"  e.g. {effective_url.rstrip('/')}/v1")
         try:
             _add_v1 = input("  Add /v1? [Y/n]: ").strip().lower()
@@ -970,7 +970,7 @@ def _model_flow_azure_foundry(config, current_model=""):
     (models.dev, provider metadata, hardcoded family fallbacks).
     """
     from hermes_cli import azure_detect
-    from hermes_cli.auth import _save_model_choice, deactivate_provider
+    from hermes_cli.auth import deactivate_provider
     from hermes_cli.config import (
         get_env_value,
         load_config,
@@ -1014,7 +1014,7 @@ def _model_flow_azure_foundry(config, current_model=""):
         )
         print(f"  Current API mode:  {_lbl}")
     if current_auth_mode == "entra_id":
-        print(f"  Current auth mode: Microsoft Entra ID (keyless)")
+        print("  Current auth mode: Microsoft Entra ID (keyless)")
     elif current_api_key:
         print(f"  Current auth mode: API key ({current_api_key[:8]}...)")
     print()
@@ -1270,9 +1270,8 @@ def _model_flow_azure_foundry(config, current_model=""):
             model["entra"] = clean_entra
         elif "entra" in model:
             del model["entra"]
-    else:
-        if "entra" in model:
-            del model["entra"]
+    elif "entra" in model:
+        del model["entra"]
     if ctx_len:
         model["context_length"] = ctx_len
 

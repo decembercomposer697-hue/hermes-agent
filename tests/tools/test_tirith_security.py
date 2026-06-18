@@ -3,6 +3,7 @@
 import io
 import json
 import os
+import pathlib
 import subprocess
 import tarfile
 import time
@@ -743,11 +744,11 @@ class TestInstallArchiveMemberValidation:
         def _download(url, dest, timeout=10):
             del timeout
             if url.endswith(".tar.gz"):
-                with open(archive, "rb") as src, open(dest, "wb") as dst:
+                with pathlib.Path(archive).open("rb") as src, pathlib.Path(dest).open("wb") as dst:
                     dst.write(src.read())
                 return
             if url.endswith("checksums.txt"):
-                with open(checksums, "rb") as src, open(dest, "wb") as dst:
+                with pathlib.Path(checksums).open("rb") as src, pathlib.Path(dest).open("wb") as dst:
                     dst.write(src.read())
                 return
             raise AssertionError(f"unexpected download URL: {url}")
@@ -777,9 +778,9 @@ class TestInstallArchiveMemberValidation:
 
         assert reason == ""
         assert path == str(hermes_home / "bin" / "tirith")
-        assert os.path.isfile(path)
-        assert not os.path.islink(path)
-        with open(path, "rb") as f:
+        assert pathlib.Path(path).is_file()
+        assert not pathlib.Path(path).is_symlink()
+        with pathlib.Path(path).open("rb") as f:
             assert f.read() == payload
 
     @patch("tools.tirith_security._verify_checksum", return_value=True)
@@ -937,7 +938,7 @@ class TestDiskFailureMarker:
             with patch("tools.tirith_security.shutil.which", return_value="/usr/local/bin/cosign"):
                 assert not _is_install_failed_on_disk()
             # Marker file should have been removed
-            assert not os.path.exists(marker)
+            assert not pathlib.Path(marker).exists()
 
     def test_cosign_missing_marker_stays_when_cosign_still_absent(self):
         """Marker with 'cosign_missing' reason stays if cosign is still missing."""
@@ -1037,9 +1038,8 @@ class TestDiskFailureMarker:
         tmpdir = tempfile.mkdtemp()
         hermes_bin = os.path.join(tmpdir, "tirith")
         # Create a fake executable
-        with open(hermes_bin, "w") as f:
-            f.write("#!/bin/sh\n")
-        os.chmod(hermes_bin, 0o755)
+        pathlib.Path(hermes_bin).write_text("#!/bin/sh\n")
+        pathlib.Path(hermes_bin).chmod(0o755)
 
         _tirith_mod._resolved_path = _INSTALL_FAILED
 
@@ -1186,7 +1186,7 @@ class TestHermesHomeIsolation:
         with patch.dict(os.environ, {"HERMES_HOME": tmpdir}):
             result = _hermes_bin_dir()
         assert result == os.path.join(tmpdir, "bin")
-        assert os.path.isdir(result)
+        assert pathlib.Path(result).is_dir()
 
     def test_failure_marker_respects_hermes_home(self):
         """_failure_marker_path must use HERMES_HOME, not hardcoded ~/.hermes."""
@@ -1319,12 +1319,11 @@ class TestSpawnWarningDedup:
 
         with patch(
             "tools.tirith_security._resolve_tirith_path", return_value=None,
-        ):
-            with caplog.at_level("WARNING", logger="tools.tirith_security"):
-                for _ in range(10):
-                    result = check_command_security("echo")
-                    assert result["action"] == "allow"
-                    assert "tirith path unavailable" in result["summary"]
+        ), caplog.at_level("WARNING", logger="tools.tirith_security"):
+            for _ in range(10):
+                result = check_command_security("echo")
+                assert result["action"] == "allow"
+                assert "tirith path unavailable" in result["summary"]
 
         none_warnings = [
             rec for rec in caplog.records

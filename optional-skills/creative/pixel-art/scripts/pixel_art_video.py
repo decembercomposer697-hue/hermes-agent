@@ -18,6 +18,7 @@ Usage (CLI):
 
 import math
 import os
+import pathlib
 import random
 import shutil
 import subprocess
@@ -56,7 +57,7 @@ def draw_stars(draw, stars, t, W, H):
 
 def init_fireflies(rng, W, H):
     return [{"x": rng.randint(20, W - 20), "y": rng.randint(H // 4, H - 20),
-             "phase": rng.uniform(0, 6.28), "speed": rng.uniform(0.3, 0.8)}
+             "phase": rng.uniform(0, math.tau), "speed": rng.uniform(0.3, 0.8)}
             for _ in range(10)]
 
 
@@ -73,7 +74,7 @@ def draw_fireflies(draw, ff, t, W, H):
 def init_leaves(rng, W, H):
     return [{"x": rng.randint(0, W), "y": rng.randint(-H, 0),
              "speed": rng.uniform(0.5, 1.5), "wobble": rng.uniform(0.02, 0.05),
-             "phase": rng.uniform(0, 6.28),
+             "phase": rng.uniform(0, math.tau),
              "color": rng.choice([(180, 120, 50), (160, 100, 40), (200, 140, 60)])}
             for _ in range(12)]
 
@@ -88,7 +89,7 @@ def draw_leaves(draw, leaves, t, W, H):
 
 def init_dust_motes(rng, W, H):
     return [{"x": rng.randint(30, W - 30), "y": rng.randint(30, H - 30),
-             "phase": rng.uniform(0, 6.28), "speed": rng.uniform(0.2, 0.5),
+             "phase": rng.uniform(0, math.tau), "speed": rng.uniform(0.2, 0.5),
              "amp": rng.uniform(2, 6)} for _ in range(20)]
 
 
@@ -103,7 +104,7 @@ def draw_dust_motes(draw, motes, t, W, H):
 
 def init_sparkles(rng, W, H):
     return [(rng.randint(W // 4, 3 * W // 4), rng.randint(H // 4, 3 * H // 4),
-             rng.uniform(0, 6.28),
+             rng.uniform(0, math.tau),
              rng.choice([(180, 200, 255), (255, 220, 150), (200, 180, 255)]))
             for _ in range(10)]
 
@@ -159,7 +160,7 @@ def draw_bubbles(draw, bubbles, t, W, H):
 
 def init_embers(rng, W, H):
     return [{"x": rng.randint(0, W), "y": rng.randint(0, H),
-             "speed": rng.uniform(0.3, 0.9), "phase": rng.uniform(0, 6.28),
+             "speed": rng.uniform(0.3, 0.9), "phase": rng.uniform(0, math.tau),
              "color": rng.choice([(255, 150, 30), (255, 100, 20), (255, 200, 50)])}
             for _ in range(18)]
 
@@ -190,7 +191,7 @@ def draw_snowflakes(draw, flakes, t, W, H):
 
 
 def init_neon_pulse(rng, W, H):
-    return [(rng.randint(0, W), rng.randint(0, H), rng.uniform(0, 6.28),
+    return [(rng.randint(0, W), rng.randint(0, H), rng.uniform(0, math.tau),
              rng.choice([(255, 0, 200), (0, 255, 255), (255, 50, 150)]))
             for _ in range(8)]
 
@@ -203,7 +204,7 @@ def draw_neon_pulse(draw, points, t, W, H):
 
 def init_heat_shimmer(rng, W, H):
     return [{"x": rng.randint(0, W), "y": rng.randint(H // 2, H),
-             "phase": rng.uniform(0, 6.28)} for _ in range(12)]
+             "phase": rng.uniform(0, math.tau)} for _ in range(12)]
 
 
 def draw_heat_shimmer(draw, points, t, W, H):
@@ -296,7 +297,7 @@ def pixel_art_video(
         layers.append((draw_fn, init_fn(rng, W, H)))
 
     n_frames = fps * duration
-    os.makedirs(os.path.dirname(os.path.abspath(output_path)) or ".", exist_ok=True)
+    pathlib.Path(os.path.dirname(os.path.abspath(output_path)) or ".").mkdir(exist_ok=True, parents=True)
 
     with tempfile.TemporaryDirectory(prefix="pixelart_frames_") as frames_dir:
         for frame_idx in range(n_frames):

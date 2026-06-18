@@ -951,7 +951,7 @@ async def test_send_image_url_dm_topic_reply_not_found_retry_drops_thread_id(mon
         return SimpleNamespace(message_id=784)
 
     adapter._bot = SimpleNamespace(send_photo=mock_send_photo)
-    import tools.url_safety as url_safety
+    from tools import url_safety
 
     monkeypatch.setattr(url_safety, "is_safe_url", lambda _url: True)
 
@@ -1011,7 +1011,7 @@ async def test_send_image_upload_dm_topic_reply_not_found_retry_drops_thread_id(
         SimpleNamespace(AsyncClient=_FakeAsyncClient),
     )
     adapter._bot = SimpleNamespace(send_photo=mock_send_photo)
-    import tools.url_safety as url_safety
+    from tools import url_safety
 
     monkeypatch.setattr(url_safety, "is_safe_url", lambda _url: True)
 

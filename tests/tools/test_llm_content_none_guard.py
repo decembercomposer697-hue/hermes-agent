@@ -11,6 +11,7 @@ reasoning fields when content is empty.
 """
 
 import asyncio
+import pathlib
 import types
 
 import pytest
@@ -167,7 +168,7 @@ class TestSourceLinesAreGuarded:
     def _read_file(rel_path: str) -> str:
         import os
         base = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        with open(os.path.join(base, rel_path)) as f:
+        with pathlib.Path(os.path.join(base, rel_path)).open() as f:
             return f.read()
 
     def test_mixture_of_agents_reference_model_guarded(self):
@@ -175,28 +176,28 @@ class TestSourceLinesAreGuarded:
         # The unguarded pattern should NOT exist
         assert ".message.content.strip()" not in src, (
             "tools/mixture_of_agents_tool.py still has unguarded "
-            ".content.strip() — apply `(... or \"\").strip()` guard"
+            '.content.strip() — apply `(... or "").strip()` guard'
         )
 
     def test_web_tools_guarded(self):
         src = self._read_file("tools/web_tools.py")
         assert ".message.content.strip()" not in src, (
             "tools/web_tools.py still has unguarded "
-            ".content.strip() — apply `(... or \"\").strip()` guard"
+            '.content.strip() — apply `(... or "").strip()` guard'
         )
 
     def test_vision_tools_guarded(self):
         src = self._read_file("tools/vision_tools.py")
         assert ".message.content.strip()" not in src, (
             "tools/vision_tools.py still has unguarded "
-            ".content.strip() — apply `(... or \"\").strip()` guard"
+            '.content.strip() — apply `(... or "").strip()` guard'
         )
 
     def test_skills_guard_guarded(self):
         src = self._read_file("tools/skills_guard.py")
         assert ".message.content.strip()" not in src, (
             "tools/skills_guard.py still has unguarded "
-            ".content.strip() — apply `(... or \"\").strip()` guard"
+            '.content.strip() — apply `(... or "").strip()` guard'
         )
 
 

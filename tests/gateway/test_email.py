@@ -13,6 +13,7 @@ Covers:
 """
 
 import os
+import pathlib
 import unittest
 from email import encoders
 from email.mime.base import MIMEBase
@@ -282,7 +283,6 @@ class TestDispatchMessage(unittest.TestCase):
 
         async def mock_handler(event):
             captured_events.append(event)
-            return None
 
         adapter._message_handler = mock_handler
         # Override handle_message to capture the event directly
@@ -463,7 +463,6 @@ class TestDispatchMessage(unittest.TestCase):
 
             async def mock_handler(event):
                 captured_events.append(event)
-                return None
 
             adapter._message_handler = mock_handler
 
@@ -703,7 +702,7 @@ class TestSendMethods(unittest.TestCase):
                 )
                 self.assertTrue(has_attachment)
         finally:
-            os.unlink(tmp_path)
+            pathlib.Path(tmp_path).unlink()
 
     def test_send_typing_is_noop(self):
         """send_typing should do nothing for email."""

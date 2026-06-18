@@ -18,7 +18,7 @@ from collections.abc import Sequence
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 try:
     import yaml
@@ -34,7 +34,7 @@ SKILL_CATEGORY_DESCRIPTION = (
     "Skills migrated from an OpenClaw workspace."
 )
 SKILL_CONFLICT_MODES = {"skip", "overwrite", "rename"}
-SUPPORTED_SECRET_TARGETS={
+SUPPORTED_SECRET_TARGETS = {
     "TELEGRAM_BOT_TOKEN",
     "OPENROUTER_API_KEY",
     "OPENAI_API_KEY",
@@ -456,7 +456,7 @@ def extract_markdown_entries(text: str) -> list[str]:
     paragraph_lines: list[str] = []
 
     def context_prefix() -> str:
-        filtered = [h for h in headings if h and not re.search(r"\b(MEMORY|USER|SOUL|AGENTS|TOOLS|IDENTITY)\.md\b", h, re.I)]
+        filtered = [h for h in headings if h and not re.search(r"\b(MEMORY|USER|SOUL|AGENTS|TOOLS|IDENTITY)\.md\b", h, re.IGNORECASE)]
         return " > ".join(filtered)
 
     def flush_paragraph() -> None:
@@ -1867,18 +1867,17 @@ class Migrator:
                 if final_destination != destination:
                     details["renamed_from"] = str(destination)
                 self.record(kind_label, skill_dir, final_destination, "migrated", **details)
+            elif final_destination != destination:
+                self.record(
+                    kind_label,
+                    skill_dir,
+                    final_destination,
+                    "migrated",
+                    f"Would copy {desc} directory under a renamed folder",
+                    renamed_from=str(destination),
+                )
             else:
-                if final_destination != destination:
-                    self.record(
-                        kind_label,
-                        skill_dir,
-                        final_destination,
-                        "migrated",
-                        f"Would copy {desc} directory under a renamed folder",
-                        renamed_from=str(destination),
-                    )
-                else:
-                    self.record(kind_label, skill_dir, final_destination, "migrated", f"Would copy {desc} directory")
+                self.record(kind_label, skill_dir, final_destination, "migrated", f"Would copy {desc} directory")
 
         desc_path = destination_root / "DESCRIPTION.md"
         if self.execute:
@@ -1977,18 +1976,17 @@ class Migrator:
                 if final_destination != destination:
                     details["renamed_from"] = str(destination)
                 self.record("skill", skill_dir, final_destination, "migrated", **details)
+            elif final_destination != destination:
+                self.record(
+                    "skill",
+                    skill_dir,
+                    final_destination,
+                    "migrated",
+                    "Would copy skill directory under a renamed folder",
+                    renamed_from=str(destination),
+                )
             else:
-                if final_destination != destination:
-                    self.record(
-                        "skill",
-                        skill_dir,
-                        final_destination,
-                        "migrated",
-                        "Would copy skill directory under a renamed folder",
-                        renamed_from=str(destination),
-                    )
-                else:
-                    self.record("skill", skill_dir, final_destination, "migrated", "Would copy skill directory")
+                self.record("skill", skill_dir, final_destination, "migrated", "Would copy skill directory")
 
         desc_path = destination_root / "DESCRIPTION.md"
         if self.execute:
@@ -3044,16 +3042,16 @@ def main() -> int:
     total = sum(s.values())
 
     print()
-    print(f"  ╔══════════════════════════════════════════════════════╗")
+    print("  ╔══════════════════════════════════════════════════════╗")
     print(f"  ║   OpenClaw -> Hermes Migration   [{mode_label:>8s}]   ║")
-    print(f"  ╠══════════════════════════════════════════════════════╣")
+    print("  ╠══════════════════════════════════════════════════════╣")
     print(f"  ║  Source:  {str(report['source_root'])[:42]:<42s}  ║")
     print(f"  ║  Target:  {str(report['target_root'])[:42]:<42s}  ║")
-    print(f"  ╠══════════════════════════════════════════════════════╣")
+    print("  ╠══════════════════════════════════════════════════════╣")
     print(f"  ║  ✔ Migrated:  {s.get('migrated', 0):>3d}    ◆ Archived:  {s.get('archived', 0):>3d}        ║")
     print(f"  ║  ⊘ Skipped:   {s.get('skipped', 0):>3d}    ⚠ Conflicts: {s.get('conflict', 0):>3d}        ║")
     print(f"  ║  ✖ Errors:    {s.get('error', 0):>3d}    Total:       {total:>3d}        ║")
-    print(f"  ╚══════════════════════════════════════════════════════╝")
+    print("  ╚══════════════════════════════════════════════════════╝")
 
     # Show what was migrated
     migrated = [i for i in items if i["status"] == "migrated"]

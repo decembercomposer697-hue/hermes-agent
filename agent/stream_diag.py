@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -272,9 +272,9 @@ def emit_stream_drop(
 
 __all__ = [
     "STREAM_DIAG_HEADERS",
-    "stream_diag_init",
-    "stream_diag_capture_response",
+    "emit_stream_drop",
     "flatten_exception_chain",
     "log_stream_retry",
-    "emit_stream_drop",
+    "stream_diag_capture_response",
+    "stream_diag_init",
 ]

@@ -26,17 +26,17 @@ import pytest
 def fake_hermes(tmp_path, monkeypatch):
     """Build a fake Hermes layout:
 
-        <tmp>/
-          skills/foo/SKILL.md           # default profile
-          plugins/foo/__init__.py
-          cron/<state>
-          memories/MEMORY.md
-          profiles/
-            hermes-security/
-              skills/foo/SKILL.md       # named profile
-              plugins/...
-            coder/
-              skills/foo/SKILL.md       # another named profile
+    <tmp>/
+      skills/foo/SKILL.md           # default profile
+      plugins/foo/__init__.py
+      cron/<state>
+      memories/MEMORY.md
+      profiles/
+        hermes-security/
+          skills/foo/SKILL.md       # named profile
+          plugins/...
+        coder/
+          skills/foo/SKILL.md       # another named profile
     """
     root = tmp_path / "fake-hermes"
     (root / "skills" / "foo").mkdir(parents=True)

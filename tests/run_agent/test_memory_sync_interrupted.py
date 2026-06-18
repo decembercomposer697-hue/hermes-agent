@@ -105,7 +105,7 @@ class TestSyncExternalMemoryForTurn:
                         "type": "function",
                         "function": {
                             "name": "terminal",
-                            "arguments": "{\"command\":\"pytest\"}",
+                            "arguments": '{"command":"pytest"}',
                         },
                     },
                 ],

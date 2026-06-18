@@ -12,7 +12,7 @@ import os
 import sys
 import tempfile
 import uuid
-from datetime import UTC, datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 _HERMES_HOME = Path(os.environ.get("HERMES_HOME", Path.home() / ".hermes"))
@@ -42,7 +42,7 @@ def _load() -> dict:
     if not CARDS_FILE.exists():
         return _empty_store()
     try:
-        with open(CARDS_FILE, encoding="utf-8") as f:
+        with Path(CARDS_FILE).open(encoding="utf-8") as f:
             data = json.load(f)
         if not isinstance(data, dict) or "cards" not in data:
             return _empty_store()
@@ -58,10 +58,10 @@ def _save(data: dict) -> None:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
             f.write("\n")
-        os.replace(tmp, CARDS_FILE)
+        Path(tmp).replace(CARDS_FILE)
     except BaseException:
         try:
-            os.unlink(tmp)
+            Path(tmp).unlink()
         except OSError:
             pass
         raise
@@ -223,7 +223,7 @@ def cmd_stats(args: argparse.Namespace) -> None:
 def cmd_export(args: argparse.Namespace) -> None:
     data = _load()
     output_path = Path(args.output).expanduser()
-    with open(output_path, "w", newline="", encoding="utf-8") as f:
+    with Path(output_path).open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, lineterminator="\n")
         for card in data["cards"]:
             writer.writerow([card["question"], card["answer"], card["collection"]])
@@ -240,7 +240,7 @@ def cmd_import(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     created = 0
-    with open(file_path, encoding="utf-8") as f:
+    with Path(file_path).open(encoding="utf-8") as f:
         reader = csv.reader(f)
         for row in reader:
             if len(row) < 2:

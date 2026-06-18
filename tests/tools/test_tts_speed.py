@@ -1,6 +1,7 @@
 """Tests for TTS speed configuration across providers."""
 
 import asyncio
+import pathlib
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -160,7 +161,7 @@ class TestMinimaxTtsT2aV2:
     def test_decodes_hex_audio(self, tmp_path, monkeypatch):
         """t2a_v2 hex-encoded audio is decoded and written verbatim."""
         _, output = self._run({}, tmp_path, monkeypatch)
-        with open(output, "rb") as f:
+        with pathlib.Path(output).open("rb") as f:
             assert f.read() == b"\x00\x01\x02\x03"
 
     def test_default_url_is_t2a_v2(self, tmp_path, monkeypatch):
@@ -236,5 +237,5 @@ class TestMinimaxTtsLegacyTextToSpeech:
     def test_writes_raw_audio(self, tmp_path, monkeypatch):
         """Legacy endpoint returns raw bytes written directly to file."""
         _, output = self._run({}, tmp_path, monkeypatch)
-        with open(output, "rb") as f:
+        with pathlib.Path(output).open("rb") as f:
             assert f.read() == b"\x00\x01\x02\x03"

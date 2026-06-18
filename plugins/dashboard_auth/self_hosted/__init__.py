@@ -296,14 +296,14 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
         # Best-effort RFC 7009 revocation if the IDP advertised an endpoint.
         # Must never raise — logout is client-side cookie clearing regardless.
         if not refresh_token:
-            return None
+            return
         try:
             disco = self._get_discovery()
         except ProviderError:
-            return None
+            return
         endpoint = str(disco.get("revocation_endpoint") or "").strip()
         if not endpoint:
-            return None
+            return
         try:
             httpx.post(
                 endpoint,
@@ -317,7 +317,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
             )
         except Exception as exc:
             logger.debug("self-hosted OIDC: revoke failed (ignored): %s", exc)
-        return None
+        return
 
     # ---- internals: token exchange ----------------------------------------
 

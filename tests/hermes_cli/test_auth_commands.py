@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest
@@ -902,7 +902,7 @@ def test_auth_list_does_not_call_mutating_select(monkeypatch, capsys):
     class _Entry:
         id = "cred-1"
         label = "primary"
-        auth_type="***"
+        auth_type = "***"
         source = "manual"
         last_status = None
         last_error_code = None

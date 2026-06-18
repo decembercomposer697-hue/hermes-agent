@@ -13,7 +13,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from hermes_constants import get_hermes_home
 
@@ -41,6 +41,7 @@ _VALID_POLICIES = ("allowlist", "pairing")
 @dataclass(frozen=True)
 class CommentDocumentRule:
     """Per-document rule.  ``None`` means 'inherit from lower tier'."""
+
     enabled: bool | None = None
     policy: str | None = None
     allow_from: frozenset | None = None
@@ -49,6 +50,7 @@ class CommentDocumentRule:
 @dataclass(frozen=True)
 class CommentsConfig:
     """Top-level comment access config."""
+
     enabled: bool = True
     policy: str = "pairing"
     allow_from: frozenset = field(default_factory=frozenset)
@@ -58,6 +60,7 @@ class CommentsConfig:
 @dataclass(frozen=True)
 class ResolvedCommentRule:
     """Fully resolved rule after field-by-field fallback."""
+
     enabled: bool
     policy: str
     allow_from: frozenset
@@ -89,7 +92,7 @@ class _MtimeCache:
             return self._data
 
         try:
-            with open(self._path, encoding="utf-8") as f:
+            with Path(self._path).open(encoding="utf-8") as f:
                 data = json.load(f)
             if not isinstance(data, dict):
                 data = {}
@@ -234,7 +237,7 @@ def _load_pairing_approved() -> set:
 def _save_pairing(data: dict) -> None:
     PAIRING_FILE.parent.mkdir(parents=True, exist_ok=True)
     tmp = PAIRING_FILE.with_suffix(".tmp")
-    with open(tmp, "w", encoding="utf-8") as f:
+    with Path(tmp).open("w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
     tmp.replace(PAIRING_FILE)
     # Invalidate cache so next load picks up change
@@ -301,7 +304,7 @@ def _print_status() -> None:
     print(f"Pairing file: {PAIRING_FILE}")
     print(f"  exists: {PAIRING_FILE.exists()}")
     print()
-    print(f"Top-level:")
+    print("Top-level:")
     print(f"  enabled:    {cfg.enabled}")
     print(f"  policy:     {cfg.policy}")
     print(f"  allow_from: {sorted(cfg.allow_from) if cfg.allow_from else '[]'}")
@@ -338,7 +341,7 @@ def _do_check(doc_key: str, user_open_id: str) -> None:
     allowed = is_user_allowed(rule, user_open_id)
     print(f"Document:     {doc_key}")
     print(f"User:         {user_open_id}")
-    print(f"Resolved rule:")
+    print("Resolved rule:")
     print(f"  enabled:      {rule.enabled}")
     print(f"  policy:       {rule.policy}")
     print(f"  allow_from:   {sorted(rule.allow_from) if rule.allow_from else '[]'}")

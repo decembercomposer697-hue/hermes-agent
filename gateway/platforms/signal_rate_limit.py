@@ -18,7 +18,7 @@ import asyncio
 import logging
 import re
 import time
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +55,7 @@ class SignalRateLimitError(Exception):
 
 class SignalSchedulerError(Exception):
     pass
+
 
 # ---------------------------------------------------------------------------
 # Detection helpers — used to fish a 429 out of signal-cli's various error

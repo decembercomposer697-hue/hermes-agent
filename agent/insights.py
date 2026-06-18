@@ -19,7 +19,7 @@ import json
 import time
 from collections import Counter, defaultdict
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from agent.usage_pricing import (
     CanonicalUsage,
@@ -908,7 +908,7 @@ class InsightsEngine:
             display_hr = hr % 12 or 12
             lines.append(f"**📅 Busiest:** {act['busiest_day']['day']}s ({act['busiest_day']['count']} sessions), {display_hr}{ampm} ({act['busiest_hour']['count']} sessions)")
             if act.get("active_days"):
-                lines.append(f"**Active days:** {act['active_days']}" )
+                lines.append(f"**Active days:** {act['active_days']}")
             if act.get("max_streak", 0) > 1:
                 lines.append(f"**Best streak:** {act['max_streak']} consecutive days")
 

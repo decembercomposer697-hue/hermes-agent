@@ -111,7 +111,7 @@ def worker_loop(worker_id: int, hermes_home: str, result_file: str) -> None:
         finally:
             conn.close()
 
-    with open(result_file, "w") as f:
+    with Path(result_file).open("w") as f:
         json.dump(events, f)
 
 
@@ -159,10 +159,10 @@ def main():
     # Aggregate worker events.
     all_events = []
     for i, f in enumerate(result_files):
-        if not os.path.isfile(f):
+        if not Path(f).is_file():
             print(f"  WORKER {i} produced no result file — died?")
             continue
-        with open(f) as fh:
+        with Path(f).open() as fh:
             events = json.load(fh)
         all_events.extend(events)
 
@@ -276,7 +276,7 @@ def main():
     print(f"Total completes:   {total_completes}")
     print(f"Lost claim races:  {total_lost_races}  (expected contention; not a bug)")
     print(f"Elapsed:           {elapsed:.2f}s")
-    print(f"Throughput:        {NUM_TASKS/elapsed:.1f} tasks/sec")
+    print(f"Throughput:        {NUM_TASKS / elapsed:.1f} tasks/sec")
     print("Per-worker completions:")
     for w in sorted(per_worker.keys()):
         print(f"  worker-{w}: {per_worker[w]}")

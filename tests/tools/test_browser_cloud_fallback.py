@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 import pytest
 
-import tools.browser_tool as browser_tool
+from tools import browser_tool
 
 
 def _reset_session_state(monkeypatch):

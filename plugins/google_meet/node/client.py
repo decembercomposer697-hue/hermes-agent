@@ -11,7 +11,7 @@ plugin load doesn't require it.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from plugins.google_meet.node import protocol as _proto
 

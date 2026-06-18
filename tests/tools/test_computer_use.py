@@ -6,7 +6,7 @@ import base64
 import json
 import os
 import sys
-from typing import Any, Dict, List
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -239,6 +239,7 @@ class TestDispatch:
         out = handle_computer_use({"action": "set_value"})
         parsed = json.loads(out)
         assert "error" in parsed
+
     def test_capture_after_skipped_when_action_failed(self, noop_backend):
         """capture_after must not fire when res.ok=False (regression guard).
 
@@ -1279,7 +1280,7 @@ class TestCuaDriverSessionReconnect:
     def test_call_tool_reconnects_once_after_closed_resource(self):
         """A daemon restart closes the cached MCP stdio channel; recover once."""
         import threading
-        from typing import Any, cast
+        from typing import cast
 
         from anyio import ClosedResourceError
 
@@ -1299,7 +1300,7 @@ class TestCuaDriverSessionReconnect:
                 return effect
 
         bridge = FakeBridge()
-        session = cast(Any, _CuaDriverSession.__new__(_CuaDriverSession))
+        session = cast("Any", _CuaDriverSession.__new__(_CuaDriverSession))
         session._bridge = bridge
         session._session = object()
         session._exit_stack = None
@@ -1320,7 +1321,7 @@ class TestCuaDriverSessionReconnect:
     def test_call_tool_does_not_retry_on_unrelated_error(self):
         """Non-transport errors must propagate without a reconnect attempt."""
         import threading
-        from typing import Any, cast
+        from typing import cast
 
         from tools.computer_use.cua_backend import _CuaDriverSession
 
@@ -1333,7 +1334,7 @@ class TestCuaDriverSessionReconnect:
                 raise ValueError("boom")
 
         bridge = FakeBridge()
-        session = cast(Any, _CuaDriverSession.__new__(_CuaDriverSession))
+        session = cast("Any", _CuaDriverSession.__new__(_CuaDriverSession))
         session._bridge = bridge
         session._session = object()
         session._exit_stack = None

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import threading
-from typing import FrozenSet, Optional
 
 from agent.credential_pool import CredentialPool, PooledCredential, load_pool
 from hermes_cli.auth import DEFAULT_XAI_OAUTH_BASE_URL

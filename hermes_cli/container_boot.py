@@ -48,6 +48,7 @@ ReconcileActionLabel = Literal["started", "registered", "skipped"]
 @dataclass(frozen=True)
 class ReconcileAction:
     """One profile's outcome from a single reconciliation pass."""
+
     profile: str
     prior_state: str | None
     action: ReconcileActionLabel

@@ -259,11 +259,7 @@ import shutil
 import stat
 import subprocess
 from pathlib import Path
-from typing import Optional
 
-from hermes_cli.subcommands._shared import (
-    add_accept_hooks_flag as _add_accept_hooks_flag,
-)
 from hermes_cli.subcommands.acp import build_acp_parser
 from hermes_cli.subcommands.auth import build_auth_parser
 from hermes_cli.subcommands.backup import build_backup_parser
@@ -346,7 +342,7 @@ def _apply_profile_override() -> None:
             profile_name = argv[i + 1]
             consume = 2
             break
-        elif arg.startswith("--profile="):
+        if arg.startswith("--profile="):
             profile_name = arg.split("=", 1)[1]
             consume = 1
             break
@@ -414,7 +410,7 @@ def _apply_profile_override() -> None:
                     start = i + 1  # +1 because argv is sys.argv[1:]
                     sys.argv = sys.argv[:start] + sys.argv[start + consume :]
                     break
-                elif arg.startswith("--profile="):
+                if arg.startswith("--profile="):
                     start = i + 1
                     sys.argv = sys.argv[:start] + sys.argv[start + 1 :]
                     break
@@ -444,7 +440,7 @@ try:
 
     _cfg_path = get_hermes_home() / "config.yaml"
     if _cfg_path.exists():
-        with open(_cfg_path, encoding="utf-8") as _f:
+        with Path(_cfg_path).open(encoding="utf-8") as _f:
             _early_cfg_raw = _yaml_early.safe_load(_f) or {}
         if "HERMES_REDACT_SECRETS" not in os.environ:
             _early_sec_cfg = _early_cfg_raw.get("security", {})
@@ -504,7 +500,6 @@ from hermes_cli.model_setup_flows import (
     _model_flow_api_key_provider,
     _model_flow_azure_foundry,
     _model_flow_bedrock,
-    _model_flow_bedrock_api_key,
     _model_flow_copilot,
     _model_flow_copilot_acp,
     _model_flow_custom,
@@ -518,7 +513,6 @@ from hermes_cli.model_setup_flows import (
     _model_flow_qwen_oauth,
     _model_flow_stepfun,
     _model_flow_xai_oauth,
-    _prompt_auth_credentials_choice,
 )
 
 logger = logging.getLogger(__name__)
@@ -1090,7 +1084,6 @@ def _exec_in_container(container_info: dict, cli_args: list):
         cli_args: the original CLI arguments (everything after 'hermes')
 
     """
-
     backend = container_info["backend"]
     container_name = container_info["container_name"]
     exec_user = container_info["exec_user"]
@@ -1566,7 +1559,7 @@ def _make_tui_argv(tui_dir: Path, tui_dev: bool) -> tuple[list[str], Path]:
     def _node_bin(bin: str) -> str:
         if bin == "node":
             env_node = os.environ.get("HERMES_NODE")
-            if env_node and os.path.isfile(env_node) and os.access(env_node, os.X_OK):
+            if env_node and Path(env_node).is_file() and os.access(env_node, os.X_OK):
                 return env_node
         path = shutil.which(bin)
         if not path and bin == "node":
@@ -1765,7 +1758,7 @@ def _read_cgroup_memory_limit() -> int | None:
     )
     for path in candidates:
         try:
-            with open(path, encoding="utf-8") as f:
+            with Path(path).open(encoding="utf-8") as f:
                 raw = f.read().strip()
         except (OSError, ValueError):
             continue
@@ -1955,7 +1948,7 @@ def _launch_tui(
             _print_tui_exit_summary(resume_session_id, active_session_file)
     finally:
         try:
-            os.unlink(active_session_file)
+            Path(active_session_file).unlink()
         except OSError:
             pass
         if wt_info:
@@ -4311,7 +4304,7 @@ def _gateway_prompt(prompt_text: str, default: str = "", timeout: float = 300.0)
                 answer = response_path.read_text().strip()
                 response_path.unlink(missing_ok=True)
                 prompt_path.unlink(missing_ok=True)
-                return answer if answer else default
+                return answer or default
             except (OSError, ValueError):
                 pass
         _time.sleep(0.5)
@@ -4347,7 +4340,7 @@ def _web_ui_build_needed(web_dir: Path) -> bool:
         dirnames[:] = [d for d in dirnames if d not in skip]
         for fn in filenames:
             if fn.endswith((".ts", ".tsx", ".js", ".jsx", ".css", ".html", ".vue")):
-                if os.path.getmtime(os.path.join(dirpath, fn)) > dist_mtime:
+                if Path(os.path.join(dirpath, fn)).stat().st_mtime > dist_mtime:
                     return True
     for meta in (
         "package.json",
@@ -4486,7 +4479,7 @@ def _nixos_build_env() -> dict[str, str] | None:
         os_release = Path("/etc/os-release").read_text(encoding="utf-8")
     except OSError:
         return None
-    if not re.search(r"^ID=nixos$", os_release, re.M):
+    if not re.search(r"^ID=nixos$", os_release, re.MULTILINE):
         return None
 
     # python3 already on PATH — nothing to do
@@ -4732,7 +4725,7 @@ def _compute_desktop_content_hash(project_root: Path) -> str:
         h.update(rel.encode())
         h.update(b"\0")
         try:
-            with open(path, "rb") as f:
+            with Path(path).open("rb") as f:
                 for chunk in iter(lambda: f.read(65536), b""):
                     h.update(chunk)
         except OSError:
@@ -4790,9 +4783,8 @@ def _desktop_build_needed(desktop_dir: Path, project_root: Path, *, source_mode:
     if source_mode:
         if not _desktop_dist_exists(desktop_dir):
             return True
-    else:
-        if _desktop_packaged_executable(desktop_dir) is None:
-            return True
+    elif _desktop_packaged_executable(desktop_dir) is None:
+        return True
 
     stamp_file = _desktop_stamp_path()
     if not stamp_file.is_file():
@@ -4821,7 +4813,7 @@ def _write_desktop_build_stamp(project_root: Path, *, source_mode: bool) -> None
     try:
         stamp_file.parent.mkdir(parents=True, exist_ok=True)
         content_hash = _compute_desktop_content_hash(project_root)
-        from datetime import datetime, timezone
+        from datetime import datetime
         stamp_data = {
             "contentHash": content_hash,
             "sourceMode": source_mode,
@@ -5237,7 +5229,7 @@ def cmd_gui(args: argparse.Namespace):
                 print("✗ Desktop GUI build failed")
                 print(f"  Run manually:  cd apps/desktop && npm run {build_script}")
                 if sys.platform == "win32":
-                    print("  If this says \"Access is denied\" on Hermes.exe, close any")
+                    print('  If this says "Access is denied" on Hermes.exe, close any')
                     print("  running Hermes desktop window and retry.")
                 print("  If the log shows Electron download retries, rebuild via a mirror:")
                 print("    ELECTRON_MIRROR=<mirror-base-url> hermes desktop --force-build")
@@ -5507,7 +5499,7 @@ def _print_curator_recent_run_notice() -> None:
 def _format_time_ago(iso_ts: str) -> str:
     """Render an ISO timestamp as `Xh ago` / `Xd ago` / `Xm ago`. Best effort."""
     try:
-        from datetime import datetime, timezone
+        from datetime import datetime
         ts = datetime.fromisoformat(iso_ts.replace("Z", "+00:00"))
         if ts.tzinfo is None:
             ts = ts.replace(tzinfo=UTC)
@@ -5716,11 +5708,11 @@ def _update_via_zip(args):
 
         # GitHub ZIPs extract to hermes-agent-<branch>/
         extracted = os.path.join(tmp_dir, f"hermes-agent-{branch}")
-        if not os.path.isdir(extracted):
+        if not Path(extracted).is_dir():
             # Try to find it
             for d in os.listdir(tmp_dir):
                 candidate = os.path.join(tmp_dir, d)
-                if os.path.isdir(candidate) and d != "__MACOSX":
+                if Path(candidate).is_dir() and d != "__MACOSX":
                     extracted = candidate
                     break
 
@@ -5732,8 +5724,8 @@ def _update_via_zip(args):
                 continue
             src = os.path.join(extracted, item)
             dst = os.path.join(str(PROJECT_ROOT), item)
-            if os.path.isdir(src):
-                if os.path.exists(dst):
+            if Path(src).is_dir():
+                if Path(dst).exists():
                     shutil.rmtree(dst)
                 shutil.copytree(src, dst)
             else:
@@ -5868,7 +5860,7 @@ def _stash_local_changes_if_needed(git_cmd: list[str], cwd: Path) -> str | None:
         print("→ Clearing unmerged index entries from a previous conflict...")
         subprocess.run(git_cmd + ["reset"], cwd=cwd, capture_output=True)
 
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     stash_name = datetime.now(UTC).strftime(
         "hermes-update-autostash-%Y%m%d-%H%M%S",
@@ -6113,12 +6105,10 @@ def _is_fork(origin_url: str | None) -> bool:
         return False
     # Normalize URL for comparison (strip trailing .git if present)
     normalized = origin_url.rstrip("/")
-    if normalized.endswith(".git"):
-        normalized = normalized[:-4]
+    normalized = normalized.removesuffix(".git")
     for official in OFFICIAL_REPO_URLS:
         official_normalized = official.rstrip("/")
-        if official_normalized.endswith(".git"):
-            official_normalized = official_normalized[:-4]
+        official_normalized = official_normalized.removesuffix(".git")
         if normalized == official_normalized:
             return False
     return True
@@ -7111,7 +7101,7 @@ def _verify_core_dependencies_installed(
         return
 
     try:
-        with open(pyproject, "rb") as f:
+        with Path(pyproject).open("rb") as f:
             data = tomllib.load(f)
         raw_deps = data.get("project", {}).get("dependencies", []) or []
     except Exception as e:
@@ -7551,7 +7541,7 @@ def _install_hangup_protection(gateway_mode: bool = False):
         logs_dir = _get_hermes_home() / "logs"
         logs_dir.mkdir(parents=True, exist_ok=True)
         log_path = logs_dir / "update.log"
-        log_file = open(log_path, "a", buffering=1, encoding="utf-8")
+        log_file = Path(log_path).open("a", buffering=1, encoding="utf-8")
 
         import datetime as _dt
 
@@ -7917,8 +7907,8 @@ def _run_pre_update_backup(args) -> None:
 
     print(f"  Saved:    {display_path} ({size_str}, {elapsed:.1f}s)")
     print(f"  Restore:  hermes import {out_path}")
-    print(f"  Disable:  omit --backup (backups are off by default)")
-    print(f"            set updates.pre_update_backup: false in config.yaml")
+    print("  Disable:  omit --backup (backups are off by default)")
+    print("            set updates.pre_update_backup: false in config.yaml")
     print()
 
 
@@ -8219,7 +8209,7 @@ def _cmd_update_impl(args, gateway_mode: bool):
                     "✗ Authentication failed — check your git credentials or SSH key.",
                 )
             else:
-                print(f"✗ Failed to fetch updates from origin.")
+                print("✗ Failed to fetch updates from origin.")
                 if stderr:
                     print(f"  {stderr.splitlines()[0]}")
             sys.exit(1)
@@ -8432,7 +8422,7 @@ def _cmd_update_impl(args, gateway_mode: bool):
                     print(
                         f"  ℹ️  Local changes preserved in stash (ref: {auto_stash_ref})",
                     )
-                    print(f"  Restore manually with: git stash apply")
+                    print("  Restore manually with: git stash apply")
                 elif discard_local_changes:
                     # Non-interactive update + user opted into discarding local
                     # source edits (updates.non_interactive_local_changes:
@@ -9615,7 +9605,7 @@ def cmd_profile(args):
         try:
             set_active_profile(name)
             if name == "default":
-                print(f"Switched to: default (~/.hermes)")
+                print("Switched to: default (~/.hermes)")
             else:
                 print(f"Switched to: {name}")
         except (ValueError, FileNotFoundError) as e:
@@ -9698,9 +9688,9 @@ def cmd_profile(args):
                         if not _is_wrapper_dir_in_path():
                             print(f"\n⚠ {_get_wrapper_dir()} is not in your PATH.")
                             print(
-                                f"  Add to your shell config (~/.bashrc or ~/.zshrc):",
+                                "  Add to your shell config (~/.bashrc or ~/.zshrc):",
                             )
-                            print(f'    export PATH="$HOME/.local/bin:$PATH"')
+                            print('    export PATH="$HOME/.local/bin:$PATH"')
 
             # Profile dir for display
             try:
@@ -9709,7 +9699,7 @@ def cmd_profile(args):
                 profile_dir_display = str(profile_dir)
 
             # Next steps
-            print(f"\nNext steps:")
+            print("\nNext steps:")
             print(f"  {name} setup              Configure API keys and model")
             print(f"  {name} chat               Start chatting")
             print(f"  {name} gateway start      Start the messaging gateway")
@@ -9720,7 +9710,7 @@ def cmd_profile(args):
                 print(
                     f"\n  ⚠ This profile has no API keys yet. Run '{name} setup' first,",
                 )
-                print(f"    or it will inherit keys from your shell environment.")
+                print("    or it will inherit keys from your shell environment.")
                 print(f"  Edit {profile_dir_display}/SOUL.md to customize personality")
             print()
 
@@ -10186,8 +10176,8 @@ def _report_dashboard_status() -> int:
         try:
             if sys.platform != "win32":
                 cmdline_path = f"/proc/{pid}/cmdline"
-                if os.path.exists(cmdline_path):
-                    with open(cmdline_path, "rb") as f:
+                if Path(cmdline_path).exists():
+                    with Path(cmdline_path).open("rb") as f:
                         cmdline = (
                             f.read()
                             .replace(b"\x00", b" ")
@@ -10345,6 +10335,8 @@ def cmd_logs(args):
         since=getattr(args, "since", None),
         component=getattr(args, "component", None),
     )
+
+
 # Top-level subcommands that argparse knows about WITHOUT running plugin
 # discovery.  Used to short-circuit eager plugin imports (which can take
 # 500ms+ pulling in google.cloud.pubsub_v1, aiohttp, grpc, etc.) when the
@@ -10625,7 +10617,7 @@ def _try_termux_fast_cli_launch() -> bool:
         if interactive_prompt:
             # Bare Termux CLI should reach the prompt first and do agent-only
             # discovery on the first submitted turn instead of before input.
-            setattr(args, "compact", True)
+            args.compact = True
             os.environ["HERMES_DEFER_AGENT_STARTUP"] = "1"
             os.environ["HERMES_FAST_STARTUP_BANNER"] = "1"
             if getattr(args, "accept_hooks", False):
@@ -10712,7 +10704,7 @@ def cmd_memory(args):
             )
             return
 
-        print(f"\n  This will permanently erase the following memory files:")
+        print("\n  This will permanently erase the following memory files:")
         for f, desc in existing:
             path = mem_dir / f
             size = path.stat().st_size
@@ -10733,7 +10725,7 @@ def cmd_memory(args):
             print(f"  ✓ Deleted {f} ({desc})")
 
         print(
-            f"\n  Memory reset complete. New sessions will start with a blank slate.",
+            "\n  Memory reset complete. New sessions will start with a blank slate.",
         )
         print(f"  Files were in: {display_hermes_home()}/memories/\n")
     else:
@@ -11526,8 +11518,7 @@ def main():
 
                     sys.stdout.write(line)
                 else:
-                    with open(args.output, "w", encoding="utf-8") as f:
-                        f.write(line)
+                    Path(args.output).write_text(line, encoding="utf-8")
                     print(f"Exported 1 session to {args.output}")
             else:
                 sessions = db.export_all(source=args.source)
@@ -11536,7 +11527,7 @@ def main():
                     for s in sessions:
                         sys.stdout.write(_json.dumps(s, ensure_ascii=False) + "\n")
                 else:
-                    with open(args.output, "w", encoding="utf-8") as f:
+                    with Path(args.output).open("w", encoding="utf-8") as f:
                         for s in sessions:
                             f.write(_json.dumps(s, ensure_ascii=False) + "\n")
                     print(f"Exported {len(sessions)} sessions to {args.output}")
@@ -11546,12 +11537,11 @@ def main():
             if not resolved_session_id:
                 print(f"Session '{args.session_id}' not found.")
                 return
-            if not args.yes:
-                if not _confirm_prompt(
-                    f"Delete session '{resolved_session_id}' and all its messages? [y/N] ",
-                ):
-                    print("Cancelled.")
-                    return
+            if not args.yes and not _confirm_prompt(
+                f"Delete session '{resolved_session_id}' and all its messages? [y/N] ",
+            ):
+                print("Cancelled.")
+                return
             sessions_dir = get_hermes_home() / "sessions"
             if db.delete_session(resolved_session_id, sessions_dir=sessions_dir):
                 print(f"Deleted session '{resolved_session_id}'.")
@@ -11561,12 +11551,11 @@ def main():
         elif action == "prune":
             days = args.older_than
             source_msg = f" from '{args.source}'" if args.source else ""
-            if not args.yes:
-                if not _confirm_prompt(
-                    f"Delete all ended sessions older than {days} days{source_msg}? [y/N] ",
-                ):
-                    print("Cancelled.")
-                    return
+            if not args.yes and not _confirm_prompt(
+                f"Delete all ended sessions older than {days} days{source_msg}? [y/N] ",
+            ):
+                print("Cancelled.")
+                return
             sessions_dir = get_hermes_home() / "sessions"
             count = db.prune_sessions(
                 older_than_days=days, source=args.source, sessions_dir=sessions_dir,
@@ -11614,7 +11603,7 @@ def main():
         elif action == "optimize":
             db_path = db.db_path
             before_mb = (
-                os.path.getsize(db_path) / (1024 * 1024)
+                Path(db_path).stat().st_size / (1024 * 1024)
                 if db_path.exists()
                 else 0.0
             )
@@ -11628,7 +11617,7 @@ def main():
                 db.close()
                 return
             after_mb = (
-                os.path.getsize(db_path) / (1024 * 1024)
+                Path(db_path).stat().st_size / (1024 * 1024)
                 if db_path.exists()
                 else 0.0
             )
@@ -11650,7 +11639,7 @@ def main():
                     print(f"  {src}: {c} sessions")
             db_path = db.db_path
             if db_path.exists():
-                size_mb = os.path.getsize(db_path) / (1024 * 1024)
+                size_mb = Path(db_path).stat().st_size / (1024 * 1024)
                 print(f"Database size: {size_mb:.1f} MB")
 
         else:

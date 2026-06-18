@@ -190,7 +190,6 @@ class TestManagerOAuthProviderMetadata:
         async def fake_parent_flow(self, request):
             if False:
                 yield  # pragma: no cover -- make this an async generator
-            return
 
         manager = MagicMock()
         manager.invalidate_if_disk_changed = AsyncMock(return_value=False)

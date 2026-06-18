@@ -279,7 +279,7 @@ class TestFormatVoiceRecordKeyForStatus:
 class TestStopWithoutStart:
     def test_returns_none_when_no_recording_active(self, monkeypatch):
         """Idempotent no-op: stop before start must not raise or touch state."""
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         monkeypatch.setattr(voice, "_recorder", None)
 
@@ -314,7 +314,7 @@ class TestContinuousAPI:
         assert callable(is_continuous_active)
 
     def test_not_active_by_default(self, monkeypatch):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         # Isolate from any state left behind by other tests in the session.
         monkeypatch.setattr(voice, "_continuous_active", False)
@@ -327,7 +327,7 @@ class TestContinuousAPI:
         """stop_continuous must not raise when no loop is active — the
         gateway's voice.toggle off path calls it unconditionally.
         """
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         monkeypatch.setattr(voice, "_continuous_active", False)
         monkeypatch.setattr(voice, "_continuous_recorder", None)
@@ -341,7 +341,7 @@ class TestContinuousAPI:
         two overlapping capture threads fighting over the microphone when the
         UI double-fires (e.g. both /voice on and Ctrl+B within the same tick).
         """
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         monkeypatch.setattr(voice, "_continuous_active", True)
         called = {"n": 0}
@@ -362,7 +362,7 @@ class TestContinuousAPI:
         assert called["n"] == 0
 
     def test_start_returns_false_while_stopping(self, monkeypatch):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         monkeypatch.setattr(voice, "_continuous_active", False)
         monkeypatch.setattr(voice, "_continuous_stopping", True, raising=False)
@@ -380,7 +380,7 @@ class TestContinuousLoopSimulation:
 
     @pytest.fixture
     def fake_recorder(self, monkeypatch):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         # Reset module state between tests.
         monkeypatch.setattr(voice, "_continuous_active", False)
@@ -433,7 +433,7 @@ class TestContinuousLoopSimulation:
         return rec
 
     def test_loop_auto_restarts_after_transcript(self, fake_recorder, monkeypatch):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         monkeypatch.setattr(
             voice,
@@ -464,7 +464,7 @@ class TestContinuousLoopSimulation:
         voice.stop_continuous()
 
     def test_auto_restart_false_stops_after_first_transcript(self, fake_recorder, monkeypatch):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         monkeypatch.setattr(
             voice,
@@ -491,7 +491,7 @@ class TestContinuousLoopSimulation:
     def test_auto_restart_false_retains_silent_strikes_across_starts(
         self, fake_recorder, monkeypatch,
     ):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         monkeypatch.setattr(
             voice,
@@ -515,7 +515,7 @@ class TestContinuousLoopSimulation:
         assert fake_recorder.start_calls == 3
 
     def test_force_transcribe_stop_delivers_current_buffer(self, fake_recorder, monkeypatch):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         class ImmediateThread:
             def __init__(self, target, daemon=False):
@@ -549,7 +549,7 @@ class TestContinuousLoopSimulation:
     def test_force_transcribe_empty_single_shots_hit_silent_limit(
         self, fake_recorder, monkeypatch,
     ):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         class ImmediateThread:
             def __init__(self, target, daemon=False):
@@ -583,7 +583,7 @@ class TestContinuousLoopSimulation:
     def test_force_transcribe_valid_single_shot_resets_silent_strikes(
         self, fake_recorder, monkeypatch,
     ):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         class ImmediateThread:
             def __init__(self, target, daemon=False):
@@ -618,7 +618,7 @@ class TestContinuousLoopSimulation:
     def test_force_transcribe_stop_failure_cancels_and_clears_stopping(
         self, fake_recorder, monkeypatch,
     ):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         class ImmediateThread:
             def __init__(self, target, daemon=False):
@@ -643,7 +643,7 @@ class TestContinuousLoopSimulation:
         assert voice._continuous_stopping is False
 
     def test_restart_failure_reports_idle(self, fake_recorder, monkeypatch):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         monkeypatch.setattr(
             voice,
@@ -662,7 +662,7 @@ class TestContinuousLoopSimulation:
         assert voice.is_continuous_active() is False
 
     def test_silent_limit_halts_loop_after_three_strikes(self, fake_recorder, monkeypatch):
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         # Transcription returns no speech — fake_recorder.stop() returns the
         # path, but transcribe returns empty text, counting as silence.
@@ -694,7 +694,7 @@ class TestContinuousLoopSimulation:
         """User hits Ctrl+B mid-transcription: the in-flight transcript must
         still fire (it's a real utterance), but the loop must NOT restart.
         """
-        import hermes_cli.voice as voice
+        from hermes_cli import voice
 
         stop_triggered = {"flag": False}
 

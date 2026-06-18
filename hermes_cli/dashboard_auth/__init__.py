@@ -28,15 +28,15 @@ from hermes_cli.dashboard_auth.registry import (
 
 __all__ = [
     "DashboardAuthProvider",
-    "Session",
-    "LoginStart",
     "InvalidCodeError",
     "InvalidCredentialsError",
+    "LoginStart",
     "ProviderError",
     "RefreshExpiredError",
+    "Session",
     "assert_protocol_compliance",
-    "register_provider",
+    "clear_providers",
     "get_provider",
     "list_providers",
-    "clear_providers",
+    "register_provider",
 ]

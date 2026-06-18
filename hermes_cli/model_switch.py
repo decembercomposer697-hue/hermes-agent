@@ -23,7 +23,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass
-from typing import List, NamedTuple, Optional
+from typing import NamedTuple
 
 from agent.models_dev import (
     ModelCapabilities,
@@ -98,6 +98,7 @@ def _check_hermes_model_warning(model_name: str) -> str:
 
 class ModelIdentity(NamedTuple):
     """Vendor slug and family prefix used for catalog resolution."""
+
     vendor: str
     family: str
 
@@ -164,6 +165,7 @@ MODEL_ALIASES: dict[str, ModelIdentity] = {
 
 class DirectAlias(NamedTuple):
     """Exact model mapping that bypasses catalog resolution."""
+
     model: str
     provider: str
     base_url: str
@@ -352,8 +354,7 @@ def _model_sort_key(model_id: str, prefix: str) -> tuple:
     """
     # Strip the prefix (and optional "/" separator for aggregator slugs)
     rest = model_id[len(prefix):]
-    if rest.startswith("/"):
-        rest = rest[1:]
+    rest = rest.removeprefix("/")
     rest = rest.lstrip("-").strip()
 
     # Parse version and suffix from the remainder.
@@ -1336,7 +1337,7 @@ def list_authenticated_providers(
             live = fetch_lmstudio_models(
                 api_key=os.environ.get("LM_API_KEY", ""),
                 base_url=lm_base,
-                timeout=1.5, # Smaller timeout for picker
+                timeout=1.5,  # Smaller timeout for picker
             )
         except AuthError:
             live = []
@@ -1523,7 +1524,7 @@ def list_authenticated_providers(
         elif overlay.auth_type == "aws_sdk":
             try:
                 _ids = cached_provider_model_ids(hermes_slug)
-                model_ids = _ids if _ids else (curated.get(hermes_slug, []) or curated.get(pid, []))
+                model_ids = _ids or (curated.get(hermes_slug, []) or curated.get(pid, []))
             except Exception:
                 model_ids = curated.get(hermes_slug, []) or curated.get(pid, [])
         elif hermes_slug == "nous":
@@ -1645,7 +1646,7 @@ def list_authenticated_providers(
         if _cp_config and getattr(_cp_config, "auth_type", "") == "aws_sdk":
             try:
                 _ids = cached_provider_model_ids(_cp.slug)
-                _cp_model_ids = _ids if _ids else curated.get(_cp.slug, [])
+                _cp_model_ids = _ids or curated.get(_cp.slug, [])
             except Exception:
                 _cp_model_ids = curated.get(_cp.slug, [])
         else:
@@ -1707,11 +1708,7 @@ def list_authenticated_providers(
             # (see hermes_cli/main.py::_save_custom_provider); older
             # configs or hand-edited files may still use a list.
             cfg_models = ep_cfg.get("models", [])
-            if isinstance(cfg_models, dict):
-                for m in cfg_models:
-                    if m and m not in models_list:
-                        models_list.append(m)
-            elif isinstance(cfg_models, list):
+            if isinstance(cfg_models, dict) or isinstance(cfg_models, list):
                 for m in cfg_models:
                     if m and m not in models_list:
                         models_list.append(m)
@@ -1806,9 +1803,7 @@ def list_authenticated_providers(
                 or "",
             ).strip().lower()
             credential_identity = (
-                inline_api_key
-                if inline_api_key
-                else (f"env:{key_env}" if key_env else "")
+                inline_api_key or (f"env:{key_env}" if key_env else "")
             )
 
             # Read discover_models from the entry (same semantics as
@@ -1858,11 +1853,7 @@ def list_authenticated_providers(
                 groups[group_key]["models"].append(default_model)
 
             cfg_models = entry.get("models", {})
-            if isinstance(cfg_models, dict):
-                for m in cfg_models:
-                    if m and m not in groups[group_key]["models"]:
-                        groups[group_key]["models"].append(m)
-            elif isinstance(cfg_models, list):
+            if isinstance(cfg_models, dict) or isinstance(cfg_models, list):
                 for m in cfg_models:
                     if m and m not in groups[group_key]["models"]:
                         groups[group_key]["models"].append(m)

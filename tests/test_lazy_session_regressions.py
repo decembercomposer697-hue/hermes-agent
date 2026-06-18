@@ -140,6 +140,7 @@ class TestSyncSessionKeyAfterAutoCompress:
 
         class _CompressingAgent:
             """Agent that simulates compression-driven session_id rotation."""
+
             def __init__(self):
                 self.session_id = "pre-compress-key"
                 self._cached_system_prompt = ""

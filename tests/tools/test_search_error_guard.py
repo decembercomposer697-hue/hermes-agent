@@ -21,7 +21,7 @@ when exit==2 AND no usable match payload remains.
 These tests drive the real methods through the real local terminal backend.
 """
 
-import os
+import pathlib
 import shutil
 
 import pytest
@@ -54,9 +54,9 @@ def partial_error_tree(tmp_path):
     sub.mkdir()
     locked = sub / "locked.txt"
     locked.write_text("needle in locked\n")
-    os.chmod(locked, 0o000)
+    pathlib.Path(locked).chmod(0o000)
     yield tmp_path
-    os.chmod(locked, 0o755)  # let pytest clean up tmp_path
+    pathlib.Path(locked).chmod(0o755)  # let pytest clean up tmp_path
 
 
 # Run every test once per available backend method.

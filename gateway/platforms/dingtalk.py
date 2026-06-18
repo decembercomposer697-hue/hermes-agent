@@ -32,8 +32,8 @@ import os
 import re
 import traceback
 import uuid
-from datetime import UTC, datetime, timezone
-from typing import Any, Dict, List, Optional, Set
+from datetime import UTC, datetime
+from typing import Any
 
 try:
     import dingtalk_stream
@@ -119,8 +119,7 @@ def check_dingtalk_requirements() -> bool:
     Lazy-installs dingtalk-stream via ``tools.lazy_deps.ensure("platform.dingtalk")``
     on first call if not present.
     """
-    global DINGTALK_STREAM_AVAILABLE, dingtalk_stream, ChatbotMessage, CallbackMessage, AckMessage
-    global HTTPX_AVAILABLE, httpx
+    global DINGTALK_STREAM_AVAILABLE, dingtalk_stream, ChatbotMessage, CallbackMessage, AckMessage, HTTPX_AVAILABLE, httpx
     if not DINGTALK_STREAM_AVAILABLE or not HTTPX_AVAILABLE:
         try:
             from tools.lazy_deps import ensure as _lazy_ensure
@@ -672,7 +671,7 @@ class DingTalkAdapter(BasePlatformAdapter):
             chat_type=chat_type,
             user_id=sender_id,
             user_name=sender_nick,
-            user_id_alt=sender_staff_id if sender_staff_id else None,
+            user_id_alt=sender_staff_id or None,
         )
 
         # Parse timestamp
@@ -932,7 +931,6 @@ class DingTalkAdapter(BasePlatformAdapter):
 
     async def send_typing(self, chat_id: str, metadata=None) -> None:
         """DingTalk does not support typing indicators."""
-        pass
 
     async def send_image(
         self,

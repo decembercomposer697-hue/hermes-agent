@@ -27,8 +27,9 @@ def _gm_load(path):
     ns = dict(globals())
     ns["__name__"] = "_godmode_module"
     ns["__file__"] = str(path)
-    exec(compile(open(path).read(), str(path), "exec"), ns)
+    exec(compile(Path(path).open().read(), str(path), "exec"), ns)
     return ns
+
 
 for _gm_script in ["parseltongue.py", "godmode_race.py", "auto_jailbreak.py"]:
     _gm_path = _gm_scripts_dir / _gm_script

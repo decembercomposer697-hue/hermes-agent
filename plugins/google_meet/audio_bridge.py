@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import platform
 import subprocess
-from typing import Optional
 
 _BLACKHOLE_DEVICE = "BlackHole 2ch"
 
@@ -106,7 +105,7 @@ class AudioBridge:
                     "load-module",
                     "module-null-sink",
                     f"sink_name={sink_name}",
-                    f"sink_properties=device.description=HermesMeetSink",
+                    "sink_properties=device.description=HermesMeetSink",
                 ],
                 check=True,
                 capture_output=True,

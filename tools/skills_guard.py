@@ -25,9 +25,8 @@ import fnmatch
 import hashlib
 import re
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import List, Tuple
 
 # ---------------------------------------------------------------------------
 # Hardcoded trust configuration
@@ -742,7 +741,7 @@ def format_scan_report(result: ScanResult) -> str:
             sev = f.severity.upper().ljust(8)
             cat = f.category.ljust(14)
             loc = f"{f.file}:{f.line}".ljust(30)
-            lines.append(f"  {sev} {cat} {loc} \"{f.match[:60]}\"")
+            lines.append(f'  {sev} {cat} {loc} "{f.match[:60]}"')
 
         lines.append("")
 

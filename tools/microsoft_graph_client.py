@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import os
 from collections.abc import AsyncIterator, Awaitable, Callable
 from pathlib import Path
 from typing import Any
@@ -190,49 +189,48 @@ class MicrosoftGraphClient:
                 async with httpx.AsyncClient(
                     timeout=httpx.Timeout(self.timeout),
                     transport=self._transport,
-                ) as client:
-                    async with client.stream(
-                        "GET",
-                        url,
-                        headers=request_headers,
-                    ) as response:
-                        if response.status_code >= 400:
-                            # Materialize error body so we can surface a meaningful
-                            # message; error bodies are small.
-                            await response.aread()
-                            api_error = self._build_api_error("GET", url, response)
-                            last_error = api_error
+                ) as client, client.stream(
+                    "GET",
+                    url,
+                    headers=request_headers,
+                ) as response:
+                    if response.status_code >= 400:
+                        # Materialize error body so we can surface a meaningful
+                        # message; error bodies are small.
+                        await response.aread()
+                        api_error = self._build_api_error("GET", url, response)
+                        last_error = api_error
 
-                            if (
-                                response.status_code == 401
-                                and attempt < self.max_retries
-                            ):
-                                self.token_provider.clear_cache()
-                                await self._sleep(
-                                    self._retry_delay(response, attempt),
-                                )
-                                attempt += 1
-                                continue
+                        if (
+                            response.status_code == 401
+                            and attempt < self.max_retries
+                        ):
+                            self.token_provider.clear_cache()
+                            await self._sleep(
+                                self._retry_delay(response, attempt),
+                            )
+                            attempt += 1
+                            continue
 
-                            if (
-                                self._should_retry(response)
-                                and attempt < self.max_retries
-                            ):
-                                await self._sleep(
-                                    self._retry_delay(response, attempt),
-                                )
-                                attempt += 1
-                                continue
+                        if (
+                            self._should_retry(response)
+                            and attempt < self.max_retries
+                        ):
+                            await self._sleep(
+                                self._retry_delay(response, attempt),
+                            )
+                            attempt += 1
+                            continue
 
-                            raise api_error
+                        raise api_error
 
-                        content_type = response.headers.get("content-type")
-                        with tmp_target.open("wb") as handle:
-                            async for chunk in response.aiter_bytes(
-                                chunk_size=chunk_size,
-                            ):
-                                if chunk:
-                                    handle.write(chunk)
+                    content_type = response.headers.get("content-type")
+                    with tmp_target.open("wb") as handle:
+                        async for chunk in response.aiter_bytes(
+                            chunk_size=chunk_size,
+                        ):
+                            if chunk:
+                                handle.write(chunk)
             except httpx.HTTPError as exc:
                 last_error = exc
                 tmp_target.unlink(missing_ok=True)
@@ -244,7 +242,7 @@ class MicrosoftGraphClient:
                 attempt += 1
                 continue
 
-            os.replace(tmp_target, target)
+            Path(tmp_target).replace(target)
             return {
                 "path": str(target),
                 "size_bytes": target.stat().st_size,

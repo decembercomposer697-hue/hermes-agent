@@ -5,7 +5,7 @@ from __future__ import annotations
 import base64
 import json
 import time
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 

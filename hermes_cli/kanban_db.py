@@ -87,7 +87,7 @@ from collections.abc import Iterable
 from contextvars import ContextVar, Token
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from toolsets import get_toolset_names
 
@@ -213,10 +213,10 @@ def _resolve_rate_limit_cooldown_seconds() -> int:
 # plenty of headroom. Each constant is tuned independently so users
 # who need to relax one don't have to relax all of them.
 _CTX_MAX_PRIOR_ATTEMPTS = 10      # most recent N prior runs shown in full
-_CTX_MAX_COMMENTS       = 30      # most recent N comments shown in full
-_CTX_MAX_FIELD_BYTES    = 4 * 1024   # 4 KB per summary/error/metadata/result
-_CTX_MAX_BODY_BYTES     = 8 * 1024   # 8 KB per task.body (opening post)
-_CTX_MAX_COMMENT_BYTES  = 2 * 1024   # 2 KB per comment
+_CTX_MAX_COMMENTS = 30      # most recent N comments shown in full
+_CTX_MAX_FIELD_BYTES = 4 * 1024   # 4 KB per summary/error/metadata/result
+_CTX_MAX_BODY_BYTES = 8 * 1024   # 8 KB per task.body (opening post)
+_CTX_MAX_COMMENT_BYTES = 2 * 1024   # 2 KB per comment
 
 
 # ---------------------------------------------------------------------------
@@ -238,6 +238,7 @@ def scoped_current_board(slug: str):
         yield
     finally:
         _CURRENT_BOARD_OVERRIDE.reset(token)
+
 
 # Slug validator: lowercase alphanumerics, digits, hyphens; 1–64 chars.
 # Strict enough to stop traversal (`..`) and embedded path separators, loose
@@ -720,10 +721,9 @@ def remove_board(slug: str, *, archive: bool = True) -> dict:
             suffix += 1
         d.rename(target)
         return {"slug": normed, "action": "archived", "new_path": str(target)}
-    else:
-        import shutil
-        shutil.rmtree(d)
-        return {"slug": normed, "action": "deleted", "new_path": ""}
+    import shutil
+    shutil.rmtree(d)
+    return {"slug": normed, "action": "deleted", "new_path": ""}
 
 
 # ---------------------------------------------------------------------------
@@ -1955,8 +1955,8 @@ def _check_file_length_invariant(conn: sqlite3.Connection) -> None:
             return  # in-memory or unnamed DB; skip
         path = path_str
         page_size = conn.execute("PRAGMA page_size").fetchone()[0]
-        file_size = os.path.getsize(path)
-        with open(path, "rb") as f:
+        file_size = Path(path).stat().st_size
+        with Path(path).open("rb") as f:
             f.seek(28)
             header_bytes = f.read(4)
         if len(header_bytes) < 4:
@@ -2188,7 +2188,7 @@ def create_task(
     # containment guard in ``_cleanup_workspace`` is the safety rail, but
     # we also stop the bad state from being created in the first place.
     if workspace_path is None and workspace_kind in {"dir", "worktree"}:
-        board_slug = board if board else get_current_board()
+        board_slug = board or get_current_board()
         board_meta = read_board_metadata(board_slug)
         board_default = board_meta.get("default_workdir")
         if board_default:
@@ -3492,11 +3492,7 @@ def _verify_created_cards(
             phantom.append(cid)
             continue
         # Accept if any of the three trust conditions holds.
-        if completing_assignee and created_by == completing_assignee:
-            verified.append(cid)
-        elif created_by == completing_task_id:
-            verified.append(cid)
-        elif cid in linked_children:
+        if (completing_assignee and created_by == completing_assignee) or created_by == completing_task_id or cid in linked_children:
             verified.append(cid)
         else:
             phantom.append(cid)
@@ -5049,7 +5045,7 @@ def _pid_alive(pid: int | None) -> bool:
     # where we have a cheap, deterministic process-state probe.
     if sys.platform == "linux":
         try:
-            with open(f"/proc/{int(pid)}/status", encoding="utf-8") as f:
+            with Path(f"/proc/{int(pid)}/status").open(encoding="utf-8") as f:
                 for line in f:
                     if line.startswith("State:"):
                         # "State:\tZ (zombie)" → dead
@@ -6505,7 +6501,7 @@ def _module_hermes_argv() -> list[str]:
 def _absolute_hermes_path(path: str) -> str:
     """Return an absolute filesystem path for a resolved Hermes shim."""
     expanded = os.path.expanduser(path)
-    return expanded if os.path.isabs(expanded) else os.path.abspath(expanded)
+    return expanded if Path(expanded).is_absolute() else os.path.abspath(expanded)
 
 
 def _looks_like_path(value: str) -> bool:
@@ -6513,7 +6509,7 @@ def _looks_like_path(value: str) -> bool:
     expanded = os.path.expanduser(value)
     return (
         expanded.startswith("~")
-        or os.path.isabs(expanded)
+        or Path(expanded).is_absolute()
         or bool(os.path.dirname(expanded))
         or "\\" in expanded
         or bool(re.match(r"^[A-Za-z]:", expanded))
@@ -6549,7 +6545,7 @@ def _safe_which_no_cwd(command: str) -> str | None:
         directory = os.path.expanduser(raw_dir)
         for name in _path_search_names(command):
             candidate = os.path.join(directory, name)
-            if not os.path.isfile(candidate):
+            if not Path(candidate).is_file():
                 continue
             if _IS_WINDOWS or os.access(candidate, os.X_OK):
                 return candidate
@@ -6823,11 +6819,11 @@ def _default_spawn(
     _rotate_worker_log(log_path, rotate_bytes, backup_count)
 
     # Use 'a' so a re-run on unblock appends rather than overwrites.
-    log_f = open(log_path, "ab")
+    log_f = Path(log_path).open("ab")
     try:
         proc = subprocess.Popen(
             cmd,
-            cwd=workspace if os.path.isdir(workspace) else None,
+            cwd=workspace if Path(workspace).is_dir() else None,
             stdin=subprocess.DEVNULL,
             stdout=log_f,
             stderr=subprocess.STDOUT,
@@ -7513,7 +7509,7 @@ def read_worker_log(
         if tail_bytes is None:
             return path.read_text(encoding="utf-8", errors="replace")
         size = path.stat().st_size
-        with open(path, "rb") as f:
+        with Path(path).open("rb") as f:
             if size > tail_bytes:
                 f.seek(size - tail_bytes)
                 # Skip a partial line if we tailed mid-line. But if the
@@ -7628,9 +7624,8 @@ def list_runs(
     """
     if (state_type is None) ^ (state_name is None):
         raise ValueError("state_type and state_name must both be set or both omitted")
-    if state_type is not None:
-        if state_type not in ("status", "outcome"):
-            raise ValueError("state_type must be 'status' or 'outcome'")
+    if state_type is not None and state_type not in ("status", "outcome"):
+        raise ValueError("state_type must be 'status' or 'outcome'")
     q = "SELECT * FROM task_runs WHERE task_id = ?"
     params: list[Any] = [task_id]
     if not include_active:

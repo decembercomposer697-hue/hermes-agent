@@ -15,7 +15,6 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Set
 
 from hermes_cli.colors import Colors, color
 from hermes_cli.config import (
@@ -149,6 +148,7 @@ def _xai_credentials_present() -> bool:
         pass
     return bool(str(os.environ.get("XAI_API_KEY") or "").strip())
 
+
 # Platform-scoped toolsets: only appear in the `hermes tools` checklist for
 # these platforms, and only resolve/save for these platforms.  A toolset
 # absent from this map is available on every platform (current behaviour).
@@ -229,6 +229,7 @@ def _checklist_toolset_keys(platform: str) -> set[str]:
         for ts_key, _, _ in _get_effective_configurable_toolsets()
         if _toolset_allowed_for_platform(ts_key, platform)
     }
+
 
 # Platform display config — derived from the canonical registry so every
 # module shares the same data.  Kept as dict-of-dicts for backward
@@ -808,9 +809,9 @@ def _run_cua_driver_installer(label: str = "Installing", verbose: bool = True) -
     import subprocess
 
     install_cmd = (
-        "/bin/bash -c \"$(curl -fsSL "
+        '/bin/bash -c "$(curl -fsSL '
         "https://raw.githubusercontent.com/trycua/cua/main/"
-        "libs/cua-driver/scripts/install.sh)\""
+        'libs/cua-driver/scripts/install.sh)"'
     )
     if verbose:
         _print_info(f"    {label} cua-driver (macOS background computer-use)...")
@@ -1685,7 +1686,6 @@ def _estimate_tool_tokens() -> dict[str, int]:
 
     try:
         # Trigger full tool discovery (imports all tool modules).
-        import model_tools
         from tools.registry import registry
     except Exception:
         logger.debug("Tool registry unavailable; skipping token estimation")
@@ -3094,12 +3094,11 @@ def _reconfigure_tool(
     for ts_key, ts_label, _ in _get_effective_configurable_toolsets():
         cat = TOOL_CATEGORIES.get(ts_key)
         reqs = TOOLSET_ENV_REQUIREMENTS.get(ts_key)
-        if cat or reqs:
-            if (
-                _toolset_has_keys(ts_key, config, force_fresh=force_fresh)
-                or _toolset_enabled_for_reconfigure(ts_key, config)
-            ):
-                configurable.append((ts_key, ts_label))
+        if (cat or reqs) and (
+            _toolset_has_keys(ts_key, config, force_fresh=force_fresh)
+            or _toolset_enabled_for_reconfigure(ts_key, config)
+        ):
+            configurable.append((ts_key, ts_label))
 
     if not configurable:
         _print_info("No configured tools to reconfigure.")

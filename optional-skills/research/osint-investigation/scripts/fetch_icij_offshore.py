@@ -67,7 +67,7 @@ def _download(dest: Path, force: bool = False) -> Path:
     )
     with urllib.request.urlopen(req, timeout=120) as resp:
         tmp = zip_path.with_suffix(".zip.tmp")
-        with open(tmp, "wb") as fh:
+        with Path(tmp).open("wb") as fh:
             while True:
                 chunk = resp.read(1 << 16)
                 if not chunk:
@@ -175,7 +175,7 @@ def fetch(
                 break
 
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w", newline="", encoding="utf-8") as fh:
+    with Path(out_path).open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=COLUMNS)
         w.writeheader()
         w.writerows(rows)

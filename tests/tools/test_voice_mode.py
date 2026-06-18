@@ -646,7 +646,7 @@ class TestAudioRecorderStop:
         wav_path = recorder.stop()
 
         assert wav_path is not None
-        assert os.path.isfile(wav_path)
+        assert Path(wav_path).is_file()
         assert wav_path.endswith(".wav")
         assert recorder.is_recording is False
 
@@ -812,7 +812,7 @@ class TestTranscribeRecording:
             seen_paths.append(path)
             assert model == "base"
             assert path != str(wav_path)
-            assert os.path.getsize(path) <= 70 * 1024
+            assert Path(path).stat().st_size <= 70 * 1024
             return {
                 "success": True,
                 "transcript": f"part {len(seen_paths)}",
@@ -829,7 +829,7 @@ class TestTranscribeRecording:
         )
         assert result["chunks"] == len(seen_paths)
         assert len(seen_paths) > 1
-        assert all(not os.path.exists(path) for path in seen_paths)
+        assert all(not Path(path).exists() for path in seen_paths)
 
     def test_oversized_wav_reports_failing_chunk(self, tmp_path, monkeypatch):
         wav_path = tmp_path / "long.wav"
@@ -1299,7 +1299,7 @@ class TestContinuousModeFlow:
             results.append(wav_path)
 
         assert all(r is not None for r in results)
-        assert os.path.isfile(results[-1])
+        assert Path(results[-1]).is_file()
 
 
 # ============================================================================

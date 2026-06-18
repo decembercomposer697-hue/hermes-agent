@@ -277,7 +277,7 @@ def secure_parent_dir(path: Path) -> None:
     if parent == Path("/") or len(parent.parts) < 3:
         return
     try:
-        os.chmod(parent, 0o700)
+        Path(parent).chmod(0o700)
     except OSError:
         pass
 
@@ -303,7 +303,7 @@ def get_subprocess_home() -> str | None:
     if not hermes_home:
         return None
     profile_home = os.path.join(hermes_home, "home")
-    if os.path.isdir(profile_home):
+    if Path(profile_home).is_dir():
         return profile_home
     return None
 
@@ -353,7 +353,7 @@ def is_wsl() -> bool:
     if _wsl_detected is not None:
         return _wsl_detected
     try:
-        with open("/proc/version", encoding="utf-8") as f:
+        with Path("/proc/version").open(encoding="utf-8") as f:
             _wsl_detected = "microsoft" in f.read().lower()
     except Exception:
         _wsl_detected = False
@@ -373,14 +373,14 @@ def is_container() -> bool:
     global _container_detected
     if _container_detected is not None:
         return _container_detected
-    if os.path.exists("/.dockerenv"):
+    if Path("/.dockerenv").exists():
         _container_detected = True
         return True
-    if os.path.exists("/run/.containerenv"):
+    if Path("/run/.containerenv").exists():
         _container_detected = True
         return True
     try:
-        with open("/proc/1/cgroup", encoding="utf-8") as f:
+        with Path("/proc/1/cgroup").open(encoding="utf-8") as f:
             cgroup = f.read()
             if "docker" in cgroup or "podman" in cgroup or "/lxc/" in cgroup:
                 _container_detected = True

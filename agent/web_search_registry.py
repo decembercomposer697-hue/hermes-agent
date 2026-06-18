@@ -33,7 +33,6 @@ from __future__ import annotations
 
 import logging
 import threading
-from typing import Dict, List, Optional
 
 from agent.web_search_provider import WebSearchProvider
 

@@ -426,9 +426,8 @@ class TestRunOnMcpLoop:
                 with patch(
                     "agent.async_utils.asyncio.run_coroutine_threadsafe",
                     side_effect=RuntimeError("scheduler down"),
-                ):
-                    with pytest.raises(RuntimeError):
-                        mcp._run_on_mcp_loop(factory)
+                ), pytest.raises(RuntimeError):
+                    mcp._run_on_mcp_loop(factory)
                 gc.collect()
 
         assert created["coro"] is not None
@@ -1613,11 +1612,10 @@ class TestReconnection:
                 self_srv._tools = []
                 self_srv._ready.set()
                 raise ConnectionError("connection dropped")
-            else:
-                # Reconnection succeeds; signal shutdown so run() exits
-                self_srv.session = MagicMock()
-                self_srv._shutdown_event.set()
-                await self_srv._shutdown_event.wait()
+            # Reconnection succeeds; signal shutdown so run() exits
+            self_srv.session = MagicMock()
+            self_srv._shutdown_event.set()
+            await self_srv._shutdown_event.wait()
 
         async def _test():
             nonlocal target_server

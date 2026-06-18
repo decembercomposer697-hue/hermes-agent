@@ -871,7 +871,6 @@ class TestResetBundledSkill:
         read-only tree (r-xr-xr-x dirs + files), as produced by copying a
         Nix-store source. The manifest is re-baselined and bundled re-copied.
         """
-        import os
         import stat
 
         bundled = self._setup_bundled(tmp_path)
@@ -892,10 +891,10 @@ class TestResetBundledSkill:
             stat.S_IRUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP
             | stat.S_IROTH | stat.S_IXOTH
         )
-        os.chmod(sub / "ref.md", stat.S_IREAD)
-        os.chmod(dest / "SKILL.md", stat.S_IREAD)
-        os.chmod(sub, ro_dir)
-        os.chmod(dest, ro_dir)
+        Path(sub / "ref.md").chmod(stat.S_IREAD)
+        Path(dest / "SKILL.md").chmod(stat.S_IREAD)
+        Path(sub).chmod(ro_dir)
+        Path(dest).chmod(ro_dir)
 
         try:
             with self._patches(bundled, skills_dir, manifest_file):
@@ -913,7 +912,7 @@ class TestResetBundledSkill:
             # Restore perms so tmp_path teardown can remove anything left.
             for p in (sub, dest):
                 if p.exists():
-                    os.chmod(p, stat.S_IRWXU)
+                    Path(p).chmod(stat.S_IRWXU)
 
     def test_reset_restore_preserves_manifest_on_rmtree_failure(self, tmp_path):
         """#34972: when the user copy genuinely cannot be removed, the manifest

@@ -25,7 +25,6 @@ import os
 import posixpath
 from contextvars import ContextVar
 from pathlib import Path
-from typing import Dict, List, Optional
 
 from hermes_cli.config import cfg_get
 
@@ -72,7 +71,7 @@ def register_credential_file(
     hermes_home = _resolve_hermes_home()
 
     # Reject absolute paths — they bypass the HERMES_HOME sandbox entirely.
-    if os.path.isabs(relative_path):
+    if Path(relative_path).is_absolute():
         logger.warning(
             "credential_files: rejected absolute path %r (must be relative to HERMES_HOME)",
             relative_path,
@@ -148,7 +147,7 @@ def _load_config_files() -> list[dict[str, str]]:
             for item in cred_files:
                 if isinstance(item, str) and item.strip():
                     rel = item.strip()
-                    if os.path.isabs(rel):
+                    if Path(rel).is_absolute():
                         logger.warning(
                             "credential_files: rejected absolute config path %r", rel,
                         )
@@ -451,5 +450,3 @@ def iter_cache_files(
 def clear_credential_files() -> None:
     """Reset the skill-scoped registry (e.g. on session reset)."""
     _get_registered().clear()
-
-

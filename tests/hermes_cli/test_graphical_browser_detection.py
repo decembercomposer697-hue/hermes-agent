@@ -33,7 +33,6 @@ def _clean_browser_env(monkeypatch):
     """Each test controls DISPLAY / WAYLAND_DISPLAY / BROWSER explicitly."""
     for var in ("DISPLAY", "WAYLAND_DISPLAY", "BROWSER"):
         monkeypatch.delenv(var, raising=False)
-    return
 
 
 def _force_platform_linux(monkeypatch):

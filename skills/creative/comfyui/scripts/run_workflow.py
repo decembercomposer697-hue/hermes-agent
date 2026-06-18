@@ -455,13 +455,13 @@ class ComfyRunner:
 
 def _inline_schema(workflow: dict) -> dict:
     """Generate schema using the sibling extract_schema module."""
-    from extract_schema import extract_schema  # noqa: WPS433
+    from extract_schema import extract_schema
     return extract_schema(workflow)
 
 
 def load_schema(schema_path: str | None, workflow: dict) -> dict:
     if schema_path:
-        with open(schema_path) as f:
+        with Path(schema_path).open() as f:
             return json.load(f)
     return _inline_schema(workflow)
 

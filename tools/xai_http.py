@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Dict
 
 
 def has_xai_credentials() -> bool:

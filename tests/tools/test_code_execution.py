@@ -28,6 +28,8 @@ def _force_local_terminal(monkeypatch):
     ensures each test starts (and ends) with the correct value.
     """
     monkeypatch.setenv("TERMINAL_ENV", "local")
+
+
 import sys
 import threading
 import unittest
@@ -116,7 +118,7 @@ class TestHermesToolsGeneration(unittest.TestCase):
     def test_file_transport_uses_tempfile_fallback_for_rpc_dir(self):
         src = generate_hermes_tools_module(["terminal"], transport="file")
         self.assertIn("import json, os, shlex, tempfile, threading, time", src)
-        self.assertIn("os.path.join(tempfile.gettempdir(), \"hermes_rpc\")", src)
+        self.assertIn('os.path.join(tempfile.gettempdir(), "hermes_rpc")', src)
         self.assertNotIn('os.environ.get("HERMES_RPC_DIR", "/tmp/hermes_rpc")', src)
 
     def test_uds_transport_serializes_concurrent_calls(self):
@@ -255,7 +257,7 @@ print(f"file lines: {r2['total_lines']}")
         The mock dispatcher sleeps briefly to guarantee the requests
         overlap on the socket.
         """
-        code = '''
+        code = """
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from hermes_tools import terminal
@@ -274,7 +276,7 @@ if mismatches:
     print(f"MISMATCH {len(mismatches)}/{N}: {mismatches[:3]}")
 else:
     print(f"OK {N}/{N}")
-'''
+"""
 
         def slow_mock(function_name, function_args, task_id=None, user_task=None):
             import time as _t
@@ -931,13 +933,13 @@ class TestHeadTailTruncation(unittest.TestCase):
 
     def test_large_output_preserves_head_and_tail(self):
         """Output exceeding MAX_STDOUT_BYTES keeps both head and tail."""
-        code = '''
+        code = """
 # Print HEAD marker, then filler, then TAIL marker
 print("HEAD_MARKER_START")
 for i in range(15000):
     print(f"filler_line_{i:06d}_padding_to_fill_buffer")
 print("TAIL_MARKER_END")
-'''
+"""
         result = self._run(code)
         self.assertEqual(result["status"], "success")
         output = result["output"]
@@ -950,10 +952,10 @@ print("TAIL_MARKER_END")
 
     def test_truncation_notice_format(self):
         """Truncation notice includes character counts."""
-        code = '''
+        code = """
 for i in range(15000):
     print(f"padding_line_{i:06d}_xxxxxxxxxxxxxxxxxxxxxxxxxx")
-'''
+"""
         result = self._run(code)
         output = result["output"]
         if "TRUNCATED" in output:

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import logging
 import threading
-from typing import Any, Dict, FrozenSet, Optional
+from typing import Any
 
 from hermes_cli.auth import (
     DEFAULT_NOUS_INFERENCE_URL,

@@ -306,7 +306,7 @@ class TestSaveEnvValueSecure:
 
         env_path = tmp_path / ".env"
         env_path.write_text("EXISTING=value\n")
-        os.chmod(env_path, 0o640)
+        Path(env_path).chmod(0o640)
 
         with patch.dict(os.environ, {"HERMES_HOME": str(tmp_path)}):
             save_env_value("TENOR_API_KEY", "sk-test-secret")
@@ -369,7 +369,7 @@ class TestRemoveEnvValue:
 
         env_path = tmp_path / ".env"
         env_path.write_text("KEEP=value\nDROP=gone\n")
-        os.chmod(env_path, 0o640)
+        Path(env_path).chmod(0o640)
 
         with patch.dict(os.environ, {"HERMES_HOME": str(tmp_path), "DROP": "gone"}):
             removed = remove_env_value("DROP")
@@ -433,7 +433,7 @@ class TestSaveConfigAtomicity:
 
             # Read raw YAML to verify it's valid and correct
             config_path = tmp_path / "config.yaml"
-            with open(config_path) as f:
+            with Path(config_path).open() as f:
                 raw = yaml.safe_load(f)
             assert raw["model"] == "test/atomic-model"
             assert raw["agent"]["max_turns"] == 77
@@ -616,8 +616,8 @@ class TestConfigMigrationSecretPrompts:
 
         monkeypatch.setattr(cfg_mod, "sanitize_env_file", lambda: 0)
         monkeypatch.setattr(cfg_mod, "check_config_version", lambda: (999, 999))
-        monkeypatch.setattr(cfg_mod, "get_missing_config_fields", lambda: [])
-        monkeypatch.setattr(cfg_mod, "get_missing_skill_config_vars", lambda: [])
+        monkeypatch.setattr(cfg_mod, "get_missing_config_fields", list)
+        monkeypatch.setattr(cfg_mod, "get_missing_skill_config_vars", list)
         monkeypatch.setattr(
             cfg_mod,
             "get_missing_env_vars",

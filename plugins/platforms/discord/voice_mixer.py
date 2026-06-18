@@ -44,7 +44,7 @@ the mixer's output cannot echo back into transcription.
 
 import logging
 import threading
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # numpy is an optional ("voice" extra) dep — never import at runtime top-level
     import numpy as np
@@ -64,6 +64,7 @@ def _require_numpy():
     import numpy as np
     return np
 
+
 # Discord-native frame geometry (matches discord.opus.Encoder).
 SAMPLE_RATE = 48000
 CHANNELS = 2
@@ -82,8 +83,15 @@ class MixerChild:
     """
 
     __slots__ = (
-        "name", "_pcm", "_pos", "loop", "gain",
-        "is_speech", "fade_frames", "_fade_done", "_finished",
+        "_fade_done",
+        "_finished",
+        "_pcm",
+        "_pos",
+        "fade_frames",
+        "gain",
+        "is_speech",
+        "loop",
+        "name",
     )
 
     def __init__(

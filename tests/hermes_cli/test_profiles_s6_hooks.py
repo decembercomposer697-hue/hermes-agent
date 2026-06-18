@@ -25,6 +25,7 @@ from hermes_cli.profiles import (
 
 class _HostManager:
     """Mimics a host backend that doesn't support runtime registration."""
+
     kind = "systemd"
 
     def supports_runtime_registration(self) -> bool:
@@ -39,6 +40,7 @@ class _HostManager:
 
 class _S6Manager:
     """Mimics S6ServiceManager just enough for the hooks."""
+
     kind = "s6"
 
     def __init__(self) -> None:

@@ -66,9 +66,9 @@ import time
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 try:
     import fcntl  # POSIX only; Windows falls back to best-effort without flock.
@@ -119,7 +119,7 @@ class ShellHookSpec:
         # to match "terminal" without any diagnostic.
         if isinstance(self.matcher, str):
             stripped = self.matcher.strip()
-            self.matcher = stripped if stripped else None
+            self.matcher = stripped or None
         if self.matcher:
             try:
                 self.compiled_matcher = re.compile(self.matcher)
@@ -194,18 +194,17 @@ def register_from_config(
                 continue
             already_allowlisted = _is_allowlisted(spec.event, spec.command)
 
-        if not already_allowlisted:
-            if not _prompt_and_record(
-                spec.event, spec.command, accept_hooks=effective_accept,
-            ):
-                logger.warning(
-                    "shell hook for %s (%s) not allowlisted — skipped. "
-                    "Use --accept-hooks / HERMES_ACCEPT_HOOKS=1 / "
-                    "hooks_auto_accept: true, or approve at the TTY "
-                    "prompt next run.",
-                    spec.event, spec.command,
-                )
-                continue
+        if not already_allowlisted and not _prompt_and_record(
+            spec.event, spec.command, accept_hooks=effective_accept,
+        ):
+            logger.warning(
+                "shell hook for %s (%s) not allowlisted — skipped. "
+                "Use --accept-hooks / HERMES_ACCEPT_HOOKS=1 / "
+                "hooks_auto_accept: true, or approve at the TTY "
+                "prompt next run.",
+                spec.event, spec.command,
+            )
+            continue
 
         with _registered_lock:
             if key in _registered:
@@ -583,7 +582,7 @@ def save_allowlist(data: dict[str, Any]) -> None:
             atomic_replace(tmp_path, p)
         except Exception:
             try:
-                os.unlink(tmp_path)
+                Path(tmp_path).unlink()
             except OSError:
                 pass
             raise
@@ -628,7 +627,7 @@ def _locked_update_approvals() -> Iterator[dict[str, Any]]:
             save_allowlist(data)
         return
 
-    with open(lock_path, "a+", encoding="utf-8") as lock_fh:
+    with Path(lock_path).open("a+", encoding="utf-8") as lock_fh:
         fcntl.flock(lock_fh.fileno(), fcntl.LOCK_EX)
         try:
             data = load_allowlist()
@@ -802,7 +801,7 @@ def script_mtime_iso(command: str) -> str | None:
     try:
         expanded = os.path.expanduser(path)
         return datetime.fromtimestamp(
-            os.path.getmtime(expanded), tz=UTC,
+            Path(expanded).stat().st_mtime, tz=UTC,
         ).isoformat().replace("+00:00", "Z")
     except OSError:
         return None
@@ -821,7 +820,7 @@ def script_is_executable(command: str) -> bool:
     if not path:
         return False
     expanded = os.path.expanduser(path)
-    if not os.path.isfile(expanded):
+    if not Path(expanded).is_file():
         return False
     try:
         argv = shlex.split(command)

@@ -7,10 +7,10 @@ import json
 import os
 import threading
 from copy import deepcopy
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Any, Dict, Optional
+from typing import Any
 
 from hermes_constants import get_hermes_home
 

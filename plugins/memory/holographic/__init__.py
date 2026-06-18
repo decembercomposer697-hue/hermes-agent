@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
+import pathlib
 import re
 from typing import Any, Dict, List
 
@@ -102,7 +103,7 @@ def _load_plugin_config() -> dict:
         return {}
     try:
         import yaml
-        with open(config_path, encoding="utf-8-sig") as f:
+        with pathlib.Path(config_path).open(encoding="utf-8-sig") as f:
             all_config = yaml.safe_load(f) or {}
         return cfg_get(all_config, "plugins", "hermes-memory-store", default={}) or {}
     except Exception:
@@ -137,11 +138,11 @@ class HolographicMemoryProvider(MemoryProvider):
             import yaml
             existing = {}
             if config_path.exists():
-                with open(config_path, encoding="utf-8-sig") as f:
+                with Path(config_path).open(encoding="utf-8-sig") as f:
                     existing = yaml.safe_load(f) or {}
             existing.setdefault("plugins", {})
             existing["plugins"]["hermes-memory-store"] = values
-            with open(config_path, "w", encoding="utf-8") as f:
+            with Path(config_path).open("w", encoding="utf-8") as f:
                 yaml.dump(existing, f, default_flow_style=False)
         except Exception:
             pass
@@ -231,7 +232,7 @@ class HolographicMemoryProvider(MemoryProvider):
     def handle_tool_call(self, tool_name: str, args: dict[str, Any], **kwargs) -> str:
         if tool_name == "fact_store":
             return self._handle_fact_store(args)
-        elif tool_name == "fact_feedback":
+        if tool_name == "fact_feedback":
             return self._handle_fact_feedback(args)
         return tool_error(f"Unknown tool: {tool_name}")
 
@@ -271,7 +272,7 @@ class HolographicMemoryProvider(MemoryProvider):
                 )
                 return json.dumps({"fact_id": fact_id, "status": "added"})
 
-            elif action == "search":
+            if action == "search":
                 results = retriever.search(
                     args["query"],
                     category=args.get("category"),
@@ -280,7 +281,7 @@ class HolographicMemoryProvider(MemoryProvider):
                 )
                 return json.dumps({"results": results, "count": len(results)})
 
-            elif action == "probe":
+            if action == "probe":
                 results = retriever.probe(
                     args["entity"],
                     category=args.get("category"),
@@ -288,7 +289,7 @@ class HolographicMemoryProvider(MemoryProvider):
                 )
                 return json.dumps({"results": results, "count": len(results)})
 
-            elif action == "related":
+            if action == "related":
                 results = retriever.related(
                     args["entity"],
                     category=args.get("category"),
@@ -296,7 +297,7 @@ class HolographicMemoryProvider(MemoryProvider):
                 )
                 return json.dumps({"results": results, "count": len(results)})
 
-            elif action == "reason":
+            if action == "reason":
                 entities = args.get("entities", [])
                 if not entities:
                     return tool_error("reason requires 'entities' list")
@@ -307,14 +308,14 @@ class HolographicMemoryProvider(MemoryProvider):
                 )
                 return json.dumps({"results": results, "count": len(results)})
 
-            elif action == "contradict":
+            if action == "contradict":
                 results = retriever.contradict(
                     category=args.get("category"),
                     limit=int(args.get("limit", 10)),
                 )
                 return json.dumps({"results": results, "count": len(results)})
 
-            elif action == "update":
+            if action == "update":
                 updated = store.update_fact(
                     int(args["fact_id"]),
                     content=args.get("content"),
@@ -324,11 +325,11 @@ class HolographicMemoryProvider(MemoryProvider):
                 )
                 return json.dumps({"updated": updated})
 
-            elif action == "remove":
+            if action == "remove":
                 removed = store.remove_fact(int(args["fact_id"]))
                 return json.dumps({"removed": removed})
 
-            elif action == "list":
+            if action == "list":
                 facts = store.list_facts(
                     category=args.get("category"),
                     min_trust=float(args.get("min_trust", 0.0)),
@@ -336,8 +337,7 @@ class HolographicMemoryProvider(MemoryProvider):
                 )
                 return json.dumps({"facts": facts, "count": len(facts)})
 
-            else:
-                return tool_error(f"Unknown action: {action}")
+            return tool_error(f"Unknown action: {action}")
 
         except KeyError as exc:
             return tool_error(f"Missing required argument: {exc}")

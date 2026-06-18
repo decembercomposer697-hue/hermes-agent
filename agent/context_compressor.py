@@ -21,7 +21,7 @@ import json
 import logging
 import re
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from agent.auxiliary_client import _is_connection_error, call_llm
 from agent.context_engine import ContextEngine
@@ -1121,7 +1121,7 @@ class ContextCompressor(ContextEngine):
                 if re.search(
                     r"\b(error|failed|exception|traceback|timeout|timed out|fatal)\b",
                     text,
-                    re.I,
+                    re.IGNORECASE,
                 ):
                     blockers.append(text[:500])
 
@@ -1956,7 +1956,7 @@ The user has requested that this compaction PRIORITISE preserving all informatio
                 )
             return messages
 
-        display_tokens = current_tokens if current_tokens else self.last_prompt_tokens or estimate_messages_tokens_rough(messages)
+        display_tokens = current_tokens or self.last_prompt_tokens or estimate_messages_tokens_rough(messages)
 
         # Phase 1: Prune old tool results (cheap, no LLM call)
         messages, pruned_count = self._prune_old_tool_results(

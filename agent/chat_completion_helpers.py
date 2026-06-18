@@ -23,7 +23,7 @@ import threading
 import time
 import uuid
 from types import SimpleNamespace
-from typing import Any, Dict, Optional
+from typing import Any
 
 from agent.error_classifier import FailoverReason
 from agent.message_sanitization import (
@@ -1529,8 +1529,8 @@ def handle_max_iterations(agent, messages: list, api_call_count: int) -> str:
                 final_response = "I reached the iteration limit and couldn't generate a summary."
 
     except Exception as e:
-        logger.warning(f"Failed to get summary response: {e}")
-        final_response = f"I reached the maximum iterations ({agent.max_iterations}) but couldn't summarize. Error: {str(e)}"
+        logger.warning("Failed to get summary response: %s", e)
+        final_response = f"I reached the maximum iterations ({agent.max_iterations}) but couldn't summarize. Error: {e!s}"
 
     return final_response
 
@@ -1550,19 +1550,18 @@ def cleanup_task_resources(agent, task_id: str) -> None:
         if is_persistent_env(task_id):
             if agent.verbose_logging:
                 logging.debug(
-                    f"Skipping per-turn cleanup_vm for persistent env {task_id}; "
-                    f"idle reaper will handle it.",
+                    "Skipping per-turn cleanup_vm for persistent env %s; idle reaper will handle it.", task_id,
                 )
         else:
             _ra().cleanup_vm(task_id)
     except Exception as e:
         if agent.verbose_logging:
-            logger.warning(f"Failed to cleanup VM for task {task_id}: {e}")
+            logger.warning("Failed to cleanup VM for task %s: %s", task_id, e)
     try:
         _ra().cleanup_browser(task_id)
     except Exception as e:
         if agent.verbose_logging:
-            logger.warning(f"Failed to cleanup browser for task {task_id}: {e}")
+            logger.warning("Failed to cleanup browser for task %s: %s", task_id, e)
 
 
 def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=None):
@@ -2622,11 +2621,11 @@ def interruptible_streaming_api_call(agent, api_kwargs: dict, *, on_first_delta=
 
 
 __all__ = [
-    "interruptible_api_call",
     "build_api_kwargs",
     "build_assistant_message",
-    "try_activate_fallback",
-    "handle_max_iterations",
     "cleanup_task_resources",
+    "handle_max_iterations",
+    "interruptible_api_call",
     "interruptible_streaming_api_call",
+    "try_activate_fallback",
 ]

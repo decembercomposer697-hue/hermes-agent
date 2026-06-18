@@ -23,9 +23,9 @@ def fetch(name):
 
 
 def check(p):
-    mw,logp,hbd,hba,rot,tpsa = float(p.get("MolecularWeight",0)),float(p.get("XLogP",0)),int(p.get("HBondDonorCount",0)),int(p.get("HBondAcceptorCount",0)),int(p.get("RotatableBondCount",0)),float(p.get("TPSA",0))
-    v = sum([mw>500,logp>5,hbd>5,hba>10])
-    return dict(mw=mw,logp=logp,hbd=hbd,hba=hba,rot=rot,tpsa=tpsa,violations=v,ro5=v<=1,veber=tpsa<=140 and rot<=10,ok=v<=1 and tpsa<=140 and rot<=10)
+    mw, logp, hbd, hba, rot, tpsa = float(p.get("MolecularWeight", 0)), float(p.get("XLogP", 0)), int(p.get("HBondDonorCount", 0)), int(p.get("HBondAcceptorCount", 0)), int(p.get("RotatableBondCount", 0)), float(p.get("TPSA", 0))
+    v = sum([mw > 500, logp > 5, hbd > 5, hba > 10])
+    return dict(mw=mw, logp=logp, hbd=hbd, hba=hba, rot=rot, tpsa=tpsa, violations=v, ro5=v <= 1, veber=tpsa <= 140 and rot <= 10, ok=v <= 1 and tpsa <= 140 and rot <= 10)
 
 
 def report(name, r):
@@ -36,8 +36,8 @@ def report(name, r):
 
 
 def main():
-    compounds = sys.stdin.read().splitlines() if len(sys.argv)<2 or sys.argv[1]=="-" else sys.argv[1:]
-    print(f"\n{'Status':<8} {'Compound':<30} Properties\n" + "-"*85)
+    compounds = sys.stdin.read().splitlines() if len(sys.argv) < 2 or sys.argv[1] == "-" else sys.argv[1:]
+    print(f"\n{'Status':<8} {'Compound':<30} Properties\n" + "-" * 85)
     passed = 0
     for name in compounds:
         props = fetch(name.strip())
@@ -46,5 +46,6 @@ def main():
         if result and result["ok"]: passed += 1
         time.sleep(0.3)
     print(f"\nSummary: {passed}/{len(compounds)} passed Ro5 + Veber.\n")
+
 
 if __name__ == "__main__": main()

@@ -19,7 +19,7 @@ import secrets
 import stat
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from urllib.parse import urlparse
 
 from hermes_constants import get_hermes_home
@@ -52,6 +52,7 @@ def _get_anthropic_sdk():
         except ImportError:
             _anthropic_sdk = None
     return _anthropic_sdk
+
 
 logger = logging.getLogger(__name__)
 
@@ -778,7 +779,7 @@ def build_anthropic_client(
         kwargs["api_key"] = api_key
         kwargs["default_headers"] = {
             "User-Agent": "claude-code/0.1.0",
-            **( {"anthropic-beta": ",".join(common_betas)} if common_betas else {} ),
+            **({"anthropic-beta": ",".join(common_betas)} if common_betas else {}),
         }
     elif _requires_bearer_auth(normalized_base_url):
         # Some Anthropic-compatible providers (e.g. MiniMax) expect the API key in
@@ -1109,7 +1110,7 @@ def _write_claude_code_credentials(
                 json.dump(existing, fh, indent=2)
                 fh.flush()
                 os.fsync(fh.fileno())
-            os.replace(_tmp_cred, cred_path)
+            Path(_tmp_cred).replace(cred_path)
         except OSError:
             try:
                 _tmp_cred.unlink(missing_ok=True)
@@ -1931,10 +1932,9 @@ def _convert_user_message(content: Any) -> dict[str, Any]:
         ):
             converted_blocks = [{"type": "text", "text": "(empty message)"}]
         return {"role": "user", "content": converted_blocks}
-    else:
-        if not content or (isinstance(content, str) and not content.strip()):
-            content = "(empty message)"
-        return {"role": "user", "content": content}
+    if not content or (isinstance(content, str) and not content.strip()):
+        content = "(empty message)"
+    return {"role": "user", "content": content}
 
 
 def _strip_orphaned_tool_blocks(result: list[dict[str, Any]]) -> None:

@@ -28,7 +28,7 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from agent.tool_result_classification import (
     FILE_MUTATING_TOOL_NAMES as _FILE_MUTATING_TOOLS,
@@ -398,20 +398,20 @@ def _maybe_wrap_untrusted(name: str, content: Any) -> Any:
 
 
 __all__ = [
+    "_DESTRUCTIVE_PATTERNS",
     "_NEVER_PARALLEL_TOOLS",
     "_PARALLEL_SAFE_TOOLS",
     "_PATH_SCOPED_TOOLS",
-    "_DESTRUCTIVE_PATTERNS",
     "_REDIRECT_OVERWRITE",
-    "_is_destructive_command",
-    "_should_parallelize_tool_batch",
+    "_append_subdir_hint_to_multimodal",
+    "_extract_error_preview",
+    "_extract_file_mutation_targets",
     "_extract_parallel_scope_path",
-    "_paths_overlap",
+    "_is_destructive_command",
     "_is_multimodal_tool_result",
     "_multimodal_text_summary",
-    "_append_subdir_hint_to_multimodal",
-    "_extract_file_mutation_targets",
-    "_extract_error_preview",
+    "_paths_overlap",
+    "_should_parallelize_tool_batch",
     "_trajectory_normalize_msg",
     "make_tool_result_message",
 ]

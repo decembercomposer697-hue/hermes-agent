@@ -14,7 +14,7 @@ which misled users into thinking consolidated skills had been pruned.
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -564,7 +564,6 @@ def test_reconcile_model_block_visible_in_full_report(curator_env):
     """End-to-end: LLM final response with the YAML block → reasons in REPORT.md."""
     import json as _json
     from datetime import datetime as _dt
-    from datetime import timezone as _tz
 
     start = _dt.now(UTC)
     before = [

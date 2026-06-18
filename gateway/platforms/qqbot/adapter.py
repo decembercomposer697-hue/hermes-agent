@@ -39,9 +39,9 @@ import os
 import time
 import uuid
 from collections.abc import Awaitable, Callable
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from urllib.parse import urlparse
 
 try:
@@ -1719,7 +1719,7 @@ class QQAdapter(BasePlatformAdapter):
                 # Image: download and cache locally.
                 try:
                     cached_path = await self._download_and_cache(url, ct, filename)
-                    if cached_path and os.path.isfile(cached_path):
+                    if cached_path and Path(cached_path).is_file():
                         image_urls.append(cached_path)
                         image_media_types.append(ct or "image/jpeg")
                     elif cached_path:
@@ -1784,17 +1784,16 @@ class QQAdapter(BasePlatformAdapter):
         if content_type.startswith("image/"):
             ext = mimetypes.guess_extension(content_type) or ".jpg"
             return cache_image_from_bytes(data, ext)
-        elif content_type == "voice" or content_type.startswith("audio/"):
+        if content_type == "voice" or content_type.startswith("audio/"):
             # QQ voice messages are typically .amr or .silk format.
             # Convert to .wav using ffmpeg so STT engines can process it.
             return await self._convert_audio_to_wav(data, url)
-        else:
-            filename = (
-                original_name
-                or Path(urlparse(url).path).name
-                or "qq_attachment"
-            )
-            return cache_document_from_bytes(data, filename)
+        filename = (
+            original_name
+            or Path(urlparse(url).path).name
+            or "qq_attachment"
+        )
+        return cache_document_from_bytes(data, filename)
 
     @staticmethod
     def _is_voice_content_type(content_type: str, filename: str) -> bool:
@@ -1935,7 +1934,7 @@ class QQAdapter(BasePlatformAdapter):
 
             # 5. Cleanup temp file
             try:
-                os.unlink(wav_path)
+                Path(wav_path).unlink()
             except OSError:
                 pass
 
@@ -1997,7 +1996,7 @@ class QQAdapter(BasePlatformAdapter):
 
         # Cleanup source file
         try:
-            os.unlink(src_path)
+            Path(src_path).unlink()
         except OSError:
             pass
 
@@ -2076,7 +2075,7 @@ class QQAdapter(BasePlatformAdapter):
             logger.debug("[%s] pilk .silk conversion failed: %s", self._log_tag, exc)
         finally:
             try:
-                os.unlink(silk_path)
+                Path(silk_path).unlink()
             except OSError:
                 pass
 
@@ -2222,7 +2221,7 @@ class QQAdapter(BasePlatformAdapter):
         model = stt_cfg["model"]
 
         try:
-            with open(wav_path, "rb") as f:
+            with Path(wav_path).open("rb") as f:
                 resp = await self._http_client.post(
                     f"{base_url}/audio/transcriptions",
                     headers={"Authorization": f"Bearer {api_key}"},
@@ -2301,14 +2300,14 @@ class QQAdapter(BasePlatformAdapter):
             return cache_document_from_bytes(audio_data, f"qq_voice{ext}")
         finally:
             try:
-                os.unlink(src_path)
+                Path(src_path).unlink()
             except OSError:
                 pass
 
         # Verify output and cache
         try:
             wav_data = Path(wav_path).read_bytes()
-            os.unlink(wav_path)
+            Path(wav_path).unlink()
             return cache_document_from_bytes(wav_data, "qq_voice.wav")
         except Exception as exc:
             logger.debug("[%s] Failed to read converted wav: %s", self._log_tag, exc)
@@ -2441,9 +2440,8 @@ class QQAdapter(BasePlatformAdapter):
         """
         del metadata
 
-        if not self.is_connected:
-            if not await self._wait_for_reconnection():
-                return SendResult(success=False, error="Not connected", retryable=True)
+        if not self.is_connected and not await self._wait_for_reconnection():
+            return SendResult(success=False, error="Not connected", retryable=True)
 
         if not content or not content.strip():
             return SendResult(success=True)
@@ -2474,14 +2472,13 @@ class QQAdapter(BasePlatformAdapter):
             try:
                 if chat_type == "c2c":
                     return await self._send_c2c_text(chat_id, content, reply_to)
-                elif chat_type == "group":
+                if chat_type == "group":
                     return await self._send_group_text(chat_id, content, reply_to)
-                elif chat_type == "guild":
+                if chat_type == "guild":
                     return await self._send_guild_text(chat_id, content, reply_to)
-                else:
-                    return SendResult(
-                        success=False, error=f"Unknown chat type for {chat_id}",
-                    )
+                return SendResult(
+                    success=False, error=f"Unknown chat type for {chat_id}",
+                )
             except Exception as exc:
                 last_exc = exc
                 err = str(exc).lower()
@@ -2589,11 +2586,10 @@ class QQAdapter(BasePlatformAdapter):
         Guild (channel) chats don't support inline keyboards; returns a
         non-retryable failure for those.
         """
-        if not self.is_connected:
-            if not await self._wait_for_reconnection():
-                return SendResult(
-                    success=False, error="Not connected", retryable=True,
-                )
+        if not self.is_connected and not await self._wait_for_reconnection():
+            return SendResult(
+                success=False, error="Not connected", retryable=True,
+            )
 
         chat_type = self._guess_chat_type(chat_id)
         formatted = self.format_message(content)
@@ -2677,7 +2673,7 @@ class QQAdapter(BasePlatformAdapter):
 
         req = ApprovalRequest(
             session_key=session_key,
-            title=f"Execute this command?",
+            title="Execute this command?",
             description=description,
             command_preview=command,
             timeout_sec=self._APPROVAL_TIMEOUT_SECONDS,
@@ -2858,9 +2854,8 @@ class QQAdapter(BasePlatformAdapter):
           complete). Handles files up to the platform's ~100 MB per-file
           limit without the ~10 MB inline-base64 cap of the old adapter.
         """
-        if not self.is_connected:
-            if not await self._wait_for_reconnection():
-                return SendResult(success=False, error="Not connected", retryable=True)
+        if not self.is_connected and not await self._wait_for_reconnection():
+            return SendResult(success=False, error="Not connected", retryable=True)
 
         chat_type = self._guess_chat_type(chat_id)
         if chat_type == "guild":

@@ -8,6 +8,7 @@ model / API quota / browser pool from being overwhelmed by a fan-out.
 from __future__ import annotations
 
 import os
+import pathlib
 import sys
 import tempfile
 
@@ -19,7 +20,7 @@ def isolated_kanban_home_with_profiles(monkeypatch):
     """Spin up a fresh HERMES_HOME with kanban DB + alpha/beta profiles."""
     test_home = tempfile.mkdtemp(prefix="kanban_per_profile_cap_test_")
     for prof in ("alpha", "beta", "default"):
-        os.makedirs(os.path.join(test_home, "profiles", prof), exist_ok=True)
+        pathlib.Path(os.path.join(test_home, "profiles", prof)).mkdir(exist_ok=True, parents=True)
     monkeypatch.setenv("HERMES_HOME", test_home)
     for mod in list(sys.modules.keys()):
         if mod.startswith("hermes_cli") or mod.startswith("hermes_state") or mod == "hermes_constants":
@@ -143,12 +144,11 @@ def test_capped_tasks_dispatched_on_subsequent_tick(isolated_kanban_home_with_pr
     # Simulate the running task completing — set it back to done so the
     # 'running' count drops
     spawned_id = res1.spawned[0][0]
-    with kb.connect_closing() as conn:
-        with kb.write_txn(conn):
-            conn.execute(
-                "UPDATE tasks SET status = 'done', claim_lock = NULL WHERE id = ?",
-                (spawned_id,),
-            )
+    with kb.connect_closing() as conn, kb.write_txn(conn):
+        conn.execute(
+            "UPDATE tasks SET status = 'done', claim_lock = NULL WHERE id = ?",
+            (spawned_id,),
+        )
 
     # Second tick: 1 more alpha should now dispatch
     with kb.connect_closing() as conn:

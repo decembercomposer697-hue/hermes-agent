@@ -168,9 +168,8 @@ def main() -> int:
         if fix_mode:
             print("\nAdd stdin=subprocess.DEVNULL to each call above.")
         return 1
-    else:
-        print("✅ All TUI-context subprocess calls have explicit stdin=")
-        return 0
+    print("✅ All TUI-context subprocess calls have explicit stdin=")
+    return 0
 
 
 if __name__ == "__main__":

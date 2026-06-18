@@ -7,7 +7,7 @@ tests run fully offline and the curator module doesn't need real credentials.
 from __future__ import annotations
 
 import importlib
-from datetime import UTC, datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -23,14 +23,14 @@ def curator_env(tmp_path, monkeypatch):
 
     import tools.skill_usage as usage
     importlib.reload(usage)
-    import agent.curator as curator
+    from agent import curator
     importlib.reload(curator)
 
     # Neutralize the real LLM pass by default — tests opt in per-case.
     monkeypatch.setattr(curator, "_run_llm_review", lambda prompt: "llm-stub")
 
     # Default: no config file → curator defaults. Tests can override.
-    monkeypatch.setattr(curator, "_load_config", lambda: {})
+    monkeypatch.setattr(curator, "_load_config", dict)
     # Pin prune_builtins OFF by default so transition tests don't pick up
     # built-ins unless they explicitly enable it. Both config-reading paths
     # are pinned (curator reads via _load_config; skill_usage reads config

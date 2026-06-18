@@ -13,6 +13,7 @@ sys.path = [p for p in sys.path if p not in {"", "."}]
 
 import json
 import logging
+import pathlib
 import signal
 import time
 import traceback
@@ -98,8 +99,8 @@ def _log_signal(signum: int, frame) -> None:
             _signal_names[int(_sig)] = _attr
     name = _signal_names.get(signum, f"signal {signum}")
     try:
-        os.makedirs(os.path.dirname(_CRASH_LOG), exist_ok=True)
-        with open(_CRASH_LOG, "a", encoding="utf-8") as f:
+        pathlib.Path(os.path.dirname(_CRASH_LOG)).mkdir(exist_ok=True, parents=True)
+        with pathlib.Path(_CRASH_LOG).open("a", encoding="utf-8") as f:
             f.write(
                 f"\n=== {name} received · {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n",
             )
@@ -181,8 +182,8 @@ def _log_exit(reason: str) -> None:
     crashes when the real story is "TUI read pipe closed on this event".
     """
     try:
-        os.makedirs(os.path.dirname(_CRASH_LOG), exist_ok=True)
-        with open(_CRASH_LOG, "a", encoding="utf-8") as f:
+        pathlib.Path(os.path.dirname(_CRASH_LOG)).mkdir(exist_ok=True, parents=True)
+        with pathlib.Path(_CRASH_LOG).open("a", encoding="utf-8") as f:
             f.write(
                 f"\n=== gateway exit · {time.strftime('%Y-%m-%d %H:%M:%S')} "
                 f"· reason={reason} ===\n",

@@ -31,14 +31,14 @@ class TestSafeWriteRoot:
     def test_writes_inside_safe_root_are_allowed(self, tmp_path: Path, monkeypatch):
         safe_root = tmp_path / "workspace"
         child = safe_root / "subdir" / "file.txt"
-        os.makedirs(child.parent, exist_ok=True)
+        Path(child.parent).mkdir(exist_ok=True, parents=True)
 
         monkeypatch.setenv("HERMES_WRITE_SAFE_ROOT", str(safe_root))
         assert _is_write_denied(str(child)) is False
 
     def test_writes_to_safe_root_itself_are_allowed(self, tmp_path: Path, monkeypatch):
         safe_root = tmp_path / "workspace"
-        os.makedirs(safe_root, exist_ok=True)
+        Path(safe_root).mkdir(exist_ok=True, parents=True)
 
         monkeypatch.setenv("HERMES_WRITE_SAFE_ROOT", str(safe_root))
         assert _is_write_denied(str(safe_root)) is False
@@ -46,8 +46,8 @@ class TestSafeWriteRoot:
     def test_writes_outside_safe_root_are_denied(self, tmp_path: Path, monkeypatch):
         safe_root = tmp_path / "workspace"
         outside = tmp_path / "other" / "file.txt"
-        os.makedirs(safe_root, exist_ok=True)
-        os.makedirs(outside.parent, exist_ok=True)
+        Path(safe_root).mkdir(exist_ok=True, parents=True)
+        Path(outside.parent).mkdir(exist_ok=True, parents=True)
 
         monkeypatch.setenv("HERMES_WRITE_SAFE_ROOT", str(safe_root))
         assert _is_write_denied(str(outside)) is True
@@ -67,7 +67,7 @@ class TestSafeWriteRoot:
         # Use a real subdirectory of tmp_path so we can test tilde-style paths
         safe_root = tmp_path / "workspace"
         inside = safe_root / "file.txt"
-        os.makedirs(safe_root, exist_ok=True)
+        Path(safe_root).mkdir(exist_ok=True, parents=True)
 
         monkeypatch.setenv("HERMES_WRITE_SAFE_ROOT", str(safe_root))
         assert _is_write_denied(str(inside)) is False
@@ -137,7 +137,7 @@ class TestAtomicWrite:
     def test_overwrite_preserves_mode(self, ops, tmp_path: Path):
         target = tmp_path / "perms.txt"
         target.write_text("old")
-        os.chmod(target, 0o640)
+        Path(target).chmod(0o640)
         res = ops.write_file(str(target), "new")
         assert res.error is None, res.error
         assert (os.stat(target).st_mode & 0o777) == 0o640
@@ -152,11 +152,11 @@ class TestAtomicWrite:
         locked.mkdir()
         target = locked / "f.txt"
         target.write_text("ORIGINAL\n")
-        os.chmod(locked, 0o500)  # r-x: cannot create entries inside
+        Path(locked).chmod(0o500)  # r-x: cannot create entries inside
         try:
             res = ops.write_file(str(target), "SHOULD NOT LAND")
         finally:
-            os.chmod(locked, 0o700)  # restore for cleanup
+            Path(locked).chmod(0o700)  # restore for cleanup
         assert res.error is not None
         assert target.read_text() == "ORIGINAL\n"
         assert [p for p in os.listdir(locked) if ".hermes-tmp" in p] == []
@@ -176,7 +176,7 @@ class TestAtomicWrite:
     def test_patch_routes_through_atomic_write(self, ops, tmp_path: Path):
         target = tmp_path / "edit.py"
         target.write_text("a = 1\nb = 2\nc = 3\n")
-        os.chmod(target, 0o600)
+        Path(target).chmod(0o600)
         res = ops.patch_replace(str(target), "b = 2", "b = 22")
         assert res.success, res.error
         assert target.read_text() == "a = 1\nb = 22\nc = 3\n"

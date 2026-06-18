@@ -9,6 +9,7 @@ final-text path in ``gateway/platforms/base.py``.
 
 import json
 import os
+import pathlib
 import tempfile
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
@@ -51,9 +52,8 @@ def _fake_tts_call(monkeypatch, audio_bytes=b"\x00" * 32):
     """Patch the TTS tool so it writes a real file at the requested path."""
 
     def _fake_text_to_speech_tool(*, text, output_path, **_kwargs):
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        with open(output_path, "wb") as fh:
-            fh.write(audio_bytes)
+        pathlib.Path(os.path.dirname(output_path)).mkdir(exist_ok=True, parents=True)
+        pathlib.Path(output_path).write_bytes(audio_bytes)
         return json.dumps({"success": True, "file_path": output_path})
 
     monkeypatch.setattr(

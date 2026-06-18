@@ -152,5 +152,3 @@ class TestGatewayPathFiresHooks:
     approval event until resolve_gateway_approval() is called from another
     thread.
     """
-
-

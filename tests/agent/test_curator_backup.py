@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import importlib
 import json
-import os
 import sys
 import tarfile
 import tempfile
@@ -258,7 +257,7 @@ def test_rollback_rejects_unsafe_tarball(backup_env, monkeypatch):
         evil.write(b"evil")
         evil.close()
         tf.add(evil.name, arcname="../../etc/evil.md")
-        os.unlink(evil.name)
+        Path(evil.name).unlink()
 
     ok, msg, _ = cb.rollback()
     assert not ok

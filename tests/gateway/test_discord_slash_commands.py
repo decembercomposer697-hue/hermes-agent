@@ -486,7 +486,7 @@ def test_build_slash_event_uses_group_context_for_channels(adapter):
     assert event.source.chat_id == "123"
     assert event.source.chat_type == "group"
     assert event.source.thread_id is None
-    assert "TestGuild / #general" == event.source.chat_name
+    assert event.source.chat_name == "TestGuild / #general"
 
 
 # ------------------------------------------------------------------
@@ -997,4 +997,3 @@ def test_register_skill_command_autocomplete_filters_by_name_and_description(ada
     # (covered in other tests). The autocomplete filter itself is exercised
     # via direct function call in the real-discord integration path.
     assert skill_cmd.callback is not None
-

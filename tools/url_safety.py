@@ -75,6 +75,7 @@ def normalize_url_for_request(url: str) -> str:
 
     return urlunsplit((parsed.scheme, netloc, path, query, fragment))
 
+
 # Hostnames that should always be blocked regardless of IP resolution
 # or any config toggle.  These are cloud metadata endpoints that an
 # attacker could use to steal instance credentials.
@@ -106,7 +107,7 @@ _ALWAYS_BLOCKED_IPS = frozenset({
 })
 _ALWAYS_BLOCKED_NETWORKS = (
     ipaddress.ip_network("169.254.0.0/16"),    # Entire link-local range (no legit agent target)
-    ipaddress.ip_network("::ffff:169.254.0.0/112"), # IPv4-mapped link-local range
+    ipaddress.ip_network("::ffff:169.254.0.0/112"),  # IPv4-mapped link-local range
 )
 
 # Exact HTTPS hostnames allowed to resolve to private/benchmark-space IPs.

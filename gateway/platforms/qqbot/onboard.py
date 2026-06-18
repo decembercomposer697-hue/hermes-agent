@@ -17,7 +17,6 @@ from __future__ import annotations
 import logging
 import time
 from enum import IntEnum
-from typing import Optional, Tuple
 from urllib.parse import quote
 
 from .constants import (

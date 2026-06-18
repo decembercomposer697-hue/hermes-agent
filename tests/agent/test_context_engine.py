@@ -1,7 +1,7 @@
 """Tests for the ContextEngine ABC and plugin slot."""
 
 import json
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 

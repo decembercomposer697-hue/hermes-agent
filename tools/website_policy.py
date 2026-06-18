@@ -15,7 +15,7 @@ import logging
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from urllib.parse import urlparse
 
 from hermes_constants import get_hermes_home
@@ -59,8 +59,7 @@ def _normalize_rule(rule: Any) -> str | None:
         parsed = urlparse(value)
         value = parsed.netloc or parsed.path
     value = value.split("/", 1)[0].strip().rstrip(".")
-    if value.startswith("www."):
-        value = value[4:]
+    value = value.removeprefix("www.")
     return value or None
 
 
@@ -102,7 +101,7 @@ def _load_policy_config(config_path: Path | None = None) -> dict[str, Any]:
         return dict(_DEFAULT_WEBSITE_BLOCKLIST)
 
     try:
-        with open(config_path, encoding="utf-8") as f:
+        with Path(config_path).open(encoding="utf-8") as f:
             config = yaml.safe_load(f) or {}
     except yaml.YAMLError as exc:
         raise WebsitePolicyError(f"Invalid config YAML at {config_path}: {exc}") from exc

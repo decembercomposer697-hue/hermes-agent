@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from typing import Any, Dict, Tuple
+from typing import Any
 
 VALID_REQUEST_TYPES = frozenset({
     "start_bot",

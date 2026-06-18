@@ -42,11 +42,10 @@ import sqlite3
 import time
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import (
     APIRouter,
-    File,
     Form,
     HTTPException,
     Query,
@@ -347,8 +346,7 @@ def _warnings_summary_from_diagnostics(
         kinds[d["kind"]] = kinds.get(d["kind"], 0) + d.get("count", 1)
         count += d.get("count", 1)
         la = d.get("last_seen_at") or 0
-        if la > latest:
-            latest = la
+        latest = max(latest, la)
         sev = d.get("severity")
         if sev in SEVERITY_ORDER:
             idx = SEVERITY_ORDER.index(sev)
@@ -510,7 +508,7 @@ def get_board(
 
         return {
             "columns": [
-                {"name": name, "tasks": columns[name]} for name in columns.keys()
+                {"name": name, "tasks": columns[name]} for name in columns
             ],
             "tenants": tenants,
             "assignees": assignees,
@@ -732,7 +730,7 @@ async def upload_task_attachment(
 
         total = 0
         try:
-            with open(dest_path, "wb") as out:
+            with Path(dest_path).open("wb") as out:
                 while True:
                     chunk = await file.read(1024 * 1024)
                     if not chunk:
@@ -1639,7 +1637,7 @@ def specify_task_endpoint(
     with kanban_db.scoped_current_board(board or kanban_db.DEFAULT_BOARD):
         # Import lazily so a missing auxiliary client at import time
         # doesn't break plugin load.
-        from hermes_cli import kanban_specify  # noqa: WPS433 (intentional)
+        from hermes_cli import kanban_specify
 
         outcome = kanban_specify.specify_task(
             task_id,
@@ -2201,7 +2199,7 @@ def auto_describe_profile(profile_name: str, payload: DescribeAutoBody):
     config and retry without a page reload.
     """
     try:
-        from hermes_cli import profile_describer  # noqa: WPS433 (intentional)
+        from hermes_cli import profile_describer
         outcome = profile_describer.describe_profile(
             profile_name,
             overwrite=bool(payload.overwrite),
@@ -2247,7 +2245,7 @@ def decompose_task_endpoint(
     # HERMES_KANBAN_BOARD env var would let concurrent requests for
     # different boards race and cross-write (issue #38323).
     with kanban_db.scoped_current_board(board or kanban_db.DEFAULT_BOARD):
-        from hermes_cli import kanban_decompose  # noqa: WPS433 (intentional)
+        from hermes_cli import kanban_decompose
         outcome = kanban_decompose.decompose_task(
             task_id,
             author=(payload.author or None),

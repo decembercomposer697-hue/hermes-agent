@@ -16,7 +16,7 @@ import os
 import sqlite3
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # Match the logger run.py uses (logging.getLogger(__name__) where __name__ ==
 # "gateway.run") so extracted log records keep their original logger name.
@@ -483,7 +483,7 @@ class GatewayKanbanWatchersMixin:
             expanded = os.path.expanduser(path)
             if expanded in seen:
                 return
-            if not os.path.isfile(expanded):
+            if not _Path(expanded).is_file():
                 return
             seen.add(expanded)
             candidates.append(expanded)
@@ -619,7 +619,7 @@ class GatewayKanbanWatchersMixin:
         # Read max_spawn config to limit concurrent kanban tasks
         max_spawn = kanban_cfg.get("max_spawn", None)
         if max_spawn is not None:
-            logger.info(f"kanban dispatcher: max_spawn={max_spawn}")
+            logger.info("kanban dispatcher: max_spawn=%s", max_spawn)
 
         # Cap the number of simultaneously running tasks so slow workers
         # (local LLMs, resource-constrained hosts) don't pile up and time
@@ -644,7 +644,7 @@ class GatewayKanbanWatchersMixin:
                     )
                     max_in_progress = None
                 else:
-                    logger.info(f"kanban dispatcher: max_in_progress={max_in_progress}")
+                    logger.info("kanban dispatcher: max_in_progress=%s", max_in_progress)
 
         raw_failure_limit = kanban_cfg.get("failure_limit", _kb.DEFAULT_FAILURE_LIMIT)
         try:
@@ -915,8 +915,7 @@ class GatewayKanbanWatchersMixin:
             )
         except (TypeError, ValueError):
             auto_decompose_per_tick = 3
-        if auto_decompose_per_tick < 1:
-            auto_decompose_per_tick = 1
+        auto_decompose_per_tick = max(auto_decompose_per_tick, 1)
 
         def _auto_decompose_tick() -> int:
             """Run the auto-decomposer for up to N triage tasks across all

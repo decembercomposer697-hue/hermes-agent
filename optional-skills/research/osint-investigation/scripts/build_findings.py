@@ -38,7 +38,7 @@ SEVERITY_ORDER = {"HIGH": 0, "MEDIUM": 1, "LOW": 2}
 
 
 def _read_cross_links(path: str) -> list[dict[str, str]]:
-    with open(path, newline="", encoding="utf-8") as fh:
+    with Path(path).open(newline="", encoding="utf-8") as fh:
         return list(csv.DictReader(fh))
 
 
@@ -56,7 +56,7 @@ def build_findings(
     grouped: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
     for i, row in enumerate(matches):
         row["__row__"] = str(i)
-        grouped[(row.get("left_normalized", ""), row.get("right_normalized", ""))].append(row)
+        grouped[row.get("left_normalized", ""), row.get("right_normalized", "")].append(row)
 
     for (left_norm, right_norm), rows in grouped.items():
         if not left_norm or not right_norm:

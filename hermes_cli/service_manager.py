@@ -712,9 +712,7 @@ class S6ServiceManager:
             # Strip the gateway- prefix back off so the message
             # matches what the user typed on the CLI (``-p <profile>``).
             profile = (
-                name[len(S6_SERVICE_PREFIX):]
-                if name.startswith(S6_SERVICE_PREFIX)
-                else name
+                name.removeprefix(S6_SERVICE_PREFIX)
             )
             raise GatewayNotRegisteredError(profile)
 

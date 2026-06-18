@@ -19,7 +19,7 @@ import os
 import random
 import threading
 import time
-from typing import Any, Optional
+from typing import Any
 
 from agent.display import (
     KawaiiSpinner,
@@ -442,7 +442,7 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
                 preview = _build_tool_preview(name, args)
                 agent.tool_progress_callback("tool.started", name, preview, args)
             except Exception as cb_err:
-                logging.debug(f"Tool progress callback error: {cb_err}")
+                logging.debug("Tool progress callback error: %s", cb_err)
 
     for tc, name, args, middleware_trace, block_result, blocked_by_guardrail in parsed_calls:
         if block_result is not None:
@@ -451,7 +451,7 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
             try:
                 agent.tool_start_callback(tc.id, name, args)
             except Exception as cb_err:
-                logging.debug(f"Tool start callback error: {cb_err}")
+                logging.debug("Tool start callback error: %s", cb_err)
 
     # ── Concurrent execution ─────────────────────────────────────────
     # Each slot holds (function_name, function_args, function_result, duration, error_flag, blocked_flag, middleware_trace)
@@ -698,7 +698,7 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
                         result=function_result,
                     )
                 except Exception as cb_err:
-                    logging.debug(f"Tool progress callback error: {cb_err}")
+                    logging.debug("Tool progress callback error: %s", cb_err)
 
             if agent.verbose_logging:
                 logging.debug(f"Tool {function_name} completed in {tool_duration:.2f}s")
@@ -711,11 +711,11 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
         elif getattr(agent, "tool_progress_mode", "all") != "off":
             _preview_str = _multimodal_text_summary(function_result)
             if agent.verbose_logging:
-                print(f"  ✅ Tool {i+1} completed in {tool_duration:.2f}s")
+                print(f"  ✅ Tool {i + 1} completed in {tool_duration:.2f}s")
                 print(agent._wrap_verbose("Result: ", _preview_str))
             else:
                 response_preview = _preview_str[:agent.log_prefix_chars] + "..." if len(_preview_str) > agent.log_prefix_chars else _preview_str
-                print(f"  ✅ Tool {i+1} completed in {tool_duration:.2f}s - {response_preview}")
+                print(f"  ✅ Tool {i + 1} completed in {tool_duration:.2f}s - {response_preview}")
 
         agent._current_tool = None
         agent._touch_activity(f"tool completed: {name} ({tool_duration:.1f}s)")
@@ -724,7 +724,7 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
             try:
                 agent.tool_complete_callback(tc.id, name, args, function_result)
             except Exception as cb_err:
-                logging.debug(f"Tool complete callback error: {cb_err}")
+                logging.debug("Tool complete callback error: %s", cb_err)
 
         function_result = maybe_persist_tool_result(
             content=function_result,
@@ -779,7 +779,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
         # If the user sent "stop" during a previous tool's execution,
         # do NOT start any more tools -- skip them all immediately.
         if agent._interrupt_requested:
-            remaining_calls = assistant_message.tool_calls[i-1:]
+            remaining_calls = assistant_message.tool_calls[i - 1:]
             if remaining_calls:
                 agent._vprint(f"{agent.log_prefix}⚡ Interrupt: skipping {len(remaining_calls)} tool call(s)", force=True)
             for skipped_tc in remaining_calls:
@@ -798,7 +798,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
         try:
             function_args = json.loads(tool_call.function.arguments)
         except json.JSONDecodeError as e:
-            logger.warning(f"Unexpected JSON error after validation: {e}")
+            logger.warning("Unexpected JSON error after validation: %s", e)
             function_args = {}
         if not isinstance(function_args, dict):
             function_args = {}
@@ -899,13 +899,13 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
                 preview = _build_tool_preview(function_name, function_args)
                 agent.tool_progress_callback("tool.started", function_name, preview, function_args)
             except Exception as cb_err:
-                logging.debug(f"Tool progress callback error: {cb_err}")
+                logging.debug("Tool progress callback error: %s", cb_err)
 
         if not _execution_blocked and agent.tool_start_callback:
             try:
                 agent.tool_start_callback(tool_call.id, function_name, function_args)
             except Exception as cb_err:
-                logging.debug(f"Tool start callback error: {cb_err}")
+                logging.debug("Tool start callback error: %s", cb_err)
 
         # Checkpoint: snapshot working dir before file-mutating tools
         if not _execution_blocked and function_name in {"write_file", "patch"} and agent._checkpoint_mgr.enabled:
@@ -1349,7 +1349,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
                     result=function_result,
                 )
             except Exception as cb_err:
-                logging.debug(f"Tool progress callback error: {cb_err}")
+                logging.debug("Tool progress callback error: %s", cb_err)
 
         agent._current_tool = None
         agent._touch_activity(f"tool completed: {function_name} ({tool_duration:.1f}s)")
@@ -1363,7 +1363,7 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
             try:
                 agent.tool_complete_callback(tool_call.id, function_name, function_args, function_result)
             except Exception as cb_err:
-                logging.debug(f"Tool complete callback error: {cb_err}")
+                logging.debug("Tool complete callback error: %s", cb_err)
 
         function_result = maybe_persist_tool_result(
             content=function_result,

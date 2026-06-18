@@ -37,7 +37,7 @@ import os
 import threading
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,6 @@ def has_azure_identity_installed() -> bool:
     Cheap check — does not walk the credential chain.
     """
     try:
-        import azure.identity
         return True
     except Exception:
         return False
@@ -98,7 +97,7 @@ def _require_azure_identity():
             ) from exc
 
         # Retry import after lazy install.
-        import azure.identity as _ai  # noqa: WPS440
+        import azure.identity as _ai
         return _ai
 
 
@@ -542,8 +541,8 @@ def build_bearer_http_client(token_provider: Callable[[], str], **httpx_kwargs: 
 
 
 __all__ = [
-    "EntraIdentityConfig",
     "SCOPE_AI_AZURE_DEFAULT",
+    "EntraIdentityConfig",
     "build_bearer_http_client",
     "build_credential",
     "build_token_provider",

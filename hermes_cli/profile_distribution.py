@@ -66,9 +66,9 @@ import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from agent.skill_utils import is_excluded_skill_path
 
@@ -453,6 +453,7 @@ def _reject_distribution_symlinks(staged: Path) -> None:
 @dataclass
 class InstallPlan:
     """Summary of what an install will do, surfaced for user confirmation."""
+
     manifest: DistributionManifest
     staged_dir: Path
     provenance: str

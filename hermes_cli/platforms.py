@@ -12,6 +12,7 @@ from typing import NamedTuple
 
 class PlatformInfo(NamedTuple):
     """Metadata for a single platform entry."""
+
     label: str
     default_toolset: str
 

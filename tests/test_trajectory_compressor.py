@@ -459,7 +459,7 @@ class TestTokenCounting:
         tc = _make_compressor()
         trajectory = [
             {"from": "system", "value": "12345678"},   # 2 tokens
-            {"from": "human", "value": "1234567890ab"}, # 3 tokens
+            {"from": "human", "value": "1234567890ab"},  # 3 tokens
         ]
         assert tc.count_trajectory_tokens(trajectory) == 5
 
@@ -516,14 +516,14 @@ class TestGenerateSummary:
 
 def _gpt_with_tool_call(label, tokens):
     """A 'gpt' turn carrying a <tool_call> marker, padded to ~`tokens` tokens."""
-    body = f"<tool_call>\n{{\"name\": \"{label}\"}}\n</tool_call>"
+    body = f'<tool_call>\n{{"name": "{label}"}}\n</tool_call>'
     pad = max(0, tokens * 4 - len(body))
     return {"from": "gpt", "value": body + "x" * pad}
 
 
 def _tool_response(label, tokens):
     """A 'tool' turn carrying a <tool_response> marker, padded to ~`tokens` tokens."""
-    body = f"<tool_response>\n{{\"name\": \"{label}\"}}\n</tool_response>"
+    body = f'<tool_response>\n{{"name": "{label}"}}\n</tool_response>'
     pad = max(0, tokens * 4 - len(body))
     return {"from": "tool", "value": body + "x" * pad}
 

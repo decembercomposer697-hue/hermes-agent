@@ -26,7 +26,7 @@ issue #26241 for details.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Union
+from typing import Any
 from urllib.parse import urlencode
 
 
@@ -48,7 +48,7 @@ def import_fal_client() -> Any:
         pass
     except Exception as exc:
         raise ImportError(str(exc))
-    import fal_client  # type: ignore  # noqa: WPS433 — intentionally lazy
+    import fal_client  # type: ignore
     return fal_client
 
 
@@ -123,7 +123,7 @@ class _ManagedFalSyncClient:
         webhook_url: str | None = None,
         priority: Any = None,
         headers: dict[str, str] | None = None,
-        start_timeout: int | float | None = None,
+        start_timeout: float | None = None,
     ):
         url = self._queue_url_format + application
         if path:

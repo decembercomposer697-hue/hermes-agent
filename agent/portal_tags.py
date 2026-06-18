@@ -31,8 +31,6 @@ version can change at runtime (editable installs, hot-reload tooling), and
 
 from __future__ import annotations
 
-from typing import List
-
 
 def _hermes_version() -> str:
     """Return the current Hermes release version, e.g. ``"0.13.0"``.

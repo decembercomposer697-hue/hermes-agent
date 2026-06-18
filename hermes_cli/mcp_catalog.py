@@ -28,7 +28,7 @@ import shutil
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import yaml
 
@@ -85,6 +85,7 @@ class InstallSpec:
 
     Omit for one-shot launchable servers (npx, uvx).
     """
+
     type: str  # "git"
     url: str
     ref: str  # commit/tag/branch — pinned, never floats
@@ -150,7 +151,7 @@ def _parse_env_spec(raw: Any) -> EnvVarSpec:
 def _parse_manifest(path: Path) -> CatalogEntry:
     """Read and validate a manifest.yaml. Raise CatalogError on any problem."""
     try:
-        with open(path, encoding="utf-8") as f:
+        with Path(path).open(encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
     except Exception as exc:
         raise CatalogError(f"failed to read {path}: {exc}") from exc
@@ -313,8 +314,7 @@ def catalog_diagnostics() -> list[tuple]:
 
 def get_entry(name: str) -> CatalogEntry | None:
     """Look up a single entry by name. ``official/<name>`` prefix accepted."""
-    if name.startswith("official/"):
-        name = name[len("official/"):]
+    name = name.removeprefix("official/")
     for entry in list_catalog():
         if entry.name == name:
             return entry
@@ -569,7 +569,7 @@ def _apply_tool_selection(
         if manifest_default:
             _write_tools_include(entry.name, manifest_default)
             print(color(
-                f"  Couldn\'t probe server. Applied manifest default "
+                f"  Couldn't probe server. Applied manifest default "
                 f"({len(manifest_default)} tools). "
                 f"Run `hermes mcp configure {entry.name}` after the server "
                 "is reachable to refine.",
@@ -578,7 +578,7 @@ def _apply_tool_selection(
         else:
             _write_tools_include(entry.name, None)
             print(color(
-                f"  Couldn\'t probe server; installed with no tool filter "
+                f"  Couldn't probe server; installed with no tool filter "
                 "(all tools enabled when reachable). "
                 f"Run `hermes mcp configure {entry.name}` after first "
                 "connect to prune.",

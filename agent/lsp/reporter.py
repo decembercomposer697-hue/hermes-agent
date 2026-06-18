@@ -8,7 +8,7 @@ OpenCode's ``lsp/diagnostic.ts`` and Claude Code's
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 # Severity-1 only by default — warnings/info/hints would flood the
 # agent.  Lift this in config under ``lsp.severities`` if needed.
@@ -57,7 +57,7 @@ def report_for_file(
     body = "\n".join(lines)
     if extra > 0:
         body += f"\n... and {extra} more"
-    return f"<diagnostics file=\"{file_path}\">\n{body}\n</diagnostics>"
+    return f'<diagnostics file="{file_path}">\n{body}\n</diagnostics>'
 
 
 def truncate(s: str, *, limit: int = MAX_TOTAL_CHARS) -> str:
@@ -69,9 +69,9 @@ def truncate(s: str, *, limit: int = MAX_TOTAL_CHARS) -> str:
 
 
 __all__ = [
-    "SEVERITY_NAMES",
     "DEFAULT_SEVERITIES",
     "MAX_PER_FILE",
+    "SEVERITY_NAMES",
     "format_diagnostic",
     "report_for_file",
     "truncate",

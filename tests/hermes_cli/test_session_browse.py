@@ -246,7 +246,6 @@ class TestCursesBrowse:
 
     def _run_with_keys(self, sessions, key_sequence):
         """Simulate running the curses picker with a given key sequence."""
-
         # Build a mock stdscr that returns keys from the sequence
         mock_stdscr = MagicMock()
         mock_stdscr.getmaxyx.return_value = (30, 120)
@@ -384,7 +383,6 @@ class TestSessionBrowseArgparse:
 
     def test_browse_subcommand_exists(self):
         """Hermes sessions browse should be parseable."""
-
         # We can't run main(), but we can import and test the parser setup
         # by checking that argparse doesn't error on "sessions browse"
         # Re-create the parser portion

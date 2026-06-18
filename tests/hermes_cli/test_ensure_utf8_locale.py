@@ -13,6 +13,7 @@ report: latin-1 locale → UnicodeEncodeError before the wizard could start.
 
 import io
 import os
+import pathlib
 import sys
 
 import hermes_cli
@@ -130,7 +131,7 @@ def test_repair_does_not_override_explicit_env(monkeypatch):
 def test_fallback_when_reconfigure_unavailable(monkeypatch, tmp_path):
     """Streams without reconfigure() fall back to reopening the fd as UTF-8."""
     real_path = tmp_path / "out.txt"
-    fh = open(real_path, "w", encoding="latin-1")
+    fh = pathlib.Path(real_path).open("w", encoding="latin-1")
 
     class _NoReconfigure:
         """latin-1 stream exposing a real fileno() but no reconfigure()."""

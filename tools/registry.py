@@ -22,7 +22,6 @@ import threading
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
@@ -79,9 +78,17 @@ class ToolEntry:
     """Metadata for a single registered tool."""
 
     __slots__ = (
-        "name", "toolset", "schema", "handler", "check_fn",
-        "requires_env", "is_async", "description", "emoji",
-        "max_result_size_chars", "dynamic_schema_overrides",
+        "check_fn",
+        "description",
+        "dynamic_schema_overrides",
+        "emoji",
+        "handler",
+        "is_async",
+        "max_result_size_chars",
+        "name",
+        "requires_env",
+        "schema",
+        "toolset",
     )
 
     def __init__(self, name, toolset, schema, handler, check_fn,
@@ -244,7 +251,7 @@ class ToolRegistry:
         is_async: bool = False,
         description: str = "",
         emoji: str = "",
-        max_result_size_chars: int | float | None = None,
+        max_result_size_chars: float | None = None,
         dynamic_schema_overrides: Callable = None,
         override: bool = False,
     ):
@@ -421,7 +428,7 @@ class ToolRegistry:
     # Query helpers  (replace redundant dicts in model_tools.py)
     # ------------------------------------------------------------------
 
-    def get_max_result_size(self, name: str, default: int | float | None = None) -> int | float:
+    def get_max_result_size(self, name: str, default: float | None = None) -> int | float:
         """Return per-tool max result size, or *default* (or global default)."""
         entry = self.get_entry(name)
         if entry and entry.max_result_size_chars is not None:

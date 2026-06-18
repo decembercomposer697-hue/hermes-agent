@@ -13,7 +13,7 @@ import urllib.error
 import urllib.request
 from difflib import get_close_matches
 from pathlib import Path
-from typing import Any, NamedTuple, Optional
+from typing import Any, NamedTuple
 
 from hermes_cli import __version__ as _HERMES_VERSION
 
@@ -780,7 +780,7 @@ def _read_nous_recommended_disk(base: str) -> dict[str, Any] | None:
     ``{"<base>": {"data": {...}, "ts": <epoch_seconds>}}``.
     """
     try:
-        with open(_nous_recommended_disk_path(), encoding="utf-8") as fh:
+        with Path(_nous_recommended_disk_path()).open(encoding="utf-8") as fh:
             blob = json.load(fh)
     except (OSError, json.JSONDecodeError):
         return None
@@ -804,7 +804,7 @@ def _write_nous_recommended_disk(base: str, data: dict[str, Any]) -> None:
     path = _nous_recommended_disk_path()
     try:
         try:
-            with open(path, encoding="utf-8") as fh:
+            with Path(path).open(encoding="utf-8") as fh:
                 blob = json.load(fh)
             if not isinstance(blob, dict):
                 blob = {}
@@ -813,10 +813,10 @@ def _write_nous_recommended_disk(base: str, data: dict[str, Any]) -> None:
         blob[base] = {"data": data, "ts": time.time()}
         path.parent.mkdir(parents=True, exist_ok=True)
         tmp = path.with_suffix(path.suffix + ".tmp")
-        with open(tmp, "w", encoding="utf-8") as fh:
+        with Path(tmp).open("w", encoding="utf-8") as fh:
             json.dump(blob, fh, indent=2)
             fh.write("\n")
-        os.replace(tmp, path)
+        Path(tmp).replace(path)
     except OSError as exc:
         import logging
         logging.getLogger(__name__).debug(
@@ -984,6 +984,7 @@ class ProviderEntry(NamedTuple):
     slug: str
     label: str
     tui_desc: str   # detailed description for `hermes model` TUI
+
 
 CANONICAL_PROVIDERS: list[ProviderEntry] = [
     ProviderEntry("nous", "Nous Portal", "Nous Portal (Everything your agent needs, 300+ models with bundled tool use)"),
@@ -1530,8 +1531,7 @@ def get_pricing_for_provider(provider: str, *, force_refresh: bool = False) -> d
             # Nous base_url typically looks like https://inference-api.nousresearch.com/v1
             # We need the part before /v1 for our fetch function
             stripped = base_url.rstrip("/")
-            if stripped.endswith("/v1"):
-                stripped = stripped[:-3]
+            stripped = stripped.removesuffix("/v1")
             return fetch_models_with_pricing(
                 api_key=api_key,
                 base_url=stripped,
@@ -2450,7 +2450,7 @@ def _load_provider_models_cache() -> dict:
         path = _provider_models_cache_path()
         if not path.exists():
             return {}
-        with open(path, encoding="utf-8") as f:
+        with Path(path).open(encoding="utf-8") as f:
             data = json.load(f)
         return data if isinstance(data, dict) else {}
     except Exception:
@@ -3427,7 +3427,7 @@ def _load_ollama_cloud_cache(*, ignore_ttl: bool = False) -> dict | None:
         cache_path = _ollama_cloud_cache_path()
         if not cache_path.exists():
             return None
-        with open(cache_path, encoding="utf-8") as f:
+        with Path(cache_path).open(encoding="utf-8") as f:
             data = json.load(f)
         if not isinstance(data, dict):
             return None
@@ -3858,27 +3858,26 @@ def validate_requested_model(
                 "recognized": True,
                 "message": None,
             }
-        else:
-            # API responded but model is not listed.  Accept anyway —
-            # the user may have access to models not shown in the public
-            # listing (e.g. Z.AI Pro/Max plans can use glm-5 on coding
-            # endpoints even though it's not in /models).  Warn but allow.
+        # API responded but model is not listed.  Accept anyway —
+        # the user may have access to models not shown in the public
+        # listing (e.g. Z.AI Pro/Max plans can use glm-5 on coding
+        # endpoints even though it's not in /models).  Warn but allow.
 
-            # Auto-correct if the top match is very similar (e.g. typo)
-            auto = get_close_matches(requested_for_lookup, api_models, n=1, cutoff=0.9)
-            if auto:
-                return {
-                    "accepted": True,
-                    "persist": True,
-                    "recognized": True,
-                    "corrected_model": auto[0],
-                    "message": f"Auto-corrected `{requested}` → `{auto[0]}`",
-                }
+        # Auto-correct if the top match is very similar (e.g. typo)
+        auto = get_close_matches(requested_for_lookup, api_models, n=1, cutoff=0.9)
+        if auto:
+            return {
+                "accepted": True,
+                "persist": True,
+                "recognized": True,
+                "corrected_model": auto[0],
+                "message": f"Auto-corrected `{requested}` → `{auto[0]}`",
+            }
 
-            suggestions = get_close_matches(requested, api_models, n=3, cutoff=0.5)
-            suggestion_text = ""
-            if suggestions:
-                suggestion_text = "\n  Similar models: " + ", ".join(f"`{s}`" for s in suggestions)
+        suggestions = get_close_matches(requested, api_models, n=3, cutoff=0.5)
+        suggestion_text = ""
+        if suggestions:
+            suggestion_text = "\n  Similar models: " + ", ".join(f"`{s}`" for s in suggestions)
 
         return {
             "accepted": False,

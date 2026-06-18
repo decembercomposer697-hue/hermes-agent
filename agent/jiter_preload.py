@@ -18,7 +18,6 @@ _JITER_PRELOAD_ERROR: Exception | None = None
 
 def preload_jiter_native_extension() -> bool:
     """Import jiter's native extension early if it is available."""
-
     global _JITER_PRELOADED, _JITER_PRELOAD_ERROR
 
     if _JITER_PRELOADED:
@@ -26,7 +25,6 @@ def preload_jiter_native_extension() -> bool:
 
     try:
         importlib.import_module("jiter.jiter")
-        from jiter import from_json as _from_json
     except Exception as exc:
         _JITER_PRELOAD_ERROR = exc
         return False

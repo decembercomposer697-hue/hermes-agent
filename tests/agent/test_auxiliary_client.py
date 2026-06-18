@@ -674,7 +674,7 @@ class TestExpiredCodexFallback:
             from agent.auxiliary_client import _resolve_auto
             client, model = _resolve_auto()
             # Should NOT be Codex, should be Anthropic (or another available provider)
-            assert not isinstance(client, type(None)), "Should find a provider after expired Codex"
+            assert client is not None, "Should find a provider after expired Codex"
 
     def test_expired_codex_openrouter_wins(self, tmp_path, monkeypatch):
         """With expired Codex + OpenRouter key, OpenRouter should win (1st in chain)."""
@@ -2364,7 +2364,7 @@ class _FailingThenSuccessCompletions:
     def create(self, **kwargs):
         self.calls += 1
         if self.calls == 1:
-            raise _AuxAuth401()
+            raise _AuxAuth401
         return _DummyResponse("sync-ok")
 
 
@@ -2375,7 +2375,7 @@ class _AsyncFailingThenSuccessCompletions:
     async def create(self, **kwargs):
         self.calls += 1
         if self.calls == 1:
-            raise _AuxAuth401()
+            raise _AuxAuth401
         return _DummyResponse("async-ok")
 
 
@@ -2920,10 +2920,10 @@ class TestVisionAutoSkipsKimiCoding:
     def test_skip_set_covers_exactly_known_entries(self):
         """Guard against accidental widening of the skip list."""
         from agent.auxiliary_client import _PROVIDERS_WITHOUT_VISION
-        assert _PROVIDERS_WITHOUT_VISION == frozenset({
+        assert frozenset({
             "kimi-coding",
             "kimi-coding-cn",
-        })
+        }) == _PROVIDERS_WITHOUT_VISION
 
 
 class TestCodexAuxiliaryAdapterTimeout:
@@ -3216,8 +3216,8 @@ class TestAuxiliaryClientPoisonedCacheEviction:
         other = MagicMock(name="other_client")
         with _client_cache_lock:
             _client_cache.clear()
-            _client_cache[("openrouter", False, None, None, None)] = (target, "x", None)
-            _client_cache[("anthropic", False, None, None, None)] = (other, "y", None)
+            _client_cache["openrouter", False, None, None, None] = (target, "x", None)
+            _client_cache["anthropic", False, None, None, None] = (other, "y", None)
         try:
             assert _evict_cached_client_instance(target) is True
             assert ("openrouter", False, None, None, None) not in _client_cache
@@ -3241,7 +3241,7 @@ class TestAuxiliaryClientPoisonedCacheEviction:
         wrapper = CodexAuxiliaryClient(real, "gpt-5.5")
         with _client_cache_lock:
             _client_cache.clear()
-            _client_cache[("openai-codex", False, None, None, None)] = (wrapper, "gpt-5.5", None)
+            _client_cache["openai-codex", False, None, None, None] = (wrapper, "gpt-5.5", None)
         try:
             # Eviction by the inner OpenAI client must remove the wrapper entry.
             assert _evict_cached_client_instance(real) is True
@@ -3283,8 +3283,8 @@ class TestAuxiliaryClientPoisonedCacheEviction:
         async_wrapper = AsyncCodexAuxiliaryClient(sync_wrapper)
         with _client_cache_lock:
             _client_cache.clear()
-            _client_cache[("openai-codex", False, None, None, None)] = (sync_wrapper, "gpt-5.5", None)
-            _client_cache[("openai-codex", True, None, None, None)] = (async_wrapper, "gpt-5.5", None)
+            _client_cache["openai-codex", False, None, None, None] = (sync_wrapper, "gpt-5.5", None)
+            _client_cache["openai-codex", True, None, None, None] = (async_wrapper, "gpt-5.5", None)
         try:
             assert _evict_cached_client_instance(real) is True
             assert ("openai-codex", False, None, None, None) not in _client_cache
@@ -3376,12 +3376,11 @@ class TestAuxiliaryClientPoisonedCacheEviction:
             ), patch(
                 "agent.auxiliary_client._try_payment_fallback",
                 return_value=(None, None, ""),
-            ):
-                with pytest.raises(ConnectionError):
-                    call_llm(
-                        task="compression",
-                        messages=[{"role": "user", "content": "x"}],
-                    )
+            ), pytest.raises(ConnectionError):
+                call_llm(
+                    task="compression",
+                    messages=[{"role": "user", "content": "x"}],
+                )
             assert cache_key not in _client_cache, (
                 "connection error must evict cached client so the next call rebuilds"
             )
@@ -3412,12 +3411,11 @@ class TestAuxiliaryClientPoisonedCacheEviction:
             ), patch(
                 "agent.auxiliary_client._try_payment_fallback",
                 return_value=(None, None, ""),
-            ):
-                with pytest.raises(ConnectionError):
-                    await async_call_llm(
-                        task="compression",
-                        messages=[{"role": "user", "content": "x"}],
-                    )
+            ), pytest.raises(ConnectionError):
+                await async_call_llm(
+                    task="compression",
+                    messages=[{"role": "user", "content": "x"}],
+                )
             assert cache_key not in _client_cache
         finally:
             with _client_cache_lock:

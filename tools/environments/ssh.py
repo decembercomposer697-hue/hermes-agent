@@ -234,9 +234,9 @@ class SSHEnvironment(BaseEnvironment):
                     )
 
                 staged = os.path.join(staging, rel_remote)
-                os.makedirs(os.path.dirname(staged), exist_ok=True)
+                Path(os.path.dirname(staged)).mkdir(exist_ok=True, parents=True)
                 try:
-                    os.symlink(os.path.abspath(host_path), staged)
+                    Path(staged).symlink_to(os.path.abspath(host_path))
                 except OSError as e:
                     # WinError 1314: symlink privilege not held (Windows without Dev Mode)
                     if getattr(e, "winerror", None) == 1314:
@@ -307,7 +307,7 @@ class SSHEnvironment(BaseEnvironment):
         rel_base = f"{self._remote_home}/.hermes".lstrip("/")
         ssh_cmd = self._build_ssh_command()
         ssh_cmd.append(f"tar cf - -C / {shlex.quote(rel_base)}")
-        with open(dest, "wb") as f:
+        with Path(dest).open("wb") as f:
             result = subprocess.run(
                 ssh_cmd,
                 stdin=subprocess.DEVNULL,

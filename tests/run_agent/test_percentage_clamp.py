@@ -6,6 +6,7 @@ overshoot the context length (possible during streaming or before
 compression fires), users see >100% in /stats, gateway status, and
 memory tool output.
 """
+import pathlib
 
 
 class TestMemoryToolPercentClamp:
@@ -78,7 +79,7 @@ class TestSourceLinesAreClamped:
     def _read_file(rel_path: str) -> str:
         import os
         base = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        with open(os.path.join(base, rel_path)) as f:
+        with pathlib.Path(os.path.join(base, rel_path)).open() as f:
             return f.read()
 
     def test_gateway_run_clamped(self):

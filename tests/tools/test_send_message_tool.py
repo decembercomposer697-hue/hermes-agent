@@ -26,6 +26,9 @@ def _reset_signal_scheduler():
     yield
     _reset_scheduler()
 
+
+import pathlib
+
 from gateway.config import Platform
 
 # Discord helpers moved to the plugin in #24325.  Import from the new path
@@ -1651,7 +1654,6 @@ class TestSendMatrixUrlEncoding:
 
     def test_room_id_is_percent_encoded_in_url(self):
         """Matrix room IDs with ! and : are percent-encoded in the PUT URL."""
-
         mock_resp = MagicMock()
         mock_resp.status = 200
         mock_resp.json = AsyncMock(return_value={"event_id": "$evt123"})
@@ -2863,5 +2865,5 @@ class TestSendTelegramThreadNotFoundRetry:
             assert "disable_web_page_preview" not in media_kwargs_seen[0], \
                 "disable_web_page_preview leaked into send_document kwargs"
         finally:
-            if media_path and os.path.exists(media_path):
-                os.unlink(media_path)
+            if media_path and pathlib.Path(media_path).exists():
+                pathlib.Path(media_path).unlink()

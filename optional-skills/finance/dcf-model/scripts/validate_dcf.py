@@ -28,7 +28,7 @@ class DCFModelValidator:
         self.errors = []
         self.warnings = []
         self.info = []
-        
+
     def validate_all(self) -> dict:
         """Run all validation checks
 
@@ -54,7 +54,7 @@ class DCFModelValidator:
         }
 
         return results
-    
+
     def check_sheet_structure(self):
         """Verify required sheets exist"""
         required_sheets = ["DCF", "WACC", "Sensitivity"]
@@ -103,7 +103,7 @@ class DCFModelValidator:
             self.errors.append(f"Total formula errors: {total_errors}")
 
         return error_details, total_errors
-    
+
     def check_dcf_logic(self):
         """Validate DCF-specific logic and calculations"""
         self._check_terminal_growth_vs_wacc()
@@ -153,7 +153,7 @@ class DCFModelValidator:
         except KeyError:
             self.warnings.append("DCF sheet not found")
         except Exception as e:
-            self.warnings.append(f"Could not validate terminal growth vs WACC: {str(e)}")
+            self.warnings.append(f"Could not validate terminal growth vs WACC: {e!s}")
 
     def _check_wacc_range(self):
         """Check if WACC is in reasonable range"""
@@ -182,7 +182,7 @@ class DCFModelValidator:
                 self.warnings.append("Could not locate WACC value")
 
         except Exception as e:
-            self.warnings.append(f"Could not validate WACC range: {str(e)}")
+            self.warnings.append(f"Could not validate WACC range: {e!s}")
 
     def _check_terminal_value_proportion(self):
         """Check if terminal value is reasonable proportion of enterprise value"""
@@ -227,8 +227,8 @@ class DCFModelValidator:
                 self.warnings.append("Could not locate terminal value and enterprise value")
 
         except Exception as e:
-            self.warnings.append(f"Could not validate terminal value proportion: {str(e)}")
-    
+            self.warnings.append(f"Could not validate terminal value proportion: {e!s}")
+
 
 def validate_dcf_model(excel_path: str) -> dict:
     """Validate a DCF model Excel file
@@ -269,7 +269,7 @@ def main():
 
         # Save to file if requested
         if output_file:
-            with open(output_file, "w") as f:
+            with Path(output_file).open("w") as f:
                 json.dump(results, f, indent=2)
 
         # Exit with error code if validation failed

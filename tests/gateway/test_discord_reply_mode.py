@@ -9,7 +9,7 @@ Also covers reply_to_text extraction from incoming messages.
 """
 import os
 import sys
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -309,6 +309,7 @@ except (ImportError, AttributeError):
 
 class FakeDMChannel(_DMChannelBase):
     """Minimal DM channel stub (skips mention / channel-allow checks)."""
+
     def __init__(self, channel_id: int = 100, name: str = "dm"):
         # Do NOT call super().__init__() — real DMChannel requires State
         self.id = channel_id
@@ -435,7 +436,7 @@ class TestYamlConfigLoading:
     def test_extra_reply_to_mode_off(self, tmp_path, monkeypatch):
         """discord.extra.reply_to_mode is also honoured."""
         hermes_home = self._write_config(
-            tmp_path, "discord:\n  extra:\n    reply_to_mode: \"off\"\n",
+            tmp_path, 'discord:\n  extra:\n    reply_to_mode: "off"\n',
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
         monkeypatch.delenv("DISCORD_REPLY_TO_MODE", raising=False)
@@ -458,7 +459,7 @@ class TestYamlConfigLoading:
         """discord.reply_to_mode wins over discord.extra.reply_to_mode."""
         hermes_home = self._write_config(
             tmp_path,
-            "discord:\n  reply_to_mode: all\n  extra:\n    reply_to_mode: \"off\"\n",
+            'discord:\n  reply_to_mode: all\n  extra:\n    reply_to_mode: "off"\n',
         )
         monkeypatch.setenv("HERMES_HOME", str(hermes_home))
         monkeypatch.delenv("DISCORD_REPLY_TO_MODE", raising=False)

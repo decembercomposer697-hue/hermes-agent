@@ -52,9 +52,9 @@ import os
 import random
 import re
 import time
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # Lazy import: BasePlatformAdapter and friends live in the main repo.
 # Imported at module top because they're stdlib-only inside Hermes — no
@@ -912,11 +912,11 @@ class SimplexAdapter(BasePlatformAdapter):
                     capture_output=True,
                     timeout=30,
                 )
-                with open(tmp_path, "rb") as f:
+                with Path(tmp_path).open("rb") as f:
                     thumb_uri = (
                         "data:image/jpg;base64," + base64.b64encode(f.read()).decode()
                     )
-                os.remove(tmp_path)
+                Path(tmp_path).unlink()
             except (FileNotFoundError, subprocess.SubprocessError) as exc:
                 logger.warning("SimpleX: image conversion unavailable: %s", exc)
 

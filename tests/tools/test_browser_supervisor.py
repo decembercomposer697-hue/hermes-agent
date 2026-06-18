@@ -46,7 +46,6 @@ def chrome_cdp(request):
     Always launches with ``--site-per-process`` so cross-origin iframes
     become real OOPIFs (needed by the iframe interaction tests).
     """
-
     # xdist worker_id is "master" in single-process mode or "gw0".."gwN" otherwise.
     # Under subprocess-per-file isolation there's no xdist, so we fall back
     # to "master" via the session-scoped fixture below.

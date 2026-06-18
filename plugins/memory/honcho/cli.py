@@ -427,10 +427,9 @@ def _ensure_sdk_installed() -> bool:
     if result.returncode == 0:
         print("  Installed.\n")
         return True
-    else:
-        print(f"  Install failed:\n{result.stderr.strip()}")
-        print("  Run manually: pip install 'honcho-ai>=2.0.1'\n")
-        return False
+    print(f"  Install failed:\n{result.stderr.strip()}")
+    print("  Run manually: pip install 'honcho-ai>=2.0.1'\n")
+    return False
 
 
 def cmd_setup(args) -> None:
@@ -932,7 +931,7 @@ def cmd_status(args) -> None:
     if write_path != active_path:
         print(f"  Write to:       {write_path}  (profile-local)")
     if active_path == global_path:
-        print(f"  Fallback:       (none — using global ~/.honcho/config.json)")
+        print("  Fallback:       (none — using global ~/.honcho/config.json)")
     elif global_path.exists():
         print(f"  Fallback:       {global_path}  (exists, cross-app interop)")
 
@@ -992,7 +991,7 @@ def _show_peer_cards(hcfg, client) -> None:
         if ai_text:
             # Truncate to first 200 chars
             display = ai_text[:200] + ("..." if len(ai_text) > 200 else "")
-            print(f"\n  AI peer representation:")
+            print("\n  AI peer representation:")
             print(f"    {display}")
 
         if not card and not ai_text:
@@ -1026,7 +1025,7 @@ def _cmd_status_all() -> None:
         marker = " *" if name == active else ""
         print(f"  {name + marker:<14} {host:<22} {enabled_str:<9} {recall:<9} {write}")
 
-    print(f"\n  * active profile\n")
+    print("\n  * active profile\n")
 
 
 def cmd_peers(args) -> None:
@@ -1166,7 +1165,7 @@ def cmd_mode(args) -> None:
         for m, desc in MODES.items():
             marker = " <-" if m == current else ""
             print(f"  {m:<10}  {desc}{marker}")
-        print(f"\n  Set with: hermes honcho mode [hybrid|context|tools]\n")
+        print("\n  Set with: hermes honcho mode [hybrid|context|tools]\n")
         return
 
     if mode_arg not in MODES:
@@ -1201,7 +1200,7 @@ def cmd_strategy(args) -> None:
         for s, desc in STRATEGIES.items():
             marker = " <-" if s == current else ""
             print(f"  {s:<15}  {desc}{marker}")
-        print(f"\n  Set with: hermes honcho strategy [per-session|per-directory|per-repo|global]\n")
+        print("\n  Set with: hermes honcho strategy [per-session|per-directory|per-repo|global]\n")
         return
 
     if strat_arg not in STRATEGIES:
@@ -1236,7 +1235,7 @@ def cmd_tokens(args) -> None:
         print()
         print(f"  Dialectic   {d_chars} chars, reasoning: {d_level}")
         print("    AI-to-AI inference. Hermes asks Honcho's AI peer a question")
-        print("    (e.g. \"what were we working on?\") and Honcho runs its own model")
+        print('    (e.g. "what were we working on?") and Honcho runs its own model')
         print("    to synthesize an answer. Used for first-turn session continuity.")
         print("    Level controls how much reasoning Honcho spends on the answer.")
         print("\n  Set with: hermes honcho tokens [--context N] [--dialectic N]\n")
@@ -1575,9 +1574,7 @@ def honcho_command(args) -> None:
         from hermes_cli.memory_setup import cmd_setup_provider
         cmd_setup_provider("honcho")
         return
-    elif sub is None:
-        cmd_status(args)
-    elif sub == "status":
+    if sub is None or sub == "status":
         cmd_status(args)
     elif sub == "peers":
         cmd_peers(args)
@@ -1614,7 +1611,6 @@ def register_cli(subparser) -> None:
     Called by the plugin CLI registration system during argparse setup.
     The *subparser* is the parser for ``hermes honcho``.
     """
-
     subparser.add_argument(
         "--target-profile", metavar="NAME", dest="target_profile",
         help="Target a specific profile's Honcho config without switching",

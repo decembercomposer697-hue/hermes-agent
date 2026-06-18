@@ -26,7 +26,7 @@ import html
 import json
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Any
 from urllib.parse import quote
 
 # httpx is imported lazily — only the ``_write_summary_via_incoming_webhook``
@@ -329,7 +329,7 @@ class TeamsSummaryWriter:
                 continue
             if items:
                 rendered = "".join(f"<li>{html.escape(str(item))}</li>" for item in items if str(item).strip())
-                blocks.append(rendered and f"<ul>{rendered}</ul>" or "<p>None</p>")
+                blocks.append((rendered and f"<ul>{rendered}</ul>") or "<p>None</p>")
             else:
                 blocks.append("<p>None</p>")
         return "".join(blocks)
@@ -470,6 +470,7 @@ _ALLOWED_TEAMS_SERVICE_HOSTS = frozenset({
 # combine digits, colons, hyphens, dots, '@', and the ``thread.skype`` /
 # ``thread.tacv2`` suffixes; reject anything outside this set so a hostile
 # value cannot path-traverse out of ``/v3/conversations/<id>/activities``.
+import pathlib
 import re as _re_teams
 
 _TEAMS_CONV_ID_RE = _re_teams.compile(r"^[A-Za-z0-9:@\-_.]+$")
@@ -819,7 +820,7 @@ class TeamsAdapter(BasePlatformAdapter):
         if conv_ref and self._app:
             activity = MessageActivityInput().add_card(card)
             return await self._app.activity_sender.send(activity, conv_ref)
-        elif self._app:
+        if self._app:
             return await self._app.send(chat_id, card)
         return None
 
@@ -1048,7 +1049,7 @@ class TeamsAdapter(BasePlatformAdapter):
                 # Local path — encode as base64 data URI
                 path = image_url.removeprefix("file://")
                 mime_type = mimetypes.guess_type(path)[0] or "image/png"
-                with open(path, "rb") as f:
+                with pathlib.Path(path).open("rb") as f:
                     content_url = f"data:{mime_type};base64,{base64.b64encode(f.read()).decode()}"
 
             attachment = Attachment(content_type=mime_type, content_url=content_url)
@@ -1114,7 +1115,7 @@ def interactive_setup() -> None:
     print()
     print_info("Then expose port 3978 publicly (devtunnel / ngrok / cloudflared),")
     print_info("and create your bot:")
-    print_info("  teams app create --name \"Hermes\" --endpoint \"https://<tunnel>/api/messages\"")
+    print_info('  teams app create --name "Hermes" --endpoint "https://<tunnel>/api/messages"')
     print()
     print_info("The CLI will print CLIENT_ID, CLIENT_SECRET, and TENANT_ID. Paste them below.")
     print()

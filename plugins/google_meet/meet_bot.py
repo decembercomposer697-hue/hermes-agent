@@ -36,7 +36,6 @@ import sys
 import threading
 import time
 from pathlib import Path
-from typing import Optional
 
 # Match ``https://meet.google.com/abc-defg-hij`` or ``.../lookup/...`` — the
 # short three-segment code or a lookup URL. Anything else is rejected.

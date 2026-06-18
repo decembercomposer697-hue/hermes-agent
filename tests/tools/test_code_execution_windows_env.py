@@ -21,6 +21,7 @@ bytes.  The child then fails to import with a SyntaxError:
 """
 
 import os
+import pathlib
 import subprocess
 import sys
 import textwrap
@@ -463,7 +464,7 @@ class TestSandboxWritesUtf8:
         ``_execute_local`` must pass ``encoding="utf-8"``.
         """
         import tools.code_execution_tool as cet
-        src = open(cet.__file__, encoding="utf-8").read()
+        src = pathlib.Path(cet.__file__).open(encoding="utf-8").read()
 
         # There should be no ``open(path, "w")`` without encoding= for
         # the two staging files.  Grep-style check: find every write of
@@ -476,7 +477,7 @@ class TestSandboxWritesUtf8:
         for match in pattern.finditer(src):
             line = match.group(0)
             assert 'encoding="utf-8"' in line or "encoding='utf-8'" in line, (
-                f"Sandbox file write missing encoding=\"utf-8\" on Windows: {line!r}"
+                f'Sandbox file write missing encoding="utf-8" on Windows: {line!r}'
             )
 
     def test_file_rpc_stub_uses_utf8(self):
@@ -488,7 +489,7 @@ class TestSandboxWritesUtf8:
         stub = generate_hermes_tools_module(["terminal"], transport="file")
         # The generated stub should open response + request files as UTF-8.
         assert 'encoding="utf-8"' in stub, (
-            "File-based RPC stub does not specify encoding=\"utf-8\" — "
+            'File-based RPC stub does not specify encoding="utf-8" — '
             "will corrupt non-ASCII tool results on non-UTF-8 locales."
         )
 
@@ -523,12 +524,11 @@ class TestSandboxWritesUtf8:
 
         try:
             # Re-read and parse exactly like the child Python would.
-            with open(tmp_path, encoding="utf-8") as fh:
-                round_tripped = fh.read()
+            round_tripped = pathlib.Path(tmp_path).read_text(encoding="utf-8")
             assert round_tripped == stub, "UTF-8 round-trip corrupted the stub"
             ast.parse(round_tripped)  # must not raise SyntaxError
         finally:
-            os.unlink(tmp_path)
+            pathlib.Path(tmp_path).unlink()
 
     @pytest.mark.skipif(
         sys.platform != "win32",
@@ -571,7 +571,7 @@ class TestSandboxWritesUtf8:
                 return
 
             # Read back as UTF-8 (what Python does on import).
-            with open(tmp_path, encoding="utf-8") as fh:
+            with pathlib.Path(tmp_path).open(encoding="utf-8") as fh:
                 try:
                     fh.read()
                     # If this succeeds on Windows, the platform default is
@@ -588,7 +588,7 @@ class TestSandboxWritesUtf8:
                     # Exactly the failure mode that motivated the fix.
                     pass
         finally:
-            os.unlink(tmp_path)
+            pathlib.Path(tmp_path).unlink()
 
 
 # ---------------------------------------------------------------------------
@@ -622,7 +622,7 @@ class TestChildStdioIsUtf8:
         PYTHONIOENCODING=utf-8 in child_env.
         """
         import tools.code_execution_tool as cet
-        src = open(cet.__file__, encoding="utf-8").read()
+        src = pathlib.Path(cet.__file__).open(encoding="utf-8").read()
         assert 'child_env["PYTHONIOENCODING"] = "utf-8"' in src, (
             "PYTHONIOENCODING=utf-8 missing from child env — Windows "
             "scripts that print non-ASCII will crash with "
@@ -634,7 +634,7 @@ class TestChildStdioIsUtf8:
         open()'s default encoding UTF-8 in user-written file I/O.
         """
         import tools.code_execution_tool as cet
-        src = open(cet.__file__, encoding="utf-8").read()
+        src = pathlib.Path(cet.__file__).open(encoding="utf-8").read()
         assert 'child_env["PYTHONUTF8"] = "1"' in src, (
             "PYTHONUTF8=1 missing from child env — user scripts that "
             "call open(path, 'w') without encoding= will produce "

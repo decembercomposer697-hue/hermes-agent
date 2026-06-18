@@ -343,7 +343,7 @@ class TestCallbackSubprocess:
         script = _write_script(
             tmp_path, "log.sh",
             f"#!/usr/bin/env bash\n"
-            f"echo \"$(cat -)\" >> {calls}\n"
+            f'echo "$(cat -)" >> {calls}\n'
             f"printf '{{}}\\n'\n",
         )
         spec = shell_hooks.ShellHookSpec(

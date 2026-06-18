@@ -589,7 +589,7 @@ class TestComponentPrefixes:
         # The gateway component captures both core gateway logs and the
         # hermes_plugins facility (plugin-installed gateway adapters log
         # under that prefix).
-        assert ("gateway", "hermes_plugins") == hermes_logging.COMPONENT_PREFIXES["gateway"]
+        assert hermes_logging.COMPONENT_PREFIXES["gateway"] == ("gateway", "hermes_plugins")
 
     def test_agent_prefix(self):
         prefixes = hermes_logging.COMPONENT_PREFIXES["agent"]
@@ -598,7 +598,7 @@ class TestComponentPrefixes:
         assert "model_tools" in prefixes
 
     def test_tools_prefix(self):
-        assert ("tools",) == hermes_logging.COMPONENT_PREFIXES["tools"]
+        assert hermes_logging.COMPONENT_PREFIXES["tools"] == ("tools",)
 
     def test_cli_prefix(self):
         prefixes = hermes_logging.COMPONENT_PREFIXES["cli"]
@@ -606,7 +606,7 @@ class TestComponentPrefixes:
         assert "cli" in prefixes
 
     def test_cron_prefix(self):
-        assert ("cron",) == hermes_logging.COMPONENT_PREFIXES["cron"]
+        assert hermes_logging.COMPONENT_PREFIXES["cron"] == ("cron",)
 
     def test_gui_prefix(self):
         prefixes = hermes_logging.COMPONENT_PREFIXES["gui"]
@@ -874,7 +874,7 @@ class TestExternalRotationRecovery:
             assert log_path.read_text() == "before rotation\n"
 
             # External rotation (NOT via handler.doRollover()).
-            os.rename(log_path, rotated)
+            Path(log_path).rename(rotated)
             assert not log_path.exists()
 
             self._emit(handler, "after rotation")
@@ -895,7 +895,7 @@ class TestExternalRotationRecovery:
             self._emit(handler, "before unlink")
             assert log_path.read_text() == "before unlink\n"
 
-            os.unlink(log_path)
+            Path(log_path).unlink()
             assert not log_path.exists()
 
             self._emit(handler, "after unlink")
@@ -919,7 +919,7 @@ class TestExternalRotationRecovery:
             self._emit(handler, "AAAA" * 32)
             assert log_path.stat().st_size > 0
 
-            with open(log_path, "w"):
+            with Path(log_path).open("w"):
                 pass  # truncate to zero
             assert log_path.stat().st_size == 0
 
@@ -979,7 +979,7 @@ class TestExternalRotationRecovery:
         assert "BEFORE rotation" in gw_path.read_text()
 
         # External actor renames the file out from under us.
-        os.rename(gw_path, rotated)
+        Path(gw_path).rename(rotated)
         assert not gw_path.exists()
 
         # Caller (or some restart path) re-enters setup_logging.  This used
@@ -1019,6 +1019,7 @@ class TestSafeStderr:
 
         class FakeStderr:
             """Simulates a Windows stderr with legacy encoding."""
+
             encoding = "cp949"
             buffer = io.BytesIO()
 

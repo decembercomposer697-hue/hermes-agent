@@ -9,7 +9,7 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from agent.skill_preprocessing import (
     expand_inline_shell as _expand_inline_shell,

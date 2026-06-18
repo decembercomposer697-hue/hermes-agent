@@ -12,7 +12,7 @@ import json
 import logging
 from collections import deque
 from collections.abc import Callable
-from typing import Any, Deque, Dict
+from typing import Any
 
 import acp
 from acp.schema import AgentPlanUpdate, PlanEntry

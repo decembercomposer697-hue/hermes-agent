@@ -61,7 +61,7 @@ description: Whitespace test
 """
         _create_skill("ws-skill", skill)
         # Agent sends patch with no leading whitespace (common LLM behaviour)
-        result = _patch_skill("ws-skill", "def hello():\n    print(\"hi\")", "def hello():\n    print(\"hello world\")")
+        result = _patch_skill("ws-skill", 'def hello():\n    print("hi")', 'def hello():\n    print("hello world")')
         assert result["success"] is True
         content = (self.skills_dir / "ws-skill" / "SKILL.md").read_text()
         assert 'print("hello world")' in content

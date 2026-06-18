@@ -16,7 +16,6 @@ import sys
 import threading
 import time
 import unicodedata
-from typing import Optional
 
 from hermes_cli.config import cfg_get
 from utils import env_var_enabled, is_truthy_value
@@ -148,6 +147,7 @@ def _is_gateway_approval_context() -> bool:
     if env_var_enabled("HERMES_GATEWAY_SESSION"):
         return True
     return bool(_get_session_platform())
+
 
 # Sensitive write targets that should trigger approval even when referenced
 # via shell expansions like $HOME or $HERMES_HOME, or by the resolved absolute
@@ -628,7 +628,8 @@ _permanent_approved: set = set()
 
 class _ApprovalEntry:
     """One pending dangerous-command approval inside a gateway session."""
-    __slots__ = ("event", "data", "result")
+
+    __slots__ = ("data", "event", "result")
 
     def __init__(self, data: dict):
         self.event = threading.Event()
@@ -913,18 +914,17 @@ def prompt_dangerous_approval(command: str, description: str,
             if choice in {"o", "once"}:
                 print(t("approval.allowed_once"))
                 return "once"
-            elif choice in {"s", "session"}:
+            if choice in {"s", "session"}:
                 print(t("approval.allowed_session"))
                 return "session"
-            elif choice in {"a", "always"}:
+            if choice in {"a", "always"}:
                 if not allow_permanent:
                     print(t("approval.allowed_session"))
                     return "session"
                 print(t("approval.allowed_always"))
                 return "always"
-            else:
-                print(t("approval.denied"))
-                return "deny"
+            print(t("approval.denied"))
+            return "deny"
 
     except (EOFError, KeyboardInterrupt):
         print("\n" + t("approval.cancelled"))
@@ -1026,10 +1026,9 @@ Respond with exactly one word: APPROVE, DENY, or ESCALATE"""
 
         if answer == "APPROVE":
             return "approve"
-        elif answer == "DENY":
+        if answer == "DENY":
             return "deny"
-        else:
-            return "escalate"
+        return "escalate"
 
     except Exception as e:
         logger.debug("Smart approvals: LLM call failed (%s), escalating", e)
@@ -1259,7 +1258,7 @@ def _await_gateway_decision(session_key: str, notify_cb, approval_data: dict,
     # Normalize outcome for the post hook. Unresolved (timeout) and None both
     # mean the user never responded; report that explicitly so plugins can
     # distinguish timeout from explicit deny.
-    _outcome = "timeout" if not resolved else (choice if choice else "timeout")
+    _outcome = "timeout" if not resolved else (choice or "timeout")
     _fire_approval_hook(
         "post_approval_response",
         command=command,
@@ -1370,9 +1369,8 @@ def check_all_command_guards(command: str, env_type: str,
         if not is_approved(session_key, tirith_key):
             warnings.append((tirith_key, tirith_desc, True))
 
-    if is_dangerous:
-        if not is_approved(session_key, pattern_key):
-            warnings.append((pattern_key, description, False))
+    if is_dangerous and not is_approved(session_key, pattern_key):
+        warnings.append((pattern_key, description, False))
 
     # Nothing to warn about
     if not warnings:
@@ -1394,7 +1392,7 @@ def check_all_command_guards(command: str, env_type: str,
             return {"approved": True, "message": None,
                     "smart_approved": True,
                     "description": combined_desc_for_llm}
-        elif verdict == "deny":
+        if verdict == "deny":
             combined_desc_for_llm = "; ".join(desc for _, desc, _ in warnings)
             return {
                 "approved": False,

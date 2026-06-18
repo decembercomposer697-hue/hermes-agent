@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import difflib
 from collections.abc import Callable
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 def build_line_shift(pre_text: str, post_text: str) -> Callable[[int], int | None]:
@@ -147,4 +147,4 @@ def shift_baseline(baseline: list[dict[str, Any]],
     return out
 
 
-__all__ = ["build_line_shift", "shift_diagnostic_range", "shift_baseline"]
+__all__ = ["build_line_shift", "shift_baseline", "shift_diagnostic_range"]

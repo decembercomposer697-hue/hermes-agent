@@ -29,7 +29,7 @@ from concurrent.futures import (
 from concurrent.futures import (
     TimeoutError as FuturesTimeoutError,
 )
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from toolsets import TOOLSETS
 
@@ -37,6 +37,8 @@ from toolsets import TOOLSETS
 # not natively known (named custom providers, third-party aggregators, etc.).
 # Must match hermes_cli.runtime_provider.RUNTIME_PROVIDER_TYPE_CUSTOM.
 _RUNTIME_PROVIDER_CUSTOM = "custom"
+import pathlib
+
 from tools import file_state
 from tools.terminal_tool import set_approval_callback as _set_subagent_approval_cb
 from utils import base_url_hostname, is_truthy_value
@@ -109,6 +111,7 @@ def _get_subagent_approval_callback():
     if is_truthy_value(val):
         return _subagent_auto_approve
     return _subagent_auto_deny
+
 
 # Build a description fragment listing toolsets available for subagents.
 # Excludes toolsets where ALL tools are blocked, composite/platform toolsets
@@ -698,7 +701,7 @@ def _resolve_workspace_hint(parent_agent) -> str | None:
             text = os.path.abspath(os.path.expanduser(str(candidate)))
         except Exception:
             continue
-        if os.path.isabs(text) and os.path.isdir(text):
+        if pathlib.Path(text).is_absolute() and pathlib.Path(text).is_dir():
             return text
     return None
 
@@ -1269,7 +1272,7 @@ def _dump_subagent_timeout_diagnostic(
         def _w(line: str = "") -> None:
             lines.append(line)
 
-        _w(f"# Subagent timeout diagnostic — issue #14726")
+        _w("# Subagent timeout diagnostic — issue #14726")
         _w(f"# Generated: {_dt.datetime.now().isoformat()}")
         _w("")
         _w("## Timeout")
@@ -1869,7 +1872,7 @@ def _run_single_child(
 
     except Exception as exc:
         duration = round(time.monotonic() - child_start, 2)
-        logging.exception(f"[subagent-{task_index}] failed")
+        logging.exception("[subagent-%s] failed", task_index)
         if child_progress_cb:
             try:
                 child_progress_cb(
@@ -2244,7 +2247,7 @@ def delegate_task(
                     status = entry.get("status", "?")
                     icon = "✓" if status == "completed" else "✗"
                     remaining = n_tasks - completed_count
-                    completion_line = f"{icon} [{idx+1}/{n_tasks}] {label}  ({dur}s)"
+                    completion_line = f"{icon} [{idx + 1}/{n_tasks}] {label}  ({dur}s)"
                     if spinner_ref:
                         try:
                             spinner_ref.print_above(completion_line)
@@ -2674,11 +2677,11 @@ def _build_top_level_description() -> str:
         "info (file paths, error messages, constraints) via the 'context' field.\n"
         "- If the user is writing in a non-English language, or asked for "
         "output in a specific language / tone / style, say so in 'context' "
-        "(e.g. \"respond in Chinese\", \"return output in Japanese\"). "
+        '(e.g. "respond in Chinese", "return output in Japanese"). '
         "Otherwise subagents default to English and their summaries will "
         "contaminate your final reply with the wrong language.\n"
         "- Subagent summaries are SELF-REPORTS, not verified facts. A subagent "
-        "that claims \"uploaded successfully\" or \"file written\" may be wrong. "
+        'that claims "uploaded successfully" or "file written" may be wrong. '
         "For operations with external side-effects (HTTP POST/PUT, remote "
         "writes, file creation at shared paths, publishing), require the "
         "subagent to return a verifiable handle (URL, ID, absolute path, HTTP "

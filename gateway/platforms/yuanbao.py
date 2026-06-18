@@ -34,7 +34,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, ClassVar, Dict, List, Optional, Tuple
+from typing import Any, ClassVar
 
 import httpx
 
@@ -158,7 +158,7 @@ _YB_RES_REF_RE = re.compile(
     r"\[(image|voice|video|file(?::[^|\]]*)?)\|ybres:([A-Za-z0-9_\-]+)\]",
 )
 
-# Patched local-media anchors once an inbound resource has been downloaded to the local cache. 
+# Patched local-media anchors once an inbound resource has been downloaded to the local cache.
 #   [image: /opt/data/image_cache/img_xxx.bmp]
 #   [file: report.pdf → /opt/data/.../report.pdf]
 #   (and any future kind, e.g. [video: /opt/.../clip.mp4])
@@ -305,7 +305,7 @@ class MarkdownProcessor:
     @staticmethod
     def is_table_atom(text: str) -> bool:
         """Determine whether an atomic block is a table (first line starts with |)."""
-        first_line = text.split("\n")[0].strip()
+        first_line = text.split("\n", maxsplit=1)[0].strip()
         return first_line.startswith("|") and first_line.endswith("|")
 
     @staticmethod
@@ -1354,14 +1354,14 @@ class RecallGuardMiddleware(InboundMiddleware):
         where = f"group {group_code}" if group_code else f"direct chat with {from_account}"
         recall_text = (
             f"[CRITICAL — MESSAGE RECALLED] The user message that triggered "
-            f"your current task (message_id=\"{recalled_id}\") in {where} has "
+            f'your current task (message_id="{recalled_id}") in {where} has '
             f"been recalled/withdrawn by the sender. "
             f"IGNORE any prior system note asking you to finish processing "
             f"tool results — the original request is void. "
             f"Do NOT continue the task, do NOT call more tools, do NOT "
             f"reference the recalled content. "
             f"Reply only with a brief acknowledgment such as "
-            f"\"The message has been recalled.\" in the "
+            f'"The message has been recalled." in the '
             f"language the user was using."
         )
 
@@ -1623,7 +1623,7 @@ class AutoSetHomeMiddleware(InboundMiddleware):
                     config_path = _home / "config.yaml"
                     user_config: dict = {}
                     if config_path.exists():
-                        with open(config_path, encoding="utf-8") as f:
+                        with Path(config_path).open(encoding="utf-8") as f:
                             user_config = yaml.safe_load(f) or {}
                     user_config["YUANBAO_HOME_CHANNEL"] = ctx.chat_id
                     atomic_yaml_write(config_path, user_config)
@@ -2302,7 +2302,7 @@ class MediaResolveMiddleware(InboundMiddleware):
             cls._resource_cache.pop(resource_id, None)
             return None
         # Verify the cached file still exists on disk (cache dir may be swept).
-        if not os.path.isfile(local_path):
+        if not Path(local_path).is_file():
             cls._resource_cache.pop(resource_id, None)
             return None
         return local_path, mime
@@ -2658,7 +2658,7 @@ class MediaResolveMiddleware(InboundMiddleware):
             path = (m.group(2) or "").strip()
             if not path or path in seen:
                 continue
-            if not os.path.exists(path):
+            if not Path(path).exists():
                 continue
             seen.add(path)
             mime = guess_mime_type(os.path.basename(path)) or (
@@ -3068,7 +3068,6 @@ class ConnectionManager:
 
     async def close(self) -> None:
         """Cancel background tasks, fail pending futures, and close the WebSocket."""
-
         if self._heartbeat_task:
             self._heartbeat_task.cancel()
             try:
@@ -3157,9 +3156,8 @@ class ConnectionManager:
                         self._connect_id = connect_id
                         logger.info("[%s] BIND_ACK received: connectId=%s", adapter.name, connect_id)
                         return True
-                    else:
-                        logger.error("[%s] BIND_ACK missing connectId", adapter.name)
-                        return False
+                    logger.error("[%s] BIND_ACK missing connectId", adapter.name)
+                    return False
 
         except TimeoutError:
             logger.error("[%s] AUTH_BIND timeout", adapter.name)
@@ -3184,7 +3182,7 @@ class ConnectionManager:
                 )
                 return None
             connect_id = _get_string(fdict, 3)
-            return connect_id if connect_id else None
+            return connect_id or None
         except Exception as exc:
             logger.warning("[%s] Failed to extract connectId: %s", self._adapter.name, exc)
             return None
@@ -3722,9 +3720,9 @@ class ImageUrlHandler(MediaSendHandler):
             image_url, max_size_mb=adapter.MEDIA_MAX_SIZE_MB,
         )
         if not content_type or content_type == "application/octet-stream":
-            path_part = image_url.split("?")[0]
+            path_part = image_url.split("?", maxsplit=1)[0]
             content_type = guess_mime_type(path_part) or "image/jpeg"
-        filename = os.path.basename(image_url.split("?")[0]) or "image.jpg"
+        filename = os.path.basename(image_url.split("?", maxsplit=1)[0]) or "image.jpg"
         return file_bytes, filename, content_type
 
     def build_msg_body(self, upload_result, **kwargs):
@@ -3744,11 +3742,10 @@ class ImageFileHandler(MediaSendHandler):
 
     async def acquire_file(self, adapter, **kwargs):
         image_path: str = kwargs["image_path"]
-        if not os.path.isfile(image_path):
+        if not Path(image_path).is_file():
             raise ValueError(f"File not found: {image_path}")
         logger.info("[%s] ImageFileHandler: reading %s", adapter.name, image_path)
-        with open(image_path, "rb") as f:
-            file_bytes = f.read()
+        file_bytes = Path(image_path).read_bytes()
         filename = os.path.basename(image_path) or "image.jpg"
         content_type = guess_mime_type(filename) or "image/jpeg"
         return file_bytes, filename, content_type
@@ -3776,7 +3773,7 @@ class FileUrlHandler(MediaSendHandler):
         )
         filename = kwargs.get("filename")
         if not filename:
-            path_part = file_url.split("?")[0]
+            path_part = file_url.split("?", maxsplit=1)[0]
             filename = os.path.basename(path_part) or "file"
         if not content_type or content_type == "application/octet-stream":
             content_type = guess_mime_type(filename) or "application/octet-stream"
@@ -3796,11 +3793,10 @@ class DocumentHandler(MediaSendHandler):
 
     async def acquire_file(self, adapter, **kwargs):
         file_path: str = kwargs["file_path"]
-        if not os.path.isfile(file_path):
+        if not Path(file_path).is_file():
             raise ValueError(f"File not found: {file_path}")
         logger.info("[%s] DocumentHandler: reading %s", adapter.name, file_path)
-        with open(file_path, "rb") as f:
-            file_bytes = f.read()
+        file_bytes = Path(file_path).read_bytes()
         filename = kwargs.get("filename") or os.path.basename(file_path) or "document"
         content_type = guess_mime_type(filename) or "application/octet-stream"
         return file_bytes, filename, content_type
@@ -3839,11 +3835,10 @@ class StickerHandler(MediaSendHandler):
             if sticker is None:
                 raise ValueError(f"Sticker not found: {sticker_name!r}")
             return build_sticker_msg_body(sticker)
-        elif face_index is not None:
+        if face_index is not None:
             return build_face_msg_body(face_index=face_index)
-        else:
-            sticker = get_random_sticker()
-            return build_sticker_msg_body(sticker)
+        sticker = get_random_sticker()
+        return build_sticker_msg_body(sticker)
 
 
 class GroupQueryService:
@@ -4566,7 +4561,7 @@ class MessageSender:
         # Strip page indicators like (1/3) that BasePlatformAdapter may add
         chunks = [_INDICATOR_RE.sub("", c) for c in chunks]
 
-        return chunks if chunks else [content]
+        return chunks or [content]
 
     # -- Cron wrapper stripping ---------------------------------------------
 

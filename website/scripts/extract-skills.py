@@ -20,8 +20,9 @@ the unified index existed).
 
 import json
 import os
+import pathlib
 from collections import Counter
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 
 import yaml
 
@@ -227,21 +228,21 @@ def _source_url(source: str, identifier: str, extra: dict) -> str:
 
     if src == "clawhub":
         # identifier is a bare slug (the "clawhub/" prefix is added at install time)
-        slug = identifier[len("clawhub/"):] if identifier.startswith("clawhub/") else identifier
+        slug = identifier.removeprefix("clawhub/")
         return f"https://clawhub.ai/skills/{slug}"
 
     if src in {"skills.sh", "skills-sh"}:
         # "skills-sh/owner/repo/skill" -> the skills.sh detail page
-        rest = identifier[len("skills-sh/"):] if identifier.startswith("skills-sh/") else identifier
+        rest = identifier.removeprefix("skills-sh/")
         return f"https://skills.sh/skills/{rest}"
 
     if src == "lobehub":
-        slug = identifier[len("lobehub/"):] if identifier.startswith("lobehub/") else identifier
+        slug = identifier.removeprefix("lobehub/")
         return f"https://lobehub.com/agent/{slug}"
 
     if src in {"browse.sh", "browse-sh"}:
         # "browse-sh/<hostname>/<task-id>" -> browse.sh task page
-        rest = identifier[len("browse-sh/"):] if identifier.startswith("browse-sh/") else identifier
+        rest = identifier.removeprefix("browse-sh/")
         return f"https://browse.sh/skills/{rest}"
 
     return ""
@@ -252,7 +253,7 @@ def extract_local_skills():
 
     for base_dir, source_label in LOCAL_SKILL_DIRS:
         base_path = os.path.join(REPO_ROOT, base_dir)
-        if not os.path.isdir(base_path):
+        if not pathlib.Path(base_path).is_dir():
             continue
 
         for root, _dirs, files in os.walk(base_path):
@@ -260,8 +261,7 @@ def extract_local_skills():
                 continue
 
             skill_path = os.path.join(root, "SKILL.md")
-            with open(skill_path, encoding="utf-8") as f:
-                content = f.read()
+            content = pathlib.Path(skill_path).read_text(encoding="utf-8")
 
             if not content.startswith("---"):
                 continue
@@ -349,11 +349,11 @@ def extract_unified_index_skills():
     index file is absent or malformed (caller falls back to the legacy
     cache).
     """
-    if not os.path.isfile(UNIFIED_INDEX_PATH):
+    if not pathlib.Path(UNIFIED_INDEX_PATH).is_file():
         return None, None
 
     try:
-        with open(UNIFIED_INDEX_PATH, encoding="utf-8") as f:
+        with pathlib.Path(UNIFIED_INDEX_PATH).open(encoding="utf-8") as f:
             data = json.load(f)
     except (json.JSONDecodeError, OSError) as e:
         print(f"[extract-skills] Failed to read unified index: {e}")
@@ -445,7 +445,7 @@ def extract_legacy_cache_skills():
     """Read the deprecated skills/index-cache/ snapshots — fallback only."""
     skills = []
 
-    if not os.path.isdir(LEGACY_INDEX_CACHE_DIR):
+    if not pathlib.Path(LEGACY_INDEX_CACHE_DIR).is_dir():
         return skills
 
     for filename in os.listdir(LEGACY_INDEX_CACHE_DIR):
@@ -454,7 +454,7 @@ def extract_legacy_cache_skills():
 
         filepath = os.path.join(LEGACY_INDEX_CACHE_DIR, filename)
         try:
-            with open(filepath, encoding="utf-8") as f:
+            with pathlib.Path(filepath).open(encoding="utf-8") as f:
                 data = json.load(f)
         except (json.JSONDecodeError, OSError):
             continue
@@ -645,8 +645,8 @@ def main():
         s["name"],
     ))
 
-    os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
-    with open(OUTPUT, "w", encoding="utf-8") as f:
+    pathlib.Path(os.path.dirname(OUTPUT)).mkdir(exist_ok=True, parents=True)
+    with pathlib.Path(OUTPUT).open("w", encoding="utf-8") as f:
         # Minified — file is served over the wire, not read by humans.
         # At 50k+ skills the indented version was ~30% larger.
         json.dump(all_skills, f, separators=(",", ":"), ensure_ascii=False)
@@ -664,7 +664,7 @@ def main():
     }
     if index_meta:
         meta.update(index_meta)
-    with open(META_OUTPUT, "w", encoding="utf-8") as f:
+    with pathlib.Path(META_OUTPUT).open("w", encoding="utf-8") as f:
         json.dump(meta, f, separators=(",", ":"), ensure_ascii=False)
 
     print(f"Extracted {len(all_skills)} skills to {OUTPUT}")

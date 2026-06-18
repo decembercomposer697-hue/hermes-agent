@@ -18,6 +18,8 @@ pytestmark = pytest.mark.integration
 pytest.importorskip("nacl.secret", reason="PyNaCl required for voice integration tests")
 discord = pytest.importorskip("discord", reason="discord.py required for voice integration tests")
 
+import pathlib
+
 import nacl.secret
 
 try:
@@ -26,8 +28,7 @@ try:
         opus_path = ctypes.util.find_library("opus")
         if not opus_path:
             for p in ("/opt/homebrew/lib/libopus.dylib", "/usr/local/lib/libopus.dylib"):
-                import os
-                if os.path.isfile(p):
+                if pathlib.Path(p).is_file():
                     opus_path = p
                     break
         if opus_path:

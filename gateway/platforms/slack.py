@@ -15,7 +15,7 @@ import os
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 try:
     import aiohttp
@@ -1312,7 +1312,7 @@ class SlackAdapter(BasePlatformAdapter):
         if not self._app:
             return SendResult(success=False, error="Not connected")
 
-        if not os.path.exists(file_path):
+        if not _Path(file_path).exists():
             raise FileNotFoundError(f"File not found: {file_path}")
 
         thread_ts = self._resolve_thread_ts(reply_to, metadata)
@@ -1394,7 +1394,7 @@ class SlackAdapter(BasePlatformAdapter):
 
                         if image_url.startswith("file://"):
                             local_path = _unquote(image_url[7:])
-                            if not os.path.exists(local_path):
+                            if not _Path(local_path).exists():
                                 logger.warning(
                                     "[Slack] Skipping missing image: %s", local_path,
                                 )
@@ -1848,7 +1848,7 @@ class SlackAdapter(BasePlatformAdapter):
         if not self._app:
             return SendResult(success=False, error="Not connected")
 
-        if not os.path.exists(video_path):
+        if not _Path(video_path).exists():
             return SendResult(
                 success=False, error=f"Video file not found: {video_path}",
             )
@@ -1907,7 +1907,7 @@ class SlackAdapter(BasePlatformAdapter):
         if not self._app:
             return SendResult(success=False, error="Not connected")
 
-        if not os.path.exists(file_path):
+        if not _Path(file_path).exists():
             return SendResult(success=False, error=f"File not found: {file_path}")
 
         display_name = file_name or os.path.basename(file_path)
@@ -2126,7 +2126,7 @@ class SlackAdapter(BasePlatformAdapter):
             allow_bots = str(allow_bots).lower().strip()
             if allow_bots == "none":
                 return
-            elif allow_bots == "mentions":
+            if allow_bots == "mentions":
                 text_check = event.get("text", "")
                 if self._bot_user_id and f"<@{self._bot_user_id}>" not in text_check:
                     return
@@ -3390,7 +3390,7 @@ class SlackAdapter(BasePlatformAdapter):
         # the whole channel can see the agent's answer.
         response_url = command.get("response_url", "")
         if response_url and user_id and channel_id and text.startswith("/"):
-            self._slash_command_contexts[(channel_id, user_id)] = {
+            self._slash_command_contexts[channel_id, user_id] = {
                 "response_url": response_url,
                 "ts": time.monotonic(),
             }
@@ -3495,10 +3495,9 @@ class SlackAdapter(BasePlatformAdapter):
                         from gateway.platforms.base import cache_audio_from_bytes
 
                         return cache_audio_from_bytes(response.content, ext)
-                    else:
-                        from gateway.platforms.base import cache_image_from_bytes
+                    from gateway.platforms.base import cache_image_from_bytes
 
-                        return cache_image_from_bytes(response.content, ext)
+                    return cache_image_from_bytes(response.content, ext)
                 except (httpx.TimeoutException, httpx.HTTPStatusError) as exc:
                     if (
                         isinstance(exc, httpx.HTTPStatusError)

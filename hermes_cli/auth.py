@@ -35,10 +35,10 @@ import webbrowser
 from collections.abc import Callable
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Dict, FrozenSet, List, Optional, Tuple
+from typing import Any
 from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
@@ -150,6 +150,7 @@ LMSTUDIO_NOAUTH_PLACEHOLDER = "dummy-lm-api-key"
 @dataclass
 class ProviderConfig:
     """Describes a known inference provider."""
+
     id: str
     name: str
     auth_type: str  # "oauth_device_code", "oauth_external", "oauth_minimax", or "api_key"
@@ -1666,7 +1667,7 @@ def _optional_base_url(value: Any) -> str | None:
     if not isinstance(value, str):
         return None
     cleaned = value.strip().rstrip("/")
-    return cleaned if cleaned else None
+    return cleaned or None
 
 
 # Allowlist of hosts the Nous Portal proxy is willing to forward inference
@@ -3114,7 +3115,7 @@ def _is_remote_session() -> bool:
         "CLOUD_SHELL",         # GCP Cloud Shell
         "CODESPACES",          # GitHub Codespaces
         "CODESPACE_NAME",      # GitHub Codespaces (alt)
-        "GITPOD_WORKSPACE_ID", # Gitpod
+        "GITPOD_WORKSPACE_ID",  # Gitpod
         "REPL_ID",             # Replit
         "STACKBLITZ",          # StackBlitz
     ):
@@ -4315,7 +4316,7 @@ def _resolve_verify(
         return False
     if effective_ca:
         ca_path = str(effective_ca)
-        if not os.path.isfile(ca_path):
+        if not Path(ca_path).is_file():
             logger.warning(
                 "CA bundle path does not exist: %s — falling back to default certificates",
                 ca_path,
@@ -4591,7 +4592,7 @@ def _write_shared_nous_state(state: dict[str, Any]) -> None:
                     fh.write(json.dumps(shared, indent=2, sort_keys=True))
                     fh.flush()
                     os.fsync(fh.fileno())
-                os.replace(tmp, path)
+                Path(tmp).replace(path)
             finally:
                 try:
                     if tmp.exists():
@@ -5017,7 +5018,7 @@ def resolve_nous_access_token(
                     relogin_required=True,
                 )
 
-            timeout = httpx.Timeout(timeout_seconds if timeout_seconds else 15.0)
+            timeout = httpx.Timeout(timeout_seconds or 15.0)
             with httpx.Client(
                 timeout=timeout,
                 headers={"Accept": "application/json"},
@@ -5113,7 +5114,7 @@ def refresh_nous_oauth_pure(
         },
     }
     verify = _resolve_verify(insecure=insecure, ca_bundle=ca_bundle, auth_state=state)
-    timeout = httpx.Timeout(timeout_seconds if timeout_seconds else 15.0)
+    timeout = httpx.Timeout(timeout_seconds or 15.0)
 
     with httpx.Client(timeout=timeout, headers={"Accept": "application/json"}, verify=verify) as client:
         current_invoke_jwt_status = _nous_invoke_jwt_status(
@@ -5347,7 +5348,7 @@ def resolve_nous_runtime_credentials(
             _write_shared_nous_state(state)
 
         verify = _resolve_verify(insecure=insecure, ca_bundle=ca_bundle, auth_state=state)
-        timeout = httpx.Timeout(timeout_seconds if timeout_seconds else 15.0)
+        timeout = httpx.Timeout(timeout_seconds or 15.0)
         _oauth_trace(
             "nous_runtime_credentials_start",
             sequence_id=sequence_id,
@@ -6359,7 +6360,7 @@ def _prompt_model_selection(
         print()
         if idx < len(ordered):
             return _confirmed_selection(ordered[idx])
-        elif idx == len(ordered):
+        if idx == len(ordered):
             try:
                 custom = input("Enter model name: ").strip()
             except (EOFError, KeyboardInterrupt):
@@ -6397,10 +6398,10 @@ def _prompt_model_selection(
             idx = int(choice)
             if 1 <= idx <= n:
                 return _confirmed_selection(ordered[idx - 1])
-            elif idx == n + 1:
+            if idx == n + 1:
                 custom = input("Enter model name: ").strip()
                 return _confirmed_selection(custom) if custom else None
-            elif idx == n + 2:
+            if idx == n + 2:
                 return None
             print(f"Please enter 1-{n + 2}")
         except ValueError:
@@ -6441,7 +6442,6 @@ def _login_openai_codex(
     force_new_login: bool = False,
 ) -> None:
     """OpenAI Codex login via device code flow. Tokens stored in ~/.hermes/auth.json."""
-
     del args, pconfig  # kept for parity with other provider login helpers
 
     # Check for existing Hermes-owned credentials
@@ -6680,7 +6680,7 @@ def _xai_oauth_exchange_code_for_tokens(
         # key fallback.  See #26847.
         if response.status_code == 403:
             raise AuthError(
-                f"xAI token exchange failed (HTTP 403)."
+                "xAI token exchange failed (HTTP 403)."
                 + (f" Response: {body}" if body else "")
                 + " This OAuth account is not authorized for xAI API"
                   " access — xAI may be restricting API/OAuth use to"
@@ -6985,13 +6985,12 @@ def _codex_device_code_login() -> dict[str, Any]:
                 if poll_resp.status_code == 200:
                     code_resp = poll_resp.json()
                     break
-                elif poll_resp.status_code in {403, 404}:
+                if poll_resp.status_code in {403, 404}:
                     continue  # User hasn't completed login yet
-                else:
-                    raise AuthError(
-                        f"Device auth polling returned status {poll_resp.status_code}.",
-                        provider="openai-codex", code="device_code_poll_error",
-                    )
+                raise AuthError(
+                    f"Device auth polling returned status {poll_resp.status_code}.",
+                    provider="openai-codex", code="device_code_poll_error",
+                )
     except KeyboardInterrupt:
         print("\nLogin cancelled.")
         raise SystemExit(130)
@@ -7525,7 +7524,7 @@ def _nous_device_code_login(
     client_id = client_id or pconfig.client_id
     scope = scope or pconfig.scope
     timeout = httpx.Timeout(timeout_seconds)
-    verify: bool | str = False if insecure else (ca_bundle if ca_bundle else True)
+    verify: bool | str = False if insecure else (ca_bundle or True)
 
     if _is_remote_session():
         open_browser = False
@@ -7774,7 +7773,7 @@ def _login_nous(args, pconfig: ProviderConfig) -> None:
                     )
             _portal = auth_state.get("portal_base_url", "")
             if model_ids:
-                print(f"Showing {len(model_ids)} curated models — use \"Enter custom model name\" for others.")
+                print(f'Showing {len(model_ids)} curated models — use "Enter custom model name" for others.')
                 selected_model = _prompt_model_selection(
                     model_ids, pricing=pricing,
                     unavailable_models=unavailable_models,

@@ -137,7 +137,6 @@ def test_model_command_uses_runtime_access_token_for_codex_list(monkeypatch):
     def _fake_prompt_model_selection(model_ids, current_model="", **_kwargs):
         captured["model_ids"] = list(model_ids)
         captured["current_model"] = current_model
-        return None
 
     monkeypatch.setattr(
         "hermes_cli.codex_models.get_codex_model_ids",

@@ -48,7 +48,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import Any
 
 from agent.web_search_provider import WebSearchProvider
 from tools.website_policy import check_website_access
@@ -67,8 +67,6 @@ logger = logging.getLogger(__name__)
 # work because tools/web_tools.py re-exports ``Firecrawl`` from this
 # module — so the patched name still references the same proxy instance.
 
-if TYPE_CHECKING:
-    from firecrawl import Firecrawl as FirecrawlSDK
 
 _FIRECRAWL_CLS_CACHE: type | None = None
 
@@ -85,7 +83,7 @@ def _load_firecrawl_cls() -> type:
             pass
         except Exception as exc:
             raise ImportError(str(exc))
-        from firecrawl import Firecrawl as _cls  # noqa: WPS433 — deliberately lazy
+        from firecrawl import Firecrawl as _cls
 
         _FIRECRAWL_CLS_CACHE = _cls
     return _FIRECRAWL_CLS_CACHE

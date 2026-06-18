@@ -24,7 +24,7 @@ Pure helpers that read the agent's state.  AIAgent keeps thin forwarders.
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from agent.prompt_builder import (
     DEFAULT_AGENT_IDENTITY,
@@ -376,8 +376,8 @@ def build_system_prompt_parts(agent: Any, system_message: str | None = None) -> 
     volatile_parts.append(timestamp_line)
 
     return {
-        "stable":   "\n\n".join(p.strip() for p in stable_parts   if p and p.strip()),
-        "context":  "\n\n".join(p.strip() for p in context_parts  if p and p.strip()),
+        "stable":   "\n\n".join(p.strip() for p in stable_parts if p and p.strip()),
+        "context":  "\n\n".join(p.strip() for p in context_parts if p and p.strip()),
         "volatile": "\n\n".join(p.strip() for p in volatile_parts if p and p.strip()),
     }
 
@@ -438,8 +438,8 @@ def format_tools_for_system_message(agent: Any) -> str:
 
 
 __all__ = [
-    "build_system_prompt_parts",
     "build_system_prompt",
-    "invalidate_system_prompt",
+    "build_system_prompt_parts",
     "format_tools_for_system_message",
+    "invalidate_system_prompt",
 ]

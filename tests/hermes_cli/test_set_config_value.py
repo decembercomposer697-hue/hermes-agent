@@ -142,7 +142,7 @@ class TestFalsyValues:
         """Blanking a config key should write an empty string to config.yaml."""
         set_config_value("model", "")
         config = _read_config(_isolated_hermes_home)
-        assert "model: ''" in config or "model: \"\"" in config
+        assert "model: ''" in config or 'model: ""' in config
 
     def test_zero_routes_to_config(self, _isolated_hermes_home):
         """Setting a config key to '0' should write 0 to config.yaml."""

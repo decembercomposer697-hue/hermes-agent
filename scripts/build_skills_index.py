@@ -22,7 +22,7 @@ import sys
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 
 # Allow importing from repo root
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,6 +30,8 @@ sys.path.insert(0, REPO_ROOT)
 
 # Ensure HERMES_HOME is set (needed by tools/skills_hub.py imports)
 os.environ.setdefault("HERMES_HOME", os.path.join(os.path.expanduser("~"), ".hermes"))
+
+import pathlib
 
 import httpx
 
@@ -412,10 +414,10 @@ def main():
         "skill_count": len(deduped),
         "skills": deduped,
     }
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+    pathlib.Path(os.path.dirname(OUTPUT_PATH)).mkdir(exist_ok=True, parents=True)
+    with pathlib.Path(OUTPUT_PATH).open("w", encoding="utf-8") as f:
         json.dump(index, f, separators=(",", ":"), ensure_ascii=False)
-    file_size = os.path.getsize(OUTPUT_PATH)
+    file_size = pathlib.Path(OUTPUT_PATH).stat().st_size
     print(f"\nDone! {len(deduped)} skills indexed in "
           f"{time.time() - overall_start:.0f}s")
     print(f"Output: {OUTPUT_PATH} ({file_size / 1024:.0f} KB)")

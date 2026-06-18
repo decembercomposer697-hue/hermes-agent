@@ -14,14 +14,13 @@ from unittest.mock import Mock
 
 import pytest
 
-import tools.browser_tool as browser_tool
+from tools import browser_tool
 
 
 @pytest.fixture(autouse=True)
 def _reset_resolver_state(monkeypatch):
     monkeypatch.setattr(browser_tool, "_cached_cloud_provider", None)
     monkeypatch.setattr(browser_tool, "_cloud_provider_resolved", False)
-    return
 
 
 class TestCloudProviderCachePolicy:

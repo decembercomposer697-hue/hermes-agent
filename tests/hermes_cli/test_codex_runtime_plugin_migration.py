@@ -632,7 +632,7 @@ class TestMigrate:
 
         # Append another user entry below the managed block
         target.write_text(
-            text + "\n[mcp_servers.user-below]\ncommand = \"below-server\"\n",
+            text + '\n[mcp_servers.user-below]\ncommand = "below-server"\n',
         )
         # Re-migrate — both should survive
         migrate({"mcp_servers": {"hermes-mcp": {"command": "npx"}}},

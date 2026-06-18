@@ -10,6 +10,7 @@ Coverage levels:
   Persistent cache       — save/load, corruption, update, provider isolation
 """
 
+import pathlib
 import time
 from unittest.mock import MagicMock, patch
 
@@ -1339,7 +1340,7 @@ class TestContextLengthCache:
         with patch("agent.model_metadata._get_context_cache_path", return_value=cache_file):
             save_context_length("model", "http://x", 32768)
             save_context_length("model", "http://x", 32768)
-            with open(cache_file) as f:
+            with pathlib.Path(cache_file).open() as f:
                 data = yaml.safe_load(f)
             assert len(data["context_lengths"]) == 1
 

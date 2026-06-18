@@ -102,7 +102,6 @@ def test_cprint_bg_thread_schedules_on_app_loop(monkeypatch):
         # Simulate run_in_terminal actually calling func (as the real PT
         # impl would once the app loop tick picks it up).
         func()
-        return None
 
     fake_pt_app.run_in_terminal = _fake_run_in_terminal
     monkeypatch.setitem(sys.modules, "prompt_toolkit.application", fake_pt_app)
@@ -203,7 +202,6 @@ def test_cprint_swallows_prompt_toolkit_import_error(monkeypatch):
                 # Returning a bogus spec that will fail on load works too,
                 # but raising here keeps the test simple.
                 raise ImportError("blocked for test")
-            return None
 
     blocker = _BlockFinder()
     sys.meta_path.insert(0, blocker)

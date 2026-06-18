@@ -2,6 +2,7 @@
 
 import json
 import os
+import pathlib
 import sys
 from unittest.mock import MagicMock, patch
 
@@ -378,50 +379,37 @@ class TestDogfoodSkill:
         )
 
     def test_skill_md_exists(self):
-        assert os.path.exists(os.path.join(self.skill_dir, "SKILL.md"))
+        assert pathlib.Path(os.path.join(self.skill_dir, "SKILL.md")).exists()
 
     def test_taxonomy_exists(self):
-        assert os.path.exists(
-            os.path.join(self.skill_dir, "references", "issue-taxonomy.md"),
-        )
+        assert pathlib.Path(os.path.join(self.skill_dir, "references", "issue-taxonomy.md")).exists()
 
     def test_report_template_exists(self):
-        assert os.path.exists(
-            os.path.join(self.skill_dir, "templates", "dogfood-report-template.md"),
-        )
+        assert pathlib.Path(os.path.join(self.skill_dir, "templates", "dogfood-report-template.md")).exists()
 
     def test_skill_md_has_frontmatter(self):
-        with open(os.path.join(self.skill_dir, "SKILL.md")) as f:
-            content = f.read()
+        content = pathlib.Path(os.path.join(self.skill_dir, "SKILL.md")).read_text()
         assert content.startswith("---")
         assert "name: dogfood" in content
         assert "description:" in content
 
     def test_skill_references_browser_console(self):
-        with open(os.path.join(self.skill_dir, "SKILL.md")) as f:
-            content = f.read()
+        content = pathlib.Path(os.path.join(self.skill_dir, "SKILL.md")).read_text()
         assert "browser_console" in content
 
     def test_skill_references_annotate(self):
-        with open(os.path.join(self.skill_dir, "SKILL.md")) as f:
-            content = f.read()
+        content = pathlib.Path(os.path.join(self.skill_dir, "SKILL.md")).read_text()
         assert "annotate" in content
 
     def test_taxonomy_has_severity_levels(self):
-        with open(
-            os.path.join(self.skill_dir, "references", "issue-taxonomy.md"),
-        ) as f:
-            content = f.read()
+        content = pathlib.Path(os.path.join(self.skill_dir, "references", "issue-taxonomy.md")).read_text()
         assert "Critical" in content
         assert "High" in content
         assert "Medium" in content
         assert "Low" in content
 
     def test_taxonomy_has_categories(self):
-        with open(
-            os.path.join(self.skill_dir, "references", "issue-taxonomy.md"),
-        ) as f:
-            content = f.read()
+        content = pathlib.Path(os.path.join(self.skill_dir, "references", "issue-taxonomy.md")).read_text()
         assert "Functional" in content
         assert "Visual" in content
         assert "Accessibility" in content

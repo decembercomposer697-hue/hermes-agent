@@ -55,7 +55,7 @@ def _safe_extract_tar_gz(archive: Path, destination: Path) -> None:
                     f"Cannot read archive member: {member.name}",
                 )
 
-            with extracted, open(target, "wb") as dst:
+            with extracted, Path(target).open("wb") as dst:
                 shutil.copyfileobj(extracted, dst)
 
             try:

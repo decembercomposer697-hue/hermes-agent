@@ -3,7 +3,7 @@
 import json
 from types import SimpleNamespace
 
-import tools.terminal_tool as terminal_tool
+from tools import terminal_tool
 
 
 def _minimal_terminal_config(cwd="/default"):
@@ -238,7 +238,7 @@ def test_safe_getcwd_falls_back_to_terminal_cwd_when_cwd_deleted(monkeypatch):
 
 def test_safe_getcwd_falls_back_to_home_when_no_terminal_cwd(monkeypatch):
     def _boom():
-        raise FileNotFoundError()
+        raise FileNotFoundError
 
     monkeypatch.setattr(terminal_tool.os, "getcwd", _boom)
     monkeypatch.delenv("TERMINAL_CWD", raising=False)

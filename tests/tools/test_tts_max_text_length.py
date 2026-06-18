@@ -6,6 +6,7 @@ MiniMax allows 10000, and ElevenLabs allows 5000-40000 depending on model.
 """
 
 import json
+import pathlib
 
 from tools.tts_tool import (
     FALLBACK_MAX_TEXT_LENGTH,
@@ -129,8 +130,7 @@ class TestTextToSpeechToolTruncation:
 
         def fake_openai(t, out, cfg):
             captured_text["text"] = t
-            with open(out, "wb") as f:
-                f.write(b"\x00")
+            pathlib.Path(out).write_bytes(b"\x00")
             return out
 
         monkeypatch.setattr("tools.tts_tool._generate_openai_tts", fake_openai)
@@ -154,8 +154,7 @@ class TestTextToSpeechToolTruncation:
 
         def fake_xai(t, out, cfg):
             captured_text["text"] = t
-            with open(out, "wb") as f:
-                f.write(b"\x00")
+            pathlib.Path(out).write_bytes(b"\x00")
             return out
 
         monkeypatch.setattr("tools.tts_tool._generate_xai_tts", fake_xai)
@@ -177,8 +176,7 @@ class TestTextToSpeechToolTruncation:
 
         def fake_openai(t, out, cfg):
             captured_text["text"] = t
-            with open(out, "wb") as f:
-                f.write(b"\x00")
+            pathlib.Path(out).write_bytes(b"\x00")
             return out
 
         monkeypatch.setattr("tools.tts_tool._generate_openai_tts", fake_openai)

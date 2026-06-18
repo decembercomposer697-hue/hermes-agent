@@ -205,8 +205,8 @@ class TestPromptToolkitTerminalCompatibility:
             kb = KeyBindings()
             _bind_prompt_submit_keys(kb, submit_handler)
             bindings = {tuple(key.value for key in binding.keys): binding.handler for binding in kb.bindings}
-            assert bindings[("c-m",)] is submit_handler
-            assert bindings[("c-j",)] is submit_handler
+            assert bindings["c-m",] is submit_handler
+            assert bindings["c-j",] is submit_handler
 
         # POSIX over SSH: c-j stays free so Ctrl+Enter (sent as LF by
         # Windows Terminal / Kitty / mintty over SSH) inserts a newline.
@@ -216,7 +216,7 @@ class TestPromptToolkitTerminalCompatibility:
             kb = KeyBindings()
             _bind_prompt_submit_keys(kb, submit_handler)
             bindings = {tuple(key.value for key in binding.keys): binding.handler for binding in kb.bindings}
-            assert bindings[("c-m",)] is submit_handler
+            assert bindings["c-m",] is submit_handler
             assert ("c-j",) not in bindings
 
         # Ghostty through tmux: TERM_PROGRAM is tmux, but Ghostty exports a
@@ -227,7 +227,7 @@ class TestPromptToolkitTerminalCompatibility:
             kb = KeyBindings()
             _bind_prompt_submit_keys(kb, submit_handler)
             bindings = {tuple(key.value for key in binding.keys): binding.handler for binding in kb.bindings}
-            assert bindings[("c-m",)] is submit_handler
+            assert bindings["c-m",] is submit_handler
             assert ("c-j",) not in bindings
 
         # Windows: only enter submits; c-j is free for the newline binding
@@ -236,7 +236,7 @@ class TestPromptToolkitTerminalCompatibility:
             kb = KeyBindings()
             _bind_prompt_submit_keys(kb, submit_handler)
             bindings = {tuple(key.value for key in binding.keys): binding.handler for binding in kb.bindings}
-            assert bindings[("c-m",)] is submit_handler
+            assert bindings["c-m",] is submit_handler
             assert ("c-j",) not in bindings
 
     def test_cpr_warning_callback_is_disabled(self):

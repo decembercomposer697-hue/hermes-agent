@@ -23,7 +23,6 @@ import json
 import logging
 import queue
 import threading
-from typing import Optional
 
 try:
     from websockets.sync.client import connect as ws_connect
@@ -38,7 +37,7 @@ _QUEUE_MAX = 256
 
 
 class WsPublisherTransport:
-    __slots__ = ("_url", "_lock", "_ws", "_dead", "_q", "_worker")
+    __slots__ = ("_dead", "_lock", "_q", "_url", "_worker", "_ws")
 
     def __init__(self, url: str, *, connect_timeout: float = 2.0) -> None:
         self._url = url

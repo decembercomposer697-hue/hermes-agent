@@ -40,22 +40,15 @@ import json
 import logging
 import os
 import re
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
-
-import httpx
+from typing import Any
 
 # After the web-provider plugin migration (PR #25182), the Firecrawl SDK
 # proxy, client construction, and response-shape normalizers all live in
 # plugins.web.firecrawl.provider. We re-export the names that external
 # code, integration tests, and unit-test patches reach for so the public
 # surface stays stable.
-if TYPE_CHECKING:
-    from firecrawl import Firecrawl
-from plugins.web.exa.provider import _get_exa_client
 from plugins.web.firecrawl.provider import (
-    Firecrawl,  # re-exported for tests that mock.patch("tools.web_tools.Firecrawl")
     _firecrawl_backend_help_suffix,
-    _get_firecrawl_client,  # re-exported for tests that `from tools.web_tools import _get_firecrawl_client`
     _get_firecrawl_gateway_url,
     _is_tool_gateway_ready,
     check_firecrawl_api_key,
@@ -64,18 +57,9 @@ from plugins.web.firecrawl.provider import (
 # Parallel + Exa clients re-exported for backward-compat with existing
 # unit tests (tests/tools/test_web_tools_config.py imports _get_parallel_client
 # / _get_async_parallel_client / _get_exa_client directly).
-from plugins.web.parallel.provider import (
-    _get_async_parallel_client,
-    _get_parallel_client,
-)
 
 # Tavily helpers re-exported for backward-compat with existing unit tests
 # (tests/tools/test_web_tools_tavily.py imports these names directly).
-from plugins.web.tavily.provider import (
-    _normalize_tavily_documents,
-    _normalize_tavily_search_results,
-    _tavily_request,
-)
 
 # Module-level cache slots for the per-vendor clients. The plugins read/write
 # these via tools.web_tools so unit tests that reset
@@ -87,6 +71,7 @@ _async_parallel_client: Any | None = None
 _exa_client: Any | None = None
 
 import sys
+from itertools import starmap
 
 from agent.auxiliary_client import (
     async_call_llm,
@@ -97,21 +82,6 @@ from tools.debug_helpers import DebugSession
 
 # Imported solely so unit tests can monkeypatch these names on
 # tools.web_tools (the firecrawl plugin reads them via its own import chain).
-from tools.managed_tool_gateway import (
-    build_vendor_gateway_url,
-    resolve_managed_tool_gateway,
-)
-from tools.managed_tool_gateway import (
-    peek_nous_access_token as _peek_nous_access_token,
-)
-from tools.managed_tool_gateway import (
-    read_nous_access_token as _read_nous_access_token,
-)
-from tools.tool_backend_helpers import (
-    managed_nous_tools_enabled,
-    nous_tool_gateway_unavailable_message,
-    prefers_gateway,
-)
 from tools.url_safety import async_is_safe_url, normalize_url_for_request
 
 logger = logging.getLogger(__name__)
@@ -150,6 +120,7 @@ def _load_web_config() -> dict:
         return load_config().get("web", {})
     except (ImportError, Exception):
         return {}
+
 
 # Recognized web backend names (config values accepted in ``web.backend`` /
 # ``web.search_backend`` / ``web.extract_backend``). Kept as a single source of
@@ -386,12 +357,13 @@ def _get_default_summarizer_model() -> str | None:
     _, model, _ = _resolve_web_extract_auxiliary()
     return model
 
+
 _debug = DebugSession("web_tools", env_var="WEB_TOOLS_DEBUG")
 
 
 async def process_content_with_llm(
-    content: str, 
-    url: str = "", 
+    content: str,
+    url: str = "",
     title: str = "",
     model: str | None = None,
     min_length: int = DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION,
@@ -421,21 +393,21 @@ async def process_content_with_llm(
     CHUNK_THRESHOLD = 500_000     # 500k chars - use chunked processing above this
     CHUNK_SIZE = 100_000          # 100k chars per chunk
     MAX_OUTPUT_SIZE = 5000        # Hard cap on final output size
-    
+
     try:
         content_len = len(content)
-        
+
         # Refuse if content is absurdly large
         if content_len > MAX_CONTENT_SIZE:
             size_mb = content_len / 1_000_000
             logger.warning("Content too large (%.1fMB > 2MB limit). Refusing to process.", size_mb)
             return f"[Content too large to process: {size_mb:.1f}MB. Try a more focused source URL.]"
-        
+
         # Skip processing if content is too short
         if content_len < min_length:
             logger.debug("Content too short (%d < %d chars), skipping LLM processing", content_len, min_length)
             return None
-        
+
         # Create context information
         context_info = []
         if title:
@@ -443,31 +415,31 @@ async def process_content_with_llm(
         if url:
             context_info.append(f"Source: {url}")
         context_str = "\n".join(context_info) + "\n\n" if context_info else ""
-        
+
         # Check if we need chunked processing
         if content_len > CHUNK_THRESHOLD:
             logger.info("Content large (%d chars). Using chunked processing...", content_len)
             return await _process_large_content_chunked(
                 content, context_str, model, CHUNK_SIZE, MAX_OUTPUT_SIZE,
             )
-        
+
         # Standard single-pass processing for normal content
         logger.info("Processing content with LLM (%d characters)", content_len)
-        
+
         processed_content = await _call_summarizer_llm(content, context_str, model)
-        
+
         if processed_content:
             # Enforce output cap
             if len(processed_content) > MAX_OUTPUT_SIZE:
                 processed_content = processed_content[:MAX_OUTPUT_SIZE] + "\n\n[... summary truncated for context management ...]"
-            
+
             # Log compression metrics
             processed_length = len(processed_content)
             compression_ratio = processed_length / content_len if content_len > 0 else 1.0
             logger.info("Content processed: %d -> %d chars (%.1f%%)", content_len, processed_length, compression_ratio * 100)
-        
+
         return processed_content
-        
+
     except Exception as e:
         logger.warning(
             "web_extract LLM summarization failed (%s). "
@@ -490,9 +462,9 @@ async def process_content_with_llm(
 
 
 async def _call_summarizer_llm(
-    content: str, 
-    context_str: str, 
-    model: str | None, 
+    content: str,
+    context_str: str,
+    model: str | None,
     max_tokens: int = 20000,
     is_chunk: bool = False,
     chunk_info: str = "",
@@ -603,14 +575,14 @@ Create a markdown summary that captures all key information in a well-organized,
                 retry_delay = min(retry_delay * 2, 60)
             else:
                 raise last_error
-    
+
     return None
 
 
 async def _process_large_content_chunked(
-    content: str, 
-    context_str: str, 
-    model: str | None, 
+    content: str,
+    context_str: str,
+    model: str | None,
     chunk_size: int,
     max_output_size: int,
 ) -> str | None:
@@ -633,18 +605,18 @@ async def _process_large_content_chunked(
     for i in range(0, len(content), chunk_size):
         chunk = content[i:i + chunk_size]
         chunks.append(chunk)
-    
+
     logger.info("Split into %d chunks of ~%d chars each", len(chunks), chunk_size)
-    
+
     # Summarize each chunk in parallel
     async def summarize_chunk(chunk_idx: int, chunk_content: str) -> tuple[int, str | None]:
         """Summarize a single chunk."""
         try:
             chunk_info = f"[Processing chunk {chunk_idx + 1} of {len(chunks)}]"
             summary = await _call_summarizer_llm(
-                chunk_content, 
-                context_str, 
-                model, 
+                chunk_content,
+                context_str,
+                model,
                 max_tokens=10000,
                 is_chunk=True,
                 chunk_info=chunk_info,
@@ -655,9 +627,9 @@ async def _process_large_content_chunked(
         except Exception as e:
             logger.warning("Chunk %d/%d failed: %s", chunk_idx + 1, len(chunks), str(e)[:50])
             return chunk_idx, None
-    
+
     # Run all chunk summarizations in parallel
-    tasks = [summarize_chunk(i, chunk) for i, chunk in enumerate(chunks)]
+    tasks = list(starmap(summarize_chunk, enumerate(chunks)))
     # Use return_exceptions=True so a single task failure does not discard
     # all other successfully summarized chunks.
     results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -674,25 +646,25 @@ async def _process_large_content_chunked(
     for chunk_idx, summary in sorted(successful_results, key=lambda x: x[0]):
         if summary:
             summaries.append(f"## Section {chunk_idx + 1}\n{summary}")
-    
+
     if not summaries:
         logger.debug("All chunk summarizations failed")
         return "[Failed to process large content: all chunk summarizations failed]"
-    
+
     logger.info("Got %d/%d chunk summaries", len(summaries), len(chunks))
-    
+
     # If only one chunk succeeded, just return it (with cap)
     if len(summaries) == 1:
         result = summaries[0]
         if len(result) > max_output_size:
             result = result[:max_output_size] + "\n\n[... truncated ...]"
         return result
-    
+
     # Synthesize the summaries into a final summary
     logger.info("Synthesizing %d summaries...", len(summaries))
-    
+
     combined_summaries = "\n\n---\n\n".join(summaries)
-    
+
     synthesis_prompt = f"""You have been given summaries of different sections of a large document. 
 Synthesize these into ONE cohesive, comprehensive summary that:
 1. Removes redundancy between sections
@@ -746,14 +718,14 @@ Create a single, unified markdown summary."""
         # Enforce hard cap
         if len(final_summary) > max_output_size:
             final_summary = final_summary[:max_output_size] + "\n\n[... summary truncated for context management ...]"
-        
+
         original_len = len(content)
         final_len = len(final_summary)
         compression = final_len / original_len if original_len > 0 else 1.0
-        
+
         logger.info("Synthesis complete: %d -> %d chars (%.2f%%)", original_len, final_len, compression * 100)
         return final_summary
-        
+
     except Exception as e:
         logger.warning("Synthesis failed: %s", str(e)[:100])
         # Fall back to concatenated summaries with truncation
@@ -782,17 +754,17 @@ def clean_base64_images(text: str) -> str:
     # Pattern to match base64 encoded images wrapped in parentheses
     # Matches: (data:image/[type];base64,[base64-string])
     base64_with_parens_pattern = r"\(data:image/[^;]+;base64,[A-Za-z0-9+/=]+\)"
-    
+
     # Pattern to match base64 encoded images without parentheses
     # Matches: data:image/[type];base64,[base64-string]
     base64_pattern = r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+"
-    
+
     # Replace parentheses-wrapped images first
     cleaned_text = re.sub(base64_with_parens_pattern, "[BASE64_IMAGE_REMOVED]", text)
-    
+
     # Then replace any remaining non-parentheses images
     cleaned_text = re.sub(base64_pattern, "[BASE64_IMAGE_REMOVED]", cleaned_text)
-    
+
     return cleaned_text
 
 
@@ -884,7 +856,7 @@ def web_search_tool(query: str, limit: int = 5) -> str:
         "original_response_size": 0,
         "final_response_size": 0,
     }
-    
+
     try:
         from tools.interrupt import is_interrupted
         if is_interrupted():
@@ -933,7 +905,7 @@ def web_search_tool(query: str, limit: int = 5) -> str:
         return result_json
 
     except Exception as e:
-        error_msg = f"Error searching web: {str(e)}"
+        error_msg = f"Error searching web: {e!s}"
         logger.debug("%s", error_msg)
 
         debug_call_data["error"] = error_msg
@@ -1009,7 +981,7 @@ async def web_extract_tool(
         "compression_metrics": [],
         "processing_applied": [],
     }
-    
+
     try:
         logger.info("Extracting content from %d URL(s)", len(normalized_urls))
 
@@ -1110,45 +1082,45 @@ async def web_extract_tool(
             results = ssrf_blocked + results
 
         response = {"results": results}
-        
+
         pages_extracted = len(response.get("results", []))
         logger.info("Extracted content from %d pages", pages_extracted)
-        
+
         debug_call_data["pages_extracted"] = pages_extracted
         debug_call_data["original_response_size"] = len(json.dumps(response))
         effective_model = model or _get_default_summarizer_model()
         auxiliary_available = check_auxiliary_model()
-        
+
         # Process each result with LLM if enabled
         if use_llm_processing and auxiliary_available:
             logger.info("Processing extracted content with LLM (parallel)...")
             debug_call_data["processing_applied"].append("llm_processing")
-            
+
             # Prepare tasks for parallel processing
             async def process_single_result(result):
                 """Process a single result with LLM and return updated result with metrics."""
                 url = result.get("url", "Unknown URL")
                 title = result.get("title", "")
                 raw_content = result.get("raw_content", "") or result.get("content", "")
-                
+
                 if not raw_content:
                     return result, None, "no_content"
-                
+
                 original_size = len(raw_content)
-                
+
                 # Process content with LLM
                 processed = await process_content_with_llm(
                     raw_content, url, title, effective_model, min_length,
                 )
-                
+
                 if processed:
                     processed_size = len(processed)
                     compression_ratio = processed_size / original_size if original_size > 0 else 1.0
-                    
+
                     # Update result with processed content
                     result["content"] = processed
                     result["raw_content"] = raw_content
-                    
+
                     metrics = {
                         "url": url,
                         "original_size": original_size,
@@ -1157,17 +1129,16 @@ async def web_extract_tool(
                         "model_used": effective_model,
                     }
                     return result, metrics, "processed"
-                else:
-                    metrics = {
-                        "url": url,
-                        "original_size": original_size,
-                        "processed_size": original_size,
-                        "compression_ratio": 1.0,
-                        "model_used": None,
-                        "reason": "content_too_short",
-                    }
-                    return result, metrics, "too_short"
-            
+                metrics = {
+                    "url": url,
+                    "original_size": original_size,
+                    "processed_size": original_size,
+                    "compression_ratio": 1.0,
+                    "model_used": None,
+                    "reason": "content_too_short",
+                }
+                return result, metrics, "too_short"
+
             # Run all LLM processing in parallel
             results_list = response.get("results", [])
             tasks = [process_single_result(result) for result in results_list]
@@ -1200,7 +1171,7 @@ async def web_extract_tool(
                 url = result.get("url", "Unknown URL")
                 content_length = len(result.get("raw_content", ""))
                 logger.info("%s (%d characters)", url, content_length)
-        
+
         # Trim output to minimal fields per entry: title, content, error
         trimmed_results = [
             {
@@ -1208,7 +1179,7 @@ async def web_extract_tool(
                 "title": r.get("title", ""),
                 "content": r.get("content", ""),
                 "error": r.get("error"),
-                **({  "blocked_by_policy": r["blocked_by_policy"]} if "blocked_by_policy" in r else {}),
+                **({"blocked_by_policy": r["blocked_by_policy"]} if "blocked_by_policy" in r else {}),
             }
             for r in response.get("results", [])
         ]
@@ -1226,29 +1197,29 @@ async def web_extract_tool(
             result_json = tool_error("Content was inaccessible or not found")
 
             cleaned_result = clean_base64_images(result_json)
-        
+
         else:
             result_json = json.dumps(trimmed_response, indent=2, ensure_ascii=False)
-            
+
             cleaned_result = clean_base64_images(result_json)
-        
+
         debug_call_data["final_response_size"] = len(cleaned_result)
         debug_call_data["processing_applied"].append("base64_image_removal")
-        
+
         # Log debug information
         _debug.log_call("web_extract_tool", debug_call_data)
         _debug.save()
-        
+
         return cleaned_result
-            
+
     except Exception as e:
-        error_msg = f"Error extracting content: {str(e)}"
+        error_msg = f"Error extracting content: {e!s}"
         logger.debug("%s", error_msg)
-        
+
         debug_call_data["error"] = error_msg
         _debug.log_call("web_extract_tool", debug_call_data)
         _debug.save()
-        
+
         return tool_error(error_msg)
 
 
@@ -1321,7 +1292,7 @@ if __name__ == "__main__":
     """
     print("🌐 Standalone Web Tools Module")
     print("=" * 40)
-    
+
     # Check if API keys are available
     web_available = check_web_api_key()
     tool_gateway_available = _is_tool_gateway_ready()
@@ -1371,45 +1342,45 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print("🛠️  Web tools ready for use!")
-    
+
     if nous_available:
         print(f"🧠 LLM content processing available with {default_summarizer_model}")
         print(f"   Default min length for processing: {DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION} chars")
-    
+
     # Show debug mode status
     if _debug.active:
         print(f"🐛 Debug mode ENABLED - Session ID: {_debug.session_id}")
         print(f"   Debug logs will be saved to: {_debug.log_dir}/web_tools_debug_{_debug.session_id}.json")
     else:
         print("🐛 Debug mode disabled (set WEB_TOOLS_DEBUG=true to enable)")
-    
+
     print("\nBasic usage:")
     print("  from web_tools import web_search_tool, web_extract_tool")
     print("  import asyncio")
-    print("")
+    print()
     print("  # Search (synchronous)")
     print("  results = web_search_tool('Python tutorials')")
-    print("")
+    print()
     print("  # Extract (asynchronous)")
     print("  async def main():")
     print("      content = await web_extract_tool(['https://example.com'])")
     print("  asyncio.run(main())")
-    
+
     if nous_available:
         print("\nLLM-enhanced usage:")
         print("  # Content automatically processed for pages >5000 chars (default)")
         print("  content = await web_extract_tool(['https://python.org/about/'])")
-        print("")
+        print()
         print("  # Customize processing parameters")
         print("  content = await web_extract_tool(")
         print("      ['https://docs.python.org'],")
         print("      model='google/gemini-3-flash-preview',")
         print("      min_length=3000")
         print("  )")
-        print("")
+        print()
         print("  # Disable LLM processing")
         print("  raw_content = await web_extract_tool(['https://example.com'], use_llm_processing=False)")
-    
+
     print("\nDebug mode:")
     print("  # Enable debug logging")
     print("  export WEB_TOOLS_DEBUG=true")
@@ -1419,7 +1390,7 @@ if __name__ == "__main__":
     print("  # - LLM compression metrics")
     print("  # - Final processed results")
     print("  # Logs saved to: ./logs/web_tools_debug_UUID.json")
-    
+
     print("\n📝 Run 'python test_web_tools_llm.py' to test LLM processing capabilities")
 
 
@@ -1430,13 +1401,13 @@ from tools.registry import registry, tool_error
 
 WEB_SEARCH_SCHEMA = {
     "name": "web_search",
-    "description": "Search the web for information. Returns up to 5 results by default with titles, URLs, and descriptions. The query is passed through to the configured backend, so operators such as site:domain, filetype:pdf, intitle:word, -term, and \"exact phrase\" may work when the backend supports them.",
+    "description": 'Search the web for information. Returns up to 5 results by default with titles, URLs, and descriptions. The query is passed through to the configured backend, so operators such as site:domain, filetype:pdf, intitle:word, -term, and "exact phrase" may work when the backend supports them.',
     "parameters": {
         "type": "object",
         "properties": {
             "query": {
                 "type": "string",
-                "description": "The search query to look up on the web. You may include backend-supported operators such as site:example.com, filetype:pdf, intitle:word, -term, or \"exact phrase\".",
+                "description": 'The search query to look up on the web. You may include backend-supported operators such as site:example.com, filetype:pdf, intitle:word, -term, or "exact phrase".',
             },
             "limit": {
                 "type": "integer",

@@ -40,7 +40,7 @@ def parse_date(raw: str) -> dt.date | None:
 
 
 def _read(path: str) -> list[dict[str, str]]:
-    with open(path, newline="", encoding="utf-8") as fh:
+    with Path(path).open(newline="", encoding="utf-8") as fh:
         return list(csv.DictReader(fh))
 
 
@@ -127,7 +127,7 @@ def analyze(
             amt = 0.0
         if not (donor and recip and d):
             continue
-        grouped[(donor, recip)].append((d, amt))
+        grouped[donor, recip].append((d, amt))
 
     results = []
     skipped = 0

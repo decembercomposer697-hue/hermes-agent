@@ -83,13 +83,15 @@ import json
 import logging
 import math
 import os
+import pathlib
 import re
 import shutil
 import sys
 import threading
 import time
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from itertools import starmap
+from typing import Any
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
@@ -136,14 +138,14 @@ def _get_mcp_stderr_log() -> Any:
             # Line-buffered so server output lands on disk promptly; errors=
             # "replace" tolerates garbled binary output from misbehaving
             # servers.
-            fh = open(log_path, "a", encoding="utf-8", errors="replace", buffering=1)
+            fh = pathlib.Path(log_path).open("a", encoding="utf-8", errors="replace", buffering=1)
             # Sanity-check: confirm a real fd is available before we commit.
             fh.fileno()
             _mcp_stderr_log_fh = fh
-        except Exception as poll_exc:  # pragma: no cover — best-effort fallback
+        except Exception:  # pragma: no cover — best-effort fallback
             logger.debug("Failed to open MCP stderr log, using devnull: %s", exc)
             try:
-                _mcp_stderr_log_fh = open(os.devnull, "w", encoding="utf-8")
+                _mcp_stderr_log_fh = pathlib.Path(os.devnull).open("w", encoding="utf-8")
             except Exception:
                 # Last resort: the real stderr.  Not ideal for TUI users but
                 # it matches pre-fix behavior.
@@ -169,6 +171,7 @@ def _write_stderr_log_header(server_name: str) -> None:
 # ---------------------------------------------------------------------------
 # Graceful import -- MCP SDK is an optional dependency
 # ---------------------------------------------------------------------------
+
 
 _MCP_AVAILABLE = False
 _MCP_HTTP_AVAILABLE = False
@@ -259,7 +262,7 @@ if _MCP_AVAILABLE and not _MCP_MESSAGE_HANDLER_SUPPORTED:
 _DEFAULT_TOOL_TIMEOUT = 120      # seconds for tool calls
 _DEFAULT_CONNECT_TIMEOUT = 60    # seconds for initial connection per server
 _MAX_RECONNECT_RETRIES = 5
-_MAX_INITIAL_CONNECT_RETRIES = 3 # retries for the very first connection attempt
+_MAX_INITIAL_CONNECT_RETRIES = 3  # retries for the very first connection attempt
 _MAX_BACKOFF_SECONDS = 60
 
 # Environment variables that are safe to pass to stdio subprocesses
@@ -329,7 +332,7 @@ def _exc_str(exc: BaseException) -> str:
     and logged to disk always carry *some* diagnostic information.
     """
     text = str(exc).strip()
-    return text if text else repr(exc)
+    return text or repr(exc)
 
 
 # ---------------------------------------------------------------------------
@@ -340,25 +343,25 @@ def _exc_str(exc: BaseException) -> str:
 # These are WARNING-level — we log but don't block, since false positives
 # would break legitimate MCP servers.
 _MCP_INJECTION_PATTERNS = [
-    (re.compile(r"ignore\s+(all\s+)?previous\s+instructions", re.I),
+    (re.compile(r"ignore\s+(all\s+)?previous\s+instructions", re.IGNORECASE),
      "prompt override attempt ('ignore previous instructions')"),
-    (re.compile(r"you\s+are\s+now\s+a", re.I),
+    (re.compile(r"you\s+are\s+now\s+a", re.IGNORECASE),
      "identity override attempt ('you are now a...')"),
-    (re.compile(r"your\s+new\s+(task|role|instructions?)\s+(is|are)", re.I),
+    (re.compile(r"your\s+new\s+(task|role|instructions?)\s+(is|are)", re.IGNORECASE),
      "task override attempt"),
-    (re.compile(r"system\s*:\s*", re.I),
+    (re.compile(r"system\s*:\s*", re.IGNORECASE),
      "system prompt injection attempt"),
-    (re.compile(r"<\s*(system|human|assistant)\s*>", re.I),
+    (re.compile(r"<\s*(system|human|assistant)\s*>", re.IGNORECASE),
      "role tag injection attempt"),
-    (re.compile(r"do\s+not\s+(tell|inform|mention|reveal)", re.I),
+    (re.compile(r"do\s+not\s+(tell|inform|mention|reveal)", re.IGNORECASE),
      "concealment instruction"),
-    (re.compile(r"(curl|wget|fetch)\s+https?://", re.I),
+    (re.compile(r"(curl|wget|fetch)\s+https?://", re.IGNORECASE),
      "network command in description"),
-    (re.compile(r"base64\.(b64decode|decodebytes)", re.I),
+    (re.compile(r"base64\.(b64decode|decodebytes)", re.IGNORECASE),
      "base64 decode reference"),
-    (re.compile(r"exec\s*\(|eval\s*\(", re.I),
+    (re.compile(r"exec\s*\(|eval\s*\(", re.IGNORECASE),
      "code execution reference"),
-    (re.compile(r"import\s+(subprocess|os|shutil|socket)", re.I),
+    (re.compile(r"import\s+(subprocess|os|shutil|socket)", re.IGNORECASE),
      "dangerous import reference"),
 ]
 
@@ -408,7 +411,7 @@ def _resolve_stdio_command(command: str, env: dict) -> tuple[str, dict]:
     resolved_env = dict(env or {})
 
     if os.sep not in resolved_command:
-        path_arg = resolved_env.get("PATH", None)
+        path_arg = resolved_env.get("PATH")
         which_hit = shutil.which(resolved_command, path=path_arg)
         if which_hit:
             resolved_command = which_hit
@@ -434,7 +437,7 @@ def _resolve_stdio_command(command: str, env: dict) -> tuple[str, dict]:
                 os.path.join(os.sep, "usr", "local", "bin", resolved_command),
             ]
             for candidate in candidates:
-                if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+                if pathlib.Path(candidate).is_file() and os.access(candidate, os.X_OK):
                     resolved_command = candidate
                     break
 
@@ -496,7 +499,7 @@ def _cache_mcp_image_block(block) -> str:
         # get any text blocks that did parse.
         logger.debug("MCP image caching skipped — gateway.platforms.base unavailable")
         return ""
-    except Exception as poll_exc:
+    except Exception:
         logger.warning("MCP image block cache failed: %s", exc)
         return ""
 
@@ -561,7 +564,7 @@ def _validate_remote_mcp_url(server_name: str, url: Any) -> str:
         )
     try:
         parsed = urlparse(stripped)
-    except Exception as poll_exc:  # urlparse is very permissive — belt and braces
+    except Exception:  # urlparse is very permissive — belt and braces
         raise InvalidMcpUrlError(
             f"Invalid MCP URL for '{server_name}': {stripped!r} ({exc})",
         ) from exc
@@ -615,7 +618,7 @@ def _resolve_client_cert(server_name: str, config: dict):
                 f"string path (got {type(path).__name__})",
             )
         expanded = os.path.expanduser(path.strip())
-        if not os.path.isfile(expanded):
+        if not pathlib.Path(expanded).is_file():
             raise FileNotFoundError(
                 f"MCP server '{server_name}': {label} not found at "
                 f"{expanded!r}",
@@ -1071,7 +1074,7 @@ class SamplingHandler:
                 f"Sampling LLM call timed out after {self.timeout}s "
                 f"for server '{self.server_name}'",
             )
-        except Exception as poll_exc:
+        except Exception:
             self.metrics["errors"] += 1
             return self._error(
                 f"Sampling LLM call failed: {_sanitize_error(_exc_str(exc))}",
@@ -1118,12 +1121,23 @@ class MCPServerTask:
     """
 
     __slots__ = (
-        "name", "session", "tool_timeout",
-        "_task", "_ready", "_shutdown_event", "_reconnect_event",
-        "_tools", "_error", "_config",
-        "_sampling", "_registered_tool_names", "_auth_type", "_refresh_lock",
-        "_rpc_lock", "_pending_refresh_tasks",
+        "_auth_type",
+        "_config",
+        "_error",
+        "_pending_refresh_tasks",
+        "_ready",
+        "_reconnect_event",
+        "_refresh_lock",
+        "_registered_tool_names",
+        "_rpc_lock",
+        "_sampling",
+        "_shutdown_event",
+        "_task",
+        "_tools",
         "initialize_result",
+        "name",
+        "session",
+        "tool_timeout",
     )
 
     def __init__(self, name: str):
@@ -1330,7 +1344,7 @@ class MCPServerTask:
                             self.session.list_tools(),
                             timeout=30.0,
                         )
-                    except Exception as poll_exc:
+                    except Exception:
                         logger.warning(
                             "MCP server '%s' keepalive failed, "
                             "triggering reconnect: %s",
@@ -1386,7 +1400,7 @@ class MCPServerTask:
         server_params = StdioServerParameters(
             command=command,
             args=args,
-            env=safe_env if safe_env else None,
+            env=safe_env or None,
         )
 
         sampling_kwargs = self._sampling.session_kwargs() if self._sampling else {}
@@ -1586,7 +1600,7 @@ class MCPServerTask:
                 _oauth_auth = get_manager().get_or_build_provider(
                     self.name, url, config.get("oauth"),
                 )
-            except Exception as poll_exc:
+            except Exception:
                 logger.warning("MCP OAuth setup failed for '%s': %s", self.name, exc)
                 raise
 
@@ -1728,18 +1742,17 @@ class MCPServerTask:
                 _http_kwargs["auth"] = _oauth_auth
             async with streamablehttp_client(url, **_http_kwargs) as (
                 read_stream, write_stream, _get_session_id,
-            ):
-                async with ClientSession(read_stream, write_stream, **sampling_kwargs) as session:
-                    self.initialize_result = await session.initialize()
-                    self.session = session
-                    await self._discover_tools()
-                    self._ready.set()
-                    reason = await self._wait_for_lifecycle_event()
-                    if reason == "reconnect":
-                        logger.info(
-                            "MCP server '%s': reconnect requested — "
-                            "tearing down legacy HTTP session", self.name,
-                        )
+            ), ClientSession(read_stream, write_stream, **sampling_kwargs) as session:
+                self.initialize_result = await session.initialize()
+                self.session = session
+                await self._discover_tools()
+                self._ready.set()
+                reason = await self._wait_for_lifecycle_event()
+                if reason == "reconnect":
+                    logger.info(
+                        "MCP server '%s': reconnect requested — "
+                        "tearing down legacy HTTP session", self.name,
+                    )
 
     async def _discover_tools(self):
         """Discover tools from the connected session."""
@@ -1861,7 +1874,7 @@ class MCPServerTask:
                 # ``await self._task`` completes. See #9930.
                 self.session = None
                 raise
-            except Exception as poll_exc:
+            except Exception:
                 self.session = None
 
                 # If this is the first connection attempt, retry with backoff
@@ -2032,6 +2045,7 @@ def _reset_server_error(server_name: str) -> None:
     """
     _server_error_counts[server_name] = 0
     _server_breaker_opened_at.pop(server_name, None)
+
 
 # ---------------------------------------------------------------------------
 # Auth-failure detection helpers (Task 6 of MCP OAuth consolidation)
@@ -2416,7 +2430,7 @@ def _snapshot_child_pids() -> set:
     # Linux: read from /proc
     try:
         children_path = f"/proc/{my_pid}/task/{my_pid}/children"
-        with open(children_path, encoding="utf-8") as f:
+        with pathlib.Path(children_path).open(encoding="utf-8") as f:
             return {int(p) for p in f.read().split() if p.strip()}
     except (FileNotFoundError, OSError, ValueError):
         pass
@@ -2565,7 +2579,7 @@ def _load_mcp_config() -> dict[str, dict]:
         except Exception:
             pass
         return {name: _interpolate_env_vars(cfg) for name, cfg in servers.items()}
-    except Exception as poll_exc:
+    except Exception:
         logger.debug("Failed to load MCP config: %s", exc)
         return {}
 
@@ -3546,7 +3560,7 @@ def register_mcp_servers(servers: dict[str, dict]) -> list[str]:
         server_names = list(new_servers.keys())
         # Connect to all servers in PARALLEL
         results = await asyncio.gather(
-            *(_discover_one(name, cfg) for name, cfg in new_servers.items()),
+            *starmap(_discover_one, new_servers.items()),
             return_exceptions=True,
         )
         for name, result in zip(server_names, results):
@@ -3766,7 +3780,7 @@ def probe_mcp_server_tools() -> dict[str, list[tuple]]:
 
     try:
         _run_on_mcp_loop(_probe_all, timeout=120)
-    except Exception as poll_exc:
+    except Exception:
         logger.debug("MCP probe failed: %s", exc)
     finally:
         _stop_mcp_loop()
@@ -3872,7 +3886,7 @@ def _kill_orphaned_mcp_children(include_active: bool = False) -> None:
             try:
                 killpg(pgid, sig)
                 return
-            except (ProcessLookupError, PermissionError, OSError) as exc:
+            except (ProcessLookupError, PermissionError, OSError):
                 # Pgroup gone (all members exited) or refused — fall back to
                 # the per-pid path so we still try the direct child if alive.
                 logger.debug(

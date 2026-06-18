@@ -78,7 +78,7 @@ def test_terminal_background_keeps_pty_for_regular_interactive_commands(monkeypa
     try:
         result = json.loads(
             terminal_tool_module.terminal_tool(
-                command="python3 -c \"print(input())\"",
+                command='python3 -c "print(input())"',
                 background=True,
                 pty=True,
             ),

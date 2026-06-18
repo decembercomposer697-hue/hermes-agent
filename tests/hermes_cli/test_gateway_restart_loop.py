@@ -224,7 +224,7 @@ class TestGatewaySelfTargetingGuard:
             pass
 
         def _sentinel(*a, **k):
-            raise _Reached()
+            raise _Reached
 
         monkeypatch.setattr(gw, "_dispatch_via_service_manager_if_s6", _sentinel)
         monkeypatch.setattr(gw, "_dispatch_all_via_service_manager_if_s6", _sentinel)
@@ -243,7 +243,7 @@ class TestGatewaySelfTargetingGuard:
             pass
 
         def _sentinel(*a, **k):
-            raise _Reached()
+            raise _Reached
 
         monkeypatch.setattr(gw, "_dispatch_via_service_manager_if_s6", _sentinel)
         monkeypatch.setattr(gw, "_dispatch_all_via_service_manager_if_s6", _sentinel)

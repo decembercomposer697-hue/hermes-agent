@@ -31,7 +31,7 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
 def _load_pyproject() -> dict:
-    with open(REPO_ROOT / "pyproject.toml", "rb") as fh:
+    with pathlib.Path(REPO_ROOT / "pyproject.toml").open("rb") as fh:
         return tomllib.load(fh)
 
 

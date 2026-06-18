@@ -22,9 +22,9 @@ import subprocess
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional
 from urllib.parse import urljoin, urlparse, urlunparse
 
 import httpx
@@ -70,6 +70,7 @@ _MAX_SKILL_FETCH_REDIRECTS = 5
 @dataclass
 class SkillMeta:
     """Minimal metadata returned by search results."""
+
     name: str
     description: str
     source: str           # "official", "github", "clawhub", "claude-marketplace", "lobehub"
@@ -84,6 +85,7 @@ class SkillMeta:
 @dataclass
 class SkillBundle:
     """A downloaded skill ready for quarantine/scanning/installation."""
+
     name: str
     files: dict[str, str | bytes]   # relative_path -> file content
     source: str
@@ -237,10 +239,10 @@ def _validate_bundle_rel_path(rel_path: str) -> str:
 
 class GitHubAuth:
     """GitHub API authentication. Tries methods in priority order:
-      1. GITHUB_TOKEN / GH_TOKEN env var (PAT — the default)
-      2. `gh auth token` subprocess (if gh CLI is installed)
-      3. GitHub App JWT + installation token (if app credentials configured)
-      4. Unauthenticated (60 req/hr, public repos only)
+    1. GITHUB_TOKEN / GH_TOKEN env var (PAT — the default)
+    2. `gh auth token` subprocess (if gh CLI is installed)
+    3. GitHub App JWT + installation token (if app credentials configured)
+    4. Unauthenticated (60 req/hr, public repos only)
     """
 
     def __init__(self):
@@ -349,7 +351,7 @@ class GitHubAuth:
             if resp.status_code == 201:
                 return resp.json().get("token")
         except Exception as e:
-            logger.debug(f"GitHub App auth failed: {e}")
+            logger.debug("GitHub App auth failed: %s", e)
 
         return None
 
@@ -467,9 +469,7 @@ class GitHubSource(SkillSource):
         _trust_rank = {"builtin": 2, "trusted": 1, "community": 0}
         seen = {}
         for r in results:
-            if r.identifier not in seen:
-                seen[r.identifier] = r
-            elif _trust_rank.get(r.trust_level, 0) > _trust_rank.get(seen[r.identifier].trust_level, 0):
+            if r.identifier not in seen or _trust_rank.get(r.trust_level, 0) > _trust_rank.get(seen[r.identifier].trust_level, 0):
                 seen[r.identifier] = r
         results = list(seen.values())
 
@@ -783,7 +783,7 @@ class GitHubSource(SkillSource):
             else:
                 logger.debug("Skipped file (fetch failed): %s/%s", repo, item_path)
 
-        return files if files else None
+        return files or None
 
     def _download_directory_recursive(self, repo: str, path: str) -> dict[str, str]:
         """Recursively download via Contents API (fallback)."""
@@ -1106,7 +1106,7 @@ class WellKnownSkillSource(SkillSource):
         return query.rstrip("/") + f"{self.BASE_PATH}/index.json"
 
     def _parse_identifier(self, identifier: str) -> dict | None:
-        raw = identifier[len("well-known:"):] if identifier.startswith("well-known:") else identifier
+        raw = identifier.removeprefix("well-known:")
         if not raw.startswith(("http://", "https://")):
             return None
 
@@ -1697,8 +1697,8 @@ class SkillsShSource(SkillSource):
 
         default_repo = f"{parts[0]}/{parts[1]}"
         repo = detail.get("repo", default_repo) if isinstance(detail, dict) else default_repo
-        skill_token=parts[2].split("/")[-1]
-        tokens=[skill_token]
+        skill_token = parts[2].split("/")[-1]
+        tokens = [skill_token]
         if isinstance(detail, dict):
             tokens.extend([
                 detail.get("install_skill", ""),
@@ -1834,8 +1834,7 @@ class SkillsShSource(SkillSource):
     @staticmethod
     def _extract_repo_slug(repo_value: str) -> str | None:
         repo_value = repo_value.strip()
-        if repo_value.startswith("https://github.com/"):
-            repo_value = repo_value[len("https://github.com/"):]
+        repo_value = repo_value.removeprefix("https://github.com/")
         repo_value = repo_value.strip("/")
         parts = repo_value.split("/")
         if len(parts) >= 2:
@@ -2123,7 +2122,7 @@ class ClawHubSource(SkillSource):
             # to `limit` so a browse command renders its first page without
             # walking the entire 50k+ catalog (max_items=0 → unbounded, used
             # only by the offline index builder via search("", limit=0)).
-            catalog = self._load_catalog_index(max_items=limit if limit > 0 else 0)
+            catalog = self._load_catalog_index(max_items=max(0, limit))
             if catalog:
                 return self._dedupe_results(catalog)[:limit] if limit > 0 else self._dedupe_results(catalog)
 
@@ -2176,7 +2175,7 @@ class ClawHubSource(SkillSource):
         return final_results
 
     def fetch(self, identifier: str) -> SkillBundle | None:
-        slug = identifier.split("/")[-1]
+        slug = identifier.rsplit("/", maxsplit=1)[-1]
 
         skill_data = self._get_json(f"{self.BASE_URL}/skills/{slug}")
         if not isinstance(skill_data, dict):
@@ -2218,7 +2217,7 @@ class ClawHubSource(SkillSource):
         )
 
     def inspect(self, identifier: str) -> SkillMeta | None:
-        slug = identifier.split("/")[-1]
+        slug = identifier.rsplit("/", maxsplit=1)[-1]
         data = self._coerce_skill_payload(self._get_json(f"{self.BASE_URL}/skills/{slug}"))
         if not isinstance(data, dict):
             return None
@@ -2724,7 +2723,7 @@ class LobeHubSource(SkillSource):
             "",
             "## Instructions",
             "",
-            system_role if system_role else "(No system role defined)",
+            system_role or "(No system role defined)",
         ]
 
         return "\n".join(fm_lines) + "\n\n" + "\n".join(body_lines) + "\n"
@@ -3261,7 +3260,7 @@ def append_audit_log(action: str, skill_name: str, source: str,
         parts.append(extra)
     line = " ".join(parts) + "\n"
     try:
-        with open(AUDIT_LOG, "a", encoding="utf-8") as f:
+        with Path(AUDIT_LOG).open("a", encoding="utf-8") as f:
             f.write(line)
     except OSError as e:
         logger.debug("Could not write audit log: %s", e)
@@ -3732,7 +3731,7 @@ def create_source_router(auth: GitHubAuth | None = None) -> list[SkillSource]:
 
     sources: list[SkillSource] = [
         OptionalSkillSource(),        # Official optional skills (highest priority)
-        HermesIndexSource(auth=auth), # Centralized index (search + resolved install paths)
+        HermesIndexSource(auth=auth),  # Centralized index (search + resolved install paths)
         SkillsShSource(auth=auth),
         WellKnownSkillSource(),
         UrlSource(),                  # Direct HTTP(S) URL to a SKILL.md file
@@ -3865,9 +3864,7 @@ def unified_search(query: str, sources: list[SkillSource],
     _TRUST_RANK = {"builtin": 2, "trusted": 1, "community": 0}
     seen: dict[str, SkillMeta] = {}
     for r in all_results:
-        if r.identifier not in seen:
-            seen[r.identifier] = r
-        elif _TRUST_RANK.get(r.trust_level, 0) > _TRUST_RANK.get(seen[r.identifier].trust_level, 0):
+        if r.identifier not in seen or _TRUST_RANK.get(r.trust_level, 0) > _TRUST_RANK.get(seen[r.identifier].trust_level, 0):
             seen[r.identifier] = r
     deduped = list(seen.values())
 

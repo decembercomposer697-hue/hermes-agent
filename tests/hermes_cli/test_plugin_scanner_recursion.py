@@ -9,7 +9,7 @@ still opt-in; exclusive kind skipped; unknown kinds → standalone warning).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 import yaml

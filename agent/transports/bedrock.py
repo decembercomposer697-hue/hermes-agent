@@ -6,7 +6,7 @@ owns format conversion and normalization, while client construction and
 boto3 calls stay on AIAgent.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from agent.transports.base import ProviderTransport
 from agent.transports.types import NormalizedResponse, ToolCall, Usage

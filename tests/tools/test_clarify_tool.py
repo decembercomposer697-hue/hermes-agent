@@ -1,7 +1,6 @@
 """Tests for tools/clarify_tool.py - Interactive clarifying questions."""
 
 import json
-from typing import List, Optional
 
 from tools.clarify_tool import (
     CLARIFY_SCHEMA,

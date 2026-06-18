@@ -26,14 +26,13 @@ import sys
 import tempfile
 import threading
 import time
-import urllib.error
 import urllib.parse
 import urllib.request
 from contextlib import asynccontextmanager, contextmanager
 from dataclasses import dataclass
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import yaml
 
@@ -227,6 +226,8 @@ app.add_middleware(
 # Keep the upstream list minimal — only truly non-sensitive, read-only
 # endpoints belong there.
 # ---------------------------------------------------------------------------
+from itertools import starmap
+
 from hermes_cli.dashboard_auth.public_paths import (
     PUBLIC_API_PATHS as _PUBLIC_API_PATHS,
 )
@@ -590,7 +591,7 @@ def _build_schema_from_config(
         # Category is the first path component for nested keys, or "general"
         # for top-level scalar fields (model, toolsets, timezone, etc.).
         if prefix:
-            category = prefix.split(".")[0]
+            category = prefix.split(".", maxsplit=1)[0]
         elif isinstance(value, dict):
             category = key
         else:
@@ -710,6 +711,7 @@ class ModelAssignment(BaseModel):
     scope="auxiliary" with task=""  → applied to every auxiliary.* slot
     scope="auxiliary" with task="__reset__"  → resets every slot to provider="auto"
     """
+
     scope: str
     provider: str
     model: str
@@ -1629,7 +1631,7 @@ def _record_completed_action(name: str, message: str, exit_code: int = 1) -> Non
     log_file_name = _ACTION_LOG_FILES[name]
     _ACTION_LOG_DIR.mkdir(parents=True, exist_ok=True)
     log_path = _ACTION_LOG_DIR / log_file_name
-    with open(log_path, "ab", buffering=0) as log_file:
+    with Path(log_path).open("ab", buffering=0) as log_file:
         log_file.write(
             f"\n=== {name} completed {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n".encode(),
         )
@@ -1649,7 +1651,7 @@ def _spawn_hermes_action(subcommand: list[str], name: str) -> subprocess.Popen:
     log_file_name = _ACTION_LOG_FILES[name]
     _ACTION_LOG_DIR.mkdir(parents=True, exist_ok=True)
     log_path = _ACTION_LOG_DIR / log_file_name
-    log_file = open(log_path, "ab", buffering=0)
+    log_file = Path(log_path).open("ab", buffering=0)
     log_file.write(
         f"\n=== {name} started {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n".encode(),
     )
@@ -1960,7 +1962,7 @@ async def transcribe_audio_upload(payload: AudioTranscriptionRequest):
     finally:
         if temp_path:
             try:
-                os.unlink(temp_path)
+                Path(temp_path).unlink()
             except OSError:
                 pass
 
@@ -2071,7 +2073,7 @@ async def speak_text(payload: TTSSpeakRequest):
         )
 
     file_path = result.get("file_path")
-    if not file_path or not os.path.isfile(file_path):
+    if not file_path or not Path(file_path).is_file():
         raise HTTPException(status_code=500, detail="Audio file missing")
 
     ext = os.path.splitext(file_path)[1].lower()
@@ -2084,13 +2086,12 @@ async def speak_text(payload: TTSSpeakRequest):
     }.get(ext, "audio/mpeg")
 
     try:
-        with open(file_path, "rb") as fh:
-            audio_bytes = fh.read()
+        audio_bytes = Path(file_path).read_bytes()
     except OSError as exc:
         raise HTTPException(status_code=500, detail=f"Could not read audio: {exc}")
     finally:
         try:
-            os.unlink(file_path)
+            Path(file_path).unlink()
         except OSError:
             pass
 
@@ -4783,7 +4784,7 @@ def _save_anthropic_oauth_creds(access_token: str, refresh_token: str, expires_a
             handle.write(json.dumps(payload, indent=2))
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(tmp_path, _HERMES_OAUTH_FILE)
+        Path(tmp_path).replace(_HERMES_OAUTH_FILE)
         try:
             _HERMES_OAUTH_FILE.chmod(stat.S_IRUSR | stat.S_IWUSR)
         except OSError:
@@ -5172,7 +5173,7 @@ def _start_xai_loopback_flow() -> dict[str, Any]:
 
 def _xai_loopback_worker(session_id: str) -> None:
     """Wait for the xAI loopback callback, exchange the code, persist tokens."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     from hermes_cli import auth as hauth
 
@@ -5315,7 +5316,7 @@ def _add_xai_oauth_pool_entry(
 
 def _nous_poller(session_id: str) -> None:
     """Background poller that drives a Nous device-code flow to completion."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     import httpx
 
@@ -5389,7 +5390,7 @@ def _minimax_poller(session_id: str) -> None:
     path leaves the system in the same state as
     ``hermes auth add minimax-oauth``.
     """
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     import httpx
 
@@ -5484,7 +5485,6 @@ def _codex_full_login_worker(session_id: str) -> None:
         from hermes_cli.auth import (
             CODEX_OAUTH_CLIENT_ID,
             CODEX_OAUTH_TOKEN_URL,
-            DEFAULT_CODEX_BASE_URL,
         )
         issuer = "https://auth.openai.com"
 
@@ -6465,9 +6465,7 @@ async def list_mcp_servers():
 
     servers = _get_mcp_servers()
     return {
-        "servers": [
-            _mcp_server_summary(name, cfg) for name, cfg in sorted(servers.items())
-        ],
+        "servers": list(starmap(_mcp_server_summary, sorted(servers.items()))),
     }
 
 
@@ -7217,7 +7215,7 @@ async def run_import(body: ImportRequest):
     archive = (body.archive or "").strip()
     if not archive:
         raise HTTPException(status_code=400, detail="archive path is required")
-    if not os.path.isfile(archive):
+    if not Path(archive).is_file():
         raise HTTPException(status_code=404, detail=f"Archive not found: {archive}")
     try:
         proc = _spawn_hermes_action(["import", archive], "import")
@@ -7667,9 +7665,7 @@ async def search_skills_hub(
         _rank = {"builtin": 2, "trusted": 1, "community": 0}
         seen = {}
         for r in all_results:
-            if r.identifier not in seen:
-                seen[r.identifier] = r
-            elif _rank.get(r.trust_level, 0) > _rank.get(seen[r.identifier].trust_level, 0):
+            if r.identifier not in seen or _rank.get(r.trust_level, 0) > _rank.get(seen[r.identifier].trust_level, 0):
                 seen[r.identifier] = r
         deduped = list(seen.values())[:capped]
 
@@ -8745,8 +8741,7 @@ async def save_toolset_env(name: str, body: ToolsetEnvUpdate):
         allowed: set[str] = set()
         if cat:
             for prov in _visible_providers(cat, config, force_fresh=True):
-                for e in prov.get("env_vars", []):
-                    allowed.add(e["key"])
+                allowed.update(e["key"] for e in prov.get("env_vars", []))
 
         unknown = [k for k in body.env if k not in allowed]
         if unknown:
@@ -9038,7 +9033,7 @@ if sys.platform.startswith("win"):
 
         class PtyUnavailableError(RuntimeError):  # type: ignore[no-redef]
             """Stub when win_pty_bridge cannot be imported."""
-            pass
+
 else:
     try:
         from hermes_cli.pty_bridge import PtyBridge, PtyUnavailableError
@@ -9049,7 +9044,7 @@ else:
 
         class PtyUnavailableError(RuntimeError):  # type: ignore[no-redef]
             """Stub on platforms where pty_bridge can't be imported."""
-            pass
+
 
 _RESIZE_RE = re.compile(rb"\x1b\[RESIZE:(\d+);(\d+)\]")
 _PTY_READ_CHUNK_TIMEOUT = 0.2
@@ -9790,7 +9785,7 @@ def mount_spa(application: FastAPI):
         if prefix:
             for asset_dir in ("/fonts/", "/fonts-terminal/", "/ds-assets/", "/assets/"):
                 css = css.replace(f"url({asset_dir}", f"url({prefix}{asset_dir}")
-                css = css.replace(f"url(\"{asset_dir}", f"url(\"{prefix}{asset_dir}")
+                css = css.replace(f'url("{asset_dir}', f'url("{prefix}{asset_dir}')
                 css = css.replace(f"url('{asset_dir}", f"url('{prefix}{asset_dir}")
         return Response(content=css, media_type="text/css")
 
@@ -10823,9 +10818,9 @@ def start_server(
                     f"Bundled providers reported these issues:\n"
                     + "\n".join(skip_reasons)
                     + "\n"
-                    f"\n"
-                    f"Or pass --insecure to skip the auth gate (NOT "
-                    f"recommended on untrusted networks).",
+                    "\n"
+                    "Or pass --insecure to skip the auth gate (NOT "
+                    "recommended on untrusted networks).",
                 )
             raise SystemExit(
                 f"Refusing to bind dashboard to {host} — the OAuth auth "

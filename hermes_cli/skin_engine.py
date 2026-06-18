@@ -115,7 +115,7 @@ Activate with ``/skin <name>`` in the CLI or ``display.skin: <name>`` in config.
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from hermes_constants import get_hermes_home
 
@@ -129,6 +129,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SkinConfig:
     """Complete skin configuration."""
+
     name: str
     description: str = ""
     colors: dict[str, str] = field(default_factory=dict)
@@ -662,7 +663,7 @@ def _load_skin_from_yaml(path: Path) -> dict[str, Any] | None:
     """Load a skin definition from a YAML file."""
     try:
         import yaml
-        with open(path, encoding="utf-8") as f:
+        with Path(path).open(encoding="utf-8") as f:
             data = yaml.safe_load(f)
         if isinstance(data, dict) and "name" in data:
             return data

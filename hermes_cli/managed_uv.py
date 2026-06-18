@@ -13,11 +13,9 @@ from __future__ import annotations
 import logging
 import os
 import platform
-import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Optional
 
 from hermes_constants import get_hermes_home
 
@@ -234,7 +232,7 @@ def _install_uv_posix(env: dict[str, str]) -> None:
         )
     finally:
         try:
-            os.unlink(installer_path)
+            Path(installer_path).unlink()
         except OSError:
             pass
 

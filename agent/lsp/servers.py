@@ -21,10 +21,11 @@ from __future__ import annotations
 
 import logging
 import os
+import pathlib
 import shutil
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from agent.lsp.workspace import nearest_root
 
@@ -240,7 +241,7 @@ def _spawn_pyright(root: str, ctx: ServerContext) -> SpawnSpec | None:
     base = os.path.basename(bin_path)
     if base in {"pyright", "pyright.exe"}:
         sibling = os.path.join(os.path.dirname(bin_path), "pyright-langserver")
-        if os.path.exists(sibling):
+        if pathlib.Path(sibling).exists():
             bin_path = sibling
     init: dict[str, Any] = {}
     # Pick the project's venv interpreter if there is one — otherwise
@@ -267,7 +268,7 @@ def _detect_python(root: str) -> str | None:
     for v in candidates:
         for sub in ("bin/python", "bin/python3", "Scripts/python.exe"):
             p = os.path.join(v, sub)
-            if os.path.exists(p):
+            if pathlib.Path(p).exists():
                 return p
     return None
 
@@ -680,7 +681,7 @@ def _spawn_astro(root: str, ctx: ServerContext) -> SpawnSpec | None:
 def _resolve_override(ctx: ServerContext, server_id: str) -> str | None:
     """User can pin a binary path in config."""
     override = ctx.binary_overrides.get(server_id)
-    if override and override[0] and os.path.exists(override[0]):
+    if override and override[0] and pathlib.Path(override[0]).exists():
         return override[0]
     return None
 
@@ -1031,11 +1032,11 @@ def language_id_for(path: str) -> str:
 
 
 __all__ = [
-    "ServerDef",
-    "ServerContext",
-    "SpawnSpec",
+    "LANGUAGE_BY_EXT",
     "SERVERS",
+    "ServerContext",
+    "ServerDef",
+    "SpawnSpec",
     "find_server_for_file",
     "language_id_for",
-    "LANGUAGE_BY_EXT",
 ]

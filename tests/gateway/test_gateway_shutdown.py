@@ -18,7 +18,6 @@ async def test_cancel_background_tasks_cancels_inflight_message_processing():
 
     async def block_forever(_event):
         await release.wait()
-        return None
 
     adapter.set_message_handler(block_forever)
     event = MessageEvent(text="work", source=make_restart_source(), message_id="1")
@@ -60,7 +59,6 @@ async def test_gateway_stop_interrupts_running_agents_and_cancels_adapter_tasks(
 
     async def block_forever(_event):
         await release.wait()
-        return None
 
     adapter.set_message_handler(block_forever)
     event = MessageEvent(text="work", source=make_restart_source(), message_id="1")

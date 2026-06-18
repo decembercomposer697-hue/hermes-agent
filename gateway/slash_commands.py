@@ -26,7 +26,6 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Union
 
 from agent.account_usage import fetch_account_usage, render_account_usage_lines
 from agent.i18n import t
@@ -63,7 +62,7 @@ class GatewaySlashCommandsMixin:
     async def _handle_reset_command(self, event: MessageEvent) -> str | EphemeralReply:
         """Handle /new or /reset command."""
         source = event.source
-        
+
         # Get existing session key
         session_key = self._session_key_for_source(source)
         self._invalidate_session_run_generation(session_key, reason="session_reset")
@@ -85,7 +84,7 @@ class GatewaySlashCommandsMixin:
         if _cache_lock is not None:
             with _cache_lock:
                 _cached = self._agent_cache.get(session_key)
-                _old_agent = _cached[0] if isinstance(_cached, tuple) else _cached if _cached else None
+                _old_agent = _cached[0] if isinstance(_cached, tuple) else _cached or None
             if _old_agent is not None:
                 self._cleanup_agent_resources(_old_agent)
         self._evict_cached_agent(session_key)
@@ -790,7 +789,7 @@ class GatewaySlashCommandsMixin:
         # under systemd (KillMode=mixed kills the cgroup) or Docker (tini
         # exits when the gateway dies, taking the detached helper with it).
         _under_service = bool(os.environ.get("INVOCATION_ID"))  # systemd sets this
-        _in_container = os.path.exists("/.dockerenv") or os.path.exists("/run/.containerenv")
+        _in_container = Path("/.dockerenv").exists() or Path("/run/.containerenv").exists()
         if _under_service or _in_container:
             self.request_restart(detached=False, via_service=True)
         else:
@@ -1230,7 +1229,7 @@ class GatewaySlashCommandsMixin:
             if persist_global:
                 try:
                     if config_path.exists():
-                        with open(config_path, encoding="utf-8") as f:
+                        with Path(config_path).open(encoding="utf-8") as f:
                             cfg = yaml.safe_load(f) or {}
                     else:
                         cfg = {}
@@ -1456,7 +1455,7 @@ class GatewaySlashCommandsMixin:
                 return t("gateway.personality.save_failed", error=str(e))
             self._ephemeral_system_prompt = ""
             return t("gateway.personality.cleared")
-        elif args in personalities:
+        if args in personalities:
             new_prompt = _resolve_prompt(personalities[args])
 
             # Write to config.yaml, same pattern as CLI save_config_value.
@@ -1481,7 +1480,7 @@ class GatewaySlashCommandsMixin:
         source = event.source
         session_entry = self.session_store.get_or_create_session(source)
         history = self.session_store.load_transcript(session_entry.session_id)
-        
+
         # Find the last user message
         last_user_msg = None
         last_user_idx = None
@@ -1490,16 +1489,16 @@ class GatewaySlashCommandsMixin:
                 last_user_msg = history[i].get("content", "")
                 last_user_idx = i
                 break
-        
+
         if not last_user_msg:
             return t("gateway.retry.no_previous")
-        
+
         # Truncate history to before the last user message and persist
         truncated = history[:last_user_idx]
         self.session_store.rewrite_transcript(session_entry.session_id, truncated)
         # Reset stored token count — transcript was truncated
         session_entry.last_prompt_tokens = 0
-        
+
         # Re-send by creating a fake text event with the old message
         retry_event = MessageEvent(
             text=last_user_msg,
@@ -1508,7 +1507,7 @@ class GatewaySlashCommandsMixin:
             raw_message=event.raw_message,
             channel_prompt=event.channel_prompt,
         )
-        
+
         # Let the normal message handler process it
         return await self._handle_message(retry_event)
 
@@ -1661,8 +1660,7 @@ class GatewaySlashCommandsMixin:
                 n = int(raw_args.split()[0])
             except (ValueError, IndexError):
                 return t("gateway.undo.invalid_count", arg=raw_args.split()[0])
-            if n < 1:
-                n = 1
+            n = max(n, 1)
 
         session_entry = self.session_store.get_or_create_session(source)
         result = self.session_store.rewind_session(session_entry.session_id, n)
@@ -1742,23 +1740,23 @@ class GatewaySlashCommandsMixin:
             if adapter:
                 self._set_adapter_auto_tts_enabled(adapter, chat_id, enabled=True)
             return t("gateway.voice.enabled_voice_only")
-        elif args in {"off", "disable"}:
+        if args in {"off", "disable"}:
             self._voice_mode[voice_key] = "off"
             self._save_voice_modes()
             if adapter:
                 self._set_adapter_auto_tts_disabled(adapter, chat_id, disabled=True)
             return t("gateway.voice.disabled_text")
-        elif args == "tts":
+        if args == "tts":
             self._voice_mode[voice_key] = "all"
             self._save_voice_modes()
             if adapter:
                 self._set_adapter_auto_tts_enabled(adapter, chat_id, enabled=True)
             return t("gateway.voice.tts_enabled")
-        elif args in {"channel", "join"}:
+        if args in {"channel", "join"}:
             return await self._handle_voice_channel_join(event)
-        elif args == "leave":
+        if args == "leave":
             return await self._handle_voice_channel_leave(event)
-        elif args == "status":
+        if args == "status":
             mode = self._voice_mode.get(voice_key, "off")
             labels = {
                 "off": t("gateway.voice.label_off"),
@@ -1781,32 +1779,31 @@ class GatewaySlashCommandsMixin:
                         lines.append(t("gateway.voice.status_member", name=m["display_name"], status=status))
                     return "\n".join(lines)
             return t("gateway.voice.status_mode", label=labels.get(mode, mode))
+        # Toggle: off → on, on/all → off
+        current = self._voice_mode.get(voice_key, "off")
+        if current == "off":
+            self._voice_mode[voice_key] = "voice_only"
+            self._save_voice_modes()
+            if adapter:
+                self._set_adapter_auto_tts_enabled(adapter, chat_id, enabled=True)
+            toggle_line = t("gateway.voice.enabled_short")
         else:
-            # Toggle: off → on, on/all → off
-            current = self._voice_mode.get(voice_key, "off")
-            if current == "off":
-                self._voice_mode[voice_key] = "voice_only"
-                self._save_voice_modes()
-                if adapter:
-                    self._set_adapter_auto_tts_enabled(adapter, chat_id, enabled=True)
-                toggle_line = t("gateway.voice.enabled_short")
-            else:
-                self._voice_mode[voice_key] = "off"
-                self._save_voice_modes()
-                if adapter:
-                    self._set_adapter_auto_tts_disabled(adapter, chat_id, disabled=True)
-                toggle_line = t("gateway.voice.disabled_short")
-            # Bare /voice still toggles, but append an explainer so users
-            # discover the on/off/tts/status subcommands (and, on Discord,
-            # live voice-channel join/leave). The toggle result is shown
-            # first via the {toggle} placeholder.
-            supports_voice_channels = adapter is not None and hasattr(
-                adapter, "join_voice_channel",
-            )
-            channels = (
-                t("gateway.voice.help_channels") if supports_voice_channels else ""
-            )
-            return t("gateway.voice.help", toggle=toggle_line, channels=channels)
+            self._voice_mode[voice_key] = "off"
+            self._save_voice_modes()
+            if adapter:
+                self._set_adapter_auto_tts_disabled(adapter, chat_id, disabled=True)
+            toggle_line = t("gateway.voice.disabled_short")
+        # Bare /voice still toggles, but append an explainer so users
+        # discover the on/off/tts/status subcommands (and, on Discord,
+        # live voice-channel join/leave). The toggle result is shown
+        # first via the {toggle} placeholder.
+        supports_voice_channels = adapter is not None and hasattr(
+            adapter, "join_voice_channel",
+        )
+        channels = (
+            t("gateway.voice.help_channels") if supports_voice_channels else ""
+        )
+        return t("gateway.voice.help", toggle=toggle_line, channels=channels)
 
     async def _handle_rollback_command(self, event: MessageEvent) -> str:
         """Handle /rollback command — list or restore filesystem checkpoints."""
@@ -1819,7 +1816,7 @@ class GatewaySlashCommandsMixin:
             import yaml as _y
             _cfg_path = _hermes_home / "config.yaml"
             if _cfg_path.exists():
-                with open(_cfg_path, encoding="utf-8") as _f:
+                with Path(_cfg_path).open(encoding="utf-8") as _f:
                     _data = _y.safe_load(_f) or {}
                 cp_cfg = _data.get("checkpoints", {})
                 if isinstance(cp_cfg, bool):
@@ -1939,7 +1936,7 @@ class GatewaySlashCommandsMixin:
             try:
                 user_config = {}
                 if config_path.exists():
-                    with open(config_path, encoding="utf-8") as f:
+                    with Path(config_path).open(encoding="utf-8") as f:
                         user_config = yaml.safe_load(f) or {}
                 keys = key_path.split(".")
                 current = user_config
@@ -2048,7 +2045,7 @@ class GatewaySlashCommandsMixin:
             import yaml
             user_config = {}
             if config_path.exists():
-                with open(config_path, encoding="utf-8") as f:
+                with Path(config_path).open(encoding="utf-8") as f:
                     user_config = yaml.safe_load(f) or {}
             user_config.setdefault("memory", {})["write_approval"] = bool(enabled)
             atomic_yaml_write(config_path, user_config)
@@ -2102,7 +2099,7 @@ class GatewaySlashCommandsMixin:
             import yaml
             user_config = {}
             if config_path.exists():
-                with open(config_path, encoding="utf-8") as f:
+                with Path(config_path).open(encoding="utf-8") as f:
                     user_config = yaml.safe_load(f) or {}
             user_config.setdefault("skills", {})["write_approval"] = bool(enabled)
             atomic_yaml_write(config_path, user_config)
@@ -2151,7 +2148,7 @@ class GatewaySlashCommandsMixin:
             try:
                 user_config = {}
                 if config_path.exists():
-                    with open(config_path, encoding="utf-8") as f:
+                    with Path(config_path).open(encoding="utf-8") as f:
                         user_config = yaml.safe_load(f) or {}
                 keys = key_path.split(".")
                 current = user_config
@@ -2198,9 +2195,8 @@ class GatewaySlashCommandsMixin:
         if current:
             disable_session_yolo(session_key)
             return EphemeralReply(t("gateway.yolo.disabled"))
-        else:
-            enable_session_yolo(session_key)
-            return EphemeralReply(t("gateway.yolo.enabled"))
+        enable_session_yolo(session_key)
+        return EphemeralReply(t("gateway.yolo.enabled"))
 
     async def _handle_verbose_command(self, event: MessageEvent) -> str:
         """Handle /verbose command — cycle tool progress display mode.
@@ -2652,8 +2648,7 @@ class GatewaySlashCommandsMixin:
             try:
                 if self._session_db.set_session_title(session_id, sanitized):
                     return t("gateway.title.set_to", title=sanitized)
-                else:
-                    return t("gateway.title.not_found")
+                return t("gateway.title.not_found")
             except ValueError as e:
                 return t("gateway.shared.warn_passthrough", error=e)
         else:
@@ -2661,8 +2656,7 @@ class GatewaySlashCommandsMixin:
             title = self._session_db.get_session_title(session_id)
             if title:
                 return t("gateway.title.current_with_title", session_id=session_id, title=title)
-            else:
-                return t("gateway.title.current_no_title", session_id=session_id)
+            return t("gateway.title.current_no_title", session_id=session_id)
 
     async def _handle_resume_command(self, event: MessageEvent) -> str:
         """Handle /resume command — list or switch to a previous session."""

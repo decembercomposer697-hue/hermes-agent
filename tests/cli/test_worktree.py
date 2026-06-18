@@ -174,7 +174,7 @@ def _cleanup_worktree(info):
     repo_root = info["repo_root"]
 
     if not Path(wt_path).exists():
-        return
+        return None
 
     if _has_unpushed_commits(wt_path, timeout=10):
         return False  # Did not clean up — has unpushed commits
@@ -442,7 +442,7 @@ class TestGitignoreManagement:
         _ignore_entry = ".worktrees/"
         existing = gitignore.read_text() if gitignore.exists() else ""
         if _ignore_entry not in existing.splitlines():
-            with open(gitignore, "a") as f:
+            with Path(gitignore).open("a") as f:
                 if existing and not existing.endswith("\n"):
                     f.write("\n")
                 f.write(f"{_ignore_entry}\n")
@@ -538,7 +538,7 @@ class TestWorktreeDirectorySymlink:
         # Manually symlink (mirrors cli.py logic)
         if not dst.exists():
             dst.parent.mkdir(parents=True, exist_ok=True)
-            os.symlink(str(src.resolve()), str(dst))
+            Path(str(dst)).symlink_to(str(src.resolve()))
 
         assert dst.is_symlink()
         assert (dst / "lib" / "marker.txt").read_text() == "venv marker"

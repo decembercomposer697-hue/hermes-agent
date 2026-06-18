@@ -8,8 +8,8 @@ import threading
 import time
 import urllib.request
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timezone
-from typing import Any, Literal, Optional
+from datetime import UTC, datetime
+from typing import Any, Literal
 
 NousAccountInfoSource = Literal["jwt", "account_api", "inference_key", "none", "error"]
 

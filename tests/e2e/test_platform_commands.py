@@ -227,7 +227,7 @@ class TestSendFailureResilience:
     async def test_send_failure_does_not_crash_pipeline(self, adapter, platform):
         """If send() returns failure, the pipeline should not raise."""
         adapter.send = AsyncMock(return_value=SendResult(success=False, error="network timeout"))
-        adapter.set_message_handler(adapter._message_handler) # re-wire with same handler
+        adapter.set_message_handler(adapter._message_handler)  # re-wire with same handler
 
         event = make_event(platform, "/help")
         # Should not raise — pipeline handles send failures internally

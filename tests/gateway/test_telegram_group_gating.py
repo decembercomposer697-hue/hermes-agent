@@ -651,13 +651,13 @@ def test_config_bridges_telegram_group_settings(monkeypatch, tmp_path):
         "  exclusive_bot_mentions: true\n"
         "  observe_unmentioned_group_messages: true\n"
         "  mention_patterns:\n"
-        "    - \"^\\\\s*chompy\\\\b\"\n"
+        '    - "^\\\\s*chompy\\\\b"\n'
         "  free_response_chats:\n"
-        "    - \"-123\"\n"
+        '    - "-123"\n'
         "  allowed_chats:\n"
-        "    - \"-100\"\n"
+        '    - "-100"\n'
         "  group_allowed_chats:\n"
-        "    - \"-100\"\n"
+        '    - "-100"\n'
         "  allowed_topics:\n"
         "    - 8\n",
         encoding="utf-8",
@@ -702,12 +702,12 @@ def test_config_bridges_telegram_user_allowlists(monkeypatch, tmp_path):
     (hermes_home / "config.yaml").write_text(
         "telegram:\n"
         "  allow_from:\n"
-        "    - \"111\"\n"
-        "    - \"222\"\n"
+        '    - "111"\n'
+        '    - "222"\n'
         "  group_allow_from:\n"
-        "    - \"333\"\n"
+        '    - "333"\n'
         "  group_allowed_chats:\n"
-        "    - \"-100\"\n",
+        '    - "-100"\n',
         encoding="utf-8",
     )
 
@@ -729,8 +729,8 @@ def test_config_env_overrides_telegram_user_allowlists(monkeypatch, tmp_path):
     hermes_home.mkdir()
     (hermes_home / "config.yaml").write_text(
         "telegram:\n"
-        "  allow_from: \"111\"\n"
-        "  group_allow_from: \"222\"\n",
+        '  allow_from: "111"\n'
+        '  group_allow_from: "222"\n',
         encoding="utf-8",
     )
 
@@ -816,7 +816,7 @@ def test_config_bridges_telegram_ignored_threads(monkeypatch, tmp_path):
         "telegram:\n"
         "  ignored_threads:\n"
         "    - 31\n"
-        "    - \"42\"\n",
+        '    - "42"\n',
         encoding="utf-8",
     )
 

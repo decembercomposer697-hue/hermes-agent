@@ -358,7 +358,7 @@ class TestSystemStatsEndpoint:
         s = r.json()
         # Identity fields always present (stdlib-sourced).
         for key in ("os", "arch", "hostname", "python_version", "hermes_version"):
-            assert key in s and s[key]
+            assert s.get(key)
         # psutil flag tells the UI whether the richer metrics are populated.
         assert "psutil" in s
 
@@ -536,7 +536,7 @@ class TestSkillsHubPreviewEndpoint:
 
     def test_preview_returns_skill_md_text(self, monkeypatch):
         monkeypatch.setattr(
-            "tools.skills_hub.create_source_router", lambda: [],
+            "tools.skills_hub.create_source_router", list,
         )
         bundle = _FakeBundle("github/owner/repo/x")
         meta = _FakeMeta("github/owner/repo/x")
@@ -557,7 +557,7 @@ class TestSkillsHubPreviewEndpoint:
 
     def test_preview_404_when_unresolved(self, monkeypatch):
         monkeypatch.setattr(
-            "tools.skills_hub.create_source_router", lambda: [],
+            "tools.skills_hub.create_source_router", list,
         )
         monkeypatch.setattr(
             "hermes_cli.skills_hub._resolve_source_meta_and_bundle",
@@ -580,7 +580,7 @@ class TestSkillsHubScanEndpoint:
         from tools.skills_guard import Finding, ScanResult
 
         monkeypatch.setattr(
-            "tools.skills_hub.create_source_router", lambda: [],
+            "tools.skills_hub.create_source_router", list,
         )
         bundle = _FakeBundle("github/owner/repo/x", trust_level="community")
         monkeypatch.setattr(
@@ -634,7 +634,7 @@ class TestSkillsHubScanEndpoint:
 
     def test_scan_404_when_no_bundle(self, monkeypatch):
         monkeypatch.setattr(
-            "tools.skills_hub.create_source_router", lambda: [],
+            "tools.skills_hub.create_source_router", list,
         )
         monkeypatch.setattr(
             "hermes_cli.skills_hub._resolve_source_meta_and_bundle",
@@ -726,7 +726,7 @@ class TestUpdateCheckEndpoint:
 
         monkeypatch.setattr(ws, "detect_install_method", lambda *a, **k: "git")
         # Stub the shared checker so the contract is deterministic (no network).
-        import hermes_cli.banner as banner
+        from hermes_cli import banner
 
         monkeypatch.setattr(banner, "check_for_updates", lambda: 5)
 
@@ -749,8 +749,8 @@ class TestUpdateCheckEndpoint:
         assert body["can_apply"] is True
 
     def test_up_to_date(self, monkeypatch):
-        import hermes_cli.banner as banner
         import hermes_cli.web_server as ws
+        from hermes_cli import banner
 
         monkeypatch.setattr(ws, "detect_install_method", lambda *a, **k: "git")
         monkeypatch.setattr(banner, "check_for_updates", lambda: 0)
@@ -770,8 +770,8 @@ class TestUpdateCheckEndpoint:
         assert body["behind"] is None
 
     def test_check_failure_is_soft(self, monkeypatch):
-        import hermes_cli.banner as banner
         import hermes_cli.web_server as ws
+        from hermes_cli import banner
 
         monkeypatch.setattr(ws, "detect_install_method", lambda *a, **k: "git")
 
@@ -788,8 +788,8 @@ class TestUpdateCheckEndpoint:
         assert body["message"]
 
     def test_git_behind_includes_commits(self, monkeypatch):
-        import hermes_cli.banner as banner
         import hermes_cli.web_server as ws
+        from hermes_cli import banner
 
         monkeypatch.setattr(ws, "detect_install_method", lambda *a, **k: "git")
         monkeypatch.setattr(banner, "check_for_updates", lambda: 3)
@@ -808,8 +808,8 @@ class TestUpdateCheckEndpoint:
         assert body["commits"][0]["summary"] == "feat: x"
 
     def test_up_to_date_omits_commits(self, monkeypatch):
-        import hermes_cli.banner as banner
         import hermes_cli.web_server as ws
+        from hermes_cli import banner
 
         monkeypatch.setattr(ws, "detect_install_method", lambda *a, **k: "git")
         monkeypatch.setattr(banner, "check_for_updates", lambda: 0)

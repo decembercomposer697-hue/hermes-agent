@@ -39,7 +39,7 @@ import asyncio
 import importlib.util
 import sys
 from collections.abc import Callable
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import yaml
 
@@ -164,7 +164,7 @@ class HookRegistry:
         """
         handlers = list(self._handlers.get(event_type, []))
         if ":" in event_type:
-            base = event_type.split(":")[0]
+            base = event_type.split(":", maxsplit=1)[0]
             wildcard_key = f"{base}:*"
             handlers.extend(self._handlers.get(wildcard_key, []))
         return handlers

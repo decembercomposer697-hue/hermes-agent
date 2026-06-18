@@ -112,7 +112,7 @@ def test_config_bridges_whatsapp_group_settings(monkeypatch, tmp_path):
         "whatsapp:\n"
         "  require_mention: true\n"
         "  mention_patterns:\n"
-        "    - \"^\\\\s*chompy\\\\b\"\n",
+        '    - "^\\\\s*chompy\\\\b"\n',
         encoding="utf-8",
     )
 
@@ -254,7 +254,7 @@ def test_config_bridges_whatsapp_dm_and_group_policy(monkeypatch, tmp_path):
         "  dm_policy: disabled\n"
         "  group_policy: allowlist\n"
         "  group_allow_from:\n"
-        "    - \"120363001234567890@g.us\"\n",
+        '    - "120363001234567890@g.us"\n',
         encoding="utf-8",
     )
 
@@ -281,7 +281,7 @@ def test_config_bridges_whatsapp_allow_from(monkeypatch, tmp_path):
         "whatsapp:\n"
         "  dm_policy: allowlist\n"
         "  allow_from:\n"
-        "    - \"6281234567890@s.whatsapp.net\"\n",
+        '    - "6281234567890@s.whatsapp.net"\n',
         encoding="utf-8",
     )
 
@@ -306,7 +306,6 @@ def test_status_broadcast_chats_are_always_dropped():
     (a contact's WhatsApp Story update). These pseudo-chats aren't real
     conversations and the adapter must drop them regardless of dm_policy.
     """
-
     # Even on the most permissive config — open DMs, no allowlist — Stories
     # and Channel posts must not reach the agent.
     adapter = _make_adapter(dm_policy="open")

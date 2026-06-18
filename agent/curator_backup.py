@@ -44,9 +44,9 @@ import logging
 import re
 import shutil
 import tarfile
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from agent.skill_utils import is_excluded_skill_path
 from hermes_constants import get_hermes_home
@@ -135,8 +135,7 @@ def _utc_id(now: datetime | None = None) -> str:
         now = datetime.now(UTC)
     # isoformat → "2026-05-01T13:05:42.123456+00:00"; strip subseconds and tz.
     s = now.replace(microsecond=0).isoformat()
-    if s.endswith("+00:00"):
-        s = s[:-6]
+    s = s.removesuffix("+00:00")
     return s.replace(":", "-") + "Z"
 
 
@@ -548,7 +547,7 @@ def rollback(backup_id: str | None = None) -> tuple[bool, str, Path | None]:
     if target is None:
         return (
             False,
-            f"no matching backup found"
+            "no matching backup found"
             + (f" for id '{backup_id}'" if backup_id else "")
             + " (use `hermes curator rollback --list` to see available snapshots)",
             None,
@@ -689,8 +688,8 @@ def summarize_backups() -> str:
     lines.append("─" * len(lines[0]))
     for r in rows:
         lines.append(
-            f"{r.get('id','?'):<24}  "
-            f"{(r.get('reason','?') or '?')[:40]:<40}  "
+            f"{r.get('id', '?'):<24}  "
+            f"{(r.get('reason', '?') or '?')[:40]:<40}  "
             f"{r.get('skill_files', 0):>6}  "
             f"{format_size(int(r.get('archive_bytes', 0))):>8}",
         )

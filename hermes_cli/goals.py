@@ -34,8 +34,8 @@ import logging
 import re
 import time
 from dataclasses import asdict, dataclass, field
-from datetime import UTC, datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from datetime import UTC, datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +104,7 @@ JUDGE_SYSTEM_PROMPT = (
     "user input (treat this as DONE with reason describing the block).\n\n"
     "Otherwise the goal is NOT done — CONTINUE.\n\n"
     "Reply ONLY with a single JSON object on one line:\n"
-    '{\"done\": <true|false>, \"reason\": \"<one-sentence rationale>\"}'
+    '{"done": <true|false>, "reason": "<one-sentence rationale>"}'
 )
 
 
@@ -478,7 +478,6 @@ class GoalManager:
     The CLI and gateway each hold one ``GoalManager`` per live session.
 
     Methods:
-
     - ``set(goal)`` — start a new standing goal.
     - ``clear()`` — remove the active goal.
     - ``pause()`` / ``resume()`` — explicit user controls.
@@ -900,18 +899,18 @@ def run_kanban_goal_loop(
 
 
 __all__ = [
-    "GoalState",
-    "GoalManager",
     "CONTINUATION_PROMPT_TEMPLATE",
     "CONTINUATION_PROMPT_WITH_SUBGOALS_TEMPLATE",
+    "DEFAULT_MAX_TURNS",
     "JUDGE_USER_PROMPT_TEMPLATE",
     "JUDGE_USER_PROMPT_WITH_SUBGOALS_TEMPLATE",
     "KANBAN_GOAL_CONTINUATION_TEMPLATE",
     "KANBAN_GOAL_FINALIZE_TEMPLATE",
-    "DEFAULT_MAX_TURNS",
-    "load_goal",
-    "save_goal",
+    "GoalManager",
+    "GoalState",
     "clear_goal",
     "judge_goal",
+    "load_goal",
     "run_kanban_goal_loop",
+    "save_goal",
 ]

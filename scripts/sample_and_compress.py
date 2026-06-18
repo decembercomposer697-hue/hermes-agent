@@ -17,7 +17,7 @@ Usage:
 import json
 import random
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import fire
 
@@ -48,16 +48,16 @@ def load_dataset_from_hf(dataset_name: str) -> list[dict[str, Any]]:
 
     """
     from datasets import load_dataset
-    
+
     print(f"   Loading {dataset_name}...")
-    
+
     try:
         # Try loading with default config
         ds = load_dataset(dataset_name, split="train")
     except Exception as e:
         print(f"   ⚠️  Error loading {dataset_name}: {e}")
         return []
-    
+
     # Convert to list of dicts
     entries = []
     for item in ds:
@@ -70,7 +70,7 @@ def load_dataset_from_hf(dataset_name: str) -> list[dict[str, Any]]:
         else:
             # Assume the whole item is the entry
             entries.append(dict(item))
-    
+
     print(f"   ✅ Loaded {len(entries):,} entries from {dataset_name}")
     return entries
 
@@ -97,11 +97,11 @@ def _count_tokens_for_entry(entry: dict) -> tuple[dict, int]:
 
     """
     global _TOKENIZER
-    
+
     conversations = entry.get("conversations", [])
     if not conversations:
         return entry, 0
-    
+
     total = 0
     for turn in conversations:
         value = turn.get("value", "")
@@ -111,7 +111,7 @@ def _count_tokens_for_entry(entry: dict) -> tuple[dict, int]:
             except Exception:
                 # Fallback to character estimate
                 total += len(value) // 4
-    
+
     return entry, total
 
 
@@ -138,38 +138,38 @@ def sample_from_datasets(
 
     """
     from multiprocessing import Pool
-    
+
     random.seed(seed)
-    
+
     print(f"\n📥 Loading {len(datasets)} datasets...")
     print(f"   Minimum tokens: {min_tokens:,} (filtering smaller trajectories)")
     print(f"   Parallel workers: {num_proc}")
     print()
-    
+
     # Load ALL entries from all datasets into one pool
     all_entries = []
-    
+
     for dataset_name in datasets:
         entries = load_dataset_from_hf(dataset_name)
-        
+
         if not entries:
             print(f"   ⚠️  Skipping {dataset_name} (no entries loaded)")
             continue
-        
+
         # Add source metadata to each entry
         for entry in entries:
             entry["_source_dataset"] = dataset_name
-        
+
         all_entries.extend(entries)
-    
+
     print(f"\n📊 Total entries loaded: {len(all_entries):,}")
-    
+
     # Filter by token count using parallel processing
     print(f"\n🔍 Filtering trajectories with >= {min_tokens:,} tokens (using {num_proc} workers)...")
-    
+
     filtered_entries = []
     token_counts = []
-    
+
     # Use multiprocessing for token counting
     with Pool(
         processes=num_proc,
@@ -179,25 +179,25 @@ def sample_from_datasets(
         # Process in chunks and show progress
         chunk_size = 1000
         processed = 0
-        
+
         for result in pool.imap_unordered(_count_tokens_for_entry, all_entries, chunksize=100):
             entry, token_count = result
             processed += 1
-            
+
             if processed % chunk_size == 0:
                 print(f"   Processed {processed:,}/{len(all_entries):,}...", end="\r")
-            
+
             if token_count >= min_tokens:
                 entry["_original_tokens"] = token_count
                 filtered_entries.append(entry)
                 token_counts.append(token_count)
-    
+
     print(f"\n   ✅ Found {len(filtered_entries):,} trajectories >= {min_tokens:,} tokens")
-    
+
     if token_counts:
         avg_tokens = sum(token_counts) / len(token_counts)
         print(f"   📈 Token stats: min={min(token_counts):,}, max={max(token_counts):,}, avg={avg_tokens:,.0f}")
-    
+
     # Random sample from the filtered pool
     if len(filtered_entries) <= total_samples:
         print(f"\n⚠️  Only {len(filtered_entries):,} trajectories available, using all of them")
@@ -205,20 +205,20 @@ def sample_from_datasets(
     else:
         sampled = random.sample(filtered_entries, total_samples)
         print(f"\n✅ Randomly sampled {len(sampled):,} trajectories from pool of {len(filtered_entries):,}")
-    
+
     # Show source distribution
     source_counts = {}
     for entry in sampled:
         source = entry.get("_source_dataset", "unknown").split("/")[-1]
         source_counts[source] = source_counts.get(source, 0) + 1
-    
-    print(f"\n📌 Sample distribution by source:")
+
+    print("\n📌 Sample distribution by source:")
     for source, count in sorted(source_counts.items()):
         print(f"      {source}: {count:,}")
-    
+
     # Shuffle
     random.shuffle(sampled)
-    
+
     return sampled
 
 
@@ -236,23 +236,22 @@ def save_samples_for_compression(
 
     """
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Split into batches
     num_batches = (len(samples) + batch_size - 1) // batch_size
-    
+
     print(f"\n💾 Saving {len(samples)} samples to {output_dir}")
     print(f"   Batch size: {batch_size}, Total batches: {num_batches}")
-    
+
     for i in range(num_batches):
         start_idx = i * batch_size
         end_idx = min((i + 1) * batch_size, len(samples))
         batch = samples[start_idx:end_idx]
-        
+
         output_file = output_dir / f"batch_{i}.jsonl"
-        with open(output_file, "w", encoding="utf-8") as f:
-            for entry in batch:
-                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-    
+        with Path(output_file).open("w", encoding="utf-8") as f:
+            f.writelines(json.dumps(entry, ensure_ascii=False) + "\n" for entry in batch)
+
     print(f"   ✅ Saved {num_batches} batch files")
 
 
@@ -269,18 +268,18 @@ def run_compression(input_dir: Path, output_dir: Path, config_path: str):
     import sys
     sys.path.insert(0, str(Path(__file__).parent.parent))
     from trajectory_compressor import CompressionConfig, TrajectoryCompressor
-    
-    print(f"\n🗜️  Running trajectory compression...")
+
+    print("\n🗜️  Running trajectory compression...")
     print(f"   Input: {input_dir}")
     print(f"   Output: {output_dir}")
     print(f"   Config: {config_path}")
-    
+
     # Load config
     config = CompressionConfig.from_yaml(config_path)
-    
+
     # Initialize compressor
     compressor = TrajectoryCompressor(config)
-    
+
     # Run compression
     compressor.process_directory(input_dir, output_dir)
 
@@ -294,22 +293,21 @@ def merge_output_to_single_jsonl(input_dir: Path, output_file: Path):
 
     """
     print(f"\n📦 Merging output files into {output_file.name}...")
-    
+
     all_entries = []
     for jsonl_file in sorted(input_dir.glob("*.jsonl")):
         if jsonl_file.name == output_file.name:
             continue
-        with open(jsonl_file, encoding="utf-8") as f:
+        with Path(jsonl_file).open(encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if line:
                     all_entries.append(json.loads(line))
-    
+
     # Write merged file
-    with open(output_file, "w", encoding="utf-8") as f:
-        for entry in all_entries:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
-    
+    with Path(output_file).open("w", encoding="utf-8") as f:
+        f.writelines(json.dumps(entry, ensure_ascii=False) + "\n" for entry in all_entries)
+
     print(f"   ✅ Merged {len(all_entries):,} entries into {output_file.name}")
     return output_file
 
@@ -342,14 +340,14 @@ def main(
     print("=" * 70)
     print("📊 TRAJECTORY SAMPLING AND COMPRESSION")
     print("=" * 70)
-    
+
     # Parse datasets
     if datasets:
         dataset_list = [d.strip() for d in datasets.split(",")]
     else:
         dataset_list = DEFAULT_DATASETS
-    
-    print(f"\n📋 Configuration:")
+
+    print("\n📋 Configuration:")
     print(f"   Total samples: {total_samples:,}")
     print(f"   Min tokens filter: {min_tokens:,}")
     print(f"   Parallel workers: {num_proc}")
@@ -359,50 +357,50 @@ def main(
     print(f"   Output name: {output_name}")
     print(f"   Config: {config}")
     print(f"   Seed: {seed}")
-    
+
     # Setup paths
     base_dir = Path(__file__).parent.parent
     sampled_dir = base_dir / "data" / f"{output_name}_raw"
     compressed_dir = base_dir / "data" / f"{output_name}_batches"
     final_output = base_dir / "data" / f"{output_name}.jsonl"
-    
+
     if not skip_download:
         # Step 1: Download, filter by token count, and sample from combined pool
         samples = sample_from_datasets(
-            dataset_list, 
-            total_samples, 
+            dataset_list,
+            total_samples,
             min_tokens=min_tokens,
             seed=seed,
             num_proc=num_proc,
         )
-        
+
         if not samples:
             print("❌ No samples collected. Exiting.")
             return
-        
+
         # Step 2: Save to JSONL files
         save_samples_for_compression(samples, sampled_dir, batch_size)
     else:
         print(f"\n⏭️  Skipping download, using existing data in {sampled_dir}")
-    
+
     # Step 3: Run compression
     config_path = base_dir / config
     if not config_path.exists():
         print(f"❌ Config not found: {config_path}")
         return
-    
+
     run_compression(sampled_dir, compressed_dir, str(config_path))
-    
+
     # Step 4: Merge into single JSONL file
     merge_output_to_single_jsonl(compressed_dir, final_output)
-    
+
     print("\n" + "=" * 70)
     print("✅ COMPLETE!")
     print("=" * 70)
     print(f"\n📁 Raw samples:        {sampled_dir}")
     print(f"📁 Compressed batches: {compressed_dir}")
     print(f"📁 Final output:       {final_output}")
-    print(f"\nTo upload to HuggingFace:")
+    print("\nTo upload to HuggingFace:")
     print(f"   huggingface-cli upload NousResearch/{output_name} {final_output}")
 
 

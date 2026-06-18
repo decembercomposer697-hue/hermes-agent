@@ -25,7 +25,6 @@ import time
 from collections.abc import Sequence
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional
 
 from hermes_constants import display_hermes_home, get_hermes_home
 
@@ -129,9 +128,8 @@ def _matches_filters(
             if _LEVEL_ORDER.get(level, 0) < _LEVEL_ORDER.get(min_level, 0):
                 return False
 
-    if session_filter is not None:
-        if session_filter not in line:
-            return False
+    if session_filter is not None and session_filter not in line:
+        return False
 
     if component_prefixes is not None:
         if not _line_matches_component(line, component_prefixes):
@@ -178,7 +176,7 @@ def tail_log(
     log_path = get_hermes_home() / "logs" / filename
     if not log_path.exists():
         print(f"Log file not found: {log_path}")
-        print(f"(Logs are created when Hermes runs — try 'hermes chat' first)")
+        print("(Logs are created when Hermes runs — try 'hermes chat' first)")
         sys.exit(1)
 
     # Parse --since into a datetime cutoff
@@ -277,8 +275,7 @@ def _read_tail(
                                 component_prefixes=component_prefixes)
         ]
         return filtered[-num_lines:]
-    else:
-        return _read_last_n_lines(path, num_lines)
+    return _read_last_n_lines(path, num_lines)
 
 
 def _read_last_n_lines(path: Path, n: int) -> list:
@@ -294,12 +291,12 @@ def _read_last_n_lines(path: Path, n: int) -> list:
 
         # For files up to 1MB, just read the whole thing — simple and correct.
         if size <= 1_048_576:
-            with open(path, encoding="utf-8", errors="replace") as f:
+            with Path(path).open(encoding="utf-8", errors="replace") as f:
                 all_lines = f.readlines()
             return all_lines[-n:]
 
         # For large files, read chunks from the end.
-        with open(path, "rb") as f:
+        with Path(path).open("rb") as f:
             chunk_size = 8192
             lines = []
             pos = size
@@ -332,7 +329,7 @@ def _read_last_n_lines(path: Path, n: int) -> list:
 
     except Exception:
         # Fallback: read entire file
-        with open(path, encoding="utf-8", errors="replace") as f:
+        with Path(path).open(encoding="utf-8", errors="replace") as f:
             all_lines = f.readlines()
         return all_lines[-n:]
 
@@ -346,7 +343,7 @@ def _follow_log(
     component_prefixes: Sequence[str] | None = None,
 ) -> None:
     """Poll a log file for new content and print matching lines."""
-    with open(path, encoding="utf-8", errors="replace") as f:
+    with Path(path).open(encoding="utf-8", errors="replace") as f:
         # Seek to end
         f.seek(0, 2)
         while True:

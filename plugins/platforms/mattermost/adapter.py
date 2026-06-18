@@ -19,7 +19,7 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import (
@@ -433,7 +433,7 @@ class MattermostAdapter(BasePlatformAdapter):
 
         file_data = None
         ct = "application/octet-stream"
-        fname = url.rsplit("/", 1)[-1].split("?")[0] or f"{kind}.png"
+        fname = url.rsplit("/", 1)[-1].split("?", maxsplit=1)[0] or f"{kind}.png"
 
         for attempt in range(3):
             try:
@@ -866,8 +866,8 @@ class MattermostAdapter(BasePlatformAdapter):
             source=source,
             raw_message=post,
             message_id=post_id,
-            media_urls=media_urls if media_urls else None,
-            media_types=media_types if media_types else None,
+            media_urls=media_urls or None,
+            media_types=media_types or None,
             channel_prompt=_channel_prompt,
         )
 
@@ -948,13 +948,13 @@ async def _standalone_send(
             file_ids: list[str] = []
             for media in media_files:
                 file_path = media.get("path") if isinstance(media, dict) else media
-                if not file_path or not os.path.exists(file_path):
+                if not file_path or not Path(file_path).exists():
                     continue
                 form = aiohttp.FormData()
                 # Mattermost requires channel_id on file uploads so the
                 # server can attribute them.
                 form.add_field("channel_id", chat_id)
-                with open(file_path, "rb") as fh:
+                with Path(file_path).open("rb") as fh:
                     form.add_field(
                         "files",
                         fh.read(),

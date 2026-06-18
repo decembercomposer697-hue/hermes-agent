@@ -17,9 +17,9 @@ import sys
 import time
 import uuid
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from threading import Lock
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from hermes_constants import get_hermes_home
 
@@ -193,11 +193,11 @@ class SessionManager:
 
     def __init__(self, agent_factory=None, db=None):
         """Args:
-            agent_factory: Optional callable that creates an AIAgent-like object.
-                           Used by tests. When omitted, a real AIAgent is created
-                           using the current Hermes runtime provider configuration.
-            db:            Optional SessionDB instance. When omitted, the default
-                           SessionDB (``~/.hermes/state.db``) is lazily created.
+        agent_factory: Optional callable that creates an AIAgent-like object.
+                       Used by tests. When omitted, a real AIAgent is created
+                       using the current Hermes runtime provider configuration.
+        db:            Optional SessionDB instance. When omitted, the default
+                       SessionDB (``~/.hermes/state.db``) is lazily created.
 
         """
         self._sessions: dict[str, SessionState] = {}

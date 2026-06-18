@@ -56,7 +56,7 @@ class TestCDATAStripping:
 
 class TestCodeFenceStripping:
     def test_strips_leading_fence_with_lang(self):
-        out = _sanitize_tool_error("```json\n{\"x\": 1}")
+        out = _sanitize_tool_error('```json\n{"x": 1}')
         assert not out.replace("[TOOL_ERROR] ", "").startswith("```")
 
     def test_strips_trailing_fence(self):

@@ -14,7 +14,7 @@ from __future__ import annotations
 import enum
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -757,7 +757,6 @@ def _classify_by_status(
     result_fn,
 ) -> ClassifiedError | None:
     """Classify based on HTTP status code with message-aware refinement."""
-
     if status_code == 401:
         # Not retryable on its own — credential pool rotation and
         # provider-specific refresh (Codex, Anthropic, Nous) run before
@@ -941,7 +940,6 @@ def _classify_400(
     result_fn,
 ) -> ClassifiedError:
     """Classify 400 Bad Request — context overflow, format error, or generic."""
-
     # Multimodal tool content rejected from 400.  Must be checked BEFORE
     # image_too_large because the recovery is different (strip image parts
     # from tool messages, mark the model as no-list-tool-content for the
@@ -1150,7 +1148,6 @@ def _classify_by_message(
     result_fn,
 ) -> ClassifiedError | None:
     """Classify based on error message patterns when no status code is available."""
-
     # Payload-too-large patterns (from message text when no status_code)
     if any(p in error_msg for p in _PAYLOAD_TOO_LARGE_PATTERNS):
         return result_fn(

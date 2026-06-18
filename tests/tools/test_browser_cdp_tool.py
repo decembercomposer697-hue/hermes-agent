@@ -10,7 +10,7 @@ import asyncio
 import json
 import threading
 import time
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 import websockets

@@ -18,12 +18,11 @@ import re
 import shutil
 import sys
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from hermes_cli.nous_subscription import get_nous_subscription_features
 from hermes_constants import get_optional_skills_dir
 from tools.tool_backend_helpers import managed_nous_tools_enabled
-from utils import base_url_hostname
 
 logger = logging.getLogger(__name__)
 
@@ -1457,7 +1456,6 @@ def _apply_default_agent_settings(config: dict):
 
 def setup_agent_settings(config: dict):
     """Configure agent behavior: iterations, progress display, compression, session reset."""
-
     print_header("Agent Settings")
     print_info(f"   Guide: {_DOCS_BASE}/user-guide/configuration")
     print()
@@ -1961,9 +1959,9 @@ def _setup_matrix():
                     print_success(f"{matrix_pkg} installed")
                 except Exception as exc:
                     print_warning(
-                        f"Install failed — run manually: pip install "
-                        f"'mautrix[encryption]' asyncpg aiosqlite Markdown "
-                        f"aiohttp-socks",
+                        "Install failed — run manually: pip install "
+                        "'mautrix[encryption]' asyncpg aiosqlite Markdown "
+                        "aiohttp-socks",
                     )
                     print_info(f"  Error: {exc}")
         except ImportError:
@@ -2480,15 +2478,15 @@ def _get_section_config_summary(config: dict, section_key: str) -> str | None:
             return str(model.get("default") or model.get("model") or "configured")
         return "configured"
 
-    elif section_key == "terminal":
+    if section_key == "terminal":
         backend = cfg_get(config, "terminal", "backend", default="local")
         return f"backend: {backend}"
 
-    elif section_key == "agent":
+    if section_key == "agent":
         max_turns = cfg_get(config, "agent", "max_turns", default=90)
         return f"max turns: {max_turns}"
 
-    elif section_key == "gateway":
+    if section_key == "gateway":
         from hermes_cli.gateway import _all_platforms, _platform_status
         # Count any non-empty status other than the "not configured" sentinel —
         # platforms like WhatsApp ("enabled, not paired"), Matrix ("configured
@@ -2503,7 +2501,7 @@ def _get_section_config_summary(config: dict, section_key: str) -> str | None:
             return ", ".join(configured)
         return None  # No platforms configured — section must run
 
-    elif section_key == "tools":
+    if section_key == "tools":
         tools = []
         if get_env_value("ELEVENLABS_API_KEY"):
             tools.append("TTS/ElevenLabs")

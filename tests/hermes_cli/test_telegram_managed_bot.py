@@ -192,11 +192,10 @@ class TestPollForToken:
 
         with patch(
             "hermes_cli.telegram_managed_bot.httpx.get", return_value=mock_resp,
-        ) as get:
-            with patch("hermes_cli.telegram_managed_bot.time.sleep"):
-                token = poll_for_token(
-                    "https://api.example.com", self.pairing(), timeout=5,
-                )
+        ) as get, patch("hermes_cli.telegram_managed_bot.time.sleep"):
+            token = poll_for_token(
+                "https://api.example.com", self.pairing(), timeout=5,
+            )
 
         assert token == VALID_TOKEN
         assert (

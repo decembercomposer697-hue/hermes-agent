@@ -21,7 +21,6 @@ import json
 import random
 import re
 import unicodedata
-from typing import Optional
 
 # ---------------------------------------------------------------------------
 # Sticker catalogue – ported from builtin-stickers.json
@@ -500,7 +499,7 @@ def search_stickers(query: str, limit: int = 10) -> list[dict]:
         floor = max(6.0, top * 0.35)
 
     filtered = [pair for pair in scored if pair[0] >= floor]
-    out = filtered if filtered else scored
+    out = filtered or scored
     return [s for _, s in out[:safe_limit]]
 
 

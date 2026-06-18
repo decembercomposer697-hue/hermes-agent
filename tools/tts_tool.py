@@ -49,7 +49,7 @@ import threading
 import uuid
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 from urllib.parse import urljoin
 
 from hermes_constants import display_hermes_home
@@ -70,6 +70,8 @@ def get_env_value(name, default=None):
         return os.getenv(name, default)
     value = _get_env_value(name)
     return default if value is None else value
+
+
 from tools.managed_tool_gateway import resolve_managed_tool_gateway
 from tools.tool_backend_helpers import (
     managed_nous_tools_enabled,
@@ -209,6 +211,7 @@ def _get_default_output_dir() -> str:
     from hermes_constants import get_hermes_dir
     return str(get_hermes_dir("cache/audio", "audio_cache"))
 
+
 DEFAULT_OUTPUT_DIR = _get_default_output_dir()
 
 # ---------------------------------------------------------------------------
@@ -259,6 +262,7 @@ def _config_bool(value: Any, default: bool = False) -> bool:
         if normalized in {"0", "false", "no", "off", "disabled"}:
             return False
     return default
+
 
 # Final fallback when provider isn't recognised at all.
 FALLBACK_MAX_TEXT_LENGTH = 4000
@@ -912,10 +916,10 @@ def _convert_to_opus(mp3_path: str) -> str | None:
             stdin=subprocess.DEVNULL,
         )
         if result.returncode != 0:
-            logger.warning("ffmpeg conversion failed with return code %d: %s", 
+            logger.warning("ffmpeg conversion failed with return code %d: %s",
                           result.returncode, result.stderr.decode("utf-8", errors="ignore")[:200])
             return None
-        if os.path.exists(ogg_path) and os.path.getsize(ogg_path) > 0:
+        if Path(ogg_path).exists() and Path(ogg_path).stat().st_size > 0:
             return ogg_path
     except subprocess.TimeoutExpired:
         logger.warning("ffmpeg OGG conversion timed out after 30s")
@@ -995,9 +999,8 @@ def _generate_elevenlabs(text: str, output_path: str, tts_config: dict[str, Any]
     )
 
     # audio_generator yields chunks -- write them all
-    with open(output_path, "wb") as f:
-        for chunk in audio_generator:
-            f.write(chunk)
+    with Path(output_path).open("wb") as f:
+        f.writelines(audio_generator)
 
     return output_path
 
@@ -1182,8 +1185,7 @@ def _generate_xai_tts(text: str, output_path: str, tts_config: dict[str, Any]) -
     )
     response.raise_for_status()
 
-    with open(output_path, "wb") as f:
-        f.write(response.content)
+    Path(output_path).write_bytes(response.content)
 
     return output_path
 
@@ -1289,35 +1291,32 @@ def _generate_minimax_tts(text: str, output_path: str, tts_config: dict[str, Any
             raise RuntimeError("MiniMax TTS returned empty audio data")
 
         audio_bytes = bytes.fromhex(hex_audio)
-        with open(output_path, "wb") as f:
-            f.write(audio_bytes)
+        Path(output_path).write_bytes(audio_bytes)
         return output_path
 
-    else:
-        # text_to_speech returns raw audio directly
-        content_type = response.headers.get("Content-Type", "")
+    # text_to_speech returns raw audio directly
+    content_type = response.headers.get("Content-Type", "")
 
-        if "audio/" in content_type:
-            with open(output_path, "wb") as f:
-                f.write(response.content)
-            return output_path
+    if "audio/" in content_type:
+        Path(output_path).write_bytes(response.content)
+        return output_path
 
-        # Fallback: try parsing as JSON
-        try:
-            result = response.json()
-            base_resp = result.get("base_resp", {})
-            status_code = base_resp.get("status_code", -1)
-            if status_code != 0:
-                status_msg = base_resp.get("status_msg", "unknown error")
-                raise RuntimeError(f"MiniMax TTS API error (code {status_code}): {status_msg}")
-        except Exception:
-            response.raise_for_status()
-            raise RuntimeError(
-                f"MiniMax TTS returned unexpected Content-Type '{content_type}' "
-                f"({len(response.content)} bytes)",
-            )
+    # Fallback: try parsing as JSON
+    try:
+        result = response.json()
+        base_resp = result.get("base_resp", {})
+        status_code = base_resp.get("status_code", -1)
+        if status_code != 0:
+            status_msg = base_resp.get("status_msg", "unknown error")
+            raise RuntimeError(f"MiniMax TTS API error (code {status_code}): {status_msg}")
+    except Exception:
+        response.raise_for_status()
+        raise RuntimeError(
+            f"MiniMax TTS returned unexpected Content-Type '{content_type}' "
+            f"({len(response.content)} bytes)",
+        )
 
-        raise RuntimeError("MiniMax TTS returned no audio data")
+    raise RuntimeError("MiniMax TTS returned no audio data")
 
 
 # ===========================================================================
@@ -1363,8 +1362,7 @@ def _generate_mistral_tts(text: str, output_path: str, tts_config: dict[str, Any
         logger.error("Mistral TTS failed: %s", e, exc_info=True)
         raise RuntimeError(f"Mistral TTS failed: {type(e).__name__}") from e
 
-    with open(output_path, "wb") as f:
-        f.write(audio_bytes)
+    Path(output_path).write_bytes(audio_bytes)
 
     return output_path
 
@@ -1662,8 +1660,7 @@ def _generate_gemini_tts(text: str, output_path: str, tts_config: dict[str, Any]
 
     # Fast path: caller wants WAV directly, just write.
     if output_path.lower().endswith(".wav"):
-        with open(output_path, "wb") as f:
-            f.write(wav_bytes)
+        Path(output_path).write_bytes(wav_bytes)
         return output_path
 
     # Otherwise write WAV to a temp file and ffmpeg-convert to the target
@@ -1702,7 +1699,7 @@ def _generate_gemini_tts(text: str, output_path: str, tts_config: dict[str, Any]
             shutil.copyfile(wav_path, output_path)
     finally:
         try:
-            os.remove(wav_path)
+            Path(wav_path).unlink()
         except OSError:
             pass
 
@@ -1786,10 +1783,10 @@ def _generate_neutts(text: str, output_path: str, tts_config: dict[str, Any]) ->
         if ffmpeg:
             conv_cmd = [ffmpeg, "-i", wav_path, "-y", "-loglevel", "error", output_path]
             subprocess.run(conv_cmd, check=True, timeout=30, stdin=subprocess.DEVNULL)
-            os.remove(wav_path)
+            Path(wav_path).unlink()
         else:
             # No ffmpeg — just rename the WAV to the expected path
-            os.rename(wav_path, output_path)
+            Path(wav_path).rename(output_path)
 
     return output_path
 
@@ -1946,12 +1943,12 @@ def _generate_piper_tts(text: str, output_path: str, tts_config: dict[str, Any])
             conv_cmd = [ffmpeg, "-i", wav_path, "-y", "-loglevel", "error", output_path]
             subprocess.run(conv_cmd, check=True, timeout=30, stdin=subprocess.DEVNULL)
             try:
-                os.remove(wav_path)
+                Path(wav_path).unlink()
             except OSError:
                 pass
         else:
             # No ffmpeg — keep WAV and return that path
-            os.rename(wav_path, output_path)
+            Path(wav_path).rename(output_path)
 
     return output_path
 
@@ -2012,10 +2009,10 @@ def _generate_kittentts(text: str, output_path: str, tts_config: dict[str, Any])
         if ffmpeg:
             conv_cmd = [ffmpeg, "-i", wav_path, "-y", "-loglevel", "error", output_path]
             subprocess.run(conv_cmd, check=True, timeout=30, stdin=subprocess.DEVNULL)
-            os.remove(wav_path)
+            Path(wav_path).unlink()
         else:
             # No ffmpeg — rename the WAV to the expected path
-            os.rename(wav_path, output_path)
+            Path(wav_path).rename(output_path)
 
     return output_path
 
@@ -2257,7 +2254,7 @@ def text_to_speech_tool(
                 }, ensure_ascii=False)
 
         # Check the file was actually created
-        if not os.path.exists(file_str) or os.path.getsize(file_str) == 0:
+        if not Path(file_str).exists() or Path(file_str).stat().st_size == 0:
             return json.dumps({
                 "success": False,
                 "error": f"TTS generation produced no output (provider: {provider})",
@@ -2302,7 +2299,7 @@ def text_to_speech_tool(
         elif provider in {"elevenlabs", "openai", "mistral", "gemini"}:
             voice_compatible = want_opus and file_str.endswith(".ogg")
 
-        file_size = os.path.getsize(file_str)
+        file_size = Path(file_str).stat().st_size
         logger.info("TTS audio saved: %s (%s bytes, provider: %s)", file_str, f"{file_size:,}", provider)
 
         # Build response with MEDIA tag for platform delivery
@@ -2600,7 +2597,7 @@ def stream_tts_to_speaker(
             finally:
                 if tmp_path:
                     try:
-                        os.unlink(tmp_path)
+                        Path(tmp_path).unlink()
                     except OSError:
                         pass
 

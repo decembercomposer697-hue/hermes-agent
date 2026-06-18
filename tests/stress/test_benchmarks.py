@@ -70,7 +70,7 @@ def main():
         # Fresh DB each time so we're not measuring cumulative effects
         import shutil
         shutil.rmtree(home, ignore_errors=True)
-        os.makedirs(home)
+        Path(home).mkdir(parents=True)
         kb._INITIALIZED_PATHS.clear()
         kb.init_db()
         conn = kb.connect()
@@ -89,7 +89,7 @@ def main():
     for n in [100, 1000, 10000]:
         print(f"\n== recompute_ready @ {n} tasks (5 parents each) ==")
         shutil.rmtree(home, ignore_errors=True)
-        os.makedirs(home)
+        Path(home).mkdir(parents=True)
         kb._INITIALIZED_PATHS.clear()
         kb.init_db()
         conn = kb.connect()
@@ -111,7 +111,7 @@ def main():
     for parent_count in [1, 10, 50]:
         print(f"\n== build_worker_context with {parent_count} parents ==")
         shutil.rmtree(home, ignore_errors=True)
-        os.makedirs(home)
+        Path(home).mkdir(parents=True)
         kb._INITIALIZED_PATHS.clear()
         kb.init_db()
         conn = kb.connect()
@@ -144,7 +144,7 @@ def main():
     for n in [100, 1000, 10000]:
         print(f"\n== list_tasks @ {n} ==")
         shutil.rmtree(home, ignore_errors=True)
-        os.makedirs(home)
+        Path(home).mkdir(parents=True)
         kb._INITIALIZED_PATHS.clear()
         kb.init_db()
         conn = kb.connect()
@@ -163,7 +163,7 @@ def main():
     for n in [100, 1000, 10000]:
         print(f"\n== board_stats @ {n} ==")
         shutil.rmtree(home, ignore_errors=True)
-        os.makedirs(home)
+        Path(home).mkdir(parents=True)
         kb._INITIALIZED_PATHS.clear()
         kb.init_db()
         conn = kb.connect()
@@ -182,7 +182,7 @@ def main():
     for n in [100, 1000]:
         print(f"\n== list_runs for task with {n} attempts ==")
         shutil.rmtree(home, ignore_errors=True)
-        os.makedirs(home)
+        Path(home).mkdir(parents=True)
         kb._INITIALIZED_PATHS.clear()
         kb.init_db()
         conn = kb.connect()
@@ -212,7 +212,7 @@ def main():
 
     # Save for future diffing.
     out_path = "/tmp/kanban_bench_results.json"
-    with open(out_path, "w") as f:
+    with Path(out_path).open("w") as f:
         json.dump(results, f, indent=2)
     print(f"\nResults saved to {out_path}")
 

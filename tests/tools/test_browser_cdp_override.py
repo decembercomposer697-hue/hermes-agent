@@ -46,7 +46,7 @@ class TestResolveCdpOverride:
             assert _resolve_cdp_override(HTTP_URL) == HTTP_URL
 
     def test_normalizes_provider_returned_http_cdp_url_when_creating_session(self, monkeypatch):
-        import tools.browser_tool as browser_tool
+        from tools import browser_tool
 
         provider = Mock()
         provider.create_session.return_value = {
@@ -80,7 +80,7 @@ class TestResolveCdpOverride:
 
 class TestGetCdpOverride:
     def test_prefers_env_var_over_config(self, monkeypatch):
-        import tools.browser_tool as browser_tool
+        from tools import browser_tool
 
         monkeypatch.setenv("BROWSER_CDP_URL", HTTP_URL)
         monkeypatch.setattr(
@@ -101,7 +101,7 @@ class TestGetCdpOverride:
         mock_get.assert_called_once_with(VERSION_URL, timeout=10)
 
     def test_uses_config_browser_cdp_url_when_env_missing(self, monkeypatch):
-        import tools.browser_tool as browser_tool
+        from tools import browser_tool
 
         monkeypatch.delenv("BROWSER_CDP_URL", raising=False)
 

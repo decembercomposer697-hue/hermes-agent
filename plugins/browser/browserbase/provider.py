@@ -34,7 +34,7 @@ from __future__ import annotations
 import logging
 import os
 import uuid
-from typing import Any, Dict, Optional
+from typing import Any
 
 import requests
 
@@ -239,14 +239,13 @@ class BrowserbaseBrowserProvider(BrowserProvider):
             if response.status_code in {200, 201, 204}:
                 logger.debug("Successfully closed Browserbase session %s", session_id)
                 return True
-            else:
-                logger.warning(
-                    "Failed to close session %s: HTTP %s - %s",
-                    session_id,
-                    response.status_code,
-                    response.text[:200],
-                )
-                return False
+            logger.warning(
+                "Failed to close session %s: HTTP %s - %s",
+                session_id,
+                response.status_code,
+                response.text[:200],
+            )
+            return False
         except Exception as e:
             logger.error("Exception closing Browserbase session %s: %s", session_id, e)
             return False

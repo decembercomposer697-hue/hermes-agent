@@ -21,7 +21,7 @@ import hashlib
 import json
 import time
 import urllib.parse
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import httpx
@@ -639,12 +639,11 @@ class TestCompleteLogin:
         with patch(
             "plugins.dashboard_auth.nous.httpx.post",
             side_effect=httpx.ConnectError("conn refused"),
-        ):
-            with pytest.raises(ProviderError, match="unreachable"):
-                provider.complete_login(
-                    code="x", state="s", code_verifier="v",
-                    redirect_uri="https://hermes.fly.dev/auth/callback",
-                )
+        ), pytest.raises(ProviderError, match="unreachable"):
+            provider.complete_login(
+                code="x", state="s", code_verifier="v",
+                redirect_uri="https://hermes.fly.dev/auth/callback",
+            )
 
     def test_captures_refresh_token_if_present_forward_compat(
         self, provider, rsa_keypair,
@@ -842,9 +841,8 @@ class TestRefreshAndRevoke:
         with patch(
             "plugins.dashboard_auth.nous.httpx.post",
             side_effect=httpx.RequestError("boom"),
-        ):
-            with pytest.raises(ProviderError, match="unreachable"):
-                provider.refresh_session(refresh_token="rt_x")
+        ), pytest.raises(ProviderError, match="unreachable"):
+            provider.refresh_session(refresh_token="rt_x")
 
     def test_refresh_500_raises_provider_error(self, provider):
         mock_resp = self._mock_post(500, "oops", ctype="text/plain")

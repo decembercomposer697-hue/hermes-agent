@@ -24,9 +24,9 @@ from __future__ import annotations
 import json
 import logging
 import shutil
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 try:
     from hermes_constants import get_hermes_home
@@ -90,7 +90,7 @@ def _log(message: str) -> None:
         log_file = get_log_file()
         log_file.parent.mkdir(parents=True, exist_ok=True)
         ts = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S")
-        with open(log_file, "a", encoding="utf-8") as f:
+        with Path(log_file).open("a", encoding="utf-8") as f:
             f.write(f"[{ts}] {message}\n")
     except OSError:
         # Never let the audit log break the agent loop.
@@ -261,17 +261,9 @@ def dry_run() -> tuple[list[dict], list[dict]]:
                 # dry-run output too.
                 continue
 
-        if cat == "test":
+        if cat == "test" or (cat == "temp" and age > 7) or (cat == "cron-output" and age > 14):
             auto.append(item)
-        elif cat == "temp" and age > 7:
-            auto.append(item)
-        elif cat == "cron-output" and age > 14:
-            auto.append(item)
-        elif cat == "research" and age > 30:
-            prompt.append(item)
-        elif cat == "chrome-profile" and age > 14:
-            prompt.append(item)
-        elif size > 500 * 1024 * 1024:
+        elif (cat == "research" and age > 30) or (cat == "chrome-profile" and age > 14) or size > 500 * 1024 * 1024:
             prompt.append(item)
 
     return auto, prompt

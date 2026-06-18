@@ -100,7 +100,7 @@ class TestDeletion:
         delete.assert_not_called()
 
         # Remove a file locally
-        os.unlink(tmp_files["cred_b.json"])
+        Path(tmp_files["cred_b.json"]).unlink()
         del tmp_files["cred_b.json"]
         mgr._get_files_fn = _make_get_files(tmp_files)
 
@@ -147,7 +147,7 @@ class TestTransactionalRollback:
         mgr.sync(force=True)
 
         # Remove a file
-        os.unlink(tmp_files["skill_main.py"])
+        Path(tmp_files["skill_main.py"]).unlink()
         del tmp_files["skill_main.py"]
         mgr._get_files_fn = _make_get_files(tmp_files)
 
@@ -229,7 +229,7 @@ class TestEdgeCases:
         upload = MagicMock()
         delete = MagicMock()
         mgr = FileSyncManager(
-            get_files_fn=lambda: [],
+            get_files_fn=list,
             upload_fn=upload,
             delete_fn=delete,
         )
@@ -251,7 +251,7 @@ class TestEdgeCases:
         )
 
         # Delete the file before sync can stat it
-        os.unlink(str(f))
+        Path(str(f)).unlink()
 
         mgr.sync(force=True)
         upload.assert_not_called()  # _file_mtime_key returns None, skipped

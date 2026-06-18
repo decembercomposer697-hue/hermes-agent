@@ -237,9 +237,7 @@ def _repair_tool_call_arguments(raw_args: str, tool_name: str = "?") -> str:
             json.loads(fixed)
             break
         except json.JSONDecodeError:
-            if fixed.endswith("}") and fixed.count("}") > fixed.count("{"):
-                fixed = fixed[:-1]
-            elif fixed.endswith("]") and fixed.count("]") > fixed.count("["):
+            if (fixed.endswith("}") and fixed.count("}") > fixed.count("{")) or (fixed.endswith("]") and fixed.count("]") > fixed.count("[")):
                 fixed = fixed[:-1]
             else:
                 break
@@ -431,14 +429,14 @@ def _sanitize_structure_non_ascii(payload: Any) -> bool:
 
 __all__ = [
     "_SURROGATE_RE",
-    "_sanitize_surrogates",
-    "_sanitize_structure_surrogates",
-    "_sanitize_messages_surrogates",
     "_escape_invalid_chars_in_json_strings",
     "_repair_tool_call_arguments",
-    "_strip_non_ascii",
     "_sanitize_messages_non_ascii",
+    "_sanitize_messages_surrogates",
+    "_sanitize_structure_non_ascii",
+    "_sanitize_structure_surrogates",
+    "_sanitize_surrogates",
     "_sanitize_tools_non_ascii",
     "_strip_images_from_messages",
-    "_sanitize_structure_non_ascii",
+    "_strip_non_ascii",
 ]

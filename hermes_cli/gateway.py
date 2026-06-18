@@ -442,7 +442,7 @@ def _scan_gateway_pids(exclude_pids: set[int], all_profiles: bool = False) -> li
             # Try /proc first (works in Docker without procps installed),
             # fall back to ps -A eww.
             _found_via_proc = False
-            if os.path.isdir("/proc"):
+            if Path("/proc").is_dir():
                 try:
                     my_pid = os.getpid()
                     for entry in os.listdir("/proc"):
@@ -452,7 +452,7 @@ def _scan_gateway_pids(exclude_pids: set[int], all_profiles: bool = False) -> li
                         if pid == my_pid or pid in exclude_pids:
                             continue
                         try:
-                            with open(f"/proc/{pid}/cmdline", "rb") as _f:
+                            with Path(f"/proc/{pid}/cmdline").open("rb") as _f:
                                 cmdline = _f.read().decode("utf-8", errors="replace")
                             cmdline = cmdline.replace("\x00", " ")
                             cmdline_lc = cmdline.lower()
@@ -2517,7 +2517,7 @@ def _normalize_launchd_plist_for_comparison(text: str) -> str:
         r"(<key>PATH</key>\s*<string>)(.*?)(</string>)",
         r"\1__HERMES_PATH__\3",
         normalized,
-        flags=re.S,
+        flags=re.DOTALL,
     )
 
 
@@ -2798,7 +2798,7 @@ def _require_service_installed(action: str, system: bool = False) -> None:
     unit_path = get_systemd_unit_path(system=system)
     if not unit_path.exists():
         scope_flag = " --system" if system else ""
-        print(f"✗ Gateway service is not installed")
+        print("✗ Gateway service is not installed")
         print(f"  Run: {'sudo ' if system else ''}hermes gateway install{scope_flag}")
         sys.exit(1)
 
@@ -3207,8 +3207,8 @@ def _spawn_detached_gateway() -> bool:
     out_path = log_dir / "gateway.log"
     err_path = log_dir / "gateway.error.log"
     try:
-        out = open(out_path, "ab")
-        err = open(err_path, "ab")
+        out = Path(out_path).open("ab")
+        err = Path(err_path).open("ab")
     except OSError:
         return False
     try:
@@ -3820,7 +3820,6 @@ def run_gateway(verbose: int = 0, quiet: bool = False, replace: bool = False):
     import atexit as _atexit
     import traceback as _traceback
     from datetime import datetime as _dt
-    from datetime import timezone as _tz
 
     def _exit_diag(tag: str, **extra: object) -> None:
         if os.environ.get("HERMES_GATEWAY_EXIT_DIAG", "1") != "1":
@@ -3841,7 +3840,7 @@ def run_gateway(verbose: int = 0, quiet: bool = False, replace: bool = False):
             }
             import json as _json
 
-            with open(log_dir / "gateway-exit-diag.log", "a", encoding="utf-8") as f:
+            with Path(log_dir / "gateway-exit-diag.log").open("a", encoding="utf-8") as f:
                 f.write(_json.dumps(line, default=str) + "\n")
         except Exception:
             pass  # never let the diagnostic itself crash the gateway
@@ -5015,9 +5014,9 @@ def _is_service_installed() -> bool:
             get_systemd_unit_path(system=False).exists()
             or get_systemd_unit_path(system=True).exists()
         )
-    elif is_macos():
+    if is_macos():
         return get_launchd_plist_path().exists()
-    elif is_windows():
+    if is_windows():
         from hermes_cli import gateway_windows
 
         return gateway_windows.is_installed()
@@ -5059,7 +5058,7 @@ def _is_service_running() -> bool:
                 pass
 
         return False
-    elif is_macos() and get_launchd_plist_path().exists():
+    if is_macos() and get_launchd_plist_path().exists():
         try:
             result = subprocess.run(
                 ["launchctl", "list", get_launchd_label()],

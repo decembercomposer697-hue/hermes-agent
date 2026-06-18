@@ -264,7 +264,7 @@ class TestPluginDiscovery:
 
         def terminal(args):
             calls.append(args)
-            raise KeyboardInterrupt()
+            raise KeyboardInterrupt
 
         with pytest.raises(KeyboardInterrupt):
             run_tool_execution_middleware("terminal", {"command": "interrupt"}, terminal)
@@ -301,7 +301,6 @@ class TestPluginDiscovery:
 
         def middleware(**kwargs):
             recorded["args"] = kwargs["args"]
-            return None
 
         manager = types.SimpleNamespace(
             _middleware={"tool_request": [middleware]},
@@ -985,7 +984,7 @@ class TestPluginContext:
 
             # Plugin handler replaced the built-in one.
             assert registry._tools["override_target"].toolset == "plugin_override_plugin"
-            assert registry._tools["override_target"].handler({} ) == "plugin"
+            assert registry._tools["override_target"].handler({}) == "plugin"
             # Override is audit-logged at INFO.
             assert any(
                 "overriding existing" in r.message and "override_target" in r.message

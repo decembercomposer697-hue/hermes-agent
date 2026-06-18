@@ -159,7 +159,6 @@ def get_peft_config():
 
 def main():
     """Main training function."""
-
     # Load data
     print("Loading dataset...")
     dataset = get_dataset()
@@ -228,6 +227,7 @@ def main():
     trainer.save_model(f"{OUTPUT_DIR}/final")
 
     print("Training complete!")
+
 
 if __name__ == "__main__":
     main()

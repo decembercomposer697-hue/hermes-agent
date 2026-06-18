@@ -15,7 +15,7 @@ The fix promotes the preflight into an optional ABC method
 """
 
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest

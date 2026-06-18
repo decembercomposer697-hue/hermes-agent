@@ -66,7 +66,7 @@ import stat
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any
 
 # Pin the legacy logger name so operator-side log filters keep matching
 # after the in-tree → plugin migration. See adapter.py for context.
@@ -331,7 +331,7 @@ def _write_private_json(path: Path, data: Any) -> None:
     """Atomically write JSON with 0o600 permissions where supported."""
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
-        os.chmod(path.parent, 0o700)
+        Path(path.parent).chmod(0o700)
     except OSError:
         pass
 
@@ -348,7 +348,7 @@ def _write_private_json(path: Path, data: Any) -> None:
             os.fsync(fh.fileno())
         atomic_replace(tmp_path, path)
         try:
-            os.chmod(path, stat.S_IRUSR | stat.S_IWUSR)
+            Path(path).chmod(stat.S_IRUSR | stat.S_IWUSR)
         except OSError:
             pass
     finally:

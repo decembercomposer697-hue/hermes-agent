@@ -29,9 +29,9 @@ import logging
 import os
 import tempfile
 from contextlib import contextmanager
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 from agent.skill_utils import is_excluded_skill_path
 from hermes_constants import get_hermes_home
@@ -99,7 +99,7 @@ def _usage_file_lock():
     if msvcrt and (not lock_path.exists() or lock_path.stat().st_size == 0):
         lock_path.write_text(" ", encoding="utf-8")
 
-    fd = open(lock_path, "r+" if msvcrt else "a+", encoding="utf-8")
+    fd = Path(lock_path).open("r+" if msvcrt else "a+", encoding="utf-8")
     try:
         if fcntl:
             fcntl.flock(fd, fcntl.LOCK_EX)
@@ -296,10 +296,10 @@ def _write_suppressed_names(names: set[str]) -> None:
                 f.write(data)
                 f.flush()
                 os.fsync(f.fileno())
-            os.replace(tmp, path)
+            Path(tmp).replace(path)
         except BaseException:
             try:
-                os.unlink(tmp)
+                Path(tmp).unlink()
             except OSError:
                 pass
             raise
@@ -506,10 +506,10 @@ def save_usage(data: dict[str, dict[str, Any]]) -> None:
                 json.dump(data, f, indent=2, sort_keys=True, ensure_ascii=False)
                 f.flush()
                 os.fsync(f.fileno())
-            os.replace(tmp_path, path)
+            Path(tmp_path).replace(path)
         except BaseException:
             try:
-                os.unlink(tmp_path)
+                Path(tmp_path).unlink()
             except OSError:
                 pass
             raise
@@ -710,7 +710,7 @@ def archive_skill(skill_name: str) -> tuple[bool, str]:
 
     try:
         skill_dir.rename(dest)
-    except OSError as e:
+    except OSError:
         # Cross-device — fall back to shutil.move
         import shutil
         try:

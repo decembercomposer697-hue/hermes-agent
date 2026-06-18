@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 from rich.console import Console
 
-import hermes_cli.banner as banner
 import model_tools
 import tools.mcp_tool
+from hermes_cli import banner
 
 
 def test_display_toolset_name_strips_legacy_suffix():
@@ -168,4 +168,3 @@ def test_build_welcome_banner_disabled_mcp_shows_disabled_not_failed():
     # A genuinely unreachable server still reads "failed"
     assert "broken" in output
     assert "failed" in output
-

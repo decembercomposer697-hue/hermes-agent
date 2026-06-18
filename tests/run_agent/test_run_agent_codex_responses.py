@@ -36,7 +36,7 @@ def _patch_agent_bootstrap(monkeypatch):
             },
         ],
     )
-    monkeypatch.setattr(run_agent, "check_toolset_requirements", lambda: {})
+    monkeypatch.setattr(run_agent, "check_toolset_requirements", dict)
 
 
 def _build_agent(monkeypatch):
@@ -433,7 +433,7 @@ def _build_xai_agent_with_slash_enum_tool(monkeypatch):
         ]
 
     monkeypatch.setattr(run_agent, "get_tool_definitions", _fake_get_tool_definitions)
-    monkeypatch.setattr(run_agent, "check_toolset_requirements", lambda: {})
+    monkeypatch.setattr(run_agent, "check_toolset_requirements", dict)
 
     agent = run_agent.AIAgent(
         model="grok-4.3",
@@ -751,7 +751,7 @@ def test_run_conversation_codex_refreshes_after_401_and_retries(monkeypatch):
     def _fake_api_call(api_kwargs):
         calls["api"] += 1
         if calls["api"] == 1:
-            raise _UnauthorizedError()
+            raise _UnauthorizedError
         return _codex_message_response("Recovered after refresh")
 
     def _fake_refresh(*, force=True):
@@ -846,7 +846,7 @@ def test_run_conversation_xai_oauth_refreshes_after_401_and_retries(monkeypatch)
     def _fake_api_call(api_kwargs):
         calls["api"] += 1
         if calls["api"] == 1:
-            raise _UnauthorizedError()
+            raise _UnauthorizedError
         return _codex_message_response("Recovered after xAI refresh")
 
     def _fake_refresh(*, force=True):
@@ -976,7 +976,7 @@ def test_run_conversation_copilot_refreshes_after_401_and_retries(monkeypatch):
     def _fake_api_call(api_kwargs):
         calls["api"] += 1
         if calls["api"] == 1:
-            raise _UnauthorizedError()
+            raise _UnauthorizedError
         return _codex_message_response("Recovered after copilot refresh")
 
     def _fake_refresh():
@@ -1398,8 +1398,8 @@ def test_normalize_codex_response_detects_leaked_tool_call_text(monkeypatch):
 
     leaked_content = (
         "I'll check the official page directly.\n"
-        "to=functions.exec_command {\"cmd\": \"curl https://example.test\"}\n"
-        "assistant to=functions.exec_command {\"stdout\": \"mailto:foo@example.test\"}\n"
+        'to=functions.exec_command {"cmd": "curl https://example.test"}\n'
+        'assistant to=functions.exec_command {"stdout": "mailto:foo@example.test"}\n'
         "Extracted: foo@example.test"
     )
     response = SimpleNamespace(

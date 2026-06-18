@@ -58,13 +58,14 @@ class _FakeOpenAI:
     def __init__(self, **kw):
         self.api_key = kw.get("api_key", "test")
         self.base_url = kw.get("base_url", "http://test")
+
     def close(self):
         pass
 
 
 def _make_agent(monkeypatch, provider, api_mode="chat_completions", base_url="https://openrouter.ai/api/v1", model=None):
     monkeypatch.setattr("run_agent.get_tool_definitions", lambda **kw: _tool_defs("web_search", "terminal"))
-    monkeypatch.setattr("run_agent.check_toolset_requirements", lambda: {})
+    monkeypatch.setattr("run_agent.check_toolset_requirements", dict)
     monkeypatch.setattr("run_agent.OpenAI", _FakeOpenAI)
     kwargs = dict(
         api_key="test-key",
@@ -80,9 +81,9 @@ def _make_agent(monkeypatch, provider, api_mode="chat_completions", base_url="ht
         kwargs["model"] = model
     elif provider == "nous":
         kwargs["model"] = "gpt-5"
-    base_url="https://openrouter.ai/api/v1",
-    api_key="test-key",
-    base_url="https://openrouter.ai/api/v1",
+    base_url = "https://openrouter.ai/api/v1",
+    api_key = "test-key",
+    base_url = "https://openrouter.ai/api/v1",
     return AIAgent(**kwargs)
 
 
@@ -138,7 +139,7 @@ class TestBuildApiKwargsOpenRouter:
                         "call_id": "call_123",
                         "response_item_id": "fc_123",
                         "type": "function",
-                        "function": {"name": "terminal", "arguments": "{\"command\":\"pwd\"}"},
+                        "function": {"name": "terminal", "arguments": '{"command":"pwd"}'},
                         "extra_content": {"thought_signature": "opaque"},
                     },
                 ],
@@ -184,7 +185,7 @@ class TestBuildApiKwargsOpenRouter:
                         "call_id": "call_123",
                         "response_item_id": "fc_123",
                         "type": "function",
-                        "function": {"name": "terminal", "arguments": "{\"command\":\"pwd\"}"},
+                        "function": {"name": "terminal", "arguments": '{"command":"pwd"}'},
                         "extra_content": {"google": {"thought_signature": "opaque"}},
                     },
                 ],
@@ -478,7 +479,7 @@ class TestBuildApiKwargsCustomEndpoint:
                         "type": "function",
                         "function": {
                             "name": "terminal",
-                            "arguments": "{\"command\":\"pwd\"}",
+                            "arguments": '{"command":"pwd"}',
                         },
                     },
                 ],

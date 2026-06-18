@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import sys
 import types
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
@@ -143,7 +143,7 @@ def test_build_kwargs_emits_tools_when_tools_present(transport, codex_messages):
         is_codex_backend=True,
     )
 
-    assert "tools" in kwargs and kwargs["tools"], "tools must be present when registered"
+    assert kwargs.get("tools"), "tools must be present when registered"
     assert kwargs["tools"][0]["name"] == "terminal"
     assert kwargs["tool_choice"] == "auto"
     assert kwargs["parallel_tool_calls"] is True

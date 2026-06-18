@@ -9,7 +9,7 @@ Covers:
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
@@ -317,7 +317,7 @@ class TestUnconfiguredErrorEnvelopeParity:
 
         from tools import web_tools
         self._clear_web_creds(monkeypatch)
-        monkeypatch.setattr(web_tools, "_load_web_config", lambda: {})
+        monkeypatch.setattr(web_tools, "_load_web_config", dict)
         out = asyncio.run(web_tools.web_extract_tool([], "markdown"))
         # The key assertion is that it returns a normal error envelope (a
         # string) rather than raising UnboundLocalError.
@@ -337,7 +337,7 @@ class TestUnconfiguredErrorEnvelopeParity:
         self._clear_web_creds(monkeypatch)
         monkeypatch.setattr(web_tools, "_firecrawl_client", None, raising=False)
         monkeypatch.setattr(web_tools, "_firecrawl_client_config", None, raising=False)
-        monkeypatch.setattr(web_tools, "_load_web_config", lambda: {})
+        monkeypatch.setattr(web_tools, "_load_web_config", dict)
 
         captured = {}
 
@@ -543,4 +543,3 @@ class TestDispatchersTriggerPluginDiscovery:
             assert web_search_registry.get_provider("brave-free") is not None
         finally:
             restore()
-

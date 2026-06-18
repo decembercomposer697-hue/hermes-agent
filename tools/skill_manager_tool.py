@@ -38,7 +38,7 @@ import re
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from hermes_cli.config import cfg_get
 from hermes_constants import display_hermes_home, get_hermes_home
@@ -99,6 +99,7 @@ def _security_scan_skill(skill_dir: Path) -> str | None:
     except Exception as e:
         logger.warning("Security scan failed for %s: %s", skill_dir, e, exc_info=True)
     return None
+
 
 import yaml
 
@@ -467,7 +468,7 @@ def _atomic_write_text(file_path: Path, content: str, encoding: str = "utf-8") -
     except Exception:
         # Clean up temp file on error
         try:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
         except OSError:
             logger.error("Failed to remove temporary file %s during atomic write", temp_path, exc_info=True)
         raise
@@ -797,7 +798,7 @@ def _remove_file(name: str, file_path: str) -> dict[str, Any]:
         return {
             "success": False,
             "error": f"File '{file_path}' not found in skill '{name}'.",
-            "available_files": available if available else None,
+            "available_files": available or None,
         }
 
     target.unlink()

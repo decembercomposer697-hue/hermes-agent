@@ -137,12 +137,12 @@ def check_system_tools():
                         "/opt/homebrew/lib/libopus.dylib",   # macOS Apple Silicon
                         "/usr/local/lib/libopus.dylib",      # macOS Intel
                         "/usr/lib/x86_64-linux-gnu/libopus.so.0",  # Debian/Ubuntu x86
-                        "/usr/lib/aarch64-linux-gnu/libopus.so.0", # Debian/Ubuntu ARM
+                        "/usr/lib/aarch64-linux-gnu/libopus.so.0",  # Debian/Ubuntu ARM
                         "/usr/lib/libopus.so",               # Arch Linux
                         "/usr/lib64/libopus.so",             # RHEL/Fedora
                     ]
                     for p in candidates:
-                        if os.path.isfile(p):
+                        if Path(p).is_file():
                             opus_path = p
                             break
                 if opus_path:
@@ -242,7 +242,7 @@ def check_config(groq_key, eleven_key):
     if config_path.exists():
         try:
             import yaml
-            with open(config_path, encoding="utf-8") as f:
+            with Path(config_path).open(encoding="utf-8") as f:
                 cfg = yaml.safe_load(f) or {}
 
             stt_provider = cfg.get("stt", {}).get("provider", "local")

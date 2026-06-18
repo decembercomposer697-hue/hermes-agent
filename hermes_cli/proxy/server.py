@@ -14,7 +14,6 @@ from __future__ import annotations
 import asyncio
 import logging
 import signal
-from typing import Optional
 
 try:
     import aiohttp
@@ -155,7 +154,7 @@ def create_app(adapter: UpstreamAdapter) -> web.Application:
                 upstream_resp = await session.request(
                     request.method,
                     upstream_url,
-                    data=body if body else None,
+                    data=body or None,
                     headers=fwd_headers,
                     allow_redirects=False,
                 )
@@ -288,9 +287,9 @@ async def run_server(
 
 
 __all__ = [
-    "create_app",
-    "run_server",
+    "AIOHTTP_AVAILABLE",
     "DEFAULT_HOST",
     "DEFAULT_PORT",
-    "AIOHTTP_AVAILABLE",
+    "create_app",
+    "run_server",
 ]

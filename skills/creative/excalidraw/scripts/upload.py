@@ -20,6 +20,7 @@ Example:
 import base64
 import json
 import os
+import pathlib
 import struct
 import sys
 import urllib.request
@@ -107,12 +108,11 @@ def main():
 
     file_path = sys.argv[1]
 
-    if not os.path.isfile(file_path):
+    if not pathlib.Path(file_path).is_file():
         print(f"Error: File not found: {file_path}")
         sys.exit(1)
 
-    with open(file_path, encoding="utf-8") as f:
-        content = f.read()
+    content = pathlib.Path(file_path).read_text(encoding="utf-8")
 
     # Basic validation: should be valid JSON with an "elements" key
     try:

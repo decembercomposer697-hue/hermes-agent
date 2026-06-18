@@ -14,7 +14,7 @@ import time
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from hermes_constants import get_hermes_home
 
@@ -96,7 +96,7 @@ class _FileLock:
 
     def __enter__(self):
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._fh = open(self.path, "a+b")
+        self._fh = Path(self.path).open("a+b")
         if os.name == "nt":
             try:
                 import msvcrt
@@ -144,7 +144,7 @@ class _FileLock:
 
 def _read_entries(path: Path) -> list[dict[str, Any]]:
     try:
-        with open(path, encoding="utf-8") as fh:
+        with Path(path).open(encoding="utf-8") as fh:
             data = json.load(fh)
     except FileNotFoundError:
         return []
@@ -160,9 +160,9 @@ def _read_entries(path: Path) -> list[dict[str, Any]]:
 def _write_entries(path: Path, entries: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(f"{path.name}.{os.getpid()}.{uuid.uuid4().hex}.tmp")
-    with open(tmp, "w", encoding="utf-8") as fh:
+    with Path(tmp).open("w", encoding="utf-8") as fh:
         json.dump({"entries": entries}, fh, sort_keys=True)
-    os.replace(tmp, path)
+    Path(tmp).replace(path)
 
 
 def _process_start_time(pid: int) -> float | None:

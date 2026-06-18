@@ -8,7 +8,6 @@ Every test with output validates against a known-good value AND
 asserts zero contamination from shell noise via _assert_clean().
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -381,7 +380,7 @@ class TestExpandPath:
         # The path should be returned as-is (no expansion).
         assert result == malicious
         # Verify the injected command did NOT execute
-        assert not os.path.exists("/tmp/_hermes_injection_test")
+        assert not Path("/tmp/_hermes_injection_test").exists()
 
     def test_tilde_username_with_subpath(self, ops):
         """~root/file.txt should attempt expansion (valid username)."""

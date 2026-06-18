@@ -14,7 +14,6 @@ import ipaddress
 import logging
 import socket
 from collections.abc import Iterable
-from typing import Optional
 
 import httpx
 

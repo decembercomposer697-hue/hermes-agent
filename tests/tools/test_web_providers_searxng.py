@@ -244,7 +244,7 @@ class TestGetBackendSearXNG:
     def test_auto_detect_picks_searxng_when_only_url_set(self, monkeypatch):
         """When no backend is configured but SEARXNG_URL is set, auto-detect returns it."""
         from tools import web_tools
-        monkeypatch.setattr(web_tools, "_load_web_config", lambda: {})
+        monkeypatch.setattr(web_tools, "_load_web_config", dict)
         monkeypatch.delenv("FIRECRAWL_API_KEY", raising=False)
         monkeypatch.delenv("FIRECRAWL_API_URL", raising=False)
         monkeypatch.delenv("PARALLEL_API_KEY", raising=False)
@@ -258,7 +258,7 @@ class TestGetBackendSearXNG:
     def test_searxng_does_not_override_higher_priority_provider(self, monkeypatch):
         """Tavily (higher priority than searxng) should win in auto-detect."""
         from tools import web_tools
-        monkeypatch.setattr(web_tools, "_load_web_config", lambda: {})
+        monkeypatch.setattr(web_tools, "_load_web_config", dict)
         monkeypatch.delenv("FIRECRAWL_API_KEY", raising=False)
         monkeypatch.delenv("FIRECRAWL_API_URL", raising=False)
         monkeypatch.delenv("PARALLEL_API_KEY", raising=False)
@@ -273,7 +273,7 @@ class TestGetBackendSearXNG:
         """
         from hermes_cli import config as hermes_config
         from tools import web_tools
-        monkeypatch.setattr(web_tools, "_load_web_config", lambda: {})
+        monkeypatch.setattr(web_tools, "_load_web_config", dict)
         monkeypatch.delenv("FIRECRAWL_API_KEY", raising=False)
         monkeypatch.delenv("FIRECRAWL_API_URL", raising=False)
         monkeypatch.delenv("PARALLEL_API_KEY", raising=False)
@@ -319,7 +319,7 @@ class TestCheckWebApiKey:
         services calls, so web is usable out of the box.
         """
         from tools import web_tools
-        monkeypatch.setattr(web_tools, "_load_web_config", lambda: {})
+        monkeypatch.setattr(web_tools, "_load_web_config", dict)
         monkeypatch.delenv("FIRECRAWL_API_KEY", raising=False)
         monkeypatch.delenv("FIRECRAWL_API_URL", raising=False)
         monkeypatch.delenv("PARALLEL_API_KEY", raising=False)

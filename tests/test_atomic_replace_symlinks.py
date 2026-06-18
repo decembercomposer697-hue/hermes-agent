@@ -127,7 +127,7 @@ def test_atomic_json_write_preserves_symlink_permissions(tmp_path: Path) -> None
     real = tmp_path / "real.json"
     link = tmp_path / "link.json"
     real.write_text("{}", encoding="utf-8")
-    os.chmod(real, 0o644)
+    Path(real).chmod(0o644)
     link.symlink_to(real)
 
     atomic_json_write(link, {"x": 1})

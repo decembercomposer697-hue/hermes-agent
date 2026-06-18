@@ -23,9 +23,9 @@ from __future__ import annotations
 
 import logging
 import os
+import pathlib
 import sys
 from contextlib import redirect_stderr, redirect_stdout
-from typing import Optional
 
 from hermes_cli.fallback_config import get_fallback_chain
 
@@ -176,7 +176,7 @@ def run_oneshot(
     # We'll print the final response to the real stdout at the end.
     real_stdout = sys.stdout
     real_stderr = sys.stderr
-    devnull = open(os.devnull, "w", encoding="utf-8")
+    devnull = pathlib.Path(os.devnull).open("w", encoding="utf-8")
 
     response: str | None = None
     failure: BaseException | None = None

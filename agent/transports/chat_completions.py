@@ -10,7 +10,7 @@ reasoning configuration, temperature handling, and extra_body assembly.
 """
 
 import copy
-from typing import Any, Dict
+from typing import Any
 
 from agent.lmstudio_reasoning import resolve_lmstudio_effort
 from agent.moonshot_schema import is_moonshot_model, sanitize_moonshot_tools
@@ -367,7 +367,7 @@ class ChatCompletionsTransport(ProviderTransport):
         # declares reasoning support via /api/v1/models capabilities (gated
         # upstream by params["supports_reasoning"]). resolve_lmstudio_effort
         # is shared with run_agent's summary path so both stay in sync.
-        if params.get("is_lmstudio", False) and params.get("supports_reasoning", False):
+        if params.get("is_lmstudio") and params.get("supports_reasoning"):
             _lm_effort = resolve_lmstudio_effort(
                 reasoning_config,
                 params.get("lmstudio_reasoning_options"),
@@ -415,7 +415,7 @@ class ChatCompletionsTransport(ProviderTransport):
 
         # Reasoning. LM Studio is handled above via top-level reasoning_effort,
         # so skip emitting extra_body.reasoning for it.
-        if params.get("supports_reasoning", False) and not params.get("is_lmstudio", False):
+        if params.get("supports_reasoning") and not params.get("is_lmstudio"):
             if is_github_models:
                 gh_reasoning = params.get("github_reasoning_extra")
                 if gh_reasoning is not None:

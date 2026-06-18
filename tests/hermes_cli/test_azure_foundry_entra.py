@@ -56,7 +56,7 @@ def fake_azure_identity(monkeypatch):
         get_bearer_token_provider=lambda credential, scope: (
             last.__setitem__("scope", scope),
             last.__setitem__("kwargs", credential.kwargs),
-            last.__setitem__("credential_count", cast(int, last["credential_count"]) + 1),
+            last.__setitem__("credential_count", cast("int", last["credential_count"]) + 1),
             _provider(scope),
         )[-1],
     )

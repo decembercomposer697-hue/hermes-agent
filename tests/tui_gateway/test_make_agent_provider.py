@@ -13,7 +13,6 @@ def test_make_agent_passes_resolved_provider():
     """_make_agent forwards provider/base_url/api_key/api_mode from
     resolve_runtime_provider to AIAgent.
     """
-
     fake_runtime = {
         "provider": "anthropic",
         "base_url": "https://api.anthropic.com",
@@ -65,7 +64,6 @@ def test_make_agent_ignores_display_personality_without_system_prompt():
     """The TUI matches the classic CLI: personality only becomes active once
     it has been saved to agent.system_prompt.
     """
-
     fake_runtime = {
         "provider": "openrouter",
         "base_url": "https://api.synthetic.new/v1",
@@ -176,7 +174,6 @@ def test_make_agent_tolerates_null_config_sections():
     key), so downstream .get() chains must be guarded. Reported via Twitter
     against the new TUI.
     """
-
     fake_runtime = {
         "provider": "openrouter",
         "base_url": "https://api.synthetic.new/v1",

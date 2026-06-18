@@ -6,7 +6,7 @@ Verifies that:
 - Preflight compression proactively compresses oversized sessions before API calls
 """
 
-#pytestmark = pytest.mark.skip(reason="Hangs in non-interactive environments")
+# pytestmark = pytest.mark.skip(reason="Hangs in non-interactive environments")
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -370,7 +370,7 @@ class TestHTTP413Compression:
         err_400 = Exception(
             "Error code: 400 - {'error': {'message': "
             "\"This endpoint's maximum context length is 128000 tokens. "
-            "Please reduce the length of the messages.\"}}",
+            'Please reduce the length of the messages."}}',
         )
         err_400.status_code = 400
         ok_resp = _mock_response(content="Recovered after real compression", finish_reason="stop")

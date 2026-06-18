@@ -1,6 +1,7 @@
 """Tests for model_tools.py — function call dispatch, agent-loop interception, legacy toolsets."""
 
 import json
+import math
 from unittest.mock import ANY, call, patch
 
 from model_tools import (
@@ -456,5 +457,5 @@ class TestCoerceNumberInfNan:
         """Guard against over-correction — real numbers still coerce."""
         from model_tools import _coerce_number
         assert _coerce_number("42") == 42
-        assert _coerce_number("3.14") == 3.14
+        assert _coerce_number("3.14") == math.pi
         assert _coerce_number("1e3") == 1000

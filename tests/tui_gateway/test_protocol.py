@@ -347,7 +347,6 @@ def test_session_resume_handles_multimodal_list_content(server, monkeypatch):
     """A user message persisted with list-shaped multimodal content used to
     crash session resume with ``'list' object has no attribute 'strip'``.
     """
-
     multimodal_user = {
         "role": "user",
         "content": [
@@ -404,7 +403,6 @@ def test_session_resume_handles_multimodal_list_content(server, monkeypatch):
 
 def test_session_resume_reuses_existing_live_session(server, monkeypatch):
     """Repeated resume must not allocate duplicate live agents."""
-
     target = "20260409_010101_abc123"
     created_sids: list[str] = []
     closed_sids: list[str] = []
@@ -524,7 +522,6 @@ def test_session_resume_reuses_existing_live_session(server, monkeypatch):
 
 def test_session_resume_live_payload_uses_current_history_with_ancestors(server, monkeypatch):
     """Live resume should not reuse a stale ancestor-inclusive snapshot."""
-
     target = "20260409_010101_child"
     ancestor_history = [{"role": "user", "content": "ancestor"}]
     current_history = [

@@ -10,6 +10,7 @@ Verifies that:
 """
 
 import os
+import pathlib
 from datetime import datetime
 from unittest.mock import MagicMock
 
@@ -20,7 +21,7 @@ import pytest
 def session_db(tmp_path):
     """Create a real SessionDB for testing."""
     os.environ["HERMES_HOME"] = str(tmp_path / ".hermes")
-    os.makedirs(tmp_path / ".hermes", exist_ok=True)
+    pathlib.Path(tmp_path / ".hermes").mkdir(exist_ok=True, parents=True)
     from hermes_state import SessionDB
     db = SessionDB(db_path=tmp_path / ".hermes" / "test_sessions.db")
     yield db

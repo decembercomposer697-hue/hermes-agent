@@ -20,7 +20,7 @@ import json
 import sqlite3
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 from hermes_cli import kanban_db as kb
 
@@ -98,7 +98,6 @@ def create_swarm(
     ``done`` with topology metadata, parallel workers are ``ready``, the verifier
     waits for every worker, and the synthesizer waits for the verifier.
     """
-
     goal = _require_text(goal, "goal")
     verifier_assignee = _require_text(verifier_assignee, "verifier_assignee")
     synthesizer_assignee = _require_text(synthesizer_assignee, "synthesizer_assignee")
@@ -176,7 +175,7 @@ def create_swarm(
 
     verifier_body = (
         "Review every worker handoff and blackboard update. Gate the swarm: "
-        "complete only with metadata {\"gate\": \"pass\"} when evidence is "
+        'complete only with metadata {"gate": "pass"} when evidence is '
         "sufficient; otherwise block with exact missing work."
         + context_suffix
     )
@@ -233,7 +232,6 @@ def post_blackboard_update(
     value: Any,
 ) -> int:
     """Append one structured update to the swarm root blackboard."""
-
     _require_text(root_id, "root_id")
     author = _require_text(author, "author")
     key = _require_text(key, "key")
@@ -247,7 +245,6 @@ def latest_blackboard(conn: sqlite3.Connection, root_id: str) -> dict[str, Any]:
     Later comments replace earlier values for the same key. ``_authors`` records
     the author of the winning value for traceability.
     """
-
     merged: dict[str, Any] = {}
     authors: dict[str, str] = {}
     for comment in kb.list_comments(conn, root_id):
@@ -270,7 +267,6 @@ def latest_blackboard(conn: sqlite3.Connection, root_id: str) -> dict[str, Any]:
 
 def parse_worker_arg(raw: str) -> SwarmWorkerSpec:
     """Parse CLI ``--worker profile:title[:skill,skill]`` values."""
-
     parts = [p.strip() for p in raw.split(":", 2)]
     if len(parts) < 2:
         raise ValueError("worker must be profile:title or profile:title:skill,skill")

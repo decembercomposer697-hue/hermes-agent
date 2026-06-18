@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import pathlib
 import platform
 import shlex
 import shutil
@@ -77,7 +78,7 @@ def get_chrome_debug_candidates(system: str) -> list[str]:
         if not path:
             return
         normalized = os.path.normcase(os.path.normpath(path))
-        if normalized in seen or not os.path.isfile(path):
+        if normalized in seen or not pathlib.Path(path).is_file():
             return
         candidates.append(path)
         seen.add(normalized)
@@ -201,7 +202,7 @@ def try_launch_chrome_debug(port: int = DEFAULT_BROWSER_CDP_PORT, system: str | 
     if not candidates:
         return False
 
-    os.makedirs(chrome_debug_data_dir(), exist_ok=True)
+    pathlib.Path(chrome_debug_data_dir()).mkdir(exist_ok=True, parents=True)
     for candidate in candidates:
         try:
             subprocess.Popen(

@@ -10,8 +10,6 @@ on what reaches ``handle_message``.
 """
 from __future__ import annotations
 
-from typing import List
-
 import pytest
 
 from gateway.config import PlatformConfig

@@ -18,7 +18,6 @@ import time -> no import cycle. The lazy import preserves the exact logger name
 from __future__ import annotations
 
 import os
-from typing import Optional
 
 from gateway.config import Platform
 from gateway.session import SessionSource

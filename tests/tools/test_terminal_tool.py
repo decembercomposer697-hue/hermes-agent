@@ -1,6 +1,6 @@
 """Regression tests for sudo detection and sudo password handling."""
 
-import tools.terminal_tool as terminal_tool
+from tools import terminal_tool
 
 
 def setup_function():

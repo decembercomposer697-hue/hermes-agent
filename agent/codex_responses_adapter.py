@@ -16,7 +16,7 @@ import logging
 import re
 import uuid
 from types import SimpleNamespace
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from agent.prompt_builder import DEFAULT_AGENT_IDENTITY
 
@@ -620,7 +620,7 @@ def _preflight_codex_input_items(raw_items: Any) -> list[dict[str, Any]]:
                     {
                         "type": "function_call_output",
                         "call_id": call_id.strip(),
-                        "output": cleaned if cleaned else "",
+                        "output": cleaned or "",
                     },
                 )
                 continue
@@ -1243,9 +1243,7 @@ def _normalize_codex_response(
 
     if tool_calls:
         finish_reason = "tool_calls"
-    elif leaked_tool_call_text:
-        finish_reason = "incomplete"
-    elif has_incomplete_items or (saw_commentary_phase and not saw_final_answer_phase):
+    elif leaked_tool_call_text or has_incomplete_items or (saw_commentary_phase and not saw_final_answer_phase):
         finish_reason = "incomplete"
     elif (reasoning_items_raw or reasoning_parts or saw_reasoning_item) and not final_text:
         # Response contains only reasoning (encrypted thinking state and/or

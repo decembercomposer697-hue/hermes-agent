@@ -45,7 +45,6 @@ def build_pipeline_runtime_config(gateway_config: Any) -> dict[str, Any]:
     Teams delivery continues to source its target details from the existing
     Teams platform config.
     """
-
     teams_config = gateway_config.platforms.get(Platform("teams"))
     teams_extra = dict((teams_config.extra or {}) if teams_config else {})
     pipeline_config = dict(teams_extra.get("meeting_pipeline") or {})
@@ -100,7 +99,6 @@ def build_pipeline_runtime(gateway: Any) -> TeamsMeetingPipeline:
 
 def bind_gateway_runtime(gateway: Any) -> bool:
     """Attach the Teams pipeline runtime to the msgraph webhook adapter."""
-
     adapter = gateway.adapters.get(Platform.MSGRAPH_WEBHOOK)
     if adapter is None:
         return False

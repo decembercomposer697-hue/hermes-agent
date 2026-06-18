@@ -121,7 +121,6 @@ async def test_interaction_backed_events_do_not_attempt_reactions(adapter):
 
     async def handler(_event):
         await asyncio.sleep(0)
-        return None
 
     async def hold_typing(_chat_id, interval=2.0, metadata=None):
         await asyncio.Event().wait()

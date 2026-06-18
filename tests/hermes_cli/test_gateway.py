@@ -5,7 +5,7 @@ from types import ModuleType, SimpleNamespace
 
 import pytest
 
-import hermes_cli.gateway as gateway
+from hermes_cli import gateway
 
 
 def _install_fake_gateway_run(monkeypatch, start_gateway):
@@ -284,7 +284,7 @@ def test_gateway_restart_on_windows_without_service_uses_detached_backend(monkey
     down. The Windows backend restarts via detached pythonw.exe even when no
     Scheduled Task / Startup item is installed.
     """
-    import hermes_cli.gateway_windows as gateway_windows
+    from hermes_cli import gateway_windows
 
     calls = []
 
@@ -312,7 +312,7 @@ def test_gateway_restart_on_windows_without_service_uses_detached_backend(monkey
 
 def test_gateway_restart_on_windows_preserves_failure_fallback(monkeypatch):
     """If the Windows backend cannot launch, keep the existing fallback."""
-    import hermes_cli.gateway_windows as gateway_windows
+    from hermes_cli import gateway_windows
 
     calls = []
 
@@ -634,7 +634,6 @@ class TestWaitForGatewayExit:
 
     def test_force_kills_after_grace_period(self, monkeypatch):
         """When the process doesn't exit, force-kill the saved PID."""
-
         # Simulate monotonic time advancing past force_after
         call_num = 0
 
@@ -664,7 +663,6 @@ class TestWaitForGatewayExit:
 
     def test_handles_process_already_gone_on_kill(self, monkeypatch):
         """ProcessLookupError during force-kill is not fatal."""
-
         call_num = 0
 
         def fake_monotonic():
@@ -720,7 +718,7 @@ class TestStopProfileGateway:
 
         assert gateway.stop_profile_gateway() is True
         assert calls["kill"] == 1          # one SIGTERM
-        assert calls["alive_probes"] == 20 # 20 liveness polls over the 2s window
+        assert calls["alive_probes"] == 20  # 20 liveness polls over the 2s window
         assert calls["remove"] == 0
 
 

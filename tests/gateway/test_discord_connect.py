@@ -203,6 +203,7 @@ async def test_reconnect_closes_previous_client_to_prevent_zombie_websocket(monk
 
     class TrackedBot(FakeBot):
         """FakeBot that records close() calls and reports open/closed state."""
+
         _closed = False
 
         def is_closed(self):
@@ -268,7 +269,7 @@ async def test_connect_releases_token_lock_on_timeout(monkeypatch):
 
     async def fake_wait_for(awaitable, timeout):
         awaitable.close()
-        raise TimeoutError()
+        raise TimeoutError
 
     monkeypatch.setattr(discord_platform.asyncio, "wait_for", fake_wait_for)
 

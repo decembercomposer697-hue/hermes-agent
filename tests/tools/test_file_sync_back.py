@@ -2,7 +2,6 @@
 
 import io
 import logging
-import os
 import signal
 import tarfile
 from pathlib import Path
@@ -80,7 +79,7 @@ def _make_manager(
         # guard does not early-return. Populate from the mapping when we
         # can; otherwise drop a sentinel entry.
         for host_path, remote_path in mapping:
-            if os.path.exists(host_path):
+            if Path(host_path).exists():
                 mgr._pushed_hashes[remote_path] = _sha256_file(host_path)
             else:
                 mgr._pushed_hashes[remote_path] = "0" * 64
@@ -295,7 +294,7 @@ class TestPushedHashesPopulated:
         assert remote_path in mgr._pushed_hashes
 
         # Remove the file from the mapping (simulates local deletion)
-        os.unlink(str(host_file))
+        Path(str(host_file)).unlink()
         current_mapping.clear()
 
         mgr.sync(force=True)

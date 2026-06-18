@@ -34,9 +34,9 @@ import signal
 import subprocess
 import sys
 import time
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     # Type checkers see ``httpx`` as the always-imported module, so every use

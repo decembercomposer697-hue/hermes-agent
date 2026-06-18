@@ -30,7 +30,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 _USAGE_EXIT = 2
 _FAILURE_EXIT = 1
@@ -102,18 +101,17 @@ def _emit_result(
         print(json.dumps(payload, indent=2))
     elif quiet:
         pass
-    else:
-        if payload.get("error"):
-            print(f"hermes send: {payload['error']}", file=sys.stderr)
-        elif payload.get("success"):
-            note = payload.get("note")
-            if note:
-                print(note)
-            else:
-                print("sent")
+    elif payload.get("error"):
+        print(f"hermes send: {payload['error']}", file=sys.stderr)
+    elif payload.get("success"):
+        note = payload.get("note")
+        if note:
+            print(note)
         else:
-            # Unknown shape — dump it so nothing is silently dropped.
-            print(json.dumps(payload, indent=2))
+            print("sent")
+    else:
+        # Unknown shape — dump it so nothing is silently dropped.
+        print(json.dumps(payload, indent=2))
 
     if payload.get("error"):
         return _FAILURE_EXIT
@@ -251,7 +249,7 @@ def _load_hermes_env() -> None:
         return
 
     try:
-        with open(config_path, encoding="utf-8") as fh:
+        with Path(config_path).open(encoding="utf-8") as fh:
             raw = yaml.safe_load(fh) or {}
     except Exception:
         return
@@ -275,7 +273,6 @@ def _load_hermes_env() -> None:
 
 def cmd_send(args: argparse.Namespace) -> None:
     """Entry point wired into the top-level argparse dispatcher."""
-
     # Bridge ~/.hermes/.env and ~/.hermes/config.yaml into os.environ so the
     # gateway config loader (invoked downstream by send_message_tool and by
     # the channel directory) can see platform credentials and home channels.
@@ -294,7 +291,7 @@ def cmd_send(args: argparse.Namespace) -> None:
         print(
             "hermes send: --to PLATFORM[:channel[:thread]] is required\n"
             "Examples:\n"
-            "  hermes send --to telegram \"hello\"\n"
+            '  hermes send --to telegram "hello"\n'
             "  hermes send --to discord:#ops --file report.md\n"
             "  hermes send --list      # list available targets",
             file=sys.stderr,
@@ -362,10 +359,10 @@ def register_send_subparser(subparsers) -> argparse.ArgumentParser:
         ),
         epilog=(
             "Examples:\n"
-            "  hermes send --to telegram \"deploy finished\"\n"
-            "  echo \"RAM 92%\" | hermes send --to telegram:-1001234567890\n"
+            '  hermes send --to telegram "deploy finished"\n'
+            '  echo "RAM 92%" | hermes send --to telegram:-1001234567890\n'
             "  hermes send --to discord:#ops --file /tmp/report.md\n"
-            "  hermes send --to slack:#eng --subject \"[CI]\" --file build.log\n"
+            '  hermes send --to slack:#eng --subject "[CI]" --file build.log\n'
             "  hermes send --list                  # all platforms\n"
             "  hermes send --list telegram         # filter by platform\n"
             "\n"

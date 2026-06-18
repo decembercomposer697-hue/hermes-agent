@@ -27,7 +27,6 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath, PureWindowsPath
-from typing import List, Optional
 
 from agent.skill_utils import is_excluded_skill_path
 
@@ -472,6 +471,7 @@ def find_alias_for_profile(profile_name: str) -> str | None:
 @dataclass
 class ProfileInfo:
     """Summary information about a profile."""
+
     name: str
     path: Path
     is_default: bool
@@ -514,7 +514,7 @@ def _read_distribution_meta(profile_dir: Path) -> tuple:
         return None, None, None
     try:
         import yaml
-        with open(mf_path, encoding="utf-8") as f:
+        with Path(mf_path).open(encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
         if not isinstance(data, dict):
             return None, None, None
@@ -534,7 +534,7 @@ def _read_config_model(profile_dir: Path) -> tuple:
         return None, None
     try:
         import yaml
-        with open(config_path, encoding="utf-8") as f:
+        with Path(config_path).open(encoding="utf-8") as f:
             cfg = yaml.safe_load(f) or {}
         model_cfg = cfg.get("model", {})
         if isinstance(model_cfg, str):
@@ -599,7 +599,7 @@ def read_profile_meta(profile_dir: Path) -> dict:
         return {"description": "", "description_auto": False}
     try:
         import yaml
-        with open(path, encoding="utf-8") as f:
+        with Path(path).open(encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
     except Exception:
         return {"description": "", "description_auto": False}
@@ -630,7 +630,7 @@ def write_profile_meta(
     existing: dict = {}
     if path.is_file():
         try:
-            with open(path, encoding="utf-8") as f:
+            with Path(path).open(encoding="utf-8") as f:
                 loaded = yaml.safe_load(f) or {}
             if isinstance(loaded, dict):
                 existing = loaded
@@ -640,7 +640,7 @@ def write_profile_meta(
         existing["description"] = description.strip()
     if description_auto is not None:
         existing["description_auto"] = bool(description_auto)
-    with open(path, "w", encoding="utf-8") as f:
+    with Path(path).open("w", encoding="utf-8") as f:
         yaml.safe_dump(existing, f, sort_keys=False, default_flow_style=False)
 
 
@@ -815,7 +815,7 @@ def create_profile(
                     # explicitly so the clone doesn't inherit weak perms.
                     if filename == ".env":
                         try:
-                            os.chmod(str(dst), 0o600)
+                            Path(str(dst)).chmod(0o600)
                         except OSError:
                             pass
 
@@ -975,11 +975,11 @@ def delete_profile(name: str, yes: bool = False) -> Path:
     if has_wrapper:
         items.append(f"Command alias ({wrapper_path})")
 
-    print(f"\nThis will permanently delete:")
+    print("\nThis will permanently delete:")
     for item in items:
         print(f"  • {item}")
     if gw_running:
-        print(f"  ⚠ Gateway is running — it will be stopped.")
+        print("  ⚠ Gateway is running — it will be stopped.")
 
     # Confirmation
     if not yes:
@@ -1005,9 +1005,8 @@ def delete_profile(name: str, yes: bool = False) -> Path:
         _stop_gateway_process(profile_dir)
 
     # 3. Remove wrapper script
-    if has_wrapper:
-        if remove_wrapper_script(canon):
-            print(f"✓ Removed {wrapper_path}")
+    if has_wrapper and remove_wrapper_script(canon):
+        print(f"✓ Removed {wrapper_path}")
 
     # 4. Remove profile directory
     remove_error: Exception | None = None
@@ -1035,14 +1034,14 @@ def delete_profile(name: str, yes: bool = False) -> Path:
             if isinstance(exc, PermissionError):
                 # Make the path writable
                 try:
-                    os.chmod(path, os.stat(path).st_mode | _stat.S_IWUSR)
+                    Path(path).chmod(os.stat(path).st_mode | _stat.S_IWUSR)
                 except OSError:
                     pass
                 # Also make the parent writable (needed for unlink/rmdir)
                 parent = os.path.dirname(path)
                 if parent:
                     try:
-                        os.chmod(parent, os.stat(parent).st_mode | _stat.S_IWUSR)
+                        Path(parent).chmod(os.stat(parent).st_mode | _stat.S_IWUSR)
                     except OSError:
                         pass
                 func(path)
@@ -1194,7 +1193,7 @@ def _cleanup_gateway_service(name: str, profile_dir: Path) -> None:
                     capture_output=True, check=False, timeout=10,
                 )
                 plist_path.unlink(missing_ok=True)
-                print(f"✓ Launchd service removed")
+                print("✓ Launchd service removed")
     except Exception as e:
         print(f"⚠ Service cleanup: {e}")
     finally:
@@ -1329,10 +1328,7 @@ def _default_export_ignore(root_dir: Path):
         ignored: set = set()
         for entry in contents:
             # Universal exclusions (any depth)
-            if entry == "__pycache__" or entry.endswith((".sock", ".tmp")):
-                ignored.add(entry)
-            # npm lockfiles can appear at root
-            elif entry in {"package.json", "package-lock.json"}:
+            if entry == "__pycache__" or entry.endswith((".sock", ".tmp")) or entry in {"package.json", "package-lock.json"}:
                 ignored.add(entry)
         # Root-level exclusions
         if Path(directory) == root_dir:
@@ -1429,11 +1425,11 @@ def _safe_extract_profile_archive(archive: Path, destination: Path) -> None:
             if extracted is None:
                 raise ValueError(f"Cannot read archive member: {member.name}")
 
-            with extracted, open(target, "wb") as dst:
+            with extracted, Path(target).open("wb") as dst:
                 shutil.copyfileobj(extracted, dst)
 
             try:
-                os.chmod(target, member.mode & 0o777)
+                Path(target).chmod(member.mode & 0o777)
             except OSError:
                 pass
 

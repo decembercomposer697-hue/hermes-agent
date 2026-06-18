@@ -446,7 +446,7 @@ class TestGatewayStopCleanup:
             lambda force=False, all_profiles=False: kill_calls.append(force) or 2,
         )
 
-        gateway_cli.gateway_command(SimpleNamespace(gateway_command="stop", **{"all": True}))
+        gateway_cli.gateway_command(SimpleNamespace(gateway_command="stop", all=True))
 
         assert service_calls == ["stop"]
         assert kill_calls == [False]
@@ -455,7 +455,7 @@ class TestGatewayStopCleanup:
 class TestLaunchdServiceRecovery:
     def test_get_restart_drain_timeout_prefers_env_then_config_then_default(self, monkeypatch):
         monkeypatch.delenv("HERMES_RESTART_DRAIN_TIMEOUT", raising=False)
-        monkeypatch.setattr(gateway_cli, "read_raw_config", lambda: {})
+        monkeypatch.setattr(gateway_cli, "read_raw_config", dict)
 
         assert (
             gateway_cli._get_restart_drain_timeout()
@@ -1368,7 +1368,7 @@ class TestGatewaySystemServiceRouting:
         monkeypatch.setattr(gateway_cli, "is_termux", lambda: True)
         monkeypatch.setattr(gateway_cli, "is_macos", lambda: False)
         monkeypatch.setattr(gateway_cli, "find_gateway_pids", lambda exclude_pids=None: [])
-        monkeypatch.setattr(gateway_cli, "_runtime_health_lines", lambda: [])
+        monkeypatch.setattr(gateway_cli, "_runtime_health_lines", list)
 
         gateway_cli.gateway_command(SimpleNamespace(gateway_command="status", deep=False, system=False))
 
@@ -1607,7 +1607,6 @@ class TestSystemServiceIdentityRootHandling:
 
     def test_auto_detected_root_is_rejected(self, monkeypatch):
         """When root is auto-detected (not explicitly requested), raise."""
-
         monkeypatch.delenv("SUDO_USER", raising=False)
         monkeypatch.setenv("USER", "root")
         monkeypatch.setenv("LOGNAME", "root")
@@ -1617,7 +1616,6 @@ class TestSystemServiceIdentityRootHandling:
 
     def test_explicit_root_is_allowed(self, monkeypatch):
         """When root is explicitly passed via --run-as-user root, allow it."""
-
         root_info = pwd.getpwnam("root")
         root_group = grp.getgrgid(root_info.pw_gid).gr_name
 
@@ -1627,7 +1625,6 @@ class TestSystemServiceIdentityRootHandling:
 
     def test_non_root_user_passes_through(self, monkeypatch):
         """Normal non-root user works as before."""
-
         monkeypatch.delenv("SUDO_USER", raising=False)
         monkeypatch.setenv("USER", "nobody")
         monkeypatch.setenv("LOGNAME", "nobody")

@@ -542,7 +542,7 @@ def _usage_and_cost(response: Any, *, provider: str, api_mode: str, model: str, 
                 from decimal import Decimal
 
                 from agent.usage_pricing import get_pricing_entry
-                _ONE_M = Decimal("1000000")
+                _ONE_M = Decimal(1000000)
                 entry = get_pricing_entry(model, provider=provider, base_url=base_url)
                 if entry:
                     if entry.input_cost_per_million is not None and canonical.input_tokens:
@@ -908,7 +908,7 @@ def on_post_llm_call(*, task_id: str = "", session_id: str = "", provider: str =
                 estimate_usage_cost,
                 get_pricing_entry,
             )
-            _ONE_M = Decimal("1000000")
+            _ONE_M = Decimal(1000000)
             _cu = CanonicalUsage(
                 input_tokens=_input,
                 output_tokens=_output,

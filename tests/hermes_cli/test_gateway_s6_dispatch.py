@@ -12,6 +12,7 @@ import pytest
 
 class _CallRecorder:
     """Minimal stand-in for S6ServiceManager."""
+
     kind = "s6"
 
     def __init__(self) -> None:

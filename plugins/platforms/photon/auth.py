@@ -44,7 +44,7 @@ from base64 import b64encode
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 try:
     import httpx
@@ -56,6 +56,7 @@ logger = logging.getLogger(__name__)
 
 class PhotonDashboardAuthError(RuntimeError):
     """Raised when Photon rejects a device-flow token for the dashboard API."""
+
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -113,7 +114,7 @@ def _save_auth(data: dict[str, Any]) -> None:
     with tmp.open("w", encoding="utf-8") as fh:
         json.dump(data, fh, indent=2, sort_keys=True)
     try:
-        os.chmod(tmp, 0o600)
+        Path(tmp).chmod(0o600)
     except OSError:
         pass
     tmp.replace(path)
@@ -267,6 +268,7 @@ class DeviceCode:
 @dataclass(frozen=True)
 class _DeviceTokenCandidate:
     """A token-like value extracted from the device-token response."""
+
     source: str
     token: str
 
@@ -1007,15 +1009,15 @@ def print_credential_summary(emit: Any = print) -> None:
         else "✗ missing (run `hermes photon setup`)"
     )
     sid, sec = load_project_credentials()
-    labels["spectrum_project_id"] = sid if sid else "✗ missing"
+    labels["spectrum_project_id"] = sid or "✗ missing"
     labels["dashboard_project_id"] = load_dashboard_project_id() or "—"
     labels["project_key"] = "✓ stored" if sec else "✗ missing"
     phone, assigned = load_user_numbers()
     labels["phone_number"] = (
-        phone if phone else "✗ missing (run `hermes photon setup --phone ...`)"
+        phone or "✗ missing (run `hermes photon setup --phone ...`)"
     )
     labels["assigned_phone_number"] = (
-        assigned if assigned else "✗ missing (run `hermes photon setup`)"
+        assigned or "✗ missing (run `hermes photon setup`)"
     )
 
     rows = [

@@ -18,6 +18,7 @@ and ``os.path.isdir`` so the MSYS path tests as "missing" exactly like
 on the real OS.
 """
 
+import pathlib
 from unittest.mock import patch
 
 from tools.environments import local as local_mod
@@ -125,8 +126,7 @@ class TestUpdateCwdWindowsMsys:
         new_dir = tmp_path / "next"
         new_dir.mkdir()
 
-        with open(env._cwd_file, "w") as f:
-            f.write("/c/whatever/from/bash")
+        pathlib.Path(env._cwd_file).write_text("/c/whatever/from/bash")
 
         # Translate the synthetic MSYS string to the real native dir.
         def fake_translate(p):

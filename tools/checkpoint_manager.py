@@ -56,7 +56,6 @@ import shutil
 import subprocess
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
 
 from hermes_constants import get_hermes_home
 from utils import env_int
@@ -176,7 +175,7 @@ def _validate_file_path(file_path: str, working_dir: str) -> str | None:
     """
     if not file_path or not file_path.strip():
         return "Empty file path"
-    if os.path.isabs(file_path):
+    if Path(file_path).is_absolute():
         return f"File path must be relative, got absolute path: {file_path!r}"
     abs_workdir = _normalize_path(working_dir)
     resolved = (abs_workdir / file_path).resolve()
@@ -668,7 +667,7 @@ class CheckpointManager:
 
         ref = _ref_name(_project_hash(abs_dir))
         ok, stdout, _ = _run_git(
-            ["log", ref, f"--format=%H|%h|%aI|%s", "-n", str(self.max_snapshots)],
+            ["log", ref, "--format=%H|%h|%aI|%s", "-n", str(self.max_snapshots)],
             store, abs_dir,
             allowed_returncodes={128, 129},
         )
@@ -793,7 +792,7 @@ class CheckpointManager:
         dir_hash = _project_hash(abs_dir)
         index_file = _index_path(store, dir_hash)
 
-        restore_target = file_path if file_path else "."
+        restore_target = file_path or "."
         ok, stdout, err = _run_git(
             ["checkout", commit_hash, "--", restore_target],
             store, abs_dir, timeout=_GIT_TIMEOUT * 2,

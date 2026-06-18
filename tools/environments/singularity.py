@@ -12,7 +12,6 @@ import subprocess
 import threading
 import uuid
 from pathlib import Path
-from typing import Optional
 
 from hermes_constants import get_hermes_home
 from tools.environments.base import (

@@ -32,7 +32,7 @@ registry.register(
 
 
 __all__ = [
+    "check_computer_use_requirements",
     "handle_computer_use",
     "set_approval_callback",
-    "check_computer_use_requirements",
 ]

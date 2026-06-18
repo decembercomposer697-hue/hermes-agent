@@ -11,7 +11,6 @@ over the platform-injected callback.
 import json
 import os
 from collections.abc import Callable
-from typing import Optional
 
 from tools.registry import registry, tool_error
 

@@ -17,7 +17,6 @@ import secrets
 import tempfile
 import time
 from pathlib import Path
-from typing import Dict
 
 from hermes_cli.config import cfg_get
 from hermes_constants import display_hermes_home
@@ -66,11 +65,11 @@ def _save_subscriptions(subs: dict[str, dict]) -> None:
             json.dump(subs, fh, indent=2, ensure_ascii=False)
             fh.flush()
             os.fsync(fh.fileno())
-        os.chmod(tmp_path, _SUBSCRIPTIONS_FILE_MODE)
+        Path(tmp_path).chmod(_SUBSCRIPTIONS_FILE_MODE)
         atomic_replace(tmp_path, path)
         # Re-assert after rename in case the destination existed with a
         # broader mode and atomic_replace preserved it.
-        os.chmod(path, _SUBSCRIPTIONS_FILE_MODE)
+        Path(path).chmod(_SUBSCRIPTIONS_FILE_MODE)
     except Exception:
         try:
             tmp_path.unlink(missing_ok=True)
@@ -211,9 +210,9 @@ def _cmd_subscribe(args):
         prompt_preview = route["prompt"][:80] + ("..." if len(route["prompt"]) > 80 else "")
         label = "Message" if route.get("deliver_only") else "Prompt"
         print(f"  {label}: {prompt_preview}")
-    print(f"\n  Configure your service to POST to the URL above.")
-    print(f"  Use the secret for HMAC-SHA256 signature validation.")
-    print(f"  The gateway must be running to receive events (hermes gateway run).\n")
+    print("\n  Configure your service to POST to the URL above.")
+    print("  Use the secret for HMAC-SHA256 signature validation.")
+    print("  The gateway must be running to receive events (hermes gateway run).\n")
 
 
 def _cmd_list(args):

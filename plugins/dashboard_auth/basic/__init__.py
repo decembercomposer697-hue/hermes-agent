@@ -286,7 +286,6 @@ class BasicAuthProvider(DashboardAuthProvider):
         # Stateless tokens — nothing to revoke server-side. The session
         # expires within its TTL. Best-effort no-op, must not raise.
         _ = refresh_token
-        return None
 
     # ---- internals ---------------------------------------------------------
 

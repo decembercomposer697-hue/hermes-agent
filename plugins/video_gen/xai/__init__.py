@@ -156,10 +156,8 @@ def _normalize_reference_images(reference_image_urls: list[str] | None):
 
 def _clamp_duration(duration: int | None, has_reference_images: bool) -> int:
     value = duration if duration is not None else DEFAULT_DURATION
-    if value < 1:
-        value = 1
-    if value > 15:
-        value = 15
+    value = max(value, 1)
+    value = min(value, 15)
     if has_reference_images and value > 10:
         value = 10
     return value

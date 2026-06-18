@@ -3650,7 +3650,7 @@ class TestApplyWalProbe:
 
         assert result == "wal"
         # Only the probe should have fired; the set-pragma must NOT appear.
-        assert any("PRAGMA journal_mode" == sql.strip() for sql in conn.executed), (
+        assert any(sql.strip() == "PRAGMA journal_mode" for sql in conn.executed), (
             "probe PRAGMA should have run"
         )
         assert not any("journal_mode=WAL" in sql for sql in conn.executed), (

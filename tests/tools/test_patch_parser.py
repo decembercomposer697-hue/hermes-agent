@@ -553,7 +553,7 @@ class TestV4ALspDiagnosticsPropagation:
         ops = self._build_ops_writing("foo.ts", "const x: number = 1\n")
 
         diag_block = (
-            "<diagnostics file=\"foo.ts\">\n"
+            '<diagnostics file="foo.ts">\n'
             "ERROR [1:7] some diagnostic\n"
             "</diagnostics>"
         )
@@ -585,7 +585,7 @@ class TestV4ALspDiagnosticsPropagation:
         assert err is None
 
         diag_block = (
-            "<diagnostics file=\"bar.ts\">\n"
+            '<diagnostics file="bar.ts">\n'
             "ERROR [3:1] something\n"
             "</diagnostics>"
         )
@@ -642,8 +642,8 @@ class TestV4ALspDiagnosticsPropagation:
         assert err is None
 
         per_file = {
-            "a.ts": "<diagnostics file=\"a.ts\">\nERR a\n</diagnostics>",
-            "b.ts": "<diagnostics file=\"b.ts\">\nERR b\n</diagnostics>",
+            "a.ts": '<diagnostics file="a.ts">\nERR a\n</diagnostics>',
+            "b.ts": '<diagnostics file="b.ts">\nERR b\n</diagnostics>',
         }
 
         class FakeFileOps:

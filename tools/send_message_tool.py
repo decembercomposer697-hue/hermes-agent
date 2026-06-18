@@ -9,6 +9,7 @@ import asyncio
 import json
 import logging
 import os
+import pathlib
 import re
 import ssl
 import time
@@ -972,7 +973,7 @@ async def _send_telegram(token, chat_id, message, media_files=None, thread_id=No
                     raise
 
         for media_path, is_voice in media_files:
-            if not os.path.exists(media_path):
+            if not pathlib.Path(media_path).exists():
                 warning = f"Media file not found, skipping: {media_path}"
                 logger.warning(warning)
                 warnings.append(warning)
@@ -980,7 +981,7 @@ async def _send_telegram(token, chat_id, message, media_files=None, thread_id=No
 
             ext = os.path.splitext(media_path)[1].lower()
             try:
-                with open(media_path, "rb") as f:
+                with pathlib.Path(media_path).open("rb") as f:
                     media_kwargs = dict(thread_kwargs)
                     try:
                         if ext in _IMAGE_EXTS and not force_document:
@@ -1095,22 +1096,21 @@ async def _send_whatsapp(extra, chat_id, message):
         return {"error": "aiohttp not installed. Run: pip install aiohttp"}
     try:
         bridge_port = extra.get("bridge_port", 3000)
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                f"http://localhost:{bridge_port}/send",
-                json={"chatId": chat_id, "message": message},
-                timeout=aiohttp.ClientTimeout(total=30),
-            ) as resp:
-                if resp.status == 200:
-                    data = await resp.json()
-                    return {
-                        "success": True,
-                        "platform": "whatsapp",
-                        "chat_id": chat_id,
-                        "message_id": data.get("messageId"),
-                    }
-                body = await resp.text()
-                return _error(f"WhatsApp bridge error ({resp.status}): {body}")
+        async with aiohttp.ClientSession() as session, session.post(
+            f"http://localhost:{bridge_port}/send",
+            json={"chatId": chat_id, "message": message},
+            timeout=aiohttp.ClientTimeout(total=30),
+        ) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                return {
+                    "success": True,
+                    "platform": "whatsapp",
+                    "chat_id": chat_id,
+                    "message_id": data.get("messageId"),
+                }
+            body = await resp.text()
+            return _error(f"WhatsApp bridge error ({resp.status}): {body}")
     except Exception as e:
         return _error(f"WhatsApp send failed: {e}")
 
@@ -1149,7 +1149,7 @@ async def _send_signal(extra, chat_id, message, media_files=None):
         valid_media = media_files or []
         attachment_paths = []
         for media_path, _is_voice in valid_media:
-            if os.path.exists(media_path):
+            if pathlib.Path(media_path).exists():
                 attachment_paths.append(media_path)
             else:
                 logger.warning("Signal media file not found, skipping: %s", media_path)
@@ -1453,7 +1453,7 @@ async def _send_matrix_via_adapter(pconfig, chat_id, message, media_files=None, 
                 return _error(f"Matrix send failed: {last_result.error}")
 
         for media_path, is_voice in media_files:
-            if not os.path.exists(media_path):
+            if not pathlib.Path(media_path).exists():
                 return _error(f"Media file not found: {media_path}")
 
             ext = os.path.splitext(media_path)[1].lower()
@@ -1461,9 +1461,7 @@ async def _send_matrix_via_adapter(pconfig, chat_id, message, media_files=None, 
                 last_result = await adapter.send_image_file(chat_id, media_path, metadata=metadata)
             elif ext in _VIDEO_EXTS:
                 last_result = await adapter.send_video(chat_id, media_path, metadata=metadata)
-            elif ext in _VOICE_EXTS and is_voice:
-                last_result = await adapter.send_voice(chat_id, media_path, metadata=metadata)
-            elif ext in _AUDIO_EXTS:
+            elif (ext in _VOICE_EXTS and is_voice) or ext in _AUDIO_EXTS:
                 last_result = await adapter.send_voice(chat_id, media_path, metadata=metadata)
             else:
                 last_result = await adapter.send_document(chat_id, media_path, metadata=metadata)
@@ -1627,7 +1625,7 @@ async def _send_feishu(pconfig, chat_id, message, media_files=None, thread_id=No
                 return _error(f"Feishu send failed: {last_result.error}")
 
         for media_path, is_voice in media_files:
-            if not os.path.exists(media_path):
+            if not pathlib.Path(media_path).exists():
                 return _error(f"Media file not found: {media_path}")
 
             ext = os.path.splitext(media_path)[1].lower()
@@ -1635,9 +1633,7 @@ async def _send_feishu(pconfig, chat_id, message, media_files=None, thread_id=No
                 last_result = await adapter.send_image_file(chat_id, media_path, metadata=metadata)
             elif ext in _VIDEO_EXTS:
                 last_result = await adapter.send_video(chat_id, media_path, metadata=metadata)
-            elif ext in _VOICE_EXTS and is_voice:
-                last_result = await adapter.send_voice(chat_id, media_path, metadata=metadata)
-            elif ext in _AUDIO_EXTS:
+            elif (ext in _VOICE_EXTS and is_voice) or ext in _AUDIO_EXTS:
                 last_result = await adapter.send_voice(chat_id, media_path, metadata=metadata)
             else:
                 last_result = await adapter.send_document(chat_id, media_path, metadata=metadata)
@@ -1715,7 +1711,7 @@ async def _send_qqbot(pconfig, chat_id, message):
             token_data = token_resp.json()
             access_token = token_data.get("access_token")
             if not access_token:
-                return _error(f"QQBot: no access_token in response")
+                return _error("QQBot: no access_token in response")
 
             # Step 2: Send message via REST
             # QQ Bot API has separate endpoints for channels, C2C, and groups.

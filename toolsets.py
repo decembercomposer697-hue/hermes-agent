@@ -22,7 +22,7 @@ Usage:
     all_tools = resolve_toolset("full_stack")
 """
 
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 # Shared tool list for CLI and all messaging platform toolsets.
 # Edit this once to update all platforms simultaneously.
@@ -93,7 +93,7 @@ TOOLSETS = {
         "tools": ["web_search", "web_extract"],
         "includes": [],  # No other toolsets included
     },
-    
+
     "search": {
         "description": "Web search only (no content extraction/scraping)",
         "tools": ["web_search"],
@@ -110,7 +110,7 @@ TOOLSETS = {
         "tools": ["x_search"],
         "includes": [],
     },
-    
+
     "vision": {
         "description": "Image analysis and vision tools",
         "tools": ["vision_analyze"],
@@ -122,7 +122,7 @@ TOOLSETS = {
         "tools": ["video_analyze"],
         "includes": [],
     },
-    
+
     "image_gen": {
         "description": "Creative generation tools (images)",
         "tools": ["image_generate"],
@@ -155,19 +155,19 @@ TOOLSETS = {
         "tools": ["terminal", "process"],
         "includes": [],
     },
-    
+
     "moa": {
         "description": "Advanced reasoning and problem-solving tools",
         "tools": ["mixture_of_agents"],
         "includes": [],
     },
-    
+
     "skills": {
         "description": "Access, create, edit, and manage skill documents with specialized instructions and knowledge",
         "tools": ["skills_list", "skill_view", "skill_manage"],
         "includes": [],
     },
-    
+
     "browser": {
         "description": "Browser automation for web interaction (navigate, click, type, scroll, iframes, hold-click) with web search for finding URLs",
         "tools": [
@@ -179,38 +179,38 @@ TOOLSETS = {
         ],
         "includes": [],
     },
-    
+
     "cronjob": {
         "description": "Cronjob management tool - create, list, update, pause, resume, remove, and trigger scheduled tasks",
         "tools": ["cronjob"],
         "includes": [],
     },
-    
+
     "messaging": {
         "description": "Cross-platform messaging: send messages to Telegram, Discord, Slack, SMS, etc.",
         "tools": ["send_message"],
         "includes": [],
     },
 
-    
+
     "file": {
         "description": "File manipulation tools: read, write, patch (with fuzzy matching), and search (content + files)",
         "tools": ["read_file", "write_file", "patch", "search_files"],
         "includes": [],
     },
-    
+
     "tts": {
         "description": "Text-to-speech: convert text to audio with Edge TTS (free), ElevenLabs, OpenAI, or xAI",
         "tools": ["text_to_speech"],
         "includes": [],
     },
-    
+
     "todo": {
         "description": "Task planning and tracking for multi-step work",
         "tools": ["todo"],
         "includes": [],
     },
-    
+
     "memory": {
         "description": "Persistent memory across sessions (personal notes + user profile)",
         "tools": ["memory"],
@@ -222,25 +222,25 @@ TOOLSETS = {
         "tools": [],
         "includes": [],
     },
-    
+
     "session_search": {
         "description": "Search and recall past conversations with summarization",
         "tools": ["session_search"],
         "includes": [],
     },
-    
+
     "clarify": {
         "description": "Ask the user clarifying questions (multiple-choice or open-ended)",
         "tools": ["clarify"],
         "includes": [],
     },
-    
+
     "code_execution": {
         "description": "Run Python scripts that call tools programmatically (reduces LLM round trips)",
         "tools": ["execute_code"],
         "includes": [],
     },
-    
+
     "delegation": {
         "description": "Spawn subagents with isolated context for complex subtasks",
         "tools": ["delegate_task"],
@@ -325,13 +325,13 @@ TOOLSETS = {
 
 
     # Scenario-specific toolsets
-    
+
     "debugging": {
         "description": "Debugging and troubleshooting toolkit",
         "tools": ["terminal", "process"],
         "includes": ["web", "file"],  # For searching error messages and solutions, and file operations
     },
-    
+
     "safe": {
         "description": "Safe toolkit without terminal access",
         "tools": [],
@@ -364,7 +364,7 @@ TOOLSETS = {
         # non-configurable-toolset recovery loop in hermes_cli/tools_config.py).
         "posture": True,
     },
-    
+
     # ==========================================================================
     # Full Hermes toolsets (CLI + messaging platforms)
     #
@@ -423,7 +423,7 @@ TOOLSETS = {
         ],
         "includes": [],
     },
-    
+
     "hermes-cli": {
         "description": "Full interactive CLI toolset - all default tools plus cronjob management",
         "tools": _HERMES_CORE_TOOLS,
@@ -446,7 +446,7 @@ TOOLSETS = {
         "tools": _HERMES_CORE_TOOLS,
         "includes": [],
     },
-    
+
     "hermes-discord": {
         "description": "Discord bot toolset - full access (terminal has safety checks via dangerous command approval)",
         "tools": _HERMES_CORE_TOOLS + [
@@ -455,19 +455,19 @@ TOOLSETS = {
         ],
         "includes": [],
     },
-    
+
     "hermes-whatsapp": {
         "description": "WhatsApp bot toolset - similar to Telegram (personal messaging, more trusted)",
         "tools": _HERMES_CORE_TOOLS,
         "includes": [],
     },
-    
+
     "hermes-slack": {
         "description": "Slack bot toolset - full access for workspace use (terminal has safety checks)",
         "tools": _HERMES_CORE_TOOLS,
         "includes": [],
     },
-    
+
     "hermes-signal": {
         "description": "Signal bot toolset - encrypted messaging platform (full access)",
         "tools": _HERMES_CORE_TOOLS,
@@ -595,7 +595,7 @@ def get_toolset(name: str) -> dict[str, Any] | None:
     try:
         from tools.registry import registry
     except Exception:
-        return toolset if toolset else None
+        return toolset or None
 
     if toolset:
         merged_tools = sorted(
@@ -646,7 +646,7 @@ def resolve_toolset(name: str, visited: set[str] = None) -> list[str]:
     """
     if visited is None:
         visited = set()
-    
+
     # Special aliases that represent all tools across every toolset
     # This ensures future toolsets are automatically included without changes.
     if name in {"all", "*"}:
@@ -700,7 +700,7 @@ def resolve_toolset(name: str, visited: set[str] = None) -> list[str]:
     for included_name in toolset.get("includes", []):
         included_tools = resolve_toolset(included_name, visited)
         tools.update(included_tools)
-    
+
     return sorted(tools)
 
 
@@ -715,11 +715,11 @@ def resolve_multiple_toolsets(toolset_names: list[str]) -> list[str]:
 
     """
     all_tools = set()
-    
+
     for name in toolset_names:
         tools = resolve_toolset(name)
         all_tools.update(tools)
-    
+
     return sorted(all_tools)
 
 
@@ -850,9 +850,9 @@ def get_toolset_info(name: str) -> dict[str, Any]:
     toolset = get_toolset(name)
     if not toolset:
         return None
-    
+
     resolved_tools = resolve_toolset(name)
-    
+
     return {
         "name": name,
         "description": toolset["description"],
@@ -867,7 +867,7 @@ def get_toolset_info(name: str) -> dict[str, Any]:
 if __name__ == "__main__":
     print("Toolsets System Demo")
     print("=" * 60)
-    
+
     print("\nAvailable Toolsets:")
     print("-" * 40)
     for name, toolset in get_all_toolsets().items():
@@ -875,20 +875,20 @@ if __name__ == "__main__":
         composite = "[composite]" if info["is_composite"] else "[leaf]"
         print(f"  {composite} {name:20} - {toolset['description']}")
         print(f"     Tools: {len(info['resolved_tools'])} total")
-    
+
     print("\nToolset Resolution Examples:")
     print("-" * 40)
     for name in ["web", "terminal", "safe", "debugging"]:
         tools = resolve_toolset(name)
         print(f"\n  {name}:")
         print(f"    Resolved to {len(tools)} tools: {', '.join(sorted(tools))}")
-    
+
     print("\nMultiple Toolset Resolution:")
     print("-" * 40)
     combined = resolve_multiple_toolsets(["web", "vision", "terminal"])
     print("  Combining ['web', 'vision', 'terminal']:")
     print(f"    Result: {', '.join(sorted(combined))}")
-    
+
     print("\nCustom Toolset Creation:")
     print("-" * 40)
     create_custom_toolset(

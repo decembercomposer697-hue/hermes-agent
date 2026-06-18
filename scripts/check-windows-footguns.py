@@ -53,10 +53,10 @@ GUARD_HINTS = (
     "getattr(os,",
     "getattr(signal,",
     "shutil.which(",
-    "if platform.system() != \"Windows\"",
+    'if platform.system() != "Windows"',
     "if platform.system() != 'Windows'",
-    "if sys.platform == \"win32\"",
-    "if sys.platform != \"win32\"",
+    'if sys.platform == "win32"',
+    'if sys.platform != "win32"',
     "if sys.platform == 'win32'",
     "if sys.platform != 'win32'",
     "IS_WINDOWS",
@@ -448,14 +448,13 @@ def scan_file(path: Path, footguns: list[Footgun]) -> list[tuple[int, str, Footg
                     code_for_scan = before
                     in_triple = delim
                     break
-                else:
-                    # Even — entire docstring fits on one line. Strip it
-                    # from the scan text to avoid matching on prose.
-                    parts = code_for_scan.split(delim)
-                    # Keep the "outside" parts (every other chunk, starting
-                    # with index 0) as code, drop the "inside" parts.
-                    code_for_scan = "".join(parts[::2])
-                    break
+                # Even — entire docstring fits on one line. Strip it
+                # from the scan text to avoid matching on prose.
+                parts = code_for_scan.split(delim)
+                # Keep the "outside" parts (every other chunk, starting
+                # with index 0) as code, drop the "inside" parts.
+                code_for_scan = "".join(parts[::2])
+                break
 
         if SUPPRESS_MARKER.search(line):
             continue

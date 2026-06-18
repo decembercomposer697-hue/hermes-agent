@@ -22,7 +22,7 @@ import shlex
 import sys
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from hermes_cli import kanban_db as kb
 from hermes_cli import kanban_swarm as ks
@@ -40,7 +40,7 @@ _STATUS_ICONS = {
     "todo":     "◻",
     "ready":    "▶",
     "running":  "●",
-    "scheduled":"⏱",
+    "scheduled": "⏱",
     "blocked":  "⊘",
     "done":     "✓",
     "archived": "—",
@@ -2833,4 +2833,4 @@ def run_slash(rest: str) -> str:
     err = buf_err.getvalue().rstrip()
     if err and out:
         return f"{out}\n{err}"
-    return err if err else (out or "(no output)")
+    return err or (out or "(no output)")

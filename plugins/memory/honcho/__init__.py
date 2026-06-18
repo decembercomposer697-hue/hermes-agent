@@ -588,9 +588,8 @@ class HonchoMemoryProvider(MemoryProvider):
         """
         if self._cron_skipped:
             return ""
-        if not self._manager or not self._session_key:
-            if not self._config:
-                return ""
+        if (not self._manager or not self._session_key) and not self._config:
+            return ""
 
         # ----- B1: adapt text based on recall_mode -----
         if self._recall_mode == "context":
@@ -992,7 +991,7 @@ class HonchoMemoryProvider(MemoryProvider):
                 "context about this user is most relevant to the current "
                 "conversation? Prioritize active context over biographical facts."
             )
-        elif pass_idx == 1:
+        if pass_idx == 1:
             prior = prior_results[-1] if prior_results else ""
             return (
                 f"Given this initial assessment:\n\n{prior}\n\n"
@@ -1001,16 +1000,15 @@ class HonchoMemoryProvider(MemoryProvider):
                 "the user's current state and immediate needs, grounded "
                 "in evidence from recent sessions."
             )
-        else:
-            # pass 2: reconciliation
-            return (
-                f"Prior passes produced:\n\n"
-                f"Pass 1:\n{prior_results[0] if len(prior_results) > 0 else '(empty)'}\n\n"
-                f"Pass 2:\n{prior_results[1] if len(prior_results) > 1 else '(empty)'}\n\n"
-                "Do these assessments cohere? Reconcile any contradictions "
-                "and produce a final, concise synthesis of what matters most "
-                "for the current conversation."
-            )
+        # pass 2: reconciliation
+        return (
+            f"Prior passes produced:\n\n"
+            f"Pass 1:\n{prior_results[0] if len(prior_results) > 0 else '(empty)'}\n\n"
+            f"Pass 2:\n{prior_results[1] if len(prior_results) > 1 else '(empty)'}\n\n"
+            "Do these assessments cohere? Reconcile any contradictions "
+            "and produce a final, concise synthesis of what matters most "
+            "for the current conversation."
+        )
 
     @staticmethod
     def _signal_sufficient(result: str) -> bool:
@@ -1328,7 +1326,7 @@ class HonchoMemoryProvider(MemoryProvider):
                     return json.dumps(self._empty_profile_hint(peer))
                 return json.dumps({"result": card})
 
-            elif tool_name == "honcho_search":
+            if tool_name == "honcho_search":
                 query = args.get("query", "")
                 if not query:
                     return tool_error("Missing required parameter: query")
@@ -1341,7 +1339,7 @@ class HonchoMemoryProvider(MemoryProvider):
                     return json.dumps({"result": "No relevant context found."})
                 return json.dumps({"result": result})
 
-            elif tool_name == "honcho_reasoning":
+            if tool_name == "honcho_reasoning":
                 query = args.get("query", "")
                 if not query:
                     return tool_error("Missing required parameter: query")
@@ -1356,7 +1354,7 @@ class HonchoMemoryProvider(MemoryProvider):
                 self._last_dialectic_turn = self._turn_count
                 return json.dumps({"result": result or "No result from Honcho."})
 
-            elif tool_name == "honcho_context":
+            if tool_name == "honcho_context":
                 peer = args.get("peer", "user")
                 ctx = self._manager.get_session_context(self._session_key, peer=peer)
                 if not ctx:
@@ -1377,7 +1375,7 @@ class HonchoMemoryProvider(MemoryProvider):
                     parts.append(f"## Recent messages\n{msg_str}")
                 return json.dumps({"result": "\n\n".join(parts) or "No context available."})
 
-            elif tool_name == "honcho_conclude":
+            if tool_name == "honcho_conclude":
                 delete_id = (args.get("delete_id") or "").strip()
                 conclusion = args.get("conclusion", "").strip()
                 peer = args.get("peer", "user")

@@ -75,7 +75,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 from urllib.parse import quote as _urlquote
 
 logger = logging.getLogger(__name__)
@@ -357,10 +357,9 @@ class RequestCache:
                 if now - entry.created_at > self._pending_ttl:
                     del self._entries[rid]
                     removed += 1
-            else:
-                if now - entry.updated_at > self._ttl:
-                    del self._entries[rid]
-                    removed += 1
+            elif now - entry.updated_at > self._ttl:
+                del self._entries[rid]
+                removed += 1
         return removed
 
 
@@ -839,7 +838,7 @@ class LineAdapter(BasePlatformAdapter):
         # Cleanup any tracked tempfiles.
         for path in list(self._media_temp_paths):
             try:
-                os.unlink(path)
+                Path(path).unlink()
             except OSError:
                 pass
         self._media_temp_paths.clear()
@@ -1243,7 +1242,7 @@ class LineAdapter(BasePlatformAdapter):
                 if path in self._media_temp_paths:
                     self._media_temp_paths.discard(path)
                     try:
-                        os.unlink(path)
+                        Path(path).unlink()
                     except OSError:
                         pass
 
@@ -1404,7 +1403,7 @@ class LineAdapter(BasePlatformAdapter):
                 preview_filename = "preview.png"
             except Exception:
                 try:
-                    os.unlink(tmp.name)
+                    Path(tmp.name).unlink()
                 except OSError:
                     pass
                 raise

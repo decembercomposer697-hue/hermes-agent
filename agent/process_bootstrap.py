@@ -26,7 +26,6 @@ from __future__ import annotations
 import os
 import sys
 import urllib.request
-from typing import Optional
 
 from utils import base_url_hostname, normalize_proxy_url
 
@@ -158,9 +157,9 @@ OpenAI = _OpenAIProxy()
 __all__ = [
     "OpenAI",
     "_OpenAIProxy",
-    "_load_openai_cls",
     "_SafeWriter",
-    "_install_safe_stdio",
-    "_get_proxy_from_env",
     "_get_proxy_for_base_url",
+    "_get_proxy_from_env",
+    "_install_safe_stdio",
+    "_load_openai_cls",
 ]

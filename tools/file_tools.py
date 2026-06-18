@@ -58,6 +58,7 @@ def _get_max_read_chars() -> int:
     _max_read_chars_cached = _DEFAULT_MAX_READ_CHARS
     return _max_read_chars_cached
 
+
 # If the total file size exceeds this AND the caller didn't specify a narrow
 # range (limit <= 200), we include a hint encouraging targeted reads.
 _LARGE_FILE_HINT_BYTES = 512_000  # 512 KB
@@ -108,7 +109,7 @@ def _configured_terminal_cwd() -> str | None:
     if raw.lower() in _TERMINAL_CWD_SENTINELS:
         return None
     expanded = os.path.expanduser(raw)
-    if not os.path.isabs(expanded):
+    if not Path(expanded).is_absolute():
         return None
     return expanded
 
@@ -503,6 +504,7 @@ def _reset_patch_failures(task_id: str, resolved_paths: list) -> None:
         for rp in resolved_paths:
             task_failures.pop(rp, None)
 
+
 # Per-task bounds for the containers inside each _read_tracker[task_id].
 # A CLI session uses one stable task_id for its lifetime; without these
 # caps, a 10k-read session would accumulate ~1.5MB of dict/set state that
@@ -641,10 +643,9 @@ def _get_file_ops(task_id: str = "default") -> ShellFileOperations:
             if task_id in _active_environments:
                 _last_activity[task_id] = time.time()
                 return cached
-            else:
-                # Environment was cleaned up -- invalidate stale cache entry
-                with _file_ops_lock:
-                    _file_ops_cache.pop(task_id, None)
+            # Environment was cleaned up -- invalidate stale cache entry
+            with _file_ops_lock:
+                _file_ops_cache.pop(task_id, None)
 
     # Need to ensure the environment exists before building file_ops.
     # Acquire per-task lock so only one thread creates the sandbox.
@@ -810,7 +811,7 @@ def read_file_tool(path: str, offset: int = 1, limit: int = 500, task_id: str = 
 
         if cached_mtime is not None:
             try:
-                current_mtime = os.path.getmtime(resolved_str)
+                current_mtime = Path(resolved_str).stat().st_mtime
                 if current_mtime == cached_mtime:
                     # Count repeated stub returns so weak tool-followers that
                     # ignore the "refer to earlier result" hint don't burn
@@ -918,7 +919,7 @@ def read_file_tool(path: str, offset: int = 1, limit: int = 500, task_id: str = 
             # 2. Staleness: warn on write/patch if the file changed since
             #    the agent last read it (external edit, concurrent agent, etc.).
             try:
-                _mtime_now = os.path.getmtime(resolved_str)
+                _mtime_now = Path(resolved_str).stat().st_mtime
                 task_data["dedup"][dedup_key] = _mtime_now
                 task_data.setdefault("read_timestamps", {})[resolved_str] = _mtime_now
             except OSError:
@@ -952,7 +953,7 @@ def read_file_tool(path: str, offset: int = 1, limit: int = 500, task_id: str = 
                 "path": path,
                 "already_read": count,
             }, ensure_ascii=False)
-        elif count >= 3:
+        if count >= 3:
             result_dict["_warning"] = (
                 f"You have read this exact file region {count} times consecutively. "
                 "The content has not changed since your last read. Use the information you already have. "
@@ -1055,7 +1056,7 @@ def _update_read_timestamp(filepath: str, task_id: str) -> None:
     _invalidate_dedup_for_path(filepath, task_id)
     try:
         resolved = str(_resolve_path_for_task(filepath, task_id))
-        current_mtime = os.path.getmtime(resolved)
+        current_mtime = Path(resolved).stat().st_mtime
     except (OSError, ValueError):
         return
     with _read_tracker_lock:
@@ -1084,7 +1085,7 @@ def _check_file_staleness(filepath: str, task_id: str) -> str | None:
     if read_mtime is None:
         return None  # File was never read — nothing to compare against
     try:
-        current_mtime = os.path.getmtime(resolved)
+        current_mtime = Path(resolved).stat().st_mtime
     except OSError:
         return None  # Can't stat — file may have been deleted, let write handle it
     if current_mtime != read_mtime:
@@ -1426,6 +1427,7 @@ def _check_file_reqs():
     """Lazy wrapper to avoid circular import with tools/__init__.py."""
     from tools import check_file_requirements
     return check_file_requirements()
+
 
 READ_FILE_SCHEMA = {
     "name": "read_file",

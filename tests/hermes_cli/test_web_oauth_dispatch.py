@@ -21,7 +21,7 @@ These tests pin the corrected behavior.
 """
 import asyncio
 import time
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import httpx

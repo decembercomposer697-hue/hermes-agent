@@ -40,7 +40,7 @@ import os
 import threading
 import time
 from collections.abc import Callable
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from agent.lsp import eventlog
 from agent.lsp.client import (
@@ -457,7 +457,7 @@ class LSPService:
         except Exception as e:
             logger.debug("snapshot open/wait failed: %s", e)
             return []
-        self._last_used[(client.server_id, client.workspace_root)] = time.time()
+        self._last_used[client.server_id, client.workspace_root] = time.time()
         return list(client.diagnostics_for(file_path))
 
     async def _open_and_wait_async(self, file_path: str) -> list[dict[str, Any]]:
@@ -471,7 +471,7 @@ class LSPService:
         except Exception as e:
             logger.debug("open/wait failed for %s: %s", file_path, e)
             return []
-        self._last_used[(client.server_id, client.workspace_root)] = time.time()
+        self._last_used[client.server_id, client.workspace_root] = time.time()
         return list(client.diagnostics_for(file_path))
 
     async def _current_diags_async(self, file_path: str) -> list[dict[str, Any]]:

@@ -7,7 +7,6 @@ text-based numbered fallback for terminals without curses support.
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import List, Optional, Set
 
 from hermes_cli.colors import Colors, color
 

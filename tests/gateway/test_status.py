@@ -236,7 +236,6 @@ class TestGatewayPidState:
         def fake_kill(pid, sig):
             if pid == 99999:
                 raise ProcessLookupError
-            return None
 
         monkeypatch.setattr(status.os, "kill", fake_kill)
 
@@ -398,7 +397,7 @@ class TestTerminatePid:
 class TestScopedLocks:
     def test_windows_file_lock_uses_high_offset(self, tmp_path, monkeypatch):
         lock_path = tmp_path / "gateway.lock"
-        handle = open(lock_path, "a+", encoding="utf-8")
+        handle = Path(lock_path).open("a+", encoding="utf-8")
         fd = handle.fileno()
         calls = []
 
@@ -744,7 +743,7 @@ class TestTakeoverMarker:
 
     def test_consume_returns_false_for_stale_marker(self, tmp_path, monkeypatch):
         """A marker older than 60s must be ignored."""
-        from datetime import datetime, timedelta, timezone
+        from datetime import datetime, timedelta
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         marker_path = tmp_path / ".gateway-takeover.json"
@@ -828,7 +827,7 @@ class TestTakeoverMarker:
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         marker_path = tmp_path / ".gateway-takeover.json"
         # Fresh marker (timestamp is recent) but names a totally different PID
-        from datetime import datetime, timezone
+        from datetime import datetime
         marker_path.write_text(json.dumps({
             "target_pid": os.getpid() + 10000,
             "target_start_time": 42,
@@ -884,7 +883,7 @@ class TestPlannedStopMarker:
         assert not (tmp_path / ".gateway-planned-stop.json").exists()
 
     def test_consume_returns_false_for_stale_marker(self, tmp_path, monkeypatch):
-        from datetime import datetime, timedelta, timezone
+        from datetime import datetime, timedelta
 
         monkeypatch.setenv("HERMES_HOME", str(tmp_path))
         marker_path = tmp_path / ".gateway-planned-stop.json"

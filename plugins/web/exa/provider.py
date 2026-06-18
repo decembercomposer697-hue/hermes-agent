@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any, Dict, List
+from typing import Any
 
 from agent.web_search_provider import WebSearchProvider
 
@@ -67,7 +67,7 @@ def _get_exa_client() -> Any:
     except Exception as exc:
         raise ImportError(str(exc))
 
-    from exa_py import Exa  # noqa: WPS433 — deliberately lazy
+    from exa_py import Exa
 
     client = Exa(api_key=api_key)
     client.headers["x-exa-integration"] = "hermes-agent"

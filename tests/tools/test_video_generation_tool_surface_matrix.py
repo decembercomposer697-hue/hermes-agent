@@ -16,7 +16,7 @@ from __future__ import annotations
 import asyncio
 import json
 import types
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 import yaml
@@ -45,7 +45,7 @@ def matrix_env(tmp_path, monkeypatch):
 
     def _subscribe(endpoint, arguments=None, with_logs=False):
         fal_calls.append({"endpoint": endpoint, "arguments": arguments})
-        return {"video": {"url": f"https://fake-fal/{endpoint.replace('/','_')}.mp4"}}
+        return {"video": {"url": f"https://fake-fal/{endpoint.replace('/', '_')}.mp4"}}
     fake_fal.subscribe = _subscribe  # type: ignore
 
     class _FalHandle:
@@ -57,7 +57,7 @@ def matrix_env(tmp_path, monkeypatch):
 
     def _submit(endpoint, arguments=None, headers=None):
         fal_calls.append({"endpoint": endpoint, "arguments": arguments})
-        return _FalHandle({"video": {"url": f"https://fake-fal/{endpoint.replace('/','_')}.mp4"}})
+        return _FalHandle({"video": {"url": f"https://fake-fal/{endpoint.replace('/', '_')}.mp4"}})
     fake_fal.submit = _submit  # type: ignore
 
     monkeypatch.setitem(__import__("sys").modules, "fal_client", fake_fal)

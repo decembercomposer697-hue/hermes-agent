@@ -18,7 +18,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from typing import Any, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger("agent.lsp.protocol")
 
@@ -91,7 +91,7 @@ async def read_message(reader: asyncio.StreamReader) -> dict | None:
         header_bytes += len(line)
         if header_bytes > 8192:
             raise LSPProtocolError(
-                f"LSP header block exceeded 8 KiB without terminator",
+                "LSP header block exceeded 8 KiB without terminator",
             )
         line = line[:-2]  # strip CRLF
         if not line:
@@ -182,15 +182,15 @@ def classify_message(msg: dict) -> tuple[str, Any]:
 
 __all__ = [
     "ERROR_CONTENT_MODIFIED",
-    "ERROR_REQUEST_CANCELLED",
     "ERROR_METHOD_NOT_FOUND",
+    "ERROR_REQUEST_CANCELLED",
     "LSPProtocolError",
     "LSPRequestError",
-    "encode_message",
-    "read_message",
-    "make_request",
-    "make_notification",
-    "make_response",
-    "make_error_response",
     "classify_message",
+    "encode_message",
+    "make_error_response",
+    "make_notification",
+    "make_request",
+    "make_response",
+    "read_message",
 ]

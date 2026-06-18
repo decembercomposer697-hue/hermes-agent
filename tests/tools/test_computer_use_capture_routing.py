@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import base64
 import json
-import os
+import pathlib
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -225,7 +225,7 @@ class TestCaptureResponseRoutedToAuxVision:
         def _fake_vat(image_path, _prompt):
             observed_path["path"] = image_path
             # File must exist while aux is being arranged.
-            assert os.path.exists(image_path)
+            assert pathlib.Path(image_path).exists()
             return "<coro>"
 
         fake_vat = MagicMock(side_effect=_fake_vat)
@@ -239,7 +239,7 @@ class TestCaptureResponseRoutedToAuxVision:
 
         # File must be unlinked after _capture_response returns.
         assert observed_path["path"]
-        assert not os.path.exists(observed_path["path"])
+        assert not pathlib.Path(observed_path["path"]).exists()
 
     def test_aux_route_creates_missing_cache_dir(self, tmp_path):
         from tools.computer_use import tool as cu_tool
@@ -256,7 +256,7 @@ class TestCaptureResponseRoutedToAuxVision:
 
         def _fake_vat(image_path, _prompt):
             observed_path["path"] = image_path
-            assert os.path.exists(image_path)
+            assert pathlib.Path(image_path).exists()
             return "<coro>"
 
         fake_vat = MagicMock(side_effect=_fake_vat)
@@ -272,7 +272,7 @@ class TestCaptureResponseRoutedToAuxVision:
         assert isinstance(resp, str)
         assert cache_dir.is_dir()
         assert observed_path["path"]
-        assert not os.path.exists(observed_path["path"])
+        assert not pathlib.Path(observed_path["path"]).exists()
 
     def test_temp_file_cleaned_up_even_when_aux_call_raises(
         self, tmp_cache_dir,
@@ -304,7 +304,7 @@ class TestCaptureResponseRoutedToAuxVision:
         assert resp.get("_multimodal") is True
         # Temp file must still be cleaned up.
         assert observed_path["path"]
-        assert not os.path.exists(observed_path["path"])
+        assert not pathlib.Path(observed_path["path"]).exists()
 
     def test_empty_aux_analysis_falls_back_to_multimodal(self, tmp_cache_dir):
         from tools.computer_use import tool as cu_tool

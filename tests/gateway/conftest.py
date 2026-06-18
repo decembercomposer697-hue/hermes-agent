@@ -451,6 +451,4 @@ def pytest_configure(config):
             )
             cache_file.write_text(msg, encoding="utf-8")
             raise pytest.UsageError(msg)
-        else:
-            cache_file.write_text("clean", encoding="utf-8")
-
+        cache_file.write_text("clean", encoding="utf-8")

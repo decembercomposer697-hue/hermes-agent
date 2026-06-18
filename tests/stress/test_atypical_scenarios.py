@@ -168,7 +168,7 @@ def _(home, kb):
     try:
         payloads = [
             "'; DROP TABLE tasks; --",
-            "\" OR 1=1 --",
+            '" OR 1=1 --',
             "'; DELETE FROM task_runs; --",
             "Robert'); DROP TABLE students;--",  # Little Bobby Tables
             "\\x00\\x01\\x02",
@@ -568,7 +568,7 @@ def _(home, kb):
     """HERMES_HOME with non-ASCII chars."""
     # Pre-create directly since tempfile doesn't love unicode prefixes
     weird = f"/tmp/hermes_héllo_émöji_{os.getpid()}"
-    os.makedirs(weird, exist_ok=True)
+    Path(weird).mkdir(exist_ok=True, parents=True)
     os.environ["HERMES_HOME"] = weird
     os.environ["HOME"] = weird
     kb._INITIALIZED_PATHS.clear()
@@ -594,8 +594,8 @@ def _(home, kb):
     real = tempfile.mkdtemp(prefix="hermes_real_")
     link1 = real + "_link1"
     link2 = real + "_link2"
-    os.symlink(real, link1)
-    os.symlink(real, link2)
+    Path(link1).symlink_to(real)
+    Path(link2).symlink_to(real)
     try:
         os.environ["HERMES_HOME"] = link1
         os.environ["HOME"] = link1
@@ -619,7 +619,7 @@ def _(home, kb):
     finally:
         for p in (link1, link2):
             try:
-                os.remove(p)
+                Path(p).unlink()
             except OSError:
                 pass
         shutil.rmtree(real, ignore_errors=True)
@@ -706,7 +706,7 @@ def _idempotency_race_worker(hermes_home: str, key: str, result_file: str,
     from hermes_cli import kanban_db as kb
 
     # Spin until the barrier file exists (crude sync across processes)
-    while not os.path.exists(barrier_path):
+    while not Path(barrier_path).exists():
         time.sleep(0.001)
 
     conn = kb.connect()
@@ -717,8 +717,7 @@ def _idempotency_race_worker(hermes_home: str, key: str, result_file: str,
         )
     finally:
         conn.close()
-    with open(result_file, "w") as f:
-        f.write(tid)
+    Path(result_file).write_text(tid)
 
 
 @scenario("idempotency_key_race")
@@ -744,12 +743,11 @@ def _(home, kb):
         p.start()
     time.sleep(0.1)  # let them hit the spin
     # Fire the gun
-    with open(barrier, "w") as f:
-        f.write("go")
+    Path(barrier).write_text("go")
     for p in procs:
         p.join(timeout=10)
 
-    tids = [open(r).read().strip() for r in results if os.path.exists(r)]
+    tids = [Path(r).open().read().strip() for r in results if Path(r).exists()]
     assert len(tids) == 2, f"only {len(tids)} workers finished"
     assert tids[0] == tids[1], (
         f"idempotency key race produced two different tasks: {tids}"

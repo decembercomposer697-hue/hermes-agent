@@ -1860,8 +1860,8 @@ def test_cli_edit_backfills_result_on_done_task(kanban_home):
     meta = '{"source": "dashboard-recovery"}'
     out = run_slash(
         "edit " + tid
-        + " --result \"DECIDED: done\""
-        + " --summary \"DECIDED: done\""
+        + ' --result "DECIDED: done"'
+        + ' --summary "DECIDED: done"'
         + " --metadata '" + meta + "'",
     )
 
@@ -2500,7 +2500,7 @@ def test_pid_alive_detects_zombie(kanban_home):
         time.sleep(0.3)
         # Verify /proc reports zombie state so the test is actually
         # exercising the zombie path and not some other liveness failure
-        with open(f"/proc/{pid}/status") as f:
+        with Path(f"/proc/{pid}/status").open() as f:
             state_line = next(
                 (l for l in f if l.startswith("State:")), "",
             )

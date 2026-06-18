@@ -12,13 +12,12 @@ import logging
 import os
 import re
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from hermes_cli.colors import Colors, color
 from hermes_cli.config import (
     cfg_get,
     get_env_value,
-    get_hermes_home,
     load_config,
     save_config,
     save_env_value,
@@ -351,7 +350,7 @@ def cmd_mcp_add(args):
             if oauth_auth:
                 server_config["auth"] = "oauth"
                 _success("OAuth configured (tokens will be acquired on first connection)")
-                oauth_ok=True
+                oauth_ok = True
             else:
                 _warning("OAuth setup failed — MCP SDK auth module not available")
         except Exception as exc:
@@ -371,25 +370,24 @@ def cmd_mcp_add(args):
         print()
         _info(f"Connecting to {url}")
         needs_auth = _confirm("Does this server require authentication?", default=True)
-        if needs_auth:
-            if auth_type == "header" or not auth_type:
-                env_key = _env_key_for_server(name)
-                existing_key = get_env_value(env_key)
-                if existing_key:
-                    _success(f"{env_key}: already configured")
-                    api_key = existing_key
-                else:
-                    api_key = _prompt("API key / Bearer token", password=True)
-                    if api_key:
-                        api_key = _strip_bearer_prefix(api_key)
-                        save_env_value(env_key, api_key)
-                        _success(f"Saved to {display_hermes_home()}/.env as {env_key}")
+        if needs_auth and (auth_type == "header" or not auth_type):
+            env_key = _env_key_for_server(name)
+            existing_key = get_env_value(env_key)
+            if existing_key:
+                _success(f"{env_key}: already configured")
+                api_key = existing_key
+            else:
+                api_key = _prompt("API key / Bearer token", password=True)
+                if api_key:
+                    api_key = _strip_bearer_prefix(api_key)
+                    save_env_value(env_key, api_key)
+                    _success(f"Saved to {display_hermes_home()}/.env as {env_key}")
 
-                # Set header with env var interpolation
-                if api_key or existing_key:
-                    server_config["headers"] = {
-                        "Authorization": f"Bearer ${{{env_key}}}",
-                    }
+            # Set header with env var interpolation
+            if api_key or existing_key:
+                server_config["headers"] = {
+                    "Authorization": f"Bearer ${{{env_key}}}",
+                }
 
     # ── Discovery: connect and list tools ─────────────────────────────
 
@@ -709,13 +707,13 @@ def cmd_mcp_login(args):
                 "OAuth client yourself and add its credentials to config.yaml:",
             )
             print()
-            print(color(f"    mcp_servers:", Colors.DIM))
+            print(color("    mcp_servers:", Colors.DIM))
             print(color(f"      {name}:", Colors.DIM))
             print(color(f"        url: {url}", Colors.DIM))
-            print(color(f"        auth: oauth", Colors.DIM))
-            print(color(f"        oauth:", Colors.DIM))
-            print(color(f"          client_id: \"<your-oauth-client-id>\"", Colors.DIM))
-            print(color(f"          client_secret: \"<your-oauth-client-secret>\"", Colors.DIM))
+            print(color("        auth: oauth", Colors.DIM))
+            print(color("        oauth:", Colors.DIM))
+            print(color('          client_id: "<your-oauth-client-id>"', Colors.DIM))
+            print(color('          client_secret: "<your-oauth-client-secret>"', Colors.DIM))
             print()
             _info("Then re-run `hermes mcp login " + name + "`.")
             return

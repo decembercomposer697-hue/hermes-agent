@@ -290,6 +290,7 @@ class RuleId(IntEnum):
 
     Values are frozen: do not renumber existing entries. Append new ones.
     """
+
     GITHUB_ACTIONS_WORKFLOW = 1
     CHILD_PROCESS_EXEC = 2
     NEW_FUNCTION_INJECTION = 3

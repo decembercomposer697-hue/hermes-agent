@@ -35,7 +35,7 @@ from __future__ import annotations
 import json
 import logging
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from agent.web_search_provider import WebSearchProvider
 from tools.xai_http import (

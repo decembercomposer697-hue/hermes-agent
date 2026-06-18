@@ -50,8 +50,8 @@ import logging
 import os
 import time
 import uuid
-from datetime import UTC, datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 try:
     import httpx
@@ -431,7 +431,6 @@ class NtfyAdapter(BasePlatformAdapter):
 
     async def send_typing(self, chat_id: str, metadata=None) -> None:
         """Ntfy does not support typing indicators."""
-        pass
 
     async def get_chat_info(self, chat_id: str) -> dict[str, Any]:
         """Return basic info about an ntfy topic."""

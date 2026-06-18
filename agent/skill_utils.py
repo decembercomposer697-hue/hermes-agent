@@ -10,7 +10,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 from hermes_constants import get_config_path, get_skills_dir, is_termux
 
@@ -223,9 +223,7 @@ def _detect_environment(env: str) -> bool:
         # its runtime scaffolding under /run/s6 and ships its admin tree under
         # /package/admin/s6-overlay. Either marker means we're inside an
         # s6-supervised container.
-        result = os.path.isdir("/run/s6") or os.path.isdir(
-            "/package/admin/s6-overlay",
-        )
+        result = Path("/run/s6").is_dir() or Path("/package/admin/s6-overlay").is_dir()
 
     _ENV_DETECT_CACHE[env] = result
     return result

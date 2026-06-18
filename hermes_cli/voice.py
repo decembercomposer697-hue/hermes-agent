@@ -26,7 +26,7 @@ import os
 import sys
 import threading
 from collections.abc import Callable
-from typing import Any, Optional
+from typing import Any
 
 # Modifier aliases mirrored from the TUI parser (``ui-tui/src/lib/platform.ts``)
 # ``_MOD_ALIASES`` table — the contract that removes the cross-runtime
@@ -214,6 +214,8 @@ def format_voice_record_key_for_status(raw: Any) -> str:
     return prefix + key[0].upper() + key[1:]
 
 
+import pathlib
+
 from tools.voice_mode import (
     create_audio_recorder,
     is_whisper_hallucination,
@@ -274,6 +276,7 @@ def _play_beep(frequency: int, count: int = 1) -> None:
         play_beep(frequency=frequency, count=count)
     except Exception as e:
         _debug(f"beep {frequency}Hz failed: {e}")
+
 
 # ── Push-to-talk state ───────────────────────────────────────────────
 _recorder = None
@@ -348,8 +351,8 @@ def stop_and_transcribe() -> str | None:
         return None
     finally:
         try:
-            if os.path.isfile(wav_path):
-                os.unlink(wav_path)
+            if pathlib.Path(wav_path).is_file():
+                pathlib.Path(wav_path).unlink()
         except Exception:
             pass
 
@@ -392,9 +395,7 @@ def start_continuous(
     ``on_status`` is called with ``"listening"`` / ``"transcribing"`` /
     ``"idle"`` so the UI can show a live indicator.
     """
-    global _continuous_active, _continuous_recorder, _continuous_auto_restart
-    global _continuous_on_transcript, _continuous_on_status, _continuous_on_silent_limit
-    global _continuous_no_speech_count
+    global _continuous_active, _continuous_recorder, _continuous_auto_restart, _continuous_on_transcript, _continuous_on_status, _continuous_on_silent_limit, _continuous_no_speech_count
 
     with _continuous_lock:
         if _continuous_active:
@@ -453,9 +454,7 @@ def stop_continuous(force_transcribe: bool = False) -> None:
     background thread before reporting ``"idle"``. Otherwise the buffer is
     discarded.
     """
-    global _continuous_active, _continuous_on_transcript, _continuous_stopping
-    global _continuous_on_status, _continuous_on_silent_limit
-    global _continuous_recorder, _continuous_no_speech_count
+    global _continuous_active, _continuous_on_transcript, _continuous_stopping, _continuous_on_status, _continuous_on_silent_limit, _continuous_recorder, _continuous_no_speech_count
 
     with _continuous_lock:
         if not _continuous_active:
@@ -505,8 +504,8 @@ def stop_continuous(force_transcribe: bool = False) -> None:
                                 if text and not is_whisper_hallucination(text):
                                     transcript = text
                         finally:
-                            if os.path.isfile(wav_path):
-                                os.unlink(wav_path)
+                            if pathlib.Path(wav_path).is_file():
+                                pathlib.Path(wav_path).unlink()
                 except Exception as e:
                     logger.warning("failed to stop/transcribe recorder: %s", e)
                 finally:
@@ -545,13 +544,12 @@ def stop_continuous(force_transcribe: bool = False) -> None:
 
             threading.Thread(target=_transcribe_and_cleanup, daemon=True).start()
             return
-        else:
-            try:
-                # cancel() (not stop()) discards buffered frames — the loop
-                # is over, we don't want to transcribe a half-captured turn.
-                rec.cancel()
-            except Exception as e:
-                logger.warning("failed to cancel recorder: %s", e)
+        try:
+            # cancel() (not stop()) discards buffered frames — the loop
+            # is over, we don't want to transcribe a half-captured turn.
+            rec.cancel()
+        except Exception as e:
+            logger.warning("failed to cancel recorder: %s", e)
 
     with _continuous_lock:
         _continuous_stopping = False
@@ -639,8 +637,8 @@ def _continuous_on_silence() -> None:
             _debug(f"_continuous_on_silence: transcribe raised {type(e).__name__}: {e}")
         finally:
             try:
-                if os.path.isfile(wav_path):
-                    os.unlink(wav_path)
+                if pathlib.Path(wav_path).is_file():
+                    pathlib.Path(wav_path).unlink()
             except Exception:
                 pass
 
@@ -800,7 +798,7 @@ def speak_text(text: str) -> None:
         # MP3 output path, pre-chosen so we can play the MP3 directly even
         # when text_to_speech_tool auto-converts to OGG for messaging
         # platforms.  afplay's OGG support is flaky, MP3 always works.
-        os.makedirs(os.path.join(tempfile.gettempdir(), "hermes_voice"), exist_ok=True)
+        pathlib.Path(os.path.join(tempfile.gettempdir(), "hermes_voice")).mkdir(exist_ok=True, parents=True)
         mp3_path = os.path.join(
             tempfile.gettempdir(),
             "hermes_voice",
@@ -810,14 +808,14 @@ def speak_text(text: str) -> None:
         _debug(f"speak_text: synthesizing {len(tts_text)} chars -> {mp3_path}")
         text_to_speech_tool(text=tts_text, output_path=mp3_path)
 
-        if os.path.isfile(mp3_path) and os.path.getsize(mp3_path) > 0:
-            _debug(f"speak_text: playing {mp3_path} ({os.path.getsize(mp3_path)} bytes)")
+        if pathlib.Path(mp3_path).is_file() and pathlib.Path(mp3_path).stat().st_size > 0:
+            _debug(f"speak_text: playing {mp3_path} ({pathlib.Path(mp3_path).stat().st_size} bytes)")
             play_audio_file(mp3_path)
             try:
-                os.unlink(mp3_path)
+                pathlib.Path(mp3_path).unlink()
                 ogg_path = mp3_path.rsplit(".", 1)[0] + ".ogg"
-                if os.path.isfile(ogg_path):
-                    os.unlink(ogg_path)
+                if pathlib.Path(ogg_path).is_file():
+                    pathlib.Path(ogg_path).unlink()
             except OSError:
                 pass
         else:

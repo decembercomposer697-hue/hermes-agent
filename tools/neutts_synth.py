@@ -36,7 +36,7 @@ def _write_wav(path: str, samples, sample_rate: int = 24000) -> None:
     block_align = num_channels * (bits_per_sample // 8)
     data_size = len(pcm) * (bits_per_sample // 8)
 
-    with open(path, "wb") as f:
+    with Path(path).open("wb") as f:
         f.write(b"RIFF")
         f.write(struct.pack("<I", 36 + data_size))
         f.write(b"WAVE")

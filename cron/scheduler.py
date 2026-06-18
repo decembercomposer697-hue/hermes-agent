@@ -29,7 +29,6 @@ except ImportError:
     except ImportError:
         msvcrt = None
 from pathlib import Path
-from typing import List, Optional
 
 # Add parent directory to path for imports BEFORE repo-level imports.
 # Without this, standalone invocations (e.g. after `hermes update` reloads
@@ -111,6 +110,7 @@ def _resolve_cron_enabled_toolsets(job: dict, cfg: dict) -> list[str] | None:
             exc,
         )
         return None
+
 
 # Valid delivery platforms — used to validate user-supplied platform names
 # in cron delivery targets, preventing env var enumeration via crafted names.
@@ -426,7 +426,6 @@ def cron_delivery_targets() -> list[dict]:
 
 def _resolve_single_delivery_target(job: dict, deliver_value: str) -> dict | None:
     """Resolve one concrete auto-delivery target for a cron job."""
-
     origin = _resolve_origin(job)
 
     if deliver_value == "local":
@@ -695,7 +694,7 @@ def _deliver_result(job: dict, content: str, adapters=None, loop=None) -> str | 
             f"(job_id: {job_id})\n"
             f"-------------\n\n"
             f"{content}\n\n"
-            f"To stop or manage this job, send me a new message (e.g. \"stop reminder {task_name}\")."
+            f'To stop or manage this job, send me a new message (e.g. "stop reminder {task_name}").'
         )
     else:
         delivery_content = content
@@ -955,7 +954,7 @@ def _run_job_script(script_path: str) -> tuple[bool, str]:
         # than a FileNotFoundError with a confusing "[WinError 2]"
         # traceback.
         _bash = shutil.which("bash") or (
-            "/bin/bash" if os.path.isfile("/bin/bash") else None
+            "/bin/bash" if Path("/bin/bash").is_file() else None
         )
         if _bash is None:
             return False, (
@@ -1138,7 +1137,7 @@ def _build_job_prompt(job: dict, prerun_script: tuple | None = None) -> str:
         "the output yourself. Just produce your report/output as your "
         "final response and the system handles the rest. "
         "SILENT: If there is genuinely nothing new to report, respond "
-        "with exactly \"[SILENT]\" (nothing else) to suppress delivery. "
+        'with exactly "[SILENT]" (nothing else) to suppress delivery. '
         "Never combine [SILENT] with content — either report your "
         "findings normally, or say [SILENT] and nothing more.]\n\n"
     )
@@ -1588,8 +1587,8 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
         try:
             import yaml
             _cfg_path = str(_get_hermes_home() / "config.yaml")
-            if os.path.exists(_cfg_path):
-                with open(_cfg_path, encoding="utf-8") as _f:
+            if Path(_cfg_path).exists():
+                with Path(_cfg_path).open(encoding="utf-8") as _f:
                     _cfg = yaml.safe_load(_f) or {}
                 _cfg = _expand_env_vars(_cfg)
                 _model_cfg = _cfg.get("model", {})
@@ -1631,7 +1630,7 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
                 pfpath = _get_hermes_home() / pfpath
             if pfpath.exists():
                 try:
-                    with open(pfpath, encoding="utf-8") as _pf:
+                    with Path(pfpath).open(encoding="utf-8") as _pf:
                         prefill_messages = json.load(_pf)
                     if not isinstance(prefill_messages, list):
                         prefill_messages = None
@@ -1759,7 +1758,7 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
             session_id=_cron_session_id,
             session_db=_session_db,
         )
-        
+
         # Run the agent with an *inactivity*-based timeout: the job can run
         # for hours if it's actively calling tools / receiving stream tokens,
         # but a hung API call or stuck tool with no activity for the configured
@@ -1875,8 +1874,8 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
             final_response = ""
         # Use a separate variable for log display; keep final_response clean
         # for delivery logic (empty response = no delivery).
-        logged_response = final_response if final_response else "(No response generated)"
-        
+        logged_response = final_response or "(No response generated)"
+
         output = f"""# Cron Job: {job_name}
 
 **Job ID:** {job_id}
@@ -1891,14 +1890,14 @@ def run_job(job: dict) -> tuple[bool, str, str, str | None]:
 
 {logged_response}
 """
-        
+
         logger.info("Job '%s' completed successfully", job_name)
         return True, output, final_response, None
-        
+
     except Exception as e:
-        error_msg = f"{type(e).__name__}: {str(e)}"
+        error_msg = f"{type(e).__name__}: {e!s}"
         logger.exception("Job '%s' failed: %s", job_name, error_msg)
-        
+
         output = f"""# Cron Job: {job_name} (FAILED)
 
 **Job ID:** {job_id}
@@ -1992,7 +1991,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
     # Cross-platform file locking: fcntl on Unix, msvcrt on Windows
     lock_fd = None
     try:
-        lock_fd = open(lock_file, "w", encoding="utf-8")
+        lock_fd = Path(lock_file).open("w", encoding="utf-8")
         if fcntl:
             fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         elif msvcrt:
@@ -2045,7 +2044,7 @@ def tick(verbose: bool = True, adapters=None, loop=None, sync: bool = True) -> i
             logger.info(
                 "Running %d job(s) in parallel (max_workers=%s)",
                 len(due_jobs),
-                _max_workers if _max_workers else "unbounded",
+                _max_workers or "unbounded",
             )
 
         def _process_job(job: dict) -> bool:

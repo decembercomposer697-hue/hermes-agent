@@ -34,7 +34,7 @@ import urllib.error
 import urllib.request
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -209,6 +209,7 @@ def _is_vpc_sc_violation(body: str) -> bool:
 @dataclass
 class CodeAssistProjectInfo:
     """Result from ``load_code_assist``."""
+
     current_tier_id: str = ""
     cloudaicompanion_project: str = ""   # Google-managed project (free tier)
     allowed_tiers: list[str] = field(default_factory=list)
@@ -382,6 +383,7 @@ def retrieve_user_quota(
 @dataclass
 class ProjectContext:
     """Resolved state for a given OAuth session."""
+
     project_id: str = ""           # effective project id sent on requests
     managed_project_id: str = ""   # Google-assigned project (free tier)
     tier_id: str = ""

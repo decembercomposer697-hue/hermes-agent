@@ -34,7 +34,7 @@ import tempfile
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any
 
 from agent.model_metadata import estimate_request_tokens_rough
 
@@ -798,7 +798,7 @@ def try_shrink_image_parts_in_messages(api_messages: list) -> bool:
 
 __all__ = [
     "check_compression_model_feasibility",
-    "replay_compression_warning",
     "compress_context",
+    "replay_compression_warning",
     "try_shrink_image_parts_in_messages",
 ]

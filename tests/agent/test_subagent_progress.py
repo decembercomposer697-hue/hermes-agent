@@ -29,7 +29,7 @@ class TestPrintAbove:
         buf = io.StringIO()
         spinner = KawaiiSpinner("test")
         spinner._out = buf  # Redirect to buffer
-        
+
         spinner.print_above("hello world")
         output = buf.getvalue()
         assert "hello world" in output
@@ -40,7 +40,7 @@ class TestPrintAbove:
         spinner = KawaiiSpinner("test")
         spinner._out = buf
         spinner.running = True  # Pretend spinner is running (don't start thread)
-        
+
         spinner.print_above("tool line")
         output = buf.getvalue()
         assert "tool line" in output
@@ -53,7 +53,7 @@ class TestPrintAbove:
         buf = io.StringIO()
         spinner = KawaiiSpinner("test")
         spinner._out = buf
-        
+
         # Simulate redirect_stdout(devnull)
         old_stdout = sys.stdout
         sys.stdout = io.StringIO()
@@ -61,7 +61,7 @@ class TestPrintAbove:
             spinner.print_above("should go to buf")
         finally:
             sys.stdout = old_stdout
-        
+
         assert "should go to buf" in buf.getvalue()
 
 
@@ -77,7 +77,7 @@ class TestBuildChildProgressCallback:
         parent = MagicMock()
         parent._delegate_spinner = None
         parent.tool_progress_callback = None
-        
+
         cb = _build_child_progress_callback(0, "test goal", parent)
         assert cb is None
 
@@ -87,14 +87,14 @@ class TestBuildChildProgressCallback:
         spinner = KawaiiSpinner("delegating")
         spinner._out = buf
         spinner.running = True
-        
+
         parent = MagicMock()
         parent._delegate_spinner = spinner
         parent.tool_progress_callback = None
-        
+
         cb = _build_child_progress_callback(0, "test goal", parent)
         assert cb is not None
-        
+
         cb("tool.started", "web_search", "quantum computing", {})
         output = buf.getvalue()
         assert "web_search" in output
@@ -107,14 +107,14 @@ class TestBuildChildProgressCallback:
         spinner = KawaiiSpinner("delegating")
         spinner._out = buf
         spinner.running = True
-        
+
         parent = MagicMock()
         parent._delegate_spinner = spinner
         parent.tool_progress_callback = None
-        
+
         cb = _build_child_progress_callback(0, "test goal", parent)
         cb("_thinking", "I'll search for papers first")
-        
+
         output = buf.getvalue()
         assert "💭" in output
         assert "search for papers" in output
@@ -186,11 +186,11 @@ class TestBuildChildProgressCallback:
         spinner = KawaiiSpinner("delegating")
         spinner._out = buf
         spinner.running = True
-        
+
         parent = MagicMock()
         parent._delegate_spinner = spinner
         parent.tool_progress_callback = None
-        
+
         # task_index=0 in a batch of 3 → prefix "[1]"
         cb0 = _build_child_progress_callback(0, "test goal", parent, task_count=3)
         cb0("tool.started", "web_search", "test", {})
@@ -211,14 +211,14 @@ class TestBuildChildProgressCallback:
         spinner = KawaiiSpinner("delegating")
         spinner._out = buf
         spinner.running = True
-        
+
         parent = MagicMock()
         parent._delegate_spinner = spinner
         parent.tool_progress_callback = None
-        
+
         cb = _build_child_progress_callback(0, "test goal", parent, task_count=1)
         cb("tool.started", "web_search", "test", {})
-        
+
         output = buf.getvalue()
         assert "[" not in output
 
@@ -389,4 +389,3 @@ class TestBatchFlush:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
-

@@ -18,7 +18,6 @@ import os
 import sys
 import time
 from collections.abc import Sequence
-from typing import Optional
 
 try:
     from winpty import PtyProcess  # type: ignore
@@ -28,7 +27,7 @@ except ImportError:  # pragma: no cover - non-Windows or pywinpty missing
     _PTY_AVAILABLE = False
 
 
-__all__ = ["WinPtyBridge", "PtyUnavailableError"]
+__all__ = ["PtyUnavailableError", "WinPtyBridge"]
 
 
 # Same clamp ceiling as the POSIX bridge: a broken winsize probe must never

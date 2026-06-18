@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import acp
 from acp.schema import (
@@ -110,7 +110,7 @@ def build_tool_title(tool_name: str, args: dict[str, Any]) -> str:
     if tool_name == "web_extract":
         urls = args.get("urls", [])
         if urls:
-            return f"extract: {urls[0]}" + (f" (+{len(urls)-1})" if len(urls) > 1 else "")
+            return f"extract: {urls[0]}" + (f" (+{len(urls) - 1})" if len(urls) > 1 else "")
         return "web extract"
     if tool_name == "process":
         action = str(args.get("action") or "").strip() or "manage"
@@ -602,7 +602,7 @@ def _format_delegate_result(result: str | None) -> str | None:
         if isinstance(trace, list) and trace:
             names = [str(t.get("tool") or "?") for t in trace if isinstance(t, dict)]
             if names:
-                lines.append("Tools: " + ", ".join(names[:12]) + (f" (+{len(names)-12})" if len(names) > 12 else ""))
+                lines.append("Tools: " + ", ".join(names[:12]) + (f" (+{len(names) - 12})" if len(names) > 12 else ""))
     return _truncate_text("\n".join(lines), limit=8000)
 
 
@@ -617,7 +617,7 @@ def _format_session_search_result(result: str | None) -> str | None:
         return None
     mode = data.get("mode") or "search"
     query = data.get("query")
-    lines = ["Recent sessions" if mode == "recent" else f"Session search results" + (f" for `{query}`" if query else "")]
+    lines = ["Recent sessions" if mode == "recent" else "Session search results" + (f" for `{query}`" if query else "")]
     if not results:
         lines.append(str(data.get("message") or "No matching sessions found."))
         return "\n".join(lines)

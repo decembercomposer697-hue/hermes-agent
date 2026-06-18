@@ -15,7 +15,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 from hermes_constants import get_hermes_home
 from plugins.google_meet import process_manager as pm
@@ -87,7 +86,7 @@ def register_cli(subparser: argparse.ArgumentParser) -> None:
     try:
         from plugins.google_meet.node.cli import register_cli as _register_node_cli
         _register_node_cli(node_p)
-    except Exception as e:  # pragma: no cover — defensive
+    except Exception:  # pragma: no cover — defensive
         # If the node module fails to import for any reason (optional dep
         # missing at import time etc.), leave the subparser present but
         # flag it. The argparse dispatch will surface a clear error.
@@ -279,17 +278,16 @@ def _cmd_install(*, realtime: bool, assume_yes: bool) -> int:
         if system == "Linux":
             if _shutil.which("paplay") and _shutil.which("pactl"):
                 print("  pulseaudio-utils already installed.")
+            elif not _confirm(
+                "  install pulseaudio-utils? this runs `sudo apt-get install -y pulseaudio-utils`",
+            ):
+                print("  skipped (you can run it manually later)")
             else:
-                if not _confirm(
-                    "  install pulseaudio-utils? this runs `sudo apt-get install -y pulseaudio-utils`",
-                ):
-                    print("  skipped (you can run it manually later)")
-                else:
-                    cmd = ["sudo", "apt-get", "install", "-y", "pulseaudio-utils"]
-                    print(f"  $ {' '.join(cmd)}")
-                    res = _sp.run(cmd, check=False)
-                    if res.returncode != 0:
-                        print("  apt install failed — install pulseaudio-utils manually")
+                cmd = ["sudo", "apt-get", "install", "-y", "pulseaudio-utils"]
+                print(f"  $ {' '.join(cmd)}")
+                res = _sp.run(cmd, check=False)
+                if res.returncode != 0:
+                    print("  apt install failed — install pulseaudio-utils manually")
         elif system == "Darwin":
             have_bh = False
             try:
@@ -310,15 +308,14 @@ def _cmd_install(*, realtime: bool, assume_yes: bool) -> int:
                     "  missing: " + ", ".join(needs) + "\n"
                     "  install Homebrew first (https://brew.sh) or install the packages manually.",
                 )
+            elif not _confirm(f"  install via brew: {' '.join(needs)}?"):
+                print("  skipped (you can run it manually later)")
             else:
-                if not _confirm(f"  install via brew: {' '.join(needs)}?"):
-                    print("  skipped (you can run it manually later)")
-                else:
-                    cmd = ["brew", "install", *needs]
-                    print(f"  $ {' '.join(cmd)}")
-                    res = _sp.run(cmd, check=False)
-                    if res.returncode != 0:
-                        print("  brew install failed — install them manually")
+                cmd = ["brew", "install", *needs]
+                print(f"  $ {' '.join(cmd)}")
+                res = _sp.run(cmd, check=False)
+                if res.returncode != 0:
+                    print("  brew install failed — install them manually")
             print(
                 "\n  NOTE: macOS does not auto-route audio. Open\n"
                 "    System Settings → Sound → Input\n"
@@ -346,7 +343,7 @@ def _cmd_auth() -> int:
     path = _auth_state_path()
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    print(f"opening Chromium — sign in to Google, then return here and press Enter.")
+    print("opening Chromium — sign in to Google, then return here and press Enter.")
     print(f"saving storage state to: {path}")
     try:
         with sync_playwright() as pw:

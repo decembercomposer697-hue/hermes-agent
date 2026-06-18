@@ -64,6 +64,8 @@ import gateway.platforms.slack as _slack_mod
 
 _slack_mod.SLACK_AVAILABLE = True
 
+import pathlib
+
 from gateway.platforms.slack import SlackAdapter
 
 
@@ -1237,7 +1239,7 @@ class TestIncomingDocumentHandling:
         msg_event = adapter.handle_message.call_args[0][0]
         assert msg_event.message_type == MessageType.DOCUMENT
         assert len(msg_event.media_urls) == 1
-        assert os.path.exists(msg_event.media_urls[0])
+        assert pathlib.Path(msg_event.media_urls[0]).exists()
         assert msg_event.media_types == ["application/pdf"]
 
     @pytest.mark.asyncio
@@ -2685,7 +2687,7 @@ class TestAssistantThreadLifecycle:
         await assistant_adapter._handle_assistant_thread_lifecycle_event(event)
 
         assert (
-            assistant_adapter._assistant_threads[("D123", "171.000")]["user_id"]
+            assistant_adapter._assistant_threads["D123", "171.000"]["user_id"]
             == "U_USER"
         )
         mock_session_store.get_or_create_session.assert_called_once()
@@ -2700,7 +2702,7 @@ class TestAssistantThreadLifecycle:
     async def test_message_uses_cached_assistant_thread_identity(
         self, assistant_adapter,
     ):
-        assistant_adapter._assistant_threads[("D123", "171.000")] = {
+        assistant_adapter._assistant_threads["D123", "171.000"] = {
             "channel_id": "D123",
             "thread_ts": "171.000",
             "user_id": "U_USER",
@@ -3493,7 +3495,7 @@ class TestSlashEphemeralAck:
         """_pop_slash_context returns the context and removes it."""
         import time
 
-        adapter._slash_command_contexts[("C1", "U1")] = {
+        adapter._slash_command_contexts["C1", "U1"] = {
             "response_url": "https://hooks.slack.com/test",
             "ts": time.monotonic(),
         }
@@ -3515,7 +3517,7 @@ class TestSlashEphemeralAck:
         """Stale contexts older than TTL are cleaned up."""
         import time
 
-        adapter._slash_command_contexts[("C1", "U1")] = {
+        adapter._slash_command_contexts["C1", "U1"] = {
             "response_url": "https://hooks.slack.com/stale",
             "ts": time.monotonic() - adapter._SLASH_CTX_TTL - 1,
         }
@@ -3529,7 +3531,7 @@ class TestSlashEphemeralAck:
         """send() should POST to response_url for slash command replies."""
         import time
 
-        adapter._slash_command_contexts[("C_SLASH", "U_SLASH")] = {
+        adapter._slash_command_contexts["C_SLASH", "U_SLASH"] = {
             "response_url": "https://hooks.slack.com/commands/T123/456/abc",
             "ts": time.monotonic(),
         }
@@ -3578,7 +3580,7 @@ class TestSlashEphemeralAck:
         """_send_slash_ephemeral returns success=True even if POST fails."""
         import time
 
-        adapter._slash_command_contexts[("C1", "U1")] = {
+        adapter._slash_command_contexts["C1", "U1"] = {
             "response_url": "https://hooks.slack.com/commands/bad",
             "ts": time.monotonic(),
         }
@@ -3607,7 +3609,7 @@ class TestSlashEphemeralAck:
         """_send_slash_ephemeral returns success=True even if aiohttp raises."""
         import time
 
-        adapter._slash_command_contexts[("C1", "U1")] = {
+        adapter._slash_command_contexts["C1", "U1"] = {
             "response_url": "https://hooks.slack.com/commands/timeout",
             "ts": time.monotonic(),
         }
@@ -3688,11 +3690,11 @@ class TestSlashEphemeralAck:
         from gateway.platforms.slack import _slash_user_id
 
         # Simulate two users stashing contexts on the same channel.
-        adapter._slash_command_contexts[("C_SHARED", "U_ALICE")] = {
+        adapter._slash_command_contexts["C_SHARED", "U_ALICE"] = {
             "response_url": "https://hooks.slack.com/alice",
             "ts": time.monotonic(),
         }
-        adapter._slash_command_contexts[("C_SHARED", "U_BOB")] = {
+        adapter._slash_command_contexts["C_SHARED", "U_BOB"] = {
             "response_url": "https://hooks.slack.com/bob",
             "ts": time.monotonic(),
         }
@@ -3728,7 +3730,7 @@ class TestSlashEphemeralAck:
 
         from gateway.platforms.slack import _slash_user_id
 
-        adapter._slash_command_contexts[("C1", "U1")] = {
+        adapter._slash_command_contexts["C1", "U1"] = {
             "response_url": "https://hooks.slack.com/test",
             "ts": time.monotonic(),
         }

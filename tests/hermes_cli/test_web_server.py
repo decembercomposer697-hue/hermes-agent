@@ -706,7 +706,7 @@ class TestWebServerEndpoints:
         assert "archived" not in resp.json()
 
     def test_audio_transcription_endpoint(self, monkeypatch):
-        import tools.transcription_tools as transcription_tools
+        from tools import transcription_tools
 
         captured = {}
 
@@ -765,9 +765,9 @@ class TestWebServerEndpoints:
         assert "/api/audio/elevenlabs/voices" in paths
 
     def test_elevenlabs_voices_unavailable_without_key(self, monkeypatch):
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
 
-        monkeypatch.setattr(web_server, "load_env", lambda: {})
+        monkeypatch.setattr(web_server, "load_env", dict)
         monkeypatch.delenv("ELEVENLABS_API_KEY", raising=False)
 
         resp = self.client.get("/api/audio/elevenlabs/voices")
@@ -775,7 +775,7 @@ class TestWebServerEndpoints:
         assert resp.json() == {"available": False, "voices": []}
 
     def test_speak_text_returns_base64_data_url(self, monkeypatch, tmp_path):
-        import tools.tts_tool as tts_tool
+        from tools import tts_tool
 
         audio_file = tmp_path / "speech.mp3"
         audio_file.write_bytes(b"ID3fake-audio-bytes")
@@ -804,7 +804,7 @@ class TestWebServerEndpoints:
         assert resp.status_code == 400
 
     def test_update_hermes_returns_docker_guidance_without_spawning(self, monkeypatch):
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
 
         spawned = False
 
@@ -838,7 +838,7 @@ class TestWebServerEndpoints:
         assert any("docker pull nousresearch/hermes-agent:latest" in line for line in status_data["lines"])
 
     def test_update_hermes_spawns_on_non_docker_install(self, monkeypatch):
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
 
         class Proc:
             pid = 12345
@@ -864,7 +864,7 @@ class TestWebServerEndpoints:
         assert calls == [(["update"], "hermes-update")]
 
     def test_action_status_reaps_completed_process(self, monkeypatch):
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
 
         waited = {"done": False}
 
@@ -898,7 +898,7 @@ class TestWebServerEndpoints:
         }
 
     def test_action_status_ignores_wait_failure(self, monkeypatch):
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
 
         class _Proc:
             pid = 99
@@ -927,7 +927,7 @@ class TestWebServerEndpoints:
 
     def test_get_status_filters_unconfigured_gateway_platforms(self, monkeypatch):
         import gateway.config as gateway_config
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
 
         class _Platform:
             def __init__(self, value):
@@ -963,7 +963,7 @@ class TestWebServerEndpoints:
 
     def test_get_status_hides_stale_platforms_when_gateway_not_running(self, monkeypatch):
         import gateway.config as gateway_config
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
 
         class _GatewayConfig:
             def get_connected_platforms(self):
@@ -2450,7 +2450,7 @@ class TestNewEndpoints:
         scoped to that profile via ``-p <name>``.
         """
         import hermes_cli.profiles as profiles_mod
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
         from hermes_cli.config import load_config
         from hermes_cli.skills_config import get_disabled_skills
         from hermes_constants import (
@@ -2523,7 +2523,7 @@ class TestNewEndpoints:
             reset_hermes_home_override(token)
 
     def test_profile_open_terminal_uses_macos_terminal(self, monkeypatch):
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
         from hermes_constants import get_hermes_home
 
         (get_hermes_home() / "profiles" / "coder").mkdir(parents=True)
@@ -2539,7 +2539,7 @@ class TestNewEndpoints:
         assert "coder setup" in " ".join(calls[0])
 
     def test_profile_open_terminal_uses_windows_cmd(self, monkeypatch):
-        import hermes_cli.web_server as web_server
+        from hermes_cli import web_server
         from hermes_constants import get_hermes_home
 
         (get_hermes_home() / "profiles" / "coder").mkdir(parents=True)
@@ -2726,9 +2726,8 @@ class TestNewEndpoints:
             assert "enabled" in skills[0]
 
     def test_skills_list_includes_disabled_skills(self, monkeypatch):
-        import hermes_cli.skills_config as skills_config
-        import hermes_cli.web_server as web_server
-        import tools.skills_tool as skills_tool
+        from hermes_cli import skills_config, web_server
+        from tools import skills_tool
 
         def _fake_find_all_skills(*, skip_disabled=False):
             if skip_disabled:
@@ -2773,9 +2772,8 @@ class TestNewEndpoints:
             assert "enabled" in toolsets[0]
 
     def test_toolsets_list_matches_cli_enabled_state(self, monkeypatch):
-        import hermes_cli.tools_config as tools_config
-        import hermes_cli.web_server as web_server
         import toolsets as toolsets_module
+        from hermes_cli import tools_config, web_server
 
         monkeypatch.setattr(
             tools_config,
@@ -3702,7 +3700,7 @@ class TestDiscoverUserThemes:
             "label: Ocean\n"
             "palette:\n"
             "  background:\n"
-            "    hex: \"#0a1628\"\n"
+            '    hex: "#0a1628"\n'
             "    alpha: 1.0\n"
             "layout:\n"
             "  density: spacious\n",

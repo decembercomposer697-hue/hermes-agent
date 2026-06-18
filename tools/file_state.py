@@ -39,7 +39,6 @@ from collections import defaultdict
 from collections.abc import Iterable
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 # ── Public stamp type ────────────────────────────────────────────────
 # (mtime, read_ts, partial).  partial=True when read_file returned a
@@ -102,7 +101,7 @@ class FileStateRegistry:
             return
         if mtime is None:
             try:
-                mtime = os.path.getmtime(resolved)
+                mtime = Path(resolved).stat().st_mtime
             except OSError:
                 return
         now = time.time()
@@ -128,7 +127,7 @@ class FileStateRegistry:
             return
         if mtime is None:
             try:
-                mtime = os.path.getmtime(resolved)
+                mtime = Path(resolved).stat().st_mtime
             except OSError:
                 return
         now = time.time()
@@ -164,7 +163,7 @@ class FileStateRegistry:
             return None
 
         try:
-            current_mtime = os.path.getmtime(resolved)
+            current_mtime = Path(resolved).stat().st_mtime
         except OSError:
             # File doesn't exist — write will create it; not stale.
             return None
@@ -322,11 +321,11 @@ def known_reads(task_id: str) -> list[str]:
 
 __all__ = [
     "FileStateRegistry",
-    "get_registry",
-    "record_read",
-    "note_write",
     "check_stale",
-    "lock_path",
-    "writes_since",
+    "get_registry",
     "known_reads",
+    "lock_path",
+    "note_write",
+    "record_read",
+    "writes_since",
 ]

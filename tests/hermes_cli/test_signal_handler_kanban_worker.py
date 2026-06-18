@@ -22,6 +22,7 @@ full CLI (which needs a real provider config).
 from __future__ import annotations
 
 import os
+import pathlib
 import signal
 import subprocess
 import sys
@@ -95,7 +96,7 @@ def _is_alive_like_dispatcher(pid: int) -> bool:
         return True
     if sys.platform == "linux":
         try:
-            with open(f"/proc/{pid}/status") as f:
+            with pathlib.Path(f"/proc/{pid}/status").open() as f:
                 for line in f:
                     if line.startswith("State:"):
                         if "Z" in line.split(":", 1)[1]:

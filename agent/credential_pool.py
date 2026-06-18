@@ -10,8 +10,8 @@ import threading
 import time
 import uuid
 from dataclasses import dataclass, fields, replace
-from datetime import UTC, datetime, timezone
-from typing import Any, Dict, List, Optional, Set, Tuple
+from datetime import UTC, datetime
+from typing import Any
 
 import hermes_cli.auth as auth_mod
 from agent.credential_persistence import (
@@ -71,7 +71,7 @@ _TERMINAL_AUTH_REASONS = frozenset({
     "invalid_token",        # RFC 6750: bearer token is malformed/expired/revoked
     "invalid_grant",        # RFC 6749: refresh_token rejected during refresh
     "unauthorized_client",  # RFC 6749: client no longer authorized
-    "refresh_token_reused", # Single-use refresh token consumed by another process
+    "refresh_token_reused",  # Single-use refresh token consumed by another process
 })
 
 # How long a DEAD manual credential is preserved before being pruned.
@@ -1451,7 +1451,7 @@ class CredentialPool:
                 entry for entry in available
                 if self._active_leases.get(entry.id, 0) < self._max_concurrent
             ]
-            candidates = below_cap if below_cap else available
+            candidates = below_cap or available
             chosen = min(
                 candidates,
                 key=lambda entry: (self._active_leases.get(entry.id, 0), entry.priority),
@@ -1577,9 +1577,8 @@ def _upsert_entry(entries: list[PooledCredential], provider: str, source: str, p
         if key in _field_names:
             if getattr(existing, key) != value:
                 field_updates[key] = value
-        elif key in _EXTRA_KEYS:
-            if existing.extra.get(key) != value:
-                extra_updates[key] = value
+        elif key in _EXTRA_KEYS and existing.extra.get(key) != value:
+            extra_updates[key] = value
     if field_updates or extra_updates:
         if extra_updates:
             field_updates["extra"] = {**existing.extra, **extra_updates}

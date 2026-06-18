@@ -25,7 +25,7 @@ These tests pin all three behaviors so the fix can't silently regress.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 from urllib.parse import parse_qs
 
 import httpx
@@ -329,7 +329,6 @@ def test_wire_format_is_form_urlencoded_with_all_pkce_fields(monkeypatch):
     If anyone ever swaps ``data=`` for ``json=`` or refactors the dict,
     xAI will start rejecting again — this catches it locally.
     """
-
     captured: dict[str, Any] = {}
 
     class _Transport(httpx.BaseTransport):

@@ -8,6 +8,7 @@ we explicitly reject any member whose type bits are S_IFLNK.
 """
 
 import os
+import pathlib
 import stat
 import tempfile
 import zipfile
@@ -58,7 +59,7 @@ def test_update_via_zip_rejects_symlink_member(tmp_path, monkeypatch):
 
     def fake_urlretrieve(url, dest):
         # Copy our malicious zip into the destination dest path.
-        with open(zip_path, "rb") as src, open(dest, "wb") as dst:
+        with pathlib.Path(zip_path).open("rb") as src, pathlib.Path(dest).open("wb") as dst:
             dst.write(src.read())
         return dest, None
 
@@ -105,7 +106,7 @@ def test_update_via_zip_accepts_normal_member(tmp_path, monkeypatch, capsys):
     args = type("Args", (), {})()
 
     def fake_urlretrieve(url, dest):
-        with open(zip_path, "rb") as src, open(dest, "wb") as dst:
+        with pathlib.Path(zip_path).open("rb") as src, pathlib.Path(dest).open("wb") as dst:
             dst.write(src.read())
         return dest, None
 

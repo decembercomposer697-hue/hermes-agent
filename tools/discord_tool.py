@@ -31,7 +31,7 @@ import os
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from tools.registry import registry
 
@@ -100,6 +100,7 @@ def _discord_request(
 
 class DiscordAPIError(Exception):
     """Raised when a Discord API call fails."""
+
     def __init__(self, status: int, body: str):
         self.status = status
         self.body = body

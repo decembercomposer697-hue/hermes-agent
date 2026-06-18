@@ -1,6 +1,7 @@
 """Tests for ``hermes debug`` CLI command and debug utilities."""
 
 import os
+import pathlib
 import urllib.error
 from unittest.mock import MagicMock, patch
 
@@ -77,9 +78,8 @@ class TestUploadPasteRs:
         with patch(
             "hermes_cli.debug.urllib.request.urlopen",
             side_effect=urllib.error.URLError("connection refused"),
-        ):
-            with pytest.raises(urllib.error.URLError):
-                _upload_paste_rs("test")
+        ), pytest.raises(urllib.error.URLError):
+            _upload_paste_rs("test")
 
 
 class TestUploadDpasteCom:
@@ -339,7 +339,6 @@ class TestCaptureLogSnapshotRedaction:
         redaction feature ships silently broken for users who opted out of
         runtime redaction (e.g. developers working on the redactor itself).
         """
-
         # Force the runtime flag off so we're exercising the force=True path,
         # not the default-on path.
         monkeypatch.setenv("HERMES_REDACT_SECRETS", "false")
@@ -967,7 +966,7 @@ class TestScheduleAutoDelete:
         # And verify that calling it doesn't produce any orphaned children
         # (it should just write pending.json synchronously).
         import os as _os
-        before = set(_os.listdir("/proc")) if _os.path.exists("/proc") else None
+        before = set(_os.listdir("/proc")) if pathlib.Path("/proc").exists() else None
         _schedule_auto_delete(
             ["https://paste.rs/abc", "https://paste.rs/def"],
             delay_seconds=10,
@@ -982,7 +981,7 @@ class TestScheduleAutoDelete:
             # a python interpreter whose cmdline contained "time.sleep".
             for pid in new_pids:
                 try:
-                    with open(f"/proc/{pid}/cmdline", "rb") as f:
+                    with pathlib.Path(f"/proc/{pid}/cmdline").open("rb") as f:
                         cmdline = f.read().decode("utf-8", errors="replace")
                     assert "time.sleep" not in cmdline, (
                         f"Leaked sleeper subprocess PID {pid}: {cmdline}"

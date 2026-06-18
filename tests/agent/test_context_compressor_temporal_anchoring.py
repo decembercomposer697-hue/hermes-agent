@@ -11,7 +11,7 @@ summarizer prompt. ``test_context_compressor_summary_continuity`` already
 proves ``compress()`` routes into ``_generate_summary``.
 """
 
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock, patch
 
 import hermes_time

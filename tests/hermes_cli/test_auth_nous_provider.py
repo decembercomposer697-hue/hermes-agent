@@ -4,7 +4,7 @@ import base64
 import json
 import logging
 import time
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
@@ -1024,7 +1024,6 @@ class TestLoginNousSkipKeepsCurrent:
 
         def _check_nous_free_tier(**kwargs):
             free_tier_calls.append(kwargs)
-            return None
 
         monkeypatch.setattr(models_mod, "check_nous_free_tier", _check_nous_free_tier)
         monkeypatch.setattr(

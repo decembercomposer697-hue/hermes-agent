@@ -30,7 +30,6 @@ that contains one.
 from __future__ import annotations
 
 import re
-from typing import List
 
 from wcwidth import wcswidth
 
@@ -53,9 +52,8 @@ def _disp_width(s: str) -> int:
     unknown sequence; treat those as zero-width rather than letting a
     negative number flow into ``max`` and break the column-width math.
     """
-
     w = wcswidth(s)
-    return w if w > 0 else 0
+    return max(0, w)
 
 
 def _pad_to_width(s: str, target: int) -> str:
@@ -64,18 +62,14 @@ def _pad_to_width(s: str, target: int) -> str:
 
 def split_table_row(row: str) -> list[str]:
     """Split ``| a | b | c |`` into ``["a", "b", "c"]`` with trims."""
-
     s = row.strip()
-    if s.startswith("|"):
-        s = s[1:]
-    if s.endswith("|"):
-        s = s[:-1]
+    s = s.removeprefix("|")
+    s = s.removesuffix("|")
     return [c.strip() for c in s.split("|")]
 
 
 def is_table_divider(row: str) -> bool:
     """True when ``row`` is a markdown table separator line."""
-
     cells = split_table_row(row)
     return len(cells) > 1 and all(_DIVIDER_CELL_RE.match(c) for c in cells)
 
@@ -88,7 +82,6 @@ def looks_like_table_row(row: str) -> bool:
     only rewrites blocks that are accompanied by a divider, so a false
     positive here at most delays the print of one line.
     """
-
     if "|" not in row:
         return False
     stripped = row.strip()
@@ -112,7 +105,6 @@ def _render_block(rows: list[list[str]], available_width: int | None = None) -> 
     perfectly padded, which is exactly the "tables look broken"
     user report this code path is meant to address.
     """
-
     ncols = max(len(r) for r in rows)
     rows = [r + [""] * (ncols - len(r)) for r in rows]
 
@@ -149,7 +141,6 @@ def _wrap_to_width(text: str, width: int) -> list[str]:
     wider than ``width``.  Empty input yields a single empty string so
     the caller's row count stays predictable.
     """
-
     if width <= 0 or not text:
         return [text]
 
@@ -220,7 +211,6 @@ def _render_vertical(
     every line narrower than ``available_width`` so the terminal does
     not soft-wrap mid-cell.
     """
-
     if not rows:
         return []
 
@@ -272,7 +262,6 @@ def realign_markdown_tables(text: str, available_width: int | None = None) -> st
     avoids the terminal soft-wrapping mid-cell, which destroys column
     alignment visually even when the bytes are perfectly padded.
     """
-
     if "|" not in text:
         return text
 

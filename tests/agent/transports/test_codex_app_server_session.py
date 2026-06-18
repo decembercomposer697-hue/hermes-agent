@@ -8,7 +8,7 @@ deadline timeouts. These tests pin all of that without spawning real codex.
 from __future__ import annotations
 
 import time
-from typing import Any, Optional
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -702,14 +702,14 @@ class TestApprovalPromptEnrichment:
 
 class TestSessionRetirement:
     """Mirrors openclaw beta.8's resilience fixes:
-      - retire timed-out app-server clients (should_retire on deadline)
-      - post-tool completion watchdog (don't burn the full deadline after a
-        tool result if codex goes silent)
-      - <turn_aborted> raw marker as terminal (don't wait for turn/completed
-        that never comes)
-      - OAuth refresh failure classification (suggest `codex login` instead
-        of raw RPC error strings)
-      - dead subprocess detection between iterations
+    - retire timed-out app-server clients (should_retire on deadline)
+    - post-tool completion watchdog (don't burn the full deadline after a
+      tool result if codex goes silent)
+    - <turn_aborted> raw marker as terminal (don't wait for turn/completed
+      that never comes)
+    - OAuth refresh failure classification (suggest `codex login` instead
+      of raw RPC error strings)
+    - dead subprocess detection between iterations
     """
 
     def test_deadline_marks_session_for_retirement(self):

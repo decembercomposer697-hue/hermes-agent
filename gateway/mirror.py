@@ -10,8 +10,8 @@ the full SessionStore machinery.
 
 import json
 import logging
+import pathlib
 from datetime import datetime
-from typing import Optional
 
 from hermes_cli.config import get_hermes_home
 
@@ -99,7 +99,7 @@ def _find_session_id(
         return None
 
     try:
-        with open(_SESSIONS_INDEX, encoding="utf-8") as f:
+        with pathlib.Path(_SESSIONS_INDEX).open(encoding="utf-8") as f:
             data = json.load(f)
     except Exception:
         return None

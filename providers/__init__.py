@@ -36,7 +36,8 @@ import logging
 import sys
 from pathlib import Path
 
-from providers.base import OMIT_TEMPERATURE, ProviderProfile
+from providers.base import OMIT_TEMPERATURE as OMIT_TEMPERATURE
+from providers.base import ProviderProfile
 
 logger = logging.getLogger(__name__)
 

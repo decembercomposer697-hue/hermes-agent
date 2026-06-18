@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
-from typing import Any, Optional
+from typing import Any
 
 from gateway.stream_events import (
     Commentary,

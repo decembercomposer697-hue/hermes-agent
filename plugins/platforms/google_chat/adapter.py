@@ -44,7 +44,7 @@ import random
 import re
 from collections.abc import Callable
 from pathlib import Path as _Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 # Heavy google-cloud + googleapiclient imports are deferred to first
 # adapter use. Importing them eagerly here added ~110ms wall and ~33MB
@@ -87,9 +87,7 @@ def _load_google_modules() -> bool:
     on a fresh interpreter. Plugin discovery imports this module on
     every CLI invocation, even ones that never touch a gateway.
     """
-    global GOOGLE_CHAT_AVAILABLE, _google_modules_loaded
-    global httplib2, pubsub_v1, gax_exceptions, service_account
-    global AuthorizedHttp, build_service, HttpError, MediaFileUpload
+    global GOOGLE_CHAT_AVAILABLE, _google_modules_loaded, httplib2, pubsub_v1, gax_exceptions, service_account, AuthorizedHttp, build_service, HttpError, MediaFileUpload
     if _google_modules_loaded:
         return GOOGLE_CHAT_AVAILABLE
     _google_modules_loaded = True
@@ -115,6 +113,7 @@ def _load_google_modules() -> bool:
     MediaFileUpload = _MediaFileUpload
     GOOGLE_CHAT_AVAILABLE = True
     return True
+
 
 from gateway.config import Platform, PlatformConfig
 
@@ -214,6 +213,7 @@ def _is_retryable_error(exc: BaseException) -> bool:
     if "broken pipe" in text or "remote disconnected" in text:
         return True
     return False
+
 
 # Sentinel kept in ``_typing_messages`` after ``send()`` patches the typing
 # marker into the agent's real response. Two purposes:
@@ -418,7 +418,7 @@ class _ThreadCountStore:
             self._path.parent.mkdir(parents=True, exist_ok=True)
             tmp = self._path.with_suffix(self._path.suffix + ".tmp")
             tmp.write_text(json.dumps(self._counts, separators=(",", ":")))
-            os.replace(tmp, self._path)
+            _Path(tmp).replace(self._path)
         except OSError as exc:
             logger.warning(
                 "[GoogleChat] could not persist thread-count store to %s: %s",
@@ -580,13 +580,13 @@ class GoogleChatAdapter(BasePlatformAdapter):
                 return service_account.Credentials.from_service_account_info(
                     info, scopes=_CHAT_SCOPES,
                 )
-            if not os.path.exists(sa_path):
+            if not _Path(sa_path).exists():
                 raise FileNotFoundError(
-                    f"Service Account JSON file not found at configured path.",
+                    "Service Account JSON file not found at configured path.",
                 )
             # Validate file parses before handing to google-auth for nicer error.
             try:
-                with open(sa_path, encoding="utf-8") as fh:
+                with _Path(sa_path).open(encoding="utf-8") as fh:
                     info = json.load(fh)
             except json.JSONDecodeError as exc:
                 raise ValueError(
@@ -2009,16 +2009,16 @@ class GoogleChatAdapter(BasePlatformAdapter):
     # control text-vs-emoji presentation but Chat ignores them and
     # often shows a blank box. Pattern lifted from PR #14965.
     _INVISIBLE_RE = re.compile(
-        "["
+        r"["
         "\\u200b"          # Zero-Width Space
-        "‌"          # Zero-Width Non-Joiner
-        "‍"          # Zero-Width Joiner (ZWJ)
-        "‎‏"    # LTR / RTL marks
-        "⁠"          # Word Joiner
-        "﻿"          # BOM / Zero-Width No-Break Space
-        "︀-️"   # Variation Selectors 1-16 (VS1–VS16)
+        r"‌"          # Zero-Width Non-Joiner
+        r"‍"          # Zero-Width Joiner (ZWJ)
+        r"‎‏"    # LTR / RTL marks
+        r"⁠"          # Word Joiner
+        r"﻿"          # BOM / Zero-Width No-Break Space
+        r"︀-️"   # Variation Selectors 1-16 (VS1–VS16)
         "\U000e0100-\U000e01ef"  # Variation Selectors 17-256
-        "]",
+        r"]",
     )
 
     @classmethod
@@ -2758,7 +2758,7 @@ class GoogleChatAdapter(BasePlatformAdapter):
         caption (or a single space when none) so it retires without a
         tombstone, then create the attachment message.
         """
-        if not os.path.exists(path):
+        if not _Path(path).exists():
             return SendResult(success=False, error=f"file not found: {path}")
 
         filename = override_filename or os.path.basename(path) or "upload.bin"
@@ -3203,10 +3203,10 @@ async def _standalone_send(
                     return {"error": f"Google Chat standalone send: inline SA JSON is invalid: {exc}"}
                 creds = service_account.Credentials.from_service_account_info(info, scopes=_CHAT_SCOPES)
             else:
-                if not os.path.exists(sa_value):
+                if not _Path(sa_value).exists():
                     return {"error": f"Google Chat standalone send: SA JSON file not found at {sa_value}"}
                 try:
-                    with open(sa_value, encoding="utf-8") as fh:
+                    with _Path(sa_value).open(encoding="utf-8") as fh:
                         info = json.load(fh)
                 except json.JSONDecodeError as exc:
                     return {"error": f"Google Chat standalone send: SA JSON file is invalid: {exc}"}

@@ -47,8 +47,7 @@ class TestGetRandomTip:
     def test_randomness(self):
         """Multiple calls should eventually return different tips."""
         seen = set()
-        for _ in range(50):
-            seen.add(get_random_tip())
+        seen.update(get_random_tip() for _ in range(50))
         # With 200+ tips and 50 draws, we should see at least 10 unique
         assert len(seen) >= 10, f"Only got {len(seen)} unique tips in 50 draws"
 

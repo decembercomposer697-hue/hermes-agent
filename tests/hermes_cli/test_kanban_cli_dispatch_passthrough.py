@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import pathlib
 import sys
 import tempfile
 
@@ -19,7 +20,7 @@ import pytest
 def isolated_kanban_home(monkeypatch):
     """Spin up a fresh HERMES_HOME with a clean kanban DB."""
     test_home = tempfile.mkdtemp(prefix="kanban_cli_passthrough_")
-    os.makedirs(os.path.join(test_home, "profiles", "default"), exist_ok=True)
+    pathlib.Path(os.path.join(test_home, "profiles", "default")).mkdir(exist_ok=True, parents=True)
     monkeypatch.setenv("HERMES_HOME", test_home)
     for mod in list(sys.modules.keys()):
         if mod.startswith("hermes_cli") or mod.startswith("hermes_state") or mod == "hermes_constants":

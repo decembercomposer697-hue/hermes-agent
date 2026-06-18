@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import os
+import pathlib
 import tempfile
 import threading
 import time
@@ -48,7 +49,7 @@ class FileStateRegistryUnitTests(unittest.TestCase):
     def tearDown(self) -> None:
         for p in self._tmpfiles:
             try:
-                os.unlink(p)
+                pathlib.Path(p).unlink()
             except OSError:
                 pass
         file_state.get_registry().clear()
@@ -94,8 +95,7 @@ class FileStateRegistryUnitTests(unittest.TestCase):
         # Bump the on-disk mtime without going through the registry.
         time.sleep(0.01)
         os.utime(p, None)
-        with open(p, "w") as f:
-            f.write("externally modified\n")
+        pathlib.Path(p).write_text("externally modified\n")
         warn = file_state.check_stale("A", p)
         self.assertIsNotNone(warn)
         self.assertIn("modified since you last read", warn)
@@ -225,8 +225,7 @@ class FileToolsIntegrationTests(unittest.TestCase):
 
     def _write_seed(self, name: str, content: str = "seed\n") -> str:
         p = os.path.join(self._tmpdir, name)
-        with open(p, "w") as f:
-            f.write(content)
+        pathlib.Path(p).write_text(content)
         return p
 
     def test_sibling_agent_write_surfaces_warning_through_handler(self):

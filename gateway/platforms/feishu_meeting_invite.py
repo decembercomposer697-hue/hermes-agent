@@ -12,7 +12,7 @@ import json
 import logging
 from dataclasses import dataclass
 from types import SimpleNamespace
-from typing import Any, Dict, Optional
+from typing import Any
 
 from gateway.platforms.base import MessageEvent, MessageType
 

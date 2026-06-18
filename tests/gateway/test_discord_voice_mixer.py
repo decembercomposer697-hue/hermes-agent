@@ -227,7 +227,6 @@ class TestPlayInVoiceChannelMixerPath:
             async def _fast(coro, *a, **k):
                 if hasattr(coro, "close"):
                     coro.close()
-                return None
             with patch("asyncio.wait_for", _fast):
                 ok = await adapter.play_in_voice_channel(111, "/tmp/x.mp3")
         # Fell through to legacy path -> vc.play called.

@@ -20,7 +20,6 @@ import time
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 from hermes_constants import get_hermes_home
 from utils import atomic_replace
@@ -429,7 +428,7 @@ def _capture_log_snapshot(
             # race: file was truncated between _resolve_log_path and stat
             return LogSnapshot(path=log_path, tail_text="(file empty)", full_text=None)
 
-        with open(log_path, "rb") as f:
+        with Path(log_path).open("rb") as f:
             if size <= max_bytes:
                 raw = f.read()
                 truncated = False
@@ -758,7 +757,7 @@ def run_debug_share(args):
 
     # Print results
     label_width = max(len(k) for k in result.urls)
-    print(f"\nDebug report uploaded:")
+    print("\nDebug report uploaded:")
     for label, url in result.urls.items():
         print(f"  {label:<{label_width}}  {url}")
 
@@ -769,9 +768,9 @@ def run_debug_share(args):
     print(f"\n⏱  Pastes will auto-delete in {hours} hours.")
 
     # Manual delete fallback
-    print(f"To delete now:  hermes debug delete <url>")
+    print("To delete now:  hermes debug delete <url>")
 
-    print(f"\nShare these links with the Hermes team for support.")
+    print("\nShare these links with the Hermes team for support.")
 
 
 def run_debug_delete(args):

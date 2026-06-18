@@ -35,7 +35,6 @@ import threading
 from collections.abc import Sequence
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Optional
 
 from hermes_constants import get_config_path, get_hermes_home
 
@@ -86,6 +85,7 @@ def _safe_stderr():  # type: ignore[return]
         pass
     # Best-effort: if wrapping fails, return the original stream.
     return stream
+
 
 # Third-party loggers that are noisy at DEBUG/INFO level.
 _NOISY_LOGGERS = (
@@ -395,7 +395,7 @@ class _ManagedRotatingFileHandler(RotatingFileHandler):
     def _chmod_if_managed(self):
         if self._managed:
             try:
-                os.chmod(self.baseFilename, 0o660)
+                Path(self.baseFilename).chmod(0o660)
             except OSError:
                 pass
 
@@ -459,7 +459,7 @@ class _ManagedRotatingFileHandler(RotatingFileHandler):
     def emit(self, record: logging.LogRecord) -> None:
         # Cheap-ish stat-per-record check; the kernel caches inode metadata
         # so the syscall is sub-microsecond on a hot file.
-        if self.stream is not None or os.path.exists(self.baseFilename):
+        if self.stream is not None or Path(self.baseFilename).exists():
             self._reopen_if_externally_rotated()
         super().emit(record)
 
@@ -525,7 +525,7 @@ def _read_logging_config():
         import yaml
         config_path = get_config_path()
         if config_path.exists():
-            with open(config_path, encoding="utf-8") as f:
+            with Path(config_path).open(encoding="utf-8") as f:
                 cfg = yaml.safe_load(f) or {}
             log_cfg = cfg.get("logging", {})
             if isinstance(log_cfg, dict):

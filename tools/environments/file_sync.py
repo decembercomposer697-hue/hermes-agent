@@ -94,7 +94,7 @@ def unique_parent_dirs(files: list[tuple[str, str]]) -> list[str]:
 def _sha256_file(path: str) -> str:
     """Return hex SHA-256 digest of a file."""
     h = hashlib.sha256()
-    with open(path, "rb") as f:
+    with Path(path).open("rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
             h.update(chunk)
     return h.hexdigest()
@@ -285,7 +285,7 @@ class FileSyncManager:
             # Windows: no flock — run without serialization
             self._sync_back_impl()
             return
-        lock_fd = open(lock_path, "w", encoding="utf-8")
+        lock_fd = Path(lock_path).open("w", encoding="utf-8")
         try:
             fcntl.flock(lock_fd, fcntl.LOCK_EX)
             self._sync_back_impl()
@@ -313,7 +313,7 @@ class FileSyncManager:
             # Defensive size cap: a misbehaving sandbox could produce an
             # arbitrarily large tar. Refuse to extract if it exceeds the cap.
             try:
-                tar_size = os.path.getsize(tf.name)
+                tar_size = Path(tf.name).stat().st_size
             except OSError:
                 tar_size = 0
             if tar_size > _SYNC_BACK_MAX_BYTES:
@@ -355,7 +355,7 @@ class FileSyncManager:
                                 )
                                 continue
 
-                        if os.path.exists(host_path) and pushed_hash is not None:
+                        if Path(host_path).exists() and pushed_hash is not None:
                             host_hash = _sha256_file(host_path)
                             if host_hash != pushed_hash:
                                 logger.warning(
@@ -365,7 +365,7 @@ class FileSyncManager:
                                     remote_path,
                                 )
 
-                        os.makedirs(os.path.dirname(host_path), exist_ok=True)
+                        Path(os.path.dirname(host_path)).mkdir(exist_ok=True, parents=True)
                         shutil.copy2(staged_file, host_path)
                         applied += 1
 

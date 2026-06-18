@@ -36,11 +36,12 @@ import base64
 import json
 import logging
 import os
+import pathlib
 import re
 import struct
 import sys
 import threading
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from tools.computer_use.backend import (
     ActionResult,
@@ -667,7 +668,6 @@ def _route_capture_through_aux_vision(
         return None
     try:
         import base64 as _base64
-        import os as _os
         import uuid as _uuid
 
         from hermes_constants import get_hermes_dir
@@ -716,7 +716,7 @@ def _route_capture_through_aux_vision(
     finally:
         if temp_image_path is not None:
             try:
-                _os.unlink(str(temp_image_path))
+                pathlib.Path(str(temp_image_path)).unlink()
             except Exception:
                 pass
 

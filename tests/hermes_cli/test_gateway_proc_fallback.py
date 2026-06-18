@@ -34,7 +34,7 @@ def _fake_proc_dir(entries: dict):
     def _open(path, mode="r", **kwargs):
         path_str = str(path)
         if "/cmdline" in path_str:
-            pid = int(path_str.split("/proc/")[1].split("/")[0])
+            pid = int(path_str.split("/proc/")[1].split("/", maxsplit=1)[0])
             raw = entries.get(pid, "").encode("utf-8").replace(b" ", b"\x00")
             m = MagicMock()
             m.read.return_value = raw

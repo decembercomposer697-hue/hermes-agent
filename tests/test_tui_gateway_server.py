@@ -225,7 +225,7 @@ def test_terminal_task_cwd_ssh_uses_remote_path_unvalidated(monkeypatch):
     to os.getcwd(), running commands against the wrong machine.
     """
     remote = "/home/jonboh/workspace/proj"  # does not exist on this host
-    assert not os.path.isdir(remote)
+    assert not Path(remote).is_dir()
     monkeypatch.setenv("TERMINAL_ENV", "ssh")
     monkeypatch.setenv("TERMINAL_CWD", remote)
 
@@ -323,7 +323,7 @@ def test_tui_verbose_tool_details_fail_closed_when_redaction_fails(monkeypatch):
     def fail_redaction(*_args, **_kwargs):
         raise RuntimeError("redaction unavailable")
 
-    setattr(redact_module, "redact_sensitive_text", fail_redaction)
+    redact_module.redact_sensitive_text = fail_redaction
     monkeypatch.setitem(sys.modules, "agent.redact", redact_module)
 
     assert server._redact_tui_verbose_text("api_key=secret") == ""
@@ -362,7 +362,7 @@ def test_tui_verbose_tool_events_omit_details_when_redaction_fails(monkeypatch):
     def fail_redaction(*_args, **_kwargs):
         raise RuntimeError("redaction unavailable")
 
-    setattr(redact_module, "redact_sensitive_text", fail_redaction)
+    redact_module.redact_sensitive_text = fail_redaction
     monkeypatch.setitem(sys.modules, "agent.redact", redact_module)
 
     events: list[tuple[str, str, dict]] = []
@@ -693,7 +693,7 @@ def test_load_enabled_toolsets_accepts_plugin_env_after_discovery(monkeypatch):
     original_validate = toolsets.validate_toolset
 
     def fake_validate(name):
-        return name == "plugin_demo" and discovered["ready"] or original_validate(name)
+        return (name == "plugin_demo" and discovered["ready"]) or original_validate(name)
 
     monkeypatch.setattr(toolsets, "validate_toolset", fake_validate)
     monkeypatch.setitem(
@@ -2519,7 +2519,6 @@ def test_config_set_model_waits_for_lazy_agent_before_switch(monkeypatch):
     """A model switch against a lazy-created live session must apply to the
     real agent, not just process env, before the prompt is dispatched.
     """
-
     agent_ready = threading.Event()
     agent = types.SimpleNamespace(model="old/model", provider="old-provider")
     session = _session(agent=agent)
@@ -3444,7 +3443,7 @@ def test_session_status_reads_live_gateway_agent(monkeypatch):
 
 
 def test_skills_reload_runs_in_gateway_process(monkeypatch):
-    import agent.skill_commands as skill_commands
+    from agent import skill_commands
 
     called = {}
     monkeypatch.setattr(
@@ -3940,7 +3939,6 @@ def test_prompt_submit_history_version_match_persists_normally(monkeypatch):
 
 def test_prompt_submit_can_truncate_before_user_ordinal(monkeypatch):
     """Desktop user-message edits should restart the turn from the edited user."""
-
     seen = {}
 
     class _Agent:
@@ -5663,13 +5661,12 @@ def test_browser_manage_connect_default_local_retries_after_launch(monkeypatch):
     import urllib.request
 
     monkeypatch.setattr(urllib.request, "urlopen", _opener)
-    with patch.dict(sys.modules, {"tools.browser_tool": fake}):
-        with patch(
-            "hermes_cli.browser_connect.try_launch_chrome_debug", return_value=True,
-        ):
-            resp = server.handle_request(
-                {"id": "1", "method": "browser.manage", "params": {"action": "connect"}},
-            )
+    with patch.dict(sys.modules, {"tools.browser_tool": fake}), patch(
+        "hermes_cli.browser_connect.try_launch_chrome_debug", return_value=True,
+    ):
+        resp = server.handle_request(
+            {"id": "1", "method": "browser.manage", "params": {"action": "connect"}},
+        )
 
     assert resp["result"]["connected"] is True
     assert resp["result"]["url"] == "http://127.0.0.1:9222"
@@ -6238,7 +6235,7 @@ def test_background_agent_kwargs_falls_back_to_root_max_turns(monkeypatch):
 
 
 def test_background_agent_kwargs_defaults_to_25(monkeypatch):
-    monkeypatch.setattr(server, "_load_cfg", lambda: {})
+    monkeypatch.setattr(server, "_load_cfg", dict)
 
     kwargs = server._background_agent_kwargs(_FakeAgentForBackground(), "task_1")
 
@@ -6799,7 +6796,7 @@ def test_sniff_image_ext_magic_and_filename():
 
 def test_slash_worker_close_reaps_zombie_and_closes_fds():
     """A hung worker is SIGKILLed, the zombie reaped, all pipes closed — once."""
-    calls = {k: 0 for k in ("terminate", "kill", "wait", "stdin", "stdout", "stderr")}
+    calls = dict.fromkeys(("terminate", "kill", "wait", "stdin", "stdout", "stderr"), 0)
 
     class FakeStream:
         def __init__(self, name):

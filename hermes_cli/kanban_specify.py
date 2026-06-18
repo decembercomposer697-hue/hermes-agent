@@ -36,7 +36,6 @@ import logging
 import os
 import re
 from dataclasses import dataclass
-from typing import Optional
 
 from hermes_cli import kanban_db as kb
 from utils import env_int

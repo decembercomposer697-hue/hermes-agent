@@ -25,8 +25,9 @@ import datetime
 import json
 import logging
 import os
+import pathlib
 import uuid
-from typing import Any, Dict
+from typing import Any
 
 from hermes_constants import get_hermes_home
 
@@ -82,7 +83,7 @@ class DebugSession:
                 "total_calls": len(self._calls),
                 "tool_calls": self._calls,
             }
-            with open(filepath, "w", encoding="utf-8") as f:
+            with pathlib.Path(filepath).open("w", encoding="utf-8") as f:
                 json.dump(payload, f, indent=2, ensure_ascii=False)
             logger.debug("%s debug log saved: %s", self.tool_name, filepath)
         except Exception as e:

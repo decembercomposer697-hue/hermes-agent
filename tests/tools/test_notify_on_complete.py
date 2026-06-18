@@ -535,7 +535,7 @@ def test_homebrew_ci_poller_via_statusCheckRollup_emits_hint(monkeypatch, tmp_pa
                     "status=$(gh pr view $PR --json statusCheckRollup "
                     "--jq '[.statusCheckRollup[] | .conclusion] "
                     "| group_by(.) | map({k:.[0],v:length}) | from_entries'); "
-                    "echo \"$status\"; sleep 30; done"
+                    'echo "$status"; sleep 30; done'
                 ),
                 background=True,
                 notify_on_complete=True,
@@ -596,10 +596,10 @@ def test_canonical_column2_awk_poller_does_not_emit_homebrew_hint(monkeypatch, t
                 command=(
                     "PR=1; while :; do "
                     "out=$(gh pr checks $PR 2>&1); "
-                    "pending=$(echo \"$out\" | awk -F\"\\t\" \"\\$2==\\\"pending\\\"\" | wc -l); "
-                    "failed=$(echo \"$out\" | awk -F\"\\t\" \"\\$2==\\\"fail\\\"\" | wc -l); "
-                    "if [ \"$pending\" -eq 0 ]; then "
-                    "[ \"$failed\" -gt 0 ] && exit 1 || exit 0; "
+                    'pending=$(echo "$out" | awk -F"\\t" "\\$2==\\"pending\\"" | wc -l); '
+                    'failed=$(echo "$out" | awk -F"\\t" "\\$2==\\"fail\\"" | wc -l); '
+                    'if [ "$pending" -eq 0 ]; then '
+                    '[ "$failed" -gt 0 ] && exit 1 || exit 0; '
                     "fi; sleep 30; "
                     "done"
                 ),

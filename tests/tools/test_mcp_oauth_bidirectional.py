@@ -203,7 +203,7 @@ async def test_hermes_provider_forwards_401_triggers_refresh(tmp_path, monkeypat
 
 async def _noop_redirect(_url: str) -> None:
     """Redirect handler that does nothing (won't be invoked in these tests)."""
-    return None
+    return
 
 
 async def _noop_callback() -> tuple[str, str | None]:

@@ -7,8 +7,9 @@ action="list" and for resolving human-friendly channel names to numeric IDs.
 
 import json
 import logging
+import pathlib
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from hermes_cli.config import get_hermes_home
 from utils import atomic_json_write
@@ -214,7 +215,7 @@ def _build_from_sessions(platform_name: str) -> list[dict[str, str]]:
 
     entries = []
     try:
-        with open(sessions_path, encoding="utf-8") as f:
+        with pathlib.Path(sessions_path).open(encoding="utf-8") as f:
             data = json.load(f)
 
         seen_ids = set()
@@ -247,7 +248,7 @@ def load_directory() -> dict[str, Any]:
     if not DIRECTORY_PATH.exists():
         return {"updated_at": None, "platforms": {}}
     try:
-        with open(DIRECTORY_PATH, encoding="utf-8") as f:
+        with pathlib.Path(DIRECTORY_PATH).open(encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return {"updated_at": None, "platforms": {}}

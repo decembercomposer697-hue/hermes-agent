@@ -51,7 +51,7 @@ On failure (either capability)::
 from __future__ import annotations
 
 import abc
-from typing import Any, Dict, List
+from typing import Any
 
 # ---------------------------------------------------------------------------
 # ABC

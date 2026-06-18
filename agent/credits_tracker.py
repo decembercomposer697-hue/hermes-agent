@@ -34,11 +34,12 @@ from __future__ import annotations
 
 import logging
 import os
+import pathlib
 import re
 import time
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from utils import is_truthy_value
 
@@ -652,7 +653,7 @@ def dev_fixture_credits_state() -> CreditsState | None:
     name = raw
     if os.path.sep in raw or "/" in raw:  # looks like a path → read the name from the file
         try:
-            with open(raw, encoding="utf-8") as fh:
+            with pathlib.Path(raw).open(encoding="utf-8") as fh:
                 name = fh.read().strip()
         except OSError:
             return None

@@ -232,7 +232,7 @@ def test_main_top_level_tui_accepts_toolsets(monkeypatch, main_mod):
         "tools.mcp_tool",
         types.SimpleNamespace(discover_mcp_tools=lambda: None),
     )
-    monkeypatch.setattr(config_mod, "load_config", lambda: {})
+    monkeypatch.setattr(config_mod, "load_config", dict)
     monkeypatch.setattr(config_mod, "get_container_exec_info", lambda: None)
     monkeypatch.setitem(
         sys.modules,
@@ -589,7 +589,7 @@ def test_main_top_level_oneshot_accepts_toolsets(monkeypatch, main_mod):
         "tools.mcp_tool",
         types.SimpleNamespace(discover_mcp_tools=lambda: None),
     )
-    monkeypatch.setattr(config_mod, "load_config", lambda: {})
+    monkeypatch.setattr(config_mod, "load_config", dict)
     monkeypatch.setattr(config_mod, "get_container_exec_info", lambda: None)
     monkeypatch.setitem(
         sys.modules,
@@ -733,7 +733,7 @@ def test_oneshot_accepts_plugin_toolset_after_discovery(monkeypatch):
     original_validate = toolsets.validate_toolset
 
     def fake_validate(name):
-        return name == "plugin_demo" and discovered["ready"] or original_validate(name)
+        return (name == "plugin_demo" and discovered["ready"]) or original_validate(name)
 
     monkeypatch.setattr(toolsets, "validate_toolset", fake_validate)
     monkeypatch.setitem(
@@ -864,7 +864,7 @@ def test_launch_tui_exports_model_provider_and_toolsets(monkeypatch, main_mod):
     monkeypatch.setattr(
         main_mod,
         "_make_tui_argv",
-        lambda tui_dir, tui_dev: (["node", "dist/entry.js"], Path(".")),
+        lambda tui_dir, tui_dev: (["node", "dist/entry.js"], Path()),
     )
 
     def fake_call(argv, cwd=None, env=None):
@@ -919,7 +919,7 @@ def test_launch_tui_applies_terminal_backend_config(
     monkeypatch.setattr(
         main_mod,
         "_make_tui_argv",
-        lambda tui_dir, tui_dev: (["node", "dist/entry.js"], Path(".")),
+        lambda tui_dir, tui_dev: (["node", "dist/entry.js"], Path()),
     )
     monkeypatch.setattr(
         main_mod.subprocess,
@@ -941,7 +941,7 @@ def test_launch_tui_exit_code_42_relaunches_update(monkeypatch, main_mod):
     monkeypatch.setattr(
         main_mod,
         "_make_tui_argv",
-        lambda tui_dir, tui_dev: (["node", "dist/entry.js"], Path(".")),
+        lambda tui_dir, tui_dev: (["node", "dist/entry.js"], Path()),
     )
     monkeypatch.setattr(main_mod.subprocess, "call", lambda *args, **kwargs: 42)
 
@@ -960,7 +960,7 @@ def test_launch_tui_drops_stale_resume_env_without_resume_arg(monkeypatch, main_
     monkeypatch.setattr(
         main_mod,
         "_make_tui_argv",
-        lambda tui_dir, tui_dev: (["node", "dist/entry.js"], Path(".")),
+        lambda tui_dir, tui_dev: (["node", "dist/entry.js"], Path()),
     )
     monkeypatch.setattr(
         main_mod.subprocess,
@@ -981,7 +981,7 @@ def test_launch_tui_sets_resume_env_from_resume_arg(monkeypatch, main_mod):
     monkeypatch.setattr(
         main_mod,
         "_make_tui_argv",
-        lambda tui_dir, tui_dev: (["node", "dist/entry.js"], Path(".")),
+        lambda tui_dir, tui_dev: (["node", "dist/entry.js"], Path()),
     )
     monkeypatch.setattr(
         main_mod.subprocess,

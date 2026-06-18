@@ -649,7 +649,7 @@ def _spawn_detached(script_path: Path | None = None) -> int:
     stray_log = log_dir / "gateway-stdio.log"
 
     try:
-        with open(stray_log, "ab", buffering=0) as log_fh:
+        with Path(stray_log).open("ab", buffering=0) as log_fh:
             proc = subprocess.Popen(
                 argv,
                 cwd=working_dir,
@@ -666,7 +666,7 @@ def _spawn_detached(script_path: Path | None = None) -> int:
         # Terminal configs). Retry without the breakaway flag — in most
         # setups pythonw.exe + DETACHED_PROCESS is enough on its own.
         flags_no_breakaway = flags & ~0x01000000
-        with open(stray_log, "ab", buffering=0) as log_fh:
+        with Path(stray_log).open("ab", buffering=0) as log_fh:
             proc = subprocess.Popen(
                 argv,
                 cwd=working_dir,
@@ -1018,7 +1018,7 @@ def _print_deep_probes() -> None:
       [6] Last lifecycle event in gateway-exit-diag.log
     """
     import json
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     from hermes_cli.config import get_hermes_home
 
@@ -1109,7 +1109,7 @@ def _print_deep_probes() -> None:
     # [6] Last lifecycle event from the exit-diag log
     if diag_path.exists():
         try:
-            with open(diag_path, "rb") as fh:
+            with Path(diag_path).open("rb") as fh:
                 # Read last ~4KB; one event is well under 500 bytes.
                 fh.seek(0, 2)
                 size = fh.tell()

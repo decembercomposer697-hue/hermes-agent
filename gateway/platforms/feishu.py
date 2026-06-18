@@ -65,7 +65,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Literal
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -1297,10 +1297,10 @@ def _run_official_feishu_ws_client(ws_client: Any, adapter: Any) -> None:
 
     def _apply_runtime_ws_overrides() -> None:
         try:
-            setattr(ws_client, "_reconnect_nonce", adapter._ws_reconnect_nonce)
-            setattr(ws_client, "_reconnect_interval", adapter._ws_reconnect_interval)
+            ws_client._reconnect_nonce = adapter._ws_reconnect_nonce
+            ws_client._reconnect_interval = adapter._ws_reconnect_interval
             if adapter._ws_ping_interval is not None:
-                setattr(ws_client, "_ping_interval", adapter._ws_ping_interval)
+                ws_client._ping_interval = adapter._ws_ping_interval
         except Exception:
             logger.debug("[Feishu] Failed to apply websocket runtime overrides", exc_info=True)
 
@@ -1320,7 +1320,7 @@ def _run_official_feishu_ws_client(ws_client: Any, adapter: Any) -> None:
 
     ws_client_module.websockets.connect = _connect_with_overrides
     if original_configure is not None:
-        setattr(ws_client, "_configure", _configure_with_overrides)
+        ws_client._configure = _configure_with_overrides
     _apply_runtime_ws_overrides()
     try:
         ws_client.start()
@@ -1329,7 +1329,7 @@ def _run_official_feishu_ws_client(ws_client: Any, adapter: Any) -> None:
     finally:
         ws_client_module.websockets.connect = original_connect
         if original_configure is not None:
-            setattr(ws_client, "_configure", original_configure)
+            ws_client._configure = original_configure
         pending = [t for t in asyncio.all_tasks(loop) if not t.done()]
         for task in pending:
             task.cancel()
@@ -1762,7 +1762,7 @@ class FeishuAdapter(BasePlatformAdapter):
         if self._ws_client is None:
             return
         try:
-            setattr(self._ws_client, "_auto_reconnect", False)
+            self._ws_client._auto_reconnect = False
         except Exception:
             pass
         finally:
@@ -2122,13 +2122,12 @@ class FeishuAdapter(BasePlatformAdapter):
         """Send a local image file to Feishu."""
         if not self._client:
             return SendResult(success=False, error="Not connected")
-        if not os.path.exists(image_path):
+        if not Path(image_path).exists():
             return SendResult(success=False, error=f"Image file not found: {image_path}")
 
         try:
             import io as _io
-            with open(image_path, "rb") as f:
-                image_bytes = f.read()
+            image_bytes = Path(image_path).read_bytes()
             # Wrap in BytesIO so lark SDK's MultipartEncoder can read .name and .tell()
             image_file = _io.BytesIO(image_bytes)
             image_file.name = os.path.basename(image_path)
@@ -2173,7 +2172,7 @@ class FeishuAdapter(BasePlatformAdapter):
 
     async def send_typing(self, chat_id: str, metadata=None) -> None:
         """Feishu bot API does not expose a typing indicator."""
-        return None
+        return
 
     async def send_image(
         self,
@@ -3701,7 +3700,7 @@ class FeishuAdapter(BasePlatformAdapter):
         if not cached_path or not media_type.startswith("text/"):
             return ""
         try:
-            if os.path.getsize(cached_path) > _MAX_TEXT_INJECT_BYTES:
+            if Path(cached_path).stat().st_size > _MAX_TEXT_INJECT_BYTES:
                 return ""
             ext = Path(cached_path).suffix.lower()
             if ext not in {".txt", ".md"} and media_type not in {"text/plain", "text/markdown"}:
@@ -4408,7 +4407,7 @@ class FeishuAdapter(BasePlatformAdapter):
     ) -> SendResult:
         if not self._client:
             return SendResult(success=False, error="Not connected")
-        if not os.path.exists(file_path):
+        if not Path(file_path).exists():
             return SendResult(success=False, error=f"File not found: {file_path}")
 
         display_name = file_name or os.path.basename(file_path)
@@ -4417,7 +4416,7 @@ class FeishuAdapter(BasePlatformAdapter):
             requested_message_type=outbound_message_type,
         )
         try:
-            with open(file_path, "rb") as file_obj:
+            with Path(file_path).open("rb") as file_obj:
                 body = self._build_file_upload_body(
                     file_type=upload_file_type,
                     file_name=display_name,

@@ -390,7 +390,7 @@ def resolve_url(base: str, path: str, *, is_cloud: bool | None = None) -> str:
 
 def resolve_api_key(explicit: str | None) -> str | None:
     """Look up API key from CLI flag → env var. Strips whitespace and quotes."""
-    val = explicit if explicit else os.environ.get(ENV_API_KEY)
+    val = explicit or os.environ.get(ENV_API_KEY)
     if val is None:
         return None
     val = val.strip().strip("'\"")

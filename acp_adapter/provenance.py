@@ -13,7 +13,7 @@ parsing status text, guessing from token drops, or reading ``state.db``.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 # Bound defensive walks; compression chains this deep are pathological.
 _MAX_WALK = 100

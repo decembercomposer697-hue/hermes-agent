@@ -56,8 +56,6 @@ Refresh-token handling:
 """
 from __future__ import annotations
 
-from typing import Optional, Tuple
-
 from fastapi import Request
 from fastapi.responses import Response
 
@@ -111,7 +109,7 @@ def _cookie_path(prefix: str) -> str:
 
     Direct-deploy (no proxy prefix) gets ``Path=/``.
     """
-    return prefix if prefix else "/"
+    return prefix or "/"
 
 
 def _common_attrs(*, use_https: bool, prefix: str) -> dict:

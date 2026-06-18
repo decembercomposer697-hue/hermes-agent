@@ -36,7 +36,6 @@ import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +47,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class _ClarifyEntry:
     """One pending clarify request inside a gateway session."""
+
     clarify_id: str
     session_key: str
     question: str

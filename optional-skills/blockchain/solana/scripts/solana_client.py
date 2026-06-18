@@ -25,7 +25,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 RPC_URL = os.environ.get(
     "SOLANA_RPC_URL",
@@ -244,30 +244,30 @@ def cmd_stats(_args):
 
     by_id = {r["id"]: r.get("result") for r in results}
 
-    slot         = by_id.get(0)
-    epoch_info   = by_id.get(1)
+    slot = by_id.get(0)
+    epoch_info = by_id.get(1)
     perf_samples = by_id.get(2)
-    supply       = by_id.get(3)
-    version      = by_id.get(4)
+    supply = by_id.get(3)
+    version = by_id.get(4)
 
     tps = None
     if perf_samples:
         s = perf_samples[0]
         tps = round(s["numTransactions"] / s["samplePeriodSecs"], 1)
 
-    total_supply = lamports_to_sol(supply["value"]["total"])      if supply else None
-    circ_supply  = lamports_to_sol(supply["value"]["circulating"]) if supply else None
+    total_supply = lamports_to_sol(supply["value"]["total"]) if supply else None
+    circ_supply = lamports_to_sol(supply["value"]["circulating"]) if supply else None
 
     sol_price = fetch_sol_price()
 
     out = {
         "slot":                   slot,
-        "epoch":                  epoch_info.get("epoch")     if epoch_info else None,
+        "epoch":                  epoch_info.get("epoch") if epoch_info else None,
         "slot_in_epoch":          epoch_info.get("slotIndex") if epoch_info else None,
         "tps":                    tps,
         "total_supply_SOL":       round(total_supply, 2) if total_supply else None,
-        "circulating_supply_SOL": round(circ_supply, 2)  if circ_supply  else None,
-        "validator_version":      version.get("solana-core")  if version   else None,
+        "circulating_supply_SOL": round(circ_supply, 2) if circ_supply else None,
+        "validator_version":      version.get("solana-core") if version else None,
     }
     if sol_price is not None:
         out["sol_price_usd"] = sol_price
@@ -402,11 +402,11 @@ def cmd_tx(args):
     if result is None:
         sys.exit("Transaction not found (may be too old for public RPC history).")
 
-    meta         = result.get("meta", {}) or {}
-    msg          = result.get("transaction", {}).get("message", {})
+    meta = result.get("meta", {}) or {}
+    msg = result.get("transaction", {}).get("message", {})
     account_keys = msg.get("accountKeys", [])
 
-    pre  = meta.get("preBalances", [])
+    pre = meta.get("preBalances", [])
     post = meta.get("postBalances", [])
 
     balance_changes = []
@@ -455,9 +455,9 @@ def cmd_token(args):
     if mint_info is None or mint_info.get("value") is None:
         sys.exit("Mint account not found.")
 
-    parsed       = mint_info["value"]["data"]["parsed"]["info"]
-    decimals     = parsed.get("decimals", 0)
-    supply_raw   = int(parsed.get("supply", 0))
+    parsed = mint_info["value"]["data"]["parsed"]["info"]
+    decimals = parsed.get("decimals", 0)
+    supply_raw = int(parsed.get("supply", 0))
     supply_human = supply_raw / (10 ** decimals) if decimals else supply_raw
 
     largest = rpc("getTokenLargestAccounts", [mint])
@@ -497,7 +497,7 @@ def cmd_token(args):
 
 def cmd_activity(args):
     """Recent transaction signatures for an address."""
-    limit  = min(args.limit, 25)
+    limit = min(args.limit, 25)
     result = rpc("getSignaturesForAddress", [args.address, {"limit": limit}])
 
     txs = [
@@ -548,7 +548,7 @@ def cmd_whales(args):
     """Scan the latest block for large SOL transfers."""
     min_lamports = int(args.min_sol * LAMPORTS_PER_SOL)
 
-    slot  = rpc("getSlot")
+    slot = rpc("getSlot")
     block = rpc("getBlock", [
         slot,
         {
@@ -570,20 +570,20 @@ def cmd_whales(args):
         if meta.get("err") is not None:
             continue
 
-        msg          = tx["transaction"].get("message", {})
+        msg = tx["transaction"].get("message", {})
         account_keys = msg.get("accountKeys", [])
-        pre          = meta.get("preBalances", [])
-        post         = meta.get("postBalances", [])
+        pre = meta.get("preBalances", [])
+        post = meta.get("postBalances", [])
 
         for i in range(len(pre)):
             change = post[i] - pre[i]
             if change >= min_lamports:
-                k        = account_keys[i]
+                k = account_keys[i]
                 receiver = k["pubkey"] if isinstance(k, dict) else k
-                sender   = None
+                sender = None
                 for j in range(len(pre)):
                     if pre[j] - post[j] >= min_lamports:
-                        sk     = account_keys[j]
+                        sk = account_keys[j]
                         sender = sk["pubkey"] if isinstance(sk, dict) else sk
                         break
                 entry = {

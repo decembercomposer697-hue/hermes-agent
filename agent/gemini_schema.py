@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 # Gemini's ``FunctionDeclaration.parameters`` field accepts the ``Schema``
 # object, which is only a subset of OpenAPI 3.0 / JSON Schema.  Strip fields
@@ -42,7 +42,6 @@ def sanitize_gemini_schema(schema: Any) -> dict[str, Any]:
     subset and recursively sanitizes nested ``properties`` / ``items`` /
     ``anyOf`` definitions.
     """
-
     if not isinstance(schema, dict):
         return {}
 
@@ -92,7 +91,6 @@ def sanitize_gemini_schema(schema: Any) -> dict[str, Any]:
 
 def sanitize_gemini_tool_parameters(parameters: Any) -> dict[str, Any]:
     """Normalize tool parameters to a valid Gemini object schema."""
-
     cleaned = sanitize_gemini_schema(parameters)
     if not cleaned:
         return {"type": "object", "properties": {}}

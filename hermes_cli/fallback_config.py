@@ -56,7 +56,6 @@ def get_fallback_chain(config: dict[str, Any] | None) -> list[dict[str, Any]]:
     they target the same provider/model/base_url route as an earlier entry.
     The returned list always contains fresh dict copies.
     """
-
     config = config or {}
     chain: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()

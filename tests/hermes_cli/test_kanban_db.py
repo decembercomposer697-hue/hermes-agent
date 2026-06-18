@@ -3028,7 +3028,7 @@ def test_resolve_hermes_argv_module_actually_runs():
     """
     import shutil
     import subprocess
-    import unittest.mock as mock
+    from unittest import mock
 
     import hermes_cli.kanban_db as kb
 
@@ -3608,7 +3608,6 @@ def test_detect_stale_skips_recently_started_task(kanban_home, monkeypatch):
 
 def test_detect_stale_skips_when_timeout_zero(kanban_home, monkeypatch):
     """stale_timeout_seconds=0 disables stale detection entirely."""
-
     with kb.connect() as conn:
         t = kb.create_task(conn, title="disabled", assignee="worker")
         kb.claim_task(conn, t)
@@ -4177,7 +4176,7 @@ def test_write_txn_check_reads_correct_header_fields(tmp_path):
     page_size = conn.execute("PRAGMA page_size").fetchone()[0]
     conn.close()
     # Now corrupt the file: claim N pages but truncate to N-1 pages
-    with open(db, "rb") as f:
+    with Path(db).open("rb") as f:
         data = bytearray(f.read())
     # Read current page_count from header bytes 28-31
     real_page_count = struct.unpack(">I", data[28:32])[0]
@@ -4186,8 +4185,7 @@ def test_write_txn_check_reads_correct_header_fields(tmp_path):
         pytest.skip("DB too small for synthetic truncation test")
     # Truncate to N-1 pages
     truncated = bytes(data[: (real_page_count - 1) * page_size])
-    with open(db, "wb") as f:
-        f.write(truncated)
+    Path(db).write_bytes(truncated)
     # Now open and check — should raise
     # We can't use connect() because _validate_sqlite_header may block; use a raw connection
     raw_conn = sqlite3.connect(str(db), isolation_level=None)
@@ -4254,12 +4252,11 @@ def test_reap_worker_zombies_records_exit_status():
             return 12345, 0
         return 0, 0
 
-    with patch("hermes_cli.kanban_db.os.waitpid", side_effect=fake_waitpid):
-        with patch(
-            "hermes_cli.kanban_db._record_worker_exit",
-            side_effect=lambda p, s: calls.append((p, s)),
-        ):
-            kb.reap_worker_zombies()
+    with patch("hermes_cli.kanban_db.os.waitpid", side_effect=fake_waitpid), patch(
+        "hermes_cli.kanban_db._record_worker_exit",
+        side_effect=lambda p, s: calls.append((p, s)),
+    ):
+        kb.reap_worker_zombies()
 
     assert calls == [(12345, 0)]
 
@@ -4322,9 +4319,8 @@ def test_zombie_reaper_survives_all_boards_failing():
         pids = [tick * 100 + 1, tick * 100 + 2]
         with patch(
             "hermes_cli.kanban_db.os.waitpid", side_effect=make_fake_waitpid(pids),
-        ):
-            with patch("hermes_cli.kanban_db._record_worker_exit"):
-                pids = kb.reap_worker_zombies()
+        ), patch("hermes_cli.kanban_db._record_worker_exit"):
+            pids = kb.reap_worker_zombies()
         total_reaped += len(pids)
 
     assert total_reaped == 10

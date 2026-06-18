@@ -35,7 +35,7 @@ invariants):
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, Union
+from typing import Any, Union
 
 # ── Message (assistant text) events ──────────────────────────────────────────
 
@@ -49,6 +49,7 @@ class MessageChunk:
     Telegram DMs, edit-in-place elsewhere).  Reasoning/think-block content is
     filtered upstream and never arrives as a MessageChunk.
     """
+
     text: str
 
 
@@ -65,6 +66,7 @@ class MessageStop:
     the consumer finalizes the current bubble and prepares a new segment without
     treating the turn as done.
     """
+
     final: bool = False
 
 
@@ -76,6 +78,7 @@ class Commentary:
     call.  Unlike a MessageChunk this is already-complete text (not a delta); the
     consumer renders it as its own message so it reads as a distinct beat.
     """
+
     text: str
 
 
@@ -91,6 +94,7 @@ class ToolCallChunk:
     don't show tool chrome).  Previously the agent's gateway callback baked the
     emoji + preview formatting in; that decision now belongs to the adapter.
     """
+
     tool_name: str
     preview: str | None = None
     args: dict[str, Any] | None = None
@@ -110,6 +114,7 @@ class ToolCallFinished:
     long tool run).  No tool *output* travels here — output is the agent's
     concern and is persisted to history, not streamed as presentation.
     """
+
     tool_name: str
     duration: float = 0.0
     ok: bool = True
@@ -127,6 +132,7 @@ class LongToolHint:
     event so the *gateway* owns the "should I surface this here?" decision rather
     than the agent.
     """
+
     tool_name: str = ""
     duration: float = 0.0
 
@@ -140,6 +146,7 @@ class GatewayNotice:
     human-readable default the base class renders when an adapter has no
     platform-specific treatment.
     """
+
     kind: str
     text: str = ""
     extra: dict[str, Any] = field(default_factory=dict)
@@ -160,12 +167,12 @@ StreamEvent = Union[
 
 
 __all__ = [
+    "Commentary",
+    "GatewayNotice",
+    "LongToolHint",
     "MessageChunk",
     "MessageStop",
-    "Commentary",
+    "StreamEvent",
     "ToolCallChunk",
     "ToolCallFinished",
-    "LongToolHint",
-    "GatewayNotice",
-    "StreamEvent",
 ]

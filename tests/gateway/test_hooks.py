@@ -307,7 +307,6 @@ class TestEmitCollect:
 
         def _handler(event_type, context):
             captured.append((event_type, context))
-            return None
 
         reg._handlers["agent:start"] = [_handler]
 

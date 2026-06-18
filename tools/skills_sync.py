@@ -25,9 +25,8 @@ import json
 import logging
 import os
 import shutil
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
-from typing import Dict, List, Tuple
 
 from agent.skill_utils import is_excluded_skill_path
 from hermes_constants import (
@@ -146,7 +145,7 @@ def _write_manifest(entries: dict[str, str]):
             atomic_replace(tmp_path, MANIFEST_FILE)
         except BaseException:
             try:
-                os.unlink(tmp_path)
+                Path(tmp_path).unlink()
             except OSError:
                 pass
             raise
@@ -445,7 +444,7 @@ def _backfill_optional_provenance(quiet: bool = False) -> list[str]:
             atomic_replace(tmp_path, lock_path)
         except BaseException:
             try:
-                os.unlink(tmp_path)
+                Path(tmp_path).unlink()
             except OSError:
                 pass
             raise
@@ -644,7 +643,7 @@ def _rmtree_writable(path: Path) -> None:
         # the parent as well as the failing path, then retry.
         for target in (os.path.dirname(fpath), fpath):
             try:
-                os.chmod(target, stat.S_IRWXU)
+                Path(target).chmod(stat.S_IRWXU)
             except OSError:
                 pass
         func(fpath)

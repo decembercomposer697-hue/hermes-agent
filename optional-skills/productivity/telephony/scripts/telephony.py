@@ -26,7 +26,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 from html import escape as xml_escape
 from pathlib import Path
@@ -577,7 +577,7 @@ def _twilio_set_default(identifier: str, *, save_env: bool = False) -> dict[str,
 
 
 def _twiml_say(message: str, voice: str) -> str:
-    return f"<Response><Say voice=\"{xml_escape(voice)}\">{xml_escape(message)}</Say></Response>"
+    return f'<Response><Say voice="{xml_escape(voice)}">{xml_escape(message)}</Say></Response>'
 
 
 def _twiml_play(audio_url: str) -> str:

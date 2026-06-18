@@ -25,7 +25,7 @@ import logging
 import os
 import threading
 import uuid
-from typing import Any, Dict, Optional
+from typing import Any
 
 # fal_client is imported lazily — see _load_fal_client(). Pulling it
 # eagerly added ~64 ms to every CLI cold start because
@@ -55,11 +55,12 @@ def _load_fal_client() -> Any:
     return fal_client
 
 
+import pathlib
+
 from tools.debug_helpers import DebugSession
 from tools.fal_common import (
     _extract_http_status,
     _ManagedFalSyncClient,
-    _normalize_fal_queue_url_format,
 )
 from tools.managed_tool_gateway import resolve_managed_tool_gateway
 from tools.tool_backend_helpers import (
@@ -612,7 +613,7 @@ def _looks_like_absolute_file_path(value: str) -> bool:
     lower = value.lower()
     if lower.startswith(("http://", "https://", "data:")):
         return False
-    if os.path.isabs(value):
+    if pathlib.Path(value).is_absolute():
         return True
     return len(value) >= 3 and value[1] == ":" and value[2] in {"/", "\\"}
 
@@ -853,7 +854,7 @@ def image_generate_tool(
 
     except Exception as e:
         generation_time = (datetime.datetime.now() - start_time).total_seconds()
-        error_msg = f"Error generating image: {str(e)}"
+        error_msg = f"Error generating image: {e!s}"
         logger.error("%s", error_msg, exc_info=True)
 
         response_data = {

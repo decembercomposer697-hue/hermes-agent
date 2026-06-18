@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import concurrent.futures
 import contextvars
+import pathlib
 import threading
 
 
@@ -162,7 +163,7 @@ def test_run_agent_concurrent_executor_wraps_submit_with_copy_context():
     for mod in (run_agent, tool_executor_module):
         src_path = inspect.getsourcefile(mod)
         assert src_path is not None
-        sources.append((src_path, open(src_path, encoding="utf-8").read()))
+        sources.append((src_path, pathlib.Path(src_path).open(encoding="utf-8").read()))
 
     submit_calls_in_agent: list[ast.Call] = []
     for _src_path, src_text in sources:
@@ -195,13 +196,7 @@ def test_run_agent_concurrent_executor_wraps_submit_with_copy_context():
             and len(call.args) >= 2
             and isinstance(call.args[1], ast.Name)
             and call.args[1].id == "_run_tool"
-        ):
-            tool_submits.append(("fixed", call))
-        # Fixed (shared helper): executor.submit(
-        #     propagate_context_to_thread(_run_tool), ...) — the helper in
-        # tools/thread_context.py does copy_context().run(...) internally and
-        # additionally propagates the thread-local approval/sudo callbacks.
-        elif (
+        ) or (
             isinstance(first, ast.Call)
             and isinstance(first.func, ast.Name)
             and first.func.id == "propagate_context_to_thread"

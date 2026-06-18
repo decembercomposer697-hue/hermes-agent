@@ -15,7 +15,7 @@ import time
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from hermes_cli.env_loader import load_hermes_dotenv
 from hermes_constants import (
@@ -58,8 +58,8 @@ def _panic_hook(exc_type, exc_value, exc_tb):
 
     trace = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
     try:
-        os.makedirs(os.path.dirname(_CRASH_LOG), exist_ok=True)
-        with open(_CRASH_LOG, "a", encoding="utf-8") as f:
+        Path(os.path.dirname(_CRASH_LOG)).mkdir(exist_ok=True, parents=True)
+        with Path(_CRASH_LOG).open("a", encoding="utf-8") as f:
             f.write(
                 f"\n=== unhandled exception · {time.strftime('%Y-%m-%d %H:%M:%S')} ===\n",
             )
@@ -90,8 +90,8 @@ def _thread_panic_hook(args):
         traceback.format_exception(args.exc_type, args.exc_value, args.exc_traceback),
     )
     try:
-        os.makedirs(os.path.dirname(_CRASH_LOG), exist_ok=True)
-        with open(_CRASH_LOG, "a", encoding="utf-8") as f:
+        Path(os.path.dirname(_CRASH_LOG)).mkdir(exist_ok=True, parents=True)
+        with Path(_CRASH_LOG).open("a", encoding="utf-8") as f:
             f.write(
                 f"\n=== thread exception · {time.strftime('%Y-%m-%d %H:%M:%S')} "
                 f"· thread={args.thread.name} ===\n",
@@ -714,13 +714,13 @@ def _profile_configured_cwd(profile_home: Path | None) -> str | None:
         p = Path(profile_home) / "config.yaml"
         if not p.exists():
             return None
-        with open(p, encoding="utf-8") as f:
+        with Path(p).open(encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
         raw = str((data.get("terminal") or {}).get("cwd") or "").strip()
         if not raw or raw in _CWD_PLACEHOLDERS:
             return None
         resolved = os.path.abspath(os.path.expanduser(raw))
-        return resolved if os.path.isdir(resolved) else None
+        return resolved if Path(resolved).is_dir() else None
     except Exception:
         return None
 
@@ -1044,7 +1044,7 @@ def _completion_cwd(params: dict | None = None) -> str:
     )
     try:
         resolved = os.path.abspath(os.path.expanduser(str(raw)))
-        if os.path.isdir(resolved):
+        if Path(resolved).is_dir():
             return resolved
     except Exception:
         pass
@@ -1204,7 +1204,7 @@ def _session_db(session: dict):
 
 def _set_session_cwd(session: dict, cwd: str) -> str:
     resolved = os.path.abspath(os.path.expanduser(str(cwd)))
-    if not os.path.isdir(resolved):
+    if not Path(resolved).is_dir():
         raise ValueError(f"working directory does not exist: {cwd}")
     session["cwd"] = resolved
     # An explicit user choice — persist it as the workspace (and let a later
@@ -1253,7 +1253,7 @@ def _load_cfg() -> dict:
             if _cfg_cache is not None and _cfg_mtime == mtime and _cfg_path == p:
                 return copy.deepcopy(_cfg_cache)
         if p.exists():
-            with open(p, encoding="utf-8") as f:
+            with Path(p).open(encoding="utf-8") as f:
                 data = yaml.safe_load(f) or {}
         else:
             data = {}
@@ -1272,7 +1272,7 @@ def _save_cfg(cfg: dict):
     import yaml
 
     path = _hermes_home / "config.yaml"
-    with open(path, "w", encoding="utf-8") as f:
+    with Path(path).open("w", encoding="utf-8") as f:
         yaml.safe_dump(cfg, f)
     with _cfg_lock:
         _cfg_cache = copy.deepcopy(cfg)
@@ -3598,7 +3598,7 @@ def _(rid, params: dict) -> dict:
     # workspace" instead of whatever folder the desktop launched in.
     raw_cwd = str(params.get("cwd") or "").strip()
     try:
-        explicit_cwd = bool(raw_cwd) and os.path.isdir(os.path.abspath(os.path.expanduser(raw_cwd)))
+        explicit_cwd = bool(raw_cwd) and Path(os.path.abspath(os.path.expanduser(raw_cwd))).is_dir()
     except Exception:
         explicit_cwd = False
     resolved_cwd = _completion_cwd(params)
@@ -4649,7 +4649,7 @@ def _(rid, params: dict) -> dict:
         )
 
     try:
-        with open(path, "w", encoding="utf-8") as f:
+        with Path(path).open("w", encoding="utf-8") as f:
             json.dump(
                 {
                     "model": getattr(agent, "model", ""),
@@ -5622,8 +5622,8 @@ def _run_prompt_submit(rid, sid: str, session: dict, text: Any) -> None:
 
             trace = traceback.format_exc()
             try:
-                os.makedirs(os.path.dirname(_CRASH_LOG), exist_ok=True)
-                with open(_CRASH_LOG, "a", encoding="utf-8") as f:
+                Path(os.path.dirname(_CRASH_LOG)).mkdir(exist_ok=True, parents=True)
+                with Path(_CRASH_LOG).open("a", encoding="utf-8") as f:
                     f.write(
                         f"\n=== turn-dispatcher exception · "
                         f"{time.strftime('%Y-%m-%d %H:%M:%S')} · sid={sid} ===\n",
@@ -6152,7 +6152,7 @@ def _decode_attachment_data_url(data_url: str) -> bytes:
     import re as _re
 
     cleaned = (data_url or "").strip()
-    m = _re.match(r"^data:[^;,]*(?:;[^;,=]+=[^;,]+)*;base64,(.*)$", cleaned, _re.DOTALL | _re.I)
+    m = _re.match(r"^data:[^;,]*(?:;[^;,=]+=[^;,]+)*;base64,(.*)$", cleaned, _re.DOTALL | _re.IGNORECASE)
     if m:
         cleaned = m.group(1)
     cleaned = _re.sub(r"\s+", "", cleaned)
@@ -6417,7 +6417,7 @@ def _(rid, params: dict) -> dict:
     # not blow up the whole restart — treat it as "no validated cwd".
     try:
         preview_cwd = os.path.abspath(os.path.expanduser(cwd)) if cwd else ""
-        if preview_cwd and not os.path.isdir(preview_cwd):
+        if preview_cwd and not Path(preview_cwd).is_dir():
             preview_cwd = ""
     except Exception:
         preview_cwd = ""
@@ -6574,7 +6574,7 @@ def _(rid, params: dict) -> dict:
                     session,
                     value,
                     confirm_expensive_model=bool(
-                        params.get("confirm_expensive_model", False),
+                        params.get("confirm_expensive_model"),
                     ),
                 )
             else:
@@ -6583,7 +6583,7 @@ def _(rid, params: dict) -> dict:
                     {"agent": None},
                     value,
                     confirm_expensive_model=bool(
-                        params.get("confirm_expensive_model", False),
+                        params.get("confirm_expensive_model"),
                     ),
                 )
             return _ok(
@@ -6964,7 +6964,7 @@ def _(rid, params: dict) -> dict:
         if not raw:
             return _err(rid, 4002, "cwd required")
         cwd = os.path.abspath(os.path.expanduser(raw))
-        if not os.path.isdir(cwd):
+        if not Path(cwd).is_dir():
             return _err(rid, 4002, f"working directory does not exist: {raw}")
         _write_config_key("terminal.cwd", cwd)
         os.environ["TERMINAL_CWD"] = cwd
@@ -7250,7 +7250,7 @@ def _(rid, params: dict) -> dict:
         # reloading silently.  Users pass confirm=true either by
         # re-invoking after reading the warning, or by setting the
         # config key to false permanently.
-        user_confirm = bool(params.get("confirm", False))
+        user_confirm = bool(params.get("confirm"))
         if not user_confirm:
             try:
                 from hermes_cli.config import load_config as _load_config
@@ -7316,7 +7316,7 @@ def _(rid, params: dict) -> dict:
             )
 
         # Honor `always=true` by persisting the opt-out to config.
-        if bool(params.get("always", False)):
+        if bool(params.get("always")):
             try:
                 from cli import save_config_value as _save_cfg
 
@@ -7796,8 +7796,7 @@ def _(rid, params: dict) -> dict:
                 n = int(arg_str.split()[0])
             except (ValueError, IndexError):
                 return _err(rid, 4004, f"undo: invalid count {arg_str!r} — use /undo or /undo N")
-        if n < 1:
-            n = 1
+        n = max(n, 1)
         try:
             recents = db.list_recent_user_messages(session_key, limit=max(n, 10))
         except Exception as e:
@@ -8174,9 +8173,9 @@ def _(rid, params: dict) -> dict:
             match = os.path.basename(expanded)
 
         search_dir = (
-            search_dir if os.path.isabs(search_dir) else os.path.join(root, search_dir)
+            search_dir if Path(search_dir).is_absolute() else os.path.join(root, search_dir)
         )
-        if not os.path.isdir(search_dir):
+        if not Path(search_dir).is_dir():
             return _ok(rid, {"items": []})
 
         want_dir = prefix_tag == "folder"
@@ -8189,7 +8188,7 @@ def _(rid, params: dict) -> dict:
             if is_context and not prefix_tag and entry.startswith("."):
                 continue
             full = os.path.join(search_dir, entry)
-            is_dir = os.path.isdir(full)
+            is_dir = Path(full).is_dir()
             # Explicit `@folder:` / `@file:` — honour the user's filter.  Skip
             # the opposite kind instead of auto-rewriting the completion tag,
             # which used to defeat the prefix and let `@folder:` list files.
@@ -8247,8 +8246,7 @@ def _details_completions(text: str) -> list[dict] | None:
         return None
 
     body = text[len("/details") :]
-    if body.startswith(" "):
-        body = body[1:]
+    body = body.removeprefix(" ")
     parts = body.split()
     has_trailing_space = text.endswith(" ")
     sections = ("thinking", "tools", "subagents", "activity")
@@ -8590,7 +8588,7 @@ def _mirror_slash_side_effects(sid: str, session: dict, command: str) -> str:
         if name == "model" and arg and agent:
             result = _apply_model_switch(sid, session, arg)
             return result.get("warning", "")
-        elif name == "personality" and arg and agent:
+        if name == "personality" and arg and agent:
             pname, new_prompt = _validate_personality(arg, _load_cfg())
             _apply_personality_to_session(sid, session, new_prompt, pname)
         elif name == "prompt" and agent:

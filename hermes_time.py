@@ -14,8 +14,8 @@ crashes due to a bad timezone string.
 
 import logging
 import os
+import pathlib
 from datetime import datetime
-from typing import Optional
 
 from hermes_constants import get_config_path
 
@@ -50,7 +50,7 @@ def _resolve_timezone_name() -> str:
         import yaml
         config_path = get_config_path()
         if config_path.exists():
-            with open(config_path, encoding="utf-8") as f:
+            with pathlib.Path(config_path).open(encoding="utf-8") as f:
                 cfg = yaml.safe_load(f) or {}
             tz_cfg = cfg.get("timezone", "")
             if isinstance(tz_cfg, str) and tz_cfg.strip():
@@ -112,5 +112,3 @@ def now() -> datetime:
         return datetime.now(tz)
     # No timezone configured — use server-local (still tz-aware)
     return datetime.now().astimezone()
-
-

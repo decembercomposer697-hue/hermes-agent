@@ -115,7 +115,6 @@ def test_create_task_appears_on_board(client):
 
 def test_scheduled_tasks_have_their_own_column_not_todo(client):
     """Scheduled/time-delay tasks must not be silently bucketed into todo."""
-
     task = client.post(
         "/api/plugins/kanban/tasks",
         json={"title": "wait for indexed data", "assignee": "ops"},
@@ -198,7 +197,6 @@ def test_dashboard_select_filters_use_sdk_value_change_handler():
     handler leaves the tenant dropdown visually selectable but never updates the
     filtered board query.
     """
-
     repo_root = Path(__file__).resolve().parents[2]
     bundle = repo_root / "plugins" / "kanban" / "dashboard" / "dist" / "index.js"
     js = bundle.read_text()
@@ -218,7 +216,6 @@ def test_dashboard_client_side_filtering_includes_tenant_filter():
     ``tenantFilter`` here, switching tenants can leave stale cards visible until a
     full reload finishes.
     """
-
     repo_root = Path(__file__).resolve().parents[2]
     bundle = repo_root / "plugins" / "kanban" / "dashboard" / "dist" / "index.js"
     js = bundle.read_text()
@@ -234,7 +231,6 @@ def test_dashboard_initial_board_uses_backend_current_when_unpinned():
     win, but an empty localStorage state must adopt the API's ``current`` board
     so multi-board installs do not look empty on first load.
     """
-
     repo_root = Path(__file__).resolve().parents[2]
     bundle = repo_root / "plugins" / "kanban" / "dashboard" / "dist" / "index.js"
     js = bundle.read_text()
@@ -1059,7 +1055,7 @@ def test_dashboard_surfaces_ready_blocked_error_inline():
 
     # Drag/drop banner now uses the parsed message instead of raw
     # ``err.message`` so it no longer leaks HTTP plumbing.
-    assert "setError(tx(t, \"moveFailed\", \"Move failed: \") + parseApiErrorMessage(err))" in bundle
+    assert 'setError(tx(t, "moveFailed", "Move failed: ") + parseApiErrorMessage(err))' in bundle
 
     # Drawer action row has its own visible error surface and clears it
     # on success/refresh so stale failures don't follow the operator
@@ -2224,9 +2220,9 @@ def test_dashboard_search_includes_body_and_result():
     repo_root = Path(__file__).resolve().parents[2]
     dist = (repo_root / "plugins" / "kanban" / "dashboard" / "dist" / "index.js").read_text()
 
-    assert "t.body || \"\"" in dist
-    assert "t.result || \"\"" in dist
-    assert "t.latest_summary || \"\"" in dist
+    assert 't.body || ""' in dist
+    assert 't.result || ""' in dist
+    assert 't.latest_summary || ""' in dist
 
 
 def test_dashboard_bulk_actions_include_reclaim_first():

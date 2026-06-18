@@ -6,6 +6,7 @@ coerce_tool_args() fixes these type mismatches by comparing argument values
 against the tool's JSON Schema before dispatch.
 """
 
+import math
 from unittest.mock import patch
 
 from model_tools import (
@@ -33,7 +34,7 @@ class TestCoerceNumber:
         assert isinstance(_coerce_number("0"), int)
 
     def test_float_string(self):
-        assert _coerce_number("3.14") == 3.14
+        assert _coerce_number("3.14") == math.pi
         assert isinstance(_coerce_number("3.14"), float)
 
     def test_float_with_zero_fractional(self):
@@ -121,7 +122,7 @@ class TestCoerceValue:
         assert _coerce_value("5", "integer") == 5
 
     def test_number_type(self):
-        assert _coerce_value("3.14", "number") == 3.14
+        assert _coerce_value("3.14", "number") == math.pi
 
     def test_boolean_type(self):
         assert _coerce_value("true", "boolean") is True

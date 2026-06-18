@@ -27,9 +27,9 @@ import os
 import re
 import threading
 from collections.abc import Callable
-from datetime import UTC, datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, NamedTuple, Optional, Set
+from typing import Any, NamedTuple
 
 from hermes_constants import get_hermes_home
 from tools import skill_usage
@@ -850,7 +850,7 @@ def _reconcile_classification(
                 # Explicit prune declaration
                 pruned.append({
                     "name": name,
-                    "source": "absorbed_into=\"\" (model-declared prune)",
+                    "source": 'absorbed_into="" (model-declared prune)',
                     "reason": (mp.get("reason") or "") if mp else "",
                 })
                 continue
@@ -1769,7 +1769,7 @@ def _run_llm_review(prompt: str) -> dict[str, Any]:
         # terminal. The background-thread runner also hides it; this
         # belt-and-suspenders path matters when a caller invokes
         # run_curator_review(synchronous=True) from the CLI.
-        with open(os.devnull, "w", encoding="utf-8") as _devnull, \
+        with Path(os.devnull).open("w", encoding="utf-8") as _devnull, \
              contextlib.redirect_stdout(_devnull), \
              contextlib.redirect_stderr(_devnull):
             conv_result = review_agent.run_conversation(user_message=prompt)

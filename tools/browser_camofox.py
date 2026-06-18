@@ -29,9 +29,10 @@ import base64
 import json
 import logging
 import os
+import pathlib
 import threading
 import uuid
-from typing import Any, Dict, Optional
+from typing import Any
 from urllib.parse import SplitResult, urlsplit, urlunsplit
 
 import requests
@@ -701,8 +702,7 @@ def camofox_vision(question: str, annotate: bool = False,
         screenshots_dir.mkdir(parents=True, exist_ok=True)
         screenshot_path = str(screenshots_dir / f"browser_screenshot_{uuid.uuid4().hex[:8]}.png")
 
-        with open(screenshot_path, "wb") as f:
-            f.write(resp.content)
+        pathlib.Path(screenshot_path).write_bytes(resp.content)
 
         # Encode for vision LLM
         img_b64 = base64.b64encode(resp.content).decode("utf-8")
@@ -789,6 +789,3 @@ def camofox_console(clear: bool = False, task_id: str | None = None) -> str:
         "note": "Console log capture is not available with the Camofox backend. "
                 "Use browser_snapshot or browser_vision to inspect page state.",
     })
-
-
-

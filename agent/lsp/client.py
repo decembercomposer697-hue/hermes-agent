@@ -47,7 +47,7 @@ import os
 import sys
 from collections.abc import Awaitable, Callable
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 from urllib.parse import quote, unquote
 
 from agent.lsp.protocol import (
@@ -935,10 +935,10 @@ def _diagnostic_key(d: dict[str, Any]) -> str:
 
 
 __all__ = [
+    "DIAGNOSTICS_DOCUMENT_WAIT",
+    "DIAGNOSTICS_FULL_WAIT",
+    "INITIALIZE_TIMEOUT",
     "LSPClient",
     "file_uri",
     "uri_to_path",
-    "INITIALIZE_TIMEOUT",
-    "DIAGNOSTICS_DOCUMENT_WAIT",
-    "DIAGNOSTICS_FULL_WAIT",
 ]

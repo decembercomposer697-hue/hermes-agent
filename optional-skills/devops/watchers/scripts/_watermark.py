@@ -25,7 +25,7 @@ import json
 import os
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 def _state_dir() -> Path:
@@ -112,7 +112,7 @@ class Watermark:
             json.dumps(self._data, indent=2, sort_keys=True),
             encoding="utf-8",
         )
-        os.replace(tmp, self._path)
+        Path(tmp).replace(self._path)
 
 
 def format_items_as_markdown(

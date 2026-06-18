@@ -57,7 +57,7 @@ import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 from hermes_constants import get_hermes_home, secure_parent_dir
 

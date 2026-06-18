@@ -44,7 +44,7 @@ import types
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any
 
 from hermes_cli.config import cfg_get
 from hermes_cli.middleware import OBSERVER_SCHEMA_VERSION, VALID_MIDDLEWARE
@@ -63,6 +63,7 @@ def get_bundled_plugins_dir() -> Path:
     if env_override:
         return Path(env_override)
     return Path(__file__).resolve().parent.parent / "plugins"
+
 
 try:
     import yaml
@@ -1217,7 +1218,7 @@ class PluginManager:
                 loaded = LoadedPlugin(manifest=manifest, enabled=False)
                 loaded.error = (
                     f"not enabled in config (run `hermes plugins enable {lookup_key}` to activate)"
-                    
+
                 )
                 self._plugins[lookup_key] = loaded
                 logger.debug(

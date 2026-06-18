@@ -284,8 +284,7 @@ def check_deps(
 
     # ---- 1. Required nodes ----
     required_nodes: set[str] = set()
-    for _, node in iter_nodes(workflow):
-        required_nodes.add(node["class_type"])
+    required_nodes.update(node["class_type"] for _, node in iter_nodes(workflow))
 
     object_info_url = resolve_url(base, "/object_info", is_cloud=is_cloud)
     installed_nodes, obj_err = fetch_object_info(object_info_url, headers)

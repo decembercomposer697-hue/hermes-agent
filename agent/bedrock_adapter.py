@@ -32,7 +32,7 @@ import logging
 import os
 import re
 from types import SimpleNamespace
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -468,7 +468,7 @@ def _convert_content_to_converse(content) -> list[dict]:
             part_type = part.get("type", "")
             if part_type == "text":
                 text = part.get("text", "")
-                blocks.append({"text": text if text else " "})
+                blocks.append({"text": text or " "})
             elif part_type == "image_url":
                 image_url = part.get("image_url", {})
                 url = image_url.get("url", "") if isinstance(image_url, dict) else ""
@@ -490,7 +490,7 @@ def _convert_content_to_converse(content) -> list[dict]:
                     # Remote URL — Converse doesn't support URLs directly,
                     # include as text reference for the model.
                     blocks.append({"text": f"[Image: {url}]"})
-        return blocks if blocks else [{"text": " "}]
+        return blocks or [{"text": " "}]
     return [{"text": str(content)}]
 
 
@@ -610,7 +610,7 @@ def convert_messages_to_converse(
     if converse_msgs and converse_msgs[-1]["role"] != "user":
         converse_msgs.append({"role": "user", "content": [{"text": " "}]})
 
-    return (system_blocks if system_blocks else None, converse_msgs)
+    return (system_blocks or None, converse_msgs)
 
 
 # ---------------------------------------------------------------------------
@@ -675,7 +675,7 @@ def normalize_converse_response(response: dict) -> SimpleNamespace:
     msg = SimpleNamespace(
         role="assistant",
         content="\n".join(text_parts) if text_parts else None,
-        tool_calls=tool_calls if tool_calls else None,
+        tool_calls=tool_calls or None,
         reasoning_content="\n\n".join(reasoning_parts) if reasoning_parts else None,
     )
 
@@ -845,7 +845,7 @@ def stream_converse_with_callbacks(
     msg = SimpleNamespace(
         role="assistant",
         content="\n".join(text_parts) if text_parts else None,
-        tool_calls=tool_calls if tool_calls else None,
+        tool_calls=tool_calls or None,
         reasoning_content="\n\n".join(reasoning_parts) if reasoning_parts else None,
     )
 
@@ -1172,6 +1172,8 @@ def _extract_provider_from_arn(arn: str) -> str:
     """
     match = re.search(r"foundation-model/([^.]+)", arn)
     return match.group(1) if match else ""
+
+
 # ---------------------------------------------------------------------------
 # Error classification — Bedrock-specific exceptions
 # ---------------------------------------------------------------------------

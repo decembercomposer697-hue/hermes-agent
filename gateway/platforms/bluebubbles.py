@@ -12,11 +12,12 @@ import asyncio
 import json
 import logging
 import os
+import pathlib
 import re
 import uuid
 from collections import OrderedDict
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 from urllib.parse import quote
 
 import httpx
@@ -97,7 +98,7 @@ def _normalize_server_url(raw: str) -> str:
     value = (raw or "").strip()
     if not value:
         return ""
-    if not re.match(r"^https?://", value, flags=re.I):
+    if not re.match(r"^https?://", value, flags=re.IGNORECASE):
         value = f"http://{value}"
     return value.rstrip("/")
 
@@ -373,13 +374,12 @@ class BlueBubblesAdapter(BasePlatformAdapter):
                     self._webhook_register_url_for_log,
                 )
                 return True
-            else:
-                logger.warning(
-                    "[bluebubbles] webhook registration returned status %s: %s",
-                    status,
-                    res.get("message"),
-                )
-                return False
+            logger.warning(
+                "[bluebubbles] webhook registration returned status %s: %s",
+                status,
+                res.get("message"),
+            )
+            return False
         except Exception as exc:
             logger.warning(
                 "[bluebubbles] failed to register webhook with server: %s",
@@ -561,7 +561,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
         """Send a file attachment via BlueBubbles multipart upload."""
         if not self.client:
             return SendResult(success=False, error="Not connected")
-        if not os.path.isfile(file_path):
+        if not pathlib.Path(file_path).is_file():
             return SendResult(success=False, error=f"File not found: {file_path}")
 
         guid = await self._resolve_chat_guid(chat_id)
@@ -570,7 +570,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
 
         fname = filename or os.path.basename(file_path)
         try:
-            with open(file_path, "rb") as f:
+            with pathlib.Path(file_path).open("rb") as f:
                 files = {"attachment": (fname, f, "application/octet-stream")}
                 data: dict[str, str] = {
                     "chatGuid": guid,

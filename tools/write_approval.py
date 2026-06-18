@@ -44,11 +44,10 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import time
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from hermes_constants import get_hermes_home
 
@@ -146,7 +145,7 @@ def stage_write(subsystem: str, payload: dict[str, Any],
         path = d / f"{pid}.json"
         tmp = path.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
-        os.replace(tmp, path)
+        Path(tmp).replace(path)
     except Exception as e:  # pragma: no cover - disk failure path
         logger.error("Failed to stage pending %s write: %s", subsystem, e, exc_info=True)
     return record
@@ -242,7 +241,7 @@ class GateDecision:
         user-facing "staged for approval" note.
     """
 
-    __slots__ = ("allow", "blocked", "stage", "message")
+    __slots__ = ("allow", "blocked", "message", "stage")
 
     def __init__(self, *, allow=False, blocked=False, stage=False, message=""):
         self.allow = allow
@@ -363,7 +362,7 @@ def _prompt_inline_memory_approval(summary: str, detail: str) -> bool | None:
     header = summary.strip() or "Save to memory?"
     body = detail.strip()
     description = f"Save to memory: {header}"
-    command = body if body else header
+    command = body or header
     # Invoke the callback directly instead of via prompt_dangerous_approval:
     # that wrapper swallows callback exceptions into "deny", which would
     # silently refuse the write. Direct invocation lets a crashed prompt fall

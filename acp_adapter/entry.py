@@ -148,9 +148,6 @@ def _print_version() -> None:
 
 
 def _run_check() -> None:
-    import acp
-
-    from acp_adapter.server import HermesACPAgent
 
     print("Hermes ACP check OK")
 

@@ -55,7 +55,7 @@ class TestCacheDocumentFromBytes:
     def test_basic_caching(self):
         data = b"hello world"
         path = cache_document_from_bytes(data, "test.txt")
-        assert os.path.exists(path)
+        assert Path(path).exists()
         assert Path(path).read_bytes() == data
 
     def test_filename_preserved_in_path(self):
@@ -176,7 +176,7 @@ class TestCacheMediaBytes:
         assert result.kind == "document"
         assert result.media_type == "application/pdf"
         assert "report.pdf" in result.display_name
-        assert os.path.exists(result.path)
+        assert Path(result.path).exists()
         assert "report.pdf" in result.context_note()
 
     def test_png_routes_to_image(self):
@@ -185,7 +185,7 @@ class TestCacheMediaBytes:
         assert result is not None
         assert result.kind == "image"
         assert result.media_type == "image/png"
-        assert os.path.exists(result.path)
+        assert Path(result.path).exists()
 
     def test_native_photo_without_filename_uses_default_kind(self):
         from gateway.platforms.base import cache_media_bytes

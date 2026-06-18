@@ -41,7 +41,7 @@ Design notes / invariants honored:
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 #: Default number of recent exchanges to preserve verbatim when the user
 #: runs ``/compress here`` without an explicit count.
@@ -142,8 +142,7 @@ def split_history_for_partial_compress(
     ``(history, [])`` — signaling the caller to fall back to full
     compression or report "nothing to do".
     """
-    if keep_last < 1:
-        keep_last = 1
+    keep_last = max(keep_last, 1)
 
     n = len(history)
     if n == 0:

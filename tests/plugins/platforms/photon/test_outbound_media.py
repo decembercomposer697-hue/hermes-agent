@@ -8,8 +8,8 @@ without spawning Node or binding ports.
 """
 from __future__ import annotations
 
-import os
-from typing import Any, Dict, List, Tuple
+import pathlib
+from typing import Any
 
 import pytest
 
@@ -50,7 +50,7 @@ def _patch_safe_path(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         PhotonAdapter,
         "validate_media_delivery_path",
-        staticmethod(lambda p: p if os.path.exists(p) else None),
+        staticmethod(lambda p: p if pathlib.Path(p).exists() else None),
     )
 
 

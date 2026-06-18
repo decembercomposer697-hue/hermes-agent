@@ -30,7 +30,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms.base import (
@@ -98,7 +98,7 @@ def _is_automated_sender(address: str, headers: dict) -> bool:
         if value and check(value):
             return True
     return False
-    
+
 
 def check_email_requirements() -> bool:
     """Check if email platform dependencies are available."""
@@ -150,15 +150,14 @@ def _extract_text_body(msg: email_lib.message.Message) -> str:
                     html = payload.decode(charset, errors="replace")
                     return _strip_html(html)
         return ""
-    else:
-        payload = msg.get_payload(decode=True)
-        if payload:
-            charset = msg.get_content_charset() or "utf-8"
-            text = payload.decode(charset, errors="replace")
-            if msg.get_content_type() == "text/html":
-                return _strip_html(text)
-            return text
-        return ""
+    payload = msg.get_payload(decode=True)
+    if payload:
+        charset = msg.get_content_charset() or "utf-8"
+        text = payload.decode(charset, errors="replace")
+        if msg.get_content_type() == "text/html":
+            return _strip_html(text)
+        return text
+    return ""
 
 
 def _strip_html(html: str) -> str:
@@ -167,10 +166,10 @@ def _strip_html(html: str) -> str:
     text = re.sub(r"<p[^>]*>", "\n", text, flags=re.IGNORECASE)
     text = re.sub(r"</p>", "\n", text, flags=re.IGNORECASE)
     text = re.sub(r"<[^>]+>", "", text)
-    text = re.sub(r"&nbsp;", " ", text)
-    text = re.sub(r"&amp;", "&", text)
-    text = re.sub(r"&lt;", "<", text)
-    text = re.sub(r"&gt;", ">", text)
+    text = text.replace(r"&nbsp;", " ")
+    text = text.replace(r"&amp;", "&")
+    text = text.replace(r"&lt;", "<")
+    text = text.replace(r"&gt;", ">")
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
 
@@ -662,7 +661,7 @@ class EmailAdapter(BasePlatformAdapter):
         for file_path in file_paths:
             p = Path(file_path)
             try:
-                with open(p, "rb") as f:
+                with Path(p).open("rb") as f:
                     part = MIMEBase("application", "octet-stream")
                     part.set_payload(f.read())
                     encoders.encode_base64(part)
@@ -743,7 +742,7 @@ class EmailAdapter(BasePlatformAdapter):
         # Attach file
         p = Path(file_path)
         fname = file_name or p.name
-        with open(p, "rb") as f:
+        with Path(p).open("rb") as f:
             part = MIMEBase("application", "octet-stream")
             part.set_payload(f.read())
             encoders.encode_base64(part)

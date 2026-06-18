@@ -4,12 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
-from typing import Optional
 
 from agent.models_dev import ModelInfo
 
-INPUT_COST_WARNING_THRESHOLD = Decimal("20")
-OUTPUT_COST_WARNING_THRESHOLD = Decimal("100")
+INPUT_COST_WARNING_THRESHOLD = Decimal(20)
+OUTPUT_COST_WARNING_THRESHOLD = Decimal(100)
 GPT55_PRO_OPENROUTER_ID = "openai/gpt-5.5-pro"
 GPT55_SUGGESTION = "did you mean to select openai/gpt-5.5?"
 

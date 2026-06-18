@@ -19,7 +19,7 @@ import time
 import uuid
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 REALTIME_URL = "wss://api.openai.com/v1/realtime"
 
@@ -146,7 +146,7 @@ class RealtimeSession:
         sink_fp = None
         if self.audio_sink_path is not None:
             self.audio_sink_path.parent.mkdir(parents=True, exist_ok=True)
-            sink_fp = open(self.audio_sink_path, "ab")
+            sink_fp = Path(self.audio_sink_path).open("ab")
 
         try:
             while True:
@@ -292,7 +292,7 @@ class RealtimeSpeaker:
             return
         self.processed_path.parent.mkdir(parents=True, exist_ok=True)
         record = {"id": entry.get("id"), "text": entry.get("text", ""), "result": result}
-        with open(self.processed_path, "a", encoding="utf-8") as fp:
+        with Path(self.processed_path).open("a", encoding="utf-8") as fp:
             fp.write(json.dumps(record) + "\n")
 
     # ── main loop ────────────────────────────────────────────────────────

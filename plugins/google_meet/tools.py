@@ -14,7 +14,7 @@ Tools:
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, Optional
+from typing import Any
 
 from plugins.google_meet import process_manager as pm
 
@@ -254,7 +254,7 @@ def handle_meet_join(args: dict[str, Any], **_kw) -> str:
                 url=url,
                 guest_name=str(args.get("guest_name") or "Hermes Agent"),
                 duration=str(args.get("duration")) if args.get("duration") else None,
-                headed=bool(args.get("headed", False)),
+                headed=bool(args.get("headed")),
                 mode=mode,
             )
             return _json({"success": bool(res.get("ok")), "node": node_name, **res})
@@ -270,7 +270,7 @@ def handle_meet_join(args: dict[str, Any], **_kw) -> str:
         )
     res = pm.start(
         url=url,
-        headed=bool(args.get("headed", False)),
+        headed=bool(args.get("headed")),
         guest_name=str(args.get("guest_name") or "Hermes Agent"),
         duration=str(args.get("duration")) if args.get("duration") else None,
         mode=mode,
