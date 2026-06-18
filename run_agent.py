@@ -502,7 +502,7 @@ class AIAgent:
 
             self._session_db = SessionDB()
             return self._session_db
-        except Exception as exc:
+        except Exception:
             logger.debug("SessionDB unavailable for recall", exc_info=True)
             return None
 
@@ -556,13 +556,13 @@ class AIAgent:
         if old_session_id and previous_messages is not None and hasattr(engine, "on_session_end"):
             try:
                 engine.on_session_end(old_session_id, previous_messages)
-            except Exception as exc:
+            except Exception:
                 logger.debug("context engine on_session_end during transition: %s", exc)
 
         if reset_engine and hasattr(engine, "on_session_reset"):
             try:
                 engine.on_session_reset()
-            except Exception as exc:
+            except Exception:
                 logger.debug("context engine on_session_reset during transition: %s", exc)
 
         should_start = bool(
@@ -585,7 +585,7 @@ class AIAgent:
             start_context = {k: v for k, v in start_context.items() if v not in (None, "")}
             try:
                 engine.on_session_start(target_session_id, **start_context)
-            except Exception as exc:
+            except Exception:
                 logger.debug("context engine on_session_start during transition: %s", exc)
 
         if (
@@ -596,7 +596,7 @@ class AIAgent:
         ):
             try:
                 engine.carry_over_new_session_context(old_session_id, target_session_id)
-            except Exception as exc:
+            except Exception:
                 logger.debug("context engine carry_over_new_session_context during transition: %s", exc)
 
     def reset_session_state(
@@ -3538,7 +3538,7 @@ class AIAgent:
                 force_closed,
                 self._client_log_context(),
             )
-        except Exception as exc:
+        except Exception:
             logger.debug(
                 "OpenAI client close failed (%s, shared=%s) %s error=%s",
                 reason,
@@ -3552,7 +3552,7 @@ class AIAgent:
             old_client = getattr(self, "client", None)
             try:
                 new_client = self._create_openai_client(self._client_kwargs, reason=reason, shared=True)
-            except Exception as exc:
+            except Exception:
                 logger.warning(
                     "Failed to rebuild shared OpenAI client (%s) %s error=%s",
                     reason,
@@ -3671,7 +3671,7 @@ class AIAgent:
                 shutdown_count,
                 self._client_log_context(),
             )
-        except Exception as exc:
+        except Exception:
             logger.debug(
                 "OpenAI client abort failed (%s, shared=False) %s error=%s",
                 reason,
@@ -3718,7 +3718,7 @@ class AIAgent:
                 singleton_now = resolve_xai_oauth_runtime_credentials(
                     refresh_if_expiring=False,
                 )
-        except Exception as exc:
+        except Exception:
             logger.debug("%s singleton read failed: %s", self.provider, exc)
             return False
 
@@ -3742,7 +3742,7 @@ class AIAgent:
                 from hermes_cli.auth import resolve_xai_oauth_runtime_credentials
 
                 creds = resolve_xai_oauth_runtime_credentials(force_refresh=force)
-        except Exception as exc:
+        except Exception:
             logger.debug("%s credential refresh failed: %s", self.provider, exc)
             return False
 
@@ -3778,7 +3778,7 @@ class AIAgent:
                 timeout_seconds=float(os.getenv("HERMES_NOUS_TIMEOUT_SECONDS", "15")),
                 force_refresh=force,
             )
-        except Exception as exc:
+        except Exception:
             logger.debug("Nous credential refresh failed: %s", exc)
             return False
 
@@ -3816,7 +3816,7 @@ class AIAgent:
             from hermes_cli.copilot_auth import resolve_copilot_token
 
             new_token, token_source = resolve_copilot_token()
-        except Exception as exc:
+        except Exception:
             logger.debug("Copilot credential refresh failed: %s", exc)
             return False
 
@@ -3853,7 +3853,7 @@ class AIAgent:
             from agent.anthropic_adapter import resolve_anthropic_token, build_anthropic_client
 
             new_token = resolve_anthropic_token()
-        except Exception as exc:
+        except Exception:
             logger.debug("Anthropic credential refresh failed: %s", exc)
             return False
 
@@ -3874,7 +3874,7 @@ class AIAgent:
                 getattr(self, "_anthropic_base_url", None),
                 timeout=get_provider_request_timeout(self.provider, self.model),
             )
-        except Exception as exc:
+        except Exception:
             logger.warning("Failed to rebuild Anthropic client after credential refresh: %s", exc)
             return False
 
