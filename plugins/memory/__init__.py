@@ -179,6 +179,8 @@ def discover_memory_providers() -> List[Tuple[str, str, bool]]:
 
     return results
 
+if TYPE_CHECKING:
+    from plugins.memory.base import MemoryProvider
 
 def load_memory_provider(name: str) -> Optional["MemoryProvider"]:
     """Load and return a MemoryProvider instance by name.
