@@ -68,7 +68,7 @@ logger = logging.getLogger(__name__)
 # module — so the patched name still references the same proxy instance.
 
 if TYPE_CHECKING:
-    from firecrawl import Firecrawl as FirecrawlSDK  # noqa: F401 — type hints only
+    from firecrawl import Firecrawl as FirecrawlSDK
 
 _FIRECRAWL_CLS_CACHE: Optional[type] = None
 
@@ -83,7 +83,7 @@ def _load_firecrawl_cls() -> type:
             _lazy_ensure("search.firecrawl", prompt=False)
         except ImportError:
             pass
-        except Exception as exc:  # noqa: BLE001 — surface install hint
+        except Exception as exc:
             raise ImportError(str(exc))
         from firecrawl import Firecrawl as _cls  # noqa: WPS433 — deliberately lazy
 
@@ -290,13 +290,13 @@ def _to_plain_object(value: Any) -> Any:
     if hasattr(value, "model_dump"):
         try:
             return value.model_dump()
-        except Exception:  # noqa: BLE001
+        except Exception:
             pass
 
     if hasattr(value, "__dict__"):
         try:
             return {k: v for k, v in value.__dict__.items() if not k.startswith("_")}
-        except Exception:  # noqa: BLE001
+        except Exception:
             pass
 
     return value
@@ -413,7 +413,7 @@ class FirecrawlWebSearchProvider(WebSearchProvider):
             web_results = _extract_web_search_results(response)
             logger.info("Firecrawl: found %d search results", len(web_results))
             return {"success": True, "data": {"web": web_results}}
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.warning("Firecrawl search error: %s", exc)
             return {"success": False, "error": f"Firecrawl search failed: {exc}"}
 
@@ -562,7 +562,7 @@ class FirecrawlWebSearchProvider(WebSearchProvider):
                         "metadata": metadata,
                     }
                 )
-            except Exception as scrape_err:  # noqa: BLE001
+            except Exception as scrape_err:
                 logger.debug("Firecrawl scrape failed for %s: %s", url, scrape_err)
                 results.append(
                     {

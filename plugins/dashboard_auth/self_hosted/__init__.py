@@ -315,7 +315,7 @@ class SelfHostedOIDCProvider(DashboardAuthProvider):
                 headers={"Accept": "application/json"},
                 timeout=_TOKEN_ENDPOINT_TIMEOUT_SEC,
             )
-        except Exception as exc:  # noqa: BLE001 — best-effort
+        except Exception as exc:
             logger.debug("self-hosted OIDC: revoke failed (ignored): %s", exc)
         return None
 
@@ -642,7 +642,7 @@ def _load_config_oauth_section() -> dict:
         from hermes_cli.config import cfg_get, load_config
 
         cfg = load_config()
-    except Exception as exc:  # noqa: BLE001 — broad catch is intentional
+    except Exception as exc:
         logger.debug(
             "dashboard-auth-self-hosted: load_config() raised %s; "
             "falling back to env-only configuration",

@@ -9,7 +9,7 @@ integration (install on join, play routing, ack) is tested with the standard
 
 import os
 import sys
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -26,7 +26,7 @@ _DISCORD_DIR = os.path.join(
 if _DISCORD_DIR not in sys.path:
     sys.path.insert(0, _DISCORD_DIR)
 
-import voice_mixer as vm  # noqa: E402
+import voice_mixer as vm
 
 
 # =====================================================================

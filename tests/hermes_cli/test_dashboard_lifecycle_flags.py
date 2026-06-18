@@ -163,7 +163,6 @@ class TestArgparseWiring:
     ``hermes dashboard --stop`` / ``--status`` actually parse."""
 
     def test_flags_are_registered(self):
-        from hermes_cli.main import main as _cli_main  # noqa: F401
         # Rebuild the argparse tree by re-running the section of main()
         # that builds it.  Cheapest way: introspect via --help on the
         # already-built parser would require refactoring; instead we

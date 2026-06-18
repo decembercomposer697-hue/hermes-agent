@@ -35,7 +35,7 @@ def _ensure_telegram_mock():
 
 _ensure_telegram_mock()
 
-from gateway.platforms.telegram import (  # noqa: E402
+from gateway.platforms.telegram import (
     TelegramAdapter,
     _escape_mdv2,
     _strip_mdv2,

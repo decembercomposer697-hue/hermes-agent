@@ -31,7 +31,6 @@ def minimax_profile(request):
     if someone later replaces the registered class with a plain
     ``ProviderProfile``, every assertion below collapses.
     """
-    import model_tools  # noqa: F401  -- triggers plugin discovery
     import providers
 
     profile = providers.get_provider_profile(request.param)
@@ -69,7 +68,6 @@ class TestMinimaxAuxModelM3:
     def test_profile_advertises_expected_aux_model(
         self, provider_id, expected
     ):
-        import model_tools  # noqa: F401
         import providers
 
         profile = providers.get_provider_profile(provider_id)
@@ -108,7 +106,6 @@ class TestMinimaxAuxModelNotHighspeed:
 
     @pytest.mark.parametrize("provider_id", ["minimax", "minimax-cn", "minimax-oauth"])
     def test_default_aux_model_is_not_highspeed(self, provider_id):
-        import model_tools  # noqa: F401
         import providers
 
         profile = providers.get_provider_profile(provider_id)

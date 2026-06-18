@@ -13,7 +13,6 @@ from collections import deque
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
-import pytest
 
 
 # ---------------------------------------------------------------------------
@@ -39,7 +38,7 @@ def _stub_mautrix():
 
 _stub_mautrix()
 
-from gateway.platforms.matrix import MatrixAdapter, _MatrixApprovalPrompt  # noqa: E402
+from gateway.platforms.matrix import MatrixAdapter, _MatrixApprovalPrompt
 
 
 # ---------------------------------------------------------------------------

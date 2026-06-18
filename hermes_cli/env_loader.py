@@ -271,7 +271,7 @@ def _apply_external_secret_sources(home_path: Path) -> None:
 
     try:
         cfg = _load_secrets_config(home_path)
-    except Exception:  # noqa: BLE001 — config errors must not block startup
+    except Exception:
         return
 
     bw_cfg = (cfg or {}).get("bitwarden") or {}
@@ -339,6 +339,6 @@ def _load_secrets_config(home_path: Path) -> dict:
     try:
         with open(config_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
-    except Exception:  # noqa: BLE001
+    except Exception:
         return {}
     return data.get("secrets") or {}

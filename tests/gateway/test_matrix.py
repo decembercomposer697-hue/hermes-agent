@@ -166,7 +166,7 @@ def _make_fake_mautrix():
     mautrix_crypto_store = types.ModuleType("mautrix.crypto.store")
 
     class MemoryCryptoStore:
-        def __init__(self, account_id="", pickle_key=""):  # noqa: S301
+        def __init__(self, account_id="", pickle_key=""):
             self.account_id = account_id
             self.pickle_key = pickle_key
 
@@ -191,7 +191,7 @@ def _make_fake_mautrix():
     class PgCryptoStore:
         upgrade_table = MagicMock()
 
-        def __init__(self, account_id="", pickle_key="", db=None):  # noqa: S301
+        def __init__(self, account_id="", pickle_key="", db=None):
             self.account_id = account_id
             self.pickle_key = pickle_key
             self.db = db
@@ -927,7 +927,7 @@ class TestMatrixRequirements:
         monkeypatch.delenv("MATRIX_ENCRYPTION", raising=False)
         from gateway.platforms.matrix import check_matrix_requirements
         try:
-            import mautrix  # noqa: F401
+            import mautrix
             assert check_matrix_requirements() is True
         except ImportError:
             with patch("tools.lazy_deps.ensure", side_effect=ImportError("mautrix unavailable")):
@@ -967,7 +967,7 @@ class TestMatrixRequirements:
         with patch.object(matrix_mod, "_check_e2ee_deps", return_value=False):
             # Still needs mautrix itself to be importable
             try:
-                import mautrix  # noqa: F401
+                import mautrix
                 assert matrix_mod.check_matrix_requirements() is True
             except ImportError:
                 with patch("tools.lazy_deps.ensure", side_effect=ImportError("mautrix unavailable")):
@@ -982,7 +982,7 @@ class TestMatrixRequirements:
         from gateway.platforms import matrix as matrix_mod
         with patch.object(matrix_mod, "_check_e2ee_deps", return_value=True):
             try:
-                import mautrix  # noqa: F401
+                import mautrix
                 assert matrix_mod.check_matrix_requirements() is True
             except ImportError:
                 with patch("tools.lazy_deps.ensure", side_effect=ImportError("mautrix unavailable")):

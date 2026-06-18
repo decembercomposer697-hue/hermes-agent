@@ -10,7 +10,6 @@ from agent.transports.types import NormalizedResponse
 
 @pytest.fixture
 def transport():
-    import agent.transports.codex  # noqa: F401
     return get_transport("codex_responses")
 
 

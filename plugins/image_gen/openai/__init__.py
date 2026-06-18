@@ -137,7 +137,7 @@ class OpenAIImageGenProvider(ImageGenProvider):
         if not os.environ.get("OPENAI_API_KEY"):
             return False
         try:
-            import openai  # noqa: F401
+            import openai
         except ImportError:
             return False
         return True

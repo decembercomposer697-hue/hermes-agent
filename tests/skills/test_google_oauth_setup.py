@@ -362,8 +362,8 @@ class TestInstallDeps:
         # google_auth_oauthlib may not be installed in the test env; only run
         # this assertion when the early-return path is actually reachable.
         try:
-            import googleapiclient  # noqa: F401
-            import google_auth_oauthlib  # noqa: F401
+            import googleapiclient
+            import google_auth_oauthlib
         except ImportError:
             pytest.skip("Google libs not installed in test env")
         assert module.install_deps() is True

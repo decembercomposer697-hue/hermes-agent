@@ -426,7 +426,6 @@ def test_x_search_honors_config_model_and_timeout(monkeypatch, tmp_path):
 
 def test_x_search_registered_in_registry_with_check_fn():
     """The tool is registered under the x_search toolset with the gating check_fn."""
-    import tools.x_search_tool  # noqa: F401 — ensures registration runs
     from tools.registry import registry
 
     entry = registry.get_entry("x_search")

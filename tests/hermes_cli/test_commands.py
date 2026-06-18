@@ -704,7 +704,6 @@ class TestSubcommandCompletion:
 
     def test_tools_enable_completes_toolset_names(self, monkeypatch):
         """`/tools enable ` should suggest currently-disabled toolsets."""
-        from hermes_cli import commands as commands_mod
 
         # `web` is enabled, `spotify` is disabled — enabling should only offer
         # the disabled ones.
@@ -1590,7 +1589,7 @@ class TestDiscordSkillCommands:
 # Discord skill commands grouped by category
 # ---------------------------------------------------------------------------
 
-from hermes_cli.commands import discord_skill_commands_by_category  # noqa: E402
+from hermes_cli.commands import discord_skill_commands_by_category
 
 
 class TestDiscordSkillCommandsByCategory:

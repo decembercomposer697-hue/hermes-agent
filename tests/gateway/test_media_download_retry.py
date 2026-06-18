@@ -532,11 +532,11 @@ def _ensure_slack_mock():
 
 _ensure_slack_mock()
 
-import gateway.platforms.slack as _slack_mod  # noqa: E402
+import gateway.platforms.slack as _slack_mod
 _slack_mod.SLACK_AVAILABLE = True
 
-from gateway.platforms.slack import SlackAdapter  # noqa: E402
-from gateway.config import PlatformConfig  # noqa: E402
+from gateway.platforms.slack import SlackAdapter
+from gateway.config import PlatformConfig
 
 
 def _make_slack_adapter():

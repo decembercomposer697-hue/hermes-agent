@@ -566,7 +566,7 @@ class PhotonAdapter(BasePlatformAdapter):
         env["PHOTON_SIDECAR_BIND"] = self._sidecar_bind
         env["PHOTON_SIDECAR_TOKEN"] = self._sidecar_token
 
-        self._sidecar_proc = subprocess.Popen(  # noqa: S603
+        self._sidecar_proc = subprocess.Popen(
             [self._node_bin, str(_SIDECAR_DIR / "index.mjs")],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -1036,9 +1036,9 @@ async def _standalone_send(
     chat_id: str,
     message: str,
     *,
-    thread_id: Optional[str] = None,  # noqa: ARG001 — Spectrum has no threads yet
+    thread_id: Optional[str] = None,
     media_files: Optional[list] = None,
-    force_document: bool = False,  # noqa: ARG001 — iMessage auto-detects file kind
+    force_document: bool = False,
 ) -> Dict[str, Any]:
     if not HTTPX_AVAILABLE:
         return {"error": "httpx not installed"}
