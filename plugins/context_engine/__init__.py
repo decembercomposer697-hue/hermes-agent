@@ -75,6 +75,8 @@ def discover_context_engines() -> List[Tuple[str, str, bool]]:
 
     return results
 
+if TYPE_CHECKING:
+    from plugins.context_engine.base import ContextEngine
 
 def load_context_engine(name: str) -> Optional["ContextEngine"]:
     """Load and return a ContextEngine instance by name.
